@@ -44,6 +44,11 @@ def employers_accounts_tag():
             "email": "demo.emplois+ai@inclusion.gouv.fr",
             "action_url": action_url,
         },
+        {
+            "title": "OPCS",
+            "email": "demo.emplois+opcs@inclusion.gouv.fr",
+            "action_url": action_url,
+        },
     ]
 
 

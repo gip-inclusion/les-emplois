@@ -298,5 +298,15 @@
     },
     "model": "account.emailaddress",
     "pk": 44
+  },
+  {
+    "fields": {
+      "email": "demo.emplois+opcs@inclusion.gouv.fr",
+      "primary": true,
+      "user": 128,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 45
   }
 ]

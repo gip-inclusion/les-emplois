@@ -431,5 +431,34 @@
     },
     "model": "companies.jobdescription",
     "pk": 15
+  },
+  {
+    "fields": {
+      "appellation": "16611",
+      "company": 3855,
+      "contract_type": "",
+      "created_at": "2026-08-17T11:24:12.563Z",
+      "creation_source": "MANUALLY",
+      "custom_name": "",
+      "description": "",
+      "field_history": [],
+      "hours_per_week": 20,
+      "is_active": true,
+      "is_qpv_mandatory": false,
+      "is_resume_mandatory": false,
+      "last_employer_update_at": "2026-08-17T11:24:12.563Z",
+      "location": null,
+      "market_context_description": "",
+      "open_positions": 1,
+      "other_contract_type": null,
+      "profile_description": "",
+      "source_id": null,
+      "source_kind": null,
+      "source_tags": null,
+      "source_url": null,
+      "ui_rank": 32767
+    },
+    "model": "companies.jobdescription",
+    "pk": 16
   }
 ]
