@@ -128,16 +128,6 @@ class JobApplicationAcceptedForProxyNotification(ProxyNotification):
     subject_template = "apply/email/accept_for_proxy_subject.txt"
     body_template = "apply/email/accept_for_proxy_body.txt"
 
-    def get_context(self):
-        context = super().get_context()
-        job_application = context["job_application"]
-        if job_application.sender_prescriber_organization:
-            # Include the survey link for all prescribers's organizations.
-            context["prescriber_survey_link"] = job_application.sender_prescriber_organization.accept_survey_url
-        else:
-            context["prescriber_survey_link"] = None
-        return context
-
 
 @notifications_registry.register
 class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
