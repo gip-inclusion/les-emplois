@@ -1128,6 +1128,15 @@ def test_end_of_iae_journey_filter_only_for_authorized_prescriber(client):
     assert response.context["page_obj"].object_list == [job_seeker]
 
 
+def test_end_of_iae_journey_filter_has_matomo_tracking(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    client.force_login(organization.members.first())
+
+    response = client.get(reverse("job_seekers_views:list"))
+    assertContains(response, 'data-matomo-option="filtre-fin-de-parcours-pass-iae"')
+    assertContains(response, 'data-matomo-option="filtre-fin-de-parcours-contrat-iae"')
+
+
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_suspended_approval_info_tooltip(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory()

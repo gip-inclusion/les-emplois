@@ -1,4 +1,5 @@
 {% load django_bootstrap5 %}
+{% load matomo %}
 
 {% if btn_dropdown_filter|default:False %}
     <div class="dropdown">
@@ -6,8 +7,8 @@
             Fin de parcours IAE à venir
         </button>
         <ul class="dropdown-menu">
-            <li>{% bootstrap_field filters_form.approval_ending_soon wrapper_class="dropdown-item" %}</li>
-            <li>{% bootstrap_field filters_form.contract_ending_soon wrapper_class="dropdown-item" %}</li>
+            <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-pass-iae" %}>{% bootstrap_field filters_form.approval_ending_soon wrapper_class="dropdown-item" %}</li>
+            <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-contrat-iae" %}>{% bootstrap_field filters_form.contract_ending_soon wrapper_class="dropdown-item" %}</li>
         </ul>
     </div>
 {% else %}
@@ -22,10 +23,10 @@
         </legend>
         <div class="my-3 collapse" id="collapseEndOfJourney">
             <ul>
-                <li>
+                <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-pass-iae" %}>
                     {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.approval_ending_soon wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
                 </li>
-                <li>
+                <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-contrat-iae" %}>
                     {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.contract_ending_soon wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
                 </li>
             </ul>
