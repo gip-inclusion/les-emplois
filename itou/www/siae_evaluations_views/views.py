@@ -643,6 +643,7 @@ def siae_job_applications_list(
             "job_application__approval",
         )
         .prefetch_related("evaluated_administrative_criteria")
+        .order_by("job_application__job_seeker__last_name")
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
