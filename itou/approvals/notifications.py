@@ -84,11 +84,6 @@ class PassAcceptedProfessionalNotification(ProfessionalNotification, EmailNotifi
     subject_template = "approvals/email/deliver_subject.txt"
     body_template = "approvals/email/deliver_body.txt"
 
-    def get_context(self):
-        context = super().get_context()
-        context.setdefault("siae_survey_link", context["job_application"].to_company.accept_survey_url)
-        return context
-
     def validate_context(self):
         if not self.context["job_application"].approval:
             raise RuntimeError("No approval found for this job application.")
