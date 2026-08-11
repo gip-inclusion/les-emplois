@@ -1547,7 +1547,6 @@ class TestJobApplicationNotifications:
         assert job_application.to_company.post_code in email.body
         assert job_application.to_company.city in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
-        assert job_application.to_company.accept_survey_url in email.body
 
     def test_notifications_deliver_approval_without_hiring_end_at(self):
         job_seeker = JobSeekerFactory()
@@ -1571,10 +1570,7 @@ class TestJobApplicationNotifications:
 
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
-        assert (
-            f"[TEST] PASS IAE pour {job_application.job_seeker.get_inverted_full_name()} et avis sur les emplois "
-            "de l'inclusion" == email.subject
-        )
+        assert f"[TEST] PASS IAE pour {job_application.job_seeker.get_inverted_full_name()}" == email.subject
         assert "PASS IAE" in email.body
 
     def test_notifications_deliver_approval_when_not_subject_to_eligibility_rules(self):
