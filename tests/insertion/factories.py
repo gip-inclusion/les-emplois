@@ -80,6 +80,13 @@ class StructureFactory(factory.django.DjangoModelFactory):
     description = factory.Faker("paragraph", locale="fr_FR")
     updated_on = factory.LazyFunction(timezone.localdate)
 
+    class Params:
+        for_snapshot = factory.Trait(
+            uid="structure-uid",
+            name="Les joies de l’apprentissage",
+            description="Une structure spécialisé dans les apprentissages.",
+        )
+
 
 class ServiceFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -92,6 +99,18 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: f"Service {n}")
     description = "Description du service."
     updated_on = datetime.date(2025, 1, 1)
+
+    class Params:
+        for_snapshot = factory.Trait(
+            uid="service-uid",
+            structure__for_snapshot=True,
+            name="Aide aux devoirs",
+            description="Un service d’aide aux devoirs pour tous les niveaux.",
+            contact_email="service.contact@email.fake",
+            address_line_1="13 rue de la porte",
+            post_code="29200",
+            city="Brest",
+        )
 
     @factory.post_generation
     def receptions(self, create, extracted, **kwargs):
@@ -133,6 +152,18 @@ class OrientationFactory(factory.django.DjangoModelFactory):
         lambda obj: [OrientationRefusalReason.NOT_MOBILE] if obj.status == OrientationStatus.REFUSED else []
     )
     status = OrientationStatus.PENDING
+
+    class Params:
+        for_snapshot = factory.Trait(
+            beneficiary__for_snapshot=True,
+            sender__for_snapshot=True,
+            sender_prescriber_organization__for_snapshot=True,
+            service__for_snapshot=True,
+            referent_first_name="Flora",
+            referent_last_name="Tristan",
+            referent_email="prescriptrice@inclusion.gouv.fr",
+            referent_phone="0102030405",
+        )
 
 
 class ProcessOrientationLinkFactory(factory.django.DjangoModelFactory):
