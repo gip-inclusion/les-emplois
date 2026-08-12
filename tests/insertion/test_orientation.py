@@ -1,11 +1,13 @@
 import datetime
 import random
+from functools import partial
 
 import pytest
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from freezegun import freeze_time
 
+from itou.companies.models import CompanyMembership
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     OrientationRefusalReason,
@@ -14,9 +16,10 @@ from itou.insertion.enums import (
 )
 from itou.insertion.models import Orientation, OrientationTransitionLog
 from itou.job_applications.enums import SenderKind
-from tests.companies.factories import CompanyFactory
+from itou.prescribers.models import PrescriberMembership
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import OrientationFactory, ServiceFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
@@ -118,6 +121,30 @@ def test_refusal_consistency():
                 refusal_reasons=[OrientationRefusalReason.DID_NOT_COME_TO_INTERVIEW],
             )
     assert not Orientation.objects.exists()
+
+
+@pytest.mark.parametrize(
+    "membership_factory,expected",
+    [
+        (CompanyMembershipFactory, True),
+        (partial(PrescriberMembershipFactory, organization__authorized=True), True),
+        (partial(PrescriberMembershipFactory, organization__authorized=False), False),
+    ],
+)
+def test_sender_can_view_personal_information(membership_factory, expected):
+    membership = membership_factory()
+    sender_prescriber_organization = membership.organization if isinstance(membership, PrescriberMembership) else None
+    sender_company = membership.company if isinstance(membership, CompanyMembership) else None
+    sender_kind = SenderKind.PRESCRIBER if sender_prescriber_organization else SenderKind.EMPLOYER
+    assert (
+        OrientationFactory(
+            sender_kind=sender_kind,
+            sender=membership.user,
+            sender_prescriber_organization=sender_prescriber_organization,
+            sender_company=sender_company,
+        ).sender_can_view_personal_information
+        is expected
+    )
 
 
 def test_transition_process():

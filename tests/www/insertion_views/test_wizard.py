@@ -196,10 +196,12 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker, mailoutbox):
     assert pretty_indented(parse_response_to_soup(response, "#main .s-section")) == snapshot(name="confirmation")
 
     # Notifications
-    [structure_email, referent_email] = mailoutbox
+    [structure_email, referent_email, beneficiary_email, sender_email] = mailoutbox
     assert structure_email.to == [service.contact_email]
     assert ProcessOrientationLink.objects.filter(orientation=orientation).exists()
     assert referent_email.to == [orientation.referent_email]
+    assert beneficiary_email.to == [orientation.beneficiary.email]
+    assert sender_email.to == [orientation.sender.email]
 
 
 def test_documents_step_credential_documents(client):
@@ -644,10 +646,12 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker, mailoutbox):
     assert orientation.attachments == []
 
     # Notifications
-    [structure_email, referent_email] = mailoutbox
+    [structure_email, referent_email, beneficiary_email, sender_email] = mailoutbox
     assert structure_email.to == [service.contact_email]
     assert ProcessOrientationLink.objects.filter(orientation=orientation).exists()
     assert referent_email.to == [orientation.referent_email]
+    assert beneficiary_email.to == [orientation.beneficiary.email]
+    assert sender_email.to == [orientation.sender.email]
 
 
 def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, mocker):
@@ -760,7 +764,7 @@ def test_orientation_wizard_no_email_if_sender_is_referent(client, mocker, mailo
 
     orientation = Orientation.objects.get()
     assert orientation.sender_is_referent is True
-    assert len(mailoutbox) == 1  # new orientation for structure
+    assert len(mailoutbox) == 3  # new orientation for structure, sender and beneficiary
 
 
 def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(client):

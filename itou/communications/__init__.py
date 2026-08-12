@@ -15,6 +15,7 @@ class NotificationCategory(StrEnum):
     DELETION = "Archivage"
     JOB_DESCRIPTION = "Gestion des fiches de poste"
     SECURITY = "Sécurité"
+    ORIENTATION = "Orientation"
 
 
 class NotificationRegistry:
