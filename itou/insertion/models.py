@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
+import itou.insertion.notifications as orientation_notifications
 from itou.companies.models import Company
 from itou.files.models import File
 from itou.insertion.enums import (
@@ -637,7 +638,6 @@ class OrientationWorkflow(xwf_models.Workflow):
 
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
     PENDING_EXPIRATION_PERIOD_DAYS = 30  # as in DORA
-    PROCESSING_EXPIRATION_PERIOD_DAYS = 60  # arbitrarily set to twice the PENDING period
     REMINDER_EMAIL_DELAY_DAYS = 10  # as in DORA
 
     id = models.UUIDField(primary_key=True, editable=False)
@@ -834,6 +834,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         if self.sender_company:
             return True
         return self.sender_prescriber_organization.is_authorized
+
+    # Notifications
+    @property
+    def notification_new_for_beneficiary(self):
+        return orientation_notifications.NewOrientationForBeneficiary(self.beneficiary, orientation=self)
+
+    @property
+    def notification_new_for_sender(self):
+        return orientation_notifications.NewOrientationForSender(self.sender, orientation=self)
 
     # Emails (to users that do not have an account)
     @property
