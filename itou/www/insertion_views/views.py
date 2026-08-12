@@ -521,6 +521,8 @@ class OrientationWizardView(WizardView):
             process_link.email_new_orientation_for_structure.send()
             if not orientation.sender_is_referent:
                 orientation.email_new_orientation_for_referent.send()
+            orientation.notification_new_for_beneficiary.send()
+            orientation.notification_new_for_sender.send()
 
             # Link the originating iMER to the created Orientation.
             event = (
