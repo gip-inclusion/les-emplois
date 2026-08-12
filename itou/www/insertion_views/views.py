@@ -516,6 +516,12 @@ class OrientationWizardView(WizardView):
                 documents.append(file)
             orientation.documents.set(documents)
 
+            # Send notifications
+            process_link = insertion_models.OrientationProcessLink.objects.create(orientation=orientation)
+            process_link.email_new_orientation_for_structure.send()
+            if not orientation.sender_is_referent:
+                orientation.email_new_orientation_for_referent.send()
+
             # Link the originating iMER to the created Orientation.
             event = (
                 insertion_models.MobilizationEvent.objects.filter(
