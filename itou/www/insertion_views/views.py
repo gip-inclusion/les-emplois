@@ -514,6 +514,17 @@ class OrientationWizardView(WizardView):
                 documents.append(file)
             orientation.documents.set(documents)
 
+            # Send notifications
+            if self.service.contact_email:
+                process_link = insertion_models.OrientationProcessLink.objects.create(orientation=orientation)
+                process_link.email_orientation_new_for_structure.send()
+            else:
+                logger.error(
+                    "Orientation=%s was created but the service does not have a contact_email", orientation.pk
+                )
+            if not orientation.sender_is_referent:
+                orientation.email_orientation_new_for_referent.send()
+
             # Link the originating iMER to the created Orientation.
             event = (
                 insertion_models.MobilizationEvent.objects.filter(

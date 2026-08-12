@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.files.models import File
-from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation
+from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation, OrientationProcessLink
 from itou.job_applications.enums import SenderKind
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
@@ -22,7 +22,7 @@ from tests.utils.testing import get_session_name, parse_response_to_soup, pretty
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_orientation_wizard_happy_path(client, snapshot, mocker):
+def test_orientation_wizard_happy_path(client, snapshot, mocker, mailoutbox):
     prescriber = PrescriberMembershipFactory(
         organization__authorized=True,
         organization__for_snapshot=True,
@@ -60,6 +60,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         fee_details="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location",
         access_conditions_dora=["Résident QPV / ZFRR"],
         credentials=["Pièce d'identité", "Justificatif de domicile"],
+        contact_email="service.contact@email.fake",
     )
     service.publics.add(public)
 
@@ -200,6 +201,12 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
 
     response = client.get(confirmation_url)
     assert pretty_indented(parse_response_to_soup(response, "#main .s-section")) == snapshot(name="confirmation")
+
+    # Notifications
+    [structure_email, referent_email] = mailoutbox
+    assert structure_email.to == [service.contact_email]
+    assert OrientationProcessLink.objects.filter(orientation=orientation).exists()
+    assert referent_email.to == [orientation.referent_email]
 
 
 def test_documents_step_credential_documents(client):
@@ -569,6 +576,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     view.dora_client.create_orientation.return_value = {"emplois_sync_uid": "job-seeker-uid"}
     mocker.patch("itou.www.insertion_views.views.insertion_models.Orientation.from_data")
     mocker.patch("itou.www.insertion_views.views.insertion_models.MobilizationEvent")
+    mocker.patch("itou.www.insertion_views.views.insertion_models.OrientationProcessLink")
 
     request = mocker.Mock()
     request.user.pk = 1
@@ -581,7 +589,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     assert payload["beneficiary_phone"] == ""
 
 
-def test_orientation_wizard_happy_path_as_employer(client, mocker):
+def test_orientation_wizard_happy_path_as_employer(client, mocker, mailoutbox):
     organization = CompanyFactory()
     user = CompanyMembershipFactory(company=organization).user
     job_seeker = JobSeekerFactory(
@@ -591,7 +599,11 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
         phone="",
     )
     JobSeekerAssignmentFactory(professional=user, company=organization, job_seeker=job_seeker)
-    service = ServiceFactory(is_orientable_with_form=True, structure__name="Structure orientation employeur")
+    service = ServiceFactory(
+        is_orientable_with_form=True,
+        structure__name="Structure orientation employeur",
+        contact_email="service.contact@email.fake",
+    )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(user)
@@ -638,6 +650,12 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
     assert orientation.sender_company == organization
     assert orientation.sender_prescriber_organization is None
     assert orientation.attachments == []
+
+    # Notifications
+    [structure_email, referent_email] = mailoutbox
+    assert structure_email.to == [service.contact_email]
+    assert OrientationProcessLink.objects.filter(orientation=orientation).exists()
+    assert referent_email.to == [orientation.referent_email]
 
 
 def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, mocker):
@@ -702,6 +720,55 @@ def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, moc
     assert latest_event.orientation == orientation
     assert older_event.orientation is None
     assert other_event.orientation is None
+
+
+def test_orientation_wizard_no_email_if_sender_is_referent(client, mocker, mailoutbox):
+    organization = CompanyFactory()
+    user = CompanyMembershipFactory(company=organization).user
+    job_seeker = JobSeekerFactory()
+    JobSeekerAssignmentFactory(professional=user, company=organization, job_seeker=job_seeker)
+    service = ServiceFactory(
+        is_orientable_with_form=True,
+        structure__name="Structure orientation employeur",
+        contact_email="service.contact@email.fake",
+    )
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(user)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+    referent_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+    )
+    documents_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.DOCUMENTS},
+    )
+
+    client.post(conformity_url, {"confirms_conditions": "on"})
+    client.post(
+        referent_url,
+        {
+            "referent_last_name": "Dupont",
+            "referent_first_name": "Jean",
+            "referent_phone": "0612345678",
+            "referent_email": user.email,
+        },
+    )
+    emplois_sync_uid = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {"emplois_sync_uid": emplois_sync_uid}
+    client.post(documents_url, {"gdpr_consent": "on"})
+
+    orientation = Orientation.objects.get()
+    assert orientation.sender_is_referent is True
+    assert len(mailoutbox) == 1  # new orientation for structure
 
 
 def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(client):

@@ -1,0 +1,68 @@
+# serializer version: 1
+# name: test_new_orientation_for_referent[maximum_contact_info][body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. a orienté Jane DOE vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  - Jean Dupont
+  - service.contact@email.fake - 01 02 03 04 05
+  
+  La structure Les joies de l’apprentissage va traiter la demande et y apportera une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_referent[maximum_contact_info][subject]
+  '[TEST] Notification d’une demande d’orientation'
+# ---
+# name: test_new_orientation_for_referent[minimum_contact_info][body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. a orienté Jane DOE vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter la demande et y apportera une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_referent[minimum_contact_info][subject]
+  '[TEST] Notification d’une demande d’orientation'
+# ---
+# name: test_new_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs.
+  
+  Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
+  
+  http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_structure[subject]
+  '[TEST] Nouvelle demande d’orientation reçue'
+# ---
