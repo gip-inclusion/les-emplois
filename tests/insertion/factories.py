@@ -2,7 +2,6 @@ import datetime
 import uuid
 
 import factory
-import factory.fuzzy
 from django.utils import timezone
 
 from itou.insertion.enums import MobilizationEventKind, OrientationRefusalReason, OrientationStatus
