@@ -28,6 +28,7 @@ from itou.insertion.enums import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
+from itou.utils.emails import get_email_message
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code
@@ -649,6 +650,7 @@ class OrientationWorkflow(xwf_models.Workflow):
 
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
     PROCESSING_EXPIRATION_PERIOD_DAYS = 60
+    REMINDER_EMAIL_DELAY_DAYS = 10
 
     id = models.UUIDField(primary_key=True, editable=False)
 
@@ -837,6 +839,25 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     def sender_is_referent(self):
         return self.referent_email == self.sender.email
 
+    @property
+    def sender_can_view_personal_information(self):
+        if self.sender_company:
+            return True
+        return self.sender_prescriber_organization.is_authorized
+
+    # Emails (to users that do not have an account)
+    @property
+    def email_orientation_new_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+            "reminder_one_delay_days": self.REMINDER_EMAIL_DELAY_DAYS,
+            "reminder_two_delay_days": self.REMINDER_EMAIL_DELAY_DAYS * 2,
+        }
+        subject = "insertion/email/new_for_referent_subject.txt"
+        body = "insertion/email/new_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class OrientationTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "orientation"
@@ -889,3 +910,15 @@ class ProcessOrientationLink(models.Model):
     @property
     def has_expired(self):
         return self.expiration_date <= timezone.now()
+
+    # Emails
+    @property
+    def email_orientation_new_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+        }
+        subject = "insertion/email/new_for_structure_subject.txt"
+        body = "insertion/email/new_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)
