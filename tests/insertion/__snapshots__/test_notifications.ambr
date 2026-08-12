@@ -1,4 +1,50 @@
 # serializer version: 1
+# name: test_new_orientation_for_beneficiary[sender_is_not_referent][body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :*
+  - Pierre DUPONT
+  - pierre.dupont@test.local
+  
+  ou bien votre conseiller·e référent·e :
+  - Flora TRISTAN
+  - prescriptrice@inclusion.gouv.fr
+  
+  La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_not_referent][subject]
+  '[TEST] Une orientation a été effectuée en votre nom'
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_referent][body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :*
+  - Pierre DUPONT
+  - pierre.dupont@test.local
+  
+  La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_referent][subject]
+  '[TEST] Une orientation a été effectuée en votre nom'
+# ---
 # name: test_new_orientation_for_referent[maximum_contact_info][body]
   '''
   Bonjour,
@@ -46,6 +92,84 @@
 # ---
 # name: test_new_orientation_for_referent[minimum_contact_info][subject]
   '[TEST] Notification d’une demande d’orientation'
+# ---
+# name: test_new_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, Jane DOE, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande a bien été transmise !'
+# ---
+# name: test_new_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, Jane DOE, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande a bien été transmise !'
+# ---
+# name: test_new_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, J… D…, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande a bien été transmise !'
 # ---
 # name: test_new_orientation_for_structure[body]
   '''
