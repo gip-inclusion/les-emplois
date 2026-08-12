@@ -784,7 +784,9 @@ DORA_WWW_BASE_URL = os.getenv("DORA_WWW_BASE_URL", "https://dora.inclusion.gouv.
 DORA_API_BASE_URL = os.getenv("DORA_API_BASE_URL", "https://api.dora.inclusion.gouv.fr")
 DORA_API_TOKEN = os.getenv("DORA_API_TOKEN")
 
-NON_ORIENTABLE_DI_SOURCES = os.getenv("NON_ORIENTABLE_DI_SOURCES", [])
+NON_ORIENTABLE_DI_SOURCES = {
+    _source.strip() for _source in os.getenv("NON_ORIENTABLE_DI_SOURCES", "").split(",") if _source.strip()
+}
 
 # GPS
 # ------------------------------------------------------------------------------
