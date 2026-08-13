@@ -1,0 +1,38 @@
+{% load components %}
+{% load matomo %}
+{% load str_filters %}
+
+{% if show_fins_de_contrats_banner %}
+    <div id="fins-de-contrats-banner"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+        {% if end_of_journey_filter_active %}
+            {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="fins-de-contrats-pedagogique" extra_classes="mb-3 mb-md-4" %}
+                {% fragment as title %}
+                    Suggérer une suite de parcours aux salariés
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Vous pouvez suggérer une suite de parcours directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
+        {% elif contracts_ending_soon_count %}
+            {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="fins-de-contrats-decouverte" extra_classes="mb-3 mb-md-4" %}
+                {% fragment as title %}
+                    Vous avez {{ contracts_ending_soon_count }} salarié{{ contracts_ending_soon_count|pluralizefr }} en fin de contrat
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        {% if contracts_ending_soon_count == 1 %}
+                            Le contrat de ce salarié arrive à échéance dans moins de 30 jours. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+                        {% else %}
+                            Le contrat de ces salariés arrive à échéance dans moins de 30 jours. Préparez au mieux leur fin de contrat en suggérant une suite de parcours adaptée à leur situation.
+                        {% endif %}
+                    </p>
+                {% endfragment %}
+                {% fragment as call_to_action %}
+                    <a class="btn btn-sm btn-primary" href="{% url 'job_seekers_views:list_organization' %}?contract_ending_soon=on" {% matomo_event "employeurs" "clic" "afficher-fins-de-contrats" %}>Afficher ces salariés</a>
+                {% endfragment %}
+            {% endcomponent_alert %}
+        {% endif %}
+    </div>
+{% endif %}

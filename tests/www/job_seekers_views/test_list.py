@@ -1162,6 +1162,91 @@ def test_end_of_iae_journey_filter_for_siae(client):
     assert response.context["page_obj"].object_list == [job_seeker_own]
 
 
+@freeze_time("2026-01-15")
+def test_fins_de_contrats_banners_for_siae(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+
+    # No contract ending soon: neither banner.
+    response = client.get(url)
+    assertNotContains(response, "Afficher ces salariés")
+    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+
+    # A salarié with a contract ending soon: discovery banner on the unfiltered list.
+    job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous avez 1 salarié en fin de contrat")
+    assertContains(response, "Afficher ces salariés")
+    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+
+    # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assertContains(response, "Suggérer une suite de parcours aux salariés")
+    assertNotContains(response, "Afficher ces salariés")
+
+
+@freeze_time("2026-01-15")
+@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
+def test_suggest_next_step_action_in_list(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+    ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=ending_soon,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    # A salarié with no contract ending soon: no action on their row.
+    JobSeekerAssignmentFactory(professional=employer, company=company)
+
+    # Unfiltered: the action is offered on the row of the salarié ending soon (mirroring the card banner),
+    # exactly once, and it links to the configured Tally form.
+    response = client.get(url)
+    assertContains(response, "Suggérer une suite de parcours")
+    assertContains(response, "https://tally.example/r/wSUGGEST", count=1)
+
+    # With the end-of-journey filter active, only the salarié ending soon remains, still with the action.
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assertContains(response, "https://tally.example/r/wSUGGEST", count=1)
+
+
+@freeze_time("2026-01-15")
+@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
+def test_suggest_next_step_banner_on_job_seeker_card(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    today = datetime.date(2026, 1, 15)
+    job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    assertContains(response, "Le contrat arrive bientôt à échéance")
+    assertContains(response, "04/02/2026")
+    assertContains(response, "https://tally.example/r/wSUGGEST")
+
+
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_suspended_approval_info_tooltip(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory()

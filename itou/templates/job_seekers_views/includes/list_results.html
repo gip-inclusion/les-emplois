@@ -73,6 +73,9 @@
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                        {% if suggest_next_step_url and job_seeker.contract_ending_soon %}
+                                            <a href="{{ suggest_next_step_url }}" class="dropdown-item" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-liste" %}>Suggérer une suite de parcours</a>
+                                        {% endif %}
                                         {% if request.current_organization.is_authorized %}
                                             {% if not job_seeker.has_valid_approval %}
                                                 <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
@@ -127,6 +130,7 @@
 </section>
 
 {% if request.htmx %}
+    {% include "job_seekers_views/includes/fins_de_contrats_banner.html" with show_fins_de_contrats_banner=show_fins_de_contrats_banner end_of_journey_filter_active=end_of_journey_filter_active contracts_ending_soon_count=contracts_ending_soon_count request=request only %}
     {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
     {% include "job_seekers_views/includes/list_reset_filters.html" with btn_dropdown_filter=True filters_counter=filters_counter request=request list_organization=list_organization order=order only %}
     {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_footer.html" %}
