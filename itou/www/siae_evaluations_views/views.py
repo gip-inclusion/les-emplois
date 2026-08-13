@@ -652,6 +652,7 @@ def siae_job_applications_list(
         "evaluated_siae": evaluated_siae,
         "evaluated_job_applications": evaluated_job_applications,
         "is_submittable": evaluated_siae.can_submit,
+        "proofs_submitted": evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTED,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -828,7 +829,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     messages.success(
         request,
         (
-            "Justificatifs transmis !||Leur contrôle est à la charge de votre DDETS. "
+            "Justificatifs transmis||Leur contrôle est à la charge de votre DDETS. "
             "Une fois finalisée, vous serez notifié du résultat par email."
         ),
         extra_tags="toast",
