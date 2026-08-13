@@ -30,6 +30,17 @@
                     <span>Accompagnements</span>
                 </a>
             </li>
+            {% if contracts_ending_soon_count is not None %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'job_seekers_views:list_organization' %}?contract_ending_soon=on" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-fins-de-contrats" %}>
+                        <i class="ri-history-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Fins de contrats</span>
+                    </a>
+                    {% if contracts_ending_soon_count %}
+                        <span class="badge rounded-pill badge-xs bg-warning">{{ contracts_ending_soon_count }}</span>
+                    {% endif %}
+                </li>
+            {% endif %}
         {% endfragment %}
     {% endcomponent_box_dashboard %}
 </div>
