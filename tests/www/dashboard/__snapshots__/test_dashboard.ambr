@@ -50,7 +50,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -392,6 +392,30 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_employer_dashboard_context[www/dashboard/views.py]',
+          'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "users_user"
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE U0."company_id" = %s)
+                 AND
+                   (SELECT U0."end_date" AS "end_date"
+                    FROM "companies_contract" U0
+                    WHERE (U0."end_date" IS NOT NULL
+                           AND U0."job_seeker_id" = ("users_user"."id")
+                           AND U0."company_id" = %s)
+                    ORDER BY 1 DESC
+                    LIMIT 1) BETWEEN %s AND %s)
         ''',
       }),
       dict({
