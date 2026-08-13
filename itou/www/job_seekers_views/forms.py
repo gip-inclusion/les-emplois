@@ -27,6 +27,21 @@ APPROVAL_ENDING_SOON_DAYS = 90
 IAE_CONTRACT_ENDING_SOON_DAYS = 30
 
 
+def annotate_last_contract_end_date(queryset, *, company=None):
+    # Latest known IAE contract end date of the job seeker, optionally scoped to a single SIAE.
+    # Scoping to the current SIAE avoids counting a contract signed with another structure, and keeps
+    # a renewed employee out of the cohort (their latest contract with the SIAE ends later).
+    # Shared business definition reused by the dashboard counter, the filter, the discovery banner and
+    # the per-row end-of-contract flag. Idempotent so the list view can annotate for the row flag while
+    # the filter also annotates for the same SIAE, without raising on a duplicate annotation.
+    if "last_contract_end_date" in queryset.query.annotations:
+        return queryset
+    contracts = Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
+    if company is not None:
+        contracts = contracts.filter(company=company)
+    return queryset.annotate(last_contract_end_date=Subquery(contracts.order_by("-end_date").values("end_date")[:1]))
+
+
 class FilterForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=False,
@@ -51,7 +66,7 @@ class FilterForm(forms.Form):
         label="Nom de la personne", required=False, widget=Select2MultipleWidget
     )
 
-    # Fields only for authorized prescribers set in __init__
+    # Fields only for authorized prescribers and IAE employers, set in __init__
     approval_ending_soon = None
     contract_ending_soon = None
 
@@ -68,7 +83,13 @@ class FilterForm(forms.Form):
             self.fields["approval_active"] = forms.BooleanField(label="Valide", required=False)
             self.fields["approval_expired"] = forms.BooleanField(label="Expiré", required=False)
             self.fields["no_approval"] = forms.BooleanField(label="Aucun", required=False)
-        if request.from_authorized_prescriber:
+        # A SIAE only looks at its own contracts; a prescriber keeps the job seeker global view (company=None).
+        self.company = (
+            request.current_organization
+            if request.from_employer and request.current_organization.is_subject_to_iae_rules
+            else None
+        )
+        if request.from_authorized_prescriber or self.company:
             self.fields["approval_ending_soon"] = forms.BooleanField(
                 label="PASS IAE bientôt expiré",
                 required=False,
@@ -132,7 +153,7 @@ class FilterForm(forms.Form):
         ]
         use_approval_status = any(approval_status_filters) and not all(approval_status_filters)
 
-        # The "end of IAE journey" filters are reserved for authorized prescribers.
+        # The "end of IAE journey" filters exist only for authorized prescribers and IAE employers.
         approval_ending_soon = self.cleaned_data.get("approval_ending_soon")
 
         if use_approval_status or approval_ending_soon:
@@ -162,13 +183,7 @@ class FilterForm(forms.Form):
                 approval_window = (today, today + datetime.timedelta(days=APPROVAL_ENDING_SOON_DAYS))
                 end_of_journey_filter &= Q(last_approval_end_at__range=approval_window)
             if contract_ending_soon:
-                queryset = queryset.annotate(
-                    last_contract_end_date=Subquery(
-                        Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
-                        .order_by("-end_date")
-                        .values("end_date")[:1]
-                    )
-                )
+                queryset = annotate_last_contract_end_date(queryset, company=self.company)
                 contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
                 end_of_journey_filter &= Q(last_contract_end_date__range=contract_window)
             filters.append(end_of_journey_filter)

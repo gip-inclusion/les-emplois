@@ -485,11 +485,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     if form.is_valid():
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
-        # The upcoming-end-of-IAE-journey filter is reserved for authorized prescribers (see FilterForm).
-        end_of_journey_filter_active = request.from_authorized_prescriber and bool(
+        end_of_journey_filter_active = bool(
             form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
         )
-        if end_of_journey_filter_active:
+        if end_of_journey_filter_active and request.from_authorized_prescriber:
             # Contracts are the most precise, but they are delayed.
             # Fallback to job applications if needs be.
             queryset = queryset.annotate(
@@ -541,7 +540,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         job_seeker.pro_support_request_mailto = None
         if (
             end_of_journey_filter_active
-            and job_seeker.pro_support_request_company_email
+            and getattr(job_seeker, "pro_support_request_company_email", None)
             # This last condition avoid the job seeker's name to leak
             # to unauthorized users.
             and job_seeker.user_can_view_personal_information
