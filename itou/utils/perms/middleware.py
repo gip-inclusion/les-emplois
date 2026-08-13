@@ -111,6 +111,7 @@ class ItouCurrentOrganizationMiddleware:
         request.from_prescriber = False
         request.from_authorized_prescriber = False
         request.from_institution = False
+        request.from_iae_actor = False
 
         if user.is_authenticated:
             logout_warning = None
@@ -143,10 +144,13 @@ class ItouCurrentOrganizationMiddleware:
                 else:
                     if isinstance(request.current_organization, PrescriberOrganization):
                         request.from_prescriber = True
+                        request.from_iae_actor = True
                         if request.current_organization.is_authorized:
                             request.from_authorized_prescriber = True
                     elif isinstance(request.current_organization, Company):
                         request.from_employer = True
+                        if request.current_organization.is_subject_to_iae_rules:
+                            request.from_iae_actor = True
                     elif isinstance(request.current_organization, Institution):
                         request.from_institution = True
 

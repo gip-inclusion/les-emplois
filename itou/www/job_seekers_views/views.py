@@ -24,7 +24,6 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -137,9 +136,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
 
     def get_context_data(self, **kwargs):
         self.approval = None
-        if self.request.from_prescriber or (
-            self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
-        ):
+        if self.request.from_iae_actor:
             self.approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
 
         fallback_back_url = (
@@ -163,9 +160,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         context = super().get_context_data(**kwargs)
 
         geiq_eligibility_diagnosis = None
-        if self.request.from_prescriber or (
-            self.request.from_employer and self.request.current_organization.kind == CompanyKind.GEIQ
-        ):
+        if self.request.from_prescriber or not self.request.from_iae_actor:
             geiq_eligibility_diagnosis = (
                 GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                     self.object,
@@ -178,9 +173,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         iae_eligibility_diagnosis = None
         can_edit_iae_eligibility = False
 
-        if self.request.from_prescriber or (
-            self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
-        ):
+        if self.request.from_iae_actor:
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.object,
                 for_siae=self.request.current_organization if self.request.from_employer else None,
@@ -333,12 +326,8 @@ def switch_stalled_status(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
-def has_access_to_assignments(request):
-    return request.from_prescriber or (request.from_employer and request.current_organization.is_subject_to_iae_rules)
-
-
 @http_methods(db_write=["POST"])
-@check_request(has_access_to_assignments)
+@check_request(lambda request: request.from_iae_actor)
 def assign_oneself_as_last_known_advisor(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER),
@@ -349,7 +338,7 @@ def assign_oneself_as_last_known_advisor(request, public_id):
 
 
 @readonly_view
-@check_request(has_access_to_assignments)
+@check_request(lambda request: request.from_iae_actor)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if request.from_employer:
         if not list_organization:

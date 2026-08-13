@@ -22,7 +22,7 @@
                aria-controls="statistiques"
                aria-selected="true"
                {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
-                {% if request.from_employer and request.current_organization.is_subject_to_iae_rules or request.from_prescriber %}
+                {% if request.from_iae_actor %}
                     <span>Pilotage</span>
                 {% else %}
                     Pilotage
