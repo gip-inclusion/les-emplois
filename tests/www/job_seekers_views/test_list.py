@@ -1233,6 +1233,40 @@ def test_end_of_iae_journey_filter_only_for_authorized_prescriber(client):
     assert response.context["page_obj"].object_list == [job_seeker]
 
 
+@freeze_time("2026-01-15")
+def test_end_of_iae_journey_filter_for_siae(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+
+    # The filter is now available for an IAE SIAE, like for authorized prescribers.
+    response = client.get(url)
+    assertContains(response, "Fin de parcours IAE à venir")
+    assertContains(response, "Contrat IAE bientôt terminé")
+
+    # A contract ending soon WITH this SIAE is in the cohort.
+    job_seeker_own = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker_own,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    # A contract ending soon WITH ANOTHER SIAE must be ignored (scoping avoids the false positive).
+    job_seeker_other_company = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker_other_company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_own]
+
+
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_suspended_approval_info_tooltip(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory()
@@ -1651,7 +1685,7 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
 
 
 @freeze_time("2026-01-15")
-def test_request_accompaniment_review_action_not_for_employer(client):
+def test_pro_support_request_not_for_employer(client):
     company = CompanyFactory(subject_to_iae_rules=True, email="siae@example.com")
     employer = CompanyMembershipFactory(company=company).user
     client.force_login(employer)
@@ -1677,9 +1711,7 @@ def test_request_accompaniment_review_action_not_for_employer(client):
         hiring_start_at=today - datetime.timedelta(days=200),
     )
 
-    # The filter should not be available, but user could try to tweak
-    # the request.
-    response = client.get(url, {"approval_ending_soon": "on", "contract_ending_soon": "on"})
+    response = client.get(url, {"approval_ending_soon": "on"})
     assert response.context["page_obj"].object_list == [job_seeker]
     assert not hasattr(response.context["page_obj"].object_list[0], "pro_support_request_company_email")
     assertNotContains(response, "mailto:siae@example.com")

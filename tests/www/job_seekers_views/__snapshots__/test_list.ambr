@@ -207,6 +207,38 @@
       <hr/>
       <fieldset>
           <legend>
+              <button aria-controls="collapseEndOfJourney" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEndOfJourney" data-bs-toggle="collapse" type="button">
+                  Fin de parcours IAE à venir
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEndOfJourney">
+              <ul>
+                  <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-pass-iae">
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_ending_soon" id="id_approval_ending_soon-offcanvas" name="approval_ending_soon" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_ending_soon-offcanvas">
+                                  PASS IAE bientôt expiré
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-contrat-iae">
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_contract_ending_soon" id="id_contract_ending_soon-offcanvas" name="contract_ending_soon" type="checkbox"/>
+                              <label class="form-check-label" for="id_contract_ending_soon-offcanvas">
+                                  Contrat IAE bientôt terminé
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
               <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                   Accompagnateurs de ma structure
               </button>
@@ -684,6 +716,39 @@
                   <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">
                       Qu’est-ce qu’un usager sans solution
                   </a>
+              </li>
+          </ul>
+      </div>
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Fin de parcours IAE à venir
+          </button>
+          <ul class="dropdown-menu">
+              <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-pass-iae">
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input aria-describedby="id_approval_ending_soon_helptext" class="form-check-input is-valid" id="id_approval_ending_soon" name="approval_ending_soon" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_ending_soon">
+                              PASS IAE bientôt expiré
+                          </label>
+                          <div class="form-text" id="id_approval_ending_soon_helptext">
+                              Dans les 90 prochains jours
+                          </div>
+                      </div>
+                  </div>
+              </li>
+              <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-contrat-iae">
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input aria-describedby="id_contract_ending_soon_helptext" class="form-check-input is-valid" id="id_contract_ending_soon" name="contract_ending_soon" type="checkbox"/>
+                          <label class="form-check-label" for="id_contract_ending_soon">
+                              Contrat IAE bientôt terminé
+                          </label>
+                          <div class="form-text" id="id_contract_ending_soon_helptext">
+                              Dans les 30 prochains jours
+                          </div>
+                      </div>
+                  </div>
               </li>
           </ul>
       </div>
