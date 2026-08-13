@@ -1,6 +1,7 @@
 from functools import partial
 
 import pytest
+from freezegun import freeze_time
 
 from itou.companies.models import CompanyMembership
 from itou.insertion import notifications
@@ -73,6 +74,46 @@ def test_new_orientation_for_beneficiary(snapshot, sender_is_referent):
         orientation.referent_email = orientation.sender.email
         orientation.save()
     email = notifications.OrientationNewForBeneficiaryNotification(
+        orientation.beneficiary, orientation=orientation
+    ).build()
+
+    assert email.to == [orientation.beneficiary.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+@freeze_time("2026-08-13")
+def test_accepted_orientation_for_structure(snapshot):
+    link = ProcessOrientationLinkFactory(orientation__for_snapshot=True)
+    email = link.email_orientation_accepted_for_structure
+
+    assert email.to == [link.orientation.service.contact_email]
+    assert email.subject == snapshot(name="subject")
+    body = email.body.replace(str(link.pk), "[PK of ProcessOrientationLink]")
+    assert body == snapshot(name="body")
+
+
+def test_accepted_orientation_for_referent(snapshot):
+    orientation = OrientationFactory(for_snapshot=True)
+    email = orientation.email_orientation_accepted_for_referent
+
+    assert email.to == [orientation.referent_email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+def test_accepted_orientation_for_sender(snapshot):
+    orientation = OrientationFactory(for_snapshot=True)
+    email = notifications.OrientationAcceptedForSenderNotification(orientation.sender, orientation=orientation).build()
+
+    assert email.to == [orientation.sender.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+def test_accepted_orientation_for_beneficiary(snapshot):
+    orientation = OrientationFactory(for_snapshot=True)
+    email = notifications.OrientationAcceptedForBeneficiaryNotification(
         orientation.beneficiary, orientation=orientation
     ).build()
 

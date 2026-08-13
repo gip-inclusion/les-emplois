@@ -1,0 +1,8 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+La prescription pour le service {{ orientation.service.name }} réalisée par {{ orientation.sender.get_inverted_full_name }} a été acceptée par la structure {{ orientation.service.structure.name }} !
+
+{% endblock body %}

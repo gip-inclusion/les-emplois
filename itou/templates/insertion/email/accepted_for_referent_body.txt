@@ -1,0 +1,8 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+La demande d’orientation réalisée par {{ orientation.sender.get_inverted_full_name }} de la structure {{ orientation.sender_organization.name }} pour {{ orientation.beneficiary.get_inverted_full_name }} vers le service {{ orientation.service.name }} a été acceptée !
+
+{% endblock body %}
