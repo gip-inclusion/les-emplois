@@ -30,7 +30,7 @@ from itou.utils import constants as global_constants, triggers
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
@@ -43,7 +43,13 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+)
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -189,6 +195,42 @@ class TestDashboardView:
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["num_rejected_employee_records"] == 0
+
+    @freeze_time("2026-01-15")
+    def test_dashboard_contracts_ending_soon_count(self, client):
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        employer = company.members.first()
+        client.force_login(employer)
+        today = date(2026, 1, 15)
+        url = reverse("dashboard:index")
+
+        # No contract ending soon yet: the entry is shown without a badge.
+        response = client.get(url)
+        assertContains(response, "Fins de contrats")
+        assert response.context["contracts_ending_soon_count"] == 0
+
+        # A job seeker assigned to the SIAE with a contract with this SIAE ending in 20 days is counted.
+        job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=job_seeker,
+            company=company,
+            start_date=today - timedelta(days=200),
+            end_date=today + timedelta(days=20),
+        )
+        # A contract with another SIAE must not be counted.
+        other_job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=other_job_seeker,
+            start_date=today - timedelta(days=200),
+            end_date=today + timedelta(days=20),
+        )
+
+        response = client.get(url)
+        assert response.context["contracts_ending_soon_count"] == 1
+
+        # The dashboard counter matches the filtered "Accompagnements" list results.
+        list_response = client.get(reverse("job_seekers_views:list_organization"), {"contract_ending_soon": "on"})
+        assert list(list_response.context["page_obj"].object_list) == [job_seeker]
 
     def test_dashboard_applications_to_process(self, client):
         non_geiq_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
