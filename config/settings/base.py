@@ -520,6 +520,10 @@ PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
 
 TALLY_URL = os.getenv("TALLY_URL")
 
+# Tally form id for the SIAE "suggest a next step" action (end of IAE contract). Empty until provided:
+# the action and the job seeker card banner stay hidden while it is not set.
+TALLY_SUGGEST_NEXT_STEP_FORM_ID = os.getenv("TALLY_SUGGEST_NEXT_STEP_FORM_ID")
+
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")

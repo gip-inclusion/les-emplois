@@ -1,0 +1,20 @@
+{% load components %}
+{% load matomo %}
+
+{% if contract_ending_soon_date %}
+    {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id=fiche_banner_extra_id extra_classes="mb-3 mb-md-4" %}
+        {% fragment as title %}
+            Le contrat arrive bientôt à échéance
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Le contrat de ce salarié arrive à échéance le {{ contract_ending_soon_date|date:"d/m/Y" }}. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+            </p>
+        {% endfragment %}
+        {% if suggest_next_step_url %}
+            {% fragment as call_to_action %}
+                <a class="btn btn-sm btn-primary has-external-link" href="{{ suggest_next_step_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
+            {% endfragment %}
+        {% endif %}
+    {% endcomponent_alert %}
+{% endif %}
