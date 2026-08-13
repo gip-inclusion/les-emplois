@@ -1,0 +1,19 @@
+<div class="c-box p-3 p-md-4 d-flex align-items-center">
+    <div class="p-0 flex-grow-1 m-0">
+        {% if proofs_submitted %}
+            Vos justificatifs ont bien été <strong>transmis</strong>.
+        {% else %}
+            Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>, veuillez les soumettre à validation.
+            <br>
+        {% endif %}
+        La DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
+    </div>
+    {% if not proofs_submitted %}
+        <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
+            {% csrf_token %}
+            <button class="btn {% if is_submittable %}btn-primary{% else %}btn-primary disabled{% endif %}">
+                Soumettre à validation
+            </button>
+        </form>
+    {% endif %}
+</div>
