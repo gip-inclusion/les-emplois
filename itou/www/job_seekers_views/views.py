@@ -1,3 +1,4 @@
+import datetime
 import logging
 import urllib.parse
 from functools import cached_property
@@ -42,12 +43,13 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_safe_url, get_tally_form_url
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireWizardMixin
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
+    IAE_CONTRACT_ENDING_SOON_DAYS,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
     CreateOrUpdateJobSeekerStep1Form,
@@ -57,6 +59,7 @@ from itou.www.job_seekers_views.forms import (
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
+    annotate_last_contract_end_date,
 )
 
 
@@ -189,8 +192,40 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
+        # SIAE job seeker card banner: shown when a contract with this SIAE ends within 30 days and the
+        # Tally form is configured. Same business definition (scoped to the current SIAE) as the list.
+        # Lives in the details tab view only, so the query does not run on the other tabs.
+        contract_ending_soon_date = None
+        suggest_next_step_url = None
+        if (
+            self.request.from_employer
+            and self.request.current_organization.is_subject_to_iae_rules
+            and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID
+        ):
+            today = timezone.localdate()
+            last_contract_end_date = (
+                Contract.objects.filter(
+                    job_seeker=self.object, company=self.request.current_organization, end_date__isnull=False
+                )
+                .order_by("-end_date")
+                .values_list("end_date", flat=True)
+                .first()
+            )
+            if last_contract_end_date and today <= last_contract_end_date <= today + datetime.timedelta(
+                days=IAE_CONTRACT_ENDING_SOON_DAYS
+            ):
+                contract_ending_soon_date = last_contract_end_date
+                suggest_next_step_url = get_tally_form_url(
+                    settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
+                    iduser=self.request.user.pk,
+                    kindcompany=self.request.current_organization.kind,
+                )
+
         return context | {
             "approval": self.approval,
+            "contract_ending_soon_date": contract_ending_soon_date,
+            "suggest_next_step_url": suggest_next_step_url,
+            "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
@@ -480,6 +515,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         request=request,
     )
 
+    base_queryset = queryset
     filters_counter = 0
     end_of_journey_filter_active = False
     if form.is_valid():
@@ -528,11 +564,37 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
     )
 
+    show_end_of_contracts_banner = request.from_employer and request.current_organization.is_subject_to_iae_rules
+    today = timezone.localdate()
+    contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
+
+    # Discovery banner: count over the SIAE assigned job seekers (unfiltered), only shown when the
+    # end-of-journey filter is not active.
+    contracts_ending_soon_count = None
+    if show_end_of_contracts_banner and not end_of_journey_filter_active:
+        contracts_ending_soon_count = (
+            annotate_last_contract_end_date(base_queryset, company=request.current_organization)
+            .filter(last_contract_end_date__range=contract_window)
+            .count()
+        )
+
+    # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
+    # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
+    suggest_next_step_url = None
+    if show_end_of_contracts_banner and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
+        suggest_next_step_url = get_tally_form_url(
+            settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
+            iduser=request.user.pk,
+            kindcompany=request.current_organization.kind,
+        )
+
     try:
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
+    if show_end_of_contracts_banner:
+        queryset = annotate_last_contract_end_date(queryset, company=request.current_organization)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
@@ -549,11 +611,17 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 job_seeker.pro_support_request_company_email,
                 job_seeker.get_full_name(),
             )
+        job_seeker.contract_ending_soon = bool(
+            show_end_of_contracts_banner
+            and job_seeker.last_contract_end_date
+            and contract_window[0] <= job_seeker.last_contract_end_date <= contract_window[1]
+        )
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
             or job_seeker.jobseeker_profile.is_stalled
             or can_orient_towards_insertion_service(request)
             or bool(job_seeker.pro_support_request_mailto)
+            or bool(suggest_next_step_url and job_seeker.contract_ending_soon)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization
@@ -571,6 +639,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "filters_counter": filters_counter,
         "order": order,
         "page_obj": page_obj,
+        "show_end_of_contracts_banner": show_end_of_contracts_banner,
+        "end_of_journey_filter_active": end_of_journey_filter_active,
+        "contracts_ending_soon_count": contracts_ending_soon_count,
+        "suggest_next_step_url": suggest_next_step_url,
     }
 
     return render(request, "job_seekers_views/includes/list_results.html" if request.htmx else template_name, context)
