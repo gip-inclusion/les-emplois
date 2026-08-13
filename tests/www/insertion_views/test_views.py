@@ -1556,7 +1556,7 @@ class TestOrientationDetailsForServiceProvider:
         assert orientation.status == link.orientation.status
 
     @pytest.mark.parametrize("from_status", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
-    def test_accept(self, client, from_status):
+    def test_accept(self, client, mailoutbox, from_status):
         link = OrientationProcessLinkFactory(
             orientation__status=from_status,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1576,6 +1576,8 @@ class TestOrientationDetailsForServiceProvider:
         response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
         assertContains(response, "Cette orientation a déjà été traitée.")
         assert orientation.updated_at == accepted_at
+
+        assert len(mailoutbox) != 0
 
     @pytest.mark.parametrize(
         "from_status", [OrientationStatus.ACCEPTED, OrientationStatus.REFUSED, OrientationStatus.EXPIRED]

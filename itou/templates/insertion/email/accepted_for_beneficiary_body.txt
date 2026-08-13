@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+Nous avons le plaisir de vous informer que la structure {{ orientation.service.structure.name }} a validé la demande réalisée par {{ orientation.sender.get_full_name }} ({{ orientation.sender_organization.display_name }}) concernant votre positionnement sur {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
+
+Pour toute information supplémentaire, n’hésitez pas à contacter votre référent ou la structure directement{% if orientation.service.contact_phone %} au {{ orientation.service.contact_phone }}{% endif %}.
+
+Nous vous souhaitons une bonne continuation.
+
+{% endblock body %}

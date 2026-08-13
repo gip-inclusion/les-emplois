@@ -57,3 +57,23 @@ class OrientationProcessingForSenderNotification(ProfessionalNotification, Email
         return context | {
             "PROCESSING_EXPIRATION_PERIOD_DAYS": orientation.PROCESSING_EXPIRATION_PERIOD_DAYS,
         }
+
+
+@notifications_registry.register
+class OrientationAcceptedForBeneficiaryNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to the beneficiary when an orientation is accepted."""
+
+    name = "Acceptation d’une orientation"
+    category = NotificationCategory.ORIENTATION
+    subject_template = "insertion/email/accepted_for_beneficiary_subject.txt"
+    body_template = "insertion/email/accepted_for_beneficiary_body.txt"
+
+
+@notifications_registry.register
+class OrientationAcceptedForSenderNotification(ProfessionalNotification, EmailNotification):
+    """Notification sent to the sender when an orientation is accepted."""
+
+    name = "Acceptation d’une orientation"
+    category = NotificationCategory.ORIENTATION
+    subject_template = "insertion/email/accepted_for_sender_subject.txt"
+    body_template = "insertion/email/accepted_for_sender_body.txt"

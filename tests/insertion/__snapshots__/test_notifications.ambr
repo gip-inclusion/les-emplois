@@ -1,4 +1,84 @@
 # serializer version: 1
+# name: test_accepted_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  Nous avons le plaisir de vous informer que la structure Les joies de l’apprentissage a validé la demande réalisée par Pierre DUPONT (Pres. Org.) concernant votre positionnement sur Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  Pour toute information supplémentaire, n’hésitez pas à contacter votre référent ou la structure directement.
+  
+  Nous vous souhaitons une bonne continuation.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_beneficiary[subject]
+  '[TEST] Votre demande a été acceptée ! 🎉'
+# ---
+# name: test_accepted_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La demande adressée par *Pierre DUPONT* (*Pres. Org.*) concernant *Jane DOE* à été validée par la structure *Les joies de l’apprentissage* pour le service * Aide aux devoirs*, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  Si vous avez des questions supplémentaires ou si vous souhaitez obtenir plus d’informations, n’hésitez pas contacter le référent du service :
+  
+  - service.contact@email.fake 
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_referent[subject]
+  '[TEST] Notification de l’acceptation d’une demande d’orientation'
+# ---
+# name: test_accepted_orientation_for_sender[body]
+  '''
+  Bonjour,
+  
+  Votre demande concernant *Jane DOE* à été validée par la structure *Les joies de l’apprentissage* pour le service * Aide aux devoirs*, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  Si vous avez des questions supplémentaires ou si vous souhaitez obtenir plus d’informations, n’hésitez pas contacter le référent du service :
+  
+  - service.contact@email.fake 
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_sender[subject]
+  '[TEST] Votre demande a été acceptée ! 🎉'
+# ---
+# name: test_accepted_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs, le 13/08/2026.
+  
+  Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu favorablement.
+  
+  Il se peut que le professionnel ayant réalisé la demande ou le ou la bénéficiaire souhaitent vous contacter pour de plus amples informations pratiques.
+  
+  Nous vous remercions par avance pour votre engagement.
+  
+  http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_structure[subject]
+  '[TEST] Vous venez de valider une demande 🎉'
+# ---
 # name: test_new_orientation_for_beneficiary[sender_is_not_referent][body]
   '''
   Bonjour,
