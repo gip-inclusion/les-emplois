@@ -30,6 +30,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.brand import product_name
 from itou.utils.constants import MB
 from itou.utils.db import or_queries
 from itou.utils.validators import MaxDateValidator, MinDateValidator
@@ -391,10 +392,11 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                 self.add_error(
                     "email",
                     format_html(
-                        "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur les "
-                        'emplois de l’inclusion, vous pouvez <a href="{}" rel="noopener" target="_blank" '
+                        "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur {}, "
+                        'vous pouvez <a href="{}" rel="noopener" target="_blank" '
                         'aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">retrouver ici'
                         "</a> des prescripteurs habilités autour de chez vous.",
+                        product_name(),
                         reverse("search:prescribers_home"),
                     ),
                 )
