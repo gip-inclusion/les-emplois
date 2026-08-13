@@ -11,7 +11,6 @@ from django.utils import dateformat, timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -1036,14 +1035,17 @@ class TestInstitutionEvaluatedSiaeDetailView:
             <button class="btn btn-primary">
                 {self.submit_text}
             </button>"""
-        back_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        back_url = (
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+            + f"#{evaluated_siae.pk}"
         )
 
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1080,7 +1082,6 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
         assertContains(response, uploaded_status)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
@@ -1350,14 +1351,17 @@ class TestInstitutionEvaluatedSiaeDetailView:
             <button class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
-        back_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        back_url = (
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+            + f"#{evaluated_siae.pk}"
         )
 
         # EvaluatedAdministrativeCriteria not yet submitted
         not_transmitted_status = "Justificatifs non transmis"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1384,7 +1388,6 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
         assertContains(
             response,
             f"""
