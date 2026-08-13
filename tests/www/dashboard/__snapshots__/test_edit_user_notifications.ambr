@@ -832,6 +832,7 @@
                                                                                   %s,
                                                                                   %s,
                                                                                   %s,
+                                                                                  %s,
                                                                                   %s))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
@@ -861,6 +862,7 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,
@@ -1623,6 +1625,7 @@
                                                                                   %s,
                                                                                   %s,
                                                                                   %s,
+                                                                                  %s,
                                                                                   %s))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
@@ -1652,6 +1655,7 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,
@@ -2463,6 +2467,7 @@
                                                                                   %s,
                                                                                   %s,
                                                                                   %s,
+                                                                                  %s,
                                                                                   %s))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
@@ -2492,6 +2497,7 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,

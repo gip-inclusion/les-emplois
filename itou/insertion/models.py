@@ -856,6 +856,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         self.notification_processing_for_beneficiary.send()
         self.notification_processing_for_sender.send()
 
+    @xwf_models.transition()
+    def accept(self):
+        process_link = OrientationProcessLink.objects.create(orientation=self)
+        process_link.email_accepted_orientation_for_structure.send()
+        if not self.sender_is_referent:
+            self.email_accepted_orientation_for_referent.send()
+        self.notification_accepted_for_beneficiary.send()
+        self.notification_accepted_for_sender.send()
+
     # Notifications
     @property
     def notification_new_for_beneficiary(self):
@@ -874,6 +883,14 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         return orientation_notifications.ProcessingOrientationForSender(
             self.sender, orientation=self, can_view_personal_information=self.sender_can_view_personal_information
         )
+
+    @property
+    def notification_accepted_for_beneficiary(self):
+        return orientation_notifications.AcceptedOrientationForBeneficiary(self.beneficiary, orientation=self)
+
+    @property
+    def notification_accepted_for_sender(self):
+        return orientation_notifications.AcceptedOrientationForSender(self.sender, orientation=self)
 
     # Emails (to users that do not have an account)
     @property
@@ -896,6 +913,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         }
         subject = "insertion/email/processing_for_referent_subject.txt"
         body = "insertion/email/processing_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_accepted_orientation_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+        }
+        subject = "insertion/email/accepted_for_referent_subject.txt"
+        body = "insertion/email/accepted_for_referent_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -953,4 +980,15 @@ class OrientationProcessLink(models.Model):
         }
         subject = "insertion/email/new_for_structure_subject.txt"
         body = "insertion/email/new_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_accepted_orientation_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+        }
+        subject = "insertion/email/accepted_for_structure_subject.txt"
+        body = "insertion/email/accepted_for_structure_body.txt"
         return get_email_message(to, context, subject, body)
