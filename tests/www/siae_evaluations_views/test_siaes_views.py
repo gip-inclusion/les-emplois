@@ -493,7 +493,10 @@ class TestSiaeJobApplicationListView:
         evaluated_administrative_criteria.submitted_at = fake_now
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = client.get(self.url(evaluated_job_application.evaluated_siae))
-        assertContains(response, submit_disabled, html=True, count=1)
+        # Nothing left to submit: tell the SIAE uploaded proofs have been transmitted.
+        assertNotContains(response, submit_disabled, html=True)
+        assertNotContains(response, submit_active, html=True)
+        assertContains(response, "Vos justificatifs ont bien été <strong>transmis</strong>.", count=1)
         assertNotContains(response, select_criteria)
         assertNotContains(response, upload_proof)
 

@@ -33,19 +33,7 @@
                     <p class="h2 mb-0">Liste de mes auto-prescriptions à justifier</p>
                     <p>Contrôle initié le {{ evaluated_siae.evaluation_campaign.evaluations_asked_at|date:"d F Y" }}</p>
 
-                    <div class="c-box p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="p-0 flex-grow-1 m-0">
-                            Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>, veuillez les soumettre à validation.
-                            <br>
-                            La DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
-                        </div>
-                        <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
-                            {% csrf_token %}
-                            <button class="btn {% if is_submittable %}btn-primary{% else %}btn-primary disabled{% endif %}">
-                                Soumettre à validation
-                            </button>
-                        </form>
-                    </div>
+                    {% include "siae_evaluations/includes/submit_proofs_box.html" with csrf_token=csrf_token evaluated_siae=evaluated_siae is_submittable=is_submittable proofs_submitted=proofs_submitted only %}
 
                     {% for evaluated_job_application in evaluated_job_applications %}
                         {% with should_select_criteria=evaluated_job_application.should_select_criteria %}
@@ -54,17 +42,7 @@
                     {% endfor %}
 
                     {% if is_submittable %}
-                        <div class="c-box p-3 p-md-4 d-flex align-items-center gap-3">
-                            <div class="p-0 flex-grow-1 m-0">
-                                Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>, veuillez les soumettre à validation.
-                                <br>
-                                La DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
-                            </div>
-                            <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
-                                {% csrf_token %}
-                                <button class="btn btn-primary">Soumettre à validation</button>
-                            </form>
-                        </div>
+                        {% include "siae_evaluations/includes/submit_proofs_box.html" with csrf_token=csrf_token evaluated_siae=evaluated_siae is_submittable=is_submittable proofs_submitted=proofs_submitted only %}
                     {% endif %}
                 </div>
             </div>
