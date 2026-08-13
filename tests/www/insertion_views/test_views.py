@@ -1529,13 +1529,14 @@ class TestOrientationDetailsForServiceProvider:
             == snapshot
         )
 
-    def test_accept(self, client):
+    def test_accept(self, client, mailoutbox):
         link = OrientationProcessLinkFactory(
             orientation__status=OrientationStatus.PENDING,
             orientation__service__name="Accompagnement aux devoirs",
             orientation__service__uid="uid-service",
         )
         response = client.get(self.get_process_link_url(link))
+
         assertContains(response, "<span>Accepter</span>", html=True)
 
         accepted_at = timezone.now() + datetime.timedelta(hours=1)
@@ -1549,6 +1550,8 @@ class TestOrientationDetailsForServiceProvider:
         response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
         assertContains(response, "Cette orientation a déjà été traitée.")
         assert orientation.updated_at == accepted_at
+
+        assert len(mailoutbox) == 4  # email sent to structure, sender, beneficiary and referent
 
     @pytest.mark.parametrize(
         "from_status", [OrientationStatus.ACCEPTED, OrientationStatus.REFUSED, OrientationStatus.EXPIRED]
