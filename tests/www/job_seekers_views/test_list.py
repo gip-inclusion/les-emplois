@@ -119,10 +119,9 @@ def test_refused_access(client, url):
     forbidden_users = [
         JobSeekerFactory(),
         LaborInspectorFactory(membership=True),
-        CompanyFactory(with_membership=True, not_subject_to_iae_rules=True).members.first(),
     ]
     if url == reverse("job_seekers_views:list"):
-        forbidden_users.append(CompanyFactory(with_membership=True, subject_to_iae_rules=True).members.first())
+        forbidden_users.append(EmployerFactory(membership=True))
     for user in forbidden_users:
         client.force_login(user)
         response = client.get(url)
@@ -170,36 +169,38 @@ def test_displayed_tabs(client, user_factory, assertion):
 
 
 @pytest.mark.parametrize(
-    "user_factory, url, assertion",
+    "user_factory, url",
     [
         (
             partial(PrescriberFactory, membership=True),
             reverse("job_seekers_views:list"),
-            assertNotContains,
         ),
         (
             partial(PrescriberFactory, membership=True),
             reverse("job_seekers_views:list_organization"),
-            assertContains,
         ),
         (
             partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
             reverse("job_seekers_views:list_organization"),
-            assertContains,
+        ),
+        (
+            partial(EmployerFactory, membership=True, membership__company__not_subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
         ),
     ],
     ids=[
         "prescriber_assignments_filters",
         "prescriber_organization_assignments_filters",
         "siae_assignments_filters",
+        "geiq_or_opcs_assignments_filters",
     ],
 )
-def test_displayed_top_filters(client, user_factory, url, assertion):
+def test_displayed_top_filters(client, user_factory, url, snapshot):
     user = user_factory()
     client.force_login(user)
     response = client.get(url)
-
-    assertion(response, "Tous les filtres")
+    top_filters = pretty_indented(parse_response_to_soup(response, selector=".btn-dropdown-filter-group"))
+    assert top_filters == snapshot
 
 
 @pytest.mark.parametrize(
@@ -749,12 +750,9 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     [
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
-        (
-            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
-            reverse("job_seekers_views:list_organization"),
-        ),
+        (CompanyWith2MembershipsFactory, reverse("job_seekers_views:list_organization")),
     ],
-    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "employer_assignments_list"],
 )
 def test_htmx_job_seeker_filter(client, factory, url):
     organization = factory()
@@ -1286,8 +1284,17 @@ def test_filtered_by_organization_members(client, org_factory, membership_factor
             partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
             reverse("job_seekers_views:list_organization"),
         ),
+        (
+            partial(CompanyWith2MembershipsFactory, not_subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
     ],
-    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+    ids=[
+        "prescriber_assignments_list",
+        "prescriber_organization_assignments_list",
+        "siae_assignments_list",
+        "geiq_or_opcs_assignments_list",
+    ],
 )
 def test_htmx_filters(client, factory, url):
     organization = factory()
@@ -1306,9 +1313,12 @@ def test_htmx_filters(client, factory, url):
     page = parse_response_to_soup(response, selector="#main")
     # Simulate the data-emplois-sync-with and check both checkboxes.
     eligibility_validated_checkboxes = page.find_all("input", attrs={"name": "eligibility_validated"})
-    assert len(eligibility_validated_checkboxes) == 2
-    for checkbox in eligibility_validated_checkboxes:
-        checkbox["checked"] = ""
+    if isinstance(organization, PrescriberOrganization) or organization.is_subject_to_iae_rules:
+        assert len(eligibility_validated_checkboxes) == 2
+        for checkbox in eligibility_validated_checkboxes:
+            checkbox["checked"] = ""
+    else:
+        assert len(eligibility_validated_checkboxes) == 0
 
     response = client.get(url, {"eligibility_validated": "on"}, headers={"HX-Request": "true"})
     update_page_with_htmx(page, f"form[hx-get='{url}']", response)
@@ -1323,12 +1333,9 @@ def test_htmx_filters(client, factory, url):
     [
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
-        (
-            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
-            reverse("job_seekers_views:list_organization"),
-        ),
+        (CompanyWith2MembershipsFactory, reverse("job_seekers_views:list_organization")),
     ],
-    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "employer_assignments_list"],
 )
 def test_job_seekers_order(client, factory, url, subtests):
     organization = factory()
@@ -1430,12 +1437,9 @@ def test_job_seekers_order(client, factory, url, subtests):
     [
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
         (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
-        (
-            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
-            reverse("job_seekers_views:list_organization"),
-        ),
+        (CompanyWith2MembershipsFactory, reverse("job_seekers_views:list_organization")),
     ],
-    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "employer_assignments_list"],
 )
 def test_htmx_order(client, factory, url):
     organization = factory()

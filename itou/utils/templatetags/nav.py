@@ -395,8 +395,8 @@ def nav(request):
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
             menu_items.append(NAV_ENTRIES["employer-orientations"])
+            menu_items.append(NAV_ENTRIES["employer-assignments"])
             if request.current_organization.is_subject_to_iae_rules:
-                menu_items.append(NAV_ENTRIES["employer-assignments"])
                 employee_group_items = [NAV_ENTRIES["employer-approvals"]]
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
