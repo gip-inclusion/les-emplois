@@ -322,6 +322,370 @@
   
   '''
 # ---
+# name: test_displayed_top_filters[geiq_or_opcs_assignments_filters]
+  '''
+  <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Usagers sans solution
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                          <label class="form-check-label" for="id_is_stalled">
+                              N’afficher que les usagers sans solution
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">
+                      Qu’est-ce qu’un usager sans solution
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_displayed_top_filters[prescriber_assignments_filters]
+  '''
+  <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Situation IAE
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <strong class="dropdown-header">
+                      Éligibilité IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_validated">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_pending">
+                              À valider
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <strong class="dropdown-header">
+                      PASS IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_active">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_expired">
+                              Expiré
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_no_approval" name="no_approval" type="checkbox"/>
+                          <label class="form-check-label" for="id_no_approval">
+                              Aucun
+                          </label>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Usagers sans solution
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                          <label class="form-check-label" for="id_is_stalled">
+                              N’afficher que les usagers sans solution
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">
+                      Qu’est-ce qu’un usager sans solution
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_displayed_top_filters[prescriber_organization_assignments_filters]
+  '''
+  <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Situation IAE
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <strong class="dropdown-header">
+                      Éligibilité IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_validated">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_pending">
+                              À valider
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <strong class="dropdown-header">
+                      PASS IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_active">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_expired">
+                              Expiré
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_no_approval" name="no_approval" type="checkbox"/>
+                          <label class="form-check-label" for="id_no_approval">
+                              Aucun
+                          </label>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Usagers sans solution
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                          <label class="form-check-label" for="id_is_stalled">
+                              N’afficher que les usagers sans solution
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">
+                      Qu’est-ce qu’un usager sans solution
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
+          <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+          </i>
+          <span>
+              Tous les filtres
+              <span id="all-filters-btn">
+              </span>
+          </span>
+      </button>
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_displayed_top_filters[siae_assignments_filters]
+  '''
+  <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Situation IAE
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <strong class="dropdown-header">
+                      Éligibilité IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_validated">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                          <label class="form-check-label" for="id_eligibility_pending">
+                              À valider
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <strong class="dropdown-header">
+                      PASS IAE
+                  </strong>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_active">
+                              Valide
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                          <label class="form-check-label" for="id_approval_expired">
+                              Expiré
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_no_approval" name="no_approval" type="checkbox"/>
+                          <label class="form-check-label" for="id_no_approval">
+                              Aucun
+                          </label>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Usagers sans solution
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <div class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                          <label class="form-check-label" for="id_is_stalled">
+                              N’afficher que les usagers sans solution
+                          </label>
+                      </div>
+                  </div>
+              </li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">
+                      Qu’est-ce qu’un usager sans solution
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
+          <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+          </i>
+          <span>
+              Tous les filtres
+              <span id="all-filters-btn">
+              </span>
+          </span>
+      </button>
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_empty_list[/job-seekers/list-organization]
   '''
   <main class="s-main" id="main" role="main">

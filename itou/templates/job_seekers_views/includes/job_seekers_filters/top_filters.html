@@ -4,7 +4,9 @@
     <div class="col-12">
         <div>{% bootstrap_form_errors filters_form %}</div>
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-            {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form btn_dropdown_filter=True only %}
+            {% if request.from_iae_actor %}
+                {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form btn_dropdown_filter=True only %}
+            {% endif %}
             <div class="dropdown">
                 <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     Usagers sans solution
@@ -22,7 +24,7 @@
             {% if request.from_authorized_prescriber %}
                 {% include "job_seekers_views/includes/job_seekers_filters/end_of_journey.html" with filters_form=filters_form btn_dropdown_filter=True only %}
             {% endif %}
-            {% if list_organization %}
+            {% if list_organization and request.from_iae_actor %}
                 <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
                     <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
                     <span>Tous les filtres <span id="all-filters-btn"></span></span>

@@ -327,7 +327,7 @@ def switch_stalled_status(request, public_id):
 
 
 @http_methods(db_write=["POST"])
-@check_request(lambda request: request.from_iae_actor)
+@check_request(lambda request: request.from_prescriber or request.from_employer)
 def assign_oneself_as_last_known_advisor(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER),
@@ -338,7 +338,7 @@ def assign_oneself_as_last_known_advisor(request, public_id):
 
 
 @readonly_view
-@check_request(lambda request: request.from_iae_actor)
+@check_request(lambda request: request.from_prescriber or request.from_employer)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if request.from_employer:
         if not list_organization:

@@ -63,28 +63,21 @@ def test_view(client):
     "professional_factory",
     [
         partial(PrescriberFactory, membership=True),
-        partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
+        partial(EmployerFactory, membership=True),
     ],
-    ids=["prescriber", "iae_employer"],
+    ids=["prescriber", "employer"],
 )
 def test_invalid(client, professional_factory):
     # Needs to be logged in
     response = client.get(reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()}))
     assert response.status_code == 302
 
-    professional = EmployerFactory(membership=True, membership__company__not_subject_to_iae_rules=True)
+    professional = professional_factory()
     client.force_login(professional)
 
     # Needs to be a POST request
     response = client.get(reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()}))
     assert response.status_code == 405
-
-    # Needs to be a prescriber or a IAE employer
-    response = client.post(reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()}))
-    assert response.status_code == 403
-
-    professional = professional_factory()
-    client.force_login(professional)
 
     # Needs to be an existing jobseeker
     response = client.post(reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()}))
