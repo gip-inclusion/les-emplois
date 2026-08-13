@@ -178,11 +178,16 @@ def test_transition_process():
 
 
 @pytest.mark.parametrize("from_state", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
-def test_transition_accept(from_state):
-    orientation = OrientationFactory(status=from_state)
+@pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
+def test_transition_accept(from_state, sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
+    orientation = OrientationFactory(status=from_state, service__contact_email="service.contact@email.fake")
+    if sender_is_referent:
+        orientation.referent_email = orientation.sender.email
+        orientation.save()
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
-        orientation.accept()
+        with django_capture_on_commit_callbacks(execute=True):
+            orientation.accept()
 
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
@@ -193,6 +198,18 @@ def test_transition_accept(from_state):
     )
     assert log.orientation.status == OrientationStatus.ACCEPTED
     assert log.orientation.updated_at == timestamp
+
+    assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
+
+    # Notifications
+    if sender_is_referent:
+        [structure_email, beneficiary_email, sender_email] = mailoutbox
+    else:
+        [structure_email, referent_email, beneficiary_email, sender_email] = mailoutbox
+        assert referent_email.to == [orientation.referent_email]
+    assert structure_email.to == [orientation.service.contact_email]
+    assert beneficiary_email.to == [orientation.beneficiary.email]
+    assert sender_email.to == [orientation.sender.email]
 
 
 @pytest.mark.parametrize("from_state", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
