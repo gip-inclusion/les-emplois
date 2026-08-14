@@ -1,0 +1,20 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+{{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} a envoyé une demande d’orientation en votre nom, auprès du service {{ orientation.service.name }}, le {{ orientation.created_at|date:"d/m/Y" }}.
+
+Malheureusement, la structure n’a pas pu donner suite à cette demande d’orientation sur ce service.
+
+*Des questions ?* Contactez la personne qui vous accompagne :
+- {{ orientation.sender.get_full_name }}
+- {{ orientation.sender.email }}
+
+{% if not orientation.sender_is_referent %}
+ou bien votre conseiller·e référent·e :
+- {{ orientation.referent_first_name|title }} {{ orientation.referent_last_name|upper }}
+- {{ orientation.referent_email }} - {{ orientation.referent_phone }}
+{% endif %}
+
+{% endblock body %}

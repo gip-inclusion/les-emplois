@@ -1617,7 +1617,7 @@ class TestOrientationRefuseForServiceProvider:
         assert response.status_code == 404
 
     @pytest.mark.parametrize("from_status", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
-    def test_refuse(self, client, from_status):
+    def test_refuse(self, client, mailoutbox, from_status):
         link = OrientationProcessLinkFactory(
             orientation__status=from_status,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1660,6 +1660,8 @@ class TestOrientationRefuseForServiceProvider:
             OrientationRefusalReason.SESSION_FULL,
         ]
         assert orientation.updated_at == refused_at
+
+        assert len(mailoutbox) != 0
 
     def test_refuse_incorrect_data(self, client):
         with freeze_time(timezone.now()):  # ensure created_at == updated_at

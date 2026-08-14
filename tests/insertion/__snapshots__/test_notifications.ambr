@@ -270,6 +270,7 @@
 # name: test_new_orientation_for_structure[subject]
   '[TEST] Nouvelle demande d’orientation reçue'
 # ---
+<<<<<<< HEAD
 # name: test_processing_orientation_for_beneficiary[body]
   '''
   Bonjour,
@@ -381,3 +382,201 @@
 # name: test_processing_orientation_for_sender[from_unauthorized_prescriber][subject]
   '[TEST] Votre demande d’orientation est en cours de traitement'
 # ---
+||||||| parent of 501c98ff5 (insertion: send emails when orientation is refused)
+=======
+# name: test_refused_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. a envoyé une demande d’orientation en votre nom, auprès du service Aide aux devoirs, le 13/08/2026.
+  
+  Malheureusement, la structure n’a pas pu donner suite à cette demande d’orientation sur ce service.
+  
+  *Des questions ?* Contactez la personne qui vous accompagne :
+  - Pierre DUPONT
+  - pierre.dupont@test.local
+  
+  ou bien votre conseiller·e référent·e :
+  - Flora TRISTAN
+  - prescriptrice@inclusion.gouv.fr - 0102030405
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_beneficiary[subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_referent[subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour J… D… sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  Pierre DUPONT de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs, le 13/08/2026.
+  
+  Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
+  
+  Votre décision de ne pas donner suite à cette demande pour le moment a été transmise à ou aux accompagnateur(s) de Jane DOE. La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Il se peut que le professionnel ayant réalisé la demande ou le ou la bénéficiaire souhaitent vous contacter pour de plus amples informations pratiques.
+  
+  Nous vous remercions par avance pour votre engagement.
+  
+  http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_structure[subject]
+  '[TEST] Vous venez de refuser une demande'
+# ---
+>>>>>>> 501c98ff5 (insertion: send emails when orientation is refused)
