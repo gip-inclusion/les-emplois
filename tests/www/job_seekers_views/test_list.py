@@ -1214,7 +1214,7 @@ def test_filtered_by_is_stalled(client):
             lambda org: partial(PrescriberMembershipFactory, organization=org),
         ),
         (
-            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            CompanyWith2MembershipsFactory,
             lambda org: partial(CompanyMembershipFactory, company=org),
         ),
     ],
