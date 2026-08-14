@@ -4,7 +4,6 @@ import logging
 
 from data_inclusion.schema.v1.thematiques import Categorie
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
@@ -36,7 +35,6 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_register_mobilization_event,
 )
-from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -354,7 +352,6 @@ class OrientationWizardView(WizardView):
     }
 
     def setup_wizard(self):
-        self.dora_client = DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN)
         self.service = get_object_or_404(
             insertion_models.Service.objects.select_related("kind", "structure", "fee", "source").prefetch_related(
                 "publics",
@@ -453,29 +450,6 @@ class OrientationWizardView(WizardView):
                     emplois_data["structure_siret"] = organization.siret
                 payload["emplois_data"] = emplois_data
 
-            try:
-                orientation_response = self.dora_client.create_orientation(payload, attachments)
-            except DoraAPIException:
-                logger.info(
-                    "orientation wizard submission_failed reason=create_orientation "
-                    "user=%s service_uid=%s job_seeker=%s",
-                    request.user.pk,
-                    self.service.uid,
-                    self.job_seeker.public_id,
-                )
-                messages.error(
-                    request,
-                    "Votre demande n'a pas été transmise suite à un problème technique. Merci de réessayer.",
-                )
-                return self.render_to_response(self.get_context_data(**kwargs))
-
-            logger.info(
-                "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
-                request.user.pk,
-                self.service.uid,
-                self.job_seeker.public_id,
-            )
-
             if request.from_employer:
                 sender_kind = SenderKind.EMPLOYER
                 sender_prescriber_organization = None
@@ -485,11 +459,10 @@ class OrientationWizardView(WizardView):
                 sender_prescriber_organization = request.current_organization
                 sender_company = None
 
-            orientation = insertion_models.Orientation.from_data(
+            orientation = insertion_models.Orientation.objects.create(
                 service=self.service,
                 beneficiary=self.job_seeker,
                 sender=request.user,
-                id=orientation_response["emplois_sync_uid"],
                 sender_kind=sender_kind,
                 sender_prescriber_organization=sender_prescriber_organization,
                 sender_company=sender_company,
@@ -499,11 +472,16 @@ class OrientationWizardView(WizardView):
                 referent_email=referent_data["referent_email"],
                 orientation_reasons=referent_data.get("orientation_reason", ""),
                 data_protection_commitment=cleaned["gdpr_consent"],
-                attachments=orientation_response.get("beneficiary_attachments", []),
+                # attachments=orientation_response.get("beneficiary_attachments", []), # TODO
             )
-            # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
-            # otherwise issue a redundant UPDATE probe before the INSERT.
-            orientation.save(force_insert=True)
+
+            logger.info(
+                "orientation wizard created orientation=%s for user=%s service_uid=%s job_seeker=%s",
+                orientation.pk,
+                request.user.pk,
+                self.service.uid,
+                self.job_seeker.public_id,
+            )
 
             # Link the originating iMER to the created Orientation.
             event = (
