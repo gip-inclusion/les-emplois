@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
@@ -625,7 +626,7 @@ class OrientationWorkflow(xwf_models.Workflow):
 
 
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
-    id = models.UUIDField(primary_key=True, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
     beneficiary = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -767,10 +768,6 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
 
     def __str__(self):
         return str(self.id)
-
-    @classmethod
-    def from_data(cls, service, beneficiary, sender, **kwargs):
-        return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
 
     @property
     def sender_organization(self):
