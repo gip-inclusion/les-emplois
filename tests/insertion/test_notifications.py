@@ -195,3 +195,64 @@ def test_refused_orientation_for_beneficiary(snapshot):
     assert email.to == [orientation.beneficiary.email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
+
+
+@freeze_time("2026-08-13")
+def test_expired_orientation_for_structure(snapshot):
+    link = ProcessOrientationLinkFactory(orientation__for_snapshot=True)
+    email = link.email_orientation_expired_for_structure
+
+    assert email.to == [link.orientation.service.contact_email]
+    assert email.subject == snapshot(name="subject")
+    body = email.body.replace(str(link.pk), "[PK of ProcessOrientationLink]")
+    assert body == snapshot(name="body")
+
+
+def test_expired_orientation_for_referent(snapshot):
+    orientation = OrientationFactory(for_snapshot=True)
+    email = orientation.email_orientation_expired_for_referent
+
+    assert email.to == [orientation.referent_email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+@pytest.mark.parametrize(
+    "membership_factory",
+    [
+        CompanyMembershipFactory,
+        partial(PrescriberMembershipFactory, organization__authorized=True),
+        PrescriberMembershipFactory,
+    ],
+    ids=["from_employer", "from_authorized_prescriber", "from_unauthorized_prescriber"],
+)
+def test_expired_orientation_for_sender(snapshot, membership_factory):
+    membership = membership_factory()
+    sender_prescriber_organization = membership.organization if isinstance(membership, PrescriberMembership) else None
+    sender_company = membership.company if isinstance(membership, CompanyMembership) else None
+    sender_kind = SenderKind.PRESCRIBER if sender_prescriber_organization else SenderKind.EMPLOYER
+
+    orientation = OrientationFactory(
+        for_snapshot=True,
+        sender_kind=sender_kind,
+        sender=membership.user,
+        sender_prescriber_organization=sender_prescriber_organization,
+        sender_company=sender_company,
+    )
+    email = notifications.OrientationExpiredForSenderNotification(orientation.sender, orientation=orientation).build()
+
+    assert email.to == [orientation.sender.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+@freeze_time("2026-08-13")
+def test_expired_orientation_for_beneficiary(snapshot):
+    orientation = OrientationFactory(for_snapshot=True)
+    email = notifications.OrientationExpiredForBeneficiaryNotification(
+        orientation.beneficiary, orientation=orientation
+    ).build()
+
+    assert email.to == [orientation.beneficiary.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
