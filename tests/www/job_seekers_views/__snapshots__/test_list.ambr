@@ -350,6 +350,22 @@
               </li>
           </ul>
       </div>
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Accompagnateur de ma structure
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <div class="dropdown-item">
+                      <label class="form-label" for="id_organization_members">
+                          Nom de la personne
+                      </label>
+                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+                      </select>
+                  </div>
+              </li>
+          </ul>
+      </div>
       <div class="ms-md-auto" id="job-seekers-list-filter-counter">
       </div>
   </div>
