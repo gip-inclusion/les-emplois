@@ -1,0 +1,21 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+{{ orientation.sender.get_inverted_full_name }} de la structure {{ orientation.sender_organization.name }} vous a adressé un bénéficiaire pour le service {{ orientation.service.name }}, le {{ orientation.created_at|date:"d/m/Y" }}.
+
+Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
+
+Votre décision de ne pas donner suite à cette demande pour le moment a été transmise à ou aux accompagnateur(s) de {{ orientation.beneficiary.get_inverted_full_name }}. La ou les raisons spécifiques évoquées sont les suivantes :
+{% for reason in reasons %}- {{ reason }}
+{% endfor %}
+{% if orientation.refusal_details %}{{ orientation.refusal_details }}{% endif %}
+
+Il se peut que le professionnel ayant réalisé la demande ou le ou la bénéficiaire souhaitent vous contacter pour de plus amples informations pratiques.
+
+Nous vous remercions par avance pour votre engagement.
+
+{{ process_link }}
+
+{% endblock body %}

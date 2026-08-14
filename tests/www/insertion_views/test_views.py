@@ -1423,7 +1423,7 @@ class TestProcessOrientationView:
         # todo after having tested orientation_details_for_service_provider
         pass
 
-    def test_refuse(self, client):
+    def test_refuse(self, client, mailoutbox):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
             orientation__service__name="Accompagnement aux devoirs",
@@ -1488,6 +1488,8 @@ class TestProcessOrientationView:
             OrientationRefusalReason.SESSION_FULL,
         ]
         assert orientation.updated_at == refused_at
+
+        assert len(mailoutbox) != 0
 
     def test_cannot_refuse(self, client):
         link = ProcessOrientationLinkFactory(
