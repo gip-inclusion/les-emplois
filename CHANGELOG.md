@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-08-03
+
+### Ajouté
+
+- [Insertion : Ajout d'une commande d'import d'orientations Les Emplois à partir d'un fichier d'export de Dora](https://github.com/gip-inclusion/les-emplois/pull/8479)
+- [Insertion : Enregistrement d'une orientation localement après POST Dora](https://github.com/gip-inclusion/les-emplois/pull/8465)
+- [Insertion : Synchronisation automatique du statut des orientations depuis Dora](https://github.com/gip-inclusion/les-emplois/pull/8495)
+
+### Modifié
+
+- [Accompagnateurs : Amélioration de la liste des bénéficiaires](https://github.com/gip-inclusion/les-emplois/pull/8483)
+- [Accompagnateur : Ne pas afficher comme dernier accompagnateur un utilisateur dont le compte est désactivé](https://github.com/gip-inclusion/les-emplois/pull/8515)
+- [Candidature : Ajout d'un bloc d'information concernant les dates de contrat](https://github.com/gip-inclusion/les-emplois/pull/8498)
+- [Contrôle a posteriori : Correction de l'alignement sur la page de sélection de l'échantillon](https://github.com/gip-inclusion/les-emplois/pull/8507)
+- [Insertion : Meilleur affichage des listes avec Markdown](https://github.com/gip-inclusion/les-emplois/pull/8508)
+- [Insertion : Permettre la soft-suppression des services et structures](https://github.com/gip-inclusion/les-emplois/pull/8472)
+- [Technique : Amélioration du middleware de permissions](https://github.com/gip-inclusion/les-emplois/pull/8480)
+
 ## 2026-07-27
 
 ### Ajouté
