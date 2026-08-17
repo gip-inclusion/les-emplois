@@ -801,6 +801,7 @@ AFPA_DEPARTMENTS = []
 # Mon récap
 # ------------------------------------------------------------------------------
 MON_RECAP_BANNER_DEPARTMENTS = ["59", "69", "93"]
+MON_RECAP_WWW_BASE_URL = os.getenv("MON_RECAP_WWW_BASE_URL", "https://mon-recap.inclusion.beta.gouv.fr")
 
 # Immersion facile
 # ------------------------------------------------------------------------------
