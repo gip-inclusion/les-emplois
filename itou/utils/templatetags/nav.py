@@ -445,22 +445,3 @@ def nav(request):
     except Exception as e:
         silently_report_exception(e)
     return {"menu_items": menu_items}
-
-
-@register.inclusion_tag("utils/templatetags/nav_anonymous.html")
-def nav_anonymous(request, *, mobile):
-    menu_items = [
-        NAV_ENTRIES["anonymous-search-employers"],
-        NAV_ENTRIES["anonymous-search-prescribers"],
-        NAV_ENTRIES["anonymous-search-services"],
-    ]
-    try:
-        if request.resolver_match:
-            for item in menu_items:
-                item.active = is_active(request, item)
-    except Exception as e:
-        silently_report_exception(e)
-    return {
-        "menu_items": menu_items,
-        "mobile": mobile,
-    }
