@@ -1,4 +1,3 @@
-{% load nav %}
 {% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
@@ -53,13 +52,6 @@
             </div>
         </div>
     </section>
-    <section class="s-postheader d-none d-xl-block">
-        <div class="s-postheader__container container">
-            <div class="s-postheader__row row">
-                <div class="s-postheader__col col-12 d-flex align-items-center">{% nav_anonymous request mobile=False %}</div>
-            </div>
-        </div>
-    </section>
     <div class="offcanvas" id="offcanvasNav" aria-label="Navigation principale pour mobile">
         <div class="offcanvas-header">
             <h4 class="h5 mb-0 btn-ico align-items-center" id="offcanvasApplyFiltersLabel">
@@ -70,7 +62,6 @@
                 <i class="ri-close-line" aria-hidden="true"></i>
             </button>
         </div>
-        <div class="offcanvas-body">{% nav_anonymous request mobile=True %}</div>
         <div class="offcanvas-footer flex-column align-items-stretch">
             <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
                 <div class="dropup-center dropdown-login">
