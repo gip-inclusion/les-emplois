@@ -60,6 +60,8 @@ class TestDashboardView:
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
+    MON_RECAP_DISCOVER_LABEL = "Découvrir le carnet Mon Récap"
+    MON_RECAP_ORDER_LABEL = "Commander des carnets Mon Récap pour vos usagers"
 
     @staticmethod
     def apply_start_url(company):
@@ -613,6 +615,32 @@ class TestDashboardView:
         assertContains(response, "Consulter les services d'insertion de votre territoire")
         assertContains(response, "Référencer vos services")
         assertContains(response, "Suggérer un service partenaire")
+
+    def test_mon_recap_card_is_not_shown_for_job_seeker(self, client):
+        user = JobSeekerFactory(with_address=True)
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, self.MON_RECAP_DISCOVER_LABEL)
+        assertNotContains(response, self.MON_RECAP_ORDER_LABEL)
+
+    def test_mon_recap_card_is_shown_for_employer(self, client, settings):
+        company = CompanyFactory(with_membership=True)
+        client.force_login(company.members.first())
+
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, self.MON_RECAP_DISCOVER_LABEL)
+        assertContains(response, self.MON_RECAP_ORDER_LABEL)
+        assertContains(response, f"{settings.MON_RECAP_WWW_BASE_URL}/commander-carnets/")
+
+    def test_mon_recap_card_is_shown_for_prescriber(self, client, settings):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
+        client.force_login(prescriber_organization.members.first())
+
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, self.MON_RECAP_DISCOVER_LABEL)
+        assertContains(response, self.MON_RECAP_ORDER_LABEL)
+        assertContains(response, f"{settings.MON_RECAP_WWW_BASE_URL}/commander-carnets/")
 
     def test_diagoriente_info_is_shown_in_sidebar_for_job_seeker(self, client):
         user = JobSeekerFactory(with_address=True)
