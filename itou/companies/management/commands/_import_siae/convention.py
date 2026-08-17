@@ -165,11 +165,11 @@ def check_convention_data_consistency():
         # Unfortunately some inactive conventions have lost their ASP siae.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == CompanySource.ASP]
         if convention.is_active:
-            assert len(asp_siaes) == 1, "unexpected length {len(asp_siaes)} for convention {convention.id}"
+            assert len(asp_siaes) == 1, f"unexpected length {len(asp_siaes)} for convention {convention.id}"
         else:
             assert 0 <= len(asp_siaes) <= 1
             # Check that each inactive convention has a grace period start date.
-            assert convention.deactivated_at is not None, "convention {convention.id} is unexpectedly active"
+            assert convention.deactivated_at is not None, f"convention {convention.id} is unexpectedly active"
 
         # Additional data consistency checks.
         for siae in convention.siaes.all():
