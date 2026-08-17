@@ -64,7 +64,7 @@
                                     {% if approval %}
                                         {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
                                     {% endif %}
-                                    {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_seeker request=request csrf_token=csrf_token only %}
+                                    {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_seeker last_assignment=last_assignment request=request csrf_token=csrf_token only %}
                                 </div>
                             </div>
                         </div>

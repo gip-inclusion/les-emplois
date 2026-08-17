@@ -43,6 +43,7 @@ from itou.www.apply.forms import (
 )
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_FOR_EMPLOYERS
+from itou.www.job_seekers_views.views import get_last_assignment
 
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "last_assignment": None,
     }
 
     return render(request, template_name, context)
@@ -250,6 +252,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             ),
             "matomo_custom_title": "Candidature",
             "job_application_sender_left_org": job_application_sender_left_org(job_application),
+            "last_assignment": get_last_assignment(request, job_application.job_seeker),
         }
         | get_siae_actions_context(request, job_application)
     )
@@ -398,6 +401,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "refusal_contact_email": refusal_contact_email,
         "with_job_seeker_detail_url": True,
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "last_assignment": get_last_assignment(request, job_application.job_seeker),
     }
 
     return render(request, template_name, context)
