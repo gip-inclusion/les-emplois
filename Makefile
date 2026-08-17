@@ -137,4 +137,4 @@ $(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/*/fixtures.py itou/
 
 # Recreate the database when fixtures change.
 resetdb: $(DBDUMP)
-	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore; fi
+	if [ $(DBREADY) = 0 ]; then $(MAKE) dumprestore; fi
