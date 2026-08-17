@@ -1,5 +1,6 @@
 {% load components %}
 {% load enums %}
+{% load matomo %}
 
 {% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
 
@@ -127,15 +128,18 @@
                 </li>
             {% endif %}
         </ul>
-        {% if assignment.advisor == request.user and assignment.organization == request.current_organization and not assignment.reason %}
-            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0 mt-3" %}
-                {% fragment as c_info__summary %}
-                    Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
-                {% endfragment %}
-                {% fragment as c_info__detail %}
-                    {# FIXME Add link :Préciser le motif de mon accompagnement #}
-                {% endfragment %}
-            {% endcomponent_info %}
+        {% if assignment.advisor == request.user and not assignment.reason %}
+            {% if assignment.organization == request.current_organization or not assignment.organization %}
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0 mt-3" %}
+                    {% fragment as c_info__summary %}
+                        Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        <a href="{% url 'job_seekers_views:edit_assignment' public_id=assignment.job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "accompagnateur" "clic" "renseigner-motif-accompagnement" %}>Préciser le motif de mon accompagnement</a>
+                    {% endfragment %}
+                {% endcomponent_info %}
+            {% endif %}
         {% endif %}
     </div>
     {% if assignment.advisor == request.user %}
