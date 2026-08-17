@@ -84,7 +84,7 @@ class NexusMixin:
 
         if Service.MON_RECAP in self.activated_services:
             context["monrecap_url"] = (
-                "https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer"
+                f"{settings.MON_RECAP_WWW_BASE_URL}/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer"
             )
         else:
             context["monrecap_url"] = reverse("nexus:activate_mon_recap")
