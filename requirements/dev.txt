@@ -1787,9 +1787,9 @@ pluggy==1.6.0 \
     # via
     #   -r test.txt
     #   pytest
-pre-commit==4.6.1 \
-    --hash=sha256:03e809865c7d178b9979d06c761fcbfe6808fdaded8581a745bb110e52050421 \
-    --hash=sha256:0e3b2942510d1fb34eec167a3ec57331bf8442122f1153a9fb8b58f5c49b2717
+pre-commit==4.6.2 \
+    --hash=sha256:8f5d7bfb021ecdbcd9d49d89847082dd24172ccde534390081a679ad046e2441 \
+    --hash=sha256:e2dde9a75d3bce11bd3831c26d134df00a2803c1d818be6a0383c3dcda25dc4e
     # via -r dev.in
 prompt-toolkit==3.0.53 \
     --hash=sha256:01c0891d7f9237d5e339f7d3e42cdae80b7534abb1c7c0e3352efba6231492f2 \
