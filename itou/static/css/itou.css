@@ -342,17 +342,8 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     border-top-right-radius: 0.5rem;
 }
 
-.c-box__header--gps {
-    background-image: url("../img/dashboard/card-header-bg-gps.png");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: contain;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
 .c-box__header--mon-recap {
-    background-image: url("../img/dashboard/card-header-bg-mon-recap.png");
+    background-image: url("../img/dashboard/card-header-bg-mon-recap-booklet.png");
     background-repeat: no-repeat;
     background-position: center right;
     background-size: contain;
