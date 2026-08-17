@@ -190,12 +190,12 @@ def get_template_context(context, service):
                 </form>
                 """,
                 context["monrecap_url"],
-                "https://mon-recap.inclusion.beta.gouv.fr/",
+                f"{settings.MON_RECAP_WWW_BASE_URL}/",
                 matomo_event("nexus", "decouvrir-service", Service.MON_RECAP),
                 CsrfTokenNode().render(context),
                 matomo_event("nexus", "activer-service", Service.MON_RECAP),
             ),
-            "find_out_url": "https://mon-recap.inclusion.beta.gouv.fr/",
+            "find_out_url": f"{settings.MON_RECAP_WWW_BASE_URL}/",
             "id": "monrecap",
         },
         Service.PILOTAGE: {
@@ -301,7 +301,7 @@ def get_service_urls(user):
             "activable": f"{marche_url}accounts/signup/",
         },
         Service.MON_RECAP: {
-            "activated": "https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer",
+            "activated": f"{settings.MON_RECAP_WWW_BASE_URL}/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer",
             "activable": reverse("nexus:mon_recap"),
         },
         Service.PILOTAGE: {
