@@ -42,14 +42,20 @@ sont rendues disponibles par [Docker](https://docs.docker.com/) et
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
 Démarrez les dépendances de développement avec la commande :
+
 ```sh
 docker compose up
+# ou
+podman compose up
 ```
 
 **Note** : Vous pouvez personnaliser la configuration des dépendances gérées
 par Docker Compose en créant [un fichier
 `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le
 fichier `README.md`.
+
+**Note** : Podman s'installe sur Debian via `sudo apt install podman
+podman-compose`.
 
 ### Dépendances Python
 
