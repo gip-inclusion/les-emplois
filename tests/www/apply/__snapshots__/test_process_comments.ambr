@@ -435,13 +435,15 @@
                                       </div>
                                   </div>
                                   <div class="c-box--accompagnateur__detail">
-                                      <hr class="mt-4 mb-3"/>
-                                      <p class="mb-0">
-                                          Vous intervenez sur le parcours de cet usager ?
-                                          <a class="btn-link" href="">
-                                              Ajoutez votre intervention
-                                          </a>
-                                      </p>
+                                      <div class="c-box--accompagnateur__detail">
+                                          <hr class="mt-4 mb-3"/>
+                                          <p class="mb-0">
+                                              Vous intervenez sur le parcours de cet usager ?
+                                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/apply/11111111-1111-1111-1111-111111111111/siae/details">
+                                                  Ajoutez votre intervention
+                                              </a>
+                                          </p>
+                                      </div>
                                   </div>
                               </div>
                               <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
@@ -1260,7 +1262,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 26,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -2481,6 +2483,42 @@
           WHERE ("job_applications_jobapplicationcomment"."job_application_id" = %s
                  AND "job_applications_jobapplicationcomment"."company_id" = %s)
           ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'get_last_assignment[www/job_seekers_views/views.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" = %s
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND NOT ("users_jobseekerassignment"."company_id" IS NULL
+                          AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
+                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({

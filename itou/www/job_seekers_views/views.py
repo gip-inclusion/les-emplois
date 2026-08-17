@@ -245,6 +245,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
+            "last_assignment": get_last_assignment(self.request, self.object),
         }
 
 

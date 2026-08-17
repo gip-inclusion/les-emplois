@@ -19,6 +19,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_edit_personal_information
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
+from itou.www.job_seekers_views.views import get_last_assignment
 
 
 logger = logging.getLogger(__name__)
@@ -120,6 +121,7 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
         context["immersion_convention_url"] = immersion_convention_url()
         context["approval_valid"] = approval and approval.is_valid()
         context["approval_expires_soon"] = approval and approval.remainder.days < 90
+        context["last_assignment"] = get_last_assignment(self.request, self.object)
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(

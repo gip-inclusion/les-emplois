@@ -116,16 +116,29 @@
                         {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
                     {% endif %}
                 {% elif assignment.organization == request.current_organization or not assignment.organization %}
-                    {% if assignment.is_active %}
-                        <div class="c-box--accompagnateur__detail">
+                    <div class="c-box--accompagnateur__detail">
+                        {% if assignment.is_active %}
                             {% include "job_seekers_views/includes/assignment_actions.html" with in_last_advisor_box=True %}
-                        </div>
-                    {% endif %}
+                        {% else %}
+                            {% partialdef create-assignment-link inline %}
+                                <hr class="mt-4 mb-3">
+                                <p class="mb-0">
+                                    Vous intervenez {% if last_assignment %}de nouveau {% endif %}sur le parcours de cet usager ?
+                                    <a href="{% url 'job_seekers_views:create_assignment' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                       class="btn-link"
+                                       {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>
+                                        Ajoutez votre intervention
+                                    </a>
+                                </p>
+                            {% endpartialdef %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if not last_assignment.is_active %}
+                    <div class="c-box--accompagnateur__detail">{% partial create-assignment-link %}</div>
                 {% endif %}
             {% elif request.from_employer or request.from_prescriber %}
-                <hr class="mt-4 mb-3">
-                {# FIXME: Add links/actions #}
-                <p class="mb-0">Vous intervenez sur le parcours de cet usager ? <a href="" class="btn-link">Ajoutez votre intervention</a></p>
+                <div class="c-box--accompagnateur__detail">{% partial create-assignment-link %}</div>
             {% endif %}
         </div>
     {% endwith %}
