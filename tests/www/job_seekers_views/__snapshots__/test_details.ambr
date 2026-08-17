@@ -766,9 +766,26 @@
                                       </i>
                                   </li>
                               </ul>
+                              <div class="c-info mb-0 mt-3">
+                                  <span class="c-info__summary">
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                  </span>
+                                  <div class="c-info__detail">
+                                      <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Préciser le motif de mon accompagnement
+                                      </a>
+                                  </div>
+                              </div>
                           </div>
                           <div class="c-box--results__footer">
                               <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                                  <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Modifier mon accompagnement
+                                      </span>
+                                  </a>
                                   <button class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
                                       <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
                                       </i>
@@ -1023,9 +1040,26 @@
                                       </i>
                                   </li>
                               </ul>
+                              <div class="c-info mb-0 mt-3">
+                                  <span class="c-info__summary">
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                  </span>
+                                  <div class="c-info__detail">
+                                      <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Préciser le motif de mon accompagnement
+                                      </a>
+                                  </div>
+                              </div>
                           </div>
                           <div class="c-box--results__footer">
                               <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                                  <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Modifier mon accompagnement
+                                      </span>
+                                  </a>
                               </div>
                           </div>
                       </div>
@@ -9351,6 +9385,13 @@
                                           <div class="c-box--accompagnateur__detail">
                                               <div class="c-box--accompagnateur__detail">
                                                   <div class="d-flex flex-column justify-content-md-end">
+                                                      <a class="btn btn-ico btn-outline-primary w-100 mt-3" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                                          </i>
+                                                          <span>
+                                                              Modifier mon accompagnement
+                                                          </span>
+                                                      </a>
                                                       <button class="btn btn-ico btn-outline-primary w-100 mt-3" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
                                                           <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
                                                           </i>

@@ -174,6 +174,11 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
                 f"archive-assignment-{assignment.pk}-modal-title",
                 "archive-assignment-[JobSeekerAssignment PK]-modal-title",
             ),
+            (
+                "href",
+                f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
+            ),
         ],
     )
     assert pretty_indented(soup) == snapshot(name="HTML page")
@@ -841,6 +846,21 @@ class TestLastAdvisor:
         """
         no_previous_assignment_text = "Vous intervenez sur le parcours de cet usager ?"
         previous_assignment_text = "Vous intervenez de nouveau sur le parcours de cet usager ?"
+        edit_assignment_url = (
+            reverse(
+                "job_seekers_views:edit_assignment",
+                kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
+            )
+            + f"?back_url={url}"
+        )
+        edit_assignment_btn = f"""
+            <a class="btn btn-ico btn-outline-primary w-100 mt-3" href={edit_assignment_url}
+                  data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="modifier-accompagnement">
+                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                <span>Modifier mon accompagnement</span>
+            </a>
+        """
 
         client.force_login(user)
 
@@ -849,6 +869,7 @@ class TestLastAdvisor:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, create_assignment_btn, html=True)
         assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
 
         # User is last advisor with no organization
         assignment.professional = user
@@ -857,6 +878,7 @@ class TestLastAdvisor:
         assertContains(response, archive_assignment_btn, html=True)
         assertContains(response, create_assignment_btn, html=True)
         assertContains(response, no_previous_assignment_text)
+        assertContains(response, edit_assignment_btn, html=True)
 
         # User is last advisor with different organization
         assignment.prescriber_organization = PrescriberOrganizationFactory()
@@ -865,6 +887,7 @@ class TestLastAdvisor:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, create_assignment_btn, html=True)
         assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
 
         # User is last advisor with same organization
         assignment.prescriber_organization = organization
@@ -872,6 +895,7 @@ class TestLastAdvisor:
         response = client.get(url)
         assertContains(response, archive_assignment_btn, html=True)
         assertNotContains(response, create_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
 
         # User is last advisor but assignment has ended
         assignment.ended_at = timezone.now()
@@ -881,6 +905,7 @@ class TestLastAdvisor:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, create_assignment_btn, html=True)
         assertContains(response, previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
 
         # No assignment
         assignment.delete()
@@ -888,6 +913,7 @@ class TestLastAdvisor:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, create_assignment_btn, html=True)
         assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
 
 
 @freeze_time("2024-08-14")
@@ -1200,6 +1226,11 @@ class TestAdvisorsTab:
                         f"archive-assignment-{assignment.pk}-modal-title",
                         "archive-assignment-[JobSeekerAssignment PK]-modal-title",
                     ),
+                    (
+                        "href",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
+                    ),
                 ],
             )
         ) == snapshot(name="active_only")
@@ -1227,6 +1258,11 @@ class TestAdvisorsTab:
                         "id",
                         str(assignment.pk),
                         "[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "href",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
                     ),
                 ],
             )
@@ -1318,29 +1354,58 @@ class TestAdvisorsTab:
                 <span>Terminer mon accompagnement</span>
             </button>
         """
+        edit_assignment_url = (
+            reverse(
+                "job_seekers_views:edit_assignment",
+                kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+            )
+            + f"?back_url={url}"
+        )
+        edit_assignment_btn = f"""
+            <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" href={edit_assignment_url}
+                  data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="modifier-accompagnement">
+                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                <span>Modifier mon accompagnement</span>
+            </a>
+        """
+        fill_assignment_reason_btn = f"""
+            <a href={edit_assignment_url} data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="renseigner-motif-accompagnement">
+                Préciser le motif de mon accompagnement
+            </a>
+        """
 
         # Assignment with different user
         client.force_login(user)
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
 
         # Assignment with no organization
         assignment.professional = user
         assignment.save()
         response = client.get(url)
         assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
 
         # Assignment with different organization
         assignment.prescriber_organization = PrescriberOrganizationFactory()
         assignment.save()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
 
         # Assignment with same organization
         assignment.prescriber_organization = organization
         assignment.save()
         response = client.get(url)
         assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
 
         # Archived assignment
         assignment.ended_at = timezone.now()
@@ -1348,3 +1413,13 @@ class TestAdvisorsTab:
         assignment.save()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
+
+        # Assignment with reason
+        assignment.reason = "iae"
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)

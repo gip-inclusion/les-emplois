@@ -1,13 +1,14 @@
 {% load matomo %}
 
 <div class="d-flex flex-column justify-content-md-end {% if not in_last_advisor_box %}flex-md-row gap-3{% endif %}">
-    {# FIXME: Add edit button #}
-    {% comment %}
-        <button class="btn btn-ico btn-outline-primary w-100 {% if in_last_advisor_box %}mt-3{% else %}w-md-auto{% endif %}">
+    {% if assignment.is_active or not in_last_advisor_box %}
+        <a class="btn btn-ico btn-outline-primary w-100 {% if in_last_advisor_box %}mt-3{% else %}w-md-auto{% endif %}"
+           href="{% url 'job_seekers_views:edit_assignment' public_id=assignment.job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ request.get_full_path|urlencode }}"
+           {% matomo_event "accompagnateur" "clic" "modifier-accompagnement" %}>
             <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
             <span>Modifier mon accompagnement</span>
-        </button>
-    {% endcomment %}
+        </a>
+    {% endif %}
     {% if assignment.is_active %}
         <button class="btn btn-ico btn-outline-primary w-100 {% if in_last_advisor_box %}mt-3{% else %}w-md-auto{% endif %}" data-bs-toggle="modal" data-bs-target="#archive-assignment-{{ assignment.pk }}-modal">
             <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
