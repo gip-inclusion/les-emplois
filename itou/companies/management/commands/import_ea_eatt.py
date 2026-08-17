@@ -123,7 +123,7 @@ class Command(BaseCommand):
     def process_file(self, file, *, wet_run=False):
         header = next(file)
         if not header.startswith("L|ASP|EA|"):  # Start of file header
-            raise RuntimeError("File doesn't conform to the expected format: %s", "L|ASP|EA|")
+            raise RuntimeError("File doesn't conform to the expected format: L|ASP|EA|")
 
         columns = next(file).rstrip("\n|").split("|")[1:]
         rows = []
@@ -133,7 +133,7 @@ class Command(BaseCommand):
                 break
             rows.append(dict(zip(columns, line.rstrip("\n|").split("|")[1:])))
         else:
-            raise RuntimeError("File doesn't conform to the expected format: %s", "Z|ASP|EA|")
+            raise RuntimeError("File doesn't conform to the expected format: Z|ASP|EA|")
 
         if not rows:
             self.logger.info("No rows found in file '%s', nothing to be done", file.name)

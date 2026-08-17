@@ -246,7 +246,7 @@ def get_user_kind_display(user):
         return "professionnel"
     elif user.is_job_seeker:
         return "candidat"
-    raise ValueError("Invalid user kind: %s", user.kind)
+    raise ValueError(f"Invalid user kind: {user.kind}")
 
 
 @require_POST
@@ -259,7 +259,7 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
         "phone": "gps/includes/member_phone.html",
     }.get(mode, None)
     if not template_name:
-        raise ValueError("Invalid mode: %s", mode)
+        raise ValueError(f"Invalid mode: {mode}")
 
     are_colleagues = False
 

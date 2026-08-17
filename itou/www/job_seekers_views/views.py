@@ -1622,7 +1622,7 @@ def display_advisor_contact_info(
         "phone": lambda assignment: assignment.advisor.phone,
     }.get(mode)
     if not getter:
-        raise ValueError("Invalid mode: %s", mode)
+        raise ValueError(f"Invalid mode: {mode}")
     assignment = get_object_or_404(
         JobSeekerAssignment.objects.select_related("company", "professional", "prescriber_organization"),
         pk=assignment_id,
