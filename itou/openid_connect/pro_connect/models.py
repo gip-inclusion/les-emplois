@@ -42,7 +42,7 @@ class ProConnectUserData(OIDConnectUserData):
 
     def join_org(self, user: User, safir: str):
         if not user.is_professional:
-            raise ValueError("Invalid user kind: %s", user.kind)
+            raise ValueError(f"Invalid user kind: {user.kind}")
         try:
             organization = PrescriberOrganization.objects.get(code_safir_pole_emploi=safir)
         except PrescriberOrganization.DoesNotExist:
