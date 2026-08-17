@@ -731,6 +731,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -788,6 +789,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -804,6 +806,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -825,30 +828,50 @@ class TestLastAdvisor:
                 <span>Terminer mon accompagnement</span>
             </button>
         """
+        create_assignment_url = (
+            reverse("job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id})
+            + f"?back_url={url}"
+        )
+        create_assignment_btn = f"""
+            <a href="{create_assignment_url}" class="btn-link" data-matomo-event="true"
+                  data-matomo-category="accompagnateur" data-matomo-action="clic"
+                  data-matomo-option="ajouter-accompagnement">
+                Ajoutez votre intervention
+            </a>
+        """
+        no_previous_assignment_text = "Vous intervenez sur le parcours de cet usager ?"
+        previous_assignment_text = "Vous intervenez de nouveau sur le parcours de cet usager ?"
 
         client.force_login(user)
 
         # Last advisor exists but is not the user
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
 
         # User is last advisor with no organization
         assignment.professional = user
         assignment.save()
         response = client.get(url)
         assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
 
         # User is last advisor with different organization
         assignment.prescriber_organization = PrescriberOrganizationFactory()
         assignment.save()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
 
         # User is last advisor with same organization
         assignment.prescriber_organization = organization
         assignment.save()
         response = client.get(url)
         assertContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, create_assignment_btn, html=True)
 
         # User is last advisor but assignment has ended
         assignment.ended_at = timezone.now()
@@ -856,11 +879,15 @@ class TestLastAdvisor:
         assignment.save()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, previous_assignment_text)
 
         # No assignment
         assignment.delete()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
 
 
 @freeze_time("2024-08-14")

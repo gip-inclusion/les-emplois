@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 32,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -1021,6 +1021,42 @@
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'get_last_assignment[www/job_seekers_views/views.py]',
+          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" = %s
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND NOT ("users_jobseekerassignment"."company_id" IS NULL
+                          AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
+                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({
