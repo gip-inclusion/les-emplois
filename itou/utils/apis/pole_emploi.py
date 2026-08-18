@@ -347,14 +347,28 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         if code_sortie != API_MAJ_PASS_SUCCESS:
             raise PoleEmploiAPIBadResponse(response_code=code_sortie, response_data=data)
 
-    def referentiel(self, code):
+    def referentiel(self, code, cache_timeout=datetime.timedelta(days=7).total_seconds()):
         """API documentation:
         https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation
         """
+        cache_key = f"{str(type(self))}.referentiel({code})"
+        result = caches["failsafe"].get(cache_key)
+        if result:
+            return result
         self.needed_scopes |= {"o2dsoffre", "api_offresdemploiv2"}
-        return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
+        result = self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
+        caches["failsafe"].set(cache_key, result)
+        return result
 
-    def offres(self, typeContrat="", natureContrat="", entreprisesAdaptees=None, range=None):
+    def offres(
+        self,
+        typeContrat="",
+        natureContrat="",
+        entreprisesAdaptees=None,
+        employeursHandiEngages=None,
+        departement=None,
+        range=None,
+    ):
         """API documentation:
         https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation
 
@@ -379,6 +393,10 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
         if entreprisesAdaptees is not None:
             params["entreprisesAdaptees"] = entreprisesAdaptees
+        if employeursHandiEngages is not None:
+            params["employeursHandiEngages"] = employeursHandiEngages
+        if departement is not None:
+            params["departement"] = departement
         if range:
             params["range"] = range
         data = self._request(f"{self.base_url}/offresdemploi/v2/offres/search", params=params, method="GET")
@@ -392,28 +410,44 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         natureContrat="",
         *,
         entreprisesAdaptees=None,
+        employeursHandiEngages=None,
         delay_between_requests=datetime.timedelta(0),
     ):
-        # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE offers.
-        # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
-        # by requesting every department one by one. But so far we are not even close from half this quota.
-        raw_offers = []
-        for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
-            max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
-            offers = self.offres(
-                typeContrat=typeContrat,
-                natureContrat=natureContrat,
-                entreprisesAdaptees=entreprisesAdaptees,
-                range=f"{i}-{max_range}",
-            )
-            logger.info(f"retrieved count={len(offers)} offers from FT API")
-            if not offers:
-                break
-            raw_offers.extend(offers)
-            if max_range == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
-                logger.error("FT API returned the maximum number of offers: some offers are likely missing")
+        """We split requests by departments to break the API limit at 3149.
 
-            time.sleep(delay_between_requests.total_seconds())
+        It is needed because FT have, as of 2026, around 8k offers
+        from Employeurs Handi Engagés.
+
+        See this page to get counts from FT:
+
+        https://candidat.francetravail.fr/offres/recherche?lieux=99100&offresPartenaires=true&rayon=10&tri=0
+
+        Don't forget to simplify that code if France Travail removes
+        the restriction of 3149 paginated results, which is documented
+        in the `range` section of:
+
+        https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
+        """
+
+        raw_offers = []
+        for departement in self.referentiel("departements"):
+            for range_start in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
+                range_stop = range_start + OFFERS_MAX_RANGE - 1
+                offers = self.offres(
+                    typeContrat=typeContrat,
+                    natureContrat=natureContrat,
+                    entreprisesAdaptees=entreprisesAdaptees,
+                    employeursHandiEngages=employeursHandiEngages,
+                    departement=departement["code"],
+                    range=f"{range_start}-{range_stop}",
+                )
+                logger.info(f"retrieved count={len(offers)} offers from FT API")
+                time.sleep(delay_between_requests.total_seconds())
+                raw_offers.extend(offers)
+                if len(offers) < OFFERS_MAX_RANGE:
+                    break
+                if range_stop == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
+                    logger.error("FT API returned the maximum number of offers: some offers are likely missing")
         return raw_offers
 
     def appellations(self):
