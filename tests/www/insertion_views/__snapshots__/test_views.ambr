@@ -375,7 +375,7 @@
       }),
       dict({
         'origin': list([
-          'orientation_details[www/insertion_views/views.py]',
+          'orientation_details_for_sender[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''

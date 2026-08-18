@@ -1,4 +1,6 @@
+import datetime
 import logging
+import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
@@ -6,8 +8,10 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
+from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -24,6 +28,7 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.storage.s3 import generate_dora_storage_url
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code
 
 
@@ -799,6 +804,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             return
         return self.duration_weekly_hours * self.duration_weeks
 
+    @property
+    def sender_is_referent(self):
+        return self.referent_email == self.sender.email
+
 
 class OrientationTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "orientation"
@@ -812,3 +821,42 @@ class OrientationTransitionLog(xwf_models.BaseTransitionLog):
 
     def __str__(self):
         return str(self.id)
+
+
+class ProcessOrientationLink(models.Model):
+    DEFAULT_VALIDITY_DAYS = 7
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    orientation = models.ForeignKey(Orientation, on_delete=models.CASCADE, related_name="process_links")
+    validity_days = models.PositiveSmallIntegerField(
+        verbose_name="durée de validité en jours",
+        default=DEFAULT_VALIDITY_DAYS,
+        validators=[MinValueValidator(1), MaxValueValidator(90)],
+    )
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
+    first_opened_at = models.DateTimeField(verbose_name="date du premier clic", null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "lien magique de traitement"
+        verbose_name_plural = "liens magiques de traitement"
+        permissions = [
+            ("create_process_orientation_link", "Can create a temporary magic link to process a given orientation")
+        ]
+
+    @property
+    def process_link(self):
+        """
+        Link present in the email sent to the service provider.
+        """
+        return get_absolute_url(
+            reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": self.pk})
+        )
+
+    @property
+    def expiration_date(self):
+        return self.created_at + datetime.timedelta(days=self.validity_days)
+
+    @property
+    def has_expired(self):
+        return self.expiration_date <= timezone.now()

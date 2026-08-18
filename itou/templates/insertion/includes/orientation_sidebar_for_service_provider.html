@@ -1,0 +1,47 @@
+{% load format_filters %}
+
+<div class="c-box mb-3 mb-md-4">
+    <h2 class="h3">Prescripteur</h2>
+    {% if orientation.sender_is_referent %}
+        {% partialdef referent-contact inline %}
+            <ul class="fs-sm list-unstyled mb-0">
+                <li>
+                    <i class="ri-user-line me-2" aria-hidden="true"></i>
+                    <span>{{ orientation.referent_last_name|upper }} {{ orientation.referent_first_name|title }}</span>
+                </li>
+                <li>
+                    <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                    <a href="mailto:{{ orientation.referent_email }}" aria-label="Contact par mail" class="text-break">{{ orientation.referent_email }}</a>
+                </li>
+                <li>
+                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                    {{ orientation.referent_phone|format_phone }}
+                </li>
+            </ul>
+        {% endpartialdef %}
+    {% else %}
+        <ul class="fs-sm list-unstyled mb-0">
+            <li>
+                <i class="ri-user-line me-2" aria-hidden="true"></i>
+                <span>{{ orientation.sender.get_inverted_full_name }}</span>
+            </li>
+            <li>
+                <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                <a href="mailto:{{ orientation.sender.email }}" aria-label="Contact par mail" class="text-break">{{ orientation.sender.email }}</a>
+            </li>
+            {% if orientation.sender.phone %}
+                <li>
+                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                    {{ orientation.sender.phone|format_phone }}
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+
+{% if not orientation.sender_is_referent %}
+    <div class="c-box mb-3 mb-md-4">
+        <h2 class="h3">Conseiller référent</h2>
+        {% partial referent-contact %}
+    </div>
+{% endif %}
