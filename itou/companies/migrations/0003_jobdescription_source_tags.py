@@ -16,7 +16,8 @@ class Migration(migrations.Migration):
             field=django.contrib.postgres.fields.ArrayField(
                 base_field=models.CharField(
                     choices=[
-                        ("FT_EA_OFFER", "Offre Entreprise Adaptée"),
+                        ("FT_EA_OFFER", "Priorité aux bénéficiaires de la RQTH"),
+                        ("FT_EHE_OFFER", "Employeur handi-engagé"),
                         ("FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"),
                     ]
                 ),

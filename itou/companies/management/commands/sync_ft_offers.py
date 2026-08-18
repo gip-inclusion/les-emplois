@@ -83,6 +83,8 @@ def pe_offer_to_job_description(data, logger):
         source_tags.append(JobSourceTag.FT_PEC_OFFER.value)
     if data["entrepriseAdaptee"]:
         source_tags.append(JobSourceTag.FT_EA_OFFER.value)
+    if data["employeurHandiEngage"]:
+        source_tags.append(JobSourceTag.FT_EHE_OFFER.value)
     if not source_tags:
         # Hopefully this will never happen, but if it does, we want to know about it.
         raise ValueError(f"Unexpected {data['natureContrat']=} {data['entrepriseAdaptee']=} for offer {data['id']=}")
@@ -122,29 +124,42 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
         parser.add_argument("--delay", action="store", dest="delay", default=1, type=int, choices=range(0, 5))
 
+    def get_pec_offers(self, pe_client, delay):
+        offers = pe_client.retrieve_all_offres(
+            natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
+            delay_between_requests=datetime.timedelta(seconds=delay),
+        )
+        self.logger.info(f"retrieved count={len(offers)} PEC offers from FT API")
+        return offers
+
+    def get_handi_offers(self, pe_client, delay):
+        """This gets both in Entreprises Adaptées and Employeurs Handi Engagés."""
+        offers = pe_client.retrieve_all_offres(
+            entreprisesAdaptees=True,
+            employeursHandiEngages=True,
+            delay_between_requests=datetime.timedelta(seconds=delay),
+        )
+        offers = [  # Strange enough: filtering with entreprisesAdaptees
+            offer  # and employeursHandiEngages
+            for offer in offers  # sometimes the API gives us offers that are neither.
+            if offer["entrepriseAdaptee"] or offer["employeurHandiEngage"]
+        ]
+        self.logger.info(f"retrieved count={len(offers)} handi offers from FT API")
+        return offers
+
     @dry_runnable
     def handle(self, *, delay, **options):
         pe_client = pole_emploi_partenaire_api_client()
 
-        # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,
-        # we will need to setup a much more complicated sync mechanism, for instance by requesting every department one
-        # by one. But so far we are not even close from half this quota.
-        raw_pec_offers = pe_client.retrieve_all_offres(
-            natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
-            delay_between_requests=datetime.timedelta(seconds=delay),
-        )
-        self.logger.info(f"retrieved count={len(raw_pec_offers)} PEC offers from FT API")
+        raw_pec_offers = self.get_pec_offers(pe_client, delay)
         time.sleep(delay)
-        raw_ea_offers = pe_client.retrieve_all_offres(
-            entreprisesAdaptees=True,
-            delay_between_requests=datetime.timedelta(seconds=delay),
-        )
-        self.logger.info(f"retrieved count={len(raw_ea_offers)} EA offers from FT API")
+        raw_handi_offers = self.get_handi_offers(pe_client, delay)
 
-        # Merge the 2 lists, to handle the improbable case where a PEC offer comes from an EA company.
+        # Merge the 2 lists, to handle the improbable case where a PEC
+        # offer comes from an EA company (2 out of 655 in 2026).
         raw_offers = list(
             (
-                {offer["id"]: offer for offer in raw_pec_offers} | {offer["id"]: offer for offer in raw_ea_offers}
+                {offer["id"]: offer for offer in raw_pec_offers} | {offer["id"]: offer for offer in raw_handi_offers}
             ).values()
         )
         self.logger.info(f"retrieved count={len(raw_offers)} unique offers from FT API")

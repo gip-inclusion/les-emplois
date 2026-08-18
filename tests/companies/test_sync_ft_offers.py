@@ -46,22 +46,29 @@ def test_sync_ft_offers(caplog, respx_mock):
         name="Technicien / Technicienne de maintenance industriel",
         rome=rome,
     )
+    respx_mock.get("https://pe.fake/offresdemploi/v2/referentiel/departements").respond(
+        # Department list is only used by `retrieve_all_offres` to
+        # bypass FT pagination limit.  So in the tests, a single
+        # department is enough: `retrieve_all_offres` is just looping
+        # over them all, looping once is enough (all responses are
+        # mocked anyway).
+        200,
+        json=[
+            {
+                "code": "04",
+                "libelle": "Alpes-de-Haute-Provence",
+                "region": {"code": "93", "libelle": "Provence-Alpes-Côte d'Azur"},
+            }
+        ],
+    )
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
-    base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT"
+    base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&departement=04"
     respx_mock.get(f"{base_url}&range=0-149").respond(206, json={"resultats": PEC_OFFERS})
-    respx_mock.get(f"{base_url}&range=150-299").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=300-449").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=450-599").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=600-749").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=750-899").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=900-1049").respond(206, json={"resultats": []})
-    respx_mock.get(f"{base_url}&range=1050-1149").respond(204)
 
-    ea_base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true"
+    ea_base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true&employeursHandiEngages=true&departement=04"
     respx_mock.get(f"{ea_base_url}&range=0-149").respond(206, json={"resultats": EA_OFFERS})
-    respx_mock.get(f"{ea_base_url}&range=150-299").respond(206, json={"resultats": []})
 
     # Try dry run first then real run
     for wet_run in [False, True]:
@@ -72,11 +79,9 @@ def test_sync_ft_offers(caplog, respx_mock):
         )
         expected_logs = [
             "retrieved count=2 offers from FT API",
-            "retrieved count=0 offers from FT API",
             "retrieved count=2 PEC offers from FT API",
             "retrieved count=2 offers from FT API",
-            "retrieved count=0 offers from FT API",
-            "retrieved count=2 EA offers from FT API",
+            "retrieved count=2 handi offers from FT API",
             "retrieved count=4 unique offers from FT API",
             (
                 "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') "
@@ -130,7 +135,9 @@ def test_sync_ft_offers(caplog, respx_mock):
     # test the update
     caplog.clear()
     PEC_OFFERS[0]["intitule"] = "NOUVEAU INTITULE"
-    respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
+    respx_mock.get(
+        "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&departement=04&range=0-149"
+    ).respond(
         206,
         json={"resultats": PEC_OFFERS},
     )
@@ -140,11 +147,9 @@ def test_sync_ft_offers(caplog, respx_mock):
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=2 offers from FT API",
-        "retrieved count=0 offers from FT API",
         "retrieved count=2 PEC offers from FT API",
         "retrieved count=2 offers from FT API",
-        "retrieved count=0 offers from FT API",
-        "retrieved count=2 EA offers from FT API",
+        "retrieved count=2 handi offers from FT API",
         "retrieved count=4 unique offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
@@ -157,7 +162,9 @@ def test_sync_ft_offers(caplog, respx_mock):
 
     # test the deletion
     caplog.clear()
-    respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
+    respx_mock.get(
+        "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&departement=04&range=0-149"
+    ).respond(
         206,
         json={"resultats": []},
     )
@@ -169,8 +176,7 @@ def test_sync_ft_offers(caplog, respx_mock):
         "retrieved count=0 offers from FT API",
         "retrieved count=0 PEC offers from FT API",
         "retrieved count=2 offers from FT API",
-        "retrieved count=0 offers from FT API",
-        "retrieved count=2 EA offers from FT API",
+        "retrieved count=2 handi offers from FT API",
         "retrieved count=2 unique offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
         "successfully created count=0 PE job offers",
