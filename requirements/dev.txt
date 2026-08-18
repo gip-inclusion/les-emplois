@@ -3072,9 +3072,9 @@ six==1.17.0 \
     #   -r test.txt
     #   html5lib
     #   python-dateutil
-slippers==0.7.0 \
-    --hash=sha256:35059d4025845a46e252633a16a04136f21b28469dee7c4a2a361e00aee5335e \
-    --hash=sha256:49c67577939cf310283904199f405db481a08d6c43406ab5df01871b50a5758a
+slippers==0.7.1 \
+    --hash=sha256:686cc3faba2de23da840e1d66d2bbf10d6ee205510545633e1a709943eee5649 \
+    --hash=sha256:7450987faf97b275e6fa19898111b1048c12486d537b3edfb9f5dcdb17dc0146
     # via -r test.txt
 soupsieve==2.9.2 \
     --hash=sha256:4a55d8cf158a9c2e587fa4922f1bbb91d68ac829e2d6f25403a85747c71daf74 \
