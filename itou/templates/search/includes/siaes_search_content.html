@@ -1,4 +1,4 @@
-{% load url_add_query %}
+{% include "search/includes/filters/offcanvas.html" %}
 <section class="s-section">
     <div class="s-section__container container">
         <div class="s-section__row row">
@@ -6,33 +6,25 @@
                 <div class="tab-content">
                     <div class="row">
                         <div class="col-12">
-                            {% include "search/includes/siaes_search_subtitle.html" %}
+                            {% include "search/includes/siaes_search_subtitle.html" with clear_filters_url=clear_filters_url %}
                             <div class="d-block w-100">
-                                <form hx-get="{% url_add_query request.path job_seeker_public_id=job_seeker.public_id|default:'' %}"
-                                      hx-trigger="change delay:.5s"
-                                      hx-include="#id_city"
-                                      hx-indicator="#job-search-results"
-                                      hx-target="#job-search-results"
-                                      hx-swap="outerHTML"
-                                      hx-push-url="true">
-                                    <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                                        {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
-                                        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.kinds only %}
-                                        {% if form.contract_types %}
-                                            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.contract_types only %}
-                                        {% endif %}
-                                        {% if form.domains %}
-                                            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.domains only %}
-                                        {% endif %}
-                                        {% include "search/includes/siaes_search_filters_departments.html" %}
-                                        <div class="ms-lg-auto">
-                                            <a href="{{ clear_filters_url }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
-                                                <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
-                                                <span>Effacer tout</span>
-                                            </a>
-                                        </div>
+                                <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                                    {% include "search/includes/filters/distance.html" with btn_dropdown_filter=True %}
+                                    {% include "search/includes/filters/structure_kind.html" with btn_dropdown_filter=True %}
+                                    {% if form.handicap %}
+                                        {% include "search/includes/filters/handicap.html" with btn_dropdown_filter=True nouveau=True %}
+                                    {% endif %}
+                                    <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+                                        <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+                                        <span>Tous les filtres <span id="all-filters-btn"></span></span>
+                                    </button>
+                                    <div class="ms-lg-auto">
+                                        <a href="{{ clear_filters_url }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+                                            <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+                                            <span>Effacer tout</span>
+                                        </a>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>

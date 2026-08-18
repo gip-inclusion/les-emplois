@@ -34,12 +34,19 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 DISTRICTS = "Arrondissements de Paris"
 
 
-def distance_radio(simulated_page, distance):
-    [elt] = simulated_page.find_all(
+def distance_radio(simulated_page, distance, checked: bool):
+    """There's two distance radio: one in the horizintal search bar,
+    one in the vertical "Tous les filtres", let's use the first.
+    """
+
+    for radio in simulated_page.find_all(
         "input",
         attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
-    )
-    return elt
+    ):
+        if checked:
+            radio["checked"] = ""
+        else:
+            del radio["checked"]
 
 
 class TestSearchCompany:
@@ -428,8 +435,8 @@ class TestSearchCompany:
         assertNotContains(response, vannes_opt, html=True)
         simulated_page = parse_response_to_soup(response)
 
-        distance_radio(simulated_page, 100)["checked"] = ""
-        del distance_radio(simulated_page, 25)["checked"]
+        distance_radio(simulated_page, 100, checked=True)
+        distance_radio(simulated_page, 25, checked=False)
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},
@@ -669,8 +676,8 @@ class TestSearchPrescriber:
         response = client.get(url, {"city": guerande.slug, "distance": 50})
         simulated_page = parse_response_to_soup(response)
 
-        distance_radio(simulated_page, 100)["checked"] = ""
-        del distance_radio(simulated_page, 50)["checked"]
+        distance_radio(simulated_page, 100, checked=True)
+        distance_radio(simulated_page, 50, checked=False)
         response = client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
         response = client.get(url, {"city": guerande.slug, "distance": 100})
@@ -1344,8 +1351,8 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug})
         simulated_page = parse_response_to_soup(response)
 
-        distance_radio(simulated_page, 100)["checked"] = ""
-        del distance_radio(simulated_page, 25)["checked"]
+        distance_radio(simulated_page, 100, checked=True)
+        distance_radio(simulated_page, 25, checked=False)
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},
@@ -1432,11 +1439,15 @@ class TestJobDescriptionSearchView:
                     assertContains(response, displayed_job)
                 else:
                     assertNotContains(response, displayed_job)
-            RQTH_PRIORITY = "Priorité aux bénéficiaires de la RQTH"
+            RQTH_PRIORITY = """
+            <span class="badge badge-sm rounded-pill bg-accent-01-lightest text-accent-01">
+                Priorité aux bénéficiaires de la RQTH
+            </span>
+            """
             if displayed_job_ea in expected_jobs:
-                assertContains(response, RQTH_PRIORITY)
+                assertContains(response, RQTH_PRIORITY, html=True)
             else:
-                assertNotContains(response, RQTH_PRIORITY)
+                assertNotContains(response, RQTH_PRIORITY, html=True)
 
         # no filter: returns everything.
         assertFilterResults(

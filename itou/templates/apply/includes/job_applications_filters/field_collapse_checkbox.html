@@ -1,3 +1,4 @@
+{% load theme_inclusion %}
 {% comment %}
 Arguments:
 - field
@@ -9,7 +10,16 @@ Arguments:
                 data-bs-target="#collapse-{{ field.name }}"
                 type="button"
                 aria-expanded="false"
-                aria-controls="collapse-{{ field.name }}">{{ field.label }}</button>
+                aria-controls="collapse-{{ field.name }}">
+            {% if nouveau|default:False %}
+                <span>
+                    {{ label|default:field.label }}
+                    {% new_badge extra_classes="badge-xs ms-2" %}
+                </span>
+            {% else %}
+                {{ label|default:field.label }}
+            {% endif %}
+        </button>
     </legend>
     <div class="my-3 collapse" id="collapse-{{ field.name }}">
         <ul>

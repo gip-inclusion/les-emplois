@@ -1109,7 +1109,7 @@
                                   </label>
                                   <div class="" data-disable-target="duet-date-picker[identifier=id_ended_at]" id="id_is_ongoing" required="">
                                       <div class="form-check">
-                                          <input checked="checked" class="form-check-input" id="id_is_ongoing_0" name="is_ongoing" type="radio" value="True"/>
+                                          <input checked="" class="form-check-input" id="id_is_ongoing_0" name="is_ongoing" type="radio" value="True"/>
                                           <label class="form-check-label" for="id_is_ongoing_0">
                                               Accompagnement en cours
                                           </label>

@@ -1,0 +1,14 @@
+<div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% include "search/includes/filters/distance.html" %}
+    {% include "search/includes/filters/structure_kind.html" %}
+    {% if form.contract_types %}
+        {% include "search/includes/filters/contract_types.html" %}
+    {% endif %}
+    {% if form.domains %}
+        {% include "search/includes/filters/domains.html" %}
+    {% endif %}
+    {% include "search/includes/filters/departments.html" %}
+    {% if form.handicap %}
+        {% include "search/includes/filters/handicap.html" with nouveau=True %}
+    {% endif %}
+</div>

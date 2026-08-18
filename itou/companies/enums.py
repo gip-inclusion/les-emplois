@@ -43,8 +43,8 @@ class ContractNature(models.TextChoices):
 
 
 class JobSourceTag(models.TextChoices):
-    FT_EA_OFFER = "FT_EA_OFFER", "Offre Entreprise Adaptée"
-    FT_EHE_OFFER = "FT_EHE_OFFER", "Employeur Handi Engagé"
+    FT_EA_OFFER = "FT_EA_OFFER", "Priorité aux bénéficiaires de la RQTH"
+    FT_EHE_OFFER = "FT_EHE_OFFER", "Employeur handi-engagé"
     FT_PEC_OFFER = "FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
 
 
