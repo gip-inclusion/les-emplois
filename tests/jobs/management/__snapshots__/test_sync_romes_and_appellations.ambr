@@ -3,6 +3,7 @@
   list([
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
     'HTTP Request: GET https://pe.fake/offresdemploi/v2/referentiel/metiers "HTTP/1.1 200 OK"',
+    'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
     'HTTP Request: GET https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code) "HTTP/1.1 200 OK"',
     "UPDATED item key=('F001',) current_item=Rome(F001) data=['name']",
     "ADDED item key=('MET01',) data=['name']",
