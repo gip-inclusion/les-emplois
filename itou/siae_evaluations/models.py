@@ -9,6 +9,7 @@ from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.eligibility.utils import iae_has_required_criteria
@@ -220,6 +221,9 @@ class EvaluationCampaign(models.Model):
             JobApplication.objects.exclude(approval=None)
             .select_related("approval", "to_company", "eligibility_diagnosis", "eligibility_diagnosis__author_siae")
             .filter(
+                # The hiring SIAE has to be conventioned, grace period included. Note that companies created by
+                # staff/support are considered active even without a convention.
+                Exists(Company.objects.active_or_in_grace_period().filter(pk=OuterRef("to_company_id"))),
                 to_company__department=self.institution.department,
                 to_company__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
                 state=JobApplicationState.ACCEPTED,
