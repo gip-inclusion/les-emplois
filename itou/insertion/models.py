@@ -21,6 +21,7 @@ from itou.insertion.enums import (
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEventKind,
+    OrientationRefusalReason,
     OrientationStatus,
     OrientationTransition,
 )
@@ -625,15 +626,30 @@ class OrientationWorkflow(xwf_models.Workflow):
     initial_state = OrientationStatus.PENDING
 
     transitions = (
-        (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
-        (OrientationTransition.REJECT, OrientationStatus.PENDING, OrientationStatus.REJECTED),
-        (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
+        (OrientationTransition.PROCESS, OrientationStatus.PENDING, OrientationStatus.PROCESSING),
+        (
+            OrientationTransition.ACCEPT,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.ACCEPTED,
+        ),
+        (
+            OrientationTransition.REFUSE,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.REFUSED,
+        ),
+        (
+            OrientationTransition.EXPIRE,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.EXPIRED,
+        ),
     )
 
     log_model = "insertion.OrientationTransitionLog"
 
 
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
+    PROCESSING_EXPIRATION_PERIOD_DAYS = 60
+
     id = models.UUIDField(primary_key=True, editable=False)
 
     beneficiary = models.ForeignKey(
@@ -719,6 +735,14 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     referent_email = models.EmailField(verbose_name="e-mail du référent")
     orientation_reasons = models.TextField(verbose_name="motif de l'orientation", blank=True)
 
+    refusal_reasons = ArrayField(
+        models.CharField(max_length=30, choices=OrientationRefusalReason.choices),
+        verbose_name="motifs de refus",
+        default=list,
+        blank=True,
+    )
+    refusal_details = models.TextField(verbose_name="détails du refus", blank=True)
+
     status = xwf_models.StateField(OrientationWorkflow, verbose_name="statut")
 
     processing_date = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
@@ -771,6 +795,11 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
                     )
                 ),
                 name="orientation_sender_organization_consistent",
+            ),
+            models.CheckConstraint(
+                condition=(Q(status=OrientationStatus.REFUSED) & ~Q(refusal_reasons=[]))
+                | (~Q(status=OrientationStatus.REFUSED) & Q(refusal_reasons=[])),
+                name="orientation_refusal_status_and_reasons_consistent",
             ),
         ]
 

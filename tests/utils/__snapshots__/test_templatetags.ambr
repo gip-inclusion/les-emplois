@@ -630,14 +630,17 @@
   '''
 # ---
 # name: test_orientation_state_badge[EXPIR\xc9E]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light">Expirée</span>'
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light">Expirée</span>'
 # ---
 # name: test_orientation_state_badge[OUVERTE]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info">En cours de traitement</span>'
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info">En cours de traitement</span>'
 # ---
 # name: test_orientation_state_badge[REFUS\xc9E]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Refusée</span>'
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Déclinée</span>'
 # ---
 # name: test_orientation_state_badge[VALID\xc9E]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success">Validée</span>'
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success">Validée</span>'
+# ---
+# name: test_orientation_state_badge[\xc9TUDE]
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03">À l’étude</span>'
 # ---

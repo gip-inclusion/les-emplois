@@ -22,7 +22,7 @@ from rest_framework import status
 from itou.companies.models import Company
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
-from itou.insertion.enums import MobilizationEventKind
+from itou.insertion.enums import MobilizationEventKind, OrientationStatus
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
@@ -51,6 +51,7 @@ from itou.www.insertion_views.forms import (
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
     OrientationsFilterForm,
+    RefusalOrientationForm,
 )
 from itou.www.utils.wizard import WizardView
 
@@ -671,17 +672,105 @@ def orientation_details_for_service_provider(request, link_id):
     if link.has_expired:
         # TODO: button to send an email with a new link
         raise PermissionDenied()
+    orientation = link.orientation
 
     if not link.first_opened_at:
         link.first_opened_at = timezone.now()
         link.save(update_fields=["first_opened_at"])
 
+    if request.method == "POST":
+        if request.POST.get("action") == "process":
+            if not orientation.process.is_available():
+                messages.warning(request, "Cette orientation ne peut pas être mise à l’étude.", extra_tags="toast")
+            else:
+                orientation.process()
+                messages.info(
+                    request,
+                    "Demande d’orientation à l’étude||"
+                    f"Vous disposez de {insertion_models.Orientation.PROCESSING_EXPIRATION_PERIOD_DAYS} jours pour "
+                    "accepter ou décliner cette demande d’orientation, passé ce délai, la demande d’orientation "
+                    "sera expirée.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(
+                    reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+                )
+        elif request.POST.get("action") == "accept":
+            if not orientation.accept.is_available():
+                messages.warning(request, "Cette orientation a déjà été traitée.", extra_tags="toast")
+            else:
+                orientation.accept()
+                messages.success(
+                    request,
+                    "Demande d’orientation acceptée||"
+                    "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(
+                    reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+                )
+
+    actions_available = orientation.status in [OrientationStatus.PENDING, OrientationStatus.PROCESSING]
+
     context = {
-        "orientation": link.orientation,
+        "orientation": orientation,
+        "link": link,
         "can_view_personal_information": True,
         "can_process": True,
+        "actions_available": actions_available,
         "back_url": None,
         "matomo_custom_title": "Détail d’une orientation pour offreur de service",
+    }
+
+    return render(request, template_name, context)
+
+
+# TODO: 404 for logged in users
+@login_not_required
+def refuse_orientation(request, link_id):
+    template_name = "insertion/orientations/refuse.html"
+
+    link = get_object_or_404(
+        insertion_models.ProcessOrientationLink.objects.filter(
+            orientation__status__in=[OrientationStatus.PENDING, OrientationStatus.PROCESSING]
+        ).select_related(
+            "orientation",
+            "orientation__beneficiary",
+            "orientation__sender",
+            "orientation__service",
+            "orientation__service__structure",
+        ),
+        id=link_id,
+    )
+    if link.has_expired:
+        # TODO: button to send an email with a new link
+        raise PermissionDenied()
+    orientation = link.orientation
+
+    if not link.first_opened_at:
+        link.first_opened_at = timezone.now()
+        link.save(update_fields=["first_opened_at"])
+
+    form = RefusalOrientationForm(instance=orientation, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        orientation = form.save(commit=False)
+        orientation.refuse()
+        messages.error(
+            request,
+            "Demande d’orientation déclinée||"
+            "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(
+            reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+        )
+
+    context = {
+        "orientation": orientation,
+        "form": form,
+        "reset_url": reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id}),
+        "matomo_custom_title": "Décliner une orientation",
     }
 
     return render(request, template_name, context)
