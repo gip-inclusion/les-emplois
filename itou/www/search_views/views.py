@@ -104,6 +104,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJ
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
         kinds = form.cleaned_data["kinds"]
+        handicap = form.cleaned_data.get("handicap")
         # in the case of SIAEs, keep the filter from the URL if present.
         # this enables not losing the count while changing tabs.
         contract_types = form.cleaned_data.get("contract_types", self.request.GET.getlist("contract_types", []))
@@ -138,6 +139,12 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJ
             if CompanyKind.EA.value in kinds:
                 job_clauses |= Q(source_kind=JobSource.PE_API, source_tags__contains=[JobSourceTag.FT_EA_OFFER.value])
             job_descriptions = job_descriptions.filter(job_clauses)
+
+        if handicap:
+            if JobSourceTag.FT_EA_OFFER in handicap:
+                job_descriptions = job_descriptions.filter(Q(source_tags__contains=[JobSourceTag.FT_EA_OFFER]))
+            if JobSourceTag.FT_EHE_OFFER in handicap:
+                job_descriptions = job_descriptions.filter(Q(source_tags__contains=[JobSourceTag.FT_EHE_OFFER]))
 
         if contract_types:
             clauses = Q(contract_type__in=[c for c in contract_types if c != JobSourceTag.FT_PEC_OFFER.value])

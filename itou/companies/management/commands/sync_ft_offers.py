@@ -133,7 +133,7 @@ class Command(BaseCommand):
         return offers
 
     def get_handi_offers(self, pe_client, delay):
-        """This gets both in Entreprises Adaptées and Employeurs Handi Engagés."""
+        """This gets both in Entreprises Adaptées and Employeurs handi-engagés."""
         offers = pe_client.retrieve_all_offres(
             entreprisesAdaptees=True,
             employeursHandiEngages=True,
@@ -150,7 +150,6 @@ class Command(BaseCommand):
     @dry_runnable
     def handle(self, *, delay, **options):
         pe_client = pole_emploi_partenaire_api_client()
-
         raw_pec_offers = self.get_pec_offers(pe_client, delay)
         time.sleep(delay)
         raw_handi_offers = self.get_handi_offers(pe_client, delay)
