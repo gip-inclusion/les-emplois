@@ -1,3 +1,4 @@
+import httpx
 import pytest
 from django.conf import settings
 from django.utils import timezone
@@ -95,3 +96,23 @@ def test_not_found(respx_mock, caplog):
     assert crit.certification_period == InclusiveDateRange(empty=True)
     assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
+
+
+def test_http_status_error_does_not_leak_pii(respx_mock):
+    """httpx builds HTTPStatusError's message from the URL, which identifies the job seeker."""
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+        502, text="Bad Gateway (non-JSON response)"
+    )
+    first_name, last_name = "Jean-Michel", "Tardiveau"
+    job_seeker = JobSeekerFactory(first_name=first_name, last_name=last_name, born_in_france=True)
+
+    with api_particulier.client() as client, pytest.raises(httpx.HTTPStatusError) as exc_info:
+        api_particulier.certify_criteria(AdministrativeCriteriaKind.RSA, client, job_seeker)
+
+    exception = exc_info.value
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in str(exception)
+    assert last_name.upper() not in str(exception).upper()
+    assert first_name.upper() not in str(exception).upper()
+    # the request the exception carries is redacted as well: Sentry serializes its repr
+    assert last_name.upper() not in repr(exception.request).upper()
+    assert last_name.upper() not in repr(exception.response.request).upper()
