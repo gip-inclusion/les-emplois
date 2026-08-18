@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
-from itou.utils.context_processors import active_announcement_campaign
+from itou.utils.context_processors import automatic_modals
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import JobSeekerFactory, random_user_kind_factory
 from tests.utils.testing import get_request
@@ -25,7 +25,7 @@ class TestAnnouncementCampaignCache:
         request = get_request(random_user_kind_factory())
 
         with assertNumQueries(0):
-            context = active_announcement_campaign(request)
+            context = automatic_modals(request)
         assert context["display_campaign_announce"] is True
         assert context["active_campaign_announce"] == campaign
 
@@ -34,17 +34,17 @@ class TestAnnouncementCampaignCache:
         campaign.save()
 
         with assertNumQueries(0):
-            context = active_announcement_campaign(request)
+            context = automatic_modals(request)
         assert context["active_campaign_announce"].max_items == campaign.max_items
 
         item = AnnouncementItemFactory(campaign=campaign)
         with assertNumQueries(0):
-            context = active_announcement_campaign(request)
+            context = automatic_modals(request)
         assert context["active_campaign_announce"].items.count() == 2
 
         item.delete()
         with assertNumQueries(0):
-            context = active_announcement_campaign(request)
+            context = automatic_modals(request)
         assert context["active_campaign_announce"].items.count() == 1
 
         # test cache does not become invalidated when saving a new campaign
@@ -52,30 +52,30 @@ class TestAnnouncementCampaignCache:
             with_item=True, start_date=(campaign.start_date + timedelta(days=40)).replace(day=1)
         )
         with assertNumQueries(0):
-            context = active_announcement_campaign(request)
+            context = automatic_modals(request)
         assert context["active_campaign_announce"] == campaign
 
         # test cached value is removed with the campaign
         campaign.delete()
         new_campaign.delete()
         with assertNumQueries(0):
-            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
         request = get_request(random_user_kind_factory())
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
-            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request) == {"display_campaign_announce": False}
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_for_anonymous_user(self):
         request = get_request(AnonymousUser())
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request) == {"display_campaign_announce": False}
 
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):
@@ -83,7 +83,7 @@ class TestAnnouncementCampaignCache:
         request = get_request(random_user_kind_factory())
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request)["active_campaign_announce"] == campaign
+            assert automatic_modals(request)["active_campaign_announce"] == campaign
 
         # NOTE: this test requires that the cache client is Redis (for the ttl function)
         cache_time_remaining = caches["failsafe"].ttl(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)

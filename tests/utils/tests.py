@@ -1632,7 +1632,7 @@ def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
     assert badges.geiq_eligibility_badge(is_eligible=is_eligible, for_job_seeker=for_job_seeker) == snapshot
 
 
-def test_active_announcement_campaign_context_processor(client, settings, empty_active_announcements_cache):
+def test_automatic_modals_context_processor(client, settings, empty_active_announcements_cache):
     AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
     response = client.get(reverse("search:employers_results"))

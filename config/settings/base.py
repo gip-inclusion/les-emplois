@@ -194,7 +194,7 @@ TEMPLATES = [
                 # Itou.
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.matomo",
-                "itou.utils.context_processors.active_announcement_campaign",
+                "itou.utils.context_processors.automatic_modals",
             ],
             "builtins": ["slippers.templatetags.slippers"],
         },

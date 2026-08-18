@@ -18,7 +18,7 @@ def matomo(request):
     return context
 
 
-def active_announcement_campaign(request):
+def automatic_modals(request):
     if request.user and request.user.is_authenticated and not request.path.startswith("/otp/verify"):
         if campaign := get_cached_active_announcement():
             return {
