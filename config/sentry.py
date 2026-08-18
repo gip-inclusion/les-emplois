@@ -10,12 +10,16 @@ from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.redis import RedisIntegration
 
 
+# Keep in sync with the query parameters sent by itou.utils.apis.api_particulier
 HTTP_QUERY_SENSITIVE_KEYS = [
     "anneeDateNaissance",
+    "codeCogInseeCommuneNaissance",
+    "codeCogInseePaysNaissance",
     "jourDateNaissance",
     "moisDateNaissance",
     "nomNaissance",
     "prenoms[]",
+    "sexeEtatCivil",
 ]
 
 

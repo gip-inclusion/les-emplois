@@ -6,6 +6,7 @@ from django.conf import settings
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import Title
+from itou.utils.logging import redact_query_params
 from itou.utils.types import InclusiveDateRange
 
 
@@ -48,7 +49,14 @@ def _build_params_from(job_seeker):
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
     params["recipient"] = SIRET_PLATEFORME_INCLUSION
-    return client.get(endpoint, params=params).raise_for_status().json()
+    response = client.get(endpoint, params=params)
+    # Sentry serializes the local variables of every frame of the traceback
+    del params
+    if not response.is_success:
+        # httpx builds the message of HTTPStatusError (and the repr of the request it carries)
+        # from the URL, whose query string identifies the job seeker
+        response.request.url = redact_query_params(response.request.url)
+    return response.raise_for_status().json()
 
 
 USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
