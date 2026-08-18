@@ -218,9 +218,32 @@
             (SELECT "job_applications_jobapplication"."to_company_id" AS "to_company"
              FROM "job_applications_jobapplication"
              INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-             INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
              INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+             INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
              WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
+                    AND EXISTS
+                      (SELECT %s AS "a"
+                       FROM "companies_company" V0
+                       WHERE (NOT (V0."siret" = %s)
+                              AND NOT (V0."kind" IN (%s, %s))
+                              AND (V0."kind" IN (%s, %s)
+                                   OR (V0."is_searchable"
+                                       AND V0."kind" = %s)
+                                   OR V0."source" = %s
+                                   OR EXISTS
+                                     (SELECT %s AS "a"
+                                      FROM "companies_siaeconvention" U0
+                                      WHERE (U0."id" = (V0."convention_id")
+                                             AND U0."is_active")
+                                      LIMIT 1)
+                                   OR EXISTS
+                                     (SELECT %s AS "a"
+                                      FROM "companies_siaeconvention" U0
+                                      WHERE (U0."deactivated_at" >= %s
+                                             AND U0."id" = (V0."convention_id"))
+                                      LIMIT 1))
+                              AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                       LIMIT 1)
                     AND "approvals_approval"."number"::text LIKE %s
                     AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
                     AND "eligibility_eligibilitydiagnosis"."author_kind" = %s
@@ -245,9 +268,32 @@
           SELECT "job_applications_jobapplication"."to_company_id" AS "to_company"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s, %s))
+                           AND (V0."kind" IN (%s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."deactivated_at" >= %s
+                                          AND U0."id" = (V0."convention_id"))
+                                   LIMIT 1))
+                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                    LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
                  AND "eligibility_eligibilitydiagnosis"."author_kind" = %s
@@ -294,9 +340,32 @@
           SELECT COUNT(*) AS "__count"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s, %s))
+                           AND (V0."kind" IN (%s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."deactivated_at" >= %s
+                                          AND U0."id" = (V0."convention_id"))
+                                   LIMIT 1))
+                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                    LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
                  AND "eligibility_eligibilitydiagnosis"."author_kind" = %s
@@ -465,10 +534,33 @@
                  "approvals_approval"."public_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           INNER JOIN "companies_company" T5 ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = T5."id")
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s, %s))
+                           AND (V0."kind" IN (%s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."deactivated_at" >= %s
+                                          AND U0."id" = (V0."convention_id"))
+                                   LIMIT 1))
+                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                    LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
                  AND "eligibility_eligibilitydiagnosis"."author_kind" = %s
