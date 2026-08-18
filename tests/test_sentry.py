@@ -1,17 +1,21 @@
+import httpx
 import sentry_sdk
-from sentry_sdk.consts import OP, SPANDATA
 
 
-def test_before_send_http_breadcrumb_sanitizer(mocker):
+def test_before_send_http_breadcrumb_sanitizer(mocker, respx_mock):
     mocker.spy(sentry_sdk.client._Client, "_prepare_event")
     with sentry_sdk.new_scope() as scope:
-        scope.clear()
-        with sentry_sdk.start_span(op=OP.HTTP_CLIENT, name="GET /test") as span:
-            span.set_data(
-                SPANDATA.HTTP_QUERY,
-                "foobar=34&nomNaissance=Martin&prenoms[]=Jean&jourDateNaissance=12&moisDateNaissance=5&anneeDateNaissance=1980",
-            )
-
+        url = "https://example.com/"
+        params = {
+            "foobar": 34,
+            "nomNaissance": "Martin",
+            "prenoms[]": "Jean",
+            "jourDateNaissance": 12,
+            "moisDateNaissance": 5,
+            "anneeDateNaissance": 1980,
+        }
+        respx_mock.get(url, params=params).mock(return_value=httpx.Response(418))
+        httpx.get(url, params=params)
         scope.capture_message("Test message")
     assert sentry_sdk.client._Client._prepare_event.call_count == 1
     assert sentry_sdk.client._Client._prepare_event.spy_return["message"] == "Test message"
