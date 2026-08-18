@@ -77,7 +77,7 @@ def test_nir_modification_request_title_blocks_reflects_actor(client, is_proxy):
     soup = parse_response_to_soup(response)
     title = f"Demande de régularisation NIR{name_fragment}"
     assert title == soup.select_one("h1").text.strip()
-    title += " - Les emplois de l'inclusion"
+    title += " - Les emplois de l’inclusion"
     assert title == soup.select_one("title").text.strip()
 
 

@@ -2,7 +2,7 @@
 # name: TestApprovalProlongation.test_check_invalid_prescriber[unknown authorized prescriber]
   '''
   <div class="invalid-feedback d-block">
-      Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur les emplois de l’inclusion, vous pouvez
+      Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur Les emplois de l’inclusion, vous pouvez
       <a aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)" href="/search/prescribers" rel="noopener" target="_blank">
           retrouver ici
       </a>

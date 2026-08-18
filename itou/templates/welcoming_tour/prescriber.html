@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 {% load static %}
 
-{% block title %}Bienvenue sur les emplois de l'inclusion ! {{ block.super }}{% endblock %}
+{% block title %}Bienvenue sur {% brand %} ! {{ block.super }}{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -18,7 +18,7 @@
                         <div class="carousel-inner pb-5">
                             <div class="carousel-item active">
                                 <div class="d-block w-100 text-center">
-                                    <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
+                                    <h1 class="h1-hero-c1">Bienvenue sur {% brand %} !</h1>
                                     <figure class="mx-auto mb-3 w-sm-33">
                                         <img src="{% static 'img/welcoming_tour/prescripteur_1.svg' %}" loading="lazy" class="img-fitcover img-fluid" alt="">
                                     </figure>
