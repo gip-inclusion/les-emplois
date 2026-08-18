@@ -1382,7 +1382,7 @@ class TestProcessOrientationView:
         orientation = Orientation.objects.get()
         assert orientation.status == link.orientation.status
 
-    def test_accept(self, client):
+    def test_accept(self, client, mailoutbox):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
             orientation__service__name="Accompagnement aux devoirs",
@@ -1403,6 +1403,8 @@ class TestProcessOrientationView:
         assertContains(response, "Cette orientation a déjà été traitée.")
         assert orientation.updated_at == accepted_at
 
+        assert len(mailoutbox) != 0
+
     def test_cannot_accept(self, client):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice(
@@ -1421,7 +1423,7 @@ class TestProcessOrientationView:
         # todo after having tested orientation_details_for_service_provider
         pass
 
-    def test_refuse(self, client):
+    def test_refuse(self, client, mailoutbox):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
             orientation__service__name="Accompagnement aux devoirs",
@@ -1486,6 +1488,8 @@ class TestProcessOrientationView:
             OrientationRefusalReason.SESSION_FULL,
         ]
         assert orientation.updated_at == refused_at
+
+        assert len(mailoutbox) != 0
 
     def test_cannot_refuse(self, client):
         link = ProcessOrientationLinkFactory(

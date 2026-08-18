@@ -1,0 +1,585 @@
+# serializer version: 1
+# name: test_accepted_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  La prescription pour le service Aide aux devoirs réalisée par DUPONT Pierre a été acceptée par la structure Les joies de l’apprentissage !
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_beneficiary[subject]
+  '[TEST] Votre demande a été acceptée ! 🎉'
+# ---
+# name: test_accepted_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La demande d’orientation réalisée par DUPONT Pierre de la structure Pres. Org. pour DOE Jane vers le service Aide aux devoirs a été acceptée !
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_referent[subject]
+  '[TEST] Notification de l’acceptation d’une demande d’orientation'
+# ---
+# name: test_accepted_orientation_for_sender[body]
+  '''
+  Bonjour Pierre,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été acceptée !
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_sender[subject]
+  '[TEST] Votre demande a été acceptée ! 🎉'
+# ---
+# name: test_accepted_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs, le 13/08/2026.
+  
+  Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu favorablement.
+  
+  Il se peut que le professionnel ayant réalisé la demande ou le ou la bénéficiaire souhaitent vous contacter pour de plus amples informations pratiques.
+  
+  Nous vous remercions par avance pour votre engagement.
+  
+  http://localhost:8000/insertion/orientations/process/[PK of ProcessOrientationLink]/
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_accepted_orientation_for_structure[subject]
+  '[TEST] Vous venez de valider une demande 🎉'
+# ---
+# name: test_expired_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a envoyé une demande d’orientation en votre nom, auprès du service Aide aux devoirs, le 13/08/2026.
+  
+  Le service n’a pas répondu à la demande dans le délai limite des 30 jours. Par conséquent, la demande a été automatiquement annulée.
+  
+  *Vous n’avez rien à faire :* l’accompagnateur de la structure Les joies de l’apprentissage a également été informé.
+  
+  *Des questions ?* Contactez la personne qui vous accompagne :
+  - DUPONT Pierre
+  - pierre.dupont@test.local
+  
+  ou bien votre conseiller·e référent·e :
+  - TRISTAN Flora
+  - prescriptrice@inclusion.gouv.fr - 0102030405
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_beneficiary[subject]
+  '[TEST] Cette demande d’orientation a été annulée'
+# ---
+# name: test_expired_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas répondu dans le délai limite des 30 jours à votre demande d’orientation pour DOE Jane auprès du service Aide aux devoirs.
+  
+  Cette demande a été automatiquement annulée.
+  
+  Vous pouvez rechercher un autre service pour votre bénéficiaire.
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_referent[subject]
+  '[TEST] Votre demande d’orientation a expiré'
+# ---
+# name: test_expired_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas répondu dans le délai limite des 30 jours à votre demande d’orientation pour DOE Jane auprès du service Aide aux devoirs.
+  
+  Cette demande a été automatiquement annulée.
+  
+  Vous pouvez rechercher un autre service pour votre bénéficiaire.
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a expiré'
+# ---
+# name: test_expired_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas répondu dans le délai limite des 30 jours à votre demande d’orientation pour DOE Jane auprès du service Aide aux devoirs.
+  
+  Cette demande a été automatiquement annulée.
+  
+  Vous pouvez rechercher un autre service pour votre bénéficiaire.
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande d’orientation a expiré'
+# ---
+# name: test_expired_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas répondu dans le délai limite des 30 jours à votre demande d’orientation pour D… J… auprès du service Aide aux devoirs.
+  
+  Cette demande a été automatiquement annulée.
+  
+  Vous pouvez rechercher un autre service pour votre bénéficiaire.
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a expiré'
+# ---
+# name: test_expired_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs, le 13/08/2026.
+  
+  Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
+  
+  N’ayant pas reçu de réponses de votre de part dans le délai limite de 30 jours, cette demande a été automatiquement annulée.
+  
+  Nous vous remercions par avance pour votre engagement.
+  
+  http://localhost:8000/insertion/orientations/process/[PK of ProcessOrientationLink]/
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_expired_orientation_for_structure[subject]
+  '[TEST] Cette demande d’orientation a expiré 🎉'
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_not_referent][body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :*
+  - DUPONT Pierre
+  - pierre.dupont@test.local
+  
+  ou bien votre conseiller·e référent·e :
+  - TRISTAN Flora
+  - prescriptrice@inclusion.gouv.fr
+  
+  La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_not_referent][subject]
+  '[TEST] Une orientation a été effectuée en votre nom'
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_referent][body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :*
+  - DUPONT Pierre
+  - pierre.dupont@test.local
+  
+  La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_beneficiary[sender_is_referent][subject]
+  '[TEST] Une orientation a été effectuée en votre nom'
+# ---
+# name: test_new_orientation_for_referent[maximum_contact_info][body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a orienté DOE Jane vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  - Jean Dupont
+  - service.contact@email.fake - 0102030405
+  
+  La structure Les joies de l’apprentissage va traiter la demande et y apportera une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_referent[maximum_contact_info][subject]
+  '[TEST] Notification d’une demande d’orientation'
+# ---
+# name: test_new_orientation_for_referent[minimum_contact_info][body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a orienté DOE Jane vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter la demande et y apportera une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_referent[minimum_contact_info][subject]
+  '[TEST] Notification d’une demande d’orientation'
+# ---
+# name: test_new_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, DOE Jane, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande a bien été transmise !'
+# ---
+# name: test_new_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, DOE Jane, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande a bien été transmise !'
+# ---
+# name: test_new_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour Aline,
+  
+  Votre demande d’orientation pour le service Aide aux devoirs ayant lieu au : 13 rue de la porte, 29200 Brest, portée par la structure Les joies de l’apprentissage a été transmise !
+  
+  Votre bénéficiaire, D… J…, recevra un récapitulatif de la demande à l’adresse e-mail renseignée.
+  
+  *Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  La structure Les joies de l’apprentissage va traiter votre et reviendra vers vous avec une réponse.
+  
+  Une relance automatique par mail lui sera adressée au bout de 10 et 20 jours sans acceptation ou refus de sa part.
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande a bien été transmise !'
+# ---
+# name: test_new_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs.
+  
+  Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
+  
+  http://localhost:8000/insertion/orientations/process/[PK of ProcessOrientationLink]/
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_new_orientation_for_structure[subject]
+  '[TEST] Nouvelle demande d’orientation reçue'
+# ---
+# name: test_refused_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. a envoyé une demande d’orientation en votre nom, auprès du service Aide aux devoirs, le 13/08/2026.
+  
+  Malheureusement, la structure n’a pas pu donner suite à cette demande d’orientation sur ce service.
+  
+  *Des questions ?* Contactez la personne qui vous accompagne :
+  - DUPONT Pierre
+  - pierre.dupont@test.local
+  
+  ou bien votre conseiller·e référent·e :
+  - TRISTAN Flora
+  - prescriptrice@inclusion.gouv.fr - 0102030405
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_beneficiary[subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour DOE Jane sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_referent[subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour DOE Jane sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour DOE Jane sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour,
+  
+  La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour D… J… sur le service Aide aux devoirs.
+  
+  La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire :
+  http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation a été refusée'
+# ---
+# name: test_refused_orientation_for_structure[body]
+  '''
+  Bonjour,
+  
+  DUPONT Pierre de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs, le 13/08/2026.
+  
+  Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
+  
+  Votre décision de ne pas donner suite à cette demande pour le moment a été transmise à ou aux accompagnateur(s) de DOE Jane. La ou les raisons spécifiques évoquées sont les suivantes :
+  - Bénéficiaire non joignable
+  - Bénéficiaire ne s’étant pas présenté à l’entretien
+  - Bénéficiaire indisponible : en emploi
+  - Bénéficiaire indisponible : en formation
+  - Bénéficiaire non éligible (ne répond pas aux pré-requis)
+  - Bénéficiaire non mobile
+  - Bénéficiaire non intéressé
+  - Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre
+  - Session complète
+  - Orientation en doublon
+  - Autre (détails dans le message ci-dessous)
+  
+  Encore une autre raison personnalisée.
+  
+  Il se peut que le professionnel ayant réalisé la demande ou le ou la bénéficiaire souhaitent vous contacter pour de plus amples informations pratiques.
+  
+  Nous vous remercions par avance pour votre engagement.
+  
+  http://localhost:8000/insertion/orientations/process/[PK of ProcessOrientationLink]/
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_refused_orientation_for_structure[subject]
+  '[TEST] Vous venez de refuser une demande'
+# ---

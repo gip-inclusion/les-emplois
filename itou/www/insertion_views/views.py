@@ -507,6 +507,19 @@ class OrientationWizardView(WizardView):
             # otherwise issue a redundant UPDATE probe before the INSERT.
             orientation.save(force_insert=True)
 
+            # Send notifications
+            if self.service.contact_email:
+                process_link = insertion_models.ProcessOrientationLink.objects.create(orientation=orientation)
+                process_link.email_orientation_new_for_structure.send()
+            else:
+                logger.error(
+                    "Orientation=%s was created but the service does not have a contact_email", orientation.pk
+                )
+            if not orientation.sender_is_referent:
+                orientation.email_orientation_new_for_referent.send()
+            orientation.notification_new_for_beneficiary.send()
+            orientation.notification_new_for_sender.send()
+
             # Link the originating iMER to the created Orientation.
             event = (
                 insertion_models.MobilizationEvent.objects.filter(

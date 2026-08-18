@@ -1,0 +1,13 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+La structure {{ orientation.service.structure.name }} n’a pas répondu dans le délai limite des {{ orientation.PENDING_EXPIRATION_PERIOD_DAYS }} jours à votre demande d’orientation pour {{ orientation.beneficiary.get_inverted_full_name }} auprès du service {{ orientation.service.name }}.
+
+Cette demande a été automatiquement annulée.
+
+Vous pouvez rechercher un autre service pour votre bénéficiaire.
+{{ orientation.new_service_search_url }}
+
+{% endblock body %}
