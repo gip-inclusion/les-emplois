@@ -1,4 +1,327 @@
 # serializer version: 1
+# name: test_displayed_canvas_filters[authorized_prescriber]
+  '''
+  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">
+                  Éligibilité IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_validated-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_pending-offcanvas">
+                                  À valider
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseApproval" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseApproval" data-bs-toggle="collapse" type="button">
+                  PASS IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseApproval">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_active" id="id_approval_active-offcanvas" name="approval_active" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_active-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_expired" id="id_approval_expired-offcanvas" name="approval_expired" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_expired-offcanvas">
+                                  Expiré
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_no_approval" id="id_no_approval-offcanvas" name="no_approval" type="checkbox"/>
+                              <label class="form-check-label" for="id_no_approval-offcanvas">
+                                  Aucun
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEndOfJourney" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEndOfJourney" data-bs-toggle="collapse" type="button">
+                  Fin de parcours IAE à venir
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEndOfJourney">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_ending_soon" id="id_approval_ending_soon-offcanvas" name="approval_ending_soon" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_ending_soon-offcanvas">
+                                  PASS IAE bientôt expiré
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_contract_ending_soon" id="id_contract_ending_soon-offcanvas" name="contract_ending_soon" type="checkbox"/>
+                              <label class="form-check-label" for="id_contract_ending_soon-offcanvas">
+                                  Contrat IAE bientôt terminé
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                  Accompagnateur de ma structure
+              </button>
+          </legend>
+          <div class="mt-3 collapse" id="collapseSenders">
+              <div class="form-group">
+                  <label class="form-label" for="id_organization_members">
+                      Nom de la personne
+                  </label>
+                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+                  </select>
+              </div>
+          </div>
+      </fieldset>
+  </div>
+  
+  '''
+# ---
+# name: test_displayed_canvas_filters[iae_employer]
+  '''
+  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">
+                  Éligibilité IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_validated-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_pending-offcanvas">
+                                  À valider
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseApproval" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseApproval" data-bs-toggle="collapse" type="button">
+                  PASS IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseApproval">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_active" id="id_approval_active-offcanvas" name="approval_active" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_active-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_expired" id="id_approval_expired-offcanvas" name="approval_expired" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_expired-offcanvas">
+                                  Expiré
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_no_approval" id="id_no_approval-offcanvas" name="no_approval" type="checkbox"/>
+                              <label class="form-check-label" for="id_no_approval-offcanvas">
+                                  Aucun
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                  Accompagnateur de ma structure
+              </button>
+          </legend>
+          <div class="mt-3 collapse" id="collapseSenders">
+              <div class="form-group">
+                  <label class="form-label" for="id_organization_members">
+                      Nom de la personne
+                  </label>
+                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+                  </select>
+              </div>
+          </div>
+      </fieldset>
+  </div>
+  
+  '''
+# ---
+# name: test_displayed_canvas_filters[prescriber]
+  '''
+  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">
+                  Éligibilité IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_validated-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+                              <label class="form-check-label" for="id_eligibility_pending-offcanvas">
+                                  À valider
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseApproval" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseApproval" data-bs-toggle="collapse" type="button">
+                  PASS IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseApproval">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_active" id="id_approval_active-offcanvas" name="approval_active" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_active-offcanvas">
+                                  Valide
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_approval_expired" id="id_approval_expired-offcanvas" name="approval_expired" type="checkbox"/>
+                              <label class="form-check-label" for="id_approval_expired-offcanvas">
+                                  Expiré
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_no_approval" id="id_no_approval-offcanvas" name="no_approval" type="checkbox"/>
+                              <label class="form-check-label" for="id_no_approval-offcanvas">
+                                  Aucun
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                  Accompagnateur de ma structure
+              </button>
+          </legend>
+          <div class="mt-3 collapse" id="collapseSenders">
+              <div class="form-group">
+                  <label class="form-label" for="id_organization_members">
+                      Nom de la personne
+                  </label>
+                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+                  </select>
+              </div>
+          </div>
+      </fieldset>
+  </div>
+  
+  '''
+# ---
 # name: test_empty_list[/job-seekers/list-organization]
   '''
   <main class="s-main" id="main" role="main">
