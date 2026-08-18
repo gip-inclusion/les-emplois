@@ -33,6 +33,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
 )
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
@@ -169,24 +170,58 @@ def test_displayed_tabs(client, user_factory, assertion):
 
 
 @pytest.mark.parametrize(
-    "factory, url, assertion",
+    "user_factory, url, assertion",
     [
-        (PrescriberMembershipFactory, reverse("job_seekers_views:list"), assertNotContains),
         (
-            partial(CompanyMembershipFactory, company__subject_to_iae_rules=True),
+            partial(PrescriberFactory, membership=True),
+            reverse("job_seekers_views:list"),
+            assertNotContains,
+        ),
+        (
+            partial(PrescriberFactory, membership=True),
             reverse("job_seekers_views:list_organization"),
             assertContains,
         ),
-        (PrescriberMembershipFactory, reverse("job_seekers_views:list_organization"), assertContains),
+        (
+            partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+            assertContains,
+        ),
     ],
-    ids=["prescriber_assignments_list", "siae_assignments_list", "prescriber_organization_assignments_list"],
+    ids=[
+        "prescriber_assignments_filters",
+        "prescriber_organization_assignments_filters",
+        "siae_assignments_filters",
+    ],
 )
-def test_displayed_filters(client, factory, url, assertion):
-    user = factory().user
+def test_displayed_top_filters(client, user_factory, url, assertion):
+    user = user_factory()
     client.force_login(user)
     response = client.get(url)
 
     assertion(response, "Tous les filtres")
+
+
+@pytest.mark.parametrize(
+    "user_factory",
+    [
+        partial(PrescriberFactory, membership=True),
+        partial(PrescriberFactory, membership=True, membership__organization__authorized=True),
+        partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
+    ],
+    ids=[
+        "prescriber",
+        "authorized_prescriber",
+        "iae_employer",
+    ],
+)
+def test_displayed_canvas_filters(client, user_factory, snapshot):
+    user = user_factory()
+    url = reverse("job_seekers_views:list_organization")
+    client.force_login(user)
+    response = client.get(url)
+    canvas_filters = pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersContent"))
+    assert canvas_filters == snapshot
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
