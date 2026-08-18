@@ -383,7 +383,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
 
         Par exemple, en 2026 :
         - On a 61 offres contrat PEC
-        - On a 7964 offres d'employeurs handi engagés
+        - On a 7964 offres d'employeurs handi-engagés
         - On a 655 offres d'entreprises adaptées
         - Si on requête employeursHandiEngages=True, entreprisesAdaptees=True on a 8004 offres
         - Si on requête natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
@@ -416,7 +416,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         """We split requests by departments to break the API limit at 3149.
 
         It is needed because FT have, as of 2026, around 8k offers
-        from Employeurs Handi Engagés.
+        from Employeurs handi-engagés.
 
         See this page to get counts from FT:
 
