@@ -6791,7 +6791,7 @@
 # ---
 # name: test_populate_mobilization_events
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -6831,7 +6831,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_imer_v0" ("id" integer,"date" timestamp WITH TIME ZONE,
-                                                                                              "user_session" varchar,"user_kind" varchar,"user_id" integer,"user_prescriber_organization_id" integer,"user_company_id" integer,"structure_id" varchar,"kind" varchar,"service_id" varchar,"source" varchar,"external_link" varchar,"orientation_id" varchar,"date_mise_à_jour_metabase" date)
+                                                                                              "user_session" varchar,"user_kind" varchar,"user_id" integer,"user_prescriber_organization_id" integer,"user_company_id" integer,"structure_id" varchar,"kind" varchar,"service_id" varchar,"source" varchar,"external_link" varchar,"orientation_id" varchar,"beneficiary_id" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -6986,6 +6986,17 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_imer_v0"."beneficiary_id" IS \'ID C1 du bénéficiaire de l’éventuelle orientation\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_mobilization_events[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_imer_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
       }),
       dict({
@@ -7081,11 +7092,39 @@
                  "insertion_genericreferenceitem"."label",
                  "insertion_genericreferenceitem"."description",
                  "insertion_genericreferenceitem"."created_at",
-                 "insertion_genericreferenceitem"."updated_at"
+                 "insertion_genericreferenceitem"."updated_at",
+                 "insertion_orientation"."id",
+                 "insertion_orientation"."beneficiary_id",
+                 "insertion_orientation"."sender_id",
+                 "insertion_orientation"."sender_kind",
+                 "insertion_orientation"."sender_prescriber_organization_id",
+                 "insertion_orientation"."sender_company_id",
+                 "insertion_orientation"."service_id",
+                 "insertion_orientation"."beneficiary_contact_preferences",
+                 "insertion_orientation"."beneficiary_other_contact_method",
+                 "insertion_orientation"."beneficiary_availability",
+                 "insertion_orientation"."requirements",
+                 "insertion_orientation"."situation",
+                 "insertion_orientation"."situation_other",
+                 "insertion_orientation"."referent_last_name",
+                 "insertion_orientation"."referent_first_name",
+                 "insertion_orientation"."referent_phone",
+                 "insertion_orientation"."referent_email",
+                 "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."status",
+                 "insertion_orientation"."processing_date",
+                 "insertion_orientation"."duration_weekly_hours",
+                 "insertion_orientation"."duration_weeks",
+                 "insertion_orientation"."data_protection_commitment",
+                 "insertion_orientation"."attachments",
+                 "insertion_orientation"."created_at",
+                 "insertion_orientation"."updated_at",
+                 "insertion_orientation"."dora_status_updated_at"
           FROM "insertion_mobilizationevent"
           LEFT OUTER JOIN "insertion_service" ON ("insertion_mobilizationevent"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_structure" ON ("insertion_mobilizationevent"."structure_id" = "insertion_structure"."id")
           INNER JOIN "insertion_genericreferenceitem" ON ("insertion_structure"."source_id" = "insertion_genericreferenceitem"."id")
+          LEFT OUTER JOIN "insertion_orientation" ON ("insertion_mobilizationevent"."orientation_id" = "insertion_orientation"."id")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -7113,6 +7152,7 @@
                                 "source",
                                 "external_link",
                                 "orientation_id",
+                                "beneficiary_id",
                                 "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',

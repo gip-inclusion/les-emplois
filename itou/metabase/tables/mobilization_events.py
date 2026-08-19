@@ -51,5 +51,11 @@ TABLE.add_columns(
             "comment": "ID de l’éventuelle orientation",
             "fn": lambda o: str(o.orientation_id) if o.orientation_id else None,
         },
+        {
+            "name": "beneficiary_id",
+            "type": "integer",
+            "comment": "ID C1 du bénéficiaire de l’éventuelle orientation",
+            "fn": lambda o: o.orientation.beneficiary_id if o.orientation_id else None,
+        },
     ]
 )
