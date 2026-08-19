@@ -69,3 +69,8 @@ class ActionKind(models.TextChoices):
     IAE_ELIGIBILITY = "IAE_ELIGIBILITY", "validation de l'éligibilité IAE"
     GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
     SELF_ASSIGN = "SELF_ASSIGN", "se positionner comme accompagnateur"
+
+
+class AssignmentEndReason(models.TextChoices):
+    AUTOMATIC = "AUTOMATIC", "automatique"
+    MANUAL = "MANUAL", "manuel"

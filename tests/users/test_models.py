@@ -28,6 +28,7 @@ from itou.companies.enums import CompanyKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
+    AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -1265,8 +1266,10 @@ class TestJobSeekerAssignment:
             f"company={company_id}"
         )
 
-    @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
-    def test_is_job_seeker(self, factory):
+    @pytest.mark.parametrize(
+        "factory", [lambda: None, PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory]
+    )
+    def test_upsert_only_on_job_seeker(self, factory):
         not_a_job_seeker = factory()
         prescriber = PrescriberFactory()
 
@@ -1276,7 +1279,7 @@ class TestJobSeekerAssignment:
             )
 
     @pytest.mark.parametrize("factory", [JobSeekerFactory, ItouStaffFactory])
-    def test_is_professional(self, factory, caplog):
+    def test_upsert_only_for_professional(self, factory, caplog):
         not_a_professional = factory()
         job_seeker = JobSeekerFactory()
 
@@ -1285,7 +1288,7 @@ class TestJobSeekerAssignment:
         )
         assert caplog.messages[0] == ERROR_LOG_NOT_PROFESSIONAL % not_a_professional.pk
 
-    def test_professional_and_organization(self):
+    def test_upsert_professional_and_organization(self):
         job_seeker = JobSeekerFactory()
         professional = random.choice(
             [
@@ -1294,16 +1297,23 @@ class TestJobSeekerAssignment:
                 LaborInspectorFactory(),  # irrealistic case but technically possible
             ]
         )
-        prescriber_organization = PrescriberOrganizationFactory()
 
         # organization is not mandatory
         JobSeekerAssignment.objects.upsert_assignment(job_seeker, professional, None, random.choice(ActionKind.values))
 
         # professional is mandatory
-        with pytest.raises(AttributeError):
-            JobSeekerAssignment.objects.upsert_assignment(
-                job_seeker, None, prescriber_organization, random.choice(ActionKind.values)
-            )
+        with pytest.raises(AssertionError):
+            JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None, random.choice(ActionKind.values))
+
+    def test_upsert_new_assignment(self):
+        old_assignment = JobSeekerAssignmentFactory(ended_at=timezone.now(), end_reason=AssignmentEndReason.MANUAL)
+        JobSeekerAssignment.objects.upsert_assignment(
+            old_assignment.job_seeker,
+            old_assignment.professional,
+            old_assignment.organization,
+            random.choice(ActionKind.values),
+        )
+        JobSeekerAssignment.objects.count() == 2
 
     def test_unique_constraint(self):
         professional = random.choice([PrescriberFactory(), EmployerFactory()])
@@ -1320,10 +1330,22 @@ class TestJobSeekerAssignment:
             job_seeker=assignment.job_seeker, professional=professional, prescriber_organization=None
         )
 
-        with pytest.raises(IntegrityError):
+        def create_new_assignment_same_actors():
             JobSeekerAssignmentFactory(
                 job_seeker=assignment.job_seeker, professional=professional, prescriber_organization=organization
             )
+
+        # End the assignment
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.MANUAL
+        assignment.save()
+
+        # We can make a new assingment
+        create_new_assignment_same_actors()
+
+        # Forbid another ongoing assignment with the same actors
+        with pytest.raises(IntegrityError):
+            create_new_assignment_same_actors()
 
     def test_constraint_company_and_prescriber_organization(self):
         job_seeker = JobSeekerFactory()

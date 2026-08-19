@@ -27,5 +27,8 @@ def merge_job_seeker_assignments(*, assignment_to_delete, assignment_to_keep):
         updated_at=last_assignment.updated_at,
         last_action_kind=last_assignment.last_action_kind,
         job_seeker=assignment_to_keep.job_seeker,
+        ended_at=last_assignment.ended_at,
+        end_reason=last_assignment.end_reason,
+        reason=last_assignment.reason,
     )
     assignment_to_delete.delete()
