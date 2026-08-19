@@ -1161,15 +1161,6 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
     )
 
-    # TODO(ewen): drop this when the job_seekers_views:list use job seeker assignments.
-    created_by_prescriber_organization = models.ForeignKey(
-        PrescriberOrganization,
-        verbose_name="créé par un membre de l'organisation",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-
     is_stalled = models.BooleanField(
         verbose_name="candidat sans solution",
         default=False,
