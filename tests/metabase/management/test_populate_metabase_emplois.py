@@ -1331,6 +1331,7 @@ def test_populate_mobilization_events(snapshot):
             "source": structure_mobilization_event.structure.source.value,
             "external_link": "",
             "orientation_id": None,
+            "beneficiary_id": None,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
@@ -1347,6 +1348,7 @@ def test_populate_mobilization_events(snapshot):
             "source": service_mobilization_event.structure.source.value,
             "external_link": "",
             "orientation_id": None,
+            "beneficiary_id": None,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
@@ -1363,6 +1365,7 @@ def test_populate_mobilization_events(snapshot):
             "source": ext_orientation_mobilization_event.structure.source.value,
             "external_link": "https://orientation.fake",
             "orientation_id": None,
+            "beneficiary_id": None,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
@@ -1379,6 +1382,7 @@ def test_populate_mobilization_events(snapshot):
             "source": orientation_mobilization_event.structure.source.value,
             "external_link": "",
             "orientation_id": str(orientation.id),
+            "beneficiary_id": orientation.beneficiary_id,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
