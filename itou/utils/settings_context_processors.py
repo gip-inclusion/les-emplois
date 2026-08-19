@@ -30,6 +30,7 @@ def expose_settings(request):
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
         "MATOMO_BASE_URL": settings.MATOMO_BASE_URL,
         "MATOMO_SITE_ID": settings.MATOMO_SITE_ID,
+        "MON_RECAP_WWW_BASE_URL": settings.MON_RECAP_WWW_BASE_URL,
         "SHOW_DEMO_ACCOUNTS_BANNER": settings.SHOW_DEMO_ACCOUNTS_BANNER,
         "TALLY_URL": settings.TALLY_URL,
     }
