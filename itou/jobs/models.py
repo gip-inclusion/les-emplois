@@ -60,7 +60,8 @@ class AppellationQuerySet(models.QuerySet):
 class Appellation(models.Model):
     """
     A ROME's appellation.
-    Data is provided by django-admin commands `generate_appellations_for_romes` and `import_appellations_for_romes`.
+
+    Data is provided by django-admin command `sync_romes_and_appellations`.
 
     A job is characterized by a ROME code and a name, but it can have many different appellations.
 
