@@ -159,6 +159,24 @@ class TestApprovalAdmin:
         assertContains(response, "<h2>PASS IAE : 1</h2>")
         assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
 
+    def test_cancelled_approvals_admin_is_readonly(self, admin_client):
+        """Except for the textarea to comment a cancelled approval, nothing can be modified."""
+        approval = CancelledApprovalFactory()
+        response = admin_client.get(
+            reverse("admin:approvals_cancelledapproval_change", kwargs={"object_id": approval.pk})
+        )
+        soup = parse_response_to_soup(response)
+        assert not soup.select("input[type=text]")
+        assert not soup.select("select")
+
+    def test_cancelled_approvals_can_be_commented(self, admin_client):
+        approval = CancelledApprovalFactory()
+        response = admin_client.get(
+            reverse("admin:approvals_cancelledapproval_change", kwargs={"object_id": approval.pk})
+        )
+        soup = parse_response_to_soup(response)
+        assert soup.select("textarea")
+
     def test_check_inconsistency_check(self, admin_client):
         consistent_approval = ApprovalFactory()
 

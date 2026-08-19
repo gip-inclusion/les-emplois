@@ -740,7 +740,7 @@ class ProlongationAdmin(InconsistencyCheckMixin, ProlongationCommonAdmin):
 
 
 @admin.register(models.CancelledApproval)
-class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
+class CancelledApprovalAdmin(ItouModelAdmin):
     list_display = (
         "number",
         "start_at",
@@ -758,9 +758,22 @@ class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
         "user_nir",
         "origin_siae_siret",
     )
+    readonly_fields = list_display + (
+        "user_birthdate",
+        "pe_notification_status",
+        "pe_notification_time",
+        "pe_notification_endpoint",
+        "pe_notification_exit_code",
+        "user_id_national_pe",
+        "origin_siae_kind",
+        "origin_sender_kind",
+        "origin_prescriber_organization_kind",
+    )  # All but the support remark inline.
+
     list_filter = ("origin_siae_kind", "origin_sender_kind", "origin_prescriber_organization_kind")
     change_list_template = "admin/approvals/change_list_with_stats.html"
     stats_url = reverse_lazy("admin:approvals_cancelledapproval_sent_to_pe_stats")
+    inlines = (PkSupportRemarkInline,)
 
     def get_urls(self):
         additional_urls = [
