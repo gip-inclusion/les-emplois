@@ -1,7 +1,8 @@
 import datetime
 
 from django import forms
-from django.db.models import OuterRef, Q, Subquery
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import OuterRef, Q, Subquery, TextChoices
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
@@ -26,7 +27,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithHelpTexts
 
 
 APPROVAL_ENDING_SOON_DAYS = 90
@@ -46,6 +47,12 @@ def annotate_last_contract_end_date(queryset, *, company=None):
     if company is not None:
         contracts = contracts.filter(company=company)
     return queryset.annotate(last_contract_end_date=Subquery(contracts.order_by("-end_date").values("end_date")[:1]))
+
+
+class AssignmentsChoices(TextChoices):
+    ACTIVE = "", "Usagers accompagnés"
+    ARCHIVED = "archived", "Usagers archivés"
+    ALL = "all", "Tous les usagers"
 
 
 class FilterForm(forms.Form):
@@ -76,8 +83,18 @@ class FilterForm(forms.Form):
     approval_ending_soon = None
     contract_ending_soon = None
 
-    def __init__(self, job_seeker_qs, data, *args, request, **kwargs):
+    assignments = forms.ChoiceField(
+        label="Statut des accompagnements",
+        choices=AssignmentsChoices.choices,
+        widget=RadioSelectWithHelpTexts,
+        required=False,
+    )
+
+    def __init__(self, job_seeker_qs, data, *args, request, from_all_coworkers, **kwargs):
         super().__init__(data, *args, **kwargs)
+        self.professional = request.user
+        self.organization = request.current_organization
+        self.from_all_coworkers = from_all_coworkers
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request)
         if request.current_organization:
             self.fields["organization_members"].choices = self._get_choices_for_organization_members(
@@ -106,6 +123,15 @@ class FilterForm(forms.Form):
                 required=False,
                 help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
+
+        if from_all_coworkers:
+            self.fields["assignments"].widget.help_texts = {
+                AssignmentsChoices.ARCHIVED: "Votre structure n'accompagne plus cet usager."
+            }
+        else:
+            self.fields["assignments"].widget.help_texts = {
+                AssignmentsChoices.ARCHIVED: "Vous n'accompagnez plus cet usager."
+            }
 
     def _get_choices_for_job_seeker(self, job_seeker_qs, request):
         return [
@@ -198,6 +224,26 @@ class FilterForm(forms.Form):
             queryset = queryset.filter(
                 JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
             )
+
+        # Assignments (active, archived or all)
+        ARCHIVED_ASSIGNMENTS = {
+            AssignmentsChoices.ACTIVE: False,
+            AssignmentsChoices.ARCHIVED: True,
+        }
+        assignments_filter = self.cleaned_data.get("assignments", AssignmentsChoices.ACTIVE)
+        assigned_to_kwargs = {
+            "professional": self.professional,
+            "organization": self.organization,
+            "from_all_coworkers": self.from_all_coworkers,
+            "archived": ARCHIVED_ASSIGNMENTS.get(assignments_filter),
+        }
+        assignments = JobSeekerAssignment.objects.assigned_to(**assigned_to_kwargs)
+        queryset = queryset.filter(pk__in=assignments.values_list("job_seeker_id", flat=True)).annotate(
+            advisors=ArrayAgg(
+                "job_seeker_assignments__professional",
+                distinct=True,
+            )
+        )
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):

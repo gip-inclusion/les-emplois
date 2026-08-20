@@ -1506,6 +1506,158 @@ def test_filtered_by_organization_members(client, org_factory, membership_factor
     assert response.context["page_obj"].object_list == [job_seeker_assigned_to_old_member]
 
 
+def test_filtered_by_assignments(client):
+    organization = PrescriberOrganizationFactory()
+    user = PrescriberFactory(membership=True, membership__organization=organization)
+    active_assignment_without_org = JobSeekerAssignmentFactory(professional=user)
+    active_assignment_with_org = JobSeekerAssignmentFactory(professional=user, prescriber_organization=organization)
+    inactive_assignment_without_org = JobSeekerAssignmentFactory(
+        professional=user, ended_at=timezone.now(), end_reason=AssignmentEndReason.AUTOMATIC
+    )
+    inactive_assignment_with_org = JobSeekerAssignmentFactory(
+        professional=user,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+    url = reverse("job_seekers_views:list")
+
+    client.force_login(user)
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list == [
+        active_assignment_with_org.job_seeker,
+        active_assignment_without_org.job_seeker,
+    ]
+
+    response = client.get(url, {"assignments": "archived"})
+    assert response.context["page_obj"].object_list == [
+        inactive_assignment_with_org.job_seeker,
+        inactive_assignment_without_org.job_seeker,
+    ]
+
+    response = client.get(url, {"assignments": "all"})
+    assert response.context["page_obj"].object_list == [
+        inactive_assignment_with_org.job_seeker,
+        inactive_assignment_without_org.job_seeker,
+        active_assignment_with_org.job_seeker,
+        active_assignment_without_org.job_seeker,
+    ]
+
+
+def test_filtered_by_organization_assignments(client):
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    [user, colleague] = organization.members.all()
+
+    # Job seeker has assignment without org
+    job_seeker_with_active_assignment = JobSeekerAssignmentFactory(professional=user).job_seeker
+
+    # Job seeker has assignment with org
+    job_seeker_with_active_assignment_2 = JobSeekerAssignmentFactory(
+        professional=user, prescriber_organization=organization
+    ).job_seeker
+
+    # Job seeker has assignment with colleague
+    job_seeker_with_active_assignment_3 = JobSeekerAssignmentFactory(
+        professional=colleague, prescriber_organization=organization
+    ).job_seeker
+
+    # Job seeker has archived assignment with user but active assignment with colleague
+    job_seeker_with_active_and_archived_assignments = JobSeekerFactory()
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_active_and_archived_assignments,
+        professional=user,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_active_and_archived_assignments,
+        professional=colleague,
+        prescriber_organization=organization,
+    )
+
+    # Job seeker has no active assignment with organization
+    job_seeker_with_archived_assignments = JobSeekerFactory()
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_archived_assignments,
+        professional=user,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_archived_assignments,
+        professional=colleague,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+
+    url = reverse("job_seekers_views:list_organization")
+
+    client.force_login(user)
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list == [
+        job_seeker_with_active_and_archived_assignments,
+        job_seeker_with_active_assignment_3,
+        job_seeker_with_active_assignment_2,
+        job_seeker_with_active_assignment,
+    ]
+
+    response = client.get(url, {"assignments": "archived"})
+    assert response.context["page_obj"].object_list == [job_seeker_with_archived_assignments]
+
+    response = client.get(url, {"assignments": "all"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_with_archived_assignments,
+        job_seeker_with_active_and_archived_assignments,
+        job_seeker_with_active_assignment_3,
+        job_seeker_with_active_assignment_2,
+        job_seeker_with_active_assignment,
+    ]
+
+
+def test_filtered_by_assignments_and_members(client):
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    [user, colleague] = organization.members.all()
+    url = reverse("job_seekers_views:list_organization")
+
+    assignment_inactive_for_all = JobSeekerAssignmentFactory(
+        professional=colleague,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=assignment_inactive_for_all.job_seeker,
+        professional=user,
+        prescriber_organization=organization,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.AUTOMATIC,
+    )
+    assignment_active_for_colleague = JobSeekerAssignmentFactory(
+        professional=colleague, prescriber_organization=organization
+    )
+    # This assignment should not be present
+    JobSeekerAssignmentFactory(professional=user, prescriber_organization=organization)
+
+    client.force_login(user)
+
+    response = client.get(url, {"organization_members": colleague.pk})
+    assert response.context["page_obj"].object_list == [assignment_active_for_colleague.job_seeker]
+
+    response = client.get(url, {"assignments": "archived", "organization_members": colleague.pk})
+    assert response.context["page_obj"].object_list == [assignment_inactive_for_all.job_seeker]
+
+    response = client.get(url, {"assignments": "all", "organization_members": colleague.pk})
+    assert response.context["page_obj"].object_list == [
+        assignment_active_for_colleague.job_seeker,
+        assignment_inactive_for_all.job_seeker,
+    ]
+
+
 @pytest.mark.parametrize(
     "factory, url",
     [
