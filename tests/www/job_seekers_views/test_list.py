@@ -16,7 +16,7 @@ from itou.asp.models import Commune
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import ActionKind
+from itou.users.enums import ActionKind, AssignmentEndReason
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -1887,3 +1887,75 @@ def test_request_accompaniment_review_recipient_priority(client):
     response = client.get(url, {"approval_ending_soon": "on"})
     assertContains(response, "mailto:contrat-asp@example.com")
     assertNotContains(response, "mailto:candidature@example.com")
+
+
+def test_advisors_count(client):
+    user = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    url = reverse("job_seekers_views:list")
+    client.force_login(user)
+
+    # Active assignment without organization
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=user,
+    )
+
+    # Active assignment with organization
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=user,
+        prescriber_organization=PrescriberOrganizationFactory(),
+    )
+
+    # Active assignment with other organization
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=user,
+        company=CompanyFactory(),
+    )
+
+    # Active assignment with other professional
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=PrescriberFactory(),
+    )
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list[0].active_advisors_nb == 2
+
+    # Assignment with unknown advisor
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=user,
+        prescriber_organization=PrescriberOrganizationFactory(),
+        assigned_to_unknown_advisor=True,
+    )
+
+    # Assignment with unknown advisor and other professional
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        company=CompanyFactory(),
+        assigned_to_unknown_advisor=True,
+    )
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list[0].active_advisors_nb == 4
+
+    # Archived assignment
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=user,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.MANUAL,
+    )
+
+    # Archived assignment with other professional
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        ended_at=timezone.now(),
+        end_reason=AssignmentEndReason.MANUAL,
+    )
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list[0].active_advisors_nb == 4

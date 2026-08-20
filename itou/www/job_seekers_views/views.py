@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -572,14 +572,20 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .values("id")[:1],
         output_field=IntegerField(),
     )
+    subquery_advisors_count = Subquery(
+        JobSeekerAssignment.objects.filter(job_seeker=OuterRef("pk"), ended_at=None)
+        .values("job_seeker")
+        .annotate(
+            known_advisors_count=Count("professional", distinct=True, filter=Q(assigned_to_unknown_advisor=False)),
+            unknown_advisors_count=Count("assigned_to_unknown_advisor", filter=Q(assigned_to_unknown_advisor=True)),
+            advisors_count=F("known_advisors_count") + F("unknown_advisors_count"),
+        )
+        .values("advisors_count"),
+        output_field=IntegerField(),
+    )
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
         advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
     )
-    # FIXME(advisors) Don't count ended assignments
-    # FIXME(advisors) We should still count when assigned_to_unknown_advisor.
-    # If we have a jobseeker with 3 assignments from the same professionnal on 3 companies, but with one assigned to
-    # unknown advisorwe need to tell the job seeker is followed by 2 advisors
-    # If the job seeker has 2 assignments on unknown advisors, the count should be 2.
 
     form = FilterForm(
         queryset,
@@ -624,6 +630,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
             active_assignment=subquery_active_assignment,
+            active_advisors_nb=Coalesce(subquery_advisors_count, 0),
         )
         .select_related("jobseeker_profile")
         .prefetch_related(
