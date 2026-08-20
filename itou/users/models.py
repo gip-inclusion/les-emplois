@@ -1783,3 +1783,7 @@ class JobSeekerAssignment(models.Model):
         if self.organization:
             return JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
         return JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG
+
+    @property
+    def is_active(self):
+        return self.ended_at is None
