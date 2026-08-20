@@ -17,22 +17,28 @@
             <h1>PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
-            {% if approval_deletion_form_url %}
-                <a href="{{ approval_deletion_form_url }}"
-                   id="approval-deletion-link"
-                   class="btn btn-lg btn-danger btn-ico"
-                   target="_blank"
-                   rel="noopener"
-                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}">
-                    <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
-                    <span>Clôturer ce PASS IAE</span>
-                </a>
-            {% endif %}
             {% if is_employer_with_accepted_application %}
-                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
+                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-ico btn-secondary" rel="noopener" target="_blank">
                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                     <span>Afficher l’attestation</span>
                 </a>
+            {% endif %}
+            {% if approval_deletion_form_url %}
+                <a href="{{ approval_deletion_form_url }}"
+                   id="approval-deletion-link"
+                   class="btn btn-lg btn-primary btn-ico"
+                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}">
+                    <i class="ri-close-circle-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </a>
+            {% elif show_close_approval_button %}
+                <span class="btn btn-lg btn-primary btn-ico disabled"
+                      tabindex="0"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="La clôture du PASS IAE est possible uniquement si le PASS est suspendu depuis plus de 12 mois consécutifs, qu’aucune candidature n’est en cours sur les 2 derniers mois et qu’aucun contrat n’est en cours (selon les données de l’ASP).">
+                    <i class="ri-close-circle-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </span>
             {% endif %}
         {% endfragment %}
     {% endcomponent_title %}

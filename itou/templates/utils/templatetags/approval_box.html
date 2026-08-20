@@ -131,6 +131,20 @@ Arguments:
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
             </a>
+            {% if approval_deletion_form_url %}
+                <a href="{{ approval_deletion_form_url }}" class="btn btn-primary btn-block btn-ico mt-3" aria-label="Mettre fin au PASS IAE de {{ approval.user.get_inverted_full_name }}">
+                    <i class="ri-close-circle-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </a>
+            {% elif show_close_approval_button %}
+                <span class="btn btn-primary btn-block btn-ico mt-3 disabled"
+                      tabindex="0"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="La clôture du PASS IAE est possible uniquement si le PASS est suspendu depuis plus de 12 mois consécutifs, qu’aucune candidature n’est en cours sur les 2 derniers mois et qu’aucun contrat n’est en cours (selon les données de l’ASP).">
+                    <i class="ri-close-circle-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </span>
+            {% endif %}
         {% endif %}
     {% endif %}
 </div>

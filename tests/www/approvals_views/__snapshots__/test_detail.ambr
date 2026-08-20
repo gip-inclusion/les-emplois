@@ -47,7 +47,6 @@
           Ce PASS IAE a été importé depuis un agrément Pôle emploi.
       </p>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[future approval]
@@ -114,7 +113,6 @@
           Ce PASS IAE a été importé depuis un agrément Pôle emploi.
       </p>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[in progress approval from pe approval]
@@ -181,7 +179,6 @@
           Ce PASS IAE a été importé depuis un agrément Pôle emploi.
       </p>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[suspended approval]
@@ -251,7 +248,6 @@
           </div>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
@@ -2675,7 +2671,6 @@
           </div>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval prolongations list as job_seeker/prescriber]
@@ -2808,7 +2803,6 @@
           </table>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
@@ -5198,7 +5192,6 @@
           </div>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as employer without modification buttons]
@@ -5310,7 +5303,6 @@
           </div>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as job_seeker/prescriber without modification buttons]
@@ -5397,7 +5389,6 @@
           </table>
       </div>
   </div>
-  
   '''
 # ---
 # name: TestContractView.test_view
@@ -5425,7 +5416,7 @@
                               </h1>
                           </div>
                           <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
-                              <a class="btn btn-lg btn-primary btn-ico" href="/approvals/display/[Public ID of Approval]" rel="noopener" target="_blank">
+                              <a class="btn btn-lg btn-ico btn-secondary" href="/approvals/display/[Public ID of Approval]" rel="noopener" target="_blank">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
@@ -5585,8 +5576,8 @@
 # ---
 # name: test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de JOHN Doe" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=ACI+de+la+Rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
-      <i aria-hidden="true" class="ri-pass-expired-line fw-medium">
+  <a aria-label="Mettre fin au PASS IAE de JOHN Doe" class="btn btn-lg btn-primary btn-ico" href="/approvals/close/456789?back_url=%2Fapprovals%2Fdetails%2F[Public ID of Approval]" id="approval-deletion-link">
+      <i aria-hidden="true" class="ri-close-circle-line fw-medium">
       </i>
       <span>
           Clôturer ce PASS IAE
