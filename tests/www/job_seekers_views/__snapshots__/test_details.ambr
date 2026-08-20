@@ -767,6 +767,50 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="c-box--results__footer">
+                              <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                                  <button class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
+                                      <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Terminer mon accompagnement
+                                      </span>
+                                  </button>
+                                  <div aria-hidden="true" aria-labelledby="archive-assignment-[JobSeekerAssignment PK]-modal-title" class="modal" id="archive-assignment-[JobSeekerAssignment PK]-modal" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <form action="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/archive?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a" class="js-prevent-multiple-submit" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <div class="modal-content">
+                                                  <div class="modal-header">
+                                                      <h3 class="modal-title" id="archive-assignment-[JobSeekerAssignment PK]-modal-title">
+                                                          Terminer l'accompagnement
+                                                      </h3>
+                                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                                                      </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                      <p>
+                                                          Une fois votre accompagnement terminé, cet usager n'apparaîtra plus dans votre liste d'accompagnements.
+                                                      </p>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                      <button class="btn btn-outline-primary btn-block w-100 w-md-auto" data-bs-dismiss="modal" type="button">
+                                                          <span>
+                                                              Annuler
+                                                          </span>
+                                                      </button>
+                                                      <button class="btn btn-primary btn-block w-100 w-md-auto" data-matomo-action="submit" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="terminer-accompagnement">
+                                                          <span>
+                                                              Confirmer
+                                                          </span>
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
                       <p class="h4">
                           Historique des accompagnateurs (0)
@@ -979,6 +1023,10 @@
                                       </i>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="c-box--results__footer">
+                              <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -9216,6 +9264,50 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <div class="d-flex flex-column justify-content-md-end">
+                                                      <button class="btn btn-ico btn-outline-primary w-100 mt-3" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
+                                                          <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
+                                                          </i>
+                                                          <span>
+                                                              Terminer mon accompagnement
+                                                          </span>
+                                                      </button>
+                                                      <div aria-hidden="true" aria-labelledby="archive-assignment-[JobSeekerAssignment PK]-modal-title" class="modal" id="archive-assignment-[JobSeekerAssignment PK]-modal" tabindex="-1">
+                                                          <div class="modal-dialog modal-dialog-centered">
+                                                              <form action="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/archive?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" class="js-prevent-multiple-submit" method="post">
+                                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                                  <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                          <h3 class="modal-title" id="archive-assignment-[JobSeekerAssignment PK]-modal-title">
+                                                                              Terminer l'accompagnement
+                                                                          </h3>
+                                                                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                                                                          </button>
+                                                                      </div>
+                                                                      <div class="modal-body">
+                                                                          <p>
+                                                                              Une fois votre accompagnement terminé, cet usager n'apparaîtra plus dans votre liste d'accompagnements.
+                                                                          </p>
+                                                                      </div>
+                                                                      <div class="modal-footer">
+                                                                          <button class="btn btn-outline-primary btn-block w-100 w-md-auto" data-bs-dismiss="modal" type="button">
+                                                                              <span>
+                                                                                  Annuler
+                                                                              </span>
+                                                                          </button>
+                                                                          <button class="btn btn-primary btn-block w-100 w-md-auto" data-matomo-action="submit" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="terminer-accompagnement">
+                                                                              <span>
+                                                                                  Confirmer
+                                                                              </span>
+                                                                          </button>
+                                                                      </div>
+                                                                  </div>
+                                                              </form>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
