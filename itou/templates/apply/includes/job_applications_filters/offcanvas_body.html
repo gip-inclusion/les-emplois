@@ -8,7 +8,7 @@
         {% include "apply/includes/job_applications_filters/sender.html" %}
         {% if filters_form.criteria %}
             <hr>
-            {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.criteria legend="Critères administratifs IAE déclarés" only %}
+            {% include "includes/field_collapse.html" with field=filters_form.criteria legend="Critères administratifs IAE déclarés" only %}
         {% endif %}
         {% include "apply/includes/job_applications_filters/eligibility.html" %}
         {% include "apply/includes/job_applications_filters/pass.html" %}
@@ -24,7 +24,7 @@
             <input type="hidden" name="{{ filters_form.job_seeker.name }}" value="{{ filters_form.job_seeker.value }}">
         {% endif %}
         <hr>
-        {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.archived legend="Candidatures archivées" only %}
+        {% include "includes/field_collapse.html" with field=filters_form.archived legend="Candidatures archivées" only %}
     {% endif %}
     {% include "apply/includes/job_applications_filters/dates.html" %}
 </div>
