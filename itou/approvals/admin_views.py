@@ -23,7 +23,8 @@ from itoutils.urls import add_url_params
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm, ProlongationDerogationForm
 from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
+from itou.approvals.models import Approval, CancelledApproval
+from itou.approvals.utils import close_approval
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import add_support_remark_to_obj
@@ -181,39 +182,6 @@ def manually_refuse_approval(
     return render(request, template_name, context)
 
 
-def _clip_approval_dependency(approval, model, end_date, acting_user):
-    _, deletions = model.objects.filter(approval=approval, start_at__gte=end_date).delete()
-    if deletions:
-        logger.info(
-            "Terminating approval pk=%(approval_id)d, deleting %(deletions)d future %(model_name)s.",
-            {
-                "approval_id": approval.pk,
-                "deletions": deletions[model._meta.label],
-                "model_name": model._meta.label,
-            },
-        )
-    try:
-        obj = model.objects.in_progress().filter(approval=approval).get()
-    except model.DoesNotExist:
-        pass
-    else:
-        logger.info(
-            "Terminating approval pk=%(approval_id)d, "
-            "setting %(model_name)s pk=%(model_id)d end_at=%(end_at)s "
-            "(was %(initial_end_at)s).",
-            {
-                "approval_id": approval.pk,
-                "model_name": obj._meta.label,
-                "model_id": obj.pk,
-                "end_at": end_date,
-                "initial_end_at": obj.end_at,
-            },
-        )
-        obj.end_at = end_date
-        obj.updated_by = acting_user
-        obj.save(update_fields=["end_at", "updated_at", "updated_by"])
-
-
 def terminate_approval(request, model_admin, approval_id):
     opts = model_admin.model._meta
     app_label = opts.app_label
@@ -221,21 +189,8 @@ def terminate_approval(request, model_admin, approval_id):
     if not request.user.has_perm(f"{app_label}.{codename}"):
         raise PermissionDenied
 
-    new_end = timezone.localdate()
-    approval = get_object_or_404(Approval, pk=approval_id, end_at__gte=new_end)
-    _clip_approval_dependency(approval, Prolongation, new_end, request.user)
-    _clip_approval_dependency(approval, Suspension, new_end, request.user)
-    logger.info(
-        "Terminating approval pk=%(approval_id)d, end_at=%(end_at)s (was %(initial_end_at)s).",
-        {
-            "approval_id": approval.pk,
-            "initial_end_at": approval.end_at,
-            "end_at": new_end,
-        },
-    )
-    approval.end_at = new_end
-    approval.save(update_fields=["end_at", "updated_at"])
-    add_support_remark_to_obj(approval, f"{new_end} : PASS IAE clôturé par {request.user.get_full_name()}.")
+    approval = get_object_or_404(Approval, pk=approval_id, end_at__gte=timezone.localdate())
+    close_approval(approval, closed_by=request.user)
     return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
 
 
