@@ -99,11 +99,16 @@ def _clip_approval_dependency(approval, model, end_date, acting_user):
         obj.save(update_fields=["end_at", "updated_at", "updated_by"])
 
 
-def close_approval(approval, *, closed_by):
-    """Terminate approval as of today, clipping its ongoing suspensions and prolongations."""
+def close_approval(approval, *, closed_by, end_at="today"):
+    """Terminate approval as of today or yesterday (end_at is inclusive)."""
+    # `end_at`` is currently needed to support both admin's historical behavior,
+    # and the new self-service "clôturer le PASS IAE" button. It should be removed
+    # once the admin adopts the new behavior, which is on its way.
     from itou.approvals.models import Prolongation, Suspension
 
-    new_end = timezone.localdate()
+    today = timezone.localdate()
+    assert end_at in ["today", "yesterday"]
+    new_end = today if end_at == "today" else today - datetime.timedelta(days=1)
     _clip_approval_dependency(approval, Prolongation, new_end, closed_by)
     _clip_approval_dependency(approval, Suspension, new_end, closed_by)
     logger.info(
