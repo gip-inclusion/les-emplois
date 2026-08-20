@@ -14,6 +14,7 @@ from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProv
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url, get_url_param_value
+from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm
 
@@ -86,7 +87,10 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context | {"redirect_field_value": self.next_url}
+        return context | {
+            "redirect_field_value": self.next_url,
+            "redirected_from_old_domain": REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM in (self.next_url or ""),
+        }
 
 
 class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
