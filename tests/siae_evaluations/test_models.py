@@ -11,7 +11,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.enums import Origin
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
@@ -33,7 +33,7 @@ from itou.siae_evaluations.models import (
 )
 from itou.utils.models import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
+from tests.companies.factories import GRACE_PERIOD, CompanyFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelectedAdministrativeCriteriaFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import (
@@ -224,6 +224,44 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         assert [] == list(evaluation_campaign.eligible_job_applications())
         for job_app in JobApplication.objects.all():
             assert _eligible_to_siae_evaluations(job_app) == "non"
+
+    def test_siae_convention_in_grace_period(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        convention = campaign_eligible_job_app_objects["siae"].convention
+        convention.is_active = False
+        convention.deactivated_at = timezone.now() - GRACE_PERIOD + datetime.timedelta(days=1)
+        convention.save()
+        assert [job_app] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(job_app) == "oui"
+
+    def test_siae_convention_after_grace_period(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        convention = campaign_eligible_job_app_objects["siae"].convention
+        convention.is_active = False
+        convention.deactivated_at = timezone.now() - GRACE_PERIOD - datetime.timedelta(days=1)
+        convention.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
+
+    def test_siae_without_convention(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae = campaign_eligible_job_app_objects["siae"]
+        siae.convention = None
+        siae.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
+
+    def test_staff_created_siae_without_convention(self, campaign_eligible_job_app_objects):
+        # Staff created companies are considered active until the `import_siae` script brings in fresh data from ASP.
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        siae = campaign_eligible_job_app_objects["siae"]
+        siae.convention = None
+        siae.source = CompanySource.STAFF_CREATED
+        siae.save()
+        assert [job_app] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(job_app) == "oui"
 
     def test_job_application_not_accepted(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()

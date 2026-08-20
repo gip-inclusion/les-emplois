@@ -78,6 +78,13 @@ def _eligible_to_siae_evaluations(job_application):
     eligible = (
         job_application.approval_id is not None
         and job_application.to_company.kind in evaluation_enums.EvaluationSiaesKind.Evaluable
+        and (
+            job_application.to_company.is_active
+            or (
+                job_application.to_company.convention is not None
+                and not job_application.to_company.grace_period_has_expired
+            )
+        )
         and job_application.state == JobApplicationState.ACCEPTED
         and job_application.eligibility_diagnosis
         and job_application.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
