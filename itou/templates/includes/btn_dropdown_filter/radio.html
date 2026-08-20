@@ -21,6 +21,9 @@ Arguments:
                            {% if choice.data.selected %} checked{% endif %}
                            {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}>
                     <label class="form-check-label" for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.data.label }}</label>
+                    {% if choice.data.help_text %}
+                        <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}" class="form-text">{{ choice.data.help_text }}</div>
+                    {% endif %}
                 </div>
             </li>
         {% endfor %}

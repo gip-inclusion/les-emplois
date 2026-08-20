@@ -231,3 +231,14 @@ class EasyMDEEditor(forms.Textarea):
                 classes.append(easymde_class)
         attrs["class"] = " ".join(classes)
         return attrs
+
+
+class RadioSelectWithHelpTexts(forms.RadioSelect):
+    def __init__(self, attrs=None, choices=(), *, help_texts=None):
+        super().__init__(attrs=attrs, choices=choices)
+        self.help_texts = help_texts or dict()
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        return super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs) | {
+            "help_text": self.help_texts.get(value, "")
+        }

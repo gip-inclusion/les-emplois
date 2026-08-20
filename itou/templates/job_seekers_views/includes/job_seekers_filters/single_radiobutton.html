@@ -1,0 +1,20 @@
+{% comment %}
+Arguments:
+- choice
+- id_suffix: When the field is present multiple times on the page, use the
+    suffix to make its input id unique.
+{% endcomment %}
+<div class="{{ wrapper_class }}">
+    <div class="form-check">
+        <input id="{{ choice.id_for_label }}{{ id_suffix|default:'' }}"
+               class="form-check-input"
+               type="radio"
+               name="{{ choice.data.name }}"
+               value="{{ choice.data.value }}"
+               {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}>
+        <label class="form-check-label" for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.choice_label }}</label>
+        {% if choice.data.help_text %}
+            <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}" class="form-text">{{ choice.data.help_text }}</div>
+        {% endif %}
+    </div>
+</div>
