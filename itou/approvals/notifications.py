@@ -110,3 +110,14 @@ class ProlongationRequestGrantedForJobSeekerNotification(JobSeekerNotification, 
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/jobseeker_subject.txt"
     body_template = "approvals/email/prolongation_request/granted/jobseeker_body.txt"
+
+
+@notifications_registry.register
+class ApprovalClosedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to the job seeker when an employer closes their PASS IAE."""
+
+    name = "PASS IAE clôturé"
+    category = NotificationCategory.IAE_PASS
+    can_be_disabled = False
+    subject_template = "approvals/email/closed/jobseeker_subject.txt"
+    body_template = "approvals/email/closed/jobseeker_body.txt"

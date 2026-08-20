@@ -1,0 +1,10 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+{{ structure.display_name }} a clôturé votre PASS IAE n° {{ approval.number_with_spaces }}, après examen de votre situation au regard de l’emploi et des actions d’accompagnement et de formation conduites dans le cadre de votre parcours.
+
+Ce PASS IAE n’est plus valide depuis le {{ approval.end_at|date:"d/m/Y" }} et ne peut plus être utilisé pour un nouveau contrat de travail dans le cadre de l’insertion par l’activité économique.
+
+Si vous souhaitez retravailler dans une structure d’insertion, un prescripteur habilité pourra réaliser un nouveau diagnostic d’éligibilité pour ouvrir un nouveau parcours.
+{% endblock body %}
