@@ -27,6 +27,11 @@ urlpatterns = [
         name="advisors",
     ),
     path(
+        "<uuid:public_id>/assignments/<int:assignment_pk>/archive",
+        views.archive_assignment,
+        name="archive_assignment",
+    ),
+    path(
         "switch_stalled_status/<uuid:public_id>",
         views.switch_stalled_status,
         name="switch_stalled_status",
