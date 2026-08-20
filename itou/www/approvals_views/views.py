@@ -27,7 +27,12 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
+from itou.approvals.perms import (
+    PERMS_READ_AND_WRITE,
+    can_declare_prolongation,
+    can_view_approval_details,
+    prolongation_derogation_session_key,
+)
 from itou.approvals.utils import get_contracts
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
@@ -49,6 +54,7 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
+from itou.utils.tokens import prolongation_derogation_token_generator
 from itou.utils.urls import get_safe_url
 from itou.www.approvals_views.forms import (
     ApprovalForm,
@@ -357,14 +363,9 @@ def prolongation_back_url(request):
     return get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
 
-@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
-    """
-    Declare a prolongation for the given approval.
-    """
-
-    siae = get_current_company_or_404(request)
-    approval = get_object_or_404(
+def get_prolongable_approval_or_404(siae, approval_id):
+    """The approvals `siae` may declare a prolongation for: those of an employee it hired."""
+    return get_object_or_404(
         Approval.objects.filter(
             Exists(
                 JobApplication.objects.filter(
@@ -375,7 +376,39 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         pk=approval_id,
     )
 
-    if not siae.is_subject_to_iae_rules or not approval.can_be_prolonged:
+
+@http_methods(db_readonly=["GET", "HEAD"])
+def prolongation_derogation(request, approval_id, token):
+    """Open the prolongation form from a derogation link issued by the support.
+
+    The token is stored in the session so that the whole declaration flow (the form page, its
+    HTMX fragments and the final POST) keeps the deadline waiver without having to carry the
+    token in every URL. It is checked again on each step, see `can_declare_prolongation`.
+    """
+    siae = get_current_company_or_404(request)
+    approval = get_prolongable_approval_or_404(siae, approval_id)
+    if (
+        not siae.is_subject_to_iae_rules
+        or not (approval.can_be_prolonged or approval.needs_prolongation_derogation)
+        or not prolongation_derogation_token_generator.check_token(token, approval=approval, company=siae)
+    ):
+        raise PermissionDenied()
+    request.session[prolongation_derogation_session_key(approval=approval, company=siae)] = token
+    return HttpResponseRedirect(
+        reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk}, query=request.GET or None)
+    )
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
+    """
+    Declare a prolongation for the given approval.
+    """
+
+    siae = get_current_company_or_404(request)
+    approval = get_prolongable_approval_or_404(siae, approval_id)
+
+    if not can_declare_prolongation(request, approval=approval, company=siae):
         raise PermissionDenied()
 
     back_url = prolongation_back_url(request)
@@ -427,6 +460,8 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                     default_storage.delete(tmpfile_key)
             prolongation.save()
             prolongation.notify_authorized_prescriber()
+            # A derogation link is single-use
+            request.session.pop(prolongation_derogation_session_key(approval=approval, company=siae), None)
             messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")
             return HttpResponseRedirect(back_url)
 
@@ -459,20 +494,9 @@ class DeclareProlongationHTMXFragmentView(ReadonlyViewMixin, TemplateView):
         super().setup(request, *args, **kwargs)
 
         self.siae = get_current_company_or_404(request)
-        if not self.siae.is_subject_to_iae_rules:
-            raise PermissionDenied()
-        self.approval = get_object_or_404(
-            Approval.objects.filter(
-                Exists(
-                    JobApplication.objects.filter(
-                        approval=OuterRef("pk"), to_company=self.siae, state=JobApplicationState.ACCEPTED
-                    )
-                )
-            ),
-            pk=approval_id,
-        )
+        self.approval = get_prolongable_approval_or_404(self.siae, approval_id)
 
-        if not self.approval.can_be_prolonged:
+        if not can_declare_prolongation(request, approval=self.approval, company=self.siae):
             raise PermissionDenied()
 
         self.form = get_prolongation_form(

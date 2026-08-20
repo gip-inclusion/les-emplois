@@ -11,6 +11,7 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import (
     manually_add_approval,
     manually_refuse_approval,
+    prolongation_derogation,
     send_approvals_to_pe_stats,
     terminate_approval,
 )
@@ -370,6 +371,12 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
     def terminate_approval(self, request, approval_id):
         return terminate_approval(request, self, approval_id)
 
+    def prolongation_derogation(self, request, approval_id):
+        """
+        Custom admin view to issue an out-of-time-limits prolongation link.
+        """
+        return prolongation_derogation(request, self, approval_id)
+
     def get_urls(self):
         additional_urls = [
             path(
@@ -386,6 +393,11 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
                 "<int:approval_id>/terminate",
                 self.admin_site.admin_view(self.terminate_approval),
                 name="approvals_approval_terminate_approval",
+            ),
+            path(
+                "<int:approval_id>/prolongation-derogation",
+                self.admin_site.admin_view(self.prolongation_derogation),
+                name="approvals_approval_prolongation_derogation",
             ),
             path(
                 "sent-to-pe-stats",

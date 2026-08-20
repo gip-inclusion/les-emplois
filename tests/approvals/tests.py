@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
+from itou.approvals.enums import ApprovalStatus, Origin, ProlongationBlocker, ProlongationReason
 from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.archive.constants import EXPIRATION_DAYS
@@ -299,6 +299,46 @@ class TestApprovalModel:
         approval = ApprovalFactory(start_at=datetime.date(2021, 11, 17))
         with freeze_time(approval.end_at + end_at_delta):
             assert approval.is_open_to_prolongation is expected
+
+    def test_prolongation_blocker_time_limits(self):
+        approval = ApprovalFactory(start_at=datetime.date(2021, 11, 17))
+
+        def blocker_at(delta):
+            with freeze_time(approval.end_at + delta):
+                # Reset the cached properties
+                return Approval.objects.get(pk=approval.pk).prolongation_blocker
+
+        assert blocker_at(relativedelta(months=-12, days=-1)) == ProlongationBlocker.TOO_EARLY
+        assert blocker_at(relativedelta(months=-12)) is None
+        assert blocker_at(relativedelta(months=6)) is None
+        assert blocker_at(relativedelta(months=6, days=1)) == ProlongationBlocker.DEADLINE_PASSED
+
+    def test_suspension_takes_precedence_over_the_time_limits(self):
+        approval = ApprovalFactory(start_at=datetime.date(2021, 11, 17))
+        past_the_deadline = approval.end_at + relativedelta(months=6, days=1)
+        with freeze_time(past_the_deadline):
+            assert Approval.objects.get(pk=approval.pk).prolongation_blocker == ProlongationBlocker.DEADLINE_PASSED
+            SuspensionFactory(
+                approval=approval,
+                start_at=past_the_deadline - relativedelta(days=1),
+                end_at=past_the_deadline + relativedelta(days=1),
+            )
+            assert Approval.objects.get(pk=approval.pk).prolongation_blocker == ProlongationBlocker.SUSPENDED
+
+    def test_needs_prolongation_derogation(self):
+        approval = ApprovalFactory(start_at=datetime.date(2021, 11, 17))
+
+        def needs_derogation_at(delta):
+            with freeze_time(approval.end_at + delta):
+                # Reset the cached properties
+                return Approval.objects.get(pk=approval.pk).needs_prolongation_derogation
+
+        # Too early or still in time: the employer does not need any link from the support
+        assert needs_derogation_at(relativedelta(months=-12, days=-1)) is False
+        assert needs_derogation_at(relativedelta(months=-12)) is False
+        assert needs_derogation_at(relativedelta(months=6)) is False
+        # Past the deadline: only the support can enable the prolongation form
+        assert needs_derogation_at(relativedelta(months=6, days=1)) is True
 
     def test_cannot_be_prolonged_when_a_newer_approval_exists(self):
         initial_approval = ApprovalFactory(start_at=timezone.localdate() - relativedelta(years=2, months=3))

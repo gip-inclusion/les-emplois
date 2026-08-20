@@ -2,6 +2,7 @@ import logging
 
 from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User
+from itou.utils.tokens import prolongation_derogation_token_generator
 
 
 logger = logging.getLogger(__name__)
@@ -40,3 +41,30 @@ def can_view_approval_details(request, approval):
     else:
         logger.exception("This should never happen")
     return None
+
+
+def prolongation_derogation_session_key(*, approval, company):
+    """Where the token of a derogation link is kept for the duration of the declaration flow."""
+    return f"prolongation_derogation:{company.pk}:{approval.pk}"
+
+
+def can_declare_prolongation(request, *, approval, company):
+    """Whether `company` may open the prolongation form for `approval`.
+
+    A derogation link issued by the support for this exact (approval, company) pair waives the
+    prolongation deadline (`Approval.prolongation_period_has_ended`), and only this limit: an
+    approval that is suspended, that is not the latest one of the job seeker, that already has a
+    pending prolongation request or that ends in more than 12 months still cannot be prolonged.
+
+    Following such a link stores its token in the session, see the `prolongation_derogation`
+    view. The token is checked again here on every step of the flow, and remains single-use:
+    declaring a prolongation consumes it, see `ProlongationDerogationTokenGenerator`.
+    """
+    if not company.is_subject_to_iae_rules:
+        return False
+    if approval.can_be_prolonged:
+        return True
+    if not approval.needs_prolongation_derogation:
+        return False
+    token = request.session.get(prolongation_derogation_session_key(approval=approval, company=company))
+    return prolongation_derogation_token_generator.check_token(token, approval=approval, company=company)
