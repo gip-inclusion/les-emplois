@@ -1,23 +1,9 @@
-from collections import namedtuple
-
 from django import forms
 from django.contrib.admin import widgets
 from django.core.exceptions import ValidationError
 
 from itou.companies.models import Company
-from itou.utils.admin import ChooseFieldsToTransfer
-
-
-FakeField = namedtuple("FakeField", ("name",))
-
-
-class FakeRelForToCompanyRawIdWidget:
-    model = Company
-    limit_choices_to = {}
-
-    def get_related_field(self):
-        # This must return something that has the name of an existing field
-        return FakeField("id")
+from itou.utils.admin import ChooseFieldsToTransfer, FakeRelForRawIdWidget
 
 
 class SelectTargetCompanyForm(forms.Form):
@@ -25,7 +11,7 @@ class SelectTargetCompanyForm(forms.Form):
 
     def __init__(self, *args, from_company, admin_site, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["to_company"].widget = widgets.ForeignKeyRawIdWidget(FakeRelForToCompanyRawIdWidget(), admin_site)
+        self.fields["to_company"].widget = widgets.ForeignKeyRawIdWidget(FakeRelForRawIdWidget(Company), admin_site)
         self.from_company = from_company
 
     def clean_to_company(self):
