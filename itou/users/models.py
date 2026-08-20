@@ -1631,7 +1631,12 @@ class JobSeekerAssignmentManager(models.Manager):
 
         match archived:
             case True:
-                qs = qs.exclude(ended_at=None)
+                if from_all_coworkers:
+                    # We only want assignments from job seekers who are no longer followed
+                    # by anyone in the organization.
+                    qs = qs.filter(~Exists(qs.filter(job_seeker=OuterRef("job_seeker")).filter(ended_at=None)))
+                else:
+                    qs = qs.exclude(ended_at=None)
             case False:
                 qs = qs.filter(ended_at=None)
         return qs
