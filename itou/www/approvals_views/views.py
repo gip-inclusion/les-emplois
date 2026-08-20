@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import Exists, F, Max, OuterRef, Prefetch, Subquery
+from django.db.models import Exists, F, OuterRef, Prefetch, Subquery
 from django.db.models.base import Coalesce
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -20,7 +20,6 @@ from formtools.wizard.views import NamedUrlSessionWizardView
 from itou.approvals import enums as approvals_enums
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.models import (
-    SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
     Approval,
     Prolongation,
     ProlongationRequest,
@@ -33,7 +32,7 @@ from itou.approvals.perms import (
     can_view_approval_details,
     prolongation_derogation_session_key,
 )
-from itou.approvals.utils import get_contracts
+from itou.approvals.utils import can_close_approval, get_contracts
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -190,42 +189,20 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
 
         # Display or not the deletion form link
         context["approval_deletion_form_url"] = None
-        if self.request.from_employer and approval.is_in_progress:
-            approval_can_be_deleted = False
-
-            long_suspensions = [
-                suspension
-                for suspension in approval.suspension_set.all()
-                if (timezone.localdate() - suspension.start_at if suspension.is_in_progress else suspension.duration)
-                > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-            ]
-
-            if any(suspension.is_in_progress for suspension in long_suspensions):
-                approval_can_be_deleted = True
-            elif long_suspensions:
-                last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
-                    "hiring_start_at__max"
-                ]
-                if last_hiring_start_at is None or any(
-                    suspension.end_at > last_hiring_start_at for suspension in long_suspensions
-                ):
-                    approval_can_be_deleted = True
-
-            if approval_can_be_deleted:
-                # ... and no hiring after this suspension: this approval is eligible for deletion
-                context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                    {
-                        "siaeID": self.request.current_organization.pk,
-                        "nomSIAE": self.request.current_organization.display_name,
-                        "prenomemployeur": self.request.user.first_name,
-                        "nomemployeur": self.request.user.last_name,
-                        "emailemployeur": self.request.user.email,
-                        "userID": self.request.user.pk,
-                        "numPASS": approval.number_with_spaces,
-                        "prenomsalarie": approval.user.first_name,
-                        "nomsalarie": approval.user.last_name,
-                    }
-                )
+        if self.request.from_employer and approval.is_in_progress and can_close_approval(approval):
+            context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
+                {
+                    "siaeID": self.request.current_organization.pk,
+                    "nomSIAE": self.request.current_organization.display_name,
+                    "prenomemployeur": self.request.user.first_name,
+                    "nomemployeur": self.request.user.last_name,
+                    "emailemployeur": self.request.user.email,
+                    "userID": self.request.user.pk,
+                    "numPASS": approval.number_with_spaces,
+                    "prenomsalarie": approval.user.first_name,
+                    "nomsalarie": approval.user.last_name,
+                }
+            )
 
         return context
 

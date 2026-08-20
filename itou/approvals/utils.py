@@ -1,5 +1,65 @@
+import datetime
+
+from django.db.models import Max, Q
+from django.utils import timezone
+
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Contract
+
+
+# A PASS IAE is eligible for closure when its suspension has been going on for
+# at least this duration without interruption.
+SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE = datetime.timedelta(days=365)
+
+
+def can_close_approval(approval):
+    """Return True when approval meets all conditions for a user-initiated closure:
+
+    0. It isn't already ending today or earlier (nothing left to close).
+    1. At least one suspension has been running (or ran) for more than 12
+       consecutive months, and no accepted hiring occurred after it ended.
+    2. The job seeker has no pending applications in the last 60 days.
+    3. The job seeker has no ongoing contract in the ASP data.
+    """
+    today = timezone.localdate()
+
+    if approval.end_at <= today:
+        # Already closed (or naturally ending) today: nothing left to close.
+        return False
+
+    long_suspensions = [
+        suspension
+        for suspension in approval.suspension_set.all()
+        if (today - suspension.start_at if suspension.is_in_progress else suspension.duration)
+        > SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE
+    ]
+
+    if any(suspension.is_in_progress for suspension in long_suspensions):
+        long_suspension = True
+    elif long_suspensions:
+        last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
+            "hiring_start_at__max"
+        ]
+        long_suspension = last_hiring_start_at is None or any(
+            suspension.end_at > last_hiring_start_at for suspension in long_suspensions
+        )
+    else:
+        return False
+
+    if not long_suspension:
+        return False
+
+    if (
+        approval.user.job_applications.pending()
+        .filter(created_at__date__gte=today - datetime.timedelta(days=60))
+        .exists()
+    ):
+        return False
+
+    return not Contract.objects.filter(
+        Q(end_date__isnull=True) | Q(end_date__gte=today),
+        job_seeker=approval.user,
+    ).exists()
 
 
 def get_user_last_accepted_siae_job_application(user):
