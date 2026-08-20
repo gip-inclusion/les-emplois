@@ -1,3 +1,4 @@
+from collections import namedtuple
 from functools import partial
 
 from django import forms
@@ -348,6 +349,24 @@ class CreatedOrUpdatedByMixin:
         if hasattr(obj, attr):
             setattr(obj, attr, request.user)
         super().save_model(request, obj, form, change)
+
+
+FakeField = namedtuple("FakeField", ("name",))
+
+
+class FakeRelForRawIdWidget:
+    """Minimal stand-in for a relation, to use `ForeignKeyRawIdWidget` on a plain form field.
+
+    Indeed, ForeignKeyRawIdWidget is designed to be used in a ModelAdmin form by default.
+    """
+
+    def __init__(self, model, limit_choices_to=None):
+        self.model = model
+        self.limit_choices_to = limit_choices_to or {}
+
+    def get_related_field(self):
+        # This must return something that has the name of an existing field
+        return FakeField("id")
 
 
 class ChooseFieldsToTransfer(forms.Form):
