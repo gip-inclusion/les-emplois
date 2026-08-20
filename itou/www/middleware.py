@@ -6,13 +6,14 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import connection
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, QueryDict
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
+from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
 
 
 def never_cache(get_response):
@@ -131,3 +132,46 @@ class TermsAcceptanceMiddleware:
             return None
         url = reverse("legal-terms", query={"next": request.get_full_path()})
         return HttpResponseRedirect(url)
+
+
+class RedirectToNewDomainMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        url = _get_redirect_url(request)
+        if url is None:
+            return None
+        return HttpResponseRedirect(url)
+
+
+def _get_redirect_url(request):
+    if not settings.REDIRECT_TO_NEW_DOMAIN:
+        return None
+    if request.get_host() == settings.NEW_DOMAIN:
+        return None
+    if request.path.startswith("/api/"):
+        # Clients of our API may not handle redirections. Let them
+        # some time before redirecting (or maybe never redirect
+        # them if we still see calls to the old domain in logs).
+        return None
+    if request.method != "GET":
+        # Don't redirect POST, DELETE, etc.: if the user visits the
+        # old domain _before_ we enable the redirection for them, then
+        # POST data and we redirect them to the new domain where they
+        # never authenticated, they will lose data.
+        # FIXME (dbaty, 2026-08-20): remove this once all users
+        # are redirected to the new domain (see `if block below).
+        return None
+    user = request.user
+    if not (user and user.is_authenticated and user.is_staff):
+        # For now, redirect only staff users. We'll expand to
+        # other users once we're sure that everything is fine.
+        return None
+
+    query = QueryDict(request.GET, mutable=True)
+    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
+    return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"

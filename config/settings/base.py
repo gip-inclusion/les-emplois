@@ -163,6 +163,7 @@ MIDDLEWARE = [
     "itou.www.middleware.TermsAcceptanceMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
+    "itou.www.middleware.RedirectToNewDomainMiddleware",
     "itou.www.middleware.RateLimitMiddleware",
     "itou.nexus.middleware.AutoLoginMiddleware",
     "itou.nexus.middleware.DropDownMiddleware",
@@ -930,3 +931,6 @@ REQUIRE_MFA_ON_ORGANIZATION_IDS = _read_id_list("otp/data/mfa_required_organizat
 
 # Delay until job descriptions or spontaneous job applications are deactivated
 DEACTIVATION_DELAY = datetime.timedelta(days=90)
+
+REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
+NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
