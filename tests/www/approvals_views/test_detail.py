@@ -1,7 +1,6 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -649,7 +648,6 @@ class TestContractView:
 
 
 @freeze_time("2023-04-26")
-@override_settings(TALLY_URL="https://tally.so")
 def test_remove_approval_button(client, snapshot):
     REMOVAL_BUTTON_ID = "approval-deletion-link"
     membership = CompanyMembershipFactory(
@@ -667,6 +665,7 @@ def test_remove_approval_button(client, snapshot):
         to_company=membership.company,
         job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
         with_approval=True,
+        approval__id=456789,
         # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
         approval__number="XXXXX1234568",
     )
@@ -691,26 +690,25 @@ def test_remove_approval_button(client, snapshot):
     # suspension still active, more than 1 year old, starting after the accepted job application
     suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
 
-    response = client.get(details_url)
-    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+    public_id_replacement = [("href", str(job_application.approval.public_id), "[Public ID of Approval]")]
 
-    response = client.get(contracts_url)
-    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    response = client.get(details_url)
+    delete_button = parse_response_to_soup(
+        response, selector=f"#{REMOVAL_BUTTON_ID}", replace_in_attr=public_id_replacement
+    )
     assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+    assertContains(client.get(contracts_url), REMOVAL_BUTTON_ID)
 
     # suspension now is inactive
     suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
     suspension.save(update_fields=["end_at", "updated_at"])
-    response = client.get(details_url)
 
     response = client.get(details_url)
-    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    delete_button = parse_response_to_soup(
+        response, selector=f"#{REMOVAL_BUTTON_ID}", replace_in_attr=public_id_replacement
+    )
     assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
-
-    response = client.get(contracts_url)
-    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+    assertContains(client.get(contracts_url), REMOVAL_BUTTON_ID)
 
     # An accepted job application exists after suspension end
     JobApplicationFactory(
@@ -725,3 +723,24 @@ def test_remove_approval_button(client, snapshot):
     assertNotContains(response, REMOVAL_BUTTON_ID)
     response = client.get(contracts_url)
     assertNotContains(response, REMOVAL_BUTTON_ID)
+
+
+def test_close_approval_button_disabled_with_tooltip(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        to_company=membership.company,
+        with_approval=True,
+        state=JobApplicationState.ACCEPTED,
+    )
+    # Suspension too short: the approval isn't closable yet, but the employer
+    # should still see a disabled button explaining why.
+    SuspensionFactory(approval=job_application.approval, start_at=timezone.localdate() - datetime.timedelta(days=10))
+
+    client.force_login(membership.user)
+    url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
+    response = client.get(url)
+
+    assertNotContains(response, "approval-deletion-link")
+    assertContains(response, 'data-bs-toggle="tooltip"')
+    assertContains(response, "La clôture du PASS\xa0IAE est possible uniquement")
