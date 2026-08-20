@@ -56,7 +56,7 @@
                             {% endif %}
                             <td>{{ job_seeker.last_action_at|date:"d/m/Y" }}</td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
-                            <td>{{ job_seeker.advisors|length }}</td>
+                            <td>{{ job_seeker.active_advisors_nb }}</td>
                             <td>
                                 {{ job_seeker.last_assignment.advisor.get_inverted_full_name|default:"Non précisé" }} ({{ job_seeker.last_assignment.organization.display_name|default:"Non précisé" }})
                             </td>
