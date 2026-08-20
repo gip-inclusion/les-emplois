@@ -1430,28 +1430,96 @@ class TestJobSeekerAssignment:
             prescriber_organization=prescriber_organization, company=company
         )
 
+        archived_assignment_no_organization = JobSeekerAssignmentFactory(professional=prescriber, ended=True)
+        archived_assignment_with_organization = JobSeekerAssignmentFactory(
+            professional=prescriber,
+            prescriber_organization=prescriber_organization,
+            company=company,
+            ended=True,
+        )
+        archived_coworker_assignment = JobSeekerAssignmentFactory(
+            prescriber_organization=prescriber_organization,
+            company=company,
+            ended=True,
+        )
+
         assertQuerySetEqual(
             JobSeekerAssignment.objects.assigned_to(prescriber, organization=None),
-            [assignment_no_organization],
+            [assignment_no_organization, archived_assignment_no_organization],
             ordered=False,
         )
 
         # NB: Nothing changes as there's no organization
         assertQuerySetEqual(
             JobSeekerAssignment.objects.assigned_to(prescriber, organization=None, from_all_coworkers=True),
-            [assignment_no_organization],
+            [assignment_no_organization, archived_assignment_no_organization],
             ordered=False,
         )
 
         assertQuerySetEqual(
             JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization),
-            [assignment_no_organization, assignment_with_organization],
+            [
+                assignment_no_organization,
+                assignment_with_organization,
+                archived_assignment_no_organization,
+                archived_assignment_with_organization,
+            ],
             ordered=False,
         )
 
         assertQuerySetEqual(
             JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization, from_all_coworkers=True),
+            [
+                assignment_no_organization,
+                assignment_with_organization,
+                assignment_coworker_organization,
+                archived_assignment_no_organization,
+                archived_assignment_with_organization,
+                archived_coworker_assignment,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization, archived=False),
+            [assignment_no_organization, assignment_with_organization],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(
+                prescriber, organization=organization, from_all_coworkers=True, archived=False
+            ),
             [assignment_no_organization, assignment_with_organization, assignment_coworker_organization],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization, archived=True),
+            [archived_assignment_no_organization, archived_assignment_with_organization],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(
+                prescriber, organization=organization, from_all_coworkers=True, archived=True
+            ),
+            [archived_assignment_no_organization, archived_assignment_with_organization, archived_coworker_assignment],
+            ordered=False,
+        )
+
+        # Make sure a job seeker isn't picked up as long as they have at least one active assignment
+        JobSeekerAssignmentFactory(
+            job_seeker=archived_coworker_assignment.job_seeker,
+            prescriber_organization=prescriber_organization,
+            company=company,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(
+                prescriber, organization=organization, from_all_coworkers=True, archived=True
+            ),
+            [archived_assignment_no_organization, archived_assignment_with_organization],
             ordered=False,
         )
 
