@@ -1013,6 +1013,80 @@ def test_filtered_by_approval_state(client, factory, url):
     ]
 
 
+def test_iae_filters_as_non_iae_actor(client, subtests):
+    company = CompanyFactory(not_subject_to_iae_rules=True)
+    user = EmployerFactory(membership=True, membership__company=company)
+
+    # Eligibility and approval both expired
+    job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        expired=True,
+        job_seeker__first_name="expired eligibility, expired approval",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_expired_eligibility_expired_approval, expired=True)
+
+    # Eligibility validated
+    job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__first_name="valid eligibility, no approval",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+
+    # Eligibility to validate
+    job_seeker_expired_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        expired=True,
+        job_seeker__first_name="expired eligibility, no approval",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+
+    # Eligibility expired and valid approval
+    job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        expired=True,
+        job_seeker__first_name="expired eligibility, valid approval",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
+
+    # Valid eligibility and valid approval
+    job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__first_name="valid eligibility, valid approval",
+        job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_valid_eligibility_valid_approval)
+
+    job_seekers = [
+        job_seeker_expired_eligibility_expired_approval,
+        job_seeker_valid_eligibility_no_approval,
+        job_seeker_expired_eligibility_no_approval,
+        job_seeker_expired_eligibility_valid_approval,
+        job_seeker_valid_eligibility_valid_approval,
+    ]
+
+    for job_seeker in reversed(job_seekers):
+        JobSeekerAssignmentFactory(professional=user, company=company, job_seeker=job_seeker)
+
+    url = reverse("job_seekers_views:list_organization")
+    iae_filters = {
+        "eligibility pending": {"eligibility_pending": "on"},
+        "eligibility validated": {"eligibility_validated": "on"},
+        "approval active": {"approval_active": "on"},
+        "approval expired": {"approval_expired": "on"},
+        "no approval": {"no_approval": "on"},
+        "approval expired or no approval": {"approval_expired": "on", "no_approval": "on"},
+    }
+    client.force_login(user)
+
+    for label, iae_filter in iae_filters.items():
+        with subtests.test(filters=label):
+            response = client.get(url, iae_filter)
+            assert response.context["page_obj"].object_list == job_seekers
+
+
 @freeze_time("2026-01-15")
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_filtered_by_end_of_iae_journey(client, url, snapshot):
