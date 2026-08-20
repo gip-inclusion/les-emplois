@@ -1,0 +1,25 @@
+{% if btn_dropdown_filter|default:False %}
+    <div id="assignments-filter-btn">
+        {% include "includes/btn_dropdown_filter/radio.html" with field=filters_form.assignments only %}
+    </div>
+{% else %}
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseAssignments"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseAssignments">Statut des accompagnements</button>
+        </legend>
+        <div class="my-3 collapse" id="collapseAssignments">
+            <ul>
+                {% for choice in filters_form.assignments %}
+                    <li>
+                        {% include "job_seekers_views/includes/job_seekers_filters/single_radiobutton.html" with choice=choice wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </fieldset>
+{% endif %}

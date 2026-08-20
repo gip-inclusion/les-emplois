@@ -110,6 +110,51 @@
       <hr/>
       <fieldset>
           <legend>
+              <button aria-controls="collapseAssignments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseAssignments" data-bs-toggle="collapse" type="button">
+                  Statut des accompagnements
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseAssignments">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_0" id="id_assignments_0-offcanvas" name="assignments" type="radio" value=""/>
+                              <label class="form-check-label" for="id_assignments_0-offcanvas">
+                                  Usagers accompagnés
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_1" id="id_assignments_1-offcanvas" name="assignments" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_assignments_1-offcanvas">
+                                  Usagers archivés
+                              </label>
+                              <div class="form-text" id="id_assignments_1-helptext-offcanvas">
+                                  Votre structure n'accompagne plus cet usager.
+                              </div>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_2" id="id_assignments_2-offcanvas" name="assignments" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_assignments_2-offcanvas">
+                                  Tous les usagers
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
               <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                   Accompagnateurs de ma structure
               </button>
@@ -239,6 +284,51 @@
       <hr/>
       <fieldset>
           <legend>
+              <button aria-controls="collapseAssignments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseAssignments" data-bs-toggle="collapse" type="button">
+                  Statut des accompagnements
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseAssignments">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_0" id="id_assignments_0-offcanvas" name="assignments" type="radio" value=""/>
+                              <label class="form-check-label" for="id_assignments_0-offcanvas">
+                                  Usagers accompagnés
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_1" id="id_assignments_1-offcanvas" name="assignments" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_assignments_1-offcanvas">
+                                  Usagers archivés
+                              </label>
+                              <div class="form-text" id="id_assignments_1-helptext-offcanvas">
+                                  Votre structure n'accompagne plus cet usager.
+                              </div>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_2" id="id_assignments_2-offcanvas" name="assignments" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_assignments_2-offcanvas">
+                                  Tous les usagers
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
               <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                   Accompagnateurs de ma structure
               </button>
@@ -336,6 +426,51 @@
       <hr/>
       <fieldset>
           <legend>
+              <button aria-controls="collapseAssignments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseAssignments" data-bs-toggle="collapse" type="button">
+                  Statut des accompagnements
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseAssignments">
+              <ul>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_0" id="id_assignments_0-offcanvas" name="assignments" type="radio" value=""/>
+                              <label class="form-check-label" for="id_assignments_0-offcanvas">
+                                  Usagers accompagnés
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_1" id="id_assignments_1-offcanvas" name="assignments" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_assignments_1-offcanvas">
+                                  Usagers archivés
+                              </label>
+                              <div class="form-text" id="id_assignments_1-helptext-offcanvas">
+                                  Votre structure n'accompagne plus cet usager.
+                              </div>
+                          </div>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="dropdown-item">
+                          <div class="form-check">
+                              <input class="form-check-input" data-emplois-sync-with="id_assignments_2" id="id_assignments_2-offcanvas" name="assignments" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_assignments_2-offcanvas">
+                                  Tous les usagers
+                              </label>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
               <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                   Accompagnateurs de ma structure
               </button>
@@ -381,6 +516,42 @@
                   </a>
               </li>
           </ul>
+      </div>
+      <div id="assignments-filter-btn">
+          <div class="dropdown">
+              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                  Statut des accompagnements
+              </button>
+              <ul class="dropdown-menu">
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                          <label class="form-check-label" for="id_assignments_0">
+                              Usagers accompagnés
+                          </label>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                          <label class="form-check-label" for="id_assignments_1">
+                              Usagers archivés
+                          </label>
+                          <div class="form-text" id="id_assignments_1-helptext">
+                              Votre structure n'accompagne plus cet usager.
+                          </div>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                          <label class="form-check-label" for="id_assignments_2">
+                              Tous les usagers
+                          </label>
+                      </div>
+                  </li>
+              </ul>
+          </div>
       </div>
       <div class="dropdown">
           <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
@@ -502,6 +673,42 @@
               </li>
           </ul>
       </div>
+      <div id="assignments-filter-btn">
+          <div class="dropdown">
+              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                  Statut des accompagnements
+              </button>
+              <ul class="dropdown-menu">
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                          <label class="form-check-label" for="id_assignments_0">
+                              Usagers accompagnés
+                          </label>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                          <label class="form-check-label" for="id_assignments_1">
+                              Usagers archivés
+                          </label>
+                          <div class="form-text" id="id_assignments_1-helptext">
+                              Vous n'accompagnez plus cet usager.
+                          </div>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                          <label class="form-check-label" for="id_assignments_2">
+                              Tous les usagers
+                          </label>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </div>
       <div class="ms-md-auto" id="job-seekers-list-filter-counter">
       </div>
   </div>
@@ -605,6 +812,42 @@
                   </a>
               </li>
           </ul>
+      </div>
+      <div id="assignments-filter-btn">
+          <div class="dropdown">
+              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                  Statut des accompagnements
+              </button>
+              <ul class="dropdown-menu">
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                          <label class="form-check-label" for="id_assignments_0">
+                              Usagers accompagnés
+                          </label>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                          <label class="form-check-label" for="id_assignments_1">
+                              Usagers archivés
+                          </label>
+                          <div class="form-text" id="id_assignments_1-helptext">
+                              Votre structure n'accompagne plus cet usager.
+                          </div>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                          <label class="form-check-label" for="id_assignments_2">
+                              Tous les usagers
+                          </label>
+                      </div>
+                  </li>
+              </ul>
+          </div>
       </div>
       <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
@@ -751,6 +994,42 @@
                   </div>
               </li>
           </ul>
+      </div>
+      <div id="assignments-filter-btn">
+          <div class="dropdown">
+              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                  Statut des accompagnements
+              </button>
+              <ul class="dropdown-menu">
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                          <label class="form-check-label" for="id_assignments_0">
+                              Usagers accompagnés
+                          </label>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                          <label class="form-check-label" for="id_assignments_1">
+                              Usagers archivés
+                          </label>
+                          <div class="form-text" id="id_assignments_1-helptext">
+                              Votre structure n'accompagne plus cet usager.
+                          </div>
+                      </div>
+                  </li>
+                  <li class="dropdown-item">
+                      <div class="form-check">
+                          <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                          <label class="form-check-label" for="id_assignments_2">
+                              Tous les usagers
+                          </label>
+                      </div>
+                  </li>
+              </ul>
+          </div>
       </div>
       <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
@@ -904,6 +1183,51 @@
               <hr/>
               <fieldset>
                   <legend>
+                      <button aria-controls="collapseAssignments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseAssignments" data-bs-toggle="collapse" type="button">
+                          Statut des accompagnements
+                      </button>
+                  </legend>
+                  <div class="my-3 collapse" id="collapseAssignments">
+                      <ul>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_0" id="id_assignments_0-offcanvas" name="assignments" type="radio" value=""/>
+                                      <label class="form-check-label" for="id_assignments_0-offcanvas">
+                                          Usagers accompagnés
+                                      </label>
+                                  </div>
+                              </div>
+                          </li>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_1" id="id_assignments_1-offcanvas" name="assignments" type="radio" value="archived"/>
+                                      <label class="form-check-label" for="id_assignments_1-offcanvas">
+                                          Usagers archivés
+                                      </label>
+                                      <div class="form-text" id="id_assignments_1-helptext-offcanvas">
+                                          Votre structure n'accompagne plus cet usager.
+                                      </div>
+                                  </div>
+                              </div>
+                          </li>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_2" id="id_assignments_2-offcanvas" name="assignments" type="radio" value="all"/>
+                                      <label class="form-check-label" for="id_assignments_2-offcanvas">
+                                          Tous les usagers
+                                      </label>
+                                  </div>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
+              </fieldset>
+              <hr/>
+              <fieldset>
+                  <legend>
                       <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                           Accompagnateurs de ma structure
                       </button>
@@ -1034,6 +1358,42 @@
                                           </a>
                                       </li>
                                   </ul>
+                              </div>
+                              <div id="assignments-filter-btn">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                          Statut des accompagnements
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                                                  <label class="form-check-label" for="id_assignments_0">
+                                                      Usagers accompagnés
+                                                  </label>
+                                              </div>
+                                          </li>
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                                                  <label class="form-check-label" for="id_assignments_1">
+                                                      Usagers archivés
+                                                  </label>
+                                                  <div class="form-text" id="id_assignments_1-helptext">
+                                                      Votre structure n'accompagne plus cet usager.
+                                                  </div>
+                                              </div>
+                                          </li>
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                                                  <label class="form-check-label" for="id_assignments_2">
+                                                      Tous les usagers
+                                                  </label>
+                                              </div>
+                                          </li>
+                                      </ul>
+                                  </div>
                               </div>
                               <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
                                   <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
@@ -1223,6 +1583,51 @@
                       </ul>
                   </div>
               </fieldset>
+              <hr/>
+              <fieldset>
+                  <legend>
+                      <button aria-controls="collapseAssignments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseAssignments" data-bs-toggle="collapse" type="button">
+                          Statut des accompagnements
+                      </button>
+                  </legend>
+                  <div class="my-3 collapse" id="collapseAssignments">
+                      <ul>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_0" id="id_assignments_0-offcanvas" name="assignments" type="radio" value=""/>
+                                      <label class="form-check-label" for="id_assignments_0-offcanvas">
+                                          Usagers accompagnés
+                                      </label>
+                                  </div>
+                              </div>
+                          </li>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_1" id="id_assignments_1-offcanvas" name="assignments" type="radio" value="archived"/>
+                                      <label class="form-check-label" for="id_assignments_1-offcanvas">
+                                          Usagers archivés
+                                      </label>
+                                      <div class="form-text" id="id_assignments_1-helptext-offcanvas">
+                                          Vous n'accompagnez plus cet usager.
+                                      </div>
+                                  </div>
+                              </div>
+                          </li>
+                          <li>
+                              <div class="dropdown-item">
+                                  <div class="form-check">
+                                      <input class="form-check-input" data-emplois-sync-with="id_assignments_2" id="id_assignments_2-offcanvas" name="assignments" type="radio" value="all"/>
+                                      <label class="form-check-label" for="id_assignments_2-offcanvas">
+                                          Tous les usagers
+                                      </label>
+                                  </div>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
+              </fieldset>
           </div>
           <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
               <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
@@ -1339,6 +1744,42 @@
                                           </a>
                                       </li>
                                   </ul>
+                              </div>
+                              <div id="assignments-filter-btn">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                          Statut des accompagnements
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input checked="" class="form-check-input" id="id_assignments_0" name="assignments" type="radio" value=""/>
+                                                  <label class="form-check-label" for="id_assignments_0">
+                                                      Usagers accompagnés
+                                                  </label>
+                                              </div>
+                                          </li>
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input class="form-check-input" id="id_assignments_1" name="assignments" type="radio" value="archived"/>
+                                                  <label class="form-check-label" for="id_assignments_1">
+                                                      Usagers archivés
+                                                  </label>
+                                                  <div class="form-text" id="id_assignments_1-helptext">
+                                                      Vous n'accompagnez plus cet usager.
+                                                  </div>
+                                              </div>
+                                          </li>
+                                          <li class="dropdown-item">
+                                              <div class="form-check">
+                                                  <input class="form-check-input" id="id_assignments_2" name="assignments" type="radio" value="all"/>
+                                                  <label class="form-check-label" for="id_assignments_2">
+                                                      Tous les usagers
+                                                  </label>
+                                              </div>
+                                          </li>
+                                      </ul>
+                                  </div>
                               </div>
                               <div class="ms-md-auto" id="job-seekers-list-filter-counter">
                               </div>
@@ -1659,10 +2100,8 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors"
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -1672,7 +2111,6 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s))))
-          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -1738,9 +2176,7 @@
                                       AND U0."prescriber_organization_id" IS NULL
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
-                                         AND U0."prescriber_organization_id" = %s))))
-                    GROUP BY V0."id",
-                             1))
+                                         AND U0."prescriber_organization_id" = %s))))))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1847,6 +2283,15 @@
                                AND U0."professional_id" = %s)
                               OR (U0."company_id" IS NULL
                                   AND U0."prescriber_organization_id" = %s)))
+                    AND "users_user"."id" IN
+                      (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE (((U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL
+                                AND U0."professional_id" = %s)
+                               OR (U0."company_id" IS NULL
+                                   AND U0."prescriber_organization_id" = %s))
+                              AND U0."ended_at" IS NULL))
                     AND
                       (SELECT U0."end_at" AS "end_at"
                        FROM "approvals_approval" U0
@@ -1913,7 +2358,6 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
           
             (SELECT U0."end_at" AS "end_at"
              FROM "approvals_approval" U0
@@ -1927,6 +2371,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY 1 DESC
              LIMIT 1) AS "last_contract_end_date",
+                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  COALESCE(
                             (SELECT U1."email" AS "company__email"
                              FROM "companies_contract" U0
@@ -2053,6 +2498,15 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s)))
+                 AND "users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s))
+                           AND U0."ended_at" IS NULL))
                  AND
                    (SELECT U0."end_at" AS "end_at"
                     FROM "approvals_approval" U0
@@ -2559,10 +3013,8 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors"
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -2573,7 +3025,6 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s))))
-          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -2640,9 +3091,7 @@
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s
-                                         AND U0."professional_id" = %s))))
-                    GROUP BY V0."id",
-                             1))
+                                         AND U0."professional_id" = %s))))))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2752,6 +3201,16 @@
                               OR (U0."company_id" IS NULL
                                   AND U0."prescriber_organization_id" = %s
                                   AND U0."professional_id" = %s)))
+                    AND "users_user"."id" IN
+                      (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE (((U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL
+                                AND U0."professional_id" = %s)
+                               OR (U0."company_id" IS NULL
+                                   AND U0."prescriber_organization_id" = %s
+                                   AND U0."professional_id" = %s))
+                              AND U0."ended_at" IS NULL))
                     AND
                       (SELECT U0."end_at" AS "end_at"
                        FROM "approvals_approval" U0
@@ -2818,7 +3277,6 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
           
             (SELECT U0."end_at" AS "end_at"
              FROM "approvals_approval" U0
@@ -2832,6 +3290,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY 1 DESC
              LIMIT 1) AS "last_contract_end_date",
+                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  COALESCE(
                             (SELECT U1."email" AS "company__email"
                              FROM "companies_contract" U0
@@ -2961,6 +3420,16 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s)))
+                 AND "users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s
+                                AND U0."professional_id" = %s))
+                           AND U0."ended_at" IS NULL))
                  AND
                    (SELECT U0."end_at" AS "end_at"
                     FROM "approvals_approval" U0
@@ -3467,10 +3936,8 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors"
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -3481,7 +3948,6 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s))))
-          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -3548,9 +4014,7 @@
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s
-                                         AND U0."professional_id" = %s))))
-                    GROUP BY V0."id",
-                             1))
+                                         AND U0."professional_id" = %s))))))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3629,7 +4093,17 @@
                                AND U0."professional_id" = %s)
                               OR (U0."company_id" IS NULL
                                   AND U0."prescriber_organization_id" = %s
-                                  AND U0."professional_id" = %s))))
+                                  AND U0."professional_id" = %s)))
+                    AND "users_user"."id" IN
+                      (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE (((U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL
+                                AND U0."professional_id" = %s)
+                               OR (U0."company_id" IS NULL
+                                   AND U0."prescriber_organization_id" = %s
+                                   AND U0."professional_id" = %s))
+                              AND U0."ended_at" IS NULL)))
              GROUP BY "users_user"."id",
                       1,
                       2,
@@ -3794,7 +4268,17 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
-                               AND U0."professional_id" = %s))))
+                               AND U0."professional_id" = %s)))
+                 AND "users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s
+                                AND U0."professional_id" = %s))
+                           AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
                    39,
                    40,
@@ -4639,10 +5123,8 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update",
-                 ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors"
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -4652,7 +5134,6 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s))))
-          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -4718,9 +5199,7 @@
                                       AND U0."prescriber_organization_id" IS NULL
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
-                                         AND U0."prescriber_organization_id" = %s))))
-                    GROUP BY V0."id",
-                             1))
+                                         AND U0."prescriber_organization_id" = %s))))))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -4796,7 +5275,16 @@
                                AND U0."prescriber_organization_id" IS NULL
                                AND U0."professional_id" = %s)
                               OR (U0."company_id" IS NULL
-                                  AND U0."prescriber_organization_id" = %s))))
+                                  AND U0."prescriber_organization_id" = %s)))
+                    AND "users_user"."id" IN
+                      (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE (((U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL
+                                AND U0."professional_id" = %s)
+                               OR (U0."company_id" IS NULL
+                                   AND U0."prescriber_organization_id" = %s))
+                              AND U0."ended_at" IS NULL)))
              GROUP BY "users_user"."id",
                       1,
                       2,
@@ -4958,7 +5446,16 @@
                             AND U0."prescriber_organization_id" IS NULL
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
-                               AND U0."prescriber_organization_id" = %s))))
+                               AND U0."prescriber_organization_id" = %s)))
+                 AND "users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s))
+                           AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
                    39,
                    40,
