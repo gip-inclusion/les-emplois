@@ -32,7 +32,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import ActionKind, UserKind
+from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
@@ -368,6 +368,31 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
             "ended_assignments": ended_assignments,
             "calendar_url": settings.ADVISORS_CALENDAR_URL,
         }
+
+
+@http_methods(db_write=["POST"])
+@check_request(lambda request: request.from_prescriber or request.from_employer)
+def archive_assignment(request, public_id, assignment_pk):
+    next_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:advisors", args=(public_id,)))
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=public_id)
+    assignment = get_object_or_404(
+        JobSeekerAssignment,
+        pk=assignment_pk,
+        job_seeker=job_seeker,
+        professional=request.user,
+    )
+
+    # Cannot archive an assignment from another organization
+    if assignment.organization and assignment.organization != request.current_organization:
+        raise PermissionDenied
+
+    if assignment.is_active:
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.MANUAL
+        assignment.save(update_fields=["updated_at", "ended_at", "end_reason"])
+        messages.success(request, "Accompagnement archivé", extra_tags="toast")
+
+    return HttpResponseRedirect(next_url)
 
 
 def can_see_external_job_applications(job_seeker, request):
