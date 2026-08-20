@@ -138,7 +138,11 @@
             {% endcomponent_info %}
         {% endif %}
     </div>
-    {% if assignment.advisor == request.user and assignment.organization == request.current_organization %}
-        {# FIXME: Add links/actions #}
+    {% if assignment.advisor == request.user %}
+        {% if assignment.organization == request.current_organization or not assignment.organization %}
+            <div class="c-box--results__footer">
+                {% include "job_seekers_views/includes/assignment_actions.html" with in_last_advisor_box=False %}
+            </div>
+        {% endif %}
     {% endif %}
 </div>

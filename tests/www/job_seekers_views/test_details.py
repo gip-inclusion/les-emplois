@@ -149,19 +149,29 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
         replace_in_attr=[
             ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
             (
-                "hx-post",
-                f"/job-seekers/display/{assignment.pk}",
-                "/job-seekers/display/[JobSeekerAssignment PK]",
+                "action",
+                f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/archive",
+                f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/archive",
             ),
             (
                 "id",
-                f"email-{assignment.pk}",
-                "email-[JobSeekerAssignment PK]",
+                f"archive-assignment-{assignment.pk}-modal",
+                "archive-assignment-[JobSeekerAssignment PK]-modal",
+            ),
+            (
+                "data-bs-target",
+                f"archive-assignment-{assignment.pk}-modal",
+                "archive-assignment-[JobSeekerAssignment PK]-modal",
             ),
             (
                 "id",
-                f"phone-{assignment.pk}",
-                "phone-[JobSeekerAssignment PK]",
+                f"archive-assignment-{assignment.pk}-modal-title",
+                "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+            ),
+            (
+                "aria-labelledby",
+                f"archive-assignment-{assignment.pk}-modal-title",
+                "archive-assignment-[JobSeekerAssignment PK]-modal-title",
             ),
         ],
     )
@@ -801,6 +811,56 @@ class TestLastAdvisor:
         assert ongoing_str not in rendered
         assert ended_str in rendered
 
+    def test_buttons_displayed(self, client):
+        assignment = JobSeekerAssignmentFactory()
+        job_seeker = assignment.job_seeker
+        user = PrescriberFactory()
+        organization = user.prescriberorganization_set.get()
+        url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        archive_assignment_btn = f"""
+            <button class="btn btn-ico btn-outline-primary w-100 mt-3"
+                  data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
+                <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
+                <span>Terminer mon accompagnement</span>
+            </button>
+        """
+
+        client.force_login(user)
+
+        # Last advisor exists but is not the user
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
+        # User is last advisor with no organization
+        assignment.professional = user
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+
+        # User is last advisor with different organization
+        assignment.prescriber_organization = PrescriberOrganizationFactory()
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
+        # User is last advisor with same organization
+        assignment.prescriber_organization = organization
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+
+        # User is last advisor but assignment has ended
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
+        # No assignment
+        assignment.delete()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
 
 @freeze_time("2024-08-14")
 def test_job_application_tab_shows_external_application_to_authorized_prescriber(client, snapshot):
@@ -1083,6 +1143,31 @@ class TestAdvisorsTab:
                         str(assignment.pk),
                         "[JobSeekerAssignment PK]",
                     ),
+                    (
+                        "action",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/archive",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/archive",
+                    ),
+                    (
+                        "id",
+                        f"archive-assignment-{assignment.pk}-modal",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal",
+                    ),
+                    (
+                        "data-bs-target",
+                        f"archive-assignment-{assignment.pk}-modal",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal",
+                    ),
+                    (
+                        "id",
+                        f"archive-assignment-{assignment.pk}-modal-title",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+                    ),
+                    (
+                        "aria-labelledby",
+                        f"archive-assignment-{assignment.pk}-modal-title",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+                    ),
                 ],
             )
         ) == snapshot(name="active_only")
@@ -1224,3 +1309,46 @@ class TestAdvisorsTab:
         rendered = template.render(Context({"assignment": assignment, "request": request}))
         assert ongoing_str not in rendered
         assert ended_str in rendered
+
+    def test_buttons_displayed(self, client):
+        assignment = JobSeekerAssignmentFactory()
+        user = PrescriberFactory()
+        organization = user.prescriberorganization_set.get()
+        url = reverse("job_seekers_views:advisors", kwargs={"public_id": assignment.job_seeker.public_id})
+        archive_assignment_btn = f"""
+            <button class="btn btn-ico btn-outline-primary w-100 w-md-auto"
+                  data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
+                <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
+                <span>Terminer mon accompagnement</span>
+            </button>
+        """
+
+        # Assignment with different user
+        client.force_login(user)
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
+        # Assignment with no organization
+        assignment.professional = user
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+
+        # Assignment with different organization
+        assignment.prescriber_organization = PrescriberOrganizationFactory()
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+
+        # Assignment with same organization
+        assignment.prescriber_organization = organization
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+
+        # Archived assignment
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
