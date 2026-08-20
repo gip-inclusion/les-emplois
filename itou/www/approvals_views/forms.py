@@ -602,3 +602,16 @@ class SuspensionEndDateForm(forms.Form):
                 "Vous ne pouvez pas saisir une date de réintégration postérieure à la fin de la suspension."
             )
         return first_day_back_to_work
+
+
+class CloseApprovalForm(forms.Form):
+    situation_reviewed = forms.BooleanField(
+        required=True,
+        label="J’atteste avoir réalisé un examen de la situation du candidat, "
+        "préalablement à cette demande de clôture de son PASS IAE.",
+    )
+    candidate_informed = forms.BooleanField(
+        required=True,
+        label="J’atteste avoir informé le candidat de ma demande de clôture de son PASS IAE.",
+        help_text="Une notification sera automatiquement envoyée à son adresse e-mail.",
+    )

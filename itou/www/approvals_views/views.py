@@ -18,7 +18,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
-from itou.approvals import enums as approvals_enums
+from itou.approvals import enums as approvals_enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.models import (
     Approval,
@@ -28,7 +28,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
-from itou.approvals.utils import can_close_approval, get_contracts
+from itou.approvals.utils import can_close_approval, close_approval, get_contracts
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -52,6 +52,7 @@ from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
 from itou.www.approvals_views.forms import (
     ApprovalForm,
+    CloseApprovalForm,
     ContractStatus,
     ProlongationRequestDenyInformationProposedActionsForm,
     ProlongationRequestDenyInformationReasonExplanationForm,
@@ -718,6 +719,50 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         "back_url": back_url,
         "form": form,
         "preview": preview,
+    }
+    return render(request, template_name, context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def close(request, approval_id, template_name="approvals/close.html"):
+    siae = get_current_company_or_404(request)
+    approval = get_object_or_404(
+        Approval.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("pk"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        ).select_related("user"),
+        pk=approval_id,
+    )
+
+    if not can_close_approval(approval):
+        raise PermissionDenied()
+
+    back_url = get_safe_url(
+        request, "back_url", fallback_url=reverse("approvals:details", kwargs={"public_id": approval.public_id})
+    )
+
+    form = CloseApprovalForm(data=request.POST if request.method == "POST" else None)
+
+    if request.method == "POST" and form.is_valid():
+        close_approval(approval, closed_by=request.user)
+        notifications.ApprovalClosedForJobSeekerNotification(approval.user, siae, approval=approval).send()
+        logger.info("user=%s closed approval=%s", request.user.pk, approval.pk)
+        messages.success(
+            request,
+            f"PASS IAE clôturé||Le PASS IAE de {approval.user.get_inverted_full_name()} a bien été clôturé.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "approval": approval,
+        "back_url": back_url,
+        "form": form,
     }
     return render(request, template_name, context)
 
