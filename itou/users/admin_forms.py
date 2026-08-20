@@ -1,5 +1,4 @@
 import logging
-from collections import namedtuple
 
 from django import forms
 from django.contrib.admin import widgets
@@ -9,6 +8,7 @@ from django.core.exceptions import ValidationError
 from itou.geo.utils import coords_to_geometry
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.admin import FakeRelForRawIdWidget
 from itou.utils.apis import geocoding as api_geocoding
 
 
@@ -83,25 +83,6 @@ class JobSeekerProfileAdminForm(forms.ModelForm):
         return asp_uid.lower()
 
 
-FakeField = namedtuple("FakeField", ("name",))
-
-
-class FakeRelForToUserRawIdWidget:
-    model = User
-    limit_choices_to = {
-        "kind": UserKind.JOB_SEEKER,
-    }
-
-    def get_related_field(self):
-        # This must return something that has the name of an existing field
-        return FakeField("id")
-
-
-class ToUserRawIdWidget(widgets.ForeignKeyRawIdWidget):
-    def __init__(self, admin_site, attrs=None, using=None):
-        super().__init__(FakeRelForToUserRawIdWidget(), admin_site, attrs, using)
-
-
 class SelectTargetUserForm(forms.Form):
     to_user = forms.ModelChoiceField(
         User.objects.filter(kind=UserKind.JOB_SEEKER), required=True, label="Choisissez l'utilisateur cible"
@@ -109,7 +90,9 @@ class SelectTargetUserForm(forms.Form):
 
     def __init__(self, *args, from_user, admin_site, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["to_user"].widget = ToUserRawIdWidget(admin_site)
+        self.fields["to_user"].widget = widgets.ForeignKeyRawIdWidget(
+            FakeRelForRawIdWidget(User, {"kind": UserKind.JOB_SEEKER}), admin_site
+        )
         self.from_user = from_user
 
     def clean_to_user(self):
