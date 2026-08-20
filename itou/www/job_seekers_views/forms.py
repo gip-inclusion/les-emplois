@@ -38,12 +38,12 @@ class FilterForm(forms.Form):
         ),
     )
 
-    eligibility_validated = forms.BooleanField(label="Valide", required=False)
-    eligibility_pending = forms.BooleanField(label="À valider", required=False)
-
-    approval_active = forms.BooleanField(label="Valide", required=False)
-    approval_expired = forms.BooleanField(label="Expiré", required=False)
-    no_approval = forms.BooleanField(label="Aucun", required=False)
+    # IAE-specific fields are only created for IAE actors
+    eligibility_validated = None
+    eligibility_pending = None
+    approval_active = None
+    approval_expired = None
+    no_approval = None
 
     is_stalled = forms.BooleanField(label="N’afficher que les usagers sans solution", required=False)
 
@@ -62,6 +62,12 @@ class FilterForm(forms.Form):
             self.fields["organization_members"].choices = self._get_choices_for_organization_members(
                 job_seeker_qs, request.current_organization
             )
+        if request.from_iae_actor:
+            self.fields["eligibility_validated"] = forms.BooleanField(label="Valide", required=False)
+            self.fields["eligibility_pending"] = forms.BooleanField(label="À valider", required=False)
+            self.fields["approval_active"] = forms.BooleanField(label="Valide", required=False)
+            self.fields["approval_expired"] = forms.BooleanField(label="Expiré", required=False)
+            self.fields["no_approval"] = forms.BooleanField(label="Aucun", required=False)
         if request.from_authorized_prescriber:
             self.fields["approval_ending_soon"] = forms.BooleanField(
                 label="PASS IAE bientôt expiré",
