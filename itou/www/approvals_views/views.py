@@ -27,7 +27,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
-from itou.approvals.utils import can_close_approval, close_approval, get_contracts
+from itou.approvals.utils import can_close_approval, close_approval, get_contracts, last_hire_was_made_by_siae
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -730,6 +730,9 @@ def close(request, approval_id, template_name="approvals/close.html"):
         ).select_related("user"),
         pk=approval_id,
     )
+
+    if not last_hire_was_made_by_siae(approval.user, siae):
+        raise Http404()
 
     if not can_close_approval(approval):
         raise PermissionDenied()

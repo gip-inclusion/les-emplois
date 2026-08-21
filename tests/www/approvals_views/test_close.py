@@ -5,8 +5,10 @@ from django.utils import timezone
 from pytest_django.asserts import assertRedirects
 
 from itou.approvals.utils import SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE
+from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
 
 
 def _closable_approval(to_company):
@@ -72,6 +74,22 @@ class TestCloseApprovalView:
         approval = ApprovalFactory()
         other_user = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
         client.force_login(other_user)
+
+        response = client.post(reverse("approvals:close", kwargs={"approval_id": approval.pk}))
+        assert response.status_code == 404
+
+    def test_previous_employer_returns_404(self, client):
+        previous = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+        approval = _closable_approval(previous.company)
+        current = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            job_seeker=approval.user,
+            approval=approval,
+            to_company=current.company,
+            state=JobApplicationState.ACCEPTED,
+        )
+        client.force_login(previous.user)
 
         response = client.post(reverse("approvals:close", kwargs={"approval_id": approval.pk}))
         assert response.status_code == 404
