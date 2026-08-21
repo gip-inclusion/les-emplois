@@ -6,7 +6,6 @@ from tests.users.factories import PrescriberFactory
 
 def test_home_anonymous(client):
     url = reverse("home:hp")
-    response = client.get(url)
     response = client.get(url, follow=True)
     assertRedirects(response, reverse("search:employers_home"))
     assertContains(response, "Rechercher un emploi inclusif")
