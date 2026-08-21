@@ -984,7 +984,7 @@
                           </div>
                       </div>
                   </div>
-                  <input id="id_order" name="order" type="hidden" value="-last_updated_at"/>
+                  <input id="id_order" name="order" type="hidden" value="-last_action_at"/>
               </form>
               <div class="s-section__row row">
                   <div class="col-12">
@@ -1280,7 +1280,7 @@
                           </div>
                       </div>
                   </div>
-                  <input id="id_order" name="order" type="hidden" value="-last_updated_at"/>
+                  <input id="id_order" name="order" type="hidden" value="-last_action_at"/>
               </form>
               <div class="s-section__row row">
                   <div class="col-12">
@@ -1714,7 +1714,7 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_action_at"
+               (SELECT U0."last_action_at" AS "last_action_at"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -1722,8 +1722,8 @@
                         OR (U0."company_id" IS NULL
                             AND U0."prescriber_organization_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id"
-                LIMIT 1) AS "last_updated_at",
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_action_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -1830,7 +1830,7 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_action_at"
+            (SELECT U0."last_action_at" AS "last_action_at"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -1838,8 +1838,8 @@
                      OR (U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id"
-             LIMIT 1) AS "last_updated_at",
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_action_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -2000,6 +2000,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
@@ -2110,7 +2111,7 @@
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
           WHERE "users_jobseekerassignment"."job_seeker_id" IN (%s)
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
         ''',
       }),
       dict({
@@ -2530,7 +2531,7 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_action_at"
+               (SELECT U0."last_action_at" AS "last_action_at"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -2539,8 +2540,8 @@
                             AND U0."prescriber_organization_id" = %s
                             AND U0."professional_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id"
-                LIMIT 1) AS "last_updated_at",
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_action_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -2648,7 +2649,7 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_action_at"
+            (SELECT U0."last_action_at" AS "last_action_at"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -2657,8 +2658,8 @@
                          AND U0."prescriber_organization_id" = %s
                          AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id"
-             LIMIT 1) AS "last_updated_at",
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_action_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -2820,6 +2821,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
@@ -2930,7 +2932,7 @@
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
           WHERE "users_jobseekerassignment"."job_seeker_id" IN (%s)
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
         ''',
       }),
       dict({
@@ -3337,7 +3339,7 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_action_at"
+               (SELECT U0."last_action_at" AS "last_action_at"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -3346,8 +3348,8 @@
                             AND U0."prescriber_organization_id" = %s
                             AND U0."professional_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id"
-                LIMIT 1) AS "last_updated_at",
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_action_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -3429,7 +3431,7 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_action_at"
+            (SELECT U0."last_action_at" AS "last_action_at"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -3438,8 +3440,8 @@
                          AND U0."prescriber_organization_id" = %s
                          AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id"
-             LIMIT 1) AS "last_updated_at",
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_action_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -3591,6 +3593,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
@@ -3704,7 +3707,7 @@
                                                                 %s,
                                                                 %s,
                                                                 %s)
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
         ''',
       }),
       dict({
@@ -3771,7 +3774,7 @@
                   Situation IAE
               </th>
               <th aria-sort="descending" scope="col">
-                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="last_updated_at" type="button">
+                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="last_action_at" type="button">
                       Dernière action
                   </button>
               </th>
@@ -4404,7 +4407,7 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_action_at"
+               (SELECT U0."last_action_at" AS "last_action_at"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -4412,8 +4415,8 @@
                         OR (U0."company_id" IS NULL
                             AND U0."prescriber_organization_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id"
-                LIMIT 1) AS "last_updated_at",
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_action_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -4494,7 +4497,7 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_action_at"
+            (SELECT U0."last_action_at" AS "last_action_at"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -4502,8 +4505,8 @@
                      OR (U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id"
-             LIMIT 1) AS "last_updated_at",
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_action_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -4630,6 +4633,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
@@ -4742,7 +4746,7 @@
           WHERE "users_jobseekerassignment"."job_seeker_id" IN (%s,
                                                                 %s,
                                                                 %s)
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
         ''',
       }),
       dict({

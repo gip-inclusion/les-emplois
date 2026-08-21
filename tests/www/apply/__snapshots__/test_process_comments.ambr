@@ -2497,6 +2497,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",

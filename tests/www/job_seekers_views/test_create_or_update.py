@@ -538,7 +538,7 @@ class TestStandaloneCreateAsPrescriber:
                 assert last_assignment.prescriber_organization == existing_assignment.prescriber_organization
                 assert last_assignment.company == existing_assignment.company
                 assert last_assignment.last_action_kind == existing_assignment.last_action_kind
-                assert last_assignment.updated_at == existing_assignment.updated_at
+                assert last_assignment.last_action_at == existing_assignment.last_action_at
                 assertMessages(
                     response,
                     [
@@ -664,7 +664,7 @@ class TestStandaloneCreateAsPrescriber:
             professional=existing_assignment.professional,
             prescriber_organization=existing_assignment.prescriber_organization,
             company=None,
-            updated_at=existing_assignment.updated_at,
+            last_action_at=existing_assignment.last_action_at,
             last_action_kind=existing_assignment.last_action_kind,
         ).exists()
 
@@ -753,7 +753,7 @@ class TestStandaloneCreateAsPrescriber:
             professional=existing_assignment.professional,
             prescriber_organization=existing_assignment.prescriber_organization,
             company=None,
-            updated_at=existing_assignment.updated_at,
+            last_action_at=existing_assignment.last_action_at,
             last_action_kind=existing_assignment.last_action_kind,
         ).exists()
 

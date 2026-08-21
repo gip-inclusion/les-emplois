@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, IntegerField, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -295,7 +295,7 @@ def can_see_external_job_applications(job_seeker, request):
         or JobSeekerAssignment.objects.filter(
             job_seeker=job_seeker,
             prescriber_organization=org,
-            updated_at__gte=threshold,
+            last_action_at__gte=threshold,
         )
         .exclude(
             # Just creating a job seeker account is not enough to see
@@ -365,10 +365,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         output_field=IntegerField(),
     )
     subquery_last_action_at = Subquery(
-        assignments_qs.filter(job_seeker=OuterRef("pk"))
-        .values("job_seeker")
-        .annotate(last_action_at=Max("updated_at"))
-        .values("last_action_at")[:1],
+        assignments_qs.filter(job_seeker=OuterRef("pk")).order_by("-last_action_at").values("last_action_at")[:1],
         output_field=DateTimeField(),
     )
     subquery_diagnosis = Subquery(
@@ -398,7 +395,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         queryset.annotate(
             full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
-            last_updated_at=subquery_last_action_at,
+            last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
         )
         .select_related("jobseeker_profile")
@@ -408,7 +405,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 "job_seeker_assignments",
                 queryset=JobSeekerAssignment.objects.select_related(
                     "professional", "prescriber_organization", "company"
-                ).order_by("-updated_at"),
+                ).order_by("-last_action_at"),
             ),
         )
     )
@@ -416,7 +413,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     try:
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
-        order = JobSeekerOrder.LAST_UPDATED_AT_DESC
+        order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)

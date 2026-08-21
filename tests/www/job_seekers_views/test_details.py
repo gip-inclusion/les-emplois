@@ -515,7 +515,7 @@ class TestLastKnownAdvisor:
             professional__email="marie.laforet@test.local",
             professional__phone="0707070707",
             created_at=timezone.now() - datetime.timedelta(days=7),
-            updated_at=timezone.now() - datetime.timedelta(days=7),
+            last_action_at=timezone.now() - datetime.timedelta(days=7),
         )
         last_advisor = last_assignment.advisor
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
@@ -532,7 +532,7 @@ class TestLastKnownAdvisor:
             professional=prescriber,
             prescriber_organization=prescriber_organization,
             created_at=last_assignment.created_at - datetime.timedelta(days=7),
-            updated_at=last_assignment.updated_at - datetime.timedelta(days=7),
+            last_action_at=last_assignment.last_action_at - datetime.timedelta(days=7),
         )
 
         response = client.get(url)
@@ -541,8 +541,8 @@ class TestLastKnownAdvisor:
         assertContains(response, last_assignment.created_at.strftime("%d/%m/%Y"))
 
         prescriber_assignment.created_at = timezone.now()
-        prescriber_assignment.updated_at = timezone.now()
-        prescriber_assignment.save(update_fields=["created_at", "updated_at"])
+        prescriber_assignment.last_action_at = timezone.now()
+        prescriber_assignment.save(update_fields=["created_at", "updated_at", "last_action_at"])
 
         response = client.get(url)
         assertNotContains(response, "M'ajouter en tant qu'accompagnateur")
@@ -573,14 +573,18 @@ class TestLastKnownAdvisor:
             professional__email="marie.laforet@test.local",
             professional__phone="0707070707",
             created_at=timezone.now() - datetime.timedelta(days=7),
-            updated_at=timezone.now() - datetime.timedelta(days=7),
+            last_action_at=timezone.now() - datetime.timedelta(days=7),
         )
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
         client.force_login(prescriber)
 
         # Prescriber is the last known advisor of the job seeker
-        prescriber_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
+        prescriber_assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=prescriber,
+            last_action_at=timezone.now(),
+        )
 
         display_phone_url = reverse(
             "job_seekers_views:display_advisor_contact_info", args=(prescriber_assignment.pk, "phone")
@@ -595,8 +599,8 @@ class TestLastKnownAdvisor:
         assertContains(response, prescriber.email)
 
         # Prescriber is an advisor of the job seeker, but not the last one
+        prescriber_assignment.last_action_at = assignment.last_action_at - datetime.timedelta(days=7)
         prescriber_assignment.created_at = assignment.created_at - datetime.timedelta(days=7)
-        prescriber_assignment.updated_at = assignment.created_at - datetime.timedelta(days=7)
         prescriber_assignment.save()
         display_phone_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "phone"))
         display_email_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "email"))
@@ -762,7 +766,7 @@ class TestCanSeeExternalJobApplication(TestCase):
         assignment = JobSeekerAssignment.objects.filter(
             prescriber_organization=org,
         ).get()
-        assignment.updated_at = recent_application.created_at
+        assignment.last_action_at = recent_application.created_at
         assignment.save()
         assert can_see_external_job_applications(self.job_seeker, request)
 
