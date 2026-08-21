@@ -209,4 +209,4 @@ class Command(EmployeeRecordTransferCommand):
 
             self.logger.info("Employee records processing done!")
         else:
-            self.logger.info("No valid options (upload, download or preflight) were given")
+            self.logger.info("No valid options (upload, download, parse-file or preflight) were given")
