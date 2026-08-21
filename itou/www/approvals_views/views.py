@@ -206,15 +206,14 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
         context["matomo_custom_title"] = "Détail PASS IAE"
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
 
-        # Display the closure button (active or disabled) to employers
-        context["show_close_approval_button"] = self.request.from_employer and approval.is_in_progress
-        context["approval_deletion_form_url"] = None
-        if context["show_close_approval_button"] and can_close_approval(approval):
-            context["approval_deletion_form_url"] = reverse(
-                "approvals:close",
-                kwargs={"approval_id": approval.pk},
-                query={"back_url": self.request.get_full_path()},
-            )
+        # Display the closure button (active or disabled) to the last hiring employer
+        show_close_approval_button = (
+            self.request.from_employer
+            and approval.is_in_progress
+            and last_hire_was_made_by_siae(approval.user, self.request.current_organization)
+        )
+        context["show_close_approval_button"] = show_close_approval_button
+        context["can_close_approval"] = show_close_approval_button and can_close_approval(approval)
 
         return context
 

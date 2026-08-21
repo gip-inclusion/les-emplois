@@ -1,8 +1,7 @@
 from django import template
-from django.urls import reverse
 
 from itou.approvals.perms import can_view_approval_details
-from itou.approvals.utils import can_close_approval
+from itou.approvals.utils import can_close_approval, last_hire_was_made_by_siae
 
 
 register = template.Library()
@@ -27,14 +26,13 @@ def approval_details_box(
     with_link_versions = ["box", "job_seeker_dashboard"]
     assert request or version not in with_link_versions, "request is needed for version='box' or version='details'"
 
-    show_close_approval_button = with_close_action and request and request.from_employer and approval.is_in_progress
-    approval_deletion_form_url = None
-    if show_close_approval_button and can_close_approval(approval):
-        approval_deletion_form_url = reverse(
-            "approvals:close",
-            kwargs={"approval_id": approval.pk},
-            query={"back_url": request.get_full_path()},
-        )
+    show_close_approval_button = (
+        with_close_action
+        and request
+        and request.from_employer
+        and approval.is_in_progress
+        and last_hire_was_made_by_siae(approval.user, request.current_organization)
+    )
 
     return {
         "approval": approval,
@@ -43,5 +41,5 @@ def approval_details_box(
         "with_details_link": version in with_link_versions and can_view_approval_details(request, approval),
         "extra_classes": extra_classes,
         "show_close_approval_button": show_close_approval_button,
-        "approval_deletion_form_url": approval_deletion_form_url,
+        "can_close_approval": show_close_approval_button and can_close_approval(approval),
     }
