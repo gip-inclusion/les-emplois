@@ -11,9 +11,9 @@
     </div>
     <div class="offcanvas-body">
         <div id="form-errors-container">{% bootstrap_form_errors filters_form %}</div>
-        {% include "recommendations/includes/recommendation_filters/field_collapse_checkbox.html" with field=filters_form.criteria only %}
+        {% include "includes/field_collapse_checkbox.html" with field=filters_form.criteria only %}
         <hr>
-        {% include "recommendations/includes/recommendation_filters/field_collapse_checkbox.html" with field=filters_form.education_level only %}
+        {% include "includes/field_collapse_checkbox.html" with field=filters_form.education_level only %}
     </div>
     <div class="offcanvas-footer gap-3">
         <button type="button" data-bs-dismiss="offcanvas" class="btn btn-block btn-primary">Voir</button>

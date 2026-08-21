@@ -3,6 +3,6 @@
         {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.departments id_suffix="-top" only %}
     {% else %}
         <hr>
-        {% include "apply/includes/job_applications_filters/field_collapse_checkbox.html" with field=filters_form.departments only %}
+        {% include "includes/field_collapse_checkbox.html" with field=filters_form.departments only %}
     {% endif %}
 {% endif %}

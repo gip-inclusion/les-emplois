@@ -143,6 +143,16 @@ class JobDescriptionSearchForm(SiaeSearchForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
+    handicap = forms.MultipleChoiceField(
+        label="Handicap",
+        choices=[
+            (JobSourceTag.FT_EA_OFFER, JobSourceTag.FT_EA_OFFER.label),
+            (JobSourceTag.FT_EHE_OFFER, JobSourceTag.FT_EHE_OFFER.label),
+        ],
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
 
 class PrescriberSearchForm(forms.Form):
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]

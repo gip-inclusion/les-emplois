@@ -7,7 +7,12 @@ Arguments:
 {% endcomment %}
 <div class="dropdown">
     <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
-        {{ label|default:field.label }}
+        {% if nouveau|default:False %}
+            <span>{{ label|default:field.label }}</span>
+            <span class="badge badge-xs bg-important rounded-pill ms-2 mt-1">Nouveau</span>
+        {% else %}
+            {{ label|default:field.label }}
+        {% endif %}
     </button>
     <ul class="dropdown-menu">
         {% for choice in field %}

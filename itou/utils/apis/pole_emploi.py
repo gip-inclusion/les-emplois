@@ -1,3 +1,15 @@
+"""This is a client for api.francetravail.io
+
+It needs a few environment variables to work, see `git grep API_ESD`.
+
+For example, to access partner API, one can use:
+
+export API_ESD_AUTH_BASE_URL_PARTENAIRE='https://entreprise.francetravail.fr'
+export API_ESD_BASE_URL='https://api.francetravail.io/partenaire'
+export API_ESD_KEY="$(pass inclusion/api-france-travail-key)"
+export API_ESD_SECRET="$(pass inclusion/api-france-travail-secret)"
+"""
+
 import datetime
 import enum
 import json
@@ -125,7 +137,7 @@ API_TIMEOUT_SECONDS = 60  # this API is pretty slow, let's give it a chance
 API_MAJ_PASS_SUCCESS = "S000"
 API_RECH_INDIVIDU_SUCCESS = "S001"
 DATE_FORMAT = "%Y-%m-%d"
-MAX_NIR_CHARACTERS = 13  # Pole Emploi only cares about the first 13 characters of the NIR.
+MAX_NIR_CHARACTERS = 13  # France Travail only cares about the first 13 characters of the NIR.
 
 
 def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
@@ -145,22 +157,38 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
 
 
 class BasePoleEmploiApiClient:
-    AUTHORIZED_SCOPES = []
     REALM = ""
-    CACHE_API_TOKEN_KEY = ""
 
-    def __init__(self, base_url, auth_base_url, key, secret):
-        if not self.AUTHORIZED_SCOPES:
-            raise NotImplementedError("Authorized scopes missing.")
+    def __init__(self, base_url, auth_base_url, key, secret) -> None:
         if not self.REALM:
             raise NotImplementedError("Realm missing.")
-        if not self.CACHE_API_TOKEN_KEY:
-            raise NotImplementedError("Cache key missing.")
+        self.needed_scopes: set[str] = set()
         self.base_url = base_url
         self.auth_base_url = auth_base_url
         self.key = key
         self.secret = secret
         self._httpx_client = None
+
+    @property
+    def cache_api_token_key(self) -> str:
+        """Generate a cache key for an API token.
+
+        If the scopes have changed (more are needed compared to the
+        current token) the cache key change, so a new key is generated
+        for a token having the new scopes.
+        """
+        return type(self).__name__ + self.scopes
+
+    @property
+    def scopes(self) -> str:
+        """From the set of needed scopes, reteurn a string of all scopes.
+
+        Useful to generate a token and a token cache key.
+
+        It has to be stable (sorted in the current case) as it is used
+        as a cache key.
+        """
+        return " ".join(sorted(self.needed_scopes))
 
     def __enter__(self):
         self._httpx_client = httpx.Client().__enter__()
@@ -173,7 +201,6 @@ class BasePoleEmploiApiClient:
         return self._httpx_client or httpx.Client()
 
     def _refresh_token(self):
-        scopes = " ".join(self.AUTHORIZED_SCOPES)
         auth_data = (
             self._get_httpx_client()
             .post(
@@ -183,7 +210,7 @@ class BasePoleEmploiApiClient:
                     "client_id": self.key,
                     "client_secret": self.secret,
                     "grant_type": "client_credentials",
-                    "scope": f"application_{self.key} {scopes}",
+                    "scope": f"application_{self.key} {self.scopes}",
                 },
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
@@ -192,7 +219,7 @@ class BasePoleEmploiApiClient:
         )
         token = f"{auth_data['token_type']} {auth_data['access_token']}"
         caches["failsafe"].set(
-            self.CACHE_API_TOKEN_KEY,
+            self.cache_api_token_key,
             token,
             auth_data["expires_in"]
             - REFRESH_TOKEN_MARGIN_SECONDS,  # make the token expire a little sooner than expected
@@ -207,7 +234,7 @@ class BasePoleEmploiApiClient:
 
     def _request(self, url, data=None, params=None, method="POST", **kwargs):
         try:
-            token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
+            token = caches["failsafe"].get(self.cache_api_token_key)
             if not token:
                 token = self._refresh_token()
 
@@ -243,24 +270,15 @@ class BasePoleEmploiApiClient:
 
 
 class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
-    # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
-    AUTHORIZED_SCOPES = [
-        "api_maj-pass-iaev1",
-        "api_offresdemploiv2",
-        "api_rechercheindividucertifiev1",
-        "api_rome-metiersv1",
-        "nomenclatureRome",
-        "o2dsoffre",
-        "passIAE",
-        "rechercherIndividuCertifie",
-        "api_referentielagencesv1",
-        "organisationpe",
-    ]
+    # France Travail also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
     REALM = "/partenaire"
-    CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
 
     def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
-        """Example data:
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/recherche-individu-certifie/documentation
+        (This documentation needs you to be logged-in.)
+
+        Example data:
         {
             "nirCertifie":"1800813800217",
             "nomNaissance":"MARTIN",
@@ -275,6 +293,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
             "certifDE":false
         }
         """
+        self.needed_scopes |= {"api_rechercheindividucertifiev1", "rechercherIndividuCertifie"}
         data = self._request(
             f"{self.base_url}/rechercheindividucertifie/v1/rechercheIndividuCertifie",
             {
@@ -295,11 +314,18 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     def mise_a_jour_pass_iae(
         self, approval, encrypted_identifier, siae_siret, siae_type, origine_candidature, typologie_prescripteur=None
     ):
-        """Example of a JSON response:
-        {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
+        """
+        API documentation:
+        https://francetravail.io/produits-partages/catalogue/mise-jour-passiae/documentation#/api-reference/operations/miseAjourPassIAE
+
+        Example of a JSON response:
+
+            {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
+
         The only valid result is HTTP 200 + codeSortie = "S000".
         Anything else (other HTTP code, or different codeSortie) means that our notification has been discarded.
         """
+        self.needed_scopes |= {"passIAE", "api_maj-pass-iaev1"}
         params = {
             "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT),
             "dateFinPassIAE": approval.get_pe_end_at(),
@@ -321,13 +347,56 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         if code_sortie != API_MAJ_PASS_SUCCESS:
             raise PoleEmploiAPIBadResponse(response_code=code_sortie, response_data=data)
 
-    def referentiel(self, code):
-        return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
+    def referentiel(self, code, cache_timeout=datetime.timedelta(days=7).total_seconds()):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation
+        """
+        cache_key = f"{str(type(self))}.referentiel({code})"
+        result = caches["failsafe"].get(cache_key)
+        if result:
+            return result
+        self.needed_scopes |= {"o2dsoffre", "api_offresdemploiv2"}
+        result = self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
+        caches["failsafe"].set(cache_key, result)
+        return result
 
-    def offres(self, typeContrat="", natureContrat="", entreprisesAdaptees=None, range=None):
+    def offres(
+        self,
+        typeContrat="",
+        natureContrat="",
+        entreprisesAdaptees=None,
+        employeursHandiEngages=None,
+        departement=None,
+        range=None,
+    ):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation
+
+        Attention aux paramètres :
+
+        - Entre entreprisesAdaptees et employeursHandiEngages c'est un
+          « OU », probablement parce que c'est dans la même catégorie
+          « handicap » sur le site de france travail.
+
+        - natureContrat implique un « ET » avec les paramètres des
+          autres catégories (dont la catégorie handicap).
+
+        Par exemple, en 2026 :
+        - On a 61 offres contrat PEC
+        - On a 7964 offres d'employeurs handi-engagés
+        - On a 655 offres d'entreprises adaptées
+        - Si on requête employeursHandiEngages=True, entreprisesAdaptees=True on a 8004 offres
+        - Si on requête natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
+          employeursHandiEngages=True, entreprisesAdaptees=True on a seulement 2 offres.
+        """
+        self.needed_scopes |= {"o2dsoffre", "api_offresdemploiv2"}
         params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
         if entreprisesAdaptees is not None:
             params["entreprisesAdaptees"] = entreprisesAdaptees
+        if employeursHandiEngages is not None:
+            params["employeursHandiEngages"] = employeursHandiEngages
+        if departement is not None:
+            params["departement"] = departement
         if range:
             params["range"] = range
         data = self._request(f"{self.base_url}/offresdemploi/v2/offres/search", params=params, method="GET")
@@ -341,37 +410,61 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         natureContrat="",
         *,
         entreprisesAdaptees=None,
+        employeursHandiEngages=None,
         delay_between_requests=datetime.timedelta(0),
     ):
-        # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE offers.
-        # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
-        # by requesting every department one by one. But so far we are not even close from half this quota.
-        raw_offers = []
-        for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
-            max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
-            offers = self.offres(
-                typeContrat=typeContrat,
-                natureContrat=natureContrat,
-                entreprisesAdaptees=entreprisesAdaptees,
-                range=f"{i}-{max_range}",
-            )
-            logger.info(f"retrieved count={len(offers)} offers from FT API")
-            if not offers:
-                break
-            raw_offers.extend(offers)
-            if max_range == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
-                logger.error("FT API returned the maximum number of offers: some offers are likely missing")
+        """We split requests by departments to break the API limit at 3149.
 
-            time.sleep(delay_between_requests.total_seconds())
+        It is needed because FT have, as of 2026, around 8k offers
+        from Employeurs handi-engagés.
+
+        See this page to get counts from FT:
+
+        https://candidat.francetravail.fr/offres/recherche?lieux=99100&offresPartenaires=true&rayon=10&tri=0
+
+        Don't forget to simplify that code if France Travail removes
+        the restriction of 3149 paginated results, which is documented
+        in the `range` section of:
+
+        https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
+        """
+
+        raw_offers = []
+        for departement in self.referentiel("departements"):
+            for range_start in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
+                range_stop = range_start + OFFERS_MAX_RANGE - 1
+                offers = self.offres(
+                    typeContrat=typeContrat,
+                    natureContrat=natureContrat,
+                    entreprisesAdaptees=entreprisesAdaptees,
+                    employeursHandiEngages=employeursHandiEngages,
+                    departement=departement["code"],
+                    range=f"{range_start}-{range_stop}",
+                )
+                logger.info(f"retrieved count={len(offers)} offers from FT API")
+                time.sleep(delay_between_requests.total_seconds())
+                raw_offers.extend(offers)
+                if len(offers) < OFFERS_MAX_RANGE:
+                    break
+                if range_stop == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
+                    logger.error("FT API returned the maximum number of offers: some offers are likely missing")
         return raw_offers
 
     def appellations(self):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/rome-4-0-metiers/documentation
+        """
+        self.needed_scopes |= {"nomenclatureRome", "api_rome-metiersv1"}
         return self._request(
             f"{self.base_url}/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)",
             method="GET",
         )
 
     def agences(self, safir=None):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/referentiel-agences/documentation
+        """
+        self.needed_scopes |= {"api_referentielagencesv1", "organisationpe"}
         agences = self._request(f"{self.base_url}/referentielagences/v1/agences", method="GET")
         if safir:
             return next((agence for agence in agences if agence["codeSafir"] == str(safir)), None)
@@ -379,15 +472,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
 
 
 class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
-    AUTHORIZED_SCOPES = [
-        "api_rechercher-usagerv2",
-        "rechercheusager",
-        "profil_accedant",
-        "api_donnees-rqthv1",
-        "h2a",
-    ]
     REALM = "/agent"
-    CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
     def _header(self, token, jeton_usager=None):
         headers = {
@@ -410,8 +495,12 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         return headers
 
     def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/rechercher-usager/documentation
+        """
         if not pole_emploi_id:
             raise TypeError("`pole_emploi_id` is mandatory.")
+        self.needed_scopes |= {"api_rechercher-usagerv2", "profil_accedant", "rechercheusager"}
         return self._request(
             f"{self.base_url}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}",
             {
@@ -420,8 +509,12 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         )
 
     def _rechercher_usager_by_birthdate_and_nir(self, birthdate, nir):
+        """API documentation:
+        https://francetravail.io/produits-partages/catalogue/rechercher-usager/documentation
+        """
         if not (birthdate and nir):
             raise TypeError("`birthdate` and `nir` are mandatory.")
+        self.needed_scopes |= {"api_rechercher-usagerv2", "profil_accedant", "rechercheusager"}
         return self._request(
             f"{self.base_url}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}",
             {

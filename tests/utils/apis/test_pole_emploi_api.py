@@ -19,7 +19,6 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
-    PoleEmploiRoyaumeAgentAPIClient,
     PoleEmploiRoyaumePartenaireApiClient,
     UserDoesNotExist,
     pole_emploi_agent_api_client,
@@ -57,9 +56,9 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         start = math.floor(time.time())  # Ignore microseconds.
         self.api_client._refresh_token()
         cache = caches["failsafe"]
-        assert cache.get(PoleEmploiRoyaumePartenaireApiClient.CACHE_API_TOKEN_KEY) == "foo batman"
+        assert cache.get(self.api_client.cache_api_token_key) == "foo batman"
         redis_client = get_redis_connection("failsafe")
-        expiry = redis_client.expiretime(cache.make_key(PoleEmploiRoyaumePartenaireApiClient.CACHE_API_TOKEN_KEY))
+        expiry = redis_client.expiretime(cache.make_key(self.api_client.cache_api_token_key))
         assert start + self.CACHE_EXPIRY - REFRESH_TOKEN_MARGIN_SECONDS <= expiry <= start + self.CACHE_EXPIRY
 
     @respx.mock
@@ -349,7 +348,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         rechercher_usager_url = f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}"
         respx.post(rechercher_usager_url).respond(200, json={"sample": "data"})
         self.api_client._request(rechercher_usager_url)
-        assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
+        assert caches["failsafe"].get(self.api_client.cache_api_token_key) == "Bearer Catwoman"
 
     @respx.mock
     def test_request_http_request_headers(self):

@@ -1,0 +1,16 @@
+{% if form.departments %}
+    <hr>
+    {% include "includes/field_collapse_checkbox.html" with field=form.departments only %}
+{% endif %}
+{% if form.districts_13 %}
+    <hr>
+    {% include "includes/field_collapse_checkbox.html" with field=form.districts_13 only %}
+{% endif %}
+{% if form.districts_69 %}
+    <hr>
+    {% include "includes/field_collapse_checkbox.html" with field=form.districts_69 only %}
+{% endif %}
+{% if form.districts_75 %}
+    <hr>
+    {% include "includes/field_collapse_checkbox.html" with field=form.districts_75 only %}
+{% endif %}

@@ -1,0 +1,6 @@
+{% if btn_dropdown_filter|default:False %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.handicap id_suffix="-top" %}
+{% else %}
+    <hr>
+    {% include "includes/field_collapse_checkbox.html" with field=form.handicap only %}
+{% endif %}
