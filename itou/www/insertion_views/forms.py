@@ -46,8 +46,8 @@ class OrientationSelectJobSeekerForm(forms.Form):
             .exclude(
                 # FIXME: will be fixed when last_name (soon: birth_name)
                 # and first_name are enforced by a SQL constraint
-                last_name="",
                 first_name="",
+                jobseeker_profile__birth_name="",
             )
             .select_related("jobseeker_profile")
             .order_by("last_name", "first_name")

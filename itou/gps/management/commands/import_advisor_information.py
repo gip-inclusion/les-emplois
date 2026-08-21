@@ -168,7 +168,7 @@ class Command(BaseCommand):
             if all(
                 [
                     jobseeker_profile.user.first_name == details.first_name,
-                    jobseeker_profile.user.last_name == details.last_name,
+                    jobseeker_profile.user.get_last_name_for_display() == details.last_name,
                     jobseeker_profile.nir == details.nir,
                     jobseeker_profile.pole_emploi_id == details.pole_emploi_id,
                     str(jobseeker_profile.birthdate or "") == details.birthdate,

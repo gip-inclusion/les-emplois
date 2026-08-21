@@ -52,7 +52,7 @@ def job_seeker_serializer(user):
         "attributes": {
             "id": user.pk,
             "prenom": user.first_name.title(),
-            "nom": user.last_name.upper(),
+            "nom": user.get_last_name_for_display().upper(),
             "departement": user.job_seeker_department,
             "date_inscription": timezone.localdate(user.date_joined).isoformat(),
         },

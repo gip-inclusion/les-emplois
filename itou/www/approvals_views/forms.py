@@ -97,10 +97,12 @@ class ApprovalForm(forms.Form):
 
     def _get_choices_for_job_seekers(self):
         approvals_qs = Approval.objects.filter(self.get_approvals_qs_filter())
-        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
+        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs).select_related(
+            "jobseeker_profile"
+        )
         return [
             (user.pk, user.get_inverted_full_name())
-            for user in users_qs.order_by("last_name", "first_name")
+            for user in users_qs.annotate_with_last_name_for_display().order_by("last_name_for_display", "first_name")
             if user.get_inverted_full_name()
         ]
 
