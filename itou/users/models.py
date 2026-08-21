@@ -1626,12 +1626,13 @@ class JobSeekerAssignmentManager(models.Manager):
             prescriber_organization=prescriber_organization,
             company=company,
             last_action_kind=last_action_kind,
+            last_action_at=timezone.now(),
             assigned_to_unknown_advisor=assigned_to_unknown_advisor,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
-            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
+            update_fields=["updated_at", "last_action_kind", "last_action_at", "assigned_to_unknown_advisor"],
             unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
 
@@ -1691,6 +1692,7 @@ class JobSeekerAssignment(models.Model):
         choices=ActionKind.choices,
         default=ActionKind.CREATE,
     )
+    last_action_at = models.DateTimeField(verbose_name="date de la dernière action", default=timezone.now)
     assigned_to_unknown_advisor = models.BooleanField(
         verbose_name="accompagnateur désigné inconnu",
         default=False,
