@@ -4,7 +4,7 @@
 {% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
 
 
-<div id="last-known-advisor-{{ job_seeker.public_id }}" class="c-box c-box--accompagnateur mb-3 mb-md-4">
+<div id="last-advisor-{{ job_seeker.public_id }}" class="c-box c-box--accompagnateur mb-3 mb-md-4">
     <div class="d-flex gap-2 justify-content-between mb-3">
         <h3 class="mb-0">Dernier accompagnateur</h3>
         {% if has_access_to_assignments %}

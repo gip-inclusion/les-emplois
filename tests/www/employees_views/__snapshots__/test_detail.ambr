@@ -1786,7 +1786,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',

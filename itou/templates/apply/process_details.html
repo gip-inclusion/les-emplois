@@ -112,7 +112,7 @@
                                     </div>
                                 {% endif %}
                                 {{ block.super }}
-                                {% include "job_seekers_views/includes/last_known_advisor.html" with job_seeker=job_application.job_seeker has_access_to_assignments=has_access_to_assignments request=request csrf_token=csrf_token only %}
+                                {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_application.job_seeker has_access_to_assignments=has_access_to_assignments request=request csrf_token=csrf_token only %}
                             {% endblock %}
                         </div>
                     </div>

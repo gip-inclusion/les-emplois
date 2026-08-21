@@ -2667,7 +2667,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[apply/process_details_company.html]',
           'BlockNode[apply/process_details_company.html]',
           'BlockNode[layout/base.html]',
@@ -4300,7 +4300,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[apply/process_details_company.html]',
           'BlockNode[apply/process_details_company.html]',
           'BlockNode[layout/base.html]',
@@ -5564,7 +5564,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[apply/process_details.html]',
           'BlockNode[apply/process_details.html]',
           'BlockNode[layout/base.html]',

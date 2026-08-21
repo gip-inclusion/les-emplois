@@ -514,7 +514,7 @@ def test_update_iae_eligibility_buttons(client):
 
 
 class TestLastKnownAdvisor:
-    def test_display_last_known_advisor(self, client):
+    def test_display_last_advisor(self, client):
         job_seeker = JobSeekerFactory()
         prescriber = PrescriberFactory(membership=True)
         assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
@@ -578,7 +578,7 @@ class TestLastKnownAdvisor:
 
         simulated_page = parse_response_to_soup(
             response,
-            selector=f"#last-known-advisor-{job_seeker.public_id}",
+            selector=f"#last-advisor-{job_seeker.public_id}",
             replace_in_attr=[
                 ("id", str(job_seeker.public_id), "[JobSeeker PublicID]"),
                 ("href", str(job_seeker.public_id), "[JobSeeker PublicID]"),
@@ -626,7 +626,7 @@ class TestLastKnownAdvisor:
 
         simulated_page = parse_response_to_soup(
             response,
-            selector=f"#last-known-advisor-{job_seeker.public_id}",
+            selector=f"#last-advisor-{job_seeker.public_id}",
             replace_in_attr=[
                 ("id", str(job_seeker.public_id), "[JobSeeker PublicID]"),
                 ("href", str(job_seeker.public_id), "[JobSeeker PublicID]"),
@@ -665,7 +665,7 @@ class TestLastKnownAdvisor:
         assertContains(response, display_phone_url)
         assertContains(response, display_email_url)
 
-        simulated_page = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
+        simulated_page = parse_response_to_soup(response, selector=f"#last-advisor-{job_seeker.public_id}")
 
         response = client.post(display_phone_url)
         assertContains(response, assignment.professional.phone)
@@ -688,7 +688,7 @@ class TestLastKnownAdvisor:
         )
         request = get_request(PrescriberFactory())
 
-        template = load_template("job_seekers_views/includes/last_known_advisor.html")
+        template = load_template("job_seekers_views/includes/last_advisor.html")
         rendered = template.render(
             Context(
                 {
@@ -746,7 +746,7 @@ class TestLastKnownAdvisor:
         ended_str = "Du 01/12/2025 au 02/03/2026"
 
         request = get_request(PrescriberFactory(membership=True))
-        template = load_template("job_seekers_views/includes/last_known_advisor.html")
+        template = load_template("job_seekers_views/includes/last_advisor.html")
         rendered = template.render(
             Context(
                 {
