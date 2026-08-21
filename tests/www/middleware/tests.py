@@ -15,9 +15,14 @@ class TestRedirectToNewDomainMiddleware:
         assert response.status_code == 200  # no redirect (not enabled)
 
         settings.REDIRECT_TO_NEW_DOMAIN = True
-        response = client.get("/admin/", HTTP_HOST="old.domain", follow=False)
+        response = client.get(
+            "/admin/",
+            query_params={"foo": "bar"},
+            HTTP_HOST="old.domain",
+            follow=False,
+        )
         assert response.status_code == 302
-        assert response.url == "https://new.domain/admin/?redirected-from-old-domain=1"
+        assert response.url == "https://new.domain/admin/?foo=bar&redirected-from-old-domain=1"
 
         response = client.get("/admin/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
