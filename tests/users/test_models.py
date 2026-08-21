@@ -1376,6 +1376,7 @@ class TestJobSeekerAssignment:
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.CREATE
+        assert assignment.last_action_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
 
@@ -1389,6 +1390,7 @@ class TestJobSeekerAssignment:
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.APPLY
+        assert assignment.last_action_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
 
