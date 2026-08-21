@@ -34,7 +34,7 @@ class TestCloseApprovalView:
 
         assertRedirects(response, back_url)
         approval.refresh_from_db()
-        assert approval.end_at == timezone.localdate()
+        assert approval.end_at == timezone.localdate() - datetime.timedelta(days=1)
         assert f"user={membership.user.pk} closed approval={approval.pk}" in caplog.messages
 
         [email] = mailoutbox
