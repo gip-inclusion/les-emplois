@@ -263,7 +263,7 @@ def test_multiple(client, snapshot):
         professional=other_prescriber,
         prescriber_organization=organization,
         last_action_kind=ActionKind.APPLY,
-        updated_at=timezone.now() - datetime.timedelta(days=1),
+        last_action_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Other app for the same job seeker
@@ -279,7 +279,7 @@ def test_multiple(client, snapshot):
         professional=prescriber,
         prescriber_organization=organization,
         last_action_kind=ActionKind.APPLY,
-        updated_at=timezone.now() - datetime.timedelta(days=2),
+        last_action_at=timezone.now() - datetime.timedelta(days=2),
     )
     # Other app without diagnosis
     job_app2 = JobApplicationFactory(
@@ -318,7 +318,7 @@ def test_multiple(client, snapshot):
         professional=prescriber,
         prescriber_organization=organization,
         last_action_kind=ActionKind.APPLY,
-        updated_at=timezone.now() - datetime.timedelta(days=2),
+        last_action_at=timezone.now() - datetime.timedelta(days=2),
     )
 
     company = CompanyFactory(for_snapshot=True)
@@ -329,7 +329,7 @@ def test_multiple(client, snapshot):
         company=company,
         last_action_kind=ActionKind.ACCEPT,
         assigned_to_unknown_advisor=True,
-        updated_at=timezone.now() - datetime.timedelta(days=1),
+        last_action_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Other app without address/city
@@ -463,7 +463,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         professional=prescriber_not_in_org_anymore,
         prescriber_organization=organization,
         last_action_kind=ActionKind.CREATE,
-        updated_at=timezone.now() - datetime.timedelta(days=2 * 365),
+        last_action_at=timezone.now() - datetime.timedelta(days=2 * 365),
     )
 
     company = CompanyFactory(for_snapshot=True)
@@ -474,7 +474,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         company=company,
         last_action_kind=ActionKind.ACCEPT,
         assigned_to_unknown_advisor=True,
-        updated_at=timezone.now() - datetime.timedelta(days=2),
+        last_action_at=timezone.now() - datetime.timedelta(days=2),
     )
 
     # When applying for a job seeker already in the list, he's not shown twice
@@ -490,7 +490,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         professional=prescriber,
         prescriber_organization=organization,
         last_action_kind=ActionKind.APPLY,
-        updated_at=timezone.now() - datetime.timedelta(days=1),
+        last_action_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Job seeker created by the prescriber but for another organization; will not be shown
@@ -875,11 +875,12 @@ def test_filtered_by_eligibility_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
-        # assignment.updated_at is set to diagnosis created_at, which is flaky when expired=True
+        # assignment.last_action_at is set to diagnosis created_at, which is flaky when expired=True
         created_at=timezone.now() - datetime.timedelta(days=2),
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
-        with_job_seeker_assignment=True,  # assignment.updated_at is one day earlier as expired=True changes created_at
+        # assignment.last_action_at is one day earlier as expired=True changes created_at
+        with_job_seeker_assignment=True,
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
     job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
@@ -898,7 +899,7 @@ def test_filtered_by_eligibility_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
-        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        # assignment.last_action_at is set to diagnosis created_at, which is non-deterministic when expired=True
         created_at=timezone.now() - datetime.timedelta(days=1),
         job_seeker__first_name="expired eligibility, no approval",
         job_seeker__last_name="Zorro",
@@ -956,7 +957,7 @@ def test_filtered_by_approval_state(client, factory, url):
         author_prescriber_organization=prescriber_organization,
         author_siae=company,
         expired=True,
-        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        # assignment.last_action_at is set to diagnosis created_at, which is non-deterministic when expired=True
         created_at=timezone.now() - datetime.timedelta(days=2),
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
@@ -971,7 +972,7 @@ def test_filtered_by_approval_state(client, factory, url):
         author_prescriber_organization=prescriber_organization,
         author_siae=company,
         expired=True,
-        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        # assignment.last_action_at is set to diagnosis created_at, which is non-deterministic when expired=True
         created_at=timezone.now() - datetime.timedelta(days=1),
         job_seeker__first_name="expired eligibility, expired approval",
         job_seeker__last_name="Zorro",
@@ -1483,18 +1484,18 @@ def test_job_seekers_order(client, factory, url, subtests):
     client.force_login(user)
 
     expected_order = {
-        "-last_updated_at": [second_created_job_seeker, a_b_job_seeker, created_job_seeker, c_d_job_seeker],
+        "-last_action_at": [second_created_job_seeker, a_b_job_seeker, created_job_seeker, c_d_job_seeker],
         "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker, second_created_job_seeker],
         "job_applications_nb": [created_job_seeker, second_created_job_seeker, a_b_job_seeker, c_d_job_seeker],
     }
 
     with subtests.test(order="<missing_value>"):
         response = client.get(url)
-        assert response.context["page_obj"].object_list == expected_order["-last_updated_at"]
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
 
     with subtests.test(order="<invalid_value>"):
         response = client.get(url, {"order": "invalid_value"})
-        assert response.context["page_obj"].object_list == expected_order["-last_updated_at"]
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
 
     for order, job_seekers in expected_order.items():
         with subtests.test(order=order):
@@ -1546,18 +1547,18 @@ def test_htmx_order(client, factory, url):
     simulated_page = parse_response_to_soup(response)
 
     ORDER_ID = "id_order"
-    LAST_UPDATED_AT_ASC = "last_updated_at"
+    LAST_ACTION_AT_ASC = "last_action_at"
 
-    [sort_by_last_updated_at_button] = simulated_page.find_all(
-        "button", {"data-emplois-setter-value": LAST_UPDATED_AT_ASC}
+    [sort_by_last_action_at_button] = simulated_page.find_all(
+        "button", {"data-emplois-setter-value": LAST_ACTION_AT_ASC}
     )
-    assert sort_by_last_updated_at_button["data-emplois-setter-target"] == f"#{ORDER_ID}"
+    assert sort_by_last_action_at_button["data-emplois-setter-target"] == f"#{ORDER_ID}"
     [order_input] = simulated_page.find_all(id=ORDER_ID)
     # Simulate click on button
-    order_input["value"] = LAST_UPDATED_AT_ASC
-    response = client.get(url, {"order": LAST_UPDATED_AT_ASC}, headers={"HX-Request": "true"})
+    order_input["value"] = LAST_ACTION_AT_ASC
+    response = client.get(url, {"order": LAST_ACTION_AT_ASC}, headers={"HX-Request": "true"})
     update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
-    response = client.get(url, {"order": LAST_UPDATED_AT_ASC})
+    response = client.get(url, {"order": LAST_ACTION_AT_ASC})
     assertContains(response, "2 résultats")
     assertContains(response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id}))
     assertContains(
@@ -1568,7 +1569,7 @@ def test_htmx_order(client, factory, url):
 
 
 @freeze_time("2026-06-11")
-def test_last_updated_at(client):
+def test_last_action_at(client):
     organization = PrescriberOrganizationWith2MembershipFactory()
     prescriber = organization.members.first()
     job_seeker = JobSeekerFactory()
@@ -1578,13 +1579,13 @@ def test_last_updated_at(client):
     _assignment_no_org = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,
         professional=prescriber,
-        updated_at=ten_days_ago,
+        last_action_at=ten_days_ago,
     )
     assignment_with_org = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,
         professional=prescriber,
         prescriber_organization=organization,
-        updated_at=thirty_days_ago,
+        last_action_at=thirty_days_ago,
     )
 
     client.force_login(prescriber)
@@ -1593,7 +1594,7 @@ def test_last_updated_at(client):
     response = client.get(url)
     assertContains(response, ten_days_ago.strftime("%d/%m/%Y"))
 
-    assignment_with_org.updated_at = now
+    assignment_with_org.last_action_at = now
     assignment_with_org.save()
     assignment_with_org.refresh_from_db()
 

@@ -229,12 +229,12 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             return
         if extracted:
             JobSeekerAssignmentFactory(
-                updated_at=self.created_at,
                 job_seeker=self.job_seeker,
                 professional=self.sender,
                 prescriber_organization=self.sender_prescriber_organization,
                 company=self.sender_company,
                 last_action_kind=ActionKind.APPLY,
+                last_action_at=self.created_at,
             )
 
 

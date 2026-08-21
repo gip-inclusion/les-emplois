@@ -2292,8 +2292,8 @@
           SELECT %s AS "a"
           FROM "users_jobseekerassignment"
           WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."last_action_at" >= %s
                  AND "users_jobseekerassignment"."prescriber_organization_id" = %s
-                 AND "users_jobseekerassignment"."updated_at" >= %s
                  AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
           LIMIT 1
         ''',
@@ -4053,8 +4053,8 @@
           SELECT %s AS "a"
           FROM "users_jobseekerassignment"
           WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."last_action_at" >= %s
                  AND "users_jobseekerassignment"."prescriber_organization_id" = %s
-                 AND "users_jobseekerassignment"."updated_at" >= %s
                  AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
           LIMIT 1
         ''',
@@ -7063,6 +7063,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
@@ -8445,6 +8446,7 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
                  T3."id",
                  T3."password",
