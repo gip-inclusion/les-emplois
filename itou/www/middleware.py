@@ -172,6 +172,6 @@ def _get_redirect_url(request):
         # other users once we're sure that everything is fine.
         return None
 
-    query = QueryDict(request.GET, mutable=True)
+    query = QueryDict(request.GET.urlencode(), mutable=True)
     query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
     return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
