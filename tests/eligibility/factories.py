@@ -73,7 +73,6 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
             return
         if extracted:
             JobSeekerAssignmentFactory(
-                updated_at=self.created_at,
                 job_seeker=self.job_seeker,
                 professional=self.author,
                 prescriber_organization=self.author_prescriber_organization,
@@ -81,6 +80,7 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
                 last_action_kind=ActionKind.GEIQ_ELIGIBILITY
                 if isinstance(self, GEIQEligibilityDiagnosis)
                 else ActionKind.IAE_ELIGIBILITY,
+                last_action_at=self.created_at,
             )
 
 

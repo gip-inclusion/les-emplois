@@ -172,18 +172,18 @@ class TestMoveCompanyData:
         assert JobSeekerAssignment.objects.count() == 3
         assert updated_assignment_1.company_id == company_2.pk
         assert updated_assignment_1.created_at == assignment_1.created_at
-        assert updated_assignment_1.updated_at == assignment_1.updated_at
         assert updated_assignment_1.last_action_kind == ActionKind.IAE_ELIGIBILITY
+        assert updated_assignment_1.last_action_at == assignment_1.last_action_at
         assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
         assert updated_assignment_2_to_comp.company_id == company_2.pk
         assert updated_assignment_2_to_comp.created_at == assignment_2.created_at
-        assert updated_assignment_2_to_comp.updated_at == assignment_2_to_comp.updated_at
         assert updated_assignment_2_to_comp.last_action_kind == ActionKind.APPLY
+        assert updated_assignment_2_to_comp.last_action_at == assignment_2_to_comp.last_action_at
         assert not JobSeekerAssignment.objects.filter(pk=assignment_3.pk).exists()
         assert updated_assignment_3_to_comp.company_id == company_2.pk
         assert updated_assignment_3_to_comp.created_at == assignment_3_to_comp.created_at
-        assert updated_assignment_3_to_comp.updated_at == assignment_3.updated_at
         assert updated_assignment_3_to_comp.last_action_kind == ActionKind.APPLY
+        assert updated_assignment_3_to_comp.last_action_at == assignment_3.last_action_at
 
     def test_move_prolongation_requests(self):
         company_from = companies_factories.CompanyFactory()

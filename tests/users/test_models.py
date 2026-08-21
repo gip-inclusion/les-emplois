@@ -1376,8 +1376,7 @@ class TestJobSeekerAssignment:
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.CREATE
-        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
-        assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.last_action_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
 
         # Update
         with freezegun.freeze_time("2025-11-15 18:00:01"):
@@ -1389,8 +1388,7 @@ class TestJobSeekerAssignment:
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.APPLY
-        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
-        assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.last_action_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
 
     @pytest.mark.parametrize(
         "organization_factory,membership_factory",

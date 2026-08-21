@@ -761,7 +761,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 "professional", "prescriber_organization", "company"
             )
         if assignments:
-            last_assignment = sorted(assignments, key=lambda j: j.updated_at, reverse=True)[0]
+            last_assignment = sorted(assignments, key=lambda j: j.last_action_at, reverse=True)[0]
             return last_assignment
         return None
 
@@ -1626,12 +1626,13 @@ class JobSeekerAssignmentManager(models.Manager):
             prescriber_organization=prescriber_organization,
             company=company,
             last_action_kind=last_action_kind,
+            last_action_at=timezone.now(),
             assigned_to_unknown_advisor=assigned_to_unknown_advisor,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
-            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
+            update_fields=["updated_at", "last_action_kind", "last_action_at", "assigned_to_unknown_advisor"],
             unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
 
@@ -1655,10 +1656,8 @@ class JobSeekerAssignment(models.Model):
     An assignment of a job seeker to a professional, with or without organization or company.
     """
 
-    # TODO(ewen): set to auto_now_add=True when the objects are created from existing contacts
-    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    # TODO(ewen): set to auto_now=True when the objects are created from existing contacts
-    updated_at = models.DateTimeField(verbose_name="date de la dernière action", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     job_seeker = models.ForeignKey(
         User,
         verbose_name="candidat",
@@ -1691,6 +1690,7 @@ class JobSeekerAssignment(models.Model):
         choices=ActionKind.choices,
         default=ActionKind.CREATE,
     )
+    last_action_at = models.DateTimeField(verbose_name="date de la dernière action", default=timezone.now)
     assigned_to_unknown_advisor = models.BooleanField(
         verbose_name="accompagnateur désigné inconnu",
         default=False,
