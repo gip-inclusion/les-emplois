@@ -1656,10 +1656,8 @@ class JobSeekerAssignment(models.Model):
     An assignment of a job seeker to a professional, with or without organization or company.
     """
 
-    # TODO(ewen): set to auto_now_add=True when the objects are created from existing contacts
-    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    # TODO(ewen): set to auto_now=True when the objects are created from existing contacts
-    updated_at = models.DateTimeField(verbose_name="date de la dernière action", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     job_seeker = models.ForeignKey(
         User,
         verbose_name="candidat",
