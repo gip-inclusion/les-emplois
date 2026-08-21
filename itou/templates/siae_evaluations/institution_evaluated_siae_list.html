@@ -35,7 +35,8 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% for evaluated_siae in evaluated_siaes %}
-                        <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                        {# navigation : anchor to scroll to a specific card when returning to this page #}
+                        <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="{{ evaluated_siae.pk }}">
                             <div class="c-box--results__header">
                                 {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
                             </div>

@@ -9,7 +9,7 @@ from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.eligibility.utils import iae_has_required_criteria
 from itou.institutions.enums import InstitutionKind
@@ -298,24 +298,10 @@ class EvaluationCampaign(models.Model):
                                     criteria_certified=True,
                                 )
                             )
-                        # TODO: For the 2026 campaign on auto-prescriptions
-                        # hires in 2025, this should be updated to handle
-                        # LEVEL_2.
-                        # Generating an accepted administrative criteria with
-                        # level 2 will significantly break all views in this
-                        # module. Many parts of it rely on the criteria state
-                        # to decide what actions to offer, and the state of the
-                        # evaluated job application.
-                        assert (
-                            selected_criterion.administrative_criteria.level == AdministrativeCriteriaLevel.LEVEL_1
-                        ), (
-                            f"AdministrativeCriteria pk={selected_criterion.pk} has level "
-                            f"{selected_criterion.administrative_criteria.level}."
-                        )
                     EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
 
             evaluated_siaes = EvaluatedSiae.objects.filter(pk__in=evaluated_siaes_pks).prefetch_related(
-                "evaluated_job_applications__evaluated_administrative_criteria"
+                "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
             )
             emails = []
             for evaluated_siae in evaluated_siaes:
@@ -349,7 +335,7 @@ class EvaluationCampaign(models.Model):
         auto_validation = []
         for evaluated_siae in self.evaluated_siaes.select_related(
             "evaluation_campaign__institution", "siae"
-        ).prefetch_related("evaluated_job_applications__evaluated_administrative_criteria"):
+        ).prefetch_related("evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"):
             state = evaluated_siae.state
             email_factory = SIAEEmailFactory(evaluated_siae)
             if evaluated_siae.reviewed_at is not None:
@@ -417,7 +403,9 @@ class EvaluationCampaign(models.Model):
             evaluated_siaes = (
                 EvaluatedSiae.objects.filter(evaluation_campaign=self)
                 .filter(notified_at=None)
-                .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+                .prefetch_related(
+                    "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
+                )
             )
             has_siae_to_notify = False
             siae_without_proofs = []
@@ -470,7 +458,7 @@ class EvaluationCampaign(models.Model):
             # add final_state to notified ones
             notified_evaluated_siaes = list(
                 EvaluatedSiae.objects.filter(evaluation_campaign=self, notified_at__isnull=False).prefetch_related(
-                    "evaluated_job_applications__evaluated_administrative_criteria"
+                    "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
                 )
             )
             for notified_evaluated_siae in notified_evaluated_siaes:
@@ -738,7 +726,7 @@ class EvaluatedJobApplication(models.Model):
         evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
         evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
         evaluation_enums.EvaluatedJobApplicationsState.PENDING,
-        # High priority: if at least one criteria has this state, the evaluated job application will also
+        # High priority: if at least one criterion has this state, the evaluated job application will also have it
     ]
 
     job_application = models.ForeignKey(
@@ -779,11 +767,33 @@ class EvaluatedJobApplication(models.Model):
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2: evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,  # noqa: E501
             }[criteria.review_state]
 
-        return max(
-            (state_from(criteria) for criteria in self.evaluated_administrative_criteria.all()),
+        evaluated_criteria = self.evaluated_administrative_criteria.all()
+        state = max(
+            (state_from(evaluated_criterion) for evaluated_criterion in evaluated_criteria),
             key=self.STATES_PRIORITY.index,
             default=evaluation_enums.EvaluatedJobApplicationsState.PENDING,
         )
+
+        # A job application (i.e. auto-prescription) only reaches the ACCEPTED state when each criterion is accepted
+        # (remember that ACCEPTED has the lowest priority in STATES_PRIORITY). Still being accepted is not enough:
+        # the set of accepted criteria must also satisfy the IAE eligibility rule, i.e. it must contain at least one
+        # level 1 criterion or N level 2 criteria, where N (between 2 and 3) depends on the SIAE kind.
+        # We make sure a set of accepted-but-insufficient criteria (e.g. a single certified level 2 criterion
+        # pre-created at campaign start) do not lock the evaluation: we keep it PENDING so the SIAE can add/prove any
+        # missing criteria.
+        # Note that the IAE eligibility rule only applies to IAE kinds; for other kinds the original logic applies
+        # (i.e. each criterion must be accepted for the job evaluation to be accepted).
+        if (
+            state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+            and self.evaluated_siae.siae.kind in ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND
+            and not iae_has_required_criteria(
+                [evaluated_criterion.administrative_criteria for evaluated_criterion in evaluated_criteria],
+                self.evaluated_siae.siae.kind,
+            )
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+        return state
 
     def hide_state_from_siae(self):
         """Hide in-progress evaluation from SIAE, until results are official."""
@@ -908,6 +918,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
     def can_upload(self):
         if self.evaluated_job_application.evaluated_siae.submission_freezed_at:
             return False
+        if self.criteria_certified:
+            return False  # Certified criteria do not require a proof.
         if self.submitted_at is None:
             return True
 

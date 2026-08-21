@@ -7,6 +7,7 @@ from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
@@ -134,6 +135,7 @@ class TestInstitutionEmailFactory:
             evaluated_job_application=evaluated_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
             submitted_at=timezone.now() - relativedelta(days=51),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
@@ -162,6 +164,7 @@ class TestInstitutionEmailFactory:
             evaluated_job_application=evaluated_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
             submitted_at=timezone.now() - relativedelta(days=51),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 

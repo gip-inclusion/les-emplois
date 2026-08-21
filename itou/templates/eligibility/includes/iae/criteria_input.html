@@ -7,7 +7,12 @@
 
         <label for="{{ field.id_for_label }}" class="form-check-label">
 
-            {{ field.label }}
+            <span class="d-flex gap-1">
+                {{ field.label }}
+                {% if field.name in certified_criteria_keys %}
+                    {% include "eligibility/includes/badge_certified.html" only %}
+                {% endif %}
+            </span>
 
             {% if field.help_text %}<p class="small mb-0 form-text text-muted">{{ field.help_text }}</p>{% endif %}
 
@@ -17,24 +22,30 @@
 
                 {# Weird point. Should be cleanup someday. This form uses objects_dict, despite single field is already sent #}
                 {% with objects_dict|get_dict_item:field.name as criteria %}
-                    {% if criteria.written_proof %}
+                    {% if certified_criteria_keys and field.name in certified_criteria_keys %}
                         <p class="small mb-0 form-text text-muted">
-                            <strong>Pièce justificative :</strong>
-                            <i>{{ criteria.written_proof }}</i>
+                            Ce critère étant certifié, aucun justificatif n’est demandé pour le moment.
                         </p>
-                    {% endif %}
-                    {% if criteria.written_proof_validity %}
-                        <p class="small mb-0 form-text text-muted">
-                            <strong>Durée de validité du justificatif :</strong>
-                            <i>{{ criteria.written_proof_validity }}</i>
-                        </p>
-                    {% endif %}
-                    {% if criteria.written_proof_url %}
-                        <p class="small mb-0 form-text text-muted">
-                            <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
-                                {{ criteria.written_proof_url }}
-                            </a>
-                        </p>
+                    {% else %}
+                        {% if criteria.written_proof %}
+                            <p class="small mb-0 form-text text-muted">
+                                <strong>Pièce justificative :</strong>
+                                <i>{{ criteria.written_proof }}</i>
+                            </p>
+                        {% endif %}
+                        {% if criteria.written_proof_validity %}
+                            <p class="small mb-0 form-text text-muted">
+                                <strong>Durée de validité du justificatif :</strong>
+                                <i>{{ criteria.written_proof_validity }}</i>
+                            </p>
+                        {% endif %}
+                        {% if criteria.written_proof_url %}
+                            <p class="small mb-0 form-text text-muted">
+                                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                                    {{ criteria.written_proof_url }}
+                                </a>
+                            </p>
+                        {% endif %}
                     {% endif %}
                 {% endwith %}
             {% endif %}

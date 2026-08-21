@@ -158,9 +158,21 @@ def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evalua
     if request.from_employer and not evaluation_campaign.ended_at:
         raise Http404("Campagne non terminée")
 
+    back_url = (
+        get_safe_url(
+            request,
+            "back_url",
+            fallback_url=reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
+        + f"#{evaluated_siae.pk}"
+    )
+
     context = {
         "evaluated_siae": evaluated_siae,
-        "back_url": get_safe_url(request, "back_url"),
+        "back_url": back_url,
         "campaign_closed_before_final_evaluation": (
             evaluation_campaign.ended_at and not evaluated_siae.final_reviewed_at
         ),
@@ -607,7 +619,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
         messages.success(
             request,
             mark_safe(
-                "<b>Résultats enregistrés !</b><br>Merci d'avoir pris le temps de contrôler les pièces justificatives."
+                "<b>Résultats enregistrés</b><br>Merci d'avoir pris le temps de contrôler les pièces justificatives."
             ),
         )
 
@@ -643,6 +655,7 @@ def siae_job_applications_list(
             "job_application__approval",
         )
         .prefetch_related("evaluated_administrative_criteria")
+        .order_by("job_application__job_seeker__last_name")
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
@@ -651,6 +664,7 @@ def siae_job_applications_list(
         "evaluated_siae": evaluated_siae,
         "evaluated_job_applications": evaluated_job_applications,
         "is_submittable": evaluated_siae.can_submit,
+        "proofs_submitted": evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTED,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -676,15 +690,23 @@ def siae_select_criteria(
     ):
         return HttpResponseForbidden()
     eligibility_diagnosis = evaluated_job_application.job_application.eligibility_diagnosis
+    # As a reminder, form checkboxes map to the set of administrative criteria declared at hiring, i.e. the only ones
+    # that can be justified. Evaluated criteria objects only carry the control state and the `criteria_certified` flag
+    # used to pre-check and lock the certified criteria.
     job_application_administrative_criteria = eligibility_diagnosis.selected_administrative_criteria.all()
+    certified_criteria_keys = {
+        eval_criterion.administrative_criteria.key
+        for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
+        if eval_criterion.criteria_certified
+    }
     initial_data = {
         eval_criterion.administrative_criteria.key: True
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
     }
-
     form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
         siae=siae,
         job_app_selected_administrative_criteria=job_application_administrative_criteria,
+        certified_criteria_keys=certified_criteria_keys,
         data=request.POST or None,
         initial=initial_data,
     )
@@ -726,6 +748,7 @@ def siae_select_criteria(
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
+        "certified_criteria_keys": certified_criteria_keys,
         "kind": siae.kind,
         "back_url": back_url,
         "matomo_custom_title": "Contrôle a posteriori : sélection des critères",
@@ -818,7 +841,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     messages.success(
         request,
         (
-            "Justificatifs transmis !||Leur contrôle est à la charge de votre DDETS."
+            "Justificatifs transmis||Leur contrôle est à la charge de votre DDETS. "
             "Une fois finalisée, vous serez notifié du résultat par email."
         ),
         extra_tags="toast",

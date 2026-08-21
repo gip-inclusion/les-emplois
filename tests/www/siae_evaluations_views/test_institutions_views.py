@@ -11,7 +11,6 @@ from django.utils import dateformat, timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -542,7 +541,10 @@ class TestInstitutionEvaluatedSiaeListView:
             for_snapshot=True,
         )
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
+        EvaluatedAdministrativeCriteriaFactory.create(
+            evaluated_job_application=evaluated_job_app,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+        )
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -714,8 +716,8 @@ class TestInstitutionEvaluatedSiaeDetailView:
         "<b>le résultat du contrôle est négatif</b>."
     )
     certified_text = (
-        "Cette auto-prescription répond à un critère de niveau 1 certifié. "
-        "Aucun justificatif n’est demandé pour le moment."
+        "Cette auto-prescription répond à un ou plusieurs critères certifiés, qui suffisent à justifier l’éligibilité "
+        "du salarié. Aucun justificatif complémentaire n’est demandé pour le moment."
     )
 
     @pytest.fixture(autouse=True)
@@ -1033,14 +1035,17 @@ class TestInstitutionEvaluatedSiaeDetailView:
             <button class="btn btn-primary">
                 {self.submit_text}
             </button>"""
-        back_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        back_url = (
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+            + f"#{evaluated_siae.pk}"
         )
 
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1077,7 +1082,6 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
         assertContains(response, uploaded_status)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
@@ -1347,14 +1351,17 @@ class TestInstitutionEvaluatedSiaeDetailView:
             <button class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
-        back_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        back_url = (
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+            + f"#{evaluated_siae.pk}"
         )
 
         # EvaluatedAdministrativeCriteria not yet submitted
         not_transmitted_status = "Justificatifs non transmis"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1381,7 +1388,6 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
         assertContains(
             response,
             f"""
@@ -1561,6 +1567,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
             submitted_at=timezone.now() - relativedelta(days=1),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         client.force_login(self.user)
@@ -3079,6 +3086,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             evaluated_job_application=accepted_job_application,
             proof=FileFactory(),
             submitted_at=timezone.now(),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
@@ -4262,7 +4270,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    "<b>Résultats enregistrés !</b><br>"
+                    "<b>Résultats enregistrés</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],
@@ -4285,7 +4293,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    "<b>Résultats enregistrés !</b><br>"
+                    "<b>Résultats enregistrés</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],

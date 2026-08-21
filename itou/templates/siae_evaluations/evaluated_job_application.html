@@ -2,6 +2,7 @@
 
 {% load components %}
 {% load django_bootstrap5 %}
+{% load format_filters %}
 {% load str_filters %}
 {% load support %}
 
@@ -11,13 +12,24 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block title_content_wrapper %}{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
+                    <p class="h2 mb-0">
+                        Auto-prescription de {{ evaluated_siae }} ({{ evaluated_siae.siae.kind }} - {{ evaluated_siae.siae.get_kind_display }})
+                    </p>
+                    <p>
+                        Numéro de téléphone à utiliser au besoin :
+                        {% if evaluated_siae.siae.phone %}
+                            <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
+                                {{ evaluated_siae.siae.phone|format_phone }}
+                            </a>
+                        {% else %}
+                            <span>Non renseigné</span>
+                        {% endif %}
+                    </p>
                     <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                         <div class="c-box--results__header">
                             {% include "siae_evaluations/includes/job_seeker_infos.html" with request=request evaluated_job_application=evaluated_job_application only %}
