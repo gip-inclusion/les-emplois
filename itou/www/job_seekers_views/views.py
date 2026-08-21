@@ -495,7 +495,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             last_assignment.advisor,
             last_assignment.organization,
         )
-        job_seeker.user_is_advisor = request.user.pk in job_seeker.advisors
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
