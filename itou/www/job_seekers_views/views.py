@@ -24,11 +24,12 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.models import Company, Contract
+from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
@@ -186,26 +187,10 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
-        # Last advisor context
-        professional, organization = self.request.user, self.request.current_organization
-        last_assignment = self.object.last_assignment
-        is_last_known_advisor = last_assignment and (professional, organization) == (
-            last_assignment.advisor,
-            last_assignment.organization,
-        )
-        is_advisor = (
-            is_last_known_advisor
-            or JobSeekerAssignment.objects.assigned_to(professional, organization)
-            .filter(job_seeker=self.object)
-            .exists()
-        )
-
         return context | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
-            "is_last_known_advisor": is_last_known_advisor,
-            "is_advisor": is_advisor,
         }
 
 
@@ -274,6 +259,77 @@ class ContractsTabView(BaseJobSeekerDetailView):
         }
 
 
+class AdvisorsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/advisors.html"
+
+    def get_context_data(self, **kwargs):
+        assignments = list(
+            JobSeekerAssignment.objects.filter(job_seeker=self.object)
+            .select_related("professional", "company", "prescriber_organization")
+            .order_by(
+                "-ended_at",  # ended assignments are sorted by ended_at field,
+                "-updated_at",  # ongoing assignments are sorted by updated_at
+            )
+        )
+
+        if employers_data := [
+            (assignment.professional_id, assignment.company_id) for assignment in assignments if assignment.company
+        ]:
+            employers_ids, companies_ids = zip(*employers_data)
+            companies_memberships = set(
+                (membership.user_id, membership.company_id)
+                for membership in CompanyMembership.objects.filter(
+                    user__in=employers_ids,
+                    company__in=companies_ids,
+                )
+            )
+        else:
+            companies_memberships = []
+
+        if prescribers_data := [
+            (assignment.professional_id, assignment.prescriber_organization_id)
+            for assignment in assignments
+            if assignment.prescriber_organization
+        ]:
+            prescribers_ids, organizations_ids = zip(*prescribers_data)
+            prescribers_memberships = set(
+                (membership.user_id, membership.organization_id)
+                for membership in PrescriberMembership.objects.filter(
+                    user__in=prescribers_ids,
+                    organization__in=organizations_ids,
+                )
+            )
+        else:
+            prescribers_memberships = []
+
+        active_assignments = []
+        ended_assignments = []
+        for assignment in assignments:
+            # Fill is_still_member
+            if assignment.company:
+                assignment.is_still_member = (
+                    assignment.professional_id,
+                    assignment.company_id,
+                ) in companies_memberships
+            elif assignment.prescriber_organization:
+                assignment.is_still_member = (
+                    assignment.professional_id,
+                    assignment.prescriber_organization_id,
+                ) in prescribers_memberships
+            else:
+                assignment.is_still_member = False
+            # Split ended and ongoing assignmnts
+            if assignment.ended_at:
+                ended_assignments.append(assignment)
+            else:
+                active_assignments.append(assignment)
+
+        return super().get_context_data(**kwargs) | {
+            "active_assignments": active_assignments,
+            "ended_assignments": ended_assignments,
+        }
+
+
 def can_see_external_job_applications(job_seeker, request):
     if not request.from_authorized_prescriber:
         return False
@@ -328,7 +384,7 @@ def switch_stalled_status(request, public_id):
 
 @http_methods(db_write=["POST"])
 @check_request(lambda request: request.from_prescriber or request.from_employer)
-def assign_oneself_as_last_known_advisor(request, public_id):
+def assign_oneself_as_last_advisor(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER),
         public_id=public_id,
@@ -382,6 +438,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
         advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
     )
+    # FIXME(advisors) Don't count ended assignments
+    # FIXME(advisors) We should still count when assigned_to_unknown_advisor.
+    # If we have a jobseeker with 3 assignments from the same professionnal on 3 companies, but with one assigned to
+    # unknown advisorwe need to tell the job seeker is followed by 2 advisors
+    # If the job seeker has 2 assignments on unknown advisors, the count should be 2.
 
     form = FilterForm(
         queryset,
@@ -430,11 +491,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization
         last_assignment = job_seeker.last_assignment
-        job_seeker.user_is_last_known_advisor = last_assignment and (professional, organization) == (
+        job_seeker.user_is_last_advisor = last_assignment and (professional, organization) == (
             last_assignment.advisor,
             last_assignment.organization,
         )
-        job_seeker.user_is_advisor = request.user.pk in job_seeker.advisors
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
@@ -1606,9 +1666,12 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
 def display_advisor_contact_info(
     request, assignment_id, mode, template_name="job_seekers_views/includes/display_contact_info.html"
 ):
+    # FIXME(advisors) Check it's allowed to display this mode for this assignment.
     getter = {
         "email": lambda assignment: assignment.advisor.email,
         "phone": lambda assignment: assignment.advisor.phone,
+        "org_email": lambda assignment: assignment.organization.email,
+        "org_phone": lambda assignment: assignment.organization.phone,
     }.get(mode)
     if not getter:
         raise ValueError(f"Invalid mode: {mode}")

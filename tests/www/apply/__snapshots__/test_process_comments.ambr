@@ -411,30 +411,39 @@
                                       </li>
                                   </ul>
                               </div>
-                              <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <div class="row mb-3">
-                                      <div class="col-12 col-sm">
-                                          <h3 class="mb-0">
-                                              Dernier accompagnateur connu
-                                          </h3>
-                                      </div>
-                                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                          <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/11111111-1111-1111-1111-111111111111/siae/details" method="post">
-                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                              <button class="btn btn-outline-primary" type="submit">
-                                                  M'ajouter en tant qu'accompagnateur
-                                              </button>
-                                          </form>
-                                      </div>
-                                  </div>
-                                  <div class="fs-sm" id="card-no-referent">
-                                      <i>
-                                          L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                      </i>
-                                  </div>
-                              </div>
                           </div>
                           <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <div class="d-flex gap-2 justify-content-between mb-3">
+                                      <h3 class="mb-0">
+                                          Dernier accompagnateur
+                                      </h3>
+                                      <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Voir tout
+                                      </a>
+                                  </div>
+                                  <div class="c-box--accompagnateur__summary">
+                                      <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                      </i>
+                                      <div>
+                                          <span class="d-block h5 disabled">
+                                              Accompagnateur non renseigné
+                                          </span>
+                                          <span class="d-block mb-1 disabled">
+                                              Aucune structure associée
+                                          </span>
+                                      </div>
+                                  </div>
+                                  <div class="c-box--accompagnateur__detail">
+                                      <hr class="mt-4 mb-3"/>
+                                      <p class="mb-0">
+                                          Vous intervenez sur le parcours de cet usager ?
+                                          <a class="btn-link" href="">
+                                              Ajoutez votre intervention
+                                          </a>
+                                      </p>
+                                  </div>
+                              </div>
                               <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
                                   <form class="js-prevent-multiple-submit" hx-indicator="#comments-add-sidebar" hx-post="/apply/11111111-1111-1111-1111-111111111111/siae/comment" hx-swap="outerHTML" hx-target="#comments-add-sidebar" hx-vals='{"location": "sidebar"}'>
                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -1252,7 +1261,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -2484,153 +2493,6 @@
       }),
       dict({
         'origin': list([
-          'User.last_assignment[users/models.py]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerassignment"."id",
-                 "users_jobseekerassignment"."created_at",
-                 "users_jobseekerassignment"."updated_at",
-                 "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."professional_id",
-                 "users_jobseekerassignment"."prescriber_organization_id",
-                 "users_jobseekerassignment"."company_id",
-                 "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
-                 "prescribers_prescriberorganization"."id",
-                 "prescribers_prescriberorganization"."address_line_1",
-                 "prescribers_prescriberorganization"."address_line_2",
-                 "prescribers_prescriberorganization"."post_code",
-                 "prescribers_prescriberorganization"."city",
-                 "prescribers_prescriberorganization"."department",
-                 "prescribers_prescriberorganization"."coords",
-                 "prescribers_prescriberorganization"."geocoding_score",
-                 "prescribers_prescriberorganization"."geocoding_updated_at",
-                 "prescribers_prescriberorganization"."ban_api_resolved_address",
-                 "prescribers_prescriberorganization"."insee_city_id",
-                 "prescribers_prescriberorganization"."name",
-                 "prescribers_prescriberorganization"."created_at",
-                 "prescribers_prescriberorganization"."updated_at",
-                 "prescribers_prescriberorganization"."uid",
-                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                 "prescribers_prescriberorganization"."automatic_geocoding_update",
-                 "prescribers_prescriberorganization"."siret",
-                 "prescribers_prescriberorganization"."kind",
-                 "prescribers_prescriberorganization"."is_brsa",
-                 "prescribers_prescriberorganization"."phone",
-                 "prescribers_prescriberorganization"."email",
-                 "prescribers_prescriberorganization"."website",
-                 "prescribers_prescriberorganization"."description",
-                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                 "prescribers_prescriberorganization"."created_by_id",
-                 "prescribers_prescriberorganization"."authorization_status",
-                 "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
-                 "companies_company"."id",
-                 "companies_company"."fields_history",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."spontaneous_applications_open_since",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
-          FROM "users_jobseekerassignment"
-          INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
-                 AND T3."is_active")
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_jobseekerassignment"
-          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
-                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
-                   AND "users_jobseekerassignment"."professional_id" = %s)
-                  OR ("users_jobseekerassignment"."company_id" = %s
-                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
-                      AND "users_jobseekerassignment"."professional_id" = %s))
-                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -2750,6 +2612,143 @@
                                                                      %s,
                                                                      %s))
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."fields_history",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."terms_accepted_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "users_jobseekerassignment"
+          INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({

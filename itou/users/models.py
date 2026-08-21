@@ -35,14 +35,16 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.models import Company
+from itou.companies.models import Company, CompanyMembership
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
+    AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
+    JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
     Title,
@@ -755,9 +757,9 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         if "job_seeker_assignments" in getattr(self, "_prefetched_objects_cache", []):
             # The data was already prefetched, hopefully with the related data (users, organizations)
             # Filter in python to allow to easily prefetch in calling views
-            assignments = list(filter(lambda obj: obj.professional.is_active, self.job_seeker_assignments.all()))
+            assignments = self.job_seeker_assignments.all()
         else:
-            assignments = self.job_seeker_assignments.filter(professional__is_active=True).select_related(
+            assignments = self.job_seeker_assignments.select_related(
                 "professional", "prescriber_organization", "company"
             )
         if assignments:
@@ -1610,7 +1612,8 @@ class JobSeekerAssignmentManager(models.Manager):
     def upsert_assignment(
         self, job_seeker, professional, organization, last_action_kind, assigned_to_unknown_advisor=False
     ):
-        assert job_seeker.is_job_seeker
+        assert job_seeker is not None and job_seeker.is_job_seeker
+        assert professional is not None
         if not professional.is_professional:
             # This should not happen but we don't want to block everything
             logger.error("We should not try to add a JobSeekerAssignment on user=%s", professional.pk)
@@ -1627,15 +1630,16 @@ class JobSeekerAssignmentManager(models.Manager):
             company=company,
             last_action_kind=last_action_kind,
             assigned_to_unknown_advisor=assigned_to_unknown_advisor,
+            ended_at=None,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
             update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
-            unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
+            unique_fields=["job_seeker", "professional", "prescriber_organization", "company", "ended_at"],
         )
 
-    def assigned_to(self, professional, organization, from_all_coworkers=False):
+    def assigned_to(self, professional, organization, from_all_coworkers=False, archived=None):
         filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
         if organization:
             prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
@@ -1647,7 +1651,14 @@ class JobSeekerAssignmentManager(models.Manager):
                     Q(professional=professional, prescriber_organization=prescriber_organization, company=company)
                 )
 
-        return JobSeekerAssignment.objects.filter(or_queries(filters))
+        qs = JobSeekerAssignment.objects.filter(or_queries(filters))
+
+        match archived:
+            case True:
+                qs.exclude(ended_at=None)
+            case False:
+                qs.filter(ended_at=None)
+        return qs
 
 
 class JobSeekerAssignment(models.Model):
@@ -1696,6 +1707,15 @@ class JobSeekerAssignment(models.Model):
         default=False,
     )
 
+    reason = models.TextField(blank=True, verbose_name="motif d'accompagnement")
+    ended_at = models.DateTimeField(verbose_name="date de fin d'accompagnement", null=True, blank=True)
+    end_reason = models.CharField(
+        verbose_name="motif de fin",
+        null=True,
+        blank=True,
+        choices=AssignmentEndReason.choices,
+    )
+
     objects = JobSeekerAssignmentManager()
 
     class Meta:
@@ -1703,9 +1723,13 @@ class JobSeekerAssignment(models.Model):
         verbose_name_plural = "affectations candidats"
         ordering = ["-updated_at"]
         constraints = [
+            # NB: the clean way would be to add condition=Q(ended_at=None) instead of
+            # putting ended_at in fields, but this is not compatible with the bulk_create
+            # used in upsert_assignments.
+            # FIXME: Change the condition when https://code.djangoproject.com/ticket/34277 is available
             models.UniqueConstraint(
                 name="unique_%(class)s_assignment_per_jobseeker",
-                fields=["job_seeker", "professional", "prescriber_organization", "company"],
+                fields=["job_seeker", "professional", "prescriber_organization", "company", "ended_at"],
                 nulls_distinct=False,
                 violation_error_message=(
                     "Une affectation existe déjà entre le candidat, le prescripteur "
@@ -1729,6 +1753,14 @@ class JobSeekerAssignment(models.Model):
                     "si elle est liée à un accompagnateur non référencé sur le service."
                 ),
             ),
+            models.CheckConstraint(
+                name="assignment_end_coherence",
+                violation_error_message="Incohérence du champ motif de fin",
+                condition=(
+                    models.Q(ended_at=None, end_reason=None)
+                    | models.Q(ended_at__isnull=False, end_reason__isnull=False)
+                ),
+            ),
         ]
 
     def __str__(self):
@@ -1747,3 +1779,32 @@ class JobSeekerAssignment(models.Model):
         if self.assigned_to_unknown_advisor:
             return None
         return self.professional
+
+    @cached_property
+    def is_still_member(self):
+        # This property can be overridden in a query set by setting it directly (assignment.is_still_member = bool)
+        if self.company:
+            return CompanyMembership.objects.filter(
+                user=self.professional,
+                company=self.company,
+            ).exists()
+        if self.prescriber_organization:
+            return PrescriberMembership.objects.filter(
+                user=self.professional,
+                organization=self.prescriber_organization,
+            ).exists()
+        return False
+
+    @property
+    def display_mode(self):
+        if self.assigned_to_unknown_advisor:
+            return JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+        if self.professional.is_active:
+            if self.organization:
+                if self.is_still_member:
+                    return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP
+                return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP
+            return JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG
+        if self.organization:
+            return JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
+        return JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG

@@ -479,7 +479,7 @@ class TestStandaloneCreateAsPrescriber:
         )
 
     @pytest.mark.parametrize(
-        "list_view,in_list,is_last_known_advisor",
+        "list_view,in_list,is_last_advisor",
         [
             pytest.param("list", False, False, id="jobseeker_not_in_user_list"),
             pytest.param("list", True, False, id="jobseeker_in_user_list"),
@@ -490,8 +490,8 @@ class TestStandaloneCreateAsPrescriber:
         ],
     )
     @pytest.mark.parametrize("check_nir", [True, False])
-    def test_standalone_creation_as_prescriber_last_known_advisor(
-        self, client, list_view, in_list, is_last_known_advisor, check_nir
+    def test_standalone_creation_as_prescriber_last_advisor(
+        self, client, list_view, in_list, is_last_advisor, check_nir
     ):
         from_url = reverse(f"job_seekers_views:{list_view}")
         prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
@@ -504,7 +504,7 @@ class TestStandaloneCreateAsPrescriber:
         if in_list:
             existing_assignment = JobSeekerAssignmentFactory(
                 job_seeker=job_seeker,
-                professional=user if is_last_known_advisor else other_user,
+                professional=user if is_last_advisor else other_user,
                 prescriber_organization=prescriber_organization,
             )
 
@@ -533,7 +533,7 @@ class TestStandaloneCreateAsPrescriber:
         last_assignment = job_seeker.last_assignment
         if in_list:
             # User was already the last known advisor of the job seeker,
-            if is_last_known_advisor:
+            if is_last_advisor:
                 assert last_assignment.advisor == existing_assignment.professional
                 assert last_assignment.prescriber_organization == existing_assignment.prescriber_organization
                 assert last_assignment.company == existing_assignment.company

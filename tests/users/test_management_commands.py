@@ -20,7 +20,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
+from itou.users.enums import AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.models import NirModificationRequest, User
 from itou.utils import triggers
@@ -37,7 +37,7 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import EmployerFactory, JobSeekerAssignmentFactory, JobSeekerFactory, LaborInspectorFactory
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -1578,3 +1578,27 @@ class TestAutoAttributeCompanyAdmins:
         email = mailoutbox[0]
         assert email.subject == snapshot(name="auto_admin_attribution email subject")
         assert email.body == snapshot(name="auto_admin_attribution email body")
+
+
+@freeze_time("2025-03-25")
+def test_archive_old_assignments_command():
+    old_assignment = JobSeekerAssignmentFactory(updated_at=datetime.datetime(2023, 3, 24, tzinfo=datetime.UTC))
+    active_assignment = JobSeekerAssignmentFactory()
+    old_ended_at = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
+    ended_assignment = JobSeekerAssignmentFactory(
+        ended_at=old_ended_at,
+        end_reason=AssignmentEndReason.MANUAL,
+    )
+    call_command("archive_old_assignments")
+
+    old_assignment.refresh_from_db()
+    assert old_assignment.ended_at == timezone.now()
+    assert old_assignment.end_reason == AssignmentEndReason.AUTOMATIC
+
+    active_assignment.refresh_from_db()
+    assert active_assignment.ended_at is None
+    assert active_assignment.end_reason is None
+
+    ended_assignment.refresh_from_db()
+    assert ended_assignment.ended_at == old_ended_at
+    assert ended_assignment.end_reason == AssignmentEndReason.MANUAL

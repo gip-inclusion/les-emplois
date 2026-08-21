@@ -1,0 +1,125 @@
+{% load components %}
+{% load enums %}
+
+{% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
+
+
+<div id="last-advisor-{{ job_seeker.public_id }}" class="c-box c-box--accompagnateur mb-3 mb-md-4">
+    <div class="d-flex gap-2 justify-content-between mb-3">
+        <h3 class="mb-0">Dernier accompagnateur</h3>
+        {% if has_access_to_assignments %}
+            <a href="{% url 'job_seekers_views:advisors' job_seeker.public_id %}" class="btn-link" aria-label="Voir tout les accompagnateurs">Voir tout</a>
+        {% endif %}
+    </div>
+    {% with assignment=job_seeker.last_assignment %}
+        <div class="c-box--accompagnateur__summary">
+
+            {% if not assignment %}
+                <i class="ri-home-smile-line disabled" aria-hidden="true"></i>
+                <div>
+                    <span class="d-block h5 disabled">Accompagnateur non renseigné</span>
+                    <span class="d-block mb-1 disabled">Aucune structure associée</span>
+                </div>
+            {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+                <i class="{{ assignment.organization.icon }}" aria-hidden="true"></i>
+                <div>
+                    {% if assignment.professional_id == request.user.pk %}
+                        <span class="h5">{{ assignment.professional.get_full_name }}</span>
+                        <span class="badge badge-xs rounded-pill bg-info-light text-info">c’est vous</span>
+                    {% else %}
+                        <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
+                    {% endif %}
+                    <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
+                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                </div>
+            {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
+                <i class="ri-user-line" aria-hidden="true"></i>
+                <div>
+                    <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
+                    <span class="d-block mb-1 disabled">Aucune structure associée</span>
+                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                </div>
+            {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR %}
+                <i class="{{ assignment.organization.icon }} disabled" aria-hidden="true"></i>
+                <div>
+                    <span class="d-block h5 disabled">Accompagnateur non renseigné</span>
+                    <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
+                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                </div>
+            {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG %}
+                <i class="{{ assignment.organization.icon }} disabled" aria-hidden="true"></i>
+                <div>
+                    <span class="d-block h5 disabled">Accompagnateur non renseigné</span>
+                    <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
+                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                </div>
+            {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG %}
+                <i class="ri-user-line disabled" aria-hidden="true"></i>
+                <div>
+                    <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
+                    <span class="d-block mb-1 disabled">Aucune structure associée</span>
+                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="c-box--accompagnateur__detail">
+            {% if assignment %}
+                {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR %}
+                    {% component_alert content=content variant="info" extra_classes="mt-3" %}
+                        {% fragment as content %}
+                            <p class="mb-0">Cet accompagnement a été renseigné par une personne ne suivant plus cet usager : aucune personne n'y est associée.</p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+                    {% component_alert content=content variant="info" extra_classes="mt-3" %}
+                        {% fragment as content %}
+                            <p class="mb-0">{{ assignment.professional.get_full_name }} ne fait plus partie de {{ assignment.organization.display_name }}.</p>
+                            <p class="btn-link">Contactez l'accompagnateur</p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG %}
+                    {% component_alert content=content variant="warning" extra_classes="mt-3" %}
+                        {% fragment as content %}
+                            <p class="mb-0">Cette personne ne fait plus partie de la structure.</p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% endif %}
+
+                {% if assignment.advisor != request.user.pk %}
+                    <form id="display-contact-info-form">
+                        {% csrf_token %}{# Used by htmx posts #}
+                    </form>
+                    {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
+                        {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                        {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                    {% elif assignment.organization %}
+                        {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+                            <span>Ou contactez la structure</span>
+                        {% else %}
+                            <span>Contactez la structure</span>
+                        {% endif %}
+                        {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                        {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                    {% endif %}
+                {% else %}
+                    {# FIXME: Add links/actions #}
+                    {% comment %}
+                    <a href="" class="btn btn-ico btn-block btn-secondary mb-2">
+                        <i class="ri-pencil-line"></i>
+                        <span>Modifier mon accompagnement</span>
+                    </a>
+                    <a href="" class="btn btn-ico btn-block btn-outline-primary">
+                        <i class="ri-stop-circle-line"></i>
+                        <span>Terminer mon accompagnement</span>
+                    </a>
+                    {% endcomment %}
+                {% endif %}
+            {% elif has_access_to_assignments %}
+                <hr class="mt-4 mb-3">
+                {# FIXME: Add links/actions #}
+                <p class="mb-0">Vous intervenez sur le parcours de cet usager ? <a href="" class="btn-link">Ajoutez votre intervention</a></p>
+            {% endif %}
+        </div>
+    {% endwith %}
+</div>

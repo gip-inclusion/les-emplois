@@ -1,0 +1,30 @@
+{% load matomo %}
+
+{% if value %}
+    <button class="btn btn-ico btn-block btn-outline-primary mt-3"
+            id="{{ mode }}-{{ assignment.pk }}"
+            hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk mode %}"
+            hx-swap="outerHTML"
+            hx-include="#display-contact-info-form"
+            {% matomo_event "advisors" "clic" "displayed_advisor_"|add:mode %}>
+        <div class="stable-text">
+            {% if "email" in mode %}
+                <i class="ri-mail-line" aria-hidden="true"></i>
+                <span>Envoyer un email</span>
+            {% else %}
+                <i class="ri-phone-line" aria-hidden="true"></i>
+                <span>Appeler</span>
+            {% endif %}
+        </div>
+        <div class="loading-text">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Affichage en cours</span>
+        </div>
+    </button>
+{% else %}
+    {# It may only be the phone number #}
+    <div class="btn btn-block btn-ico btn-outline-primary disabled mt-3">
+        <i class="ri-phone-line" aria-hidden="true"></i>
+        <span>Téléphone non renseigné</span>
+    </div>
+{% endif %}
