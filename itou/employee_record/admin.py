@@ -132,6 +132,7 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     form = EmployeeRecordAdminForm
+    list_select_related = ["job_application__job_seeker"]
 
     @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
     def schedule_approval_update_notification(self, request, queryset):
@@ -164,6 +165,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "created_at",
         "updated_at",
         "approval_number",
+        "employee_full_name",
         "siret",
         "asp_processing_code",
         "status",
@@ -261,6 +263,10 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     )
 
     change_form_template = "admin/employee_records/employeerecord_change_form.html"
+
+    @admin.display(description="Nom")
+    def employee_full_name(self, obj):
+        return obj.job_application.job_seeker.get_full_name()
 
     @admin.display(description="numéro d'agrément")
     def approval_number_link(self, obj):
