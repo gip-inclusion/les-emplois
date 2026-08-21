@@ -355,11 +355,11 @@ class JobSeekerFactory(UserFactory):
         if extracted:
             if self.created_by:
                 JobSeekerAssignmentFactory(
-                    updated_at=self.date_joined,
                     job_seeker=self,
                     professional=self.created_by,
                     prescriber_organization=self.jobseeker_profile.created_by_prescriber_organization,
                     last_action_kind=ActionKind.CREATE,
+                    last_action_at=self.date_joined,
                 )
 
 

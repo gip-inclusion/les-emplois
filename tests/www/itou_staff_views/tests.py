@@ -1007,7 +1007,7 @@ class TestMergeUsers:
         assert updated_assignment_1.prescriber_organization is None
         assert updated_assignment_1.last_action_kind == assignment_1.last_action_kind
         assert updated_assignment_1.created_at == assignment_1.created_at
-        assert updated_assignment_1.updated_at == assignment_1.updated_at
+        assert updated_assignment_1.last_action_at == assignment_1.last_action_at
 
         updated_assignment_2_to_user = JobSeekerAssignment.objects.get(pk=assignment_2_to_user.pk)
         assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
@@ -1017,20 +1017,22 @@ class TestMergeUsers:
             updated_assignment_2_to_user.last_action_kind == assignment_2_to_user.last_action_kind
         )  # assignment_2_to_user was last updated, take its last_action_kind
         assert updated_assignment_2_to_user.created_at == min(assignment_2.created_at, assignment_2_to_user.created_at)
-        assert updated_assignment_2_to_user.updated_at == max(assignment_2.updated_at, assignment_2_to_user.updated_at)
+        assert updated_assignment_2_to_user.last_action_at == max(
+            assignment_2.last_action_at, assignment_2_to_user.last_action_at
+        )
 
         updated_assignment_3_to_user = JobSeekerAssignment.objects.get(pk=assignment_3_to_user.pk)
         assert updated_assignment_3_to_user.professional == prescriber_1
         assert updated_assignment_3_to_user.last_action_kind == assignment_3.last_action_kind
         assert updated_assignment_3_to_user.created_at == assignment_3_to_user.created_at
-        assert updated_assignment_3_to_user.updated_at == assignment_3.updated_at
+        assert updated_assignment_3_to_user.last_action_at == assignment_3.last_action_at
 
         updated_assignment_4 = JobSeekerAssignment.objects.get(pk=assignment_4.pk)
         assert updated_assignment_4.professional == prescriber_1
         assert updated_assignment_4.prescriber_organization == org
         assert updated_assignment_4.last_action_kind == assignment_4.last_action_kind
         assert updated_assignment_4.created_at == assignment_4.created_at
-        assert updated_assignment_4.updated_at == assignment_4.updated_at
+        assert updated_assignment_4.last_action_at == assignment_4.last_action_at
 
         updated_assignment_5 = JobSeekerAssignment.objects.get(pk=assignment_5.pk)
         updated_assignment_5_to_user = JobSeekerAssignment.objects.get(pk=assignment_5_to_user.pk)
@@ -1038,19 +1040,19 @@ class TestMergeUsers:
         assert updated_assignment_5.prescriber_organization == org
         assert updated_assignment_5.last_action_kind == assignment_5.last_action_kind
         assert updated_assignment_5.created_at == assignment_5.created_at
-        assert updated_assignment_5.updated_at == assignment_5.updated_at
+        assert updated_assignment_5.last_action_at == assignment_5.last_action_at
         assert updated_assignment_5_to_user.professional == prescriber_1
         assert updated_assignment_5_to_user.prescriber_organization is None
         assert updated_assignment_5_to_user.last_action_kind == assignment_5_to_user.last_action_kind
         assert updated_assignment_5_to_user.created_at == assignment_5_to_user.created_at
-        assert updated_assignment_5_to_user.updated_at == assignment_5_to_user.updated_at
+        assert updated_assignment_5_to_user.last_action_at == assignment_5_to_user.last_action_at
 
         updated_assignment_6 = JobSeekerAssignment.objects.get(pk=assignment_6.pk)
         assert updated_assignment_6.professional == prescriber_1
         assert updated_assignment_6.company == company
         assert updated_assignment_6.last_action_kind == assignment_6.last_action_kind
         assert updated_assignment_6.created_at == assignment_6.created_at
-        assert updated_assignment_6.updated_at == assignment_6.updated_at
+        assert updated_assignment_6.last_action_at == assignment_6.last_action_at
 
         updated_assignment_7 = JobSeekerAssignment.objects.get(pk=assignment_7.pk)
         updated_assignment_7_to_user = JobSeekerAssignment.objects.get(pk=assignment_7_to_user.pk)
@@ -1058,12 +1060,12 @@ class TestMergeUsers:
         assert updated_assignment_7.prescriber_organization == org
         assert updated_assignment_7.last_action_kind == assignment_7.last_action_kind
         assert updated_assignment_7.created_at == assignment_7.created_at
-        assert updated_assignment_7.updated_at == assignment_7.updated_at
+        assert updated_assignment_7.last_action_at == assignment_7.last_action_at
         assert updated_assignment_7_to_user.professional == prescriber_1
         assert updated_assignment_7_to_user.company == company
         assert updated_assignment_7_to_user.last_action_kind == assignment_7_to_user.last_action_kind
         assert updated_assignment_7_to_user.created_at == assignment_7_to_user.created_at
-        assert updated_assignment_7_to_user.updated_at == assignment_7_to_user.updated_at
+        assert updated_assignment_7_to_user.last_action_at == assignment_7_to_user.last_action_at
 
         assert caplog.messages == [
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "

@@ -761,7 +761,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 "professional", "prescriber_organization", "company"
             )
         if assignments:
-            last_assignment = sorted(assignments, key=lambda j: j.updated_at, reverse=True)[0]
+            last_assignment = sorted(assignments, key=lambda j: j.last_action_at, reverse=True)[0]
             return last_assignment
         return None
 

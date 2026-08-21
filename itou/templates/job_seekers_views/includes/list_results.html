@@ -21,7 +21,7 @@
                     <tr>
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.FULL_NAME_ASC name="Nom Prénom" only %}
                         {% if request.from_iae_actor %}<th scope="col">Situation IAE</th>{% endif %}
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière action" only %}
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_ACTION_AT_ASC name="Dernière action" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nbr de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d'accompagnateurs" only %}
                         <th scope="col">Dernier accompagnateur connu</th>
@@ -54,7 +54,7 @@
                                     </div>
                                 </td>
                             {% endif %}
-                            <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
+                            <td>{{ job_seeker.last_action_at|date:"d/m/Y" }}</td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.advisors|length }}</td>
                             <td>
