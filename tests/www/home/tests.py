@@ -15,4 +15,5 @@ def test_home_logged_in(client):
     client.force_login(PrescriberFactory(membership=True))
     url = reverse("home:hp")
     response = client.get(url, follow=True)
+    assertRedirects(response, reverse("dashboard:index"))
     assertContains(response, "Rechercher un emploi inclusif")
