@@ -411,30 +411,39 @@
                                       </li>
                                   </ul>
                               </div>
-                              <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <div class="row mb-3">
-                                      <div class="col-12 col-sm">
-                                          <h3 class="mb-0">
-                                              Dernier accompagnateur connu
-                                          </h3>
-                                      </div>
-                                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                          <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/11111111-1111-1111-1111-111111111111/siae/details" method="post">
-                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                              <button class="btn btn-outline-primary" type="submit">
-                                                  M'ajouter en tant qu'accompagnateur
-                                              </button>
-                                          </form>
-                                      </div>
-                                  </div>
-                                  <div class="fs-sm" id="card-no-referent">
-                                      <i>
-                                          L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                      </i>
-                                  </div>
-                              </div>
                           </div>
                           <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <div class="d-flex gap-2 justify-content-between mb-3">
+                                      <h3 class="mb-0">
+                                          Dernier accompagnateur
+                                      </h3>
+                                      <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Voir tout
+                                      </a>
+                                  </div>
+                                  <div class="c-box--accompagnateur__summary">
+                                      <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                      </i>
+                                      <div>
+                                          <span class="d-block h5 disabled">
+                                              Accompagnateur non renseigné
+                                          </span>
+                                          <span class="d-block mb-1 disabled">
+                                              Aucune structure associée
+                                          </span>
+                                      </div>
+                                  </div>
+                                  <div class="c-box--accompagnateur__detail">
+                                      <hr class="mt-4 mb-3"/>
+                                      <p class="mb-0">
+                                          Vous intervenez sur le parcours de cet usager ?
+                                          <a class="btn-link" href="">
+                                              Ajoutez votre intervention
+                                          </a>
+                                      </p>
+                                  </div>
+                              </div>
                               <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
                                   <form class="js-prevent-multiple-submit" hx-indicator="#comments-add-sidebar" hx-post="/apply/11111111-1111-1111-1111-111111111111/siae/comment" hx-swap="outerHTML" hx-target="#comments-add-sidebar" hx-vals='{"location": "sidebar"}'>
                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -1252,7 +1261,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -2484,7 +2493,136 @@
       }),
       dict({
         'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U0."is_admin"
+                           AND U1."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
+          'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
+          ORDER BY "approvals_approval"."created_at" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.last_assignment[users/models.py]',
+          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
@@ -2611,147 +2749,6 @@
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
           WHERE "users_jobseekerassignment"."job_seeker_id" = %s
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_jobseekerassignment"
-          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
-                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
-                   AND "users_jobseekerassignment"."professional_id" = %s)
-                  OR ("users_jobseekerassignment"."company_id" = %s
-                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
-                      AND "users_jobseekerassignment"."professional_id" = %s))
-                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
-          'Company.convention_can_be_accessed_by[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-          'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
-          ORDER BY "approvals_approval"."created_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-                 AND "eligibility_administrativecriteria"."kind" IN (%s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s))
-          LIMIT 1
         ''',
       }),
       dict({
