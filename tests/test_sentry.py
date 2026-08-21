@@ -24,6 +24,11 @@ def test_before_send_http_breadcrumb_sanitizer(mocker, respx_mock):
         for breadcrumb in sentry_sdk.client._Client._prepare_event.spy_return["breadcrumbs"]["values"]
         if breadcrumb["type"] == "http"
     ]
+    if len(http_breacrumbs) != 1:
+        # This condition sometimes fail, but not always.
+        # FIXME (dbaty, 2026-08-21): remove this `if` block once we
+        # have fixed this flaky test.
+        raise ValueError(f"Flaky test, {http_breacrumbs=}")
     [http_breadcrumb] = http_breacrumbs
     assert http_breadcrumb["data"]["http.query"] == (
         "foobar=34&nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_&jourDateNaissance=_REDACTED_&moisDateNaissance=_REDACTED_&anneeDateNaissance=_REDACTED_"
