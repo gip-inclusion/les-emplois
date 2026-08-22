@@ -22,7 +22,7 @@
 
     {% for field in form %}
         {% if form.LEVEL_1_PREFIX in field.name %}
-            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS certified_criteria_keys=None %}
         {% endif %}
     {% endfor %}
 
@@ -30,7 +30,7 @@
 
     {% for field in form %}
         {% if form.LEVEL_2_PREFIX in field.name %}
-            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS certified_criteria_keys=None %}
         {% endif %}
     {% endfor %}
 

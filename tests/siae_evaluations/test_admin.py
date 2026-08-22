@@ -89,6 +89,7 @@ class TestEvaluationCampaignAdmin:
         )
         campaign4_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=campaign4_siae)
         EvaluatedAdministrativeCriteriaFactory(
+            level1=True,
             evaluated_job_application=campaign4_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=1),
             submitted_at=timezone.now() - relativedelta(days=1),
@@ -110,7 +111,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Count the full results
             + 1  # Fetch evaluated siae and related evaludation_campaign, siae, convention
             + 1  # Prefetch evaludated job applications
-            + 1  # Prefetch corresponding administrative criteria
+            + 1  # Prefetch corresponding evaluated administrative criteria and their administrative criteria
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
         ):
