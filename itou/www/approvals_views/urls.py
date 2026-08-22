@@ -55,6 +55,7 @@ urlpatterns = [
         name="prolongation_request_deny",
     ),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
+    path("close/<int:approval_id>", views.close, name="close"),
     path(
         "suspension/<int:suspension_id>/action/",
         views.suspension_action_choice,

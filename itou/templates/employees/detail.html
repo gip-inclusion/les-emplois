@@ -51,7 +51,7 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}
-                        {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
+                        {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' with_close_action=True %}
                     {% endif %}
                     {% if immersion_search_url %}
                         {# Immersion Facilitée proposal #}
