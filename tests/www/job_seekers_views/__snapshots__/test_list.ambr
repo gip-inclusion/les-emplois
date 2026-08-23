@@ -84,7 +84,7 @@
           </legend>
           <div class="my-3 collapse" id="collapseEndOfJourney">
               <ul>
-                  <li>
+                  <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-pass-iae">
                       <div class="dropdown-item">
                           <div class="form-check">
                               <input class="form-check-input" data-emplois-sync-with="id_approval_ending_soon" id="id_approval_ending_soon-offcanvas" name="approval_ending_soon" type="checkbox"/>
@@ -94,7 +94,7 @@
                           </div>
                       </div>
                   </li>
-                  <li>
+                  <li data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="filtre-fin-de-parcours-contrat-iae">
                       <div class="dropdown-item">
                           <div class="form-check">
                               <input class="form-check-input" data-emplois-sync-with="id_contract_ending_soon" id="id_contract_ending_soon-offcanvas" name="contract_ending_soon" type="checkbox"/>
