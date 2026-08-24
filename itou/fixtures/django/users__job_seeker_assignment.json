@@ -1006,5 +1006,75 @@
     },
     "model": "users.jobseekerassignment",
     "pk": 72
+  },
+  {
+    "fields": {
+      "assigned_to_unknown_advisor": false,
+      "company": null,
+      "created_at": "2026-01-31T08:48:53.037Z",
+      "job_seeker": 2,
+      "last_action_kind": "SELF_ASSIGN",
+      "prescriber_organization": null,
+      "professional": 7,
+      "updated_at": "2026-01-31T08:48:53.037Z"
+    },
+    "model": "users.jobseekerassignment",
+    "pk": 73
+  },
+  {
+    "fields": {
+      "assigned_to_unknown_advisor": false,
+      "company": null,
+      "created_at": "2026-01-30T08:48:53.037Z",
+      "job_seeker": 2,
+      "last_action_kind": "HIRE",
+      "prescriber_organization": 1,
+      "professional": 7,
+      "updated_at": "2026-01-30T08:48:53.037Z"
+    },
+    "model": "users.jobseekerassignment",
+    "pk": 74
+  },
+  {
+    "fields": {
+      "assigned_to_unknown_advisor": true,
+      "company": null,
+      "created_at": "2026-01-29T08:48:53.037Z",
+      "job_seeker": 2,
+      "last_action_kind": "GEIQ_ELIGIBILITY",
+      "prescriber_organization": 7,
+      "professional": 4,
+      "updated_at": "2026-01-29T08:48:53.037Z"
+    },
+    "model": "users.jobseekerassignment",
+    "pk": 75
+  },
+  {
+    "fields": {
+      "assigned_to_unknown_advisor": false,
+      "company": null,
+      "created_at": "2026-01-28T08:48:53.037Z",
+      "job_seeker": 2,
+      "last_action_kind": "IAE_ELIGIBILITY",
+      "prescriber_organization": 1,
+      "professional": 130,
+      "updated_at": "2026-01-28T08:48:53.037Z"
+    },
+    "model": "users.jobseekerassignment",
+    "pk": 76
+  },
+  {
+    "fields": {
+      "assigned_to_unknown_advisor": false,
+      "company": null,
+      "created_at": "2026-01-27T08:48:53.037Z",
+      "job_seeker": 2,
+      "last_action_kind": "APPLY",
+      "prescriber_organization": null,
+      "professional": 130,
+      "updated_at": "2026-01-27T08:48:53.037Z"
+    },
+    "model": "users.jobseekerassignment",
+    "pk": 77
   }
 ]
