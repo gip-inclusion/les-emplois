@@ -14,11 +14,13 @@ def collect_analytics_data(before):
     updown_metrics = UpdownApiClient().get_metrics(start=start, end=end)
     github_metrics = GithubApiClient().get_metrics(start=start)
     data = {
-        models.DatumCode.TECH_SENTRY_APDEX: round(sentry_metrics["apdex"] * 10000),
-        models.DatumCode.TECH_SENTRY_FAILURE_RATE: round(sentry_metrics["failure_rate"] * 10000),
         models.DatumCode.TECH_UPDOWN_UPTIME: round(updown_metrics["uptime"]),
         models.DatumCode.TECH_GH_TOTAL_BUGS: github_metrics["total_pr_bugs"],
     }
+    if "apdex" in sentry_metrics:
+        data[models.DatumCode.TECH_SENTRY_APDEX] = round(sentry_metrics["apdex"] * 10000)
+    if "failure_rate" in sentry_metrics:
+        data[models.DatumCode.TECH_SENTRY_FAILURE_RATE] = round(sentry_metrics["failure_rate"] * 10000)
     if updown_metrics.get("apdex"):
         data[models.DatumCode.TECH_UPDOWN_APDEX] = round(updown_metrics["apdex"] * 10000)
 
