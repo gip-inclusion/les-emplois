@@ -357,14 +357,9 @@ def prolongation_back_url(request):
     return get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
 
-@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
-    """
-    Declare a prolongation for the given approval.
-    """
-
-    siae = get_current_company_or_404(request)
-    approval = get_object_or_404(
+def get_prolongable_approval_or_404(siae, approval_id):
+    """The approvals `siae` may declare a prolongation for: those of an employee it hired."""
+    return get_object_or_404(
         Approval.objects.filter(
             Exists(
                 JobApplication.objects.filter(
@@ -374,6 +369,16 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         ),
         pk=approval_id,
     )
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
+    """
+    Declare a prolongation for the given approval.
+    """
+
+    siae = get_current_company_or_404(request)
+    approval = get_prolongable_approval_or_404(siae, approval_id)
 
     if not siae.is_subject_to_iae_rules or not approval.can_be_prolonged:
         raise PermissionDenied()
@@ -461,17 +466,7 @@ class DeclareProlongationHTMXFragmentView(ReadonlyViewMixin, TemplateView):
         self.siae = get_current_company_or_404(request)
         if not self.siae.is_subject_to_iae_rules:
             raise PermissionDenied()
-        self.approval = get_object_or_404(
-            Approval.objects.filter(
-                Exists(
-                    JobApplication.objects.filter(
-                        approval=OuterRef("pk"), to_company=self.siae, state=JobApplicationState.ACCEPTED
-                    )
-                )
-            ),
-            pk=approval_id,
-        )
-
+        self.approval = get_prolongable_approval_or_404(self.siae, approval_id)
         if not self.approval.can_be_prolonged:
             raise PermissionDenied()
 
