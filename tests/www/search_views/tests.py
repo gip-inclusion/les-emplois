@@ -16,6 +16,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, J
 from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Appellation, Rome
+from itou.prescribers.enums import PrescriberOrganizationCategory, PrescriberOrganizationKind
 from itou.utils.templatetags.str_filters import pluralizefr
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import (
@@ -599,7 +600,12 @@ class TestSearchCompany:
 class TestSearchPrescriber:
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:prescribers_home"))
-        assertContains(response, "Rechercher des prescripteurs habilités")
+        assertContains(response, "Rechercher un accompagnement")
+        assertContains(
+            response,
+            "Pour obtenir un emploi inclusif, accéder à une aide et effectuer des démarches, "
+            "le renfort d’un accompagnateur est souvent essentiel.",
+        )
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
@@ -610,7 +616,7 @@ class TestSearchPrescriber:
 
     def test_invalid(self, client):
         response = client.get(reverse("search:prescribers_results"), {"city": "foo-44"})
-        assertContains(response, "Rechercher des prescripteurs habilités")
+        assertContains(response, "Rechercher un accompagnement")
         assertContains(response, "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.")
 
     def test_results(self, client):
@@ -618,11 +624,15 @@ class TestSearchPrescriber:
 
         vannes = create_city_vannes()
         guerande = create_city_guerande()
-        organization_1 = PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
-        PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
+        organization_1 = PrescriberOrganizationFactory(
+            authorized=True, kind=PrescriberOrganizationKind.ML, coords=guerande.coords
+        )
+        PrescriberOrganizationFactory(authorized=True, kind=PrescriberOrganizationKind.FT, coords=vannes.coords)
 
         response = client.get(url, {"city": guerande.slug, "distance": 100})
         assertContains(response, "2 résultats")
+        assertContains(response, "Jeunesse")
+        assertContains(response, "France Travail")
 
         # Has link to organization card with back_url
         organization_url = f"{organization_1.get_card_url()}?back_url={urlencode_filter(url)}"
@@ -633,10 +643,64 @@ class TestSearchPrescriber:
 
         assertContains(
             response,
-            "<title>Prescripteurs habilités à 15 km du centre de Guérande (44) - Les emplois de l'inclusion</title>",
+            "<title>Accompagnement à 15 km du centre de Guérande (44) - Les emplois de l'inclusion</title>",
             html=True,
             count=1,
         )
+
+    def test_category_filter(self, client):
+        guerande = create_city_guerande()
+        mission_locale = PrescriberOrganizationFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.ML,
+            coords=guerande.coords,
+            name="Mission Locale Test",
+        )
+        france_travail = PrescriberOrganizationFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.FT,
+            coords=guerande.coords,
+            name="Agence FT Test",
+        )
+        PrescriberOrganizationFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.AFPA,
+            coords=guerande.coords,
+            name="AFPA Test",
+        )
+        foyer = PrescriberOrganizationFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.RS_FJT,
+            coords=guerande.coords,
+            name="FJT Test",
+        )
+        url = reverse("search:prescribers_results")
+        params = {"city": guerande.slug, "distance": 5}
+
+        response = client.get(url, params)
+        assertContains(response, "4 résultats")
+        assertContains(response, mission_locale.name)
+        assertContains(response, france_travail.name)
+        assertContains(response, "AFPA Test")
+        assertContains(response, foyer.name)
+        assertContains(response, "Prescripteur habilité emploi inclusif")
+
+        response = client.get(url, {**params, "category": PrescriberOrganizationCategory.JEUNESSE})
+        assertContains(response, "2 résultats")
+        assertContains(response, mission_locale.name)
+        assertContains(response, foyer.name)
+        assertNotContains(response, france_travail.name)
+        assertNotContains(response, "AFPA Test")
+
+        response = client.get(url, {**params, "category": PrescriberOrganizationCategory.HEBERGEMENT})
+        assertContains(response, "1 résultat")
+        assertContains(response, foyer.name)
+        assertNotContains(response, mission_locale.name)
+
+        response = client.get(url, {**params, "category": PrescriberOrganizationCategory.FRANCE_TRAVAIL})
+        assertContains(response, "1 résultat")
+        assertContains(response, france_travail.name)
+        assertNotContains(response, mission_locale.name)
 
     @override_settings(PAGE_SIZE_SMALL=1)
     def test_pagination(self, client):
@@ -653,7 +717,7 @@ class TestSearchPrescriber:
         response = client.get(url)
         assertContains(
             response,
-            "<title>Rechercher des prescripteurs habilités - Les emplois de l'inclusion</title>",
+            "<title>Rechercher un accompagnement - Les emplois de l'inclusion</title>",
             html=True,
             count=1,
         )

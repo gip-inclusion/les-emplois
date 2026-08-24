@@ -22,7 +22,7 @@ from itou.companies.models import Company, JobDescription
 from itou.insertion.models import Service
 from itou.insertion.utils import get_orient_for_job_seeker_context
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.prescribers.enums import PrescriberAuthorizationStatus
+from itou.prescribers.enums import PrescriberAuthorizationStatus, kinds_for_category
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
@@ -334,18 +334,27 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
     city = None
     distance = None
-    form = PrescriberSearchForm(data=request.GET or None, initial={"distance": PrescriberSearchForm.DISTANCE_DEFAULT})
+    form = PrescriberSearchForm(
+        data=request.GET or None,
+        initial={
+            "distance": PrescriberSearchForm.DISTANCE_DEFAULT,
+            "category": PrescriberSearchForm.CATEGORY_ALL,
+        },
+    )
     prescriber_orgs = []
 
     if form.is_valid():
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
+        category = form.cleaned_data["category"]
 
+        prescriber_orgs = PrescriberOrganization.objects.filter(
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+        if category:
+            prescriber_orgs = prescriber_orgs.filter(kind__in=kinds_for_category(category))
         prescriber_orgs = (
-            PrescriberOrganization.objects.filter(
-                authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-            )
-            .within(city.coords, distance)
+            prescriber_orgs.within(city.coords, distance)
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")
         )
@@ -358,6 +367,9 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         "prescriber_orgs_page": prescriber_orgs_page,
         "matomo_custom_title": "Recherche d'organisations prescriptrices",
         "back_url": reverse("search:prescribers_home"),
+        "clear_filters_url": add_url_params(
+            reverse("search:prescribers_results"), {"city": form.data.get("city") if form.data else None}
+        ),
     }
     return render(
         request,

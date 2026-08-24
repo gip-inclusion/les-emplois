@@ -21,6 +21,7 @@ from itou.prescribers.enums import (
     DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
+    categories_for_kind,
 )
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -281,6 +282,10 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     @property
     def is_authorized(self):
         return self.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+
+    @property
+    def accompaniment_categories(self):
+        return categories_for_kind(self.kind)
 
     @property
     def accept_survey_url(self):

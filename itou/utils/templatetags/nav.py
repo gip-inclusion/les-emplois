@@ -78,7 +78,7 @@ NAV_ENTRIES = {
         ],
     ),
     "anonymous-search-prescribers": NavItem(
-        label="Rechercher des prescripteurs habilités",
+        label="Rechercher un accompagnement",
         target=reverse("search:prescribers_home"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),
@@ -105,7 +105,7 @@ NAV_ENTRIES = {
         ],
     ),
     "prescribers-search": NavItem(
-        label="Un prescripteur habilité",
+        label="Un accompagnement",
         target=reverse("search:prescribers_results"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),

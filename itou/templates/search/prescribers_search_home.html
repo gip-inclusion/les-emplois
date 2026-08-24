@@ -1,9 +1,9 @@
 {% extends "layout/base.html" %}
 
-{% block title %}Rechercher des prescripteurs habilités {{ block.super }}{% endblock %}
+{% block title %}Rechercher un accompagnement {{ block.super }}{% endblock %}
 
 {% block body_class %}p-home{% endblock %}
 
 {% block content %}
-    {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
+    {% include "search/includes/generic_search_home.html" with form=form title="Rechercher un accompagnement" chapo="Pour obtenir un emploi inclusif, accéder à une aide et effectuer des démarches, le renfort d’un accompagnateur est souvent essentiel." url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
 {% endblock %}

@@ -57,6 +57,60 @@ class PrescriberOrganizationKind(models.TextChoices):
         return self
 
 
+class PrescriberOrganizationCategory(models.TextChoices):
+    FRANCE_TRAVAIL = "france_travail", "France Travail"
+    JEUNESSE = "jeunesse", "Jeunesse"
+    HANDICAP = "handicap", "Handicap"
+    HEBERGEMENT = "hebergement", "Hébergement"
+    SOCIAL = "social", "Social"
+
+
+# Kinds may belong to several categories. Unlisted kinds stay visible when no filter is applied.
+PRESCRIBER_CATEGORY_TO_KINDS = {
+    PrescriberOrganizationCategory.FRANCE_TRAVAIL: [PrescriberOrganizationKind.FT],
+    PrescriberOrganizationCategory.JEUNESSE: [
+        PrescriberOrganizationKind.ML,
+        PrescriberOrganizationKind.E2C,
+        PrescriberOrganizationKind.EPIDE,
+        PrescriberOrganizationKind.PIJ_BIJ,
+        PrescriberOrganizationKind.PJJ,
+        PrescriberOrganizationKind.ASE,
+        PrescriberOrganizationKind.PREVENTION,
+        PrescriberOrganizationKind.RS_FJT,
+    ],
+    PrescriberOrganizationCategory.HANDICAP: [
+        PrescriberOrganizationKind.CAP_EMPLOI,
+        PrescriberOrganizationKind.CAVA,
+        PrescriberOrganizationKind.OACAS,
+    ],
+    PrescriberOrganizationCategory.HEBERGEMENT: [
+        PrescriberOrganizationKind.CHRS,
+        PrescriberOrganizationKind.CHU,
+        PrescriberOrganizationKind.CADA,
+        PrescriberOrganizationKind.HUDA,
+        PrescriberOrganizationKind.CPH,
+        PrescriberOrganizationKind.RS_FJT,
+    ],
+    PrescriberOrganizationCategory.SOCIAL: [
+        PrescriberOrganizationKind.CCAS,
+        PrescriberOrganizationKind.DEPT,
+        PrescriberOrganizationKind.ODC,
+        PrescriberOrganizationKind.PLIE,
+        PrescriberOrganizationKind.CIDFF,
+        PrescriberOrganizationKind.CAF,
+        PrescriberOrganizationKind.MSA,
+    ],
+}
+
+
+def kinds_for_category(category):
+    return PRESCRIBER_CATEGORY_TO_KINDS[category]
+
+
+def categories_for_kind(kind):
+    return [category for category, kinds in PRESCRIBER_CATEGORY_TO_KINDS.items() if kind in kinds]
+
+
 HIDDEN_PRESCRIBER_KINDS = [
     PrescriberOrganizationKind.FT,
     PrescriberOrganizationKind.OHPD,
