@@ -1523,8 +1523,10 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 case IdentityCertificationAuthorities.API_PARTICULIER:
                     blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
                     blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
-                    blocked_fields.add("birth_name")
-                    blocked_fields.add("last_name")
+                    if self.birth_name:
+                        blocked_fields.add("birth_name")
+                    else:
+                        blocked_fields.add("last_name")
 
                     # These fields can be empty even after the certification, generating an error
                     # when the form is validated. Hence we allow the edition of this field.
