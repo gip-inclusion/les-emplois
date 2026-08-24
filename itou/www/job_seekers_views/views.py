@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 from functools import cached_property
 
 from django.conf import settings
@@ -7,7 +8,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, IntegerField, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -397,6 +398,34 @@ def assign_oneself_as_last_advisor(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
+PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de parcours IAE"
+# Use non-breaking spaces to avoid mail user agent to trim leading spaces.
+PRO_SUPPORT_REQUEST_EMAIL_BODY = """\
+    Bonjour,
+
+{job_seeker_full_name} arrive bientôt en fin de parcours IAE
+
+Pour préparer la suite de son accompagnement, pouvez-vous me partager les éléments utiles : ce qui a été travaillé, les freins encore présents et votre préconisation pour la suite ?
+
+On peut aussi s'appeler si c'est plus simple.
+
+Merci.
+"""  # noqa: E501 # Line too long
+
+
+def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
+    # V1 opens a pre-filled mailto to the employing SIAE: no email is
+    # sent nor stored server-side.
+    query = urllib.parse.urlencode(
+        {
+            "subject": PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
+            "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(job_seeker_full_name=job_seeker_full_name),
+        },
+        quote_via=urllib.parse.quote,
+    )
+    return f"mailto:{to_email}?{query}"
+
+
 @readonly_view
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
@@ -452,9 +481,34 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     )
 
     filters_counter = 0
+    end_of_journey_filter_active = False
     if form.is_valid():
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
+        # The upcoming-end-of-IAE-journey filter is reserved for authorized prescribers (see FilterForm).
+        end_of_journey_filter_active = request.from_authorized_prescriber and bool(
+            form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
+        )
+        if end_of_journey_filter_active:
+            # Contracts are the most precise, but they are delayed.
+            # Fallback to job applications if needs be.
+            queryset = queryset.annotate(
+                pro_support_request_company_email=Coalesce(
+                    Subquery(
+                        Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False)
+                        .exclude(company__email="")
+                        .order_by(F("start_date").desc())
+                        .values("company__email")[:1]
+                    ),
+                    Subquery(
+                        JobApplication.objects.accepted()
+                        .filter(job_seeker=OuterRef("pk"))
+                        .exclude(to_company__email="")
+                        .order_by(F("hiring_start_at").desc(nulls_last=True))
+                        .values("to_company__email")[:1]
+                    ),
+                )
+            )
 
     queryset = (
         queryset.annotate(
@@ -484,10 +538,23 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
+        job_seeker.pro_support_request_mailto = None
+        if (
+            end_of_journey_filter_active
+            and job_seeker.pro_support_request_company_email
+            # This last condition avoid the job seeker's name to leak
+            # to unauthorized users.
+            and job_seeker.user_can_view_personal_information
+        ):
+            job_seeker.pro_support_request_mailto = _build_pro_support_request_mailto(
+                job_seeker.pro_support_request_company_email,
+                job_seeker.get_full_name(),
+            )
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
             or job_seeker.jobseeker_profile.is_stalled
             or can_orient_towards_insertion_service(request)
+            or bool(job_seeker.pro_support_request_mailto)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization

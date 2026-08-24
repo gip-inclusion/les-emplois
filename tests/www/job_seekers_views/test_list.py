@@ -14,6 +14,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.asp.models import Commune
 from itou.companies.models import Company
+from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
@@ -1594,3 +1595,138 @@ def test_last_action_at(client):
 
     response = client.get(url)
     assertContains(response, now.strftime("%d/%m/%Y"))
+
+
+ACCOMPANIMENT_REVIEW_ACTION_LABEL = ""
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize("view", ("job_seekers_views:list", "job_seekers_views:list_organization"))
+def test_pro_support_request_action_for_authorized_prescriber(client, view):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    user = organization.members.first()
+    client.force_login(user)
+    today = datetime.date(2026, 1, 15)
+
+    job_seeker = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        author=user,
+        author_prescriber_organization=organization,
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=600),
+        end_at=today + datetime.timedelta(days=30),
+    )
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker,
+        sent_by_job_seeker=True,
+        to_company__email="",
+        state=JobApplicationState.ACCEPTED,
+        hiring_start_at=today - datetime.timedelta(days=200),
+    )
+
+    # Without the end-of-journey filter, the action is hidden.
+    mailto_label = "Demander un bilan d’accompagnement à la SIAE"
+    url = reverse(view)
+    response = client.get(url)
+    assertNotContains(response, mailto_label)
+
+    # With the filter active, the action should be displayed, unless
+    # the company does not have any email.
+    response = client.get(url, {"approval_ending_soon": "on"})
+    assertNotContains(response, mailto_label)
+
+    # Now with a company that has an e-mail.
+    company = job_application.to_company
+    company.email = "siae@example.com"
+    company.save()
+    response = client.get(url, {"approval_ending_soon": "on"})
+    assertContains(response, mailto_label)
+    assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
+    assertContains(response, "Jean%20DUPONT%20arrive")
+
+
+@freeze_time("2026-01-15")
+def test_request_accompaniment_review_action_not_for_employer(client):
+    company = CompanyFactory(subject_to_iae_rules=True, email="siae@example.com")
+    employer = CompanyMembershipFactory(company=company).user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+
+    job_seeker = JobSeekerFactory()
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=employer,
+        company=company,
+    )
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=600),
+        end_at=today + datetime.timedelta(days=30),
+    )
+    JobApplicationFactory(
+        job_seeker=job_seeker,
+        sent_by_job_seeker=True,
+        to_company=company,
+        state=JobApplicationState.ACCEPTED,
+        hiring_start_at=today - datetime.timedelta(days=200),
+    )
+
+    # The filter should not be available, but user could try to tweak
+    # the request.
+    response = client.get(url, {"approval_ending_soon": "on", "contract_ending_soon": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
+    assert not hasattr(response.context["page_obj"].object_list[0], "pro_support_request_company_email")
+    assertNotContains(response, "mailto:siae@example.com")
+
+
+@freeze_time("2026-01-15")
+def test_request_accompaniment_review_recipient_priority(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    user = organization.members.first()
+    client.force_login(user)
+    url = reverse("job_seekers_views:list")
+    today = datetime.date(2026, 1, 15)
+
+    job_seeker = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        author=user,
+        author_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=600),
+        end_at=today + datetime.timedelta(days=30),
+    )
+    # Fallback source: the last accepted job application SIAE.
+    JobApplicationFactory(
+        job_seeker=job_seeker,
+        sent_by_job_seeker=True,
+        to_company__email="candidature@example.com",
+        state=JobApplicationState.ACCEPTED,
+        hiring_start_at=today - datetime.timedelta(days=200),
+    )
+    # Priority source: the ASP contract SIAE ending the latest wins over an older contract and the
+    # accepted job application.
+    ContractFactory(
+        job_seeker=job_seeker,
+        company__email="vieux-contrat@example.com",
+        start_date=today - datetime.timedelta(days=800),
+        end_date=today - datetime.timedelta(days=400),
+    )
+    ContractFactory(
+        job_seeker=job_seeker,
+        company__email="contrat-asp@example.com",
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
+    response = client.get(url, {"approval_ending_soon": "on"})
+    assertContains(response, "mailto:contrat-asp@example.com")
+    assertNotContains(response, "mailto:candidature@example.com")
