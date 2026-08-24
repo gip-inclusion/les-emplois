@@ -61,7 +61,7 @@ def get_permissions_dict():
         | PERMS_EDIT
         | PERMS_EXPORT_FT_API_REJECTIONS
         | PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS,
-        approvals_models.CancelledApproval: PERMS_READ,
+        approvals_models.CancelledApproval: PERMS_EDIT,  # Only to add comments
         approvals_models.Prolongation: PERMS_ALL,
         approvals_models.ProlongationRequest: PERMS_DELETE,
         approvals_models.Suspension: PERMS_ALL,
