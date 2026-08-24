@@ -158,6 +158,11 @@ def _get_redirect_url(request):
         # some time before redirecting (or maybe never redirect
         # them if we still see calls to the old domain in logs).
         return None
+    if request.path.startswith(reverse("otp_views:verify_otp")):
+        # Don't redirect to the new domain, otherwise the user will
+        # end up at "new.domain/otp/verify" and it will look like the
+        # user has been disconnected (which they are not).
+        return None
     if request.method != "GET":
         # Don't redirect POST, DELETE, etc.: if the user visits the
         # old domain _before_ we enable the redirection for them, then
