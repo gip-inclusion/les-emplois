@@ -347,7 +347,7 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
     mesure = serializers.CharField(source="employee_record.asp_measure")  # Required
-    siret = serializers.CharField(source="employee_record.siret")  # Required
+    siret = serializers.SerializerMethodField()  # Required
 
     personnePhysique = serializers.SerializerMethodField()  # Required
     adresse = serializers.SerializerMethodField()  # Required
@@ -356,6 +356,26 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
+
+    def get_siret(self, obj: EmployeeRecordUpdateNotification):
+        """We don't trust the SIRET we have in the ER:
+
+        - siret_from_asp_source and obj.siret can be equal, so this
+          does not change anything.
+        - siret_from_asp_source and obj.siret can differ in which case:
+            The ER have an old SIRET, the ASP have a new SIRET: using
+            siret_from_asp_source fix the situation as we're giving the
+            SIRET expected by the ASP.
+
+        Giving the old SIRET leads the ASP to refuse the update (Error
+        3435).
+
+        This probably just bypasses a filter ASP side: the goal of a
+        Notification is just to update the end date of a pass linked
+        to an existing ER.
+
+        """
+        return obj.employee_record.job_application.to_company.siret_from_asp_source()
 
     def get_personnePhysique(self, obj: EmployeeRecordUpdateNotification):
         is_missing_required_fields = not all(
