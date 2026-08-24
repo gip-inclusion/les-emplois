@@ -22,7 +22,13 @@ from pytest_django.asserts import (
 
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.job_applications import models as job_applications_models
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.enums import (
+    PrescriberAuthorizationStatus,
+    PrescriberOrganizationCategory,
+    PrescriberOrganizationKind,
+    categories_for_kind,
+    kinds_for_category,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User
@@ -1173,3 +1179,56 @@ def test_prescriber_kinds_are_alphabetically_sorted():
             c[1].lower(),
         ),
     )
+
+
+def test_kinds_for_category():
+    assert kinds_for_category(PrescriberOrganizationCategory.FRANCE_TRAVAIL) == [PrescriberOrganizationKind.FT]
+    assert set(kinds_for_category(PrescriberOrganizationCategory.JEUNESSE)) == {
+        PrescriberOrganizationKind.ML,
+        PrescriberOrganizationKind.E2C,
+        PrescriberOrganizationKind.EPIDE,
+        PrescriberOrganizationKind.PIJ_BIJ,
+        PrescriberOrganizationKind.PJJ,
+        PrescriberOrganizationKind.ASE,
+        PrescriberOrganizationKind.PREVENTION,
+        PrescriberOrganizationKind.RS_FJT,
+    }
+    assert set(kinds_for_category(PrescriberOrganizationCategory.HANDICAP)) == {
+        PrescriberOrganizationKind.CAP_EMPLOI,
+        PrescriberOrganizationKind.CAVA,
+        PrescriberOrganizationKind.OACAS,
+    }
+    assert set(kinds_for_category(PrescriberOrganizationCategory.SOCIAL)) == {
+        PrescriberOrganizationKind.CCAS,
+        PrescriberOrganizationKind.DEPT,
+        PrescriberOrganizationKind.ODC,
+        PrescriberOrganizationKind.PLIE,
+        PrescriberOrganizationKind.CIDFF,
+        PrescriberOrganizationKind.CAF,
+        PrescriberOrganizationKind.MSA,
+    }
+    assert set(kinds_for_category(PrescriberOrganizationCategory.HEBERGEMENT)) == {
+        PrescriberOrganizationKind.CHRS,
+        PrescriberOrganizationKind.CHU,
+        PrescriberOrganizationKind.CADA,
+        PrescriberOrganizationKind.HUDA,
+        PrescriberOrganizationKind.CPH,
+        PrescriberOrganizationKind.RS_FJT,
+    }
+    assert set(kinds_for_category(PrescriberOrganizationCategory.JUSTICE)) == {
+        PrescriberOrganizationKind.SPIP,
+        PrescriberOrganizationKind.PJJ,
+    }
+
+
+def test_kind_can_belong_to_several_categories():
+    assert set(categories_for_kind(PrescriberOrganizationKind.RS_FJT)) == {
+        PrescriberOrganizationCategory.JEUNESSE,
+        PrescriberOrganizationCategory.HEBERGEMENT,
+    }
+    assert set(categories_for_kind(PrescriberOrganizationKind.PJJ)) == {
+        PrescriberOrganizationCategory.JEUNESSE,
+        PrescriberOrganizationCategory.JUSTICE,
+    }
+    assert categories_for_kind(PrescriberOrganizationKind.AFPA) == []
+    assert categories_for_kind(PrescriberOrganizationKind.OTHER) == []
