@@ -14,6 +14,11 @@ urlpatterns = [
     path("list", views.ApprovalListView.as_view(), name="list"),
     path("declare_prolongation/<int:approval_id>", views.declare_prolongation, name="declare_prolongation"),
     path(
+        "declare_prolongation/<int:approval_id>/derogation/<str:token>",
+        views.prolongation_derogation,
+        name="prolongation_derogation",
+    ),
+    path(
         "declare_prolongation/<int:approval_id>/check_prescriber_email",
         views.CheckPrescriberEmailView.as_view(),
         name="check_prescriber_email",

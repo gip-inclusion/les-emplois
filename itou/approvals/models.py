@@ -398,6 +398,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
     # The period of time during which it is possible to prolong a PASS IAE.
+    # The support can waive the closing date by issuing a derogation link, never the opening one.
     PROLONGATION_OPENS_MONTHS_BEFORE_END = 12
     PROLONGATION_CLOSES_MONTHS_AFTER_END = 6
 
@@ -825,25 +826,69 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def pending_prolongation_request(self):
         return self.prolongationrequest_set.filter(status=enums.ProlongationRequestStatus.PENDING).first()
 
+    def count_declarations(self):
+        """How many times a prolongation was declared for this PASS IAE, whatever its outcome.
+
+        Rows are not supposed to be deleted (a denied request keeps its `DENIED` status), so this
+        only ever grows. `ProlongationDerogationTokenGenerator` folds it into its hash to make
+        a support derogation link single-use.
+        """
+        return self.prolongation_set.count() + self.prolongationrequest_set.count()
+
+    @property
+    def prolongation_period_has_started(self):
+        """Prolongations open 12 months before the end of a PASS IAE. Nothing waives this."""
+        return timezone.localdate() >= self.end_at - relativedelta(months=self.PROLONGATION_OPENS_MONTHS_BEFORE_END)
+
+    @property
+    def prolongation_period_has_ended(self):
+        """Prolongations close 6 months after the end of a PASS IAE.
+
+        The support can waive this deadline, and only this one, by issuing a derogation link.
+        """
+        return timezone.localdate() > self.end_at + relativedelta(months=self.PROLONGATION_CLOSES_MONTHS_AFTER_END)
+
     @property
     def is_open_to_prolongation(self):
-        now = timezone.localdate()
-        lower_bound = self.end_at - relativedelta(months=self.PROLONGATION_OPENS_MONTHS_BEFORE_END)
-        upper_bound = self.end_at + relativedelta(months=self.PROLONGATION_CLOSES_MONTHS_AFTER_END)
-        return lower_bound <= now <= upper_bound
+        return self.prolongation_period_has_started and not self.prolongation_period_has_ended
 
     @cached_property
-    def can_be_prolonged(self):
+    def prolongation_blocker(self):
+        """Why this PASS IAE cannot be prolonged. `None` when it can.
+
+        Checked from the most definitive to the most waivable: `DEADLINE_PASSED` comes last
+        because it is the only blocker a support derogation link can waive.
+        """
+        if self.is_suspended:
+            return enums.ProlongationBlocker.SUSPENDED
+        if self.pending_prolongation_request():
+            return enums.ProlongationBlocker.PENDING_REQUEST
         # Since it is possible to prolong even a few months after the end of a PASS IAE,
         # it is possible that another one has been issued in the meantime. Thus we
         # have to ensure that the current PASS IAE is the most recent for the user
         # before allowing a prolongation.
-        return (
-            self.is_open_to_prolongation
-            and self == self.user.latest_approval
-            and not self.is_suspended
-            and not self.pending_prolongation_request()
-        )
+        if self != self.user.latest_approval:
+            return enums.ProlongationBlocker.NOT_LATEST_APPROVAL
+        if not self.prolongation_period_has_started:
+            return enums.ProlongationBlocker.TOO_EARLY
+        if self.prolongation_period_has_ended:
+            return enums.ProlongationBlocker.DEADLINE_PASSED
+        return None
+
+    @cached_property
+    def can_be_prolonged(self):
+        # `is_open_to_prolongation` first: it short-circuits the queries of `prolongation_blocker`
+        # for the many PASS IAE simply out of the prolongation period.
+        return self.is_open_to_prolongation and self.prolongation_blocker is None
+
+    @cached_property
+    def needs_prolongation_derogation(self):
+        """The passed deadline is the only obstacle to a prolongation.
+
+        Only then may the support issue a derogation link: it waives that deadline, and
+        nothing else. See `ProlongationDerogationTokenGenerator`.
+        """
+        return self.prolongation_blocker == enums.ProlongationBlocker.DEADLINE_PASSED
 
     @staticmethod
     def get_origin_kwargs(origin_job_application):

@@ -1,0 +1,27 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+    <p>
+        Ce lien permet à l’entreprise choisie de déclarer une prolongation de ce PASS IAE alors que
+        le délai de prolongation, six mois après son échéance, est dépassé. Il ne fonctionne que pour
+        cette entreprise, et uniquement pour un utilisateur connecté sur son espace de travail. Il ne
+        peut être utilisé qu’une seule fois.
+    </p>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-row">{{ form }}</div>
+        <div class="submit-row">
+            <input class="default" type="submit" value="Générer le lien">
+        </div>
+    </form>
+
+    {% if derogation_link %}
+        <h2>Lien à transmettre à l’employeur</h2>
+        <div class="form-row">
+            <label for="derogation-link">Lien de demande de prolongation :</label>
+            <input id="derogation-link" type="text" class="vLargeTextField" readonly value="{{ derogation_link }}">
+            <p class="help">Lien à usage unique, valable 90 jours, jusqu’au {{ expires_at }}. À transmettre par e-mail à l’employeur.</p>
+        </div>
+    {% endif %}
+{% endblock content %}
