@@ -177,6 +177,7 @@ class MobilizationEventAdmin(InsertionAdmin):
         "prescriber_organization_link",
         "company_link",
         "service_external_link",
+        "orientation_link",
         "created_at",
     ]
 
@@ -195,6 +196,14 @@ class MobilizationEventAdmin(InsertionAdmin):
     @admin.display(description="entreprise")
     def company_link(self, obj):
         return get_admin_view_link(obj.company, content=obj.company.name)
+
+    @admin.display(description="orientation")
+    def orientation_link(self, obj):
+        if obj.orientation:
+            return get_admin_view_link(
+                obj.orientation, content=f"Orientation pour {obj.orientation.beneficiary.get_full_name()}"
+            )
+        return "-"
 
 
 class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
