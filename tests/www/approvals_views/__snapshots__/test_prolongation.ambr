@@ -179,7 +179,7 @@
       <label class="form-label">
           Motif
       </label>
-      <div class="" hx-indicator="#mainForm" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+      <div class="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason" required="">
           <div class="form-check">
               <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
               <label class="form-check-label" for="id_reason_0">
@@ -215,7 +215,7 @@
       <label class="form-label">
           Motif
       </label>
-      <div class="" hx-indicator="#mainForm" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+      <div class="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason" required="">
           <div class="form-check">
               <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
               <label class="form-check-label" for="id_reason_0">

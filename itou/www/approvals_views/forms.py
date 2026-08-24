@@ -223,8 +223,8 @@ class CreateProlongationForm(forms.ModelForm):
                 ),
                 "hx-params": "not end_at",  # Clear "end_at" when switching reason
                 "hx-swap": "outerHTML",
-                "hx-target": "#mainForm",
-                "hx-indicator": "#mainForm",  # Add a spinner to another element, here the main form instead of a field
+                "hx-target": "#new-prolongation-form",
+                "hx-indicator": "#new-prolongation-form",  # Add a spinner to another element, here the main form
             }
         )
 
