@@ -2,7 +2,7 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
-<form id="mainForm" method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+<form id="new-prolongation-form" method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
 
     {% bootstrap_form_errors form type="non_fields" %}
