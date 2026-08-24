@@ -33,7 +33,15 @@ class SentryApiClient:
     def get_metrics(self, start, end):
         response = self._request(start=start, end=end)
 
-        data_received = response.json()["data"][0]
+        try:
+            data_received = response.json()["data"][0]
+        except IndexError:  # `data` key may be empty
+            logger.info(
+                "Sentry returned no metrics for period %s - %s",
+                start.isoformat(),
+                end.isoformat(),
+            )
+            return {}
         return {
             "failure_rate": data_received["failure_rate()"],
             "apdex": data_received["apdex()"],
