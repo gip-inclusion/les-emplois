@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 2026-08-10
+
+### Ajouté
+
+- [Insertion : Ajout de la page de détail d’une orientation](https://github.com/gip-inclusion/les-emplois/pull/8467)
+- [Insertion : Ajout de la page liste des orientations envoyées](https://github.com/gip-inclusion/les-emplois/pull/8496)
+- [Insertion : Ajout des logs de transition pour les orientations](https://github.com/gip-inclusion/les-emplois/pull/8545)
+
+### Modifié
+
+- [Insertion : Ne pas proposer le formulaire d’orientation pour les services venant de certaines sources](https://github.com/gip-inclusion/les-emplois/pull/8519)
+- [Interface : Suppression de l'affichage en liste des résultats](https://github.com/gip-inclusion/les-emplois/pull/8325)
+
 ## 2026-08-03
 
 ### Ajouté
