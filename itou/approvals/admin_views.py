@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-s
 https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
 """
 
+import datetime
 import logging
 from collections import defaultdict
 
@@ -20,7 +21,7 @@ from django.urls import reverse
 from django.utils import timezone
 from itoutils.urls import add_url_params
 
-from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
+from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm, ProlongationDerogationForm
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.job_applications.enums import JobApplicationState
@@ -28,6 +29,7 @@ from itou.job_applications.models import JobApplication
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.apis import enums as api_enums
 from itou.utils.emails import get_email_text_template
+from itou.utils.tokens import prolongation_derogation_token_generator
 from itou.utils.urls import get_absolute_url
 
 
@@ -235,6 +237,76 @@ def terminate_approval(request, model_admin, approval_id):
     approval.save(update_fields=["end_at", "updated_at"])
     add_support_remark_to_obj(approval, f"{new_end} : PASS IAE clôturé par {request.user.get_full_name()}.")
     return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+
+
+def prolongation_derogation(
+    request, model_admin, approval_id, template_name="admin/approvals/prolongation_derogation.html"
+):
+    """Admin view to issue a link that allows an employer to declare an out-of-time-limits prolongation.
+
+    Only the prolongation deadline is waived, see `Approval.needs_prolongation_derogation`.
+    """
+
+    opts = model_admin.model._meta
+    codename = get_permission_codename("change", opts)
+    if not request.user.has_perm(f"{opts.app_label}.{codename}"):
+        raise PermissionDenied
+
+    approval = get_object_or_404(Approval.objects.select_related("user").with_assigned_company(), pk=approval_id)
+
+    if not approval.needs_prolongation_derogation:
+        PROLONGATION_STILL_POSSIBLE = (
+            "Ce PASS IAE est dans les délais, l’employeur peut déclarer la prolongation sans lien de dérogation."
+        )
+        blocker = approval.prolongation_blocker
+        messages.error(request, blocker.label if blocker else PROLONGATION_STILL_POSSIBLE)
+        return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+
+    form = ProlongationDerogationForm(
+        approval=approval,
+        admin_site=model_admin.admin_site,
+        data=request.POST or None,
+        # The company handling the PASS IAE is the expected one in the
+        # majority of cases, but the support can still pick another one
+        initial={"company": approval.assigned_company},
+    )
+    derogation_link = None
+    if request.method == "POST" and form.is_valid():
+        company = form.cleaned_data["company"]
+        token = prolongation_derogation_token_generator.make_token(approval=approval, company=company)
+        derogation_link = get_absolute_url(
+            reverse("approvals:prolongation_derogation", kwargs={"approval_id": approval.pk, "token": token})
+        )
+        add_support_remark_to_obj(
+            approval,
+            f"{timezone.localdate()} : lien de demande de prolongation hors délais généré par "
+            f"{request.user.get_full_name()} pour l’entreprise {company.pk} — {company.display_name}.",
+        )
+        logger.info(
+            "staff user=%(user_id)d issued a prolongation derogation link "
+            "for approval=%(approval_id)d company=%(company_id)d.",
+            {"user_id": request.user.pk, "approval_id": approval.pk, "company_id": company.pk},
+        )
+        messages.success(request, "Le lien de demande de prolongation a bien été généré.")
+    timeout = datetime.timedelta(seconds=prolongation_derogation_token_generator.timeout)
+    context = _admin_context(
+        request,
+        model_admin,
+        title=(
+            f"Générer un lien de demande de prolongation pour "
+            f"le PASS IAE {approval.number} ({approval.user.get_full_name()})"
+        ),
+        approval=approval,
+        # `add` and `original` drive the last breadcrumb of admin/change_form.html,
+        # `errors` its “Error:” page <title> prefix.
+        add=False,
+        original=approval,
+        errors=admin.helpers.AdminErrorList(form, {}),
+        derogation_link=derogation_link,
+        expires_at=timezone.localdate() + timeout if derogation_link else None,
+        form=form,
+    )
+    return render(request, template_name, context)
 
 
 def _compute_send_approvals_to_pe_stats(model, list_url):

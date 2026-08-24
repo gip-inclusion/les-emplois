@@ -1,20 +1,35 @@
 import uuid
-from datetime import timedelta
+from datetime import date, timedelta
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
-from itou.approvals.enums import ProlongationReason
+from itou.approvals.enums import ProlongationReason, ProlongationRequestStatus
 from itou.approvals.models import Prolongation
+from itou.approvals.perms import prolongation_derogation_session_key
 from itou.companies.enums import CompanyKind
+from itou.job_applications.enums import JobApplicationState
+from itou.utils.tokens import prolongation_derogation_token_generator
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.approvals.factories import ProlongationFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -139,6 +154,24 @@ class TestApprovalProlongation:
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = client.get(url)
         assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "view_name",
+        [
+            "declare_prolongation",
+            "prolongation_form_for_reason",
+            "check_prescriber_email",
+            "check_contact_details",
+        ],
+    )
+    def test_approval_prolongation_with_company_not_subject_to_iae_rules(self, client, view_name):
+        """Only a company subject to IAE rules may declare a prolongation."""
+        self._setup_with_company_kind(CompanyKind.GEIQ)
+        assert not self.siae.is_subject_to_iae_rules
+        client.force_login(self.employer)
+        url = reverse(f"approvals:{view_name}", kwargs={"approval_id": self.approval.pk})
+        response = client.post(url, {"reason": ProlongationReason.SENIOR})
+        assert response.status_code == 403
 
     @pytest.mark.parametrize(
         "view_name",
@@ -627,3 +660,308 @@ def test_prolongation_report_file(client, mocker, faker, xlsx_file, mailoutbox):
         in email.body
     )
     assert TestApprovalProlongation.PROLONGATION_EMAIL_REPORT_TEXT in email.body
+
+
+class TestProlongationDerogationLink:
+    """The support can hand out a link waiving the prolongation deadline, and only this limit."""
+
+    HTMX_VIEW_NAMES = ["prolongation_form_for_reason", "check_prescriber_email", "check_contact_details"]
+
+    NEW_PROLONGATION_MARKUP = '<form id="new-prolongation-form"'
+
+    def _setup_approval(self, end_at):
+        self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            approval__start_at=end_at - relativedelta(months=24),
+            approval__end_at=end_at,
+            # An AI company would add the report file field,
+            # whose HTMX and full page renderings differ
+            to_company__kind=CompanyKind.EI,
+        )
+        self.siae = self.job_application.to_company
+        self.employer = self.siae.members.first()
+        self.approval = self.job_application.approval
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        # A PASS IAE that expired more than 6 months ago: the employer cannot prolong it alone
+        self._setup_approval(end_at=timezone.localdate() - relativedelta(months=8))
+        assert not self.approval.is_open_to_prolongation
+
+    def _derogation_url(self, token, **kwargs):
+        """The link the support hands out: it opens the declaration form."""
+        return reverse(
+            "approvals:prolongation_derogation", kwargs={"approval_id": self.approval.pk, "token": token}, **kwargs
+        )
+
+    def _url(self, **kwargs):
+        return reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}, **kwargs)
+
+    def _token(self, company=None):
+        return prolongation_derogation_token_generator.make_token(approval=self.approval, company=company or self.siae)
+
+    def _follow_derogation_link(self, client, token=None, **kwargs):
+        """Follow the derogation link and return the declaration form page."""
+        response = client.get(self._derogation_url(token or self._token(), **kwargs))
+        assertRedirects(response, self._url(**kwargs))
+        return client.get(response.url)
+
+    def _assert_link_refused(self, response, company=None):
+        """The derogation link led nowhere: the employer is sent back with an explicit message."""
+        assertRedirects(response, reverse("dashboard:index"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Le token n’est peut-être plus valable ou concerne une autre structure "
+                    f"que celle actuellement active ({(company or self.siae).display_name}).",
+                )
+            ],
+        )
+
+    def _session_token(self, client, company=None):
+        session_key = prolongation_derogation_session_key(approval=self.approval, company=company or self.siae)
+        return client.session.get(session_key)
+
+    def test_with_token(self, client):
+        client.force_login(self.employer)
+        response = self._follow_derogation_link(client)
+        assertContains(response, self.NEW_PROLONGATION_MARKUP)
+
+    def test_declare_prolongation(self, client, mailoutbox):
+        client.force_login(self.employer)
+        back_url = reverse("dashboard:index")
+        query = {"back_url": back_url}
+        url = self._url(query=query)
+
+        response = self._follow_derogation_link(client, query=query)
+        assert response.context["preview"] is False
+
+        post_data = {
+            "end_at": (self.approval.end_at + relativedelta(days=30)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": ProlongationReason.COMPLETE_TRAINING,
+            "preview": "1",
+        }
+        response = client.post(url, data=post_data)
+        assert response.context["preview"] is True
+
+        del post_data["preview"]
+        post_data["save"] = 1
+        response = client.post(url, data=post_data)
+        assertRedirects(response, back_url)
+
+        prolongation = self.approval.prolongation_set.get()
+        assert prolongation.declared_by == self.employer
+        assert prolongation.declared_by_siae == self.siae
+        assert prolongation.start_at == self.approval.end_at
+        assert prolongation.reason == ProlongationReason.COMPLETE_TRAINING
+        assert not mailoutbox
+
+    def test_without_token(self, client):
+        client.force_login(self.employer)
+        response = client.get(self._url())
+        assert response.status_code == 403
+
+    def test_the_bypass_is_scoped_to_one_approval(self, client):
+        # The company hired two job seekers, both PASS IAE are out of the prolongation window
+        # but the support only issued a link for one of them
+        other_end_at = timezone.localdate() - relativedelta(months=8)
+        other_approval = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            approval__start_at=other_end_at - relativedelta(months=24),
+            approval__end_at=other_end_at,
+            to_company=self.siae,
+        ).approval
+        client.force_login(self.employer)
+        self._follow_derogation_link(client)
+        other_url = reverse("approvals:declare_prolongation", kwargs={"approval_id": other_approval.pk})
+        assert client.get(other_url).status_code == 403
+
+    def test_before_the_prolongation_window(self, client):
+        # A PASS IAE ending in more than 12 months is out of the window too,
+        # but no link can rescue it: only the deadline is waivable
+        self._setup_approval(end_at=timezone.localdate() + relativedelta(months=18))
+        assert not self.approval.is_open_to_prolongation
+        assert not self.approval.needs_prolongation_derogation
+        client.force_login(self.employer)
+
+        assert client.get(self._url()).status_code == 403
+        self._assert_link_refused(client.get(self._derogation_url(self._token())))
+
+    def test_link_is_consumed_by_a_first_prolongation(self, client):
+        token = self._token()
+        ProlongationFactory(
+            approval=self.approval,
+            declared_by_siae=self.siae,
+            declared_by=self.employer,
+            start_at=self.approval.end_at,
+            end_at=self.approval.end_at + relativedelta(days=30),
+        )
+        self.approval.refresh_from_db()
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(token)))
+
+    def test_link_is_consumed_by_a_first_prolongation_request(self, client):
+        # A prolongation request is denied:
+        # the PASS IAE is still extendable, but with another link
+        token = self._token()
+        ProlongationRequestFactory(
+            approval=self.approval,
+            declared_by_siae=self.siae,
+            declared_by=self.employer,
+            status=ProlongationRequestStatus.DENIED,
+        )
+        client.force_login(self.employer)
+        assert self.approval.needs_prolongation_derogation
+        self._assert_link_refused(client.get(self._derogation_url(token)))
+
+    def test_a_new_link_can_be_issued_after_a_prolongation(self, client):
+        # The PASS IAE is still out of the prolongation window after a first prolongation:
+        # the consumed link cannot be reused, but the support can issue another one
+        ProlongationFactory(
+            approval=self.approval,
+            declared_by_siae=self.siae,
+            declared_by=self.employer,
+            start_at=self.approval.end_at,
+            end_at=self.approval.end_at + relativedelta(days=30),
+        )
+        self.approval.refresh_from_db()
+        assert self.approval.needs_prolongation_derogation
+        client.force_login(self.employer)
+        assertContains(self._follow_derogation_link(client, self._token()), self.NEW_PROLONGATION_MARKUP)
+
+    def test_invalid_token(self, client):
+        invalid_token = "ddt9as-f88cd08908264f2e9de6"
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(invalid_token)))
+
+    def test_invalid_token_inside_the_prolongation_window(self, client):
+        # The approval could be prolonged without any token:
+        # a bogus one must not be accepted anyway
+        invalid_token = "ddt9as-f88cd08908264f2e9de6"
+        self._setup_approval(end_at=timezone.localdate() + relativedelta(months=1))
+        assert self.approval.is_open_to_prolongation
+        client.force_login(self.employer)
+        assertContains(client.get(self._url()), self.NEW_PROLONGATION_MARKUP)
+        self._assert_link_refused(client.get(self._derogation_url(invalid_token)))
+
+    def test_token_issued_for_another_company(self, client):
+        other_company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        derogation_url = self._derogation_url(self._token(company=other_company))
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(derogation_url))
+        # The company the token was issued for never hired this job seeker
+        client.force_login(other_company.members.first())
+        self._assert_link_refused(client.get(derogation_url), company=other_company)
+
+    def test_current_company_not_subject_to_iae_rules(self, client):
+        geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            approval=self.approval,
+            job_seeker=self.approval.user,
+            to_company=geiq,
+            state=JobApplicationState.ACCEPTED,
+        )
+        client.force_login(geiq.members.first())
+        self._assert_link_refused(client.get(self._derogation_url(self._token(company=geiq))), company=geiq)
+
+    def test_expired_token(self, client, settings):
+        # Moving through time brings a new version of the "CGU" into force
+        settings.BYPASS_TERMS_ACCEPTANCE = True
+        with freeze_time("2025-08-21") as frozen_time:
+            # Fixed dates, so that the PASS IAE stays out of the prolongation window
+            # and out of the waiting period for the whole test
+            self._setup_approval(end_at=date(2024, 6, 30))
+            assert not self.approval.is_open_to_prolongation
+            token = self._token()
+            frozen_time.move_to("2025-11-18")  # 89 days later
+            client.force_login(self.employer)
+            assertContains(self._follow_derogation_link(client, token), self.NEW_PROLONGATION_MARKUP)
+            frozen_time.move_to("2025-11-20")  # 91 days later
+            client.force_login(self.employer)
+            self._assert_link_refused(client.get(self._derogation_url(token)))
+
+    def test_suspended_approval(self, client):
+        SuspensionFactory(
+            approval=self.approval,
+            siae=self.siae,
+            start_at=timezone.localdate() - relativedelta(days=1),
+            end_at=timezone.localdate() + relativedelta(days=1),
+        )
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(self._token())))
+
+    def test_pending_prolongation_request(self, client):
+        ProlongationRequestFactory(approval=self.approval, declared_by_siae=self.siae)
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(self._token())))
+
+    def test_not_the_latest_approval(self, client):
+        ApprovalFactory(user=self.approval.user)
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(self._token())))
+
+    def test_waiting_period_has_elapsed(self, client):
+        # Beyond the 2 years waiting period the job seeker has no latest approval anymore
+        self._setup_approval(end_at=timezone.localdate() - relativedelta(months=30))
+        client.force_login(self.employer)
+        self._assert_link_refused(client.get(self._derogation_url(self._token())))
+
+    def test_stale_token_is_removed_from_the_session(self, client):
+        client.force_login(self.employer)
+        token = self._token()
+        self._follow_derogation_link(client, token)
+        assert self._session_token(client) == token
+
+        # Another declaration consumes the link
+        ProlongationFactory(
+            approval=self.approval,
+            declared_by_siae=self.siae,
+            declared_by=self.employer,
+            start_at=self.approval.end_at,
+            end_at=self.approval.end_at + relativedelta(days=30),
+        )
+        assert client.get(self._url()).status_code == 403
+        assert self._session_token(client) is None
+
+    def test_valid_token_is_kept_in_the_session(self, client):
+        client.force_login(self.employer)
+        token = self._token()
+        assertContains(self._follow_derogation_link(client, token), self.NEW_PROLONGATION_MARKUP)
+        assertContains(client.get(self._url()), self.NEW_PROLONGATION_MARKUP)
+        assert self._session_token(client) == token
+
+    @pytest.mark.parametrize("view_name", HTMX_VIEW_NAMES)
+    def test_htmx_fragments(self, client, view_name):
+        client.force_login(self.employer)
+        data = {"reason": ProlongationReason.SENIOR}
+        url = reverse(f"approvals:{view_name}", kwargs={"approval_id": self.approval.pk})
+        assert client.post(url, data).status_code == 403
+        self._follow_derogation_link(client)
+        assert client.post(url, data).status_code == 200
+        ProlongationFactory(
+            approval=self.approval,
+            declared_by_siae=self.siae,
+            declared_by=self.employer,
+            start_at=self.approval.end_at,
+            end_at=self.approval.end_at + relativedelta(days=30),
+        )
+        assert client.post(url, data).status_code == 403
+
+    def test_check_prescriber_email_button(self, client):
+        client.force_login(self.employer)
+        page = parse_response_to_soup(self._follow_derogation_link(client), selector="#main")
+        [reason] = page.select("#id_reason")
+        data = {
+            "reason": ProlongationReason.RQTH,
+            # Workaround the validation of the initial page by providing enough data
+            "end_at": self.approval.end_at + relativedelta(days=30),
+            "email": PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first().email,
+        }
+        update_page_with_htmx(page, "#id_reason", client.post(reason["hx-post"], data))
+        [button] = page.select("#check_prescriber_email button")
+        assert client.post(button["hx-post"], data).status_code == 200

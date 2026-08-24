@@ -1,8 +1,13 @@
 from django import forms
+from django.contrib.admin import widgets
 from django.core.exceptions import ValidationError
 
 from itou.approvals.models import Approval
-from itou.job_applications.enums import Origin
+from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
+from itou.job_applications.enums import JobApplicationState, Origin
+from itou.job_applications.models import JobApplication
+from itou.utils.admin import FakeRelForRawIdWidget
 
 
 class ApprovalFormMixin:
@@ -86,3 +91,35 @@ class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelFo
     class Meta:
         model = Approval
         fields = ["start_at", "end_at", "number"]
+
+
+class ProlongationDerogationForm(forms.Form):
+    """Select the company to which a derogation link for an out-of-deadline prolongation is issued."""
+
+    company = forms.ModelChoiceField(
+        Company.objects.filter(kind__in=CompanyKind.siae_kinds()),
+        required=True,
+        label="SIAE autorisée à déclarer la prolongation",
+        help_text="Saisissez l’ID de la SIAE, ou recherchez-la avec la loupe.",
+        error_messages={
+            "invalid_choice": (
+                "Cette entreprise n’existe pas ou n’est pas une SIAE, elle ne peut pas déclarer de prolongation."
+            )
+        },
+    )
+
+    def __init__(self, *args, approval, admin_site, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["company"].widget = widgets.ForeignKeyRawIdWidget(
+            FakeRelForRawIdWidget(Company, limit_choices_to={"kind__in": CompanyKind.siae_kinds()}), admin_site
+        )
+        self.approval = approval
+
+    def clean_company(self):
+        """Mirrors checks performed by `declare_prolongation` to never hand out a link leading to a 404/403."""
+        company = self.cleaned_data["company"]
+        if not JobApplication.objects.filter(
+            approval=self.approval, to_company=company, state=JobApplicationState.ACCEPTED
+        ).exists():
+            raise ValidationError("Cette entreprise n’a pas de candidature acceptée liée à ce PASS IAE.")
+        return company

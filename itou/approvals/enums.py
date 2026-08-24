@@ -47,6 +47,31 @@ class ProlongationReason(models.TextChoices):
         return empty + [(enum.value, enum.label) for enum in enums]
 
 
+class ProlongationBlocker(models.TextChoices):
+    """Why a PASS IAE cannot be prolonged.
+
+    Only `DEADLINE_PASSED` can be waived, by a derogation link issued by the support.
+    """
+
+    SUSPENDED = "SUSPENDED", "Ce PASS IAE est suspendu, il ne peut pas être prolongé."
+    PENDING_REQUEST = (
+        "PENDING_REQUEST",
+        "Une demande de prolongation est déjà en attente pour ce PASS IAE.",
+    )
+    NOT_LATEST_APPROVAL = (
+        "NOT_LATEST_APPROVAL",
+        "Ce PASS IAE n’est pas le PASS IAE le plus récent du candidat, il ne peut donc pas être prolongé.",
+    )
+    TOO_EARLY = (
+        "TOO_EARLY",
+        "Ce PASS IAE se termine dans plus de 12 mois, il est trop tôt pour le prolonger.",
+    )
+    DEADLINE_PASSED = (
+        "DEADLINE_PASSED",
+        "Ce PASS IAE est arrivé à échéance il y a plus de 6 mois, le délai de prolongation est dépassé.",
+    )
+
+
 class ProlongationRequestStatus(models.TextChoices):
     PENDING = "PENDING", "À traiter"
     GRANTED = "GRANTED", "Acceptée"

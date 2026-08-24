@@ -31,10 +31,13 @@ from itou.users.enums import LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.admin import get_admin_view_link
 from itou.utils.models import PkSupportRemark
+from itou.utils.tokens import prolongation_derogation_token_generator
+from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import (
     ApprovalFactory,
     CancelledApprovalFactory,
     ProlongationFactory,
+    ProlongationRequestFactory,
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -1093,6 +1096,189 @@ class TestCustomApprovalAdminViews:
         )
         msg = inline.employee_record_status(job_application)
         assert msg == "Une fiche salarié existe déjà pour ce candidat"
+
+
+class TestProlongationDerogation:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        with freeze_time("2025-08-21"):
+            today = timezone.localdate()
+            # A PASS IAE whose prolongation deadline has passed: its employer cannot prolong it alone
+            self.job_application = JobApplicationFactory(
+                sent_by_prescriber_alone=True,
+                with_approval=True,
+                approval__start_at=today - relativedelta(months=32),
+                approval__end_at=today - relativedelta(months=8),
+                to_company__subject_to_iae_rules=True,
+            )
+            self.approval = self.job_application.approval
+            self.company = self.job_application.to_company
+            self.url = reverse("admin:approvals_approval_prolongation_derogation", args=(self.approval.pk,))
+            assert self.approval.needs_prolongation_derogation
+            yield
+
+    def test_visible_button(self, client):
+        staff_user = ItouStaffFactory()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="view_approval"))
+        client.force_login(staff_user)
+        change_url = reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk})
+        response = client.get(change_url)
+        assertNotContains(response, self.url)
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="change_approval"))
+        response = client.get(change_url)
+        assertContains(response, f'<a href="{self.url}">Générer un lien de demande de prolongation</a>', html=True)
+
+    def test_hidden_button_when_prolongation_is_impossible(self, client):
+        # A pending prolongation request is one of the blockers of the derogation view
+        ProlongationRequestFactory(approval=self.approval, declared_by_siae=self.company)
+        staff_user = ItouStaffFactory()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename__in=["view_approval", "change_approval"]))
+        client.force_login(staff_user)
+        response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertNotContains(response, self.url)
+
+    def test_without_change_permission(self, client):
+        staff_user = ItouStaffFactory()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="view_approval"))
+        client.force_login(staff_user)
+        assert client.get(self.url).status_code == 403
+
+    def test_generate_link(self, admin_client, caplog):
+        response = admin_client.get(self.url)
+        assertContains(response, "Générer le lien")
+        assertNotContains(response, "Lien à usage unique")
+        assert not PkSupportRemark.objects.exists()
+        response = admin_client.post(self.url, data={"company": self.company.pk})
+        token = prolongation_derogation_token_generator.make_token(approval=self.approval, company=self.company)
+        expected_link = get_absolute_url(
+            reverse("approvals:prolongation_derogation", kwargs={"approval_id": self.approval.pk, "token": token})
+        )
+        assertContains(response, f'value="{expected_link}"')
+        assertContains(response, "Lien à usage unique, valable 90 jours, jusqu’au 19 novembre 2025.")
+        support_remark = PkSupportRemark.objects.get(
+            content_type=ContentType.objects.get_for_model(Approval), object_id=self.approval.pk
+        )
+        user = User.objects.get(pk=get_user(admin_client).pk)
+        assert support_remark.remark == (
+            f"2025-08-21 : lien de demande de prolongation hors délais généré par {user.get_full_name()} "
+            f"pour l’entreprise {self.company.pk} — {self.company.display_name}."
+        )
+        assert (
+            f"staff user={user.pk} issued a prolongation derogation link "
+            f"for approval={self.approval.pk} company={self.company.pk}." in caplog.messages
+        )
+
+    def test_company_defaults_to_the_latest_company(self, admin_client):
+        response = admin_client.get(self.url)
+        assertContains(response, f'value="{self.company.pk}"')
+        # The job seeker was hired by another SIAE more recently
+        new_company = CompanyFactory(subject_to_iae_rules=True)
+        with freeze_time("2025-08-22"):
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True,
+                approval=self.approval,
+                job_seeker=self.approval.user,
+                to_company=new_company,
+                state=JobApplicationState.ACCEPTED,
+            )
+        response = admin_client.get(self.url)
+        assertContains(response, f'value="{new_company.pk}"')
+
+    def test_company_without_accepted_job_application(self, admin_client):
+        other_company = CompanyFactory(subject_to_iae_rules=True)
+        response = admin_client.post(self.url, data={"company": other_company.pk})
+        assertContains(response, "Cette entreprise n’a pas de candidature acceptée liée à ce PASS IAE.")
+        assert not PkSupportRemark.objects.exists()
+
+    def test_company_not_subject_to_iae_rules(self, admin_client):
+        geiq = CompanyFactory(kind=CompanyKind.GEIQ)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            approval=self.approval,
+            job_seeker=self.approval.user,
+            to_company=geiq,
+            state=JobApplicationState.ACCEPTED,
+        )
+        response = admin_client.post(self.url, data={"company": geiq.pk})
+        assertContains(
+            response,
+            "Cette entreprise n’existe pas ou n’est pas une SIAE, elle ne peut pas déclarer de prolongation.",
+        )
+        assert not PkSupportRemark.objects.exists()
+
+    def test_suspended_approval(self, admin_client):
+        SuspensionFactory(
+            approval=self.approval,
+            siae=self.company,
+            start_at=timezone.localdate() - relativedelta(days=1),
+            end_at=timezone.localdate() + relativedelta(days=1),
+        )
+        response = admin_client.get(self.url)
+        assertRedirects(response, reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, "Ce PASS IAE est suspendu, il ne peut pas être prolongé.")],
+        )
+
+    def test_pending_prolongation_request(self, admin_client):
+        ProlongationRequestFactory(approval=self.approval, declared_by_siae=self.company)
+        response = admin_client.get(self.url)
+        assertRedirects(response, reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, "Une demande de prolongation est déjà en attente pour ce PASS IAE.")],
+        )
+
+    def test_not_the_latest_approval(self, admin_client):
+        ApprovalFactory(user=self.approval.user)
+        response = admin_client.get(self.url)
+        assertRedirects(response, reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Ce PASS IAE n’est pas le PASS IAE le plus récent du candidat, il ne peut donc pas être prolongé.",
+                )
+            ],
+        )
+
+    def test_approval_ending_in_more_than_12_months(self, admin_client):
+        # Only the deadline is waivable: it is still too early to prolong this PASS IAE
+        self.approval.end_at = timezone.localdate() + relativedelta(months=18)
+        self.approval.save(update_fields=["end_at", "updated_at"])
+
+        response = admin_client.get(self.url)
+        assertRedirects(response, reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Ce PASS IAE se termine dans plus de 12 mois, il est trop tôt pour le prolonger.",
+                )
+            ],
+        )
+        assertNotContains(admin_client.get(response.url), self.url)
+
+    def test_approval_still_within_the_prolongation_window(self, admin_client):
+        # The employer can declare the prolongation on their own, generating a link would be pointless & confusing
+        self.approval.end_at = timezone.localdate() - relativedelta(months=2)
+        self.approval.save(update_fields=["end_at", "updated_at"])
+
+        response = admin_client.get(self.url)
+        assertRedirects(response, reverse("admin:approvals_approval_change", kwargs={"object_id": self.approval.pk}))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Ce PASS IAE est dans les délais, l’employeur peut déclarer la prolongation "
+                    "sans lien de dérogation.",
+                )
+            ],
+        )
+        assertNotContains(admin_client.get(response.url), self.url)
 
 
 def test_prolongation_inconsistency_check(admin_client):

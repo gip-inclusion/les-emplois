@@ -103,3 +103,26 @@ class AdminRequestTokenGenerator(TokenGenerator):
 
 
 admin_request_token_generator = AdminRequestTokenGenerator()
+
+
+class ProlongationDerogationTokenGenerator(TokenGenerator):
+    """Token generator for out-of-time-limits prolongation links.
+
+    Support staff issues a link for an (approval, company) pair when the employer cannot
+    declare the prolongation themselves because the prolongation deadline has passed
+    (`Approval.needs_prolongation_derogation`). The link is single-use: the hash value
+    holds `Approval.count_declarations()`, so declaring a prolongation (or a prolongation
+    request) invalidates every link issued before it.
+    """
+
+    key_salt = "itou.utils.tokens.ProlongationDerogationTokenGenerator"
+    timeout = 3 * 30 * 24 * 3600  # arbitrary time interval of 3 months
+
+    def make_token(self, approval, company):
+        return super().make_token(approval=approval, company=company)
+
+    def _make_hash_value(self, timestamp, approval, company):
+        return f"{approval.pk}-{company.pk}-{approval.count_declarations()}-{timestamp}"
+
+
+prolongation_derogation_token_generator = ProlongationDerogationTokenGenerator()
