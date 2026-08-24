@@ -209,6 +209,16 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         assert personal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
         assert personal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
 
+    def test_different_siret_between_er_and_asp(self):
+        # Do not trust denormalized SIRET: it can be out of date.
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED, siret="OLD_SIRET")
+        notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
+        serializer = EmployeeRecordUpdateNotificationSerializer(notification)
+        data = serializer.data
+
+        assert data["siret"] != "OLD_SIRET"
+        assert data["siret"] == employee_record.job_application.to_company.siret_from_asp_source()
+
     def test_batch_serializer(self, subtests):
         # This is the same serializer used for employee record batches.
         # Previously not tested, killing 2 birds with 1 stone.
