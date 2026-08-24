@@ -2,13 +2,23 @@
     {% for prescriber_org in prescriber_orgs_page %}
         <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
             <div class="c-box--results__header">
-                <div class="c-box--results__summary">
-                    <i class="ri-home-smile-2-line" aria-hidden="true"></i>
-                    <div>
-                        <span>{{ prescriber_org.get_kind_display }}
-                            {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
-                        </span>
-                        <h3>{{ prescriber_org.name }}</h3>
+                <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-start">
+                    <div class="c-box--results__summary">
+                        <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+                        <div>
+                            <span>{{ prescriber_org.get_kind_display }}
+                                {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
+                            </span>
+                            <h3>{{ prescriber_org.name }}</h3>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 justify-content-md-end">
+                        {% for category in prescriber_org.accompaniment_categories %}
+                            <span class="badge badge-sm rounded-pill bg-info text-white fw-normal">{{ category.label }}</span>
+                        {% endfor %}
+                        {% if prescriber_org.is_authorized %}
+                            <span class="badge badge-sm rounded-pill bg-info-lighter text-info fw-normal">Prescripteur habilité emploi inclusif</span>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
@@ -23,7 +33,7 @@
                         </li>
                     </ul>
                     <div>
-                        <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link">Voir ce prescripteur</a>
+                        <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link">Voir cette structure</a>
                     </div>
                 </div>
             </div>

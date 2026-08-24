@@ -1,7 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
 {% load static %}
-{% load str_filters %}
 
 {% block title %}
     {% include "search/includes/prescribers_search_title.html" with city=city distance=distance only %}
@@ -9,9 +8,12 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
         {% fragment as c_title__main %}
-            <h1>Rechercher des prescripteurs habilités</h1>
+            <h1>Rechercher un accompagnement</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>Pour obtenir un emploi inclusif, accéder à une aide et effectuer des démarches, le renfort d’un accompagnateur est souvent essentiel.</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -31,7 +33,6 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
-                    <h2 class="mb-3 mb-md-4">Prescripteur{{ prescriber_orgs_page.paginator.count|pluralizefr }}</h2>
                     <div class="d-block w-100">
                         <form hx-get="{% url 'search:prescribers_results' %}"
                               hx-trigger="change delay:.5s"
@@ -42,6 +43,13 @@
                               hx-push-url="true">
                             <div class="btn-dropdown-filter-group my-3 my-md-4">
                                 {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
+                                {% include "includes/btn_dropdown_filter/radio.html" with field=form.category only %}
+                                <div class="ms-lg-auto">
+                                    <a href="{{ clear_filters_url }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+                                        <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+                                        <span>Effacer tout</span>
+                                    </a>
+                                </div>
                             </div>
                         </form>
                     </div>
