@@ -34,6 +34,22 @@ from itou.utils.urls import get_absolute_url
 logger = logging.getLogger("itou.approvals.admin")
 
 
+def _admin_context(request, model_admin, *, title, **extra):
+    """Build the context every custom admin view needs to render an admin template."""
+    admin_site = model_admin.admin_site
+    opts = model_admin.model._meta
+    return admin_site.each_context(request) | {
+        "admin_site": admin_site.name,
+        "app_label": opts.app_label,
+        "has_view_permission": model_admin.has_view_permission(request),
+        "media": model_admin.media,
+        "opts": opts,
+        "subtitle": None,
+        "title": title,
+        **extra,
+    }
+
+
 def manually_add_approval(
     request, model_admin, job_application_id, template_name="admin/approvals/manually_add_approval.html"
 ):
@@ -41,9 +57,7 @@ def manually_add_approval(
     Custom admin view to manually add an approval.
     """
 
-    admin_site = model_admin.admin_site
-    opts = model_admin.model._meta
-    app_label = opts.app_label
+    app_label = model_admin.model._meta.app_label
     has_perm = request.user.has_perm(f"{app_label}.handle_manual_approval_requests")
 
     if not has_perm:
@@ -92,21 +106,16 @@ def manually_add_approval(
         messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
-    context = {
-        "add": True,
-        "adminform": adminForm,
-        "admin_site": admin_site.name,
-        "app_label": app_label,
-        "errors": admin.helpers.AdminErrorList(form, {}),
-        "form": form,
-        "job_application": job_application,
-        "media": model_admin.media,
-        "opts": opts,
-        "title": "Ajout manuel d'un numéro d'agrément",
-        "subtitle": None,
-        "has_view_permission": model_admin.has_view_permission(request),
-        **admin_site.each_context(request),
-    }
+    context = _admin_context(
+        request,
+        model_admin,
+        title="Ajout manuel d'un numéro d'agrément",
+        add=True,
+        adminform=adminForm,
+        errors=admin.helpers.AdminErrorList(form, {}),
+        form=form,
+        job_application=job_application,
+    )
     return render(request, template_name, context)
 
 
@@ -117,9 +126,7 @@ def manually_refuse_approval(
     Custom admin view to manually refuse an approval (in the case of a job seeker in waiting period).
     """
 
-    admin_site = model_admin.admin_site
-    opts = model_admin.model._meta
-    app_label = opts.app_label
+    app_label = model_admin.model._meta.app_label
     has_perm = request.user.has_perm(f"{app_label}.handle_manual_approval_requests")
 
     if not has_perm:
@@ -160,20 +167,15 @@ def manually_refuse_approval(
         },
     )
 
-    context = {
-        "add": True,
-        "admin_site": admin_site.name,
-        "app_label": app_label,
-        "email_body_template": email_body_template,
-        "email_subject_template": email_subject_template,
-        "job_application": job_application,
-        "media": model_admin.media,
-        "opts": opts,
-        "title": "Confirmer le refus manuel d'un numéro d'agrément",
-        "subtitle": None,
-        "has_view_permission": model_admin.has_view_permission(request),
-        **admin_site.each_context(request),
-    }
+    context = _admin_context(
+        request,
+        model_admin,
+        title="Confirmer le refus manuel d'un numéro d'agrément",
+        add=True,
+        email_body_template=email_body_template,
+        email_subject_template=email_subject_template,
+        job_application=job_application,
+    )
     return render(request, template_name, context)
 
 
