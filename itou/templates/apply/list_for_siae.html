@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
@@ -17,19 +18,26 @@
                 </a>
             {% endif %}
         </div>
-        {% if siae.is_subject_to_iae_rules %}
-            <div class="c-title__secondary">
-                <p>
-                    Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.
-                </p>
-                <p>Les demandes rétroactives ne sont pas autorisées.</p>
-            </div>
-        {% endif %}
     </div>
-
-    {% include "apply/includes/siae_batch_actions.html" with display_batch_actions=False %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    {% if siae.is_subject_to_iae_rules %}
+        {% component_alert title=title content=content variant="warning" %}
+            {% fragment as title %}
+                Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche.
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">Les demandes rétroactives ne sont pas autorisées.</p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "apply/includes/siae_batch_actions.html" with display_batch_actions=False %}
+{% endblock %}
 
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
