@@ -409,7 +409,7 @@ class Command(BaseCommand):
             "beneficiaries_access_modes_external_form_link_text"
         ]
         service.mobilization_modes_beneficiaries_other = dora_data["beneficiaries_access_modes_other"]
-        service.mobilization_modes_professionals_external_form_link = dora_data[
+        service.mobilization_link = dora_data[
             "coach_orientation_modes_external_form_link"
         ]
         service.mobilization_modes_professionals_external_form_link_text = dora_data[
@@ -551,8 +551,8 @@ class Command(BaseCommand):
 
         service.eligibility_zones = data["zone_eligibilite"] or []
 
-        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
-        self._void_if_max_len(service, "mobilization_modes_professionals_external_form_link")
+        service.mobilization_link = data["lien_mobilisation"] or ""
+        self._void_if_max_len(service, "mobilization_link")
 
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""

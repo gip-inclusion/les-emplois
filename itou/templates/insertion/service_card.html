@@ -276,7 +276,7 @@
                         <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
                             <h2 class="h3">Les démarches à réaliser</h2>
                             {% if service.is_dora %}
-                                {% if service.mobilization_modes_professionals.exists or service.mobilization_modes_professionals_external_form_link or service.mobilization_modes_professionals_other %}
+                                {% if service.mobilization_modes_professionals.exists or service.mobilization_link or service.mobilization_modes_professionals_other %}
                                     <h3 class="h4">Pour les professionnels de l'accompagnement</h3>
                                     <ul class="mb-0">
                                         {% for mode in service.mobilization_modes_professionals.all %}
@@ -290,9 +290,9 @@
                                                 </li>
                                             {% endif %}
                                         {% endfor %}
-                                        {% if service.mobilization_modes_professionals_external_form_link %}
+                                        {% if service.mobilization_link %}
                                             <li>
-                                                <a href="{{ service.mobilization_modes_professionals_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_professionals_external_form_link_text|default:"Orienter un bénéficiaire" }}</a>
+                                                <a href="{{ service.mobilization_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_professionals_external_form_link_text|default:"Orienter un bénéficiaire" }}</a>
                                             </li>
                                         {% endif %}
                                         {% if professionals_has_autre and service.mobilization_modes_professionals_other %}

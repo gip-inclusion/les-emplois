@@ -359,6 +359,11 @@ class Service(GeolocatedAddressMixin, models.Model):
         },
         related_name="+",
     )
+    mobilization_link = models.URLField(
+        verbose_name="lien de mobilisation",
+        blank=True,
+        max_length=2000,
+    )
 
     # DORA's mobilization fields
     mobilization_modes_beneficiaries = models.ManyToManyField(
@@ -386,9 +391,6 @@ class Service(GeolocatedAddressMixin, models.Model):
             "kind": GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
         },
         related_name="+",
-    )
-    mobilization_modes_professionals_external_form_link = models.URLField(
-        verbose_name="lien vers le formulaire externe", blank=True, max_length=2000
     )
     mobilization_modes_professionals_external_form_link_text = models.CharField(
         verbose_name="l’intitulé du lien vers le formulaire externe",
@@ -463,12 +465,12 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def should_mobilize_via_external_link(self) -> bool:
-        return not self.is_dora and bool(self.mobilization_modes_professionals_external_form_link)
+        return not self.is_dora and bool(self.mobilization_link)
 
     @property
     def has_orientation_action(self):
         return (self.is_orientable_with_form and not self.from_non_orientable_di_source) or bool(
-            self.mobilization_modes_professionals_external_form_link
+            self.mobilization_link
         )
 
     def has_mobilization_modes(self):
@@ -476,7 +478,7 @@ class Service(GeolocatedAddressMixin, models.Model):
             self.is_dora
             and (
                 bool(self.mobilization_modes_professionals.all())
-                or self.mobilization_modes_professionals_external_form_link
+                or self.mobilization_link
                 or self.mobilization_modes_professionals_other
                 or bool(self.mobilization_modes_beneficiaries.all())
                 or self.mobilization_modes_beneficiaries_external_form_link
