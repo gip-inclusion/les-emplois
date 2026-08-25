@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -42,3 +44,35 @@ class AuditTrail(models.Model):
     data = models.JSONField("métadonnées", null=True)
 
     objects = AuditTrailManager()
+
+    def credibility(self) -> float:
+        """Measure the credibility of this event according to the past events.
+
+        Gives a value between 0 (the event does not looks legit
+        according to past events), and 1 (the event looks legit).
+
+        Consider > 0.5 to be OK, < 0.5 to be suspicious.
+        """
+        trail = AuditTrail.objects.filter(
+            event_type=AuditTrailEventType.LOG_IN,
+            user=self.user,
+            timestamp__lt=self.timestamp - datetime.timedelta(days=1),
+        )
+        known_browser_ids = {event.browser_id for event in trail}
+        known_ips = {event.ip for event in trail}
+
+        browser_is_known = self.browser_id in known_browser_ids
+        ip_is_known = self.ip in known_ips
+        match browser_is_known, ip_is_known:
+            case True, True:
+                return 1
+            case True, False:
+                return 0.9
+            case False, True:
+                return 0.6
+            case _:
+                return 0
+
+    @property
+    def is_suspicious(self) -> bool:
+        return self.credibility() < 0.5
