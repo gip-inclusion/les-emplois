@@ -47,7 +47,7 @@
     {{ block.super }}
     <script nonce="{{ csp_nonce }}">
         function disable_other_contract_type() {
-            var isDisabled = $("#id_contract_type").val() !== "OTHER"
+            var isDisabled = $("#id_contract_type").val() !== "OTHER" // no-typography-rule-check
             $("#id_other_contract_type").attr("disabled", isDisabled)
             if (isDisabled) {
                 $("#id_other_contract_type").val("")
