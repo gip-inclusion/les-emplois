@@ -25,7 +25,7 @@ from itou.otp.utils import create_otp_backup_code, create_placeholder_for_extern
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory, ResetRequestFactory
-from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWith2MembershipFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -779,8 +779,8 @@ def test_mfa_reset_full_process(client, settings, mailoutbox, django_capture_on_
 
 def test_mfa_reset_mail_to_support_when_reset_request_submitted(client, settings, mailoutbox):
     settings.REQUIRE_MFA_FOR_PROS = True
-    org = PrescriberOrganizationWith2MembershipFactory(membership=True)
-    user = org.members.filter(prescribermembership__is_admin=False).first()
+    org = PrescriberOrganizationFactory(with_membership=True)
+    user = org.members.first()
     ItouTOTPDeviceFactory(name="1", user=user)
     client.force_login(user)
 
@@ -789,6 +789,28 @@ def test_mfa_reset_mail_to_support_when_reset_request_submitted(client, settings
     assert len(mailoutbox) == 2
     assert any("demande une réinitialisation de ses paramètres de 2FA" in mail.subject for mail in mailoutbox)
     assert any("demandé une réinitialisation de vos paramètres de 2FA" in mail.subject for mail in mailoutbox)
+    assert any(settings.ITOU_EMAIL_CONTACT in mail.to for mail in mailoutbox)
+
+
+def test_mfa_reset_mail_to_admins_when_reset_request_submitted(client, settings, mailoutbox):
+    settings.REQUIRE_MFA_FOR_PROS = True
+    org = PrescriberOrganizationWith2MembershipFactory(membership=True)
+    user = org.members.filter(prescribermembership__is_admin=False).first()
+    admin = org.members.filter(prescribermembership__is_admin=True).first()
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    response = client.get(reverse("otp_views:reset_request_init"))
+    assertContains(response, admin.get_truncated_full_name())
+
+    response = client.post(reverse("otp_views:reset_request_init"), follow=True)
+    assert response.status_code == 200
+    assert len(mailoutbox) == 2
+    assert any("demande une réinitialisation de ses paramètres de 2FA" in mail.subject for mail in mailoutbox)
+    assert any("demandé une réinitialisation de vos paramètres de 2FA" in mail.subject for mail in mailoutbox)
+    # Don't bother the support:
+    assert not any(settings.ITOU_EMAIL_CONTACT in mail.to for mail in mailoutbox)
+    # Just tell the admins
+    assert any(admin.email in mail.to for mail in mailoutbox)
 
 
 @pytest.mark.parametrize("accept_it", [True, False])

@@ -17,6 +17,7 @@ from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
 from itou.audit_trail.models import AuditTrail, AuditTrailEventType
+from itou.common_apps.organizations.utils import get_org_admins
 from itou.otp.emails import notify_backup_code_has_been_used, notify_mfa_reset_request_init
 from itou.otp.enums import ResetRequestState
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice, ResetRequest
@@ -79,7 +80,8 @@ def reset_request_self_cancel(request, template_name="otp_views/reset_request_se
 
 def reset_request_init(request, template_name="otp_views/reset_request_init.html"):
     form = forms.Form(data={})
-    context = {"form": form, "disabled": False}
+    admins = get_org_admins(getattr(request, "organizations", None), request.user)
+    context = {"form": form, "admins": admins, "disabled": False}
     if not get_user_devices(request.user):
         messages.warning(request, "Aucune double authentification n’est configurée pour votre compte.")
         context["disabled"] = True
@@ -114,7 +116,11 @@ def reset_request_init(request, template_name="otp_views/reset_request_init.html
 
 
 def reset_request_created(request, template_name="otp_views/reset_request_created.html"):
-    return render(request, template_name)
+    return render(
+        request,
+        template_name,
+        context={"org_has_admins": bool(get_org_admins(getattr(request, "organizations", None), request.user))},
+    )
 
 
 def reset_request_do_reset(request, token, template_name="otp_views/reset_request_do_reset.html"):

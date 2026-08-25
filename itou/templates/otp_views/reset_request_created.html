@@ -22,8 +22,15 @@
                             <strong>Votre demande a bien été transmise.</strong>
                         </p>
                         <p>
-                            <strong>Votre demande a bien été transmise au support technique des emplois de l’inclusion.</strong>
-                            Vous serez notifié par <strong>e-mail</strong> dès que votre <strong>demande aura été traitée</strong>.
+                            {% if org_has_admins %}
+                                <strong>Rapprochez-vous des administrateurs</strong>
+                                de votre structure afin qu’ils puissent la traiter.
+                                Sans réponse de leur part, contactez le support technique des emplois de l’inclusion.
+                                Vous recevrez également un e-mail dès que votre demande aura été traitée.
+                            {% else %}
+                                <strong>Votre demande a bien été transmise au support technique des emplois de l’inclusion.</strong>
+                                Vous serez notifié par <strong>e-mail</strong> dès que votre <strong>demande aura été traitée</strong>.
+                            {% endif %}
                         </p>
                         <hr class="mb-3">
                         <div class="form-row align-items-center justify-content-end gx-3">
