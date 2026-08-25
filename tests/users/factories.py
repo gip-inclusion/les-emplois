@@ -357,9 +357,9 @@ class JobSeekerFactory(UserFactory):
                 JobSeekerAssignmentFactory(
                     job_seeker=self,
                     professional=self.created_by,
-                    prescriber_organization=self.jobseeker_profile.created_by_prescriber_organization,
                     last_action_kind=ActionKind.CREATE,
                     last_action_at=self.date_joined,
+                    **kwargs,
                 )
 
 

@@ -42,7 +42,6 @@ def _model_sanity_check():
         "prolongation",
         "prolongationrequest",
         "notification_settings",
-        "jobseekerprofile",
     }
     if relation_fields != expected_fields:
         raise RuntimeError(

@@ -1176,7 +1176,6 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
@@ -1493,8 +1492,6 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-
-        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
         next_url = reverse(
             "apply:application_jobs",
@@ -2035,8 +2032,6 @@ class TestApplyAsPrescriber:
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-
-        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == organization
 
         next_url = reverse(
             "apply:application_jobs",
