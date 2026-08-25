@@ -1,0 +1,60 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load support %}
+
+{% block title %}Réinitialisation de la double authentification {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Demander la réinitialisation de ma double authentification</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="section__col col-12">
+                    <div class="c-box">
+                        <h2>Réinitialisation de la double authentification</h2>
+                        <p>
+                            {% if admins %}
+                                Pour des raisons de sécurité, votre demande sera transmise <strong>aux administrateurs</strong> suivants avant d’être traitée :
+                                <ul>
+                                    {% for admin, organization in admins.items %}
+                                        <li>
+                                            <strong>{{ admin.get_truncated_full_name }}</strong> — {{ organization }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                Pour des raisons de sécurité, votre demande sera examinée par le support technique des emplois de l’inclusion avant d’être traitée.
+                            {% endif %}
+                            {% component_alert title=title content=content variant="info" %}
+                                {% fragment as title %}
+                                    Informations transmises avec votre demande :
+                                {% endfragment %}
+                                {% fragment as content %}
+                                    <ul>
+                                        <li>Date et heure de la demande</li>
+                                        <li>Adresse IP et localisation approximative</li>
+                                        <li>Navigateur et appareil utilisés</li>
+                                    </ul>
+                                    Ces informations sont comparées à vos connexions habituelles afin d’aider à vérifier qu’il s’agit bien de vous.
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% itou_buttons_form primary_label="Envoyer la demande" primary_disabled=disabled reset_url=None show_mandatory_fields_mention=False %}
+                            </form>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "commentaire du support",
+                "verbose_name_plural": "commentaires du support",
             },
         ),
         migrations.CreateModel(
@@ -88,6 +89,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "commentaire du support",
+                "verbose_name_plural": "commentaires du support",
             },
         ),
     ]

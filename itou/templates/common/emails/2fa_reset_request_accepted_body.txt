@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Une demande de réinitialisation de vos paramètres de double authentification à été approuvée, si elle n’a pas été faite par vous, ignorez ce message et ne cliquez pas sur le lien suivant.
+
+Pour réinitialiser vos paramètres de double authentification, cliquez sur le lien suivant :
+
+{% url "otp_views:reset_request_do_reset" reset_link.nonce %}
+
+{% endblock body %}
