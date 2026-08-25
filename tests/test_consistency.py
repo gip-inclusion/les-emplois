@@ -11,7 +11,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import management
 from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.fields.related import RelatedField
+from django.db.models.fields.related import ManyToManyField, RelatedField
 from django.template import loader, loader_tags
 from django.template.defaulttags import LoadNode
 
@@ -256,7 +256,9 @@ def test_files_foreign_keys():
     models = apps.get_models()
     for model in models:
         file_related_fields = [
-            f for f in model._meta.get_fields() if isinstance(f, RelatedField) and f.related_model == File
+            f
+            for f in model._meta.get_fields()
+            if isinstance(f, RelatedField) and f.related_model == File and not isinstance(f, ManyToManyField)
         ]
         for field in file_related_fields:
             expected_on_delete = CASCADE if model == Scan else PROTECT

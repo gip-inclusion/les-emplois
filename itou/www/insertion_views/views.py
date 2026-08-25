@@ -19,6 +19,7 @@ from itoutils.django.decoupage_administratif.admin_division_parsing import get_d
 from rest_framework import status
 
 from itou.companies.models import Company
+from itou.files.models import save_file
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind
@@ -504,6 +505,12 @@ class OrientationWizardView(WizardView):
             # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
             # otherwise issue a redundant UPDATE probe before the INSERT.
             orientation.save(force_insert=True)
+
+            documents = []
+            for attachment_tuple in attachments:
+                file = save_file(folder="orientations/", file=attachment_tuple[1], anonymize_filename=False)
+                documents.append(file)
+            orientation.documents.set(documents)
 
             # Link the originating iMER to the created Orientation.
             event = (

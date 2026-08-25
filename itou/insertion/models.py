@@ -12,6 +12,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.companies.models import Company
+from itou.files.models import File
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     GenericReferenceItemKind,
@@ -733,12 +734,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         default=False,
     )
 
+    # `attachments` will be removed in favor of `documents` when we stop posting orientations to DORA
     attachments = ArrayField(
         models.CharField(max_length=1024),
         verbose_name="documents joints",
         blank=True,
         default=list,
     )
+    # `documents` are saved but not displayed for now; we still display `attachments` until we stop posting to DORA
+    documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="+")  #
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)

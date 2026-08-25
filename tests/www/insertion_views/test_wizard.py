@@ -6,8 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
+from itou.files.models import File
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation
 from itou.job_applications.enums import SenderKind
 from itou.utils.apis.dora import DoraAPIException
@@ -20,6 +21,7 @@ from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, 
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_orientation_wizard_happy_path(client, snapshot, mocker):
     prescriber = PrescriberMembershipFactory(
         organization__authorized=True,
@@ -159,6 +161,11 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         "orientations/attachments/doc.pdf",
         "orientations/attachments/proof.pdf",
     ]
+    assertQuerySetEqual(
+        orientation.documents.all(),
+        File.objects.filter(key__in=["orientations/doc.pdf", "orientations/proof.pdf"]),
+        ordered=False,
+    )
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload == {
@@ -470,6 +477,7 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
         ({}, "à distance"),
     ],
 )
+@pytest.mark.usefixtures("temporary_bucket")
 def test_documents_step_normalizes_beneficiary_phone_for_dora(
     client, mocker, service_kwargs, expected_di_service_address_line
 ):
