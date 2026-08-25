@@ -187,6 +187,11 @@
       'model': 'job_applications.JobApplicationTransitionLog',
     }),
     dict({
+      'field': 'actor',
+      'hidden': True,
+      'model': 'otp.ResetRequestTransitionLog',
+    }),
+    dict({
       'field': 'updated_by',
       'hidden': False,
       'model': 'prescribers.PrescriberMembership',
@@ -294,6 +299,11 @@
       'field': 'user',
       'hidden': False,
       'model': 'otp.ItouTOTPDevice',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'otp.ResetRequest',
     }),
     dict({
       'field': 'user',
