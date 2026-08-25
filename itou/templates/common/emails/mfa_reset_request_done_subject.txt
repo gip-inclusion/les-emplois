@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Vos paramètres de 2FA ont été réinitialisés
+{% endblock %}

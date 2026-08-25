@@ -53,7 +53,7 @@ def new_user(request, invitation_type, invitation_id):
                 "Un utilisateur est déjà connecté.<br>"
                 "Merci de déconnecter ce compte en cliquant sur le bouton ci-dessous. "
                 "La page d'accueil se chargera automatiquement, n'en tenez pas compte.<br>"
-                "Retournez dans votre boite mail et cliquez de nouveau sur le lien "
+                "Retournez dans votre boîte mail et cliquez de nouveau sur le lien "
                 "reçu pour accepter l'invitation."
             )
             message = safestring.mark_safe(message)

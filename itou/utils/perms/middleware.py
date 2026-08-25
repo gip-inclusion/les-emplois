@@ -95,6 +95,14 @@ def get_active_institution_memberships(user):
     )
 
 
+def otp_verification_exempt(path):
+    return path in (
+        reverse("otp_views:verify_otp"),
+        reverse("otp_views:login_with_backup_code"),
+        reverse("otp_views:enrollment_step_2_download_app_for_phones"),
+    ) or path.startswith("/otp/reset-request/")
+
+
 class ItouCurrentOrganizationMiddleware:
     """
     Store the ID of the current prescriber organization or employer structure in session
@@ -173,21 +181,14 @@ class ItouCurrentOrganizationMiddleware:
             # Enforce MFA if needed:
             if require_otp(user):
                 logger.info("Requiring internal OTP for user %d", user.id)
-                login_verify_otp_url = reverse("otp_views:verify_otp")
-                otp_is_needed = all(
-                    request.path != url
-                    for url in (
-                        login_verify_otp_url,
-                        reverse("otp_views:login_with_backup_code"),
-                        reverse("otp_views:enrollment_step_2_download_app_for_phones"),
-                    )
-                )
-                user_has_devices = bool(get_user_devices(user))
-                if user_has_devices and otp_is_needed:
-                    return HttpResponseRedirect(
-                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                    )
-                if not user_has_devices and not request.path.startswith("/otp/enrollment"):
+                if get_user_devices(user):
+                    if not otp_verification_exempt(request.path):
+                        return HttpResponseRedirect(
+                            add_url_params(
+                                reverse("otp_views:verify_otp"), {REDIRECT_FIELD_NAME: request.get_full_path()}
+                            )
+                        )
+                elif not request.path.startswith("/otp/enrollment"):
                     return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
             # Allow access to signup and invitations view even without ProConnect or an active organization
