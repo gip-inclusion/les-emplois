@@ -19,7 +19,12 @@ from itou.otp.utils import (
 from tests.companies.factories import CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+)
 
 
 def test_get_user_devices():

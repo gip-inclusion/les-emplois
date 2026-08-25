@@ -1,0 +1,9 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Vos paramètres de double authentification ont été réinitialisés. Vous pouvez dès à présent vous connecter et configurer une nouvelle double authentification.
+Si vous n'êtes pas à l'origine de cette action, contactez sans attendre security@inclusion.gouv.fr.
+
+{% endblock body %}

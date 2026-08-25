@@ -1,0 +1,18 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour le support,
+
+L’utilisateur {{ caller.get_truncated_full_name }} (ou quelqu’un essayant de prendre le contrôle de son compte), a fait une demande de réinitialisation de sa double authentification.
+
+{% if reset_request.is_suspicious %}
+⚠️ Cette demande présente un élément de connexion inhabituel (IP ou appareil différents des habitudes de cet utilisateur). Nous vous recommandons une vigilance renforcée.
+{% endif %}
+
+Nous vous recommandons de vérifier son identité, idéalement par un contact direct, avant de traiter cette demande.
+
+Vous pouvez traiter cette demande ici :
+
+{{ admin_url }}
+
+{% endblock body %}

@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -7,6 +9,7 @@ from django_datadog_logger.formatters.datadog import get_client_ip
 class AuditTrailEventType(models.TextChoices):
     PARTIAL_LOG_IN = "PARTIAL_LOG_IN", "L’utilisateur s’identifie (via un mot de passe ou un IDP)"
     LOG_IN = "LOG_IN", "L’utilisateur est connecté (2FA validé le cas échéant)"
+    MFA_RESET_REQUEST = "MFA_RESET_REQUEST", "Demande de réinitialisation du 2FA"
 
 
 class AuditTrailManager(models.Manager):
@@ -42,3 +45,33 @@ class AuditTrail(models.Model):
     data = models.JSONField("métadonnées", null=True)
 
     objects = AuditTrailManager()
+
+    def credibility(self) -> float:
+        """Measure the credibility of this event according to the past events.
+
+        Gives a value between 0 (the event does not looks legit
+        according to past events), and 1 (the event looks legit).
+
+        Consider > 0.5 to be OK, < 0.5 to be suspicious.
+        """
+        trail = AuditTrail.objects.filter(
+            event_type=AuditTrailEventType.LOG_IN,
+            user=self.user,
+            timestamp__lt=self.timestamp - datetime.timedelta(days=1),
+        )
+        known_browser_ids = {event.browser_id for event in trail}
+        known_ips = {event.ip for event in trail}
+
+        browser_is_known = self.browser_id in known_browser_ids
+        ip_is_known = self.ip in known_ips
+        if browser_is_known and ip_is_known:
+            return 1
+        if browser_is_known and not ip_is_known:
+            return 0.9
+        if ip_is_known and not browser_is_known:
+            return 0.6
+        return 0
+
+    @property
+    def is_suspicious(self) -> bool:
+        return self.credibility() < 0.5

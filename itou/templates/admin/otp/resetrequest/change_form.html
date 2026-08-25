@@ -1,0 +1,31 @@
+{% extends 'admin/change_form.html' %}
+{% block form_top %}
+    {% if available_transitions %}
+        <div class="submit-row" id="otp-reset-request-transitions">
+            {% for transition in available_transitions %}
+                <input type='submit' class="danger {% if transition.name == "accept" %}js-with-confirm{% endif %}" name="transition_{{ transition.name }}" value="{{ transition.label }}">
+            {% endfor %}
+            {% if request_is_suspicious %}
+                <div>
+                    <ul class="messagelist">
+                        <li class="error">
+                            Cette demande présente un élément de connexion inhabituel (IP ou appareil différents des habitudes de cet utilisateur). Nous vous recommandons une vigilance renforcée.
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    <script nonce="{{ csp_nonce }}">
+        (function() {
+            Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
+                form.addEventListener("click", function(e) {
+                    if (!confirm("Avez-vous fait toutes les vérifications pour garantir que cette demande de ré-initialisation de 2FA est légitime ?")) {
+                        e.preventDefault();
+                    }
+                })
+            })
+        }());
+    </script>
+    {{ block.super }}
+{% endblock %}
