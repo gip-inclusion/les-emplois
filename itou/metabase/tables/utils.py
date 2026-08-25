@@ -13,6 +13,7 @@ from django.db.models.fields import (
     CharField,
     DateField,
     DateTimeField,
+    DecimalField,
     IntegerField,
     TextField,
     UUIDField,
@@ -58,6 +59,8 @@ def get_field_type_from_field(field):
         return "text"
     if isinstance(field, IntegerField):
         return "integer"
+    if isinstance(field, DecimalField):
+        return "numeric"
     if isinstance(field, AutoField) and field.name == "id":
         return "integer"
     if isinstance(field, UUIDField):
