@@ -2,7 +2,6 @@ from django.conf import settings
 from django.db import transaction
 
 from itou.companies.models import CompanyMembership
-from itou.emails.utils import get_email_message
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.prescribers.models import PrescriberMembership
 
@@ -56,16 +55,6 @@ def create_otp_backup_code(user) -> str:
     )
     clear_code, _ = ItouStaticToken.objects.create(device)
     return clear_code
-
-
-def notify_backup_code_has_been_used(user):
-    email = get_email_message(
-        to=[user.email],
-        context={"user": user},
-        subject="common/emails/used_otp_backup_code_subject.txt",
-        body="common/emails/used_otp_backup_code_body.md",
-    )
-    email.send()
 
 
 def user_is_concerned_by_otp(user):
