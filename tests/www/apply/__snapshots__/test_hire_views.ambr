@@ -2911,7 +2911,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
@@ -3798,7 +3797,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
@@ -4917,7 +4915,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
@@ -5955,7 +5952,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
@@ -6884,7 +6880,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -7611,7 +7606,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -8459,7 +8453,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -9454,7 +9447,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -10178,7 +10170,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -10905,7 +10896,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -11753,7 +11743,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
@@ -12748,7 +12737,6 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"

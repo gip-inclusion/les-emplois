@@ -602,7 +602,6 @@ class TestStandaloneCreateAsPrescriber:
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
                 JobSeekerAssignmentFactory(
                     job_seeker=existing_job_seeker,
                     professional=user,
@@ -611,7 +610,6 @@ class TestStandaloneCreateAsPrescriber:
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
                 JobApplicationFactory(
                     sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
@@ -624,7 +622,6 @@ class TestStandaloneCreateAsPrescriber:
             case _:
                 # Not in list
                 existing_job_seeker.created_by = other_user_in_other_organization
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
                 JobSeekerAssignmentFactory(
                     job_seeker=existing_job_seeker,
                     professional=other_user_in_other_organization,
@@ -691,7 +688,6 @@ class TestStandaloneCreateAsPrescriber:
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
                 JobSeekerAssignmentFactory(
                     job_seeker=existing_job_seeker,
                     professional=user,
@@ -700,7 +696,6 @@ class TestStandaloneCreateAsPrescriber:
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
                 JobApplicationFactory(
                     sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
@@ -713,7 +708,6 @@ class TestStandaloneCreateAsPrescriber:
             case _:
                 # Not in list
                 existing_job_seeker.created_by = other_user_in_other_organization
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
                 JobSeekerAssignmentFactory(
                     job_seeker=existing_job_seeker,
                     professional=other_user_in_other_organization,
@@ -983,7 +977,6 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(next_url)
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
         next_url = reverse(
             "job_seekers_views:details",
             kwargs={"public_id": new_job_seeker.public_id},

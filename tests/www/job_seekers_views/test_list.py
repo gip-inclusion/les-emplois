@@ -421,7 +421,21 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         post_code="29200",
         city="Brest",
         created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+    # When applying for a job seeker already in the list, he's not shown twice
+    JobApplicationFactory(
+        job_seeker=alain,
+        sender=prescriber,
+        sent_by_authorized_prescriber=True,
+        updated_at=timezone.now() - datetime.timedelta(days=1),
+        with_iae_eligibility_diagnosis=True,
+    )
+    alain_assignment = JobSeekerAssignmentFactory(
+        job_seeker=alain,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+        last_action_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Job seeker created by another member of the organization
@@ -432,7 +446,6 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         post_code="29200",
         city="Brest",
         created_by=other_prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
     )
     bernard_assignment = JobSeekerAssignmentFactory(
         job_seeker=bernard,
@@ -456,7 +469,6 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         post_code="29200",
         city="Brest",
         created_by=prescriber_not_in_org_anymore,
-        jobseeker_profile__created_by_prescriber_organization=organization,
     )
     JobSeekerAssignmentFactory(
         job_seeker=charlotte,
@@ -477,22 +489,6 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         last_action_at=timezone.now() - datetime.timedelta(days=2),
     )
 
-    # When applying for a job seeker already in the list, he's not shown twice
-    JobApplicationFactory(
-        job_seeker=alain,
-        sender=prescriber,
-        sent_by_authorized_prescriber=True,
-        updated_at=timezone.now() - datetime.timedelta(days=1),
-        with_iae_eligibility_diagnosis=True,
-    )
-    alain_assignment = JobSeekerAssignmentFactory(
-        job_seeker=alain,
-        professional=prescriber,
-        prescriber_organization=organization,
-        last_action_kind=ActionKind.APPLY,
-        last_action_at=timezone.now() - datetime.timedelta(days=1),
-    )
-
     # Job seeker created by the prescriber but for another organization; will not be shown
     other_organization = PrescriberOrganizationFactory()
     david = JobSeekerFactory(
@@ -502,8 +498,8 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         post_code="29200",
         city="Brest",
         created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=other_organization,
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=other_organization,
     )
 
     # Job seeker created by someone else, for another organization
@@ -514,8 +510,8 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         post_code="29200",
         city="Brest",
         created_by=other_prescriber,
-        jobseeker_profile__created_by_prescriber_organization=other_organization,
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=other_organization,
     )
 
     client.force_login(prescriber)
@@ -651,8 +647,8 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         post_code="29200",
         city="Brest",
         created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=organization,
     )
 
     # Job seeker created by another member of the organization
@@ -663,8 +659,8 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         post_code="29200",
         city="Brest",
         created_by=other_prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=organization,
     )
 
     response = client.get(url_user)
@@ -724,8 +720,8 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         post_code="29200",
         city="Brest",
         created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=organization,
     )
 
     # The prescriber is now in another org (without it they can't use the website)
@@ -1425,7 +1421,6 @@ def test_job_seekers_order(client, factory, url, subtests):
         sender=user,
         sender_company=company,
         job_seeker__created_by=user,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         job_seeker__first_name="Charles",
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
@@ -1439,10 +1434,10 @@ def test_job_seekers_order(client, factory, url, subtests):
     )
     created_job_seeker = JobSeekerFactory(
         created_by=user,
-        jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         first_name="Zorro",
         last_name="Martin",
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=prescriber_organization,
     )
     if is_company:
         JobSeekerAssignmentFactory(
@@ -1452,10 +1447,10 @@ def test_job_seekers_order(client, factory, url, subtests):
         )
     second_created_job_seeker = JobSeekerFactory(
         created_by=user,
-        jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         first_name="Zorro",
         last_name="Martin",
         with_job_seeker_assignment=True,
+        with_job_seeker_assignment__prescriber_organization=prescriber_organization,
     )
     if is_company:
         JobSeekerAssignmentFactory(
@@ -1468,7 +1463,6 @@ def test_job_seekers_order(client, factory, url, subtests):
         sent_by_employer=is_company,
         sender_company=company,
         sender=user,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         job_seeker__first_name="Alice",
         job_seeker__last_name="Berger",
         with_job_seeker_assignment=True,
