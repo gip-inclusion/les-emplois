@@ -1,0 +1,43 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load support %}
+
+{% block title %}Réinitialisation de la double authentification {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Réinitialisation de ma double authentification</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="section__col col-12">
+                    <div class="c-box">
+                        {% if success %}
+                            <h2>Votre double authentification a été réinitialisée</h2>
+                            <p>Vous pouvez maintenant configurer un nouveau moyen d’authentification :</p>
+                            <a href="{% url 'otp_views:enrollment_step_0_intro' %}" class="btn btn-block btn-primary">Configurer pas à pas</a>
+                        {% else %}
+                            <h2>Votre double authentification n’a pas été réinitialisée</h2>
+                            {% component_alert title=title content=content variant="warning" %}
+                                {% fragment as title %}
+                                    Le lien de réinitialisation que vous avez tenté d’utiliser n’est pas valide.
+                                {% endfragment %}
+                                {% fragment as content %}
+                                    Il est possible que le lien soit expiré ou qu’il ai déjà été utilié.
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

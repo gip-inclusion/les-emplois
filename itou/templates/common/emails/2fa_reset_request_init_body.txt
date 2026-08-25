@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Un membre de votre organisation, {{ caller.get_truncated_full_name }},
+ou quelqu’un essayant de prendre le contrôle de son compte, a fait une
+demande de réinitialisation sa double authentifaction.
+
+TODO : Lien vers l'interface des demandese.
+
+{% endblock body %}

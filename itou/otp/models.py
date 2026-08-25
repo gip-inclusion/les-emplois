@@ -1,20 +1,44 @@
+import logging
 import secrets
 import uuid
 
+import xworkflows
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import make_password
 from django.db import models
-from django_otp.models import Device, ThrottlingMixin, TimestampMixin
+from django.urls import reverse
+from django.utils import timezone
+from django_otp.models import Device, DeviceManager, ThrottlingMixin, TimestampMixin
 from django_otp.plugins.otp_totp.models import (
     TOTPDevice as BaseTOTPDevice,
     default_key as generate_totp_key,
     key_validator,
 )
+from django_xworkflows import models as xwf_models
 from encrypted_fields import EncryptedCharField
 
+from itou.otp.emails import (
+    notify_2fa_reset_request_accepted,
+    notify_2fa_reset_request_denied,
+    notify_2fa_reset_request_done,
+)
+from itou.otp.enums import ResetRequestState, ResetRequestTransition
 from itou.utils.models import CopyModelFieldsMeta
+from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
+
+
+class ItouDeviceManager(DeviceManager):
+    def disable_for_user(self, user) -> int:
+        now = timezone.now()
+        devices = self.filter(user=user)
+        for device in devices:
+            device.disabled_at = now
+        return self.bulk_update(devices, ["disabled_at"])
 
 
 # `django_otp.TOTPDevice` needs a few adjustments, but it's not an
@@ -45,6 +69,8 @@ class ItouTOTPDevice(
         on_delete=models.CASCADE,
     )
     disabled_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
+
+    objects = ItouDeviceManager()
 
     class Meta:
         verbose_name = "appareil d’authentification (TOTP)"
@@ -152,3 +178,107 @@ class ItouStaticToken(models.Model):
             self.save(update_fields=["hashed_code"])
 
         return check_password(clear_code, self.hashed_code, setter)
+
+
+class Itou2FAResetRequestWorkflow(xwf_models.Workflow):
+    log_model = "otp.Itou2FAResetRequestTransitionLog"
+
+    states = ResetRequestState.choices
+    transitions = (
+        (ResetRequestTransition.ACCEPT, ResetRequestState.PENDING, ResetRequestState.ACCEPTED),
+        (ResetRequestTransition.RESEND, ResetRequestState.ACCEPTED, ResetRequestState.ACCEPTED),
+        (
+            ResetRequestTransition.DENY,
+            [ResetRequestState.ACCEPTED, ResetRequestState.PENDING],
+            ResetRequestState.DENIED,
+        ),
+        (ResetRequestTransition.RESET_DEVICES, ResetRequestState.ACCEPTED, ResetRequestState.DONE),
+    )
+    initial_state = ResetRequestState.PENDING
+
+
+class Itou2FAResetRequestQuerySet(models.QuerySet):
+    def deny(self, *, actor=None, msg=None):
+        """Deny all Reset Request of this QuerySet."""
+        for request in self:
+            request.deny(actor=actor, msg=msg)
+
+
+class Itou2FAResetRequest(xwf_models.WorkflowEnabled, models.Model):
+    objects = Itou2FAResetRequestQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = "Demande de réinitialisation 2FA"
+        verbose_name_plural = "Demandes de réinitialisation 2FA"
+
+    user = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"),
+        verbose_name="utilisateur",
+        help_text="L’utilisateur demandant la réinitialisation de ses 2FA.",
+        related_name="itou_totp_reset_requests",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField("Date de création", auto_now_add=True)
+    updated_at = models.DateTimeField("Date de modification", auto_now=True)
+    state = xwf_models.StateField(Itou2FAResetRequestWorkflow, verbose_name="état")
+    nonce = models.CharField(default=secrets.token_hex, editable=False)
+
+    def mark_used(self):
+        self.used_at = timezone.now()
+        self.save(update_fields=("used_at",))
+
+    def __str__(self):
+        return f"Demande de réinitialisation 2FA de {self.user.get_full_name()}"
+
+    @xwf_models.transition()
+    def accept(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_accepted(self)
+
+    @xwf_models.transition()
+    def deny(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_denied(self)
+
+    @xwf_models.transition()
+    def resend(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_accepted(self)
+
+    @xwf_models.transition()
+    def reset_devices(self, *, actor=None, msg=None) -> int:
+        """Invalidates or deletes all 2FA user devices."""
+        disabled = ItouTOTPDevice.objects.disable_for_user(self.user)
+        deleted, _ = ItouStaticDevice.objects.filter(user=self.user).delete()
+        notify_2fa_reset_request_done(self)
+        return disabled + deleted
+
+    @xworkflows.transition_check(ResetRequestTransition.RESET_DEVICES)
+    def check_reset_devices(self):
+        """Enforce reset link validity."""
+        return self.updated_at + settings.OTP_RESET_LINK_VALIDITY > timezone.now()
+
+    @xworkflows.transition_check(ResetRequestTransition.RESEND)
+    def check_resend(self):
+        """Enforce reset request validity."""
+        return self.updated_at + settings.OTP_RESET_REQUEST_VALIDITY > timezone.now()
+
+    @property
+    def reset_link(self):
+        return get_absolute_url(reverse("otp_views:reset_request_do_reset", args=(self.nonce,)))
+
+
+class Itou2FAResetRequestTransitionLog(xwf_models.BaseTransitionLog):
+    MODIFIED_OBJECT_FIELD = "reset_request"
+    EXTRA_LOG_ATTRIBUTES = (("user", "actor", None),)
+
+    reset_request = models.ForeignKey(Itou2FAResetRequest, related_name="logs", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+    msg = models.CharField("Message", null=True)
+
+    class Meta:
+        verbose_name = "log de demande de réinitialisation de 2FA"
+        verbose_name_plural = "log des demandes de réinitialisation de 2FA"

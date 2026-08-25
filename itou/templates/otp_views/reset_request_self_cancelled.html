@@ -1,0 +1,34 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load support %}
+
+{% block title %}Annulation d’une demande de réinitialisation de double authentification {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Annuler une demande de réinitialisation de ma double authentification</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="section__col col-12">
+                    <div class="c-box">
+                        <h2>Demande de réinitialisation annulée</h2>
+                        <p>
+                            <strong>La demande de réinitialisation de votre double authentification a été annulée.</strong>
+                            Elle n’avait pas été utilisée, votre double authentification est toujours en place.
+                        </p>
+                        <a href="{% url 'account_login' %}" class="btn btn-ico btn-primary">Revenir à la connexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

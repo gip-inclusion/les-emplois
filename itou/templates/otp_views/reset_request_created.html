@@ -1,0 +1,44 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load support %}
+
+{% block title %}Réinitialisation de la double authentification {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Demander la réinitialisation de ma double authentification</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="section__col col-12">
+                    <div class="c-box">
+                        <h2>Demande envoyée</h2>
+                        <p>
+                            <strong>Votre demande a bien été transmise.</strong>
+                        </p>
+                        <p>
+                            {% if org_has_admins %}
+                                <strong>Rapprochez-vous des administrateurs</strong>
+                                de votre structure afin qu’ils puissent la traiter.
+                                Sans réponse de leur part, contactez le support technique des emplois de l’inclusion.
+                                Vous recevrez également un e-mail dès que votre demande aura été traitée.
+                            {% else %}
+                                <strong>Votre demande a bien été transmise au support technique des emplois de l’inclusion.</strong>
+                                Vous serez notifié par <strong>e-mail</strong> dès que votre <strong>demande aura été traitée</strong>.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'account_login' %}" class="btn btn-ico btn-primary">Revenir à la connexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

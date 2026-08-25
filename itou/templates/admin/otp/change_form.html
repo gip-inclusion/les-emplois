@@ -1,0 +1,22 @@
+{% extends 'admin/change_form.html' %}
+{% block form_top %}
+    {% if available_transitions %}
+        <div class="submit-row" id="employee-record-transitions">
+            {% for transition in available_transitions %}
+                <input type='submit' class="danger js-with-confirm" name="transition_{{ transition.name }}" value="{{ transition.label }}">
+            {% endfor %}
+        </div>
+    {% endif %}
+    <script nonce="{{ csp_nonce }}">
+        (function() {
+            Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
+                form.addEventListener("submit", function(e) {
+                    if (!confirm("Avez-vous fait toutes les vérifications pour garantir que cette demande de ré-initialisation de 2FA est légitime ?")) {
+                        e.preventDefault();
+                    }
+                })
+            })
+        }());
+    </script>
+    {{ block.super }}
+{% endblock %}

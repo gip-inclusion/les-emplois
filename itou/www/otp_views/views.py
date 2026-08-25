@@ -3,6 +3,8 @@ import binascii
 import logging
 
 import segno
+import xworkflows
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
@@ -14,11 +16,13 @@ from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
-from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
+from itou.common_apps.organizations.utils import get_org_admins
+from itou.otp.emails import notify_2fa_reset_request_init, notify_backup_code_has_been_used
+from itou.otp.enums import ResetRequestState
+from itou.otp.models import Itou2FAResetRequest, ItouStaticDevice, ItouTOTPDevice
 from itou.otp.utils import (
     create_otp_backup_code,
     get_user_devices,
-    notify_backup_code_has_been_used,
     user_can_enroll_otp_device,
     user_can_manage_otp_devices,
 )
@@ -55,6 +59,76 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
 
     context = {"devices": devices}
     return render(request, template_name, context)
+
+
+def reset_request_self_cancel(request, template_name="otp_views/reset_request_self_cancel.html"):
+    form = forms.Form(data={})
+    context = {"form": form, "denied": False}
+    try:
+        context["reset_request"] = reset_request = Itou2FAResetRequest.objects.get(
+            user=request.user, state__in=(ResetRequestState.PENDING, ResetRequestState.ACCEPTED)
+        )
+    except Itou2FAResetRequest.DoesNotExist:
+        context["reset_request"] = reset_request = None
+    if request.method == "POST" and reset_request:
+        reset_request.deny(actor=request.user, msg=f"Using {request.path}")
+        return HttpResponseRedirect(reverse("otp_views:reset_request_self_cancelled"))
+    return render(request, template_name, context=context)
+
+
+def reset_request_init(request, template_name="otp_views/reset_request_init.html"):
+    form = forms.Form(data={})
+    admins = get_org_admins(getattr(request, "organizations", None), request.user)
+    context = {"form": form, "admins": admins, "disabled": False}
+    if not get_user_devices(request.user):
+        messages.warning(request, "Aucune double authentification n’est configurée pour votre compte.")
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if request.user.is_verified():
+        messages.warning(
+            request,
+            "Vous êtes correctement authentifié avec votre second facteur.",
+        )
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if Itou2FAResetRequest.objects.filter(
+        user=request.user, state__in=(ResetRequestState.PENDING, ResetRequestState.ACCEPTED)
+    ):
+        messages.warning(request, "Une demande de réinitialisation est déjà en cours pour votre compte.")
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if request.method == "POST":
+        Itou2FAResetRequest.objects.create(user=request.user)
+        notify_2fa_reset_request_init(request.user, getattr(request, "organizations", None))
+        return HttpResponseRedirect(reverse("otp_views:reset_request_created"))
+
+    return render(request, template_name, context)
+
+
+def reset_request_created(request, template_name="otp_views/reset_request_created.html"):
+    return render(
+        request,
+        template_name,
+        context={"org_has_admins": bool(get_org_admins(getattr(request, "organizations", None), request.user))},
+    )
+
+
+def reset_request_do_reset(request, nonce, template_name="otp_views/reset_request_do_reset.html"):
+    reset_request = get_object_or_404(Itou2FAResetRequest.objects.select_for_update(of=("self",)), nonce=nonce)
+    if reset_request.user != request.user:
+        logger.warning("User %s tried to use 2fa reset link of %s", request.user, reset_request.user)
+        return render(request, template_name, {"success": False})
+    context = {}
+    try:
+        context["success"] = reset_request.reset_devices(actor=request.user)
+        status = 200
+    except xworkflows.base.InvalidTransitionError:
+        context["success"] = False
+        status = 400
+    return render(request, template_name, context, status=status)
 
 
 @check_user_can_enroll
@@ -155,6 +229,11 @@ class VerifyOTPView(FormView):
 
     def form_valid(self, form):
         otp_login(self.request, self.request.user.otp_device)
+        Itou2FAResetRequest.objects.filter(
+            user=self.request.user, state__in=(ResetRequestState.PENDING, ResetRequestState.ACCEPTED)
+        ).deny(
+            actor=self.request.user, msg="User successfully logged with its current 2FA"
+        )  # Invalidate all 2FA reset requests as the user finally have it.
         return super().form_valid(form)
 
     def get_success_url(self):

@@ -113,6 +113,7 @@ def get_permissions_dict():
         jobs_models.Rome: PERMS_READ,
         nexus_models.ActivatedService: PERMS_DELETE,
         otp_models.ItouTOTPDevice: PERMS_READ,
+        otp_models.Itou2FAResetRequest: PERMS_EDIT,
         prescribers_models.PrescriberMembership: PERMS_ADD,
         prescribers_models.PrescriberOrganization: PERMS_ALL,
         siae_evaluations_models.Calendar: PERMS_READ,
