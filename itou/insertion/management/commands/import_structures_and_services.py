@@ -402,21 +402,6 @@ class Command(BaseCommand):
 
         service.access_conditions_dora = dora_data["access_conditions"]
 
-        service.mobilization_modes_beneficiaries_external_form_link = dora_data[
-            "beneficiaries_access_modes_external_form_link"
-        ]
-        service.mobilization_modes_beneficiaries_external_form_link_text = dora_data[
-            "beneficiaries_access_modes_external_form_link_text"
-        ]
-        service.mobilization_modes_beneficiaries_other = dora_data["beneficiaries_access_modes_other"]
-        service.mobilization_link = dora_data[
-            "coach_orientation_modes_external_form_link"
-        ]
-        service.mobilization_modes_professionals_external_form_link_text = dora_data[
-            "coach_orientation_modes_external_form_link_text"
-        ]
-        service.mobilization_modes_professionals_other = dora_data["coach_orientation_modes_other"]
-
         service.credentials = dora_data["credentials"]
         service.credentials_documents = dora_data["forms"]
         service.credentials_online_form = dora_data["online_form"]
@@ -491,24 +476,6 @@ class Command(BaseCommand):
                 "funding_labels",
                 GenericReferenceItemSource.DORA,
                 GenericReferenceItemKind.FUNDING_LABEL,
-            ),
-        )
-        do_m2m_operation(
-            "mobilization_modes_beneficiaries",
-            self.get_reference_set_from_data(
-                dora_data,
-                "beneficiaries_access_modes",
-                GenericReferenceItemSource.DORA,
-                GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            ),
-        )
-        do_m2m_operation(
-            "mobilization_modes_professionals",
-            self.get_reference_set_from_data(
-                dora_data,
-                "coach_orientation_modes",
-                GenericReferenceItemSource.DORA,
-                GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
             ),
         )
 

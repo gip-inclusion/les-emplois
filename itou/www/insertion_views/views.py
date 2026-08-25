@@ -131,8 +131,6 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         Prefetch("receptions", queryset=insertion_models.GenericReferenceItem.objects.order_by("label")),
         "mobilizations",
         "mobilization_publics",
-        "mobilization_modes_beneficiaries",
-        "mobilization_modes_professionals",
     )
     slug_field = "uid"
     slug_url_kwarg = "service_uid"
@@ -166,12 +164,6 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
                 "credential_documents": self.object.generate_credential_documents_info(),
                 "show_mobilization_section": self.object.has_mobilization_modes(),
-                "professionals_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_professionals.all()
-                ),
-                "beneficiaries_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
-                ),
                 "formatted_categories": self.format_categories(),
                 "can_view_modal": can_view_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),

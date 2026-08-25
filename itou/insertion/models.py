@@ -474,17 +474,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         )
 
     def has_mobilization_modes(self):
-        return (not self.is_dora and bool(self.mobilizations.all())) or (
-            self.is_dora
-            and (
-                bool(self.mobilization_modes_professionals.all())
-                or self.mobilization_link
-                or self.mobilization_modes_professionals_other
-                or bool(self.mobilization_modes_beneficiaries.all())
-                or self.mobilization_modes_beneficiaries_external_form_link
-                or self.mobilization_modes_beneficiaries_other
-            )
-        )
+        return bool(self.mobilizations.all()) or bool(self.mobilizations_details)
 
     def generate_credential_documents_info(self) -> list[tuple[str, str]]:
         return [
