@@ -18,6 +18,7 @@ from itoutils.django.decoupage_administratif.admin_division_parsing import get_d
 from rest_framework import status
 
 from itou.companies.models import Company
+from itou.files.models import save_file
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind
@@ -405,11 +406,6 @@ class OrientationWizardView(WizardView):
                 return self.render_to_response(self.get_context_data(**kwargs))
 
             cleaned = self.form.cleaned_data
-            attachments = []
-            for field in ("credentials_documents_files", "credentials_proof_files"):
-                for uploaded_file in cleaned.get(field) or []:
-                    uploaded_file.seek(0)
-                    attachments.append((uploaded_file.name, uploaded_file))
 
             referent_data = self.wizard_session.get(OrientationStep.REFERENT)
             payload = {
@@ -472,8 +468,14 @@ class OrientationWizardView(WizardView):
                 referent_email=referent_data["referent_email"],
                 orientation_reasons=referent_data.get("orientation_reason", ""),
                 data_protection_commitment=cleaned["gdpr_consent"],
-                # attachments=orientation_response.get("beneficiary_attachments", []), # TODO
             )
+
+            attachments = []
+            for field in ("credentials_documents_files", "credentials_proof_files"):
+                for uploaded_file in cleaned.get(field) or []:
+                    file = save_file(folder="orientations/", file=uploaded_file)
+                    attachments.append(file)
+            orientation.attachments_tmp.set(attachments)
 
             logger.info(
                 "orientation wizard created orientation=%s for user=%s service_uid=%s job_seeker=%s",
