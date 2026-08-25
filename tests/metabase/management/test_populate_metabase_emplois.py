@@ -1,4 +1,5 @@
 import datetime
+import decimal
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -15,11 +16,14 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription, SiaeACIConvergencePHC
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason, AssessmentState
+from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import MobilizationEventKind
+from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.jobs.models import Rome
-from itou.metabase.tables import mobilization_events
+from itou.metabase.tables import geiq_assessments, mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider
@@ -34,6 +38,12 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.geiq_assessments.factories import (
+    AssessmentCampaignFactory,
+    AssessmentFactory,
+    EmployeeContractFactory,
+    EmployeeFactory,
+)
 from tests.geo.factories import create_qpv
 from tests.insertion.factories import MobilizationEventFactory, OrientationFactory, ServiceFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
@@ -1324,6 +1334,202 @@ def test_populate_mobilization_events(snapshot):
             "external_link": "",
             "orientation_id": str(orientation.id),
             "beneficiary_id": orientation.beneficiary_id,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_geiq_assessments(snapshot):
+    campaign = AssessmentCampaignFactory(year=2022)
+    ddets_membership = InstitutionMembershipFactory(
+        institution__kind=InstitutionKind.DDETS_GEIQ, institution__department="33"
+    )
+    ddets = ddets_membership.institution
+    dreets_membership = InstitutionMembershipFactory(
+        institution__kind=InstitutionKind.DREETS_GEIQ, institution__department="33"
+    )
+    dreets = dreets_membership.institution
+    # Linked to the assessment but without a convention: must be ignored.
+    other_ddets = InstitutionFactory(kind=InstitutionKind.DDETS_GEIQ, department="64")
+    other_conventionned_ddets = InstitutionFactory(kind=InstitutionKind.DDETS_GEIQ, department="24")
+    assessment = AssessmentFactory(
+        campaign=campaign,
+        label_geiq_name="Un GEIQ",
+        label_geiq_post_code="33000",
+        with_main_geiq=True,
+        label_antennas=[{"id": 1, "name": "Antenne", "post_code": "64000"}],
+        employee_nb=12,
+        with_submission_requirements=True,
+        convention_amount=decimal.Decimal("50000.00"),
+        granted_amount=decimal.Decimal("42000.00"),
+        advance_amount=decimal.Decimal("20000.00"),
+        submitted_at=datetime.datetime(2023, 2, 3, tzinfo=datetime.UTC),
+        submitted_by=EmployerFactory(),
+        grants_selection_validated_at=datetime.datetime(2023, 2, 4, tzinfo=datetime.UTC),
+        decision_validated_at=datetime.datetime(2023, 2, 5, tzinfo=datetime.UTC),
+        reviewed_at=datetime.datetime(2023, 2, 6, tzinfo=datetime.UTC),
+        reviewed_by=ddets_membership.user,
+        reviewed_by_institution=ddets,
+        review_comment="Bravo !",
+        final_reviewed_at=datetime.datetime(2023, 2, 7, tzinfo=datetime.UTC),
+        final_reviewed_by=dreets_membership.user,
+        final_reviewed_by_institution=dreets,
+    )
+    AssessmentInstitutionLink.objects.create(assessment=assessment, institution=ddets, with_convention=True)
+    AssessmentInstitutionLink.objects.create(assessment=assessment, institution=dreets, with_convention=True)
+    AssessmentInstitutionLink.objects.create(assessment=assessment, institution=other_ddets, with_convention=False)
+    AssessmentInstitutionLink.objects.create(
+        assessment=assessment, institution=other_conventionned_ddets, with_convention=True
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="geiq_assessments")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {geiq_assessments.AssessmentsTable.name}")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": assessment.pk,
+            "campaign_year": 2022,
+            "state": AssessmentState.FINAL_REVIEWED.label,
+            "label_geiq_id": assessment.label_geiq_id,
+            "label_geiq_name": "Un GEIQ",
+            "label_geiq_post_code": "33000",
+            "department": "33",
+            "department_name": "33 - Gironde",
+            "region": "Nouvelle-Aquitaine",
+            "conventionned_institutions_departments": ["24", "33"],  # Sorted and deduplicated.
+            "with_main_geiq": 1,
+            "antenna_nb": 1,
+            "employee_nb": 12,
+            "convention_amount": decimal.Decimal("50000.00"),
+            "granted_amount": decimal.Decimal("42000.00"),
+            "advance_amount": decimal.Decimal("20000.00"),
+            "created_at": assessment.created_at,
+            "contracts_selection_validated_at": assessment.contracts_selection_validated_at,
+            "submitted_at": datetime.datetime(2023, 2, 3, tzinfo=datetime.UTC),
+            "grants_selection_validated_at": datetime.datetime(2023, 2, 4, tzinfo=datetime.UTC),
+            "decision_validated_at": datetime.datetime(2023, 2, 5, tzinfo=datetime.UTC),
+            "reviewed_at": datetime.datetime(2023, 2, 6, tzinfo=datetime.UTC),
+            "final_reviewed_at": datetime.datetime(2023, 2, 7, tzinfo=datetime.UTC),
+            "reviewed_by_institution_id": ddets.pk,
+            "final_reviewed_by_institution_id": dreets.pk,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_geiq_contracts(snapshot):
+    campaign = AssessmentCampaignFactory(year=2022)
+    assessment = AssessmentFactory(campaign=campaign, label_geiq_post_code="33000")
+    employee = EmployeeFactory(assessment=assessment, allowance_amount=1400, allowance_granted_previous_year=True)
+    # A contract presented by the GEIQ and granted by the DDETS/DREETS.
+    granted_contract = EmployeeContractFactory(
+        employee=employee,
+        start_at=datetime.date(2022, 1, 1),
+        planned_end_at=datetime.date(2022, 12, 31),
+        end_at=datetime.date(2022, 12, 31),
+        nb_days_in_campaign_year=365,
+        allowance_requested=True,
+        allowance_granted=True,
+    )
+    # A refused contract of less than 90 days in the campaign year.
+    refused_contract = EmployeeContractFactory(
+        employee=EmployeeFactory(assessment=assessment, allowance_amount=814),
+        start_at=datetime.date(2022, 12, 1),
+        planned_end_at=datetime.date(2023, 6, 30),
+        end_at=None,
+        nb_days_in_campaign_year=31,
+        allowance_requested=True,
+        allowance_granted=False,
+        allowance_request_justification_reason=AllowanceJustificationReason.SUPPORT_CONSIDERATION,
+        allowance_request_justification_details="Accompagnement hors contrat",
+        allowance_refusal_reason=AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY,
+        allowance_refusal_details="Justificatifs manquants",
+    )
+    # A contract not presented by the GEIQ.
+    unrequested_contract = EmployeeContractFactory(
+        employee=EmployeeFactory(assessment=assessment, allowance_amount=0),
+        start_at=datetime.date(2022, 3, 1),
+        planned_end_at=datetime.date(2022, 4, 1),
+        end_at=datetime.date(2022, 4, 1),
+        nb_days_in_campaign_year=32,
+        allowance_requested=False,
+        allowance_granted=False,
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="geiq_contracts")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {geiq_assessments.ContractsTable.name} ORDER BY start_at")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": granted_contract.pk,
+            "assessment_id": assessment.pk,
+            "employee_id": employee.pk,
+            "campaign_year": 2022,
+            "department": "33",
+            "department_name": "33 - Gironde",
+            "region": "Nouvelle-Aquitaine",
+            "start_at": datetime.date(2022, 1, 1),
+            "planned_end_at": datetime.date(2022, 12, 31),
+            "end_at": datetime.date(2022, 12, 31),
+            "nb_days_in_campaign_year": 365,
+            "allowance_requested": 1,
+            "allowance_granted": 1,
+            "allowance_amount": 1400,
+            "allowance_request_justification_reason": None,
+            "allowance_refusal_reason": None,
+            "allowance_granted_previous_year": 1,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": unrequested_contract.pk,
+            "assessment_id": assessment.pk,
+            "employee_id": unrequested_contract.employee_id,
+            "campaign_year": 2022,
+            "department": "33",
+            "department_name": "33 - Gironde",
+            "region": "Nouvelle-Aquitaine",
+            "start_at": datetime.date(2022, 3, 1),
+            "planned_end_at": datetime.date(2022, 4, 1),
+            "end_at": datetime.date(2022, 4, 1),
+            "nb_days_in_campaign_year": 32,
+            "allowance_requested": 0,
+            "allowance_granted": 0,
+            "allowance_amount": 0,
+            "allowance_request_justification_reason": None,
+            "allowance_refusal_reason": None,
+            "allowance_granted_previous_year": 0,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": refused_contract.pk,
+            "assessment_id": assessment.pk,
+            "employee_id": refused_contract.employee_id,
+            "campaign_year": 2022,
+            "department": "33",
+            "department_name": "33 - Gironde",
+            "region": "Nouvelle-Aquitaine",
+            "start_at": datetime.date(2022, 12, 1),
+            "planned_end_at": datetime.date(2023, 6, 30),
+            "end_at": None,
+            "nb_days_in_campaign_year": 31,
+            "allowance_requested": 1,
+            "allowance_granted": 0,
+            "allowance_amount": 814,
+            "allowance_request_justification_reason": AllowanceJustificationReason.SUPPORT_CONSIDERATION.label,
+            "allowance_refusal_reason": AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY.label,
+            "allowance_granted_previous_year": 0,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
