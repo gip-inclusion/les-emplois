@@ -49,17 +49,17 @@ PILOTAGE_DATASTORE_S3_ACCESS_KEY = AWS_S3_ACCESS_KEY_ID
 PILOTAGE_DATASTORE_S3_SECRET_KEY = AWS_S3_SECRET_ACCESS_KEY
 PILOTAGE_DATASTORE_S3_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
 
-DORA_AWS_S3_ENDPOINT_URL = AWS_S3_ENDPOINT_URL
-DORA_AWS_S3_ACCESS_KEY_ID = AWS_S3_ACCESS_KEY_ID
-DORA_AWS_S3_SECRET_ACCESS_KEY = AWS_S3_SECRET_ACCESS_KEY
-DORA_AWS_S3_STORAGE_BUCKET_NAME = None  # In tests, a fixture configures the Dora bucket name
+# DORA_AWS_S3_ENDPOINT_URL = AWS_S3_ENDPOINT_URL
+# DORA_AWS_S3_ACCESS_KEY_ID = AWS_S3_ACCESS_KEY_ID
+# DORA_AWS_S3_SECRET_ACCESS_KEY = AWS_S3_SECRET_ACCESS_KEY
+# DORA_AWS_S3_STORAGE_BUCKET_NAME = None  # In tests, a fixture configures the Dora bucket name
 
-STORAGES["dora"]["OPTIONS"] = {  # noqa: F405
-    "bucket_name": None,  # In tests, a fixture configures the Dora bucket name
-    "access_key": AWS_S3_ACCESS_KEY_ID,
-    "secret_key": AWS_S3_SECRET_ACCESS_KEY,
-    "endpoint_url": AWS_S3_ENDPOINT_URL,
-}
+# STORAGES["dora"]["OPTIONS"] = {  # noqa: F405
+#     "bucket_name": None,  # In tests, a fixture configures the Dora bucket name
+#     "access_key": AWS_S3_ACCESS_KEY_ID,
+#     "secret_key": AWS_S3_SECRET_ACCESS_KEY,
+#     "endpoint_url": AWS_S3_ENDPOINT_URL,
+# }
 # We *want* to do the same `collectstatic` on the CI than on PROD to catch errors early,
 # but we don't want to do it when running the test suite locally for performance reasons.
 if not os.getenv("CI", False):
