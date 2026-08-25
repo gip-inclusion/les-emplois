@@ -59,9 +59,9 @@ def test_legal_terms_post_updates_timestamp_when_accepted_terms_are_outdated(cli
 @pytest.mark.parametrize(
     "slug,date,content",  # 'content' should be a string exclusive to each version
     [
-        ("2022-10-14", "14/10/2022", "« L’Employeur solidaire »"),
-        ("2024-02-05", "05/02/2024", "« L’Employeur inclusif »"),
-        ("2025-10-15", "15/10/2025", "« Le bénéficiaire du parcours »"),
+        ("2022-10-14", "14/10/2022", "« L’Employeur solidaire »"),
+        ("2024-02-05", "05/02/2024", "« L’Employeur inclusif »"),
+        ("2025-10-15", "15/10/2025", "« Le bénéficiaire du parcours »"),
         ("2026-03-16", "16/03/2026", "bilan d’exécution annuel validé par sa DDETS et DREETS"),
     ],
 )
