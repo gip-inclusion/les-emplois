@@ -39,10 +39,12 @@ class NexusApiObjectsMixin(NexusApiMixin):
         serializer = self.serializer(data=request.data, many=True, context={"source": self.source})
         response_payload = {}
         if not serializer.is_valid():
+            # DRF reports list serializer errors as a dict keyed by index, holding only the failures
+            errors_by_index = serializer.errors
             valid_data = []
             error_summary = {}
-            for data, errors in zip(request.data, serializer.errors):
-                if errors:
+            for index, data in enumerate(request.data):
+                if errors := errors_by_index.get(index):
                     error_summary[data["id"]] = errors
                 else:
                     valid_data.append(data)
