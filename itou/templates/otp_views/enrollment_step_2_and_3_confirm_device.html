@@ -183,8 +183,8 @@
         <script nonce="{{ csp_nonce }}">
             document.getElementById("confirmation-checkbox").addEventListener("change", (event) => {
                 const button = document.getElementById("end-button");
-                button.classList.toggle("disabled", !event.target.checked);
-                button.href = event.target.checked ? "{{ post_save_url }}" : "";
+                button.classList.toggle("disabled", !event.target.checked); // no-typography-rule-check
+                button.href = event.target.checked ? "{{ post_save_url }}" : ""; // no-typography-rule-check
             })
         </script>
     {% endif %}
