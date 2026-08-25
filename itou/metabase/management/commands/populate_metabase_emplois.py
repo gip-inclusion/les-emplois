@@ -33,6 +33,7 @@ from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
+from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, EmployeeContract
 from itou.insertion.models import MobilizationEvent
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
@@ -48,6 +49,7 @@ from itou.metabase.tables import (
     evaluated_job_applications,
     evaluated_siaes,
     evaluation_campaigns,
+    geiq_assessments,
     insee_codes,
     institutions,
     job_applications,
@@ -118,6 +120,8 @@ class Command(BaseCommand):
             "users": self.populate_users,
             "memberships": self.populate_memberships,
             "mobilization_events": self.populate_mobilization_events,
+            "geiq_assessments": self.populate_geiq_assessments,
+            "geiq_contracts": self.populate_geiq_contracts,
         }
 
     def add_arguments(self, parser):
@@ -641,7 +645,23 @@ class Command(BaseCommand):
             mobilization_events.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
         )
 
-    # Only the data push is retried
+    def populate_geiq_assessments(self):
+        queryset = Assessment.objects.select_related("campaign").prefetch_related(
+            Prefetch(
+                "institution_links",
+                queryset=AssessmentInstitutionLink.objects.select_related("institution"),
+            ),
+        )
+        metabase_db.populate_table(
+            geiq_assessments.AssessmentsTable, batch_size=10_000, querysets=[queryset], schema="raw_emplois"
+        )
+
+    def populate_geiq_contracts(self):
+        queryset = EmployeeContract.objects.select_related("employee__assessment__campaign")
+        metabase_db.populate_table(
+            geiq_assessments.ContractsTable, batch_size=50_000, querysets=[queryset], schema="raw_emplois"
+        )
+
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
