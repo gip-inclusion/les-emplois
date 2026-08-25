@@ -3,6 +3,7 @@ import binascii
 import logging
 
 import segno
+import xworkflows
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
@@ -16,17 +17,18 @@ from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 from itoutils.urls import add_url_params
 
-from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
+from itou.audit_trail.models import AuditTrail, AuditTrailEventType
+from itou.otp.emails import notify_backup_code_has_been_used, notify_mfa_reset_request_init
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice, ResetRequest
 from itou.otp.signals import user_logged_in_with_2fa
 from itou.otp.utils import (
     create_otp_backup_code,
     get_user_devices,
-    notify_backup_code_has_been_used,
     user_can_enroll_otp_device,
     user_can_manage_otp_devices,
 )
 from itou.utils.auth import check_user_or_404
-from itou.utils.readonly import http_methods
+from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.otp_views.enums import DeviceType
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeForm, VerifyOTPForm
@@ -58,6 +60,76 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
 
     context = {"devices": devices}
     return render(request, template_name, context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def reset_request_self_cancel(request, template_name="otp_views/reset_request_self_cancel.html"):
+    context = {"account_login_url": reverse("account_login")}
+    try:
+        context["reset_request"] = reset_request = ResetRequest.objects.cancellable().get(user=request.user)
+    except ResetRequest.DoesNotExist:
+        context["reset_request"] = reset_request = None
+    if request.method == "POST" and reset_request:
+        reset_request.deny(user=request.user, msg=f"Using {request.path}")
+        return HttpResponseRedirect(reverse("otp_views:reset_request_self_cancelled"))
+    return render(request, template_name, context=context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def reset_request_init(request, template_name="otp_views/reset_request_init.html"):
+    context = {"disabled": False}
+    if not get_user_devices(request.user):
+        messages.warning(request, "Aucune double authentification n’est configurée pour votre compte.")
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if request.user.is_verified():
+        messages.warning(
+            request,
+            "Vous êtes correctement authentifié avec votre second facteur.",
+        )
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if ResetRequest.objects.filter(user=request.user).cancellable().exists():
+        messages.warning(request, "Une demande de réinitialisation est déjà en cours pour votre compte.")
+        context["disabled"] = True
+        return render(request, template_name, context)
+
+    if request.method == "POST":
+        reset_request = ResetRequest.objects.create(user=request.user)
+        AuditTrail.objects.log(
+            AuditTrailEventType.MFA_RESET_REQUEST,
+            request,
+            data={"itou_mfa_reset_request_pk": reset_request.pk},
+        )
+        notify_mfa_reset_request_init(reset_request)
+        return HttpResponseRedirect(reverse("otp_views:reset_request_created"))
+
+    return render(request, template_name, context)
+
+
+@readonly_view
+def reset_request_created(request, template_name="otp_views/reset_request_created.html"):
+    return render(request, template_name, context={"next_url": reverse("account_login")})
+
+
+@http_methods(db_write=["GET"])  # TODO : faire une page intermédiaire pour garder GET idempotent ?
+def reset_request_do_reset(request, token, template_name="otp_views/reset_request_do_reset.html"):
+    reset_request = get_object_or_404(ResetRequest.objects.select_for_update(of=("self",), no_key=True), token=token)
+    if reset_request.user != request.user:
+        logger.warning("User %s tried to use 2fa reset link of %s", request.user, reset_request.user)
+        return render(request, template_name, {"success": False})
+    context = {}
+    try:
+        context["success"] = reset_request.reset_devices(user=request.user)
+        context["next_url"] = reverse("otp_views:enrollment_step_0_intro")
+        status = 200
+    except xworkflows.base.AbortTransition:
+        context["success"] = False
+        context["next_url"] = reverse("account_login")
+        status = 400
+    return render(request, template_name, context, status=status)
 
 
 @check_user_can_enroll
@@ -218,6 +290,9 @@ class VerifyOTPView(FormView):
     def form_valid(self, form):
         otp_login(self.request, self.request.user.otp_device)
         user_logged_in_with_2fa.send(sender=self.__class__, request=self.request, user=self.request.user)
+        ResetRequest.objects.filter(user=self.request.user).cancellable().deny(
+            user=self.request.user, msg="User successfully logged in with its current 2FA"
+        )  # Invalidate all 2FA reset requests as the user finally has it.
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -260,7 +335,9 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # since the user seems to have lost them.
         ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
-
+        ResetRequest.objects.filter(user=request.user).cancellable().deny(
+            user=request.user, msg="L’utilisateur a réussi à utiliser un code de récupération."
+        )
         notify_backup_code_has_been_used(request.user)
 
         # FIXME (dbaty): shall we also logout the user so that they

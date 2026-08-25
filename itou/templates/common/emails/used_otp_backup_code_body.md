@@ -2,5 +2,5 @@
 {% block body %}
 Bonjour {{ user.get_full_name }},
 
-Un code de récupération vient d’être utilisé pour se connecter {% brand "à" %}. Si vous n’êtes pas à l’origine de cette action, merci de contacter au plus vite security@inclusion.gouv.fr en spécifiant l’adresse email concernée.
+Un code de récupération vient d’être utilisé pour se connecter {% brand "à" %}. Si vous n’êtes pas à l’origine de cette action, merci de contacter au plus vite security-mfa@inclusion.gouv.fr en spécifiant l’adresse email concernée.
 {% endblock body %}
