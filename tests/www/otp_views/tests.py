@@ -1,9 +1,10 @@
-import datetime
+import datetime as dt
 import logging
 from functools import partial
 from unittest import mock
 
 import pytest
+import xworkflows
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
@@ -19,11 +20,13 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
-from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
+from itou.otp.enums import ResetRequestState
+from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice, ResetRequest
+from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device, get_user_devices
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
-from tests.otp.factories import ItouTOTPDeviceFactory
+from tests.otp.factories import ItouTOTPDeviceFactory, ResetRequestFactory
+from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -661,7 +664,7 @@ class TestItouStaffLogin:
         active_device.refresh_from_db()
         old_disabled_device.refresh_from_db()
         # The active device is soft-deleted at login time
-        assert active_device.disabled_at == datetime.datetime(2026, 7, 9, tzinfo=datetime.UTC)
+        assert active_device.disabled_at == dt.datetime(2026, 7, 9, tzinfo=dt.UTC)
         # The already-disabled device keeps its original timestamp
         assert old_disabled_device.disabled_at == already_disabled_at
 
@@ -703,7 +706,7 @@ class TestItouStaffLogin:
         ItouTOTPDeviceFactory(
             name="Mon appareil",
             user=user,
-            last_used_at=timezone.make_aware(datetime.datetime(2026, 6, 1, 12, 0)),
+            last_used_at=timezone.make_aware(dt.datetime(2026, 6, 1, 12, 0)),
         )
 
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
@@ -748,3 +751,196 @@ class TestConfirmTOTPDeviceForm:
             device=unsaved_device_for_form,
         )
         assert "name" not in form.errors
+
+
+def test_2fa_reset_full_process(client, settings, mailoutbox, django_capture_on_commit_callbacks):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    # Step 1: the user asks for a reset:
+    assert not ResetRequest.objects.exists()
+    response = client.post(reverse("otp_views:reset_request_init"), follow=True)
+    assertContains(response, "Votre demande a bien été transmise.")
+    assert ResetRequest.objects.exists()
+
+    reset_request = ResetRequest.objects.first()
+
+    # Step 2: admin validate the request
+    with django_capture_on_commit_callbacks(execute=True):  # To run _async_send_message huey task
+        reset_request.accept()
+
+    email = mailoutbox.pop()
+    assert email.to == [user.email]
+    assert "Réinitialisation de vos paramètres de 2FA" in email.subject
+    assert reset_request.nonce in email.body
+
+    # Step 3: User clicks the reset link
+    assert ItouTOTPDevice.objects.exists()
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert not ItouTOTPDevice.objects.filter(disabled_at__isnull=True).exists()
+    assert not ItouStaticDevice.objects.exists()
+    assert not ItouStaticToken.objects.exists()
+    assertContains(response, "Votre double authentification a été réinitialisée")
+
+
+def test_2fa_reset_mail_to_admins_when_reset_request_submitted(client, settings, mailoutbox):
+    settings.REQUIRE_MFA_FOR_PROS = True
+    org = PrescriberOrganizationWith2MembershipFactory(membership=True)
+    user = org.members.filter(prescribermembership__is_admin=False).first()
+
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    client.post(reverse("otp_views:reset_request_init"))
+    assert len(mailoutbox) == 2
+    assert any("demande une réinitialisation de ses paramètres de 2FA" in mail.subject for mail in mailoutbox)
+    assert any("demandé une réinitialisation de vos paramètres de 2FA" in mail.subject for mail in mailoutbox)
+
+
+@pytest.mark.parametrize("accept_it", [True, False])
+def test_2fa_reset_cannot_request_twice(client, settings, accept_it):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    assert ResetRequest.objects.count() == 0
+    client.post(reverse("otp_views:reset_request_init"))
+    assert ResetRequest.objects.count() == 1
+    if accept_it:
+        ResetRequest.objects.first().accept()
+    response = client.post(reverse("otp_views:reset_request_init"))
+    assertContains(response, "Une demande de réinitialisation est déjà en cours pour votre compte.")
+    assert ResetRequest.objects.count() == 1
+
+
+@pytest.mark.parametrize("accept_it", [True, False])
+def test_2fa_reset_self_cancel(client, settings, accept_it):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    reset_request_cancel_url = reverse("otp_views:reset_request_self_cancel")
+
+    response = client.get(reset_request_cancel_url)
+    assertContains(response, "Vous n’avez pas de demande de réinitialisation en cours.")
+    reset_request = ResetRequestFactory(user=user)
+    response = client.get(reset_request_cancel_url)
+    assertContains(response, "Vous avez une demande de réinitialisation en cours")
+    if accept_it:
+        reset_request.accept()
+    response = client.post(reset_request_cancel_url, follow=True)
+    assertContains(response, "Demande de réinitialisation annulée")
+    reset_request.refresh_from_db()
+    assert reset_request.state == ResetRequestState.DENIED
+
+
+def test_2fa_reset_mail_to_self_when_reset_request_submitted(client, settings, mailoutbox):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    client.post(reverse("otp_views:reset_request_init"))
+    email = mailoutbox.pop()
+    assert email.to == [user.email]
+    assert "Vous avez demandé une réinitialisation de vos paramètres de 2FA" in email.subject
+
+
+@pytest.mark.parametrize("accept_it", [True, False])
+def test_2fa_reset_cleaned_after_successful_login(client, settings, accept_it):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    client.force_login(user)
+    device = ItouTOTPDeviceFactory(name="1", user=user)
+    reset_request = ResetRequestFactory(user=user)
+
+    assert ResetRequest.objects.first().state == ResetRequestState.PENDING
+    if accept_it:
+        reset_request.accept()
+        assert ResetRequest.objects.first().state == ResetRequestState.ACCEPTED
+    client.post(reverse("otp_views:verify_otp"), data={"otp_token": TOTP(device.bin_key).token()})
+    assert ResetRequest.objects.first().state == ResetRequestState.DENIED
+
+
+def test_2fa_reset_cannot_use_reset_link_twice(client, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    reset_request = ResetRequestFactory(user=user)
+    reset_request.accept()
+
+    # User use its reset link a first time: should work
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert response.status_code == 200
+    assert not ItouTOTPDevice.objects.filter(disabled_at__isnull=True).exists()
+
+    # User enrolls a new device
+    ItouTOTPDeviceFactory(name="2", user=user)
+
+    # User use its reset link a second time: should not work
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert response.status_code >= 400
+    assert get_user_devices(user)
+
+
+def test_2fa_reset_link_cannot_be_used_after_expiration(settings, client):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    device = ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    reset_request = ResetRequestFactory(user=device.user)
+    with mock.patch(
+        "django.utils.timezone.now",
+        return_value=timezone.now() - settings.OTP_RESET_LINK_VALIDITY - dt.timedelta(days=3),
+    ):
+        reset_request.accept()
+
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert response.status_code >= 400
+    assert get_user_devices(user)
+
+
+def test_2fa_reset_link_can_be_used_after_resend_after_link_expiration(settings, client):
+    """An expired link can still be resent by an admin, resetting the
+    link validity, as long as the request itself is not expired.
+    """
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    device = ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    reset_request = ResetRequestFactory(user=device.user)
+    with mock.patch(
+        "django.utils.timezone.now",
+        return_value=timezone.now() - settings.OTP_RESET_LINK_VALIDITY - dt.timedelta(days=3),
+    ):
+        reset_request.accept()
+    reset_request.resend()
+
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert response.status_code == 200
+    assert not get_user_devices(user)
+
+
+def test_2fa_reset_cannot_be_resent_nor_used_after_request_expiration(settings, client):
+    """An expired request cannot be resent by an admin."""
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True)
+    device = ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    with mock.patch(
+        "django.utils.timezone.now",
+        return_value=timezone.now() - settings.OTP_RESET_REQUEST_VALIDITY - dt.timedelta(days=3),
+    ):
+        reset_request = ResetRequestFactory(user=device.user)
+        reset_request.accept()
+
+    with pytest.raises(xworkflows.AbortTransition):
+        reset_request.resend()
+
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_request.nonce}))
+    assert response.status_code >= 400
+    assert get_user_devices(user)

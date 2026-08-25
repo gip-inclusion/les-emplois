@@ -1,0 +1,8 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Vos paramètres de double authentification ont été réinitialisés, vous pouvez maintenant vous connecter et configurer une nouvelle double authentification.
+
+{% endblock body %}

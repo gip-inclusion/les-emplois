@@ -1,0 +1,22 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Une demande de réinitialisation de vos paramètres de double authentification à été rejetée.
+
+Si elle provenait bien de vous et que vous êtes toujours bloqués suite
+à la perte de votre second facteur d’authentification, vous pouvez
+refaire la demande dans quelques jours.
+
+Si vous avez un administrateur dans votre organisation, allez le voir
+en personne pour prouver votre identité et le bienfondé de votre
+demande.
+
+Si vous n’avez pas d’administrateur dans votre organisation, ou s’il
+ne répond pas, vous devrez donner au support des preuves de la perte
+de votre double authentification, par exemple en appuyant votre
+demande par des témoignages de collègues qui attestent que vous êtes
+bien à l’origine de la demande.
+
+{% endblock body %}
