@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 88,
+    'num_queries': 90,
     'queries': list([
       dict({
         'origin': list([
@@ -1279,6 +1279,11 @@
                              (SELECT %s AS "a"
                               FROM "eligibility_eligibilitydiagnosis" U0
                               WHERE U0."author_id" = ("users_user"."id")
+                              LIMIT 1)
+                           OR EXISTS
+                             (SELECT %s AS "a"
+                              FROM "otp_resetrequesttransitionlog" U0
+                              WHERE U0."actor_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
@@ -2828,6 +2833,63 @@
                                                      %s,
                                                      %s,
                                                      %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "otp_resetrequest"."id"
+          FROM "otp_resetrequest"
+          WHERE "otp_resetrequest"."user_id" IN (%s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "otp_resetrequesttransitionlog"."id",
+                 "otp_resetrequesttransitionlog"."transition",
+                 "otp_resetrequesttransitionlog"."from_state",
+                 "otp_resetrequesttransitionlog"."to_state",
+                 "otp_resetrequesttransitionlog"."timestamp",
+                 "otp_resetrequesttransitionlog"."reset_request_id",
+                 "otp_resetrequesttransitionlog"."actor_id",
+                 "otp_resetrequesttransitionlog"."msg"
+          FROM "otp_resetrequesttransitionlog"
+          WHERE "otp_resetrequesttransitionlog"."actor_id" IN (%s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s)
           ORDER BY RANDOM() ASC
         ''',
       }),

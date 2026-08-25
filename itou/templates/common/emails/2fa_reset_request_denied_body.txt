@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+Votre demande de réinitialisation de vos paramètres de double authentification a été refusée.
+Si elle provenait bien de vous et que vous êtes toujours bloqué(e) :
+
+- vous pouvez refaire une demande dans quelques jours ;
+- si un administrateur est présent dans votre structure, allez le voir en personne pour prouver votre identité et le bien-fondé de votre demande ;
+- sinon, contactez notre support en lui fournissant des preuves de la perte de votre second facteur (par exemple des témoignages de collègues).
+
+Si vous n’êtes pas à l’origine de cette demande, aucune action n’est requise de votre part.
+
+{% endblock body %}
