@@ -112,7 +112,7 @@ class ServiceAdmin(InsertionAdmin):
         ),
         (
             "Mobilisation (data·inclusion)",
-            {"fields": ["mobilizations", "mobilizations_details", "mobilization_publics"]},
+            {"fields": ["mobilizations", "mobilizations_details", "mobilization_publics", "mobilization_link"]},
         ),
         (
             "Mobilisation (DORA)",
@@ -123,7 +123,6 @@ class ServiceAdmin(InsertionAdmin):
                     "mobilization_modes_beneficiaries_external_form_link_text",
                     "mobilization_modes_beneficiaries_other",
                     "mobilization_modes_professionals",
-                    "mobilization_modes_professionals_external_form_link",
                     "mobilization_modes_professionals_external_form_link_text",
                     "mobilization_modes_professionals_other",
                     "funding_labels",

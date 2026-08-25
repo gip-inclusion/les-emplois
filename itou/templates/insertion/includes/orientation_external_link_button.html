@@ -1,10 +1,10 @@
 {% load matomo %}
 <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}"
-   data-emplois-mobilization-external-link="{{ service.mobilization_modes_professionals_external_form_link }}"
+   data-emplois-mobilization-external-link="{{ service.mobilization_link }}"
    rel="noopener"
    target="_blank"
-   href="{{ service.mobilization_modes_professionals_external_form_link }}"
+   href="{{ service.mobilization_link }}"
    {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
     {% if service.mobilization_modes_professionals_external_form_link_text %}
         {{ service.mobilization_modes_professionals_external_form_link_text }}

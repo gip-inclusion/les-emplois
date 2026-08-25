@@ -32,7 +32,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -99,7 +99,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -173,7 +173,7 @@
         218,
         222
       ],
-      "mobilization_modes_professionals_external_form_link": "https://site.fake/demande-rappel/",
+      "mobilization_link": "https://site.fake/demande-rappel/",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -255,7 +255,7 @@
       "mobilization_modes_professionals": [
         218
       ],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -344,7 +344,7 @@
         220,
         222
       ],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -414,7 +414,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -484,7 +484,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -554,7 +554,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -625,7 +625,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -694,7 +694,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -763,7 +763,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -834,7 +834,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -903,7 +903,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
@@ -970,7 +970,7 @@
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
       "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
       "mobilization_publics": [

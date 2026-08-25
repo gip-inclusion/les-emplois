@@ -317,7 +317,7 @@ def test_start_orientation_redirects_when_external_link_preferred(client):
     service = ServiceFactory(
         is_orientable_with_form=True,
         source__value="other",
-        mobilization_modes_professionals_external_form_link="https://test.example.com",
+        mobilization_link="https://test.example.com",
     )
     assert service.should_mobilize_via_external_link
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -333,7 +333,7 @@ def test_orientation_select_job_seeker_redirects_when_external_link_preferred(cl
     service = ServiceFactory(
         is_orientable_with_form=True,
         source__value="other",
-        mobilization_modes_professionals_external_form_link="https://test.example.com",
+        mobilization_link="https://test.example.com",
     )
     assert service.should_mobilize_via_external_link
     select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})

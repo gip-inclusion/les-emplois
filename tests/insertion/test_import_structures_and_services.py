@@ -88,17 +88,17 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert (
         Service.objects.get(
             uid="mission-locale--with-mobilization-link"
-        ).mobilization_modes_professionals_external_form_link
+        ).mobilization_link
         == "https://example.com/mobilisation"
     )
     assert (
         Service.objects.get(
             uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927"
-        ).mobilization_modes_professionals_external_form_link
+        ).mobilization_link
         == "https://dora-link.precendence.test.com"
     )
     assert (
-        Service.objects.get(uid="emplois-de-linclusion--null").mobilization_modes_professionals_external_form_link
+        Service.objects.get(uid="emplois-de-linclusion--null").mobilization_link
         == ""
     )
 
