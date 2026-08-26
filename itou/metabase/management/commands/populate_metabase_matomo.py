@@ -13,7 +13,6 @@ from psycopg import sql
 from sentry_sdk.crons import monitor
 
 import itou.metabase.db as metabase_db
-from itou.metabase.utils import build_dbt_daily
 from itou.utils import constants
 from itou.utils.command import BaseCommand
 from itou.utils.date import monday_of_the_week
@@ -229,7 +228,6 @@ class Command(BaseCommand):
                 last_week_monday,
                 sorted(all_rows, key=lambda r: r[-1]),  # sort by dashboard name
             )
-            build_dbt_daily()
             send_slack_message(
                 ":white_check_mark: Mise à jour des données Matomo terminée", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
             )

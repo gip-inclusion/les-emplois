@@ -63,7 +63,7 @@ def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
     )
 
 
-@override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar", AIRFLOW_BASE_URL="https://airfl.ow")
+@override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
 @pytest.mark.django_db(transaction=True)
 @freeze_time("2022-06-21")
 def test_matomo_populate_public(respx_mock, snapshot):
@@ -71,7 +71,6 @@ def test_matomo_populate_public(respx_mock, snapshot):
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
-    respx_mock.post("https://airfl.ow/api/v1/dags/dbt_daily/dagRuns", json={"conf": {}})
 
     with connection.cursor() as cursor:
         cursor.execute("DROP TABLE IF EXISTS suivi_visiteurs_tb_publics_v1")

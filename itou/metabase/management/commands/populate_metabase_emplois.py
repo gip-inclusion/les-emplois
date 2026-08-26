@@ -13,9 +13,6 @@ The metabase database tables are trashed and recreated every time.
 
 The data is heavily denormalized among tables so that the metabase user
 has all the fields needed and thus never needs to perform joining two tables.
-
-We maintain a google sheet with extensive documentation about all tables and fields.
-Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
 
 import logging
@@ -68,7 +65,6 @@ from itou.metabase.tables import (
     suspensions,
     users,
 )
-from itou.metabase.utils import build_dbt_daily
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (
@@ -675,23 +671,37 @@ class Command(BaseCommand):
             mobilization_events.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
         )
 
+    # Only the data push is retried
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
         wait=tenacity.wait_fixed(5),
         after=log_retry_attempt,
     )
-    def handle(self, *, mode, **options):
+    def populate(self, mode):
         if mode == "all":
-            send_slack_message(
-                ":rocket: lancement mise à jour de données C1 -> Metabase", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
-            )
             for operation in self.MODE_TO_OPERATION.values():
                 operation()
-            build_dbt_daily()
+        else:
+            self.MODE_TO_OPERATION[mode]()
+
+    def handle(self, *, mode, **options):
+        if mode != "all":
+            self.populate(mode)
+            return
+
+        send_slack_message(
+            ":rocket: lancement mise à jour de données Metabase", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
+        )
+        try:
+            self.populate(mode)
+        except Exception:
             send_slack_message(
-                ":white_check_mark: succès mise à jour de données C1 -> Metabase",
+                ":red_circle: échec de la mise à jour de données Metabase",
                 url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
             )
         else:
-            self.MODE_TO_OPERATION[mode]()
+            send_slack_message(
+                ":white_check_mark: succès de la mise à jour de données Metabase",
+                url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
+            )

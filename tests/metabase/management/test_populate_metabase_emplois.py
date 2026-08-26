@@ -1,5 +1,4 @@
 import datetime
-import urllib
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -57,10 +56,8 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberF
 
 @freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
-def test_populate_all(respx_mock, settings):
+def test_populate_all():
     """Check the command runs correctly"""
-    settings.AIRFLOW_BASE_URL = "https://airflow"
-    respx_mock.post(urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"))
     management.call_command("populate_metabase_emplois", mode="all")
 
 

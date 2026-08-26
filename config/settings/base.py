@@ -773,8 +773,6 @@ SECURE_CSP = {
     ],
 }
 
-AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
-
 FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"
