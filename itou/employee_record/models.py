@@ -235,6 +235,11 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
+    watched_data_updated_at = models.DateTimeField(
+        verbose_name="date de dernière modification des éléments liés",
+        help_text="Typiquement les dates du PASS IAE lié",
+        null=True,
+    )
     status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut", max_length=10)
 
     # Job application has references on many mandatory parts of the E.R.:
