@@ -524,6 +524,22 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 declare=[("current_employee_record_id", "INT")],
             ),
             pgtrigger.Trigger(
+                name="update_employee_record_watched_data_updated_at",
+                when=pgtrigger.After,
+                operation=pgtrigger.UpdateOf("start_at", "end_at"),
+                condition=pgtrigger.Q(old__end_at__df=pgtrigger.F("new__end_at"))
+                | pgtrigger.Q(old__start_at__df=pgtrigger.F("new__start_at")),
+                func="""
+                    -- If there is an "UPDATE" action on 'approvals_approval' table (Approval model object):
+                    -- update each `EmployeeRecord.watched_data_updated_at` linked to this approval
+                    UPDATE employee_record_employeerecord SET
+                        updated_at = NOW(),
+                        watched_data_updated_at=NOW()
+                    WHERE approval_number = NEW.number;
+                    RETURN NULL;
+                """,
+            ),
+            pgtrigger.Trigger(
                 name="plan_pe_notification_on_date_updates",
                 when=pgtrigger.Before,
                 operation=pgtrigger.UpdateOf("start_at", "end_at"),
