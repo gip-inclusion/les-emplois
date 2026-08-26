@@ -1924,7 +1924,7 @@
       <div class="table-responsive mt-3 mt-md-4">
           <table class="table table-hover table-sortable">
               <caption class="visually-hidden">
-                  Liste des salariés et PASS IAE
+                  Liste des PASS IAE
               </caption>
               <thead>
                   <tr>
@@ -1944,7 +1944,7 @@
                       </th>
                       <th class="text-end w-50px" scope="col">
                           <span class="visually-hidden">
-                              Actions possibles sur les salariés et PASS IAE
+                              Actions possibles sur les PASS IAE
                           </span>
                       </th>
                   </tr>
@@ -1952,7 +1952,7 @@
               <tbody>
                   <tr>
                       <td>
-                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="pass-iae-tableau" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/list">
                               DOE Jane
                           </a>
                       </td>
@@ -1985,8 +1985,8 @@
                           356112 jours (Environ 975 ans)
                       </td>
                       <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir les informations de DOE Jane" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list">
-                              <i aria-label="Voir les informations de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir le PASS IAE de DOE Jane" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="pass-iae-tableau" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/list">
+                              <i aria-label="Voir le PASS IAE de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
                       </td>
