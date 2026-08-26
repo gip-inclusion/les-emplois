@@ -227,7 +227,7 @@ NAV_ENTRIES = {
         matomo_event_option="accompagnements-siae",
     ),
     "employer-approvals": NavItem(
-        label="Salariés et PASS IAE",
+        label="PASS IAE",
         target=reverse("approvals:list"),
         active_view_names=["approvals:list"],
         matomo_event_category="offcanvasNav",
