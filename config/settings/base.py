@@ -520,6 +520,12 @@ PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
 
 TALLY_URL = os.getenv("TALLY_URL")
 
+# Landing page embedded on the home page, served by the plateforme-accueil app.
+# Overridable per environment so a review app can embed its own deployment.
+PLATEFORME_ACCUEIL_URL = os.getenv(
+    "PLATEFORME_ACCUEIL_URL", "https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud"
+)
+
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
@@ -752,6 +758,8 @@ SECURE_CSP = {
         "https://pilotage.inclusion.beta.gouv.fr",
         "https://inclusion.beta.gouv.fr",
         "https://api.data.inclusion.gouv.fr",
+        # Landing page embedded on the home page
+        PLATEFORME_ACCUEIL_URL,
         "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
         "data:",  # For downloading Metabase questions as PNG on Firefox etc
     ],

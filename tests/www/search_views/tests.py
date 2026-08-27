@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
 import pytest
+from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst, urlencode as urlencode_filter
 from django.templatetags.static import static
@@ -55,8 +56,19 @@ class TestSearchCompany:
     applications_open_str = "Cette structure vous intéresse ?"
 
     def test_home_anonymous(self, client):
+        # The home page is the landing page from the plateforme-accueil app,
+        # embedded between our header and our footer.
         response = client.get(reverse("search:employers_home"))
-        assertContains(response, "Rechercher un emploi inclusif")
+        assertContains(response, 'id="iframe-plateforme-accueil"')
+        assertContains(response, settings.PLATEFORME_ACCUEIL_URL)
+        assertNotContains(response, "s-home-search")
+
+    @override_settings(PLATEFORME_ACCUEIL_URL="")
+    def test_home_anonymous_without_the_landing_page(self, client):
+        # Environments that do not embed it keep the local search form.
+        response = client.get(reverse("search:employers_home"))
+        assertNotContains(response, 'id="iframe-plateforme-accueil"')
+        assertContains(response, "s-home-search")
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
