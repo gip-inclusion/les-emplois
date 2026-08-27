@@ -40,10 +40,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - uses: ./.github/actions/setup
-    - name: 🤹 Django tests
-      run: make test TARGET="--ignore=tests/www"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: 🤹 Django tests
+        run: make test TARGET="--ignore=tests/www"
 
   test_www:
     runs-on: ubuntu-latest
@@ -54,10 +54,10 @@ jobs:
       cancel-in-progress: true
     services: *test_services
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - uses: ./.github/actions/setup
-    - name: 🤹 Django tests
-      run: make test TARGET="tests/www --ignore=tests/www/apply"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: 🤹 Django tests
+        run: make test TARGET="tests/www --ignore=tests/www/apply"
 
   test_www_apply:
     runs-on: ubuntu-latest
@@ -68,35 +68,35 @@ jobs:
       cancel-in-progress: true
     services: *test_services
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - uses: ./.github/actions/setup
-    - name: 🤹 Django tests
-      run: make test TARGET="tests/www/apply"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: 🤹 Django tests
+        run: make test TARGET="tests/www/apply"
 
   quality:
-      runs-on: ubuntu-latest
-      permissions: {}
-      env:
-        DJANGO_SETTINGS_MODULE: config.settings.test
-        REQUIREMENTS_PATH: requirements/test.txt
-      concurrency:
-        group: ${{ github.workflow }}-quality-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-        cancel-in-progress: true
-      services:
-        postgres:
-          # Docker Hub image
-          image: postgis/postgis:17-master
-          env:
-            POSTGRES_PASSWORD: password
-          volumes:
-            - /var/run/postgresql:/var/run/postgresql
-          # Set health checks to wait until postgres has started
-          options: >-
-            --health-cmd pg_isready
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
-      steps:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      REQUIREMENTS_PATH: requirements/test.txt
+    concurrency:
+      group: ${{ github.workflow }}-quality-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgis/postgis:17-master
+        env:
+          POSTGRES_PASSWORD: password
+        volumes:
+          - /var/run/postgresql:/var/run/postgresql
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       - name: ✨ Verify quality
