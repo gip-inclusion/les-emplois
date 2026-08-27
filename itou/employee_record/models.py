@@ -215,6 +215,25 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
 
+def _check_and_remove_watched_data_updated_at(employee_record, archive):
+    # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
+    # also block any approval date updates on linked approvals since a trigger would
+    # try to update the linked EmployeeRecord.
+    approval = employee_record.job_application.approval
+    if approval is None:
+        logger.error("Employee record without approval: %s - THIS SHOULD NOT HAPPEN", employee_record.pk)
+        return
+    sent_start_at = datetime.datetime.strptime(archive["personnePhysique"]["passDateDeb"], "%d/%m/%Y").date()
+    sent_end_at = datetime.datetime.strptime(archive["personnePhysique"]["passDateFin"], "%d/%m/%Y").date()
+    if approval.end_at == sent_end_at and approval.start_at == sent_start_at:
+        logger.info(
+            "Removed watched_data_updated_at=%s flag from employee_record=%s",
+            employee_record.watched_data_updated_at,
+            employee_record.pk,
+        )
+        employee_record.watched_data_updated_at = None
+
+
 class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     """
     EmployeeRecord - Fiche salarié (FS for short)
@@ -401,6 +420,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_processing_information(
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
+        if self.watched_data_updated_at and archive:
+            _check_and_remove_watched_data_updated_at(self, archive)
 
     @xwf_models.transition()
     def enable(self, *, user=None):
@@ -760,3 +781,17 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     @xwf_models.transition()
     def process(self, *, code, label, archive):
         self.set_asp_processing_information(code, label, archive)
+        if self.employee_record.watched_data_updated_at and archive:
+            employee_record = (
+                EmployeeRecord.objects.select_for_update(of=("self",), no_key=True)
+                .select_related("job_application__approval")
+                .get()
+            )
+            _check_and_remove_watched_data_updated_at(employee_record, archive)
+            if employee_record.watched_data_updated_at is None:
+                employee_record.save(
+                    update_fields=(
+                        "updated_at",
+                        "watched_data_updated_at",
+                    )
+                )

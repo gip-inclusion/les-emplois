@@ -1,3 +1,4 @@
+import datetime
 import random
 from datetime import timedelta
 
@@ -7,7 +8,7 @@ from django.utils import timezone
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
-from tests.employee_record.factories import EmployeeRecordFactory
+from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
 
 
 @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
@@ -109,5 +110,63 @@ def test_update_with_approval_extension(factory, status):
     factory(approval=employee_record.job_application.approval)
 
     assert employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
+    employee_record.refresh_from_db()
+    assert employee_record.watched_data_updated_at is not None
+
+
+def test_notification_process_with_watched_data_updated_at_and_uptodate_approval_dates(faker):
+    employee_record = EmployeeRecordFactory(status=Status.PROCESSED, watched_data_updated_at=timezone.now())
+    notification = EmployeeRecordUpdateNotificationFactory(employee_record=employee_record)
+
+    notification.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+    process_code, process_message = (
+        EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE,
+        "La ligne de la fiche salarié a été enregistrée avec succès.",
+    )
+    minimal_archive = {
+        "personnePhysique": {
+            "passDateDeb": employee_record.job_application.approval.start_at.strftime("%d/%m/%Y"),
+            "passDateFin": employee_record.job_application.approval.end_at.strftime("%d/%m/%Y"),
+        }
+    }
+    notification.process(
+        code=process_code,
+        label=process_message,
+        archive=minimal_archive,
+    )
+    assert notification.status == Status.PROCESSED
+    assert notification.asp_processing_code == process_code
+    assert notification.asp_processing_label == process_message
+    assert notification.archived_json == minimal_archive
+    employee_record.refresh_from_db()
+    assert employee_record.watched_data_updated_at is None
+
+
+def test_notification_process_with_watched_data_updated_at_and_obsolete_approval_dates(faker):
+    employee_record = EmployeeRecordFactory(status=Status.PROCESSED, watched_data_updated_at=timezone.now())
+    notification = EmployeeRecordUpdateNotificationFactory(employee_record=employee_record)
+
+    notification.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+    process_code, process_message = (
+        EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE,
+        "La ligne de la fiche salarié a été enregistrée avec succès.",
+    )
+    minimal_archive = {
+        "personnePhysique": {
+            "passDateDeb": employee_record.job_application.approval.start_at.strftime("%d/%m/%Y"),
+            "passDateFin": (employee_record.job_application.approval.end_at - datetime.timedelta(days=10)).strftime(
+                "%d/%m/%Y"
+            ),
+        }
+    }
+    notification.process(
+        code=process_code,
+        label=process_message,
+        archive=minimal_archive,
+    )
+    assert notification.status == Status.PROCESSED
+    assert notification.asp_processing_code == process_code
+    assert notification.asp_processing_label == process_message
+    assert notification.archived_json == minimal_archive
     employee_record.refresh_from_db()
     assert employee_record.watched_data_updated_at is not None

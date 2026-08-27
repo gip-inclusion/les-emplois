@@ -88,8 +88,28 @@
                  "employee_record_employeerecordupdatenotification"."created_at",
                  "employee_record_employeerecordupdatenotification"."updated_at",
                  "employee_record_employeerecordupdatenotification"."status",
-                 "employee_record_employeerecordupdatenotification"."employee_record_id"
+                 "employee_record_employeerecordupdatenotification"."employee_record_id",
+                 "employee_record_employeerecord"."id",
+                 "employee_record_employeerecord"."asp_processing_code",
+                 "employee_record_employeerecord"."asp_processing_label",
+                 "employee_record_employeerecord"."asp_batch_file",
+                 "employee_record_employeerecord"."asp_batch_line_number",
+                 "employee_record_employeerecord"."archived_json",
+                 "employee_record_employeerecord"."created_at",
+                 "employee_record_employeerecord"."updated_at",
+                 "employee_record_employeerecord"."processed_at",
+                 "employee_record_employeerecord"."watched_data_updated_at",
+                 "employee_record_employeerecord"."status",
+                 "employee_record_employeerecord"."job_application_id",
+                 "employee_record_employeerecord"."ntt",
+                 "employee_record_employeerecord"."financial_annex_id",
+                 "employee_record_employeerecord"."approval_number",
+                 "employee_record_employeerecord"."asp_id",
+                 "employee_record_employeerecord"."asp_measure",
+                 "employee_record_employeerecord"."siret",
+                 "employee_record_employeerecord"."processed_as_duplicate"
           FROM "employee_record_employeerecordupdatenotification"
+          INNER JOIN "employee_record_employeerecord" ON ("employee_record_employeerecordupdatenotification"."employee_record_id" = "employee_record_employeerecord"."id")
           WHERE ("employee_record_employeerecordupdatenotification"."asp_batch_file" = %s
                  AND "employee_record_employeerecordupdatenotification"."asp_batch_line_number" = %s)
           ORDER BY "employee_record_employeerecordupdatenotification"."created_at" DESC
