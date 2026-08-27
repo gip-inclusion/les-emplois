@@ -705,6 +705,10 @@ MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
 MATOMO_SITE_ID = os.getenv("MATOMO_SITE_ID")
 MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
+# Showcase page embedded in an iframe on the search home, served by the
+# "plateforme-accueil" application.
+PLATEFORME_ACCUEIL_BASE_URL = os.getenv("PLATEFORME_ACCUEIL_BASE_URL", "https://accueil.plateforme.inclusion.gouv.fr")
+
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
 csp_img_src = [
@@ -754,7 +758,7 @@ SECURE_CSP = {
         "https://inclusion.beta.gouv.fr",
         "https://api.data.inclusion.gouv.fr",
         # Homepage
-        "https://accueil.plateforme.inclusion.gouv.fr",
+        PLATEFORME_ACCUEIL_BASE_URL,
         "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
         "data:",  # For downloading Metabase questions as PNG on Firefox etc
     ],
