@@ -524,7 +524,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         )
 
     def rechercher_usager(
-        self, jobseeker_profile: "JobSeekerProfile | None" = None, france_travail_id: str | None = None
+        self, jobseeker_profile: JobSeekerProfile | None = None, france_travail_id: str | None = None
     ):
         """Find a user by pivot data (birthdate and nir or pole_emploi_id)
         and return a crypted token (`jeton usager`).

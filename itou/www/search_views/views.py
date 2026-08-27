@@ -414,7 +414,7 @@ def search_services_results(request, template_name="search/services/results.html
             # location is pre-filled with their city_slug. A category is
             # also required, so the initial page load displays an error.
             [category_error] = form.errors["category"]
-        except (KeyError, ValueError):
+        except KeyError, ValueError:
             pass
         else:
             # Category not provided or empty.

@@ -623,7 +623,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         JobApplication = self.jobapplication_set.model
         try:
             return self.jobapplication_set.filter(state=job_application_enums.JobApplicationState.ACCEPTED).get()
-        except (JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned):
+        except JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned:
             return False
 
     def _get_obj_remainder(self, obj):

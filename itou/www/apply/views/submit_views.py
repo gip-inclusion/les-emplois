@@ -193,7 +193,7 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
         if job_description_id := request.GET.get("job_description_id"):
             try:
                 job_description = self.company.job_description_through.active().get(pk=job_description_id)
-            except (JobDescription.DoesNotExist, ValueError):
+            except JobDescription.DoesNotExist, ValueError:
                 pass
             else:
                 session_data["selected_jobs"] = [job_description.pk]
