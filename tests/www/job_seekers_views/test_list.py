@@ -102,9 +102,9 @@ def assert_contains_last_advisor(response, job_seeker_assignment):
     assertContains(response, f"{last_advisor_name} ({last_advisor_org_name})")
 
 
-def assert_contains_button_advisor_self_assign(response, job_seeker, is_last_known_advisor):
+def assert_contains_button_advisor_self_assign(response, job_seeker, is_last_advisor):
     form_url = reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": job_seeker.public_id})
-    assertion = assertNotContains if is_last_known_advisor else assertContains
+    assertion = assertNotContains if is_last_advisor else assertContains
     assertion(response, form_url)
 
 
@@ -370,7 +370,7 @@ def test_multiple(client, snapshot):
         for assignment in [job_seeker_assignment, job_seeker_assignment2, job_seeker_assignment3]:
             assert_contains_last_advisor(response, assignment)
             assert_contains_button_advisor_self_assign(
-                response, assignment.job_seeker, is_last_known_advisor=assignment.professional == prescriber
+                response, assignment.job_seeker, is_last_advisor=assignment.professional == prescriber
             )
 
         # Job seeker does not have an address, so it is not in the URL
@@ -532,7 +532,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         for assignment in [alain_assignment, bernard_assignment, charlotte_assignment]:
             assert_contains_last_advisor(response, assignment)
             assert_contains_button_advisor_self_assign(
-                response, assignment.job_seeker, is_last_known_advisor=assignment.professional == prescriber
+                response, assignment.job_seeker, is_last_advisor=assignment.professional == prescriber
             )
 
         # Job seeker not displayed for the prescriber

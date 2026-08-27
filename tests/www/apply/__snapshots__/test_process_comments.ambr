@@ -413,7 +413,7 @@
                               </div>
                           </div>
                           <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                              <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                              <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                   <div class="d-flex gap-2 justify-content-between mb-3">
                                       <h3 class="mb-0">
                                           Dernier accompagnateur
@@ -2617,7 +2617,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[apply/process_details_company.html]',
           'BlockNode[apply/process_details_company.html]',
           'BlockNode[layout/base.html]',

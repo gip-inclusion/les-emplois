@@ -385,7 +385,7 @@ def switch_stalled_status(request, public_id):
 
 @http_methods(db_write=["POST"])
 @check_request(lambda request: request.from_prescriber or request.from_employer)
-def assign_oneself_as_last_known_advisor(request, public_id):
+def assign_oneself_as_last_advisor(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER),
         public_id=public_id,
@@ -489,7 +489,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization
         last_assignment = job_seeker.last_assignment
-        job_seeker.user_is_last_known_advisor = last_assignment and (professional, organization) == (
+        job_seeker.user_is_last_advisor = last_assignment and (professional, organization) == (
             last_assignment.advisor,
             last_assignment.organization,
         )

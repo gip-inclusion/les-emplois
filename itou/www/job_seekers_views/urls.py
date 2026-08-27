@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     path(
         "assign_oneself_as_advisor/<uuid:public_id>",
-        views.assign_oneself_as_last_known_advisor,
+        views.assign_oneself_as_last_advisor,
         name="assign_oneself_as_advisor",
     ),
     path("list", views.list_job_seekers, name="list"),
