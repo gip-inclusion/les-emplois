@@ -1250,9 +1250,9 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_display_advisor_contact_info
+# name: TestLastAdvisor.test_display_advisor_contact_info
   '''
-  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-[JobSeeker PublicID]">
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-[JobSeeker PublicID]">
       <div class="d-flex gap-2 justify-content-between mb-3">
           <h3 class="mb-0">
               Dernier accompagnateur
@@ -1309,9 +1309,9 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_display_advisor_contact_info_as_job_seeker
+# name: TestLastAdvisor.test_display_advisor_contact_info_as_job_seeker
   '''
-  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
       <div class="d-flex gap-2 justify-content-between mb-3">
           <h3 class="mb-0">
               Dernier accompagnateur
@@ -1365,7 +1365,7 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_display_advisor_contact_info_with_button
+# name: TestLastAdvisor.test_display_advisor_contact_info_with_button
   '''
   <html>
       <head>
@@ -1388,9 +1388,9 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_display_advisor_organization_contact_info
+# name: TestLastAdvisor.test_display_advisor_organization_contact_info
   '''
-  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-[JobSeeker PublicID]">
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-[JobSeeker PublicID]">
       <div class="d-flex gap-2 justify-content-between mb-3">
           <h3 class="mb-0">
               Dernier accompagnateur
@@ -1464,13 +1464,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_NO_ORG]
+# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_NO_ORG]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -1541,13 +1541,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
+# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -1618,13 +1618,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
+# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -1728,13 +1728,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[INACTIVE_NO_ORG]
+# name: TestLastAdvisor.test_last_assigment_display[INACTIVE_NO_ORG]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -1773,13 +1773,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[INACTIVE_WITH_ORG]
+# name: TestLastAdvisor.test_last_assigment_display[INACTIVE_WITH_ORG]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -1867,13 +1867,13 @@
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_last_assigment_display[UNKNOWN_ADVISOR]
+# name: TestLastAdvisor.test_last_assigment_display[UNKNOWN_ADVISOR]
   '''
   <html>
       <head>
       </head>
       <body>
-          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
               <div class="d-flex gap-2 justify-content-between mb-3">
                   <h3 class="mb-0">
                       Dernier accompagnateur
@@ -2249,7 +2249,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -2557,7 +2557,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -2829,7 +2829,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -3201,7 +3201,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -6190,7 +6190,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -6517,7 +6517,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -6777,7 +6777,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -7092,7 +7092,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -7419,7 +7419,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -7679,7 +7679,7 @@
                                       </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -8003,7 +8003,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -8804,7 +8804,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[job_seekers_views/details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/details.html]',
@@ -9302,7 +9302,7 @@
                                               </span>
                                           </a>
                                       </div>
-                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
                                           <div class="d-flex gap-2 justify-content-between mb-3">
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
@@ -10180,7 +10180,7 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[job_seekers_views/details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/details.html]',
@@ -10315,8 +10315,8 @@
         'origin': list([
           'JobSeekerAssignment.is_still_member[users/models.py]',
           'JobSeekerAssignment.display_mode[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IfNode[job_seekers_views/includes/last_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_advisor.html]',
           'IncludeNode[job_seekers_views/details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/details.html]',

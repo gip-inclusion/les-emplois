@@ -51,7 +51,7 @@
                     {% if approval %}
                         {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
                     {% endif %}
-                    {% include "job_seekers_views/includes/last_known_advisor.html" with job_seeker=job_seeker request=request csrf_token=csrf_token only %}
+                    {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_seeker request=request csrf_token=csrf_token only %}
                     {% if immersion_search_url %}
                         {# Immersion Facilitée proposal #}
                         <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
