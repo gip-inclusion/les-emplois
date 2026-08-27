@@ -778,6 +778,40 @@
                       </div>
                   </div>
                   <div class="col-12 col-xxl-4 col-xxxl-3">
+                      <div class="c-box mb-4 has-no-transition collapse collapseAdvisorReview show" id="collapseAdvisorReviewShow">
+                          <h3>
+                              Cette page vous est-elle utile ?
+                          </h3>
+                          <button aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide" aria-expanded="false" class="btn btn-ico btn-block btn-outline-primary mb-2" data-bs-target=".collapseAdvisorReview" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="page_utile_oui" type="button">
+                              <i aria-hidden="true" class="ri-thumb-up-line">
+                              </i>
+                              <span>
+                                  Oui
+                              </span>
+                          </button>
+                          <button aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide" aria-expanded="false" class="btn btn-ico btn-block btn-outline-primary" data-bs-target=".collapseAdvisorReview" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="page_utile_non" type="button">
+                              <i aria-hidden="true" class="ri-thumb-down-line">
+                              </i>
+                              <span>
+                                  Non
+                              </span>
+                          </button>
+                      </div>
+                      <div class="c-box mb-4 has-no-transition collapse collapseAdvisorReview" id="collapseAdvisorReviewHide">
+                          <h3>
+                              Envie d'approfondir le sujet avec nous ?
+                          </h3>
+                          <p>
+                              Choisissez un créneau qui vous convient pour un échange de 30 minutes.
+                          </p>
+                          <a class="btn btn-ico btn-block btn-outline-primary" href="">
+                              <i class="ri-calendar-line">
+                              </i>
+                              <span>
+                                  Prendre rendez-vous
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-box c-box--promo-partenaire">
                           <div class="row g-0">
                               <div class="col-12 pe-3 pe-md-4 py-3 py-md-4">
@@ -949,6 +983,40 @@
                       </div>
                   </div>
                   <div class="col-12 col-xxl-4 col-xxxl-3">
+                      <div class="c-box mb-4 has-no-transition collapse collapseAdvisorReview show" id="collapseAdvisorReviewShow">
+                          <h3>
+                              Cette page vous est-elle utile ?
+                          </h3>
+                          <button aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide" aria-expanded="false" class="btn btn-ico btn-block btn-outline-primary mb-2" data-bs-target=".collapseAdvisorReview" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="page_utile_oui" type="button">
+                              <i aria-hidden="true" class="ri-thumb-up-line">
+                              </i>
+                              <span>
+                                  Oui
+                              </span>
+                          </button>
+                          <button aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide" aria-expanded="false" class="btn btn-ico btn-block btn-outline-primary" data-bs-target=".collapseAdvisorReview" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="page_utile_non" type="button">
+                              <i aria-hidden="true" class="ri-thumb-down-line">
+                              </i>
+                              <span>
+                                  Non
+                              </span>
+                          </button>
+                      </div>
+                      <div class="c-box mb-4 has-no-transition collapse collapseAdvisorReview" id="collapseAdvisorReviewHide">
+                          <h3>
+                              Envie d'approfondir le sujet avec nous ?
+                          </h3>
+                          <p>
+                              Choisissez un créneau qui vous convient pour un échange de 30 minutes.
+                          </p>
+                          <a class="btn btn-ico btn-block btn-outline-primary" href="">
+                              <i class="ri-calendar-line">
+                              </i>
+                              <span>
+                                  Prendre rendez-vous
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-box c-box--promo-partenaire">
                           <div class="row g-0">
                               <div class="col-12 pe-3 pe-md-4 py-3 py-md-4">

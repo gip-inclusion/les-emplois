@@ -343,6 +343,7 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
         return super().get_context_data(**kwargs) | {
             "active_assignments": active_assignments,
             "ended_assignments": ended_assignments,
+            "calendar_url": settings.ADVISORS_CALENDAR_URL,
         }
 
 

@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load matomo %}
 {% load static %}
 {% load str_filters %}
 
@@ -50,6 +51,38 @@
                     {% endif %}
                 </div>
                 <div class="col-12 col-xxl-4 col-xxxl-3">
+                    <div id="collapseAdvisorReviewShow" class="c-box mb-4 has-no-transition collapse collapseAdvisorReview show">
+                        <h3>Cette page vous est-elle utile ?</h3>
+                        <button class="btn btn-ico btn-block btn-outline-primary mb-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target=".collapseAdvisorReview"
+                                aria-expanded="false"
+                                aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide"
+                                {% matomo_event "accompagnateur" "clic" "page_utile_oui" %}>
+                            <i class="ri-thumb-up-line" aria-hidden="true"></i>
+                            <span>Oui</span>
+                        </button>
+                        <button class="btn btn-ico btn-block btn-outline-primary"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target=".collapseAdvisorReview"
+                                aria-expanded="false"
+                                aria-controls="collapseAdvisorReviewShow collapseAdvisorReviewHide"
+                                {% matomo_event "accompagnateur" "clic" "page_utile_non" %}>
+                            <i class="ri-thumb-down-line" aria-hidden="true"></i>
+                            <span>Non</span>
+                        </button>
+                    </div>
+                    <div id="collapseAdvisorReviewHide" class="c-box mb-4 has-no-transition collapse collapseAdvisorReview">
+                        <h3>Envie d'approfondir le sujet avec nous ?</h3>
+                        <p>Choisissez un créneau qui vous convient pour un échange de 30 minutes.</p>
+                        <a href="{{ calendar_url }}" class="btn btn-ico btn-block btn-outline-primary">
+                            <i class="ri-calendar-line"></i>
+                            <span>Prendre rendez-vous</span>
+
+                        </a>
+                    </div>
                     <div class="c-box c-box--promo-partenaire">
                         <div class="row g-0">
                             <div class="col-12 pe-3 pe-md-4 py-3 py-md-4">
