@@ -8,10 +8,10 @@ jobs:
     permissions: {}
 
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Detect fixup commits & complain if found
-      run: >
-        ! gh pr view ${{ github.event.pull_request.number }} --json commits  --jq ".commits[].messageHeadline"
-        | grep --regexp '^(amend|fixup|squash)!' --extended-regexp
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Detect fixup commits & complain if found
+        run: >
+          ! gh pr view ${{ github.event.pull_request.number }} --json commits  --jq ".commits[].messageHeadline"
+          | grep --regexp '^(amend|fixup|squash)!' --extended-regexp
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
