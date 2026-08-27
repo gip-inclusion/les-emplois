@@ -149,3 +149,5 @@ sentry-sdk  # https://github.com/getsentry/sentry-python
 # ------------------------------------------------------------------------------
 django-otp  # https://github.com/django-otp/django-otp
 segno  # https://github.com/heuer/segno
+
+uwsgi  # For Clever
