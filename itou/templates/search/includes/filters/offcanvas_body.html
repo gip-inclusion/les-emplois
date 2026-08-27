@@ -9,6 +9,6 @@
     {% endif %}
     {% include "search/includes/filters/departments.html" %}
     {% if form.handicap %}
-        {% include "search/includes/filters/handicap.html" with nouveau=True %}
+        {% include "search/includes/filters/handicap.html" with nouveau=True matomo_category="recherche" %}
     {% endif %}
 </div>

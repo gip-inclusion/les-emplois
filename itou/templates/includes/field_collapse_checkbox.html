@@ -1,7 +1,9 @@
+{% load matomo %}
 {% load theme_inclusion %}
 {% comment %}
 Arguments:
 - field
+- matomo_category: When given, a matomo click event is set for each choice of this field.
 {% endcomment %}
 <fieldset>
     <legend>
@@ -26,7 +28,13 @@ Arguments:
             {% for choice in field %}
                 <li>
                     <div class="form-check">
-                        <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
+                        <input id="{{ choice.id_for_label }}"
+                               class="form-check-input"
+                               name="{{ choice.data.name }}"
+                               type="checkbox"
+                               value="{{ choice.data.value }}"
+                               {% if choice.data.selected %} checked{% endif %}
+                               {% if matomo_category|default:False %}{% matomo_event matomo_category "clic" choice.data.name|add:"_"|add:choice.data.value %}{% endif %}>
                         <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
                     </div>
                 </li>
