@@ -9,7 +9,7 @@ def test_home_anonymous(client):
     url = reverse("home:hp")
     response = client.get(url, follow=True)
     assertRedirects(response, reverse("search:home"))
-    assertContains(response, 'frame.src = "https://accueil.plateforme.inclusion.gouv.fr";')
+    assertContains(response, 'data-plateforme-accueil="https://accueil.plateforme.inclusion.gouv.fr"')
 
     query = {REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM: "1"}
     response = client.get(url, query_params=query)

@@ -56,7 +56,7 @@ class TestSearchCompany:
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:employers_home"))
-        assertContains(response, 'frame.src = "https://accueil.plateforme.inclusion.gouv.fr";')
+        assertContains(response, 'data-plateforme-accueil="https://accueil.plateforme.inclusion.gouv.fr"')
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
@@ -607,7 +607,7 @@ class TestSearchPrescriber:
         response = client.get(reverse("search:prescribers_home"))
         assertContains(
             response,
-            'frame.src = "https://accueil.plateforme.inclusion.gouv.fr?tab=onglet-accompagnateur";',
+            'data-plateforme-accueil="https://accueil.plateforme.inclusion.gouv.fr?tab=onglet-accompagnateur"',
         )
 
     def test_home_connected(self, client):

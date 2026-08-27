@@ -27,7 +27,7 @@ class TestSearchServices:
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:services_home"))
-        assertContains(response, 'frame.src = "https://accueil.plateforme.inclusion.gouv.fr?tab=onglet-insertion";')
+        assertContains(response, 'data-plateforme-accueil="https://accueil.plateforme.inclusion.gouv.fr?tab=onglet-insertion"')
 
     def test_home_connected(self, client):
         client.force_login(EmployerFactory(membership=True))
