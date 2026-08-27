@@ -736,7 +736,7 @@ class EvaluatedJobApplication(models.Model):
         evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
         evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
         evaluation_enums.EvaluatedJobApplicationsState.PENDING,
-        # High priority: if at least one criteria has this state, the evaluated job application will also
+        # High priority: if at least one criterion has this state, the evaluated job application will also have it
     ]
 
     job_application = models.ForeignKey(
