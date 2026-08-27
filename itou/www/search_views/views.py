@@ -53,7 +53,7 @@ def search_home(request, template_name="search/search_home.html"):
     if request.user.is_authenticated:
         warnings.warn("Access to 'search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
-    iframe_url = "https://accueil.plateforme.inclusion.gouv.fr"
+    iframe_url = settings.PLATEFORME_ACCUEIL_BASE_URL
     match request.resolver_match.url_name:
         case "prescribers_home":
             iframe_url = add_url_params(iframe_url, {"tab": "onglet-accompagnateur"})
