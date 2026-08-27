@@ -53,7 +53,13 @@ def employer_search_home(request, template_name="search/siaes_search_home.html")
     if request.user.is_authenticated:
         warnings.warn("Access to 'employer_search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
-    return render(request, template_name, {"siae_search_form": SiaeSearchForm()})
+    iframe_url = "https://accueil.plateforme.inclusion.gouv.fr"
+    match request.resolver_match.url_name:
+        case "prescribers_home":
+            iframe_url = add_url_params(iframe_url, {"tab": "onglet-accompagnateur"})
+        case "services_home":
+            iframe_url = add_url_params(iframe_url, {"tab": "onglet-insertion"})
+    return render(request, template_name, {"iframe_url": iframe_url})
 
 
 class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJobSeekerMixin, FormView):
@@ -326,18 +332,6 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
 
 @login_not_required
 @readonly_view
-def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
-    """
-    The search home page has a different design from the results page.
-    """
-    if request.user.is_authenticated:
-        warnings.warn("Access to 'search_prescribers_home' while authenticated", category=RuntimeWarning)
-        return HttpResponseRedirect(reverse("search:prescribers_results"))
-    return render(request, template_name, {"form": PrescriberSearchForm()})
-
-
-@login_not_required
-@readonly_view
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
     city = None
     distance = None
@@ -371,18 +365,6 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
         context,
     )
-
-
-@login_not_required
-@readonly_view
-def search_services_home(request, template_name="search/services/home.html"):
-    """
-    The search home page has a different design from the results page.
-    """
-    if request.user.is_authenticated:
-        warnings.warn("Access to 'search_services_home' while authenticated", category=RuntimeWarning)
-        return HttpResponseRedirect(reverse("search:services_results"))
-    return render(request, template_name, {"form": ServiceSearchForm()})
 
 
 @login_not_required

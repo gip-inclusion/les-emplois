@@ -68,25 +68,18 @@ class NavGroup:
 # This is quite verbose, and having a registry of entries helps with testing.
 NAV_ENTRIES = {
     # Anonymous users
-    "anonymous-search-employers": NavItem(
-        label="Rechercher un emploi inclusif",
+    "anonymous-home": NavItem(
+        label="Accueil",
         target=reverse("search:employers_home"),
         active_view_names=[
             "search:employers_home",
             "search:employers_results",
             "search:job_descriptions_results",
+            "search:prescribers_home",
+            "search:prescribers_results",
+            "search:services_home",
+            "search:services_results",
         ],
-    ),
-    "anonymous-search-prescribers": NavItem(
-        label="Rechercher des prescripteurs habilités",
-        target=reverse("search:prescribers_home"),
-        active_view_names=["search:prescribers_home", "search:prescribers_results"],
-    ),
-    "anonymous-search-services": NavItem(
-        label="Rechercher un service d'insertion",
-        target=reverse("search:services_home"),
-        active_view_names=["search:services_home", "search:services_results"],
-        is_beta=True,
     ),
     # Logged in users.
     "home": NavItem(

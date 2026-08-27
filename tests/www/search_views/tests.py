@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
 from django.utils.http import urlencode
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, JobSource, JobSourceTag
@@ -56,14 +56,13 @@ class TestSearchCompany:
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:employers_home"))
-        assertContains(response, "Rechercher un emploi inclusif")
+        assertContains(response, 'frame.src = "https://accueil.plateforme.inclusion.gouv.fr";')
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
         with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
-            response = client.get(reverse("search:employers_home"))
-        assertRedirects(response, reverse("search:employers_results"))
+            client.get(reverse("search:employers_home"))
 
     def test_not_existing(self, client):
         response = client.get(self.URL, {"city": "foo-44"})
@@ -606,14 +605,16 @@ class TestSearchCompany:
 class TestSearchPrescriber:
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:prescribers_home"))
-        assertContains(response, "Rechercher des prescripteurs habilités")
+        assertContains(
+            response,
+            'frame.src = "https://accueil.plateforme.inclusion.gouv.fr?tab=onglet-accompagnateur";',
+        )
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
-        with pytest.warns(RuntimeWarning, match="Access to 'search_prescribers_home' while authenticated"):
-            response = client.get(reverse("search:prescribers_home"))
-        assertRedirects(response, reverse("search:prescribers_results"))
+        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+            client.get(reverse("search:prescribers_home"))
 
     def test_invalid(self, client):
         response = client.get(reverse("search:prescribers_results"), {"city": "foo-44"})
