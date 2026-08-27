@@ -105,10 +105,21 @@ class Command(BaseCommand):
                         )
                     else:
                         self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
+                        # If the birth name was not known (which means
+                        # that the last name _was_ known, otherwise we
+                        # would not end up in this function), then
+                        # according to France Travail certification
+                        # the last name was actually the first name,
+                        # and the first name was actually the _birth_
+                        # name. The last name is unknown and should be
+                        # emptied.
+                        clear_last_name = not user.jobseeker_profile.birth_name
                         user.jobseeker_profile.birth_name, user.first_name = (
                             user.first_name,
-                            user.jobseeker_profile.birth_name,
+                            user.jobseeker_profile.birth_name or user.last_name,
                         )
+                        if clear_last_name:
+                            user.last_name = ""
                         certify_user(user, response2)
                         swapped_users.append(user)
                         swapped_profiles.append(user.jobseeker_profile)
@@ -138,5 +149,5 @@ class Command(BaseCommand):
         )
         self.logger.info("count=%d users could not be certified.", len(not_certified))
 
-        User.objects.bulk_update(swapped_users, ["first_name"], batch_size=1000)
+        User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
         self.logger.info("count=%d users have been swapped", len(swapped_users))
