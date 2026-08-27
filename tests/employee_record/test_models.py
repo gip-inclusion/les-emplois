@@ -521,6 +521,58 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json == "whatever"
 
+    def test_state_processed_with_watched_data_updated_at_and_uptodate_approval_dates(self, faker):
+        self.employee_record.watched_data_updated_at = timezone.now()
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        minimal_archive = {
+            "personnePhysique": {
+                "passDateDeb": self.employee_record.job_application.approval.start_at.strftime("%d/%m/%Y"),
+                "passDateFin": self.employee_record.job_application.approval.end_at.strftime("%d/%m/%Y"),
+            }
+        }
+        self.employee_record.process(
+            code=process_code,
+            label=process_message,
+            archive=minimal_archive,
+        )
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == minimal_archive
+        assert self.employee_record.watched_data_updated_at is None
+
+    def test_state_processed_with_watched_data_updated_at_and_obsolete_approval_dates(self, faker):
+        self.employee_record.watched_data_updated_at = timezone.now()
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        minimal_archive = {
+            "personnePhysique": {
+                "passDateDeb": self.employee_record.job_application.approval.start_at.strftime("%d/%m/%Y"),
+                "passDateFin": (
+                    self.employee_record.job_application.approval.end_at - datetime.timedelta(days=10)
+                ).strftime("%d/%m/%Y"),
+            }
+        }
+        self.employee_record.process(
+            code=process_code,
+            label=process_message,
+            archive=minimal_archive,
+        )
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == minimal_archive
+        assert self.employee_record.watched_data_updated_at is not None
+
     def test_state_disabled(self, faker):
         # Employee record in READY state can't be disabled
         with pytest.raises(xworkflows.InvalidTransitionError):

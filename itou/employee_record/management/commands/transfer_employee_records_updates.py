@@ -87,7 +87,11 @@ class Command(EmployeeRecordTransferCommand):
             processing_label = employee_record["libelleTraitement"]
 
             # Pre-check done, now find notification by file name and line number
-            notification = EmployeeRecordUpdateNotification.objects.find_by_batch(batch_filename, line_number).first()
+            notification = (
+                EmployeeRecordUpdateNotification.objects.select_related("employee_record")
+                .find_by_batch(batch_filename, line_number)
+                .first()
+            )
             if not notification:
                 self.logger.info(
                     f"Skipping, could not get existing employee record notification: {batch_filename=}, {line_number=}"
