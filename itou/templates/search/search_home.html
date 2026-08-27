@@ -1,27 +1,15 @@
 {% extends "layout/base.html" %}
+{% load static %}
 
 {% block title %}Les emplois de l'inclusion{% endblock %}
 
 {% block body_class %}p-home{% endblock %}
 
 {% block content %}
-    <iframe id="iframe-plateforme-accueil" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
+    {# src is set by plateforme_accueil_embed.js, once it can catch the first resize message. #}
+    <iframe id="iframe-plateforme-accueil" data-plateforme-accueil="{{ iframe_url }}" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
 {% endblock %}
 
-{% block script %}
-    <script nonce="{{ csp_nonce }}">
-        (function() {
-            "use strict";
-            const frame = document.getElementById("iframe-plateforme-accueil");
-            window.addEventListener("message", function(event) {
-                var data = event.data;
-                if (!data || data.source !== "plateforme-accueil" || data.type !== "resize" || frame.contentWindow !== event.source) {
-                    return;
-                }
-                frame.style.height = data.height + "px";
-            });
-            // Load frame after the message listener is installed.
-            frame.src = "{{ iframe_url }}";
-        })();
-    </script>
+{% block extra_script_files %}
+    <script src="{% static 'js/plateforme_accueil_embed.js' %}"></script>
 {% endblock %}
