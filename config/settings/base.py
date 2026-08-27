@@ -754,7 +754,7 @@ SECURE_CSP = {
         "https://inclusion.beta.gouv.fr",
         "https://api.data.inclusion.gouv.fr",
         # Homepage
-        "https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud",
+        "https://accueil.plateforme.inclusion.gouv.fr",
         "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
         "data:",  # For downloading Metabase questions as PNG on Firefox etc
     ],
