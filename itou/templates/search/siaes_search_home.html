@@ -5,7 +5,7 @@
 {% block body_class %}p-home{% endblock %}
 
 {% block content %}
-    <iframe id="iframe-plateforme-accueil" src="https://accueil.plateforme.inclusion.gouv.fr/" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
+    <iframe id="iframe-plateforme-accueil" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
 {% endblock %}
 
 {% block script %}
@@ -20,6 +20,8 @@
                 }
                 frame.style.height = data.height + "px";
             });
+            // Load frame after the message listener is installed.
+            frame.src = "https://accueil.plateforme.inclusion.gouv.fr";
         })();
     </script>
 {% endblock %}
