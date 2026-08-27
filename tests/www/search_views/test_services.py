@@ -35,7 +35,7 @@ class TestSearchServices:
 
     def test_home_connected(self, client):
         client.force_login(EmployerFactory())
-        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
             client.get(reverse("search:services_home"))
 
     def test_invalid_query_parameters(self, client):
