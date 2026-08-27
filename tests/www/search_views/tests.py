@@ -61,7 +61,7 @@ class TestSearchCompany:
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
-        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
             client.get(reverse("search:employers_home"))
 
     def test_not_existing(self, client):
@@ -613,7 +613,7 @@ class TestSearchPrescriber:
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
-        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
             client.get(reverse("search:prescribers_home"))
 
     def test_invalid(self, client):

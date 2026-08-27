@@ -44,7 +44,7 @@ def test_redirect_to_pc_activation_view(client, user_factory, identity_provider,
         response = client.get(reverse("search:employers_home"))
         assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
     else:
-        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
             response = client.get(reverse("search:employers_home"), follow=True)
         assert response.status_code == 200
 

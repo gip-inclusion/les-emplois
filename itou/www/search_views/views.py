@@ -49,9 +49,9 @@ logger = logging.getLogger(__name__)
 
 
 @login_not_required
-def employer_search_home(request, template_name="search/siaes_search_home.html"):
+def search_home(request, template_name="search/search_home.html"):
     if request.user.is_authenticated:
-        warnings.warn("Access to 'employer_search_home' while authenticated", category=RuntimeWarning)
+        warnings.warn("Access to 'search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
     iframe_url = "https://accueil.plateforme.inclusion.gouv.fr"
     match request.resolver_match.url_name:
