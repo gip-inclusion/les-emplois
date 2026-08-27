@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
   merge_group:
+  # Allow this workflow to be triggered manually:
+  # gh workflow run ci.yml --ref <branche>
+  workflow_dispatch:
 
 jobs:
   test_core:
