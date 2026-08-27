@@ -11,7 +11,7 @@ from tests.utils.testing import parse_response_to_soup
 
 # Test htmx request factory
 def test_htmx_client(htmx_client):
-    response = htmx_client.get(reverse("search:employers_home"))
+    response = htmx_client.get(reverse("search:home"))
     assert response.status_code == 200
     assert isinstance(response.wsgi_request.htmx, HtmxDetails)
     assert response.wsgi_request.htmx.boosted is False

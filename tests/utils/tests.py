@@ -748,7 +748,7 @@ class TestUtilsTemplateTags:
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")
-        redirect_field_value = reverse("search:employers_home")
+        redirect_field_value = reverse("search:home")
 
         # Redirection value.
         context = {"redirect_field_value": redirect_field_value}
@@ -775,7 +775,7 @@ class TestUtilsTemplateTags:
 
     def test_redirection_input_field(self):
         name = "next"
-        value = reverse("search:employers_home")
+        value = reverse("search:home")
         template = Template(
             """
             {% load redirection_fields %}

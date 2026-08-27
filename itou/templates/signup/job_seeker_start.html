@@ -14,7 +14,7 @@
             <strong>Trouvez un conseiller à l’emploi près de chez vous,</strong> grâce à la recherche de prescripteurs habilités :
         </p>
         <a href="{% url 'search:prescribers_home' %}" class="btn btn-link mb-3 ps-0" target="_blank" rel="noopener">Rechercher un prescripteur habilité</a>
-        {% url 'search:employers_home' as reset_url %}
+        {% url 'search:home' as reset_url %}
         {% url 'signup:choose_user_kind' as previous_url %}
         {% url 'signup:job_seeker_situation' as next_url %}
         {% itou_buttons_form primary_label="Suivant" primary_url=next_url secondary_url=previous_url reset_url=reset_url show_mandatory_fields_mention=False %}

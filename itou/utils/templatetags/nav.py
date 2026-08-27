@@ -70,8 +70,9 @@ NAV_ENTRIES = {
     # Anonymous users
     "anonymous-home": NavItem(
         label="Accueil",
-        target=reverse("search:employers_home"),
+        target=reverse("search:home"),
         active_view_names=[
+            "search:home",
             "search:employers_home",
             "search:employers_results",
             "search:job_descriptions_results",

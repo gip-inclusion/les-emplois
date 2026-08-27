@@ -290,7 +290,7 @@ class TestProConnectAuthorizeView:
     def test_next_url(self, client, pro_connect, caplog):
         url = f"{pro_connect.authorize_url}?{urlencode({'next_url': 'https://external.url.com'})}"
         response = client.get(url, follow=False)
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
         assert caplog.records[0].message == "Forbidden external url"
 
 
@@ -387,7 +387,7 @@ class TestProConnectCallbackView:
 
         user = JobSeekerFactory(username=pc_user_data.username, email=pc_user_data.email)
         response = pro_connect.mock_oauth_dance(client, expected_failure=True)
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:home"))
         assertContains(response, "existe déjà avec cette adresse e-mail")
         assertContains(response, "pour devenir professionnel sur la plateforme")
         user.delete()
@@ -557,7 +557,7 @@ class TestProConnectCallbackView:
     def test_callback_mismatched_nonce(self, client, pro_connect, caplog):
         pro_connect.mock_oauth_dance(
             client,
-            expected_redirect_url=reverse("search:employers_home"),
+            expected_redirect_url=reverse("search:home"),
             matching_nonces=False,
         )
         assert User.objects.count() == 0
@@ -724,7 +724,7 @@ class TestProConnectLogout:
             fetch_redirect_response=False,
         )
         response = client.get(add_url_params(post_logout_redirect_uri, {"state": signed_state}))
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
 
     def test_logout_with_redirection(self, client, pro_connect):
         pro_connect.mock_oauth_dance(client)
@@ -784,7 +784,7 @@ class TestProConnectLogout:
         user = PrescriberFactory()
         client.force_login(user)
         response = client.post(reverse("account_logout"))
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
         assert not auth.get_user(client).is_authenticated
 
     def test_logout_with_incomplete_state(self, client, pro_connect):
@@ -798,7 +798,7 @@ class TestProConnectLogout:
         session.save()
 
         response = client.post(reverse("account_logout"))
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
         assert not auth.get_user(client).is_authenticated
 
 
@@ -938,7 +938,7 @@ class TestProConnectNexusChannel:
         pro_connect.mock_oauth_dance(
             client,
             channel=ProConnectChannel.NEXUS.value,
-            expected_redirect_url=reverse("search:employers_home"),  # Default previous url
+            expected_redirect_url=reverse("search:home"),  # Default previous url
         )
         assert get_user(client).is_authenticated is False
         assert not User.objects.exists()

@@ -62,7 +62,7 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
     if error_msg:
         logger.error(error_msg, exc_info=True)
-    return HttpResponseRedirect(reverse("search:employers_home"))
+    return HttpResponseRedirect(reverse("search:home"))
 
 
 def _generate_pro_params_from_session(pc_data, host):
@@ -130,7 +130,7 @@ def _add_user_kind_error_message(request, existing_user):
 @login_not_required
 def pro_connect_authorize(request):
     # Start a new session.
-    previous_url = get_safe_url(request, "previous_url", fallback_url=reverse("search:employers_home"))
+    previous_url = get_safe_url(request, "previous_url", fallback_url=reverse("search:home"))
     next_url = request.GET.get("next_url")
     if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
         return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
@@ -417,7 +417,7 @@ def pro_connect_callback(request):
 def pro_connect_logout(request):
     token = request.GET.get("token")
     post_logout_redirect_url = reverse("pro_connect:logout_callback")
-    redirect_url = get_safe_url(request, "redirect_url", fallback_url=reverse("search:employers_home"))
+    redirect_url = get_safe_url(request, "redirect_url", fallback_url=reverse("search:home"))
 
     logout_state = ProConnectState.save_state(data={"redirect_url": redirect_url})
 

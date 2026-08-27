@@ -13,7 +13,7 @@
         </p>
         <a href="{% url 'signup:job_seeker_criteria' %}" class="btn btn-link has-external-link mb-3 ps-0" target="_blank" rel="noopener">Voir les critères d’accès aux emplois inclusifs</a>
 
-        {% url 'search:employers_home' as reset_url %}
+        {% url 'search:home' as reset_url %}
         {% url 'signup:job_seeker' as next_url %}
         {% url 'signup:job_seeker_start' as previous_url %}
         {% itou_buttons_form primary_label="Suivant" primary_url=next_url secondary_url=previous_url reset_url=reset_url show_mandatory_fields_mention=False %}

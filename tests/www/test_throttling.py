@@ -19,7 +19,7 @@ def test_throttling(client, user_factory, one_request_per_minute):
         client.force_login(user_factory())
         url = reverse("dashboard:index")
     else:
-        url = reverse("search:employers_home")
+        url = reverse("search:home")
 
     response = client.get(url)
     assert response.status_code == 200
