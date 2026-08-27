@@ -335,7 +335,7 @@ class OrientationAdmin(ItouModelAdmin):
         search_term = request.GET.get("q", "").strip()
         try:
             uuid.UUID(search_term)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             pass
         else:
             search_fields.append("pk__exact")

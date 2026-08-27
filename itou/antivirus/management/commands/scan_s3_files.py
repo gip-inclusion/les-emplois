@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 for _ in range(5):
                     try:
                         client.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME, key, fileobj)
-                    except (BotoConnectionError, HTTPClientError):
+                    except BotoConnectionError, HTTPClientError:
                         pass
                     else:
                         break
