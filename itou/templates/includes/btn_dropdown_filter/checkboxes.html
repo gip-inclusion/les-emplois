@@ -1,3 +1,4 @@
+{% load matomo %}
 {% load theme_inclusion %}
 {% comment %}
 Arguments:
@@ -5,6 +6,7 @@ Arguments:
 - label: (defaults to the field label)
 - id_suffix: When the field is present multiple times on the page, use the
     suffix to make its input id unique.
+- matomo_category: When given, a matomo click event is set for each choice of this field.
 {% endcomment %}
 <div class="dropdown">
     <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
@@ -25,7 +27,8 @@ Arguments:
                            type="checkbox"
                            value="{{ choice.data.value }}"
                            {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}
-                           {% if choice.data.selected %}checked{% endif %}>
+                           {% if choice.data.selected %}checked{% endif %}
+                           {% if matomo_category|default:False %}{% matomo_event matomo_category "clic" choice.data.name|add:"_"|add:choice.data.value %}{% endif %}>
                     <label for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}" class="form-check-label">
                         {{ choice.choice_label }}
                     </label>

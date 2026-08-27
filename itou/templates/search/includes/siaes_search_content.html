@@ -12,7 +12,7 @@
                                     {% include "search/includes/filters/distance.html" with btn_dropdown_filter=True %}
                                     {% include "search/includes/filters/structure_kind.html" with btn_dropdown_filter=True %}
                                     {% if form.handicap %}
-                                        {% include "search/includes/filters/handicap.html" with btn_dropdown_filter=True nouveau=True %}
+                                        {% include "search/includes/filters/handicap.html" with btn_dropdown_filter=True nouveau=True matomo_category="recherche" %}
                                     {% endif %}
                                     <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
                                         <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
