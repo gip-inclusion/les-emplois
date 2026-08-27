@@ -9,7 +9,7 @@ def test_home_anonymous(client, settings):
     settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
     url = reverse("home:hp")
     response = client.get(url, follow=True)
-    assertRedirects(response, reverse("search:employers_home"))
+    assertRedirects(response, reverse("search:home"))
     assertContains(
         response,
         'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
@@ -17,7 +17,7 @@ def test_home_anonymous(client, settings):
 
     query = {REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM: "1"}
     response = client.get(url, query_params=query)
-    assertRedirects(response, reverse("search:employers_home", query=query))
+    assertRedirects(response, reverse("search:home", query=query))
 
 
 def test_home_logged_in(client):

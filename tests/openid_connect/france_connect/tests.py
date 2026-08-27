@@ -580,13 +580,13 @@ class TestFranceConnect:
         assert not auth.get_user(client).is_authenticated
 
         response = client.get(reverse("france_connect:logout_callback"), {"state": state})
-        assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
+        assertRedirects(response, reverse("search:home"), fetch_redirect_response=False)
 
     @pytest.mark.parametrize("state", (None, "invalid"))
     def test_logout_callback_invalid(self, client, state):
         url = reverse("france_connect:logout_callback")
         response = client.get(add_url_params(url, {"state": state}))
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
         assertMessages(
             response,
             [
