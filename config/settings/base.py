@@ -794,6 +794,11 @@ GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
 GPS_SLACK_WEBHOOK_URL = os.getenv("GPS_SLACK_WEBHOOK_URL")
 GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
 
+# Advisors
+# ------------------------------------------------------------------------------
+ADVISORS_CALENDAR_URL = os.getenv("ADVISORS_CALENDAR_URL", "")
+
+
 # Afpa
 AFPA_DEPARTMENTS = []
 
