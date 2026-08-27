@@ -83,7 +83,12 @@ class Command(EmployeeRecordTransferCommand):
             self.logger.info(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
 
             # Now we must find the matching FS
-            employee_record = EmployeeRecord.objects.full_fetch().find_by_batch(batch_filename, line_number).first()
+            employee_record = (
+                EmployeeRecord.objects.full_fetch()
+                .find_by_batch(batch_filename, line_number)
+                .select_for_update(of=("self",), no_key=True)
+                .first()
+            )
             if not employee_record:
                 self.logger.info(
                     f"Skipping, could not get existing employee record: {batch_filename=}, {line_number=}"
