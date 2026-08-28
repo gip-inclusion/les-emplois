@@ -2,6 +2,8 @@ import datetime
 import random
 import uuid
 
+import pytest
+from django.template import Context
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +15,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.job_applications.enums import JobApplicationState
+from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -29,7 +32,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.testing import update_page_with_htmx
-from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_request, load_template, parse_response_to_soup, pretty_indented
 
 
 def test_anonymous_user(client):
@@ -873,3 +876,176 @@ class TestContracts:
             client.force_login(user)
             response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
             assert response.status_code == expected_status
+
+
+class TestAdvisorsTab:
+    def test_forbidden_access(self, client):
+        job_seeker = JobSeekerFactory()
+        url = reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id})
+
+        for user in [job_seeker, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == 403
+
+    def test_tab_access(self, client):
+        job_seeker = JobSeekerFactory()
+        url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        advisors_tab_url = reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(job_seeker)
+        response = client.get(advisors_tab_url)
+        assert response.status_code == 403
+
+        factory = random.choice([PrescriberFactory, EmployerFactory])
+        user = factory(membership=True)
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=user)
+        client.force_login(user)
+        response = client.get(url)
+        response = client.get(advisors_tab_url)
+        assert response.status_code == 200
+
+    def test_tab(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        url = reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id})
+        user = PrescriberFactory(
+            membership=True,
+            membership__organization__for_snapshot=True,
+            for_snapshot=True,
+        )
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=user,
+            last_action_kind=ActionKind.APPLY,
+            created_at=datetime.datetime(2025, 11, 12, 11, tzinfo=datetime.UTC),
+            last_action_at=datetime.datetime(2026, 1, 3, 11, tzinfo=datetime.UTC),
+        )
+
+        client.force_login(user)
+
+        response = client.get(url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/job-seekers/display/{assignment.pk}",
+                        "/job-seekers/display/[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "hx-post",
+                        f"/job-seekers/display/{assignment.pk}",
+                        "/job-seekers/display/[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "id",
+                        str(assignment.pk),
+                        "[JobSeekerAssignment PK]",
+                    ),
+                ],
+            )
+        ) == snapshot(name="active_only")
+
+        assignment.ended_at = datetime.datetime(2026, 3, 23, 11, tzinfo=datetime.UTC)
+        assignment.end_reason = AssignmentEndReason.MANUAL
+        assignment.save()
+        response = client.get(url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/job-seekers/display/{assignment.pk}",
+                        "/job-seekers/display/[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "hx-post",
+                        f"/job-seekers/display/{assignment.pk}",
+                        "/job-seekers/display/[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "id",
+                        str(assignment.pk),
+                        "[JobSeekerAssignment PK]",
+                    ),
+                ],
+            )
+        ) == snapshot(name="inactive_only")
+
+    @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
+    @freeze_time("2026-08-08")
+    def test_assigment_display(self, snapshot, display_mode):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            display_mode=display_mode,
+            professional__for_snapshot=True,
+            last_action_kind=ActionKind.APPLY,
+        )
+        request = get_request(PrescriberFactory())
+
+        template = load_template("job_seekers_views/includes/advisor.html")
+        rendered = template.render(Context({"assignment": assignment, "request": request}))
+        rendered = rendered.replace(
+            f"/job-seekers/display/{assignment.pk}",
+            "/job-seekers/display/[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"card-{assignment.pk}",
+            "card-[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"email-{assignment.pk}",
+            "email-[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"phone-{assignment.pk}",
+            "phone-[JobSeekerAssignment PK]",
+        )
+        if assignment.organization:
+            rendered = rendered.replace(
+                assignment.organization.display_name,
+                "[Org display name]",
+            )
+        assert pretty_indented(rendered) == snapshot
+
+    def test_oneself_assigment_display(self, client):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            professional__for_snapshot=True,
+            display_mode=JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP,
+        )
+        badge = '<span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>'
+        url = reverse("job_seekers_views:advisors", kwargs={"public_id": assignment.job_seeker.public_id})
+
+        client.force_login(assignment.professional)
+        response = client.get(url)
+        assertContains(response, badge, html=True)
+
+        client.force_login(PrescriberFactory(membership=True))
+        response = client.get(url)
+        assertNotContains(response, badge, html=True)
+
+    def test_assignment_duration(self):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            professional__for_snapshot=True,
+            last_action_kind=ActionKind.APPLY,
+            created_at=datetime.datetime(2025, 12, 1, 11, tzinfo=datetime.UTC),
+        )
+        ongoing_str = "Depuis le 01/12/2025"
+        ended_str = "Du 01/12/2025 au 02/03/2026"
+
+        request = get_request(PrescriberFactory(membership=True))
+        template = load_template("job_seekers_views/includes/advisor.html")
+        rendered = template.render(Context({"assignment": assignment, "request": request}))
+        assert ongoing_str in rendered
+        assert ended_str not in rendered
+
+        assignment.ended_at = datetime.datetime(2026, 3, 2, 11, tzinfo=datetime.UTC)
+        rendered = template.render(Context({"assignment": assignment, "request": request}))
+        assert ongoing_str not in rendered
+        assert ended_str in rendered

@@ -22,6 +22,11 @@ urlpatterns = [
         name="contracts",
     ),
     path(
+        "advisors/<uuid:public_id>",
+        views.AdvisorsTabView.as_view(),
+        name="advisors",
+    ),
+    path(
         "switch_stalled_status/<uuid:public_id>",
         views.switch_stalled_status,
         name="switch_stalled_status",
