@@ -1365,6 +1365,29 @@
   
   '''
 # ---
+# name: TestLastKnownAdvisor.test_display_advisor_contact_info_with_button
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <span class="btn btn-ico btn-block btn-outline-primary mt-3">
+              <strong>
+                  0707070707
+              </strong>
+              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                  </i>
+                  <span class="visually-hidden">
+                      Copier
+                  </span>
+              </button>
+          </span>
+      </body>
+  </html>
+  
+  '''
+# ---
 # name: TestLastKnownAdvisor.test_display_advisor_organization_contact_info
   '''
   <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-[JobSeeker PublicID]">
@@ -1479,7 +1502,7 @@
                   <form id="display-contact-info-form">
                       <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
                   </form>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email?with_button=True" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-line">
                           </i>
@@ -1495,7 +1518,7 @@
                           </span>
                       </div>
                   </button>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone?with_button=True" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-phone-line">
                           </i>
@@ -1556,7 +1579,7 @@
                   <form id="display-contact-info-form">
                       <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
                   </form>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email?with_button=True" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-line">
                           </i>
@@ -1572,7 +1595,7 @@
                           </span>
                       </div>
                   </button>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone?with_button=True" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-phone-line">
                           </i>
@@ -1666,7 +1689,7 @@
                   <span class="visually-hidden">
                       Contacter la structure
                   </span>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email?with_button=True" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-line">
                           </i>
@@ -1682,7 +1705,7 @@
                           </span>
                       </div>
                   </button>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone?with_button=True" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-phone-line">
                           </i>
@@ -1805,7 +1828,7 @@
                   <span class="visually-hidden">
                       Contacter la structure
                   </span>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email?with_button=True" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-line">
                           </i>
@@ -1821,7 +1844,7 @@
                           </span>
                       </div>
                   </button>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone?with_button=True" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-phone-line">
                           </i>
@@ -1899,7 +1922,7 @@
                   <span class="visually-hidden">
                       Contacter la structure
                   </span>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email?with_button=True" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-line">
                           </i>
@@ -1915,7 +1938,7 @@
                           </span>
                       </div>
                   </button>
-                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone?with_button=True" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-phone-line">
                           </i>
