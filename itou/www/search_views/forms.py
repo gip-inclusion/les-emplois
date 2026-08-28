@@ -117,8 +117,7 @@ class SiaeSearchForm(forms.Form):
 
 
 class JobDescriptionSearchForm(SiaeSearchForm):
-    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
-
+    KIND_CHOICES = CompanyKind.for_job_description_filter()
     CONTRACT_TYPE_CHOICES = sorted(
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],
