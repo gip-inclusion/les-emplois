@@ -17,6 +17,9 @@ TABLE = MetabaseTable(name="organisations_v0")
 TABLE.add_columns(
     [
         get_column_from_field(get_model_field(PrescriberOrganization, "pk"), name="id"),
+        get_column_from_field(
+            get_model_field(PrescriberOrganization, "uid"), name="uid", comment="identifiant universel unique"
+        ),
         get_column_from_field(get_model_field(PrescriberOrganization, "siret"), name="siret"),
         {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": attrgetter("display_name")},
         get_column_from_field(
