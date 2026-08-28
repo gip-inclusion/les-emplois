@@ -187,26 +187,10 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
-        # Last advisor context
-        professional, organization = self.request.user, self.request.current_organization
-        last_assignment = self.object.last_assignment
-        is_last_known_advisor = last_assignment and (professional, organization) == (
-            last_assignment.advisor,
-            last_assignment.organization,
-        )
-        is_advisor = (
-            is_last_known_advisor
-            or JobSeekerAssignment.objects.assigned_to(professional, organization)
-            .filter(job_seeker=self.object)
-            .exists()
-        )
-
         return context | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
-            "is_last_known_advisor": is_last_known_advisor,
-            "is_advisor": is_advisor,
         }
 
 
