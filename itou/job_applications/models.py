@@ -24,7 +24,6 @@ from itou.eligibility.models.geiq import (
 )
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
-from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
@@ -1286,9 +1285,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
             self.approval.unsuspend(self.hiring_start_at)
-
-        # Sync GPS groups
-        FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
 
         # Schedule certification of administrative criteria.
         if self.eligibility_diagnosis:

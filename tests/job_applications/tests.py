@@ -23,7 +23,6 @@ from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCri
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition, EmployeeRecordTransitionLog
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES,
@@ -193,23 +192,6 @@ class TestJobApplicationModel:
                 sent_by_prescriber_alone=True, to_company__kind=CompanyKind.AI, inverted_vae_contract=True
             ).clean()
         assert "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ" in str(excinfo.value)
-
-    def test_accept_follow_up_group(self):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber=True,
-            state=JobApplicationState.PROCESSING,
-            to_company__subject_to_iae_rules=True,
-        )
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
-        user = job_application.to_company.members.first()
-        assert not FollowUpGroup.objects.exists()
-
-        job_application.accept(user=user)
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == job_application.job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == user
-        assert membership.creator == user
 
     def test_get_geiq_eligibility_diagnosis(self):
         expired_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(

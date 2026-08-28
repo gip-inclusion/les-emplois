@@ -41,7 +41,6 @@ def get_permissions_dict():
     import itou.files.models as files_models
     import itou.geiq_assessments.models as geiq_assessments_models
     import itou.geo.models as geo_models
-    import itou.gps.models as gps_models
     import itou.insertion.models as insertion_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
@@ -98,8 +97,6 @@ def get_permissions_dict():
         geiq_assessments_models.EmployeeContract: PERMS_READ,
         geiq_assessments_models.EmployeePrequalification: PERMS_READ,
         geiq_assessments_models.LabelInfos: PERMS_READ,
-        gps_models.FollowUpGroup: PERMS_DELETE,
-        gps_models.FollowUpGroupMembership: PERMS_DELETE,
         insertion_models.GenericReferenceItem: PERMS_READ,
         insertion_models.MobilizationEvent: PERMS_READ,
         insertion_models.Orientation: PERMS_READ,
@@ -135,17 +132,6 @@ def get_permissions_dict():
         utils_models.PkSupportRemark: PERMS_ADD,
         utils_models.UUIDSupportRemark: PERMS_ADD,
     }
-    group_gps_admin_permissions = {
-        companies_models.Company: PERMS_READ,
-        gps_models.FollowUpGroup: PERMS_ALL,
-        gps_models.FollowUpGroupMembership: PERMS_ALL,
-        job_applications_models.JobApplication: PERMS_READ,
-        job_applications_models.JobApplicationTransitionLog: PERMS_READ,
-        prescribers_models.PrescriberOrganization: PERMS_READ,
-        users_models.User: PERMS_ADD | PERMS_HIJACK | PERMS_EXPORT_CTA,
-        users_models.JobSeekerAssignment: PERMS_READ,
-        users_models.JobSeekerProfile: PERMS_EDIT,
-    }
     group_pilotage_admin_permissions = {
         analytics_models.StatsDashboardVisit: PERMS_READ,
         approvals_models.Approval: PERMS_READ,
@@ -170,10 +156,6 @@ def get_permissions_dict():
         "itou-admin": {**group_itou_admin_permissions},
         "itou-admin-readonly": {
             **{model: perms & PERMS_READONLY for model, perms in group_itou_admin_permissions.items()}
-        },
-        "gps-admin": {**group_gps_admin_permissions},
-        "gps-admin-readonly": {
-            **{model: perms & PERMS_READONLY for model, perms in group_gps_admin_permissions.items()}
         },
         "pilotage-admin": {**group_pilotage_admin_permissions},
         "pilotage-admin-readonly": {

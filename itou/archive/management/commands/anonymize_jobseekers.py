@@ -26,7 +26,6 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
@@ -381,7 +380,6 @@ class Command(BaseCommand):
         self.logger.info("Anonymized job applications after grace period, count: %d", len(anonymized_jobapplications))
 
     def _delete_jobseekers_with_related_objects(self, users):
-        FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
         for user in users:
             async_delete_contact(user.email)

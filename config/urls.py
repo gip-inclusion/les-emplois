@@ -147,7 +147,6 @@ urlpatterns = [
         name="legal-privacy",
     ),
     path("", include("itou.www.security.urls")),
-    path("gps/", include("itou.www.gps.urls")),
     path("rdvi/", include("itou.www.rdv_insertion.urls")),
     path("staff/", include("itou.www.itou_staff_views.urls")),
     path("otp/", include("itou.www.otp_views.urls")),

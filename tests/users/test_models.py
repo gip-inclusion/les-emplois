@@ -1138,10 +1138,7 @@ def test_save_erases_ft_fields_if_details_change():
     def reset_profile():
         user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
         user.jobseeker_profile.pe_obfuscated_nir = "XXX_1234567890123_YYY"
-        user.jobseeker_profile.ft_gps_id = "7f4d1259-78e3-4818-b357-5befea239990"
-        user.jobseeker_profile.save(
-            update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at", "ft_gps_id"]
-        )
+        user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
         IdentityCertification.objects.upsert_certifications(
             [
                 IdentityCertification(
@@ -1159,7 +1156,6 @@ def test_save_erases_ft_fields_if_details_change():
     profile.refresh_from_db()
     assert profile.pe_obfuscated_nir is None
     assert profile.pe_last_certification_attempt_at is None
-    assert profile.ft_gps_id is None
     assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
@@ -1170,7 +1166,6 @@ def test_save_erases_ft_fields_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
-    assert user.jobseeker_profile.ft_gps_id is None
     assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
@@ -1181,7 +1176,6 @@ def test_save_erases_ft_fields_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
-    assert user.jobseeker_profile.ft_gps_id is None
     assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
@@ -1192,7 +1186,6 @@ def test_save_erases_ft_fields_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
-    assert user.jobseeker_profile.ft_gps_id is None
     assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
@@ -1210,7 +1203,6 @@ def test_save_erases_ft_fields_if_details_change():
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.UTC
     )
-    assert user.jobseeker_profile.ft_gps_id == "7f4d1259-78e3-4818-b357-5befea239990"
     assertQuerySetEqual(
         profile.identity_certifications.values_list("certifier", flat=True),
         [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],

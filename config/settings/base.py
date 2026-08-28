@@ -787,13 +787,6 @@ NON_ORIENTABLE_DI_SOURCES = {
     _source.strip() for _source in os.getenv("NON_ORIENTABLE_DI_SOURCES", "").split(",") if _source.strip()
 }
 
-# GPS
-# ------------------------------------------------------------------------------
-GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
-GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
-GPS_SLACK_WEBHOOK_URL = os.getenv("GPS_SLACK_WEBHOOK_URL")
-GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
-
 # Advisors
 # ------------------------------------------------------------------------------
 ADVISORS_CALENDAR_URL = os.getenv("ADVISORS_CALENDAR_URL", "")

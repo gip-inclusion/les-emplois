@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.urls import reverse
 
 from itou.communications import NotificationCategory, registry as notifications_registry
@@ -22,18 +21,6 @@ class JobSeekerCreatedByProxyNotification(EmailNotification):
     subject_template = "account/email/email_jobseeker_created_by_third_party_subject.txt"
     body_template = "account/email/email_jobseeker_created_by_third_party_body.txt"
     can_be_disabled = False
-
-
-@notifications_registry.register
-class JobSeekerCreatedByProxyNotificationForGPS(EmailNotification):
-    name = "Invitation à accéder au compte d'un nouvel utilisateur créé par un tiers - GPS"
-    category = NotificationCategory.REGISTRATION
-    subject_template = "account/email/email_jobseeker_created_by_third_party_for_gps_subject.txt"
-    body_template = "account/email/email_jobseeker_created_by_third_party_for_gps_body.txt"
-    can_be_disabled = False
-
-    def get_build_extra(self):
-        return {"from_email": settings.GPS_CONTACT_EMAIL}
 
 
 @notifications_registry.register

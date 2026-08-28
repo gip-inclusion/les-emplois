@@ -28,7 +28,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
@@ -427,7 +426,6 @@ class TestApply:
         user, other_user = membership1.user, membership2.user
         job_seeker = JobSeekerFactory()
         selected_job = company.job_description_through.first()
-        FollowUpGroup.objects.follow_beneficiary(job_seeker, user)
 
         client.force_login(user)
 
@@ -481,7 +479,6 @@ class TestApply:
 
         if with_known_advisor:
             assert assignment.professional == other_user
-            assert assignment.job_seeker.follow_up_group.referent.member == other_user
         else:
             assert assignment.professional == user
 
@@ -694,10 +691,6 @@ class TestApplyAsJobSeeker:
         # + 1 in mobile header
         # + 1 in the page content
         assertContains(response, reverse("dashboard:edit_user_info"), count=3)
-
-        # GPS : a job seeker must not follow himself
-        # ----------------------------------------------------------------------
-        assert not FollowUpGroup.objects.exists()
 
         # Check JobSeekerAssignment: no assignment is created when a job seeker applies
         # ----------------------------------------------------------------------
@@ -1500,13 +1493,6 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assertRedirects(response, next_url)
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        membership = FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).get()
-        membership.delete()  # delete it to check it is created again when applying
-
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
@@ -1621,12 +1607,6 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
-
-        # Check GPS group again
-        # ----------------------------------------------------------------------
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).exists()
 
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
@@ -2040,13 +2020,6 @@ class TestApplyAsPrescriber:
         )
         assertRedirects(response, next_url)
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        membership = FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=prescriber
-        ).get()
-        membership.delete()  # delete it to check it is created again when applying
-
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
@@ -2114,12 +2087,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
-
-        # Check GPS group again
-        # ----------------------------------------------------------------------
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=prescriber
-        ).exists()
 
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
@@ -2765,13 +2732,6 @@ class TestApplyAsCompany:
         )
         assertRedirects(response, next_url)
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        membership = FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).get()
-        membership.delete()  # delete it to check it is created again when applying
-
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
@@ -2839,12 +2799,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
-
-        # Check GPS group again
-        # ----------------------------------------------------------------------
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).exists()
 
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------

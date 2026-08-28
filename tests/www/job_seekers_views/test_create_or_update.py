@@ -12,7 +12,6 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
-from itou.gps.models import FollowUpGroupMembership
 from itou.users.enums import ActionKind, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -32,7 +31,7 @@ from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP,
 
 
 class TestGetOrCreateAsOther:
-    TUNNELS = ["sender", "hire", "gps"]
+    TUNNELS = ["sender", "hire"]
 
     def test_labor_inspectors_are_not_allowed_to_get_or_create_job_seeker(self, client):
         company = CompanyFactory()
@@ -90,7 +89,7 @@ class TestGetOrCreateAsOther:
 
 class TestGetOrCreateForJobSeeker:
     def test_start_create_forbidden_for_job_seekers(self, client):
-        TUNNELS = ["sender", "hire", "gps"]
+        TUNNELS = ["sender", "hire"]
         company = CompanyFactory()
         job_seeker = JobSeekerFactory()
 
@@ -111,7 +110,7 @@ class TestGetOrCreateForJobSeeker:
             assert response.status_code == 403
 
     def test_create_forbidden_for_job_seekers(self, client):
-        TUNNELS = ["sender", "hire", "gps"]
+        TUNNELS = ["sender", "hire"]
         company = CompanyFactory()
         job_seeker = JobSeekerFactory()
 
@@ -994,9 +993,6 @@ class TestStandaloneCreateAsPrescriber:
             ],
         )
 
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).exists()
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
             professional=user,

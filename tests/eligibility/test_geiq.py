@@ -10,7 +10,6 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 from tests.companies.factories import CompanyFactory
@@ -59,11 +58,6 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     )
 
     assert diagnosis.pk
-    group = FollowUpGroup.objects.get()
-    assert group.beneficiary == diagnosis.job_seeker
-    membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-    assert membership.member == diagnosis.author
-    assert membership.creator == diagnosis.author
     assignment = JobSeekerAssignment.objects.get()
     assert assignment.job_seeker == diagnosis.job_seeker
     assert assignment.professional == diagnosis.author
@@ -78,11 +72,6 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     )
 
     assert diagnosis.pk
-    group = FollowUpGroup.objects.exclude(pk=group.pk).get()  # Get the newer group
-    assert group.beneficiary == diagnosis.job_seeker
-    membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-    assert membership.member == diagnosis.author
-    assert membership.creator == diagnosis.author
     assert JobSeekerAssignment.objects.filter(
         job_seeker=diagnosis.job_seeker,
         professional=diagnosis.author,

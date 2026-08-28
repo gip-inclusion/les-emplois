@@ -19,7 +19,6 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.models.iae import get_criteria_from_job_seeker
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile
@@ -285,14 +284,6 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.administrative_criteria.count() == 0
         assert diagnosis.expires_at == datetime.date(2025, 3, 5)
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == user
-        assert membership.creator == user
-
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.get()
@@ -321,14 +312,6 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.author_prescriber_organization == organization
         assert diagnosis.administrative_criteria.count() == 0
         assert diagnosis.expires_at == datetime.date(2025, 6, 3)
-
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == prescriber
-        assert membership.creator == prescriber
 
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------

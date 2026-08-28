@@ -1144,8 +1144,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -1485,7 +1484,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -1623,7 +1621,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -1825,8 +1822,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
           LEFT OUTER JOIN "companies_company" T5 ON ("job_applications_jobapplication"."sender_company_id" = T5."id")
@@ -2326,8 +2322,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -2667,7 +2662,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -2805,7 +2799,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -2875,7 +2868,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -3185,8 +3177,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -3526,7 +3517,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -3659,7 +3649,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -3761,7 +3750,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -4326,8 +4314,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -4667,7 +4654,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -4805,7 +4791,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -4879,7 +4864,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -5366,8 +5350,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -5707,7 +5690,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -5845,7 +5827,6 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -5916,7 +5897,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -6352,8 +6332,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -6685,8 +6664,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -6844,7 +6822,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -7103,8 +7080,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -7411,8 +7387,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -7570,7 +7545,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -7839,8 +7813,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -8258,8 +8231,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -8417,7 +8389,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -8810,8 +8781,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -9252,8 +9222,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -9411,7 +9380,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -9642,8 +9610,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -9975,8 +9942,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -10134,7 +10100,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -10393,8 +10358,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -10701,8 +10665,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -10860,7 +10823,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -11129,8 +11091,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -11548,8 +11509,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -11707,7 +11667,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -12100,8 +12059,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -12542,8 +12500,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."is_active"
@@ -12701,7 +12658,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",

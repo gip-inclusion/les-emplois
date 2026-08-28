@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 90,
+    'num_queries': 87,
     'queries': list([
       dict({
         'origin': list([
@@ -1304,11 +1304,6 @@
                              (SELECT %s AS "a"
                               FROM "geiq_assessments_assessmenttransitionlog" U0
                               WHERE U0."user_id" = ("users_user"."id")
-                              LIMIT 1)
-                           OR EXISTS
-                             (SELECT %s AS "a"
-                              FROM "gps_followupgroupmembership" U0
-                              WHERE U0."creator_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
@@ -3037,70 +3032,6 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          SELECT "gps_followupgroup"."id"
-          FROM "gps_followupgroup"
-          WHERE "gps_followupgroup"."beneficiary_id" IN (%s,
-                                                         %s,
-                                                         %s,
-                                                         %s,
-                                                         %s,
-                                                         %s,
-                                                         %s,
-                                                         %s,
-                                                         %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'anonymize_and_delete_professionals[archive/anonymize.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroupmembership"."id",
-                 "gps_followupgroupmembership"."is_referent_certified",
-                 "gps_followupgroupmembership"."is_active",
-                 "gps_followupgroupmembership"."created_at",
-                 "gps_followupgroupmembership"."created_in_bulk",
-                 "gps_followupgroupmembership"."last_contact_at",
-                 "gps_followupgroupmembership"."started_at",
-                 "gps_followupgroupmembership"."ended_at",
-                 "gps_followupgroupmembership"."updated_at",
-                 "gps_followupgroupmembership"."can_view_personal_information",
-                 "gps_followupgroupmembership"."follow_up_group_id",
-                 "gps_followupgroupmembership"."member_id",
-                 "gps_followupgroupmembership"."creator_id",
-                 "gps_followupgroupmembership"."reason",
-                 "gps_followupgroupmembership"."end_reason"
-          FROM "gps_followupgroupmembership"
-          WHERE "gps_followupgroupmembership"."creator_id" IN (%s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'anonymize_and_delete_professionals[archive/anonymize.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
           SELECT "rdv_insertion_invitationrequest"."id"
           FROM "rdv_insertion_invitationrequest"
           WHERE "rdv_insertion_invitationrequest"."job_seeker_id" IN (%s,
@@ -3513,30 +3444,6 @@
         ]),
         'sql': '''
           DELETE
-          FROM "gps_followupgroupmembership"
-          WHERE "gps_followupgroupmembership"."member_id" IN (%s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'anonymize_and_delete_professionals[archive/anonymize.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          DELETE
           FROM "rdv_insertion_participation"
           WHERE "rdv_insertion_participation"."job_seeker_id" IN (%s,
                                                                   %s,
@@ -3655,22 +3562,6 @@
       }),
     ]),
   })
-# ---
-# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_contact][inactive_jobseeker_email_body]
-  '''
-  Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse jane.doe@test.local depuis le XX/XX/XXXX.
-  Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
-  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
-  
-  ---
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
-  http://localhost:8000/
-  '''
-# ---
-# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_contact][inactive_jobseeker_email_subject]
-  '[TEST] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_body]
   '''

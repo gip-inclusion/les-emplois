@@ -1,8 +1,6 @@
 {% load str_filters %}
 
-{% if is_gps|default:False %}
-    Enregistrer un nouveau bénéficiaire
-{% elif hire_process %}
+{% if hire_process %}
     {% if job_seeker|default:None %}
         Déclarer l’embauche de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
     {% else %}

@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -171,7 +171,6 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",
@@ -791,30 +790,6 @@
           FROM "otp_itoutotpdevice"
           WHERE ("otp_itoutotpdevice"."disabled_at" IS NULL
                  AND "otp_itoutotpdevice"."user_id" = %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ItouUserAdmin.follow_up_groups_or_members[users/admin.py]',
-          'VariableNode[admin/includes/fieldset.html]',
-          'IfNode[admin/includes/fieldset.html]',
-          'IfNode[admin/includes/fieldset.html]',
-          'ForNode[admin/includes/fieldset.html]',
-          'ForNode[admin/includes/fieldset.html]',
-          'IncludeNode[admin/change_form.html]',
-          'ForNode[admin/change_form.html]',
-          'BlockNode[admin/change_form.html]',
-          'BlockNode[admin/base.html]',
-          'ExtendsNode[admin/base_site.html]',
-          'ExtendsNode[admin/change_form.html]',
-          'ExtendsNode[admin/users/change_user_form.html]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "gps_followupgroupmembership"
-          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroupmembership"."member_id" = %s)
         ''',
       }),
       dict({
