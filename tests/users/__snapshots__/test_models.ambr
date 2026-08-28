@@ -16,8 +16,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
@@ -45,8 +48,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
@@ -74,8 +80,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
@@ -103,8 +112,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
@@ -132,8 +144,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
@@ -161,8 +176,11 @@
                                                    "company_id",
                                                    "last_action_kind",
                                                    "last_action_at",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id", "ended_at") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",

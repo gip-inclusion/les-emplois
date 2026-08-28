@@ -41,6 +41,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
+    AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -1610,7 +1611,8 @@ class JobSeekerAssignmentManager(models.Manager):
     def upsert_assignment(
         self, job_seeker, professional, organization, last_action_kind, assigned_to_unknown_advisor=False
     ):
-        assert job_seeker.is_job_seeker
+        assert job_seeker is not None and job_seeker.is_job_seeker
+        assert professional is not None
         if not professional.is_professional:
             # This should not happen but we don't want to block everything
             logger.error("We should not try to add a JobSeekerAssignment on user=%s", professional.pk)
@@ -1628,15 +1630,16 @@ class JobSeekerAssignmentManager(models.Manager):
             last_action_kind=last_action_kind,
             last_action_at=timezone.now(),
             assigned_to_unknown_advisor=assigned_to_unknown_advisor,
+            ended_at=None,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
             update_fields=["updated_at", "last_action_kind", "last_action_at", "assigned_to_unknown_advisor"],
-            unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
+            unique_fields=["job_seeker", "professional", "prescriber_organization", "company", "ended_at"],
         )
 
-    def assigned_to(self, professional, organization, from_all_coworkers=False):
+    def assigned_to(self, professional, organization, from_all_coworkers=False, archived=None):
         filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
         if organization:
             prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
@@ -1648,7 +1651,14 @@ class JobSeekerAssignmentManager(models.Manager):
                     Q(professional=professional, prescriber_organization=prescriber_organization, company=company)
                 )
 
-        return JobSeekerAssignment.objects.filter(or_queries(filters))
+        qs = JobSeekerAssignment.objects.filter(or_queries(filters))
+
+        match archived:
+            case True:
+                qs = qs.exclude(ended_at=None)
+            case False:
+                qs = qs.filter(ended_at=None)
+        return qs
 
 
 class JobSeekerAssignment(models.Model):
@@ -1696,6 +1706,15 @@ class JobSeekerAssignment(models.Model):
         default=False,
     )
 
+    reason = models.TextField(blank=True, verbose_name="motif d'accompagnement")
+    ended_at = models.DateTimeField(verbose_name="date de fin d'accompagnement", null=True, blank=True)
+    end_reason = models.CharField(
+        verbose_name="motif de fin",
+        null=True,
+        blank=True,
+        choices=AssignmentEndReason.choices,
+    )
+
     objects = JobSeekerAssignmentManager()
 
     class Meta:
@@ -1703,9 +1722,13 @@ class JobSeekerAssignment(models.Model):
         verbose_name_plural = "affectations candidats"
         ordering = ["-updated_at"]
         constraints = [
+            # NB: the clean way would be to add condition=Q(ended_at=None) instead of
+            # putting ended_at in fields, but this is not compatible with the bulk_create
+            # used in upsert_assignments.
+            # FIXME: Change the condition when https://code.djangoproject.com/ticket/34277 is available
             models.UniqueConstraint(
                 name="unique_%(class)s_assignment_per_jobseeker",
-                fields=["job_seeker", "professional", "prescriber_organization", "company"],
+                fields=["job_seeker", "professional", "prescriber_organization", "company", "ended_at"],
                 nulls_distinct=False,
                 violation_error_message=(
                     "Une affectation existe déjà entre le candidat, le prescripteur "
@@ -1727,6 +1750,14 @@ class JobSeekerAssignment(models.Model):
                 violation_error_message=(
                     "Une affectation doit comporter une organisation prescriptrice ou une entreprise "
                     "si elle est liée à un accompagnateur non référencé sur le service."
+                ),
+            ),
+            models.CheckConstraint(
+                name="assignment_end_coherence",
+                violation_error_message="Incohérence du champ motif de fin",
+                condition=(
+                    models.Q(ended_at=None, end_reason=None)
+                    | models.Q(ended_at__isnull=False, end_reason__isnull=False)
                 ),
             ),
         ]
