@@ -379,6 +379,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
         advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
     )
+    # FIXME(advisors) Don't count ended assignments
+    # FIXME(advisors) We should still count when assigned_to_unknown_advisor.
+    # If we have a jobseeker with 3 assignments from the same professionnal on 3 companies, but with one assigned to
+    # unknown advisorwe need to tell the job seeker is followed by 2 advisors
+    # If the job seeker has 2 assignments on unknown advisors, the count should be 2.
 
     form = FilterForm(
         queryset,
