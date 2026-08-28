@@ -35,6 +35,11 @@
                         <tr>
                             <td>
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
+                                {% if job_seeker.archived %}
+                                    {% with help_text=list_organization|yesno:"votre structure ne l'accompagne plus,vous ne l'accompagnez plus" %}
+                                        <i class="ri-information-line text-info" data-bs-toggle="tooltip" data-bs-title="Usager archivé ({{ help_text }})" aria-label="Usager archivé ({{ help_text }})" role="button" tabindex="0"></i>
+                                    {% endwith %}
+                                {% endif %}
                                 {% if job_seeker.jobseeker_profile.is_considered_stalled %}
                                     <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Usager sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Usager sans solution" data-bs-toggle="tooltip"></i></span>
                                 {% endif %}

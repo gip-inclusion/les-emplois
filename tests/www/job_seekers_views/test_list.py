@@ -1521,6 +1521,11 @@ def test_filtered_by_assignments(client):
         end_reason=AssignmentEndReason.AUTOMATIC,
     )
     url = reverse("job_seekers_views:list")
+    archive_icon = """
+        <i class="ri-information-line text-info" data-bs-toggle="tooltip"
+            data-bs-title="Usager archivé (vous ne l'accompagnez plus)"
+            aria-label="Usager archivé (vous ne l'accompagnez plus)" role="button" tabindex="0"></i>
+    """
 
     client.force_login(user)
 
@@ -1529,12 +1534,14 @@ def test_filtered_by_assignments(client):
         active_assignment_with_org.job_seeker,
         active_assignment_without_org.job_seeker,
     ]
+    assertNotContains(response, archive_icon, html=True)
 
     response = client.get(url, {"assignments": "archived"})
     assert response.context["page_obj"].object_list == [
         inactive_assignment_with_org.job_seeker,
         inactive_assignment_without_org.job_seeker,
     ]
+    assertContains(response, archive_icon, 2, html=True)
 
     response = client.get(url, {"assignments": "all"})
     assert response.context["page_obj"].object_list == [
@@ -1543,6 +1550,7 @@ def test_filtered_by_assignments(client):
         active_assignment_with_org.job_seeker,
         active_assignment_without_org.job_seeker,
     ]
+    assertContains(response, archive_icon, 2, html=True)
 
 
 def test_filtered_by_organization_assignments(client):
@@ -1595,6 +1603,11 @@ def test_filtered_by_organization_assignments(client):
     )
 
     url = reverse("job_seekers_views:list_organization")
+    archive_icon = """
+        <i class="ri-information-line text-info" data-bs-toggle="tooltip"
+            data-bs-title="Usager archivé (votre structure ne l'accompagne plus)"
+            aria-label="Usager archivé (votre structure ne l'accompagne plus)" role="button" tabindex="0"></i>
+    """
 
     client.force_login(user)
 
@@ -1605,9 +1618,11 @@ def test_filtered_by_organization_assignments(client):
         job_seeker_with_active_assignment_2,
         job_seeker_with_active_assignment,
     ]
+    assertNotContains(response, archive_icon, html=True)
 
     response = client.get(url, {"assignments": "archived"})
     assert response.context["page_obj"].object_list == [job_seeker_with_archived_assignments]
+    assertContains(response, archive_icon, 1, html=True)
 
     response = client.get(url, {"assignments": "all"})
     assert response.context["page_obj"].object_list == [
@@ -1617,6 +1632,7 @@ def test_filtered_by_organization_assignments(client):
         job_seeker_with_active_assignment_2,
         job_seeker_with_active_assignment,
     ]
+    assertContains(response, archive_icon, 1, html=True)
 
 
 def test_filtered_by_assignments_and_members(client):
