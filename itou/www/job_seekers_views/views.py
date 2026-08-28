@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from django.conf import settings
 from django.contrib import messages
@@ -135,18 +136,20 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
     def test_func(self):
         return self.request.from_prescriber or self.request.from_employer
 
-    def get_context_data(self, **kwargs):
-        self.approval = None
+    @cached_property
+    def approval(self):
+        # This object is only used in 2 tabs so we don't want to make the queries in all tabs
         if self.request.from_iae_actor:
-            self.approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
+            return self.object.approvals.valid().prefetch_related("suspension_set").first()
+        return None
 
+    def get_context_data(self, **kwargs):
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
 
         return super().get_context_data(**kwargs) | {
             "matomo_custom_title": "Détail candidat",
-            "approval": self.approval,
             "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
@@ -188,6 +191,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             can_edit_iae_eligibility = True
 
         return context | {
+            "approval": self.approval,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
@@ -255,6 +259,7 @@ class ContractsTabView(BaseJobSeekerDetailView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
+            "approval": self.approval,
             "contracts": self.get_contracts(self.request, self.approval),
         }
 
