@@ -108,12 +108,18 @@
                                                 Orienter vers un service d’insertion
                                             </a>
                                         {% endif %}
-                                        {% if not job_seeker.user_is_last_advisor %}
-                                            {# FIXME redirect to the future assignment change view instead #}
-                                            <form method="post" action="{% url "job_seekers_views:assign_oneself_as_advisor" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="dropdown-item">Ajouter mon intervention</button>
-                                            </form>
+                                        {% if job_seeker.active_assignment %}
+                                            <a href="{% url "job_seekers_views:edit_assignment" public_id=job_seeker.public_id assignment_pk=job_seeker.active_assignment %}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="dropdown-item"
+                                               {% matomo_event "candidat" "clic" "edit-assignment-from-list" %}>
+                                                Modifier mon intervention
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url "job_seekers_views:create_assignment" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="dropdown-item"
+                                               {% matomo_event "candidat" "clic" "create-assignment-from-list" %}>
+                                                Ajouter mon intervention
+                                            </a>
                                         {% endif %}
                                         {% if job_seeker.pro_support_request_mailto %}
                                             <a href="{{ job_seeker.pro_support_request_mailto }}" class="dropdown-item" {% matomo_event "candidat" "clic" "demande_bilan_accompagnement" %}>Demander un bilan d’accompagnement à la SIAE</a>

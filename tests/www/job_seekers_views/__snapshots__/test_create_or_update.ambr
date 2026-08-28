@@ -18,7 +18,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
                   </p>
               </div>
               <div class="modal-footer">
@@ -26,7 +26,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Modifier mon intervention
                   </button>
               </div>
           </div>
@@ -54,7 +54,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                   </p>
               </div>
               <div class="modal-footer">
@@ -62,7 +62,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Ajouter mon intervention
                   </button>
               </div>
           </div>
@@ -90,7 +90,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
                   </p>
               </div>
               <div class="modal-footer">
@@ -98,7 +98,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Modifier mon intervention
                   </button>
               </div>
           </div>
@@ -126,15 +126,15 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager sera ajouté à votre liste d'accompagnements et vous serez automatiquement désigné comme dernier accompagnateur connu.
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                   </p>
               </div>
               <div class="modal-footer">
                   <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
-                      Ce n'est pas mon candidat
+                      Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Continuer
+                      Ajouter mon intervention
                   </button>
               </div>
           </div>
@@ -184,7 +184,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
                   </p>
               </div>
               <div class="modal-footer">
@@ -192,7 +192,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Modifier mon intervention
                   </button>
               </div>
           </div>
@@ -242,7 +242,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                   </p>
               </div>
               <div class="modal-footer">
@@ -250,7 +250,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Ajouter mon intervention
                   </button>
               </div>
           </div>
@@ -300,7 +300,7 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
                   </p>
               </div>
               <div class="modal-footer">
@@ -308,7 +308,7 @@
                       Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      M'ajouter en tant qu'accompagnateur
+                      Modifier mon intervention
                   </button>
               </div>
           </div>
@@ -358,15 +358,301 @@
                       </b>
                   </p>
                   <p>
-                      Cet usager sera ajouté à votre liste d'accompagnements et vous serez automatiquement désigné comme dernier accompagnateur connu.
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                   </p>
               </div>
               <div class="modal-footer">
                   <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
-                      Ce n'est pas mon candidat
+                      Retour
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Continuer
+                      Ajouter mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:check_nir_for_sender-#nir-confirmation-modal]
+  '''
+  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="nir-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="nir-confirmation-label">
+                      Utilisateur trouvé
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          Le numéro
+                          <span>
+                              2
+                          </span>
+                          <span class="ms-1">
+                              90
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              010
+                          </span>
+                          <span class="ms-1">
+                              101
+                          </span>
+                          <span class="ms-1">
+                              25
+                          </span>
+                          est associé au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Ajouter mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:check_nir_for_sender-#nir-confirmation-modal].1
+  '''
+  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="nir-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="nir-confirmation-label">
+                      Utilisateur trouvé
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          Le numéro
+                          <span>
+                              2
+                          </span>
+                          <span class="ms-1">
+                              90
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              010
+                          </span>
+                          <span class="ms-1">
+                              101
+                          </span>
+                          <span class="ms-1">
+                              25
+                          </span>
+                          est associé au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Cet usager figure déjà dans la liste d'accompagnements de votre structure.
+                      <br/>
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Ajouter mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:check_nir_for_sender-#nir-confirmation-modal].2
+  '''
+  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="nir-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="nir-confirmation-label">
+                      Utilisateur trouvé
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          Le numéro
+                          <span>
+                              2
+                          </span>
+                          <span class="ms-1">
+                              90
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              01
+                          </span>
+                          <span class="ms-1">
+                              010
+                          </span>
+                          <span class="ms-1">
+                              101
+                          </span>
+                          <span class="ms-1">
+                              25
+                          </span>
+                          est associé au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Modifier mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:search_by_email_for_sender-#email-confirmation-modal]
+  '''
+  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="email-confirmation-label">
+                      Email existant
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          L'adresse jane.doe@test.local est associée au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Ajouter mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:search_by_email_for_sender-#email-confirmation-modal].1
+  '''
+  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="email-confirmation-label">
+                      Email existant
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          L'adresse jane.doe@test.local est associée au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Cet usager figure déjà dans la liste d'accompagnements de votre structure.
+                      <br/>
+                      Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Ajouter mon intervention
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestStandaloneCreateAsPrescriber.test_standalone_creation_as_prescriber_existing_user_modal_content[job_seekers_views:search_by_email_for_sender-#email-confirmation-modal].2
+  '''
+  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="email-confirmation-label">
+                      Email existant
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      <b>
+                          L'adresse jane.doe@test.local est associée au compte de D… J….
+                      </b>
+                  </p>
+                  <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
+                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                      Modifier mon intervention
                   </button>
               </div>
           </div>
