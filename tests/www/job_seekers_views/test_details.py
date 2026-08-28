@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.enums import ProlongationRequestStatus
@@ -594,6 +595,33 @@ class TestLastKnownAdvisor:
         update_page_with_htmx(simulated_page, f"#email-{assignment.pk}", response)
 
         assert pretty_indented(simulated_page) == snapshot
+
+    def test_display_advisor_contact_info_with_button(self, client, snapshot):
+        prescriber_organization = PrescriberOrganizationFactory(for_snapshot=True)
+        prescriber = PrescriberMembershipFactory(
+            user__public_id="788bc466-3747-4cdb-aafc-80c888d6b69d",
+            user__first_name="Pierre",
+            user__last_name="Dubois",
+            user__email="pierre.dubois@test.local",
+            user__phone="0606060606",
+            organization=prescriber_organization,
+        ).user
+        job_seeker = JobSeekerFactory()
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
+            professional__first_name="Marie",
+            professional__last_name="Laforêt",
+            professional__email="marie.laforet@test.local",
+            professional__phone="0707070707",
+            created_at=timezone.now() - datetime.timedelta(days=7),
+            last_action_at=timezone.now() - datetime.timedelta(days=7),
+        )
+
+        client.force_login(prescriber)
+        display_phone_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "phone"))
+        response = client.post(add_url_params(display_phone_url, {"with_button": True}))
+        assert pretty_indented(parse_response_to_soup(response)) == snapshot
 
     @freeze_time("2026-06-30")
     def test_display_advisor_organization_contact_info(self, client, snapshot):

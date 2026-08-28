@@ -3,7 +3,7 @@
 {% if value %}
     <button class="btn btn-ico btn-block btn-outline-primary mt-3"
             id="{{ mode }}-{{ assignment.pk }}"
-            hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk mode %}"
+            hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk mode %}?with_button=True"
             hx-swap="outerHTML"
             hx-include="#display-contact-info-form"
             {% matomo_event "advisors" "clic" "displayed_last_advisor_"|add:mode %}>

@@ -1684,4 +1684,5 @@ def display_advisor_contact_info(
         logger.error("Invalid advisor info request assignment=%s mode=%s", assignment.pk, mode)
         return '<i class="text-disabled">Non renseigné</i>'
 
-    return render(request, template_name, {"info": info})
+    with_button = request.GET.get("with_button", False)
+    return render(request, template_name, {"info": info, "with_button": with_button})
