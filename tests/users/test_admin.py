@@ -111,13 +111,9 @@ def test_get_fields_to_transfer_for_job_seekers():
         "created_assessments",  # Assessment.created_by
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
-        "created_follow_up_groups",  # gps.FollowUpGroupMembership.creator: creator of a follow up group of GPS
         "final_reviewed_assessments",  # Assessment.final_reviewed_by
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
-        "follow_up_group",  # gps.FollowUpGroup: do I have a GPS follow group as a jobseeker
-        "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
-        "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
         "geiqeligibilitydiagnosis",  # GEIQEligibilityDiagnosis.author
         "groups",  # django.contrib.auth.models.Group
         "institution",  # Institution.members

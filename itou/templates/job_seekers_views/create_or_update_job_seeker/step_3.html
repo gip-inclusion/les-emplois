@@ -2,13 +2,10 @@
 {% load django_bootstrap5 %}
 
 {% block progress_title %}
-    Situation du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+    Situation du candidat
 {% endblock %}
 {% block step_title %}
-    Quelle est la situation du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
-    ?
+    Quelle est la situation du candidat ?
 {% endblock %}
 
 {% block form_content %}

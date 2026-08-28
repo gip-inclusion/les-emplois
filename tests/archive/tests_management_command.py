@@ -41,7 +41,6 @@ from itou.eligibility.models.geiq import (
 )
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.models import File
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
@@ -64,7 +63,6 @@ from tests.eligibility.factories import (
 )
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
-from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -142,9 +140,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
         # jobseeker_with_recent_geiq_eligibility_diagnosis
         GEIQEligibilityDiagnosisFactory(job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, from_prescriber=True)
 
-        # jobseeker_in_followup_group_with_recent_contact
-        FollowUpGroupMembershipFactory(follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY)
-
         # jobseeker_with_evaluated_job_application
         EvaluatedJobApplicationFactory(
             job_application__job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
@@ -192,13 +187,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
                     sent_by_prescriber_alone=True, job_seeker=jobseeker, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 id="jobseeker_with_job_application_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
-                lambda jobseeker: FollowUpGroupMembershipFactory(
-                    follow_up_group__beneficiary=jobseeker, last_contact_at=timezone.now() - INACTIVITY_PERIOD
-                ),
-                id="jobseeker_in_followup_group_without_recent_contact",
             ),
         ],
     )
@@ -540,11 +528,6 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1, from_prescriber=True
         )
 
-        recent_follow_up_group_contact_of_notified_jobseeker = FollowUpGroupMembershipFactory(
-            follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
-            follow_up_group__beneficiary__notified_days_ago=1,
-        )
-
         call_command("anonymize_jobseekers", wet_run=True)
 
         assertQuerySetEqual(
@@ -570,7 +553,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 approval_ending_after_grace_period_of_notified_jobseeker.user,
                 recent_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
                 recent_geiq_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
-                recent_follow_up_group_contact_of_notified_jobseeker.follow_up_group.beneficiary,
             ],
             ordered=False,
         )
@@ -637,25 +619,6 @@ class TestAnonymizeJobseekersManagementCommand:
         else:
             assert not mailoutbox
 
-        assert respx_mock.calls.call_count == 1
-
-    def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
-        FollowUpGroupMembershipFactory(
-            follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
-            follow_up_group__beneficiary__notified_days_ago=31,
-            last_contact_at=timezone.now() - INACTIVITY_PERIOD,
-        )
-
-        assert FollowUpGroup.objects.exists()
-        assert FollowUpGroupMembership.objects.exists()
-
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", wet_run=True)
-
-        assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
-        assert not FollowUpGroup.objects.exists()
-        assert not FollowUpGroupMembership.objects.exists()
-        assert AnonymizedJobSeeker.objects.exists()
         assert respx_mock.calls.call_count == 1
 
     def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, respx_mock):

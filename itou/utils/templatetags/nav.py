@@ -314,27 +314,6 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="institution-geiq-bilan-execution",
     ),
-    # GPS (for employers and prescribers with an org in department nb 30)
-    "gps": NavItem(
-        label="Réseau d'intervenants",
-        icon="ri-pin-distance-line",
-        target=reverse("gps:group_list"),
-        active_view_names=[
-            "gps:group_list",
-            "gps:old_group_list",
-            "gps:group_memberships",
-            "gps:group_beneficiary",
-            "gps:group_contribution",
-            "gps:group_edition",
-            "gps:join_group",
-            "gps:join_group_from_coworker",
-            "gps:join_group_from_nir",
-            "gps:join_group_from_name_and_email",
-        ],
-        matomo_event_category="gps",
-        matomo_event_name="clic",
-        matomo_event_option="tdb_liste_beneficiaires",
-    ),
     # Recommandations (only for members of FT organizations matching ENABLED_RECOMMENDATIONS_SAFIR_CODES setting)
     "recommendations": NavItem(
         label="Actions recommandées",
@@ -373,7 +352,6 @@ def nav(request):
             if request.from_authorized_prescriber:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
             menu_items.append(NavGroup(label="Accompagnements", icon="ri-user-line", items=jobseekers_items))
-            menu_items.append(NAV_ENTRIES["gps"])
             organization_items = [
                 (
                     NAV_ENTRIES["prescriber-overview"]
@@ -408,7 +386,6 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-members"])
             if request.current_organization.convention_can_be_accessed_by(request.user):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
-            menu_items.append(NAV_ENTRIES["gps"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.from_institution:
             menu_items.append(

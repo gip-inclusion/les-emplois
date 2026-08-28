@@ -19,7 +19,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import MobilizationEventKind
 from itou.job_applications.enums import JobApplicationState
 from itou.jobs.models import Rome
-from itou.metabase.tables import gps, mobilization_events
+from itou.metabase.tables import mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider
@@ -35,7 +35,6 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geo.factories import create_qpv
-from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.insertion.factories import MobilizationEventFactory, OrientationFactory, ServiceFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1136,61 +1135,6 @@ def test_populate_companies_convergence(settings):
             (convergence_company.siret, True),
             (aci_non_convergence_company.siret, False),
             (non_convergence_company.siret, False),
-        ]
-
-
-@freeze_time("2023-02-02")
-@pytest.mark.django_db(transaction=True)
-def test_populate_gps_groups(snapshot):
-    group = FollowUpGroupFactory(for_snapshot=True)
-
-    with assertSnapshotQueries(snapshot):
-        management.call_command("populate_metabase_emplois", mode="gps_groups")
-
-    with connection.cursor() as cursor:
-        cursor.execute(f"SELECT * FROM {gps.GroupsTable.name} ORDER BY id")
-        rows = cursor.fetchall()
-        assert rows == [
-            (
-                group.pk,
-                group.beneficiary_id,
-                group.created_at,
-                group.updated_at,
-                group.created_in_bulk,
-                group.beneficiary.department,
-                datetime.date(2023, 2, 2),
-            ),
-        ]
-
-
-@freeze_time("2023-02-02")
-@pytest.mark.django_db(transaction=True)
-def test_populate_gps_memberships(snapshot):
-    membership = FollowUpGroupMembershipFactory(follow_up_group__for_snapshot=True, member__for_snapshot=True)
-    prescriber = membership.member
-    PrescriberMembershipFactory(user=prescriber, organization__department="63")
-    PrescriberMembershipFactory(user=prescriber, organization__department="13")
-    PrescriberMembershipFactory(user=prescriber, organization__department="75")
-
-    with assertSnapshotQueries(snapshot):
-        management.call_command("populate_metabase_emplois", mode="gps_memberships")
-
-    with connection.cursor() as cursor:
-        cursor.execute(f"SELECT * FROM {gps.MembershipsTable.name} ORDER BY id")
-        rows = cursor.fetchall()
-        assert rows == [
-            (
-                membership.pk,
-                membership.follow_up_group.pk,
-                membership.created_at,
-                membership.updated_at,
-                membership.ended_at,
-                membership.member.pk,
-                ["13", "63", "75"],
-                int(membership.created_in_bulk),
-                int(membership.is_referent_certified),
-                datetime.date(2023, 2, 2),
-            ),
         ]
 
 

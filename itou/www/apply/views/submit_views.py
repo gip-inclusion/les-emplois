@@ -21,7 +21,6 @@ from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import save_file
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
@@ -679,9 +678,6 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         self.apply_session.delete()
 
         if self.request.from_employer or self.request.from_prescriber:
-            # New job application -> sync GPS groups if the sender is not a jobseeker
-            FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
-
             advisor = self.form.cleaned_data.get("advisor")
 
             # Sync job seeker assignment
@@ -694,10 +690,6 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
                 ActionKind.APPLY,
                 assigned_to_unknown_advisor,
             )
-
-            # Add advisor to GPS as well
-            if advisor := (professional is not self.request.user and professional):
-                FollowUpGroup.objects.follow_beneficiary(self.job_seeker, advisor)
 
         # Send notifications
         company_recipients = job_application.to_company.active_members.all()

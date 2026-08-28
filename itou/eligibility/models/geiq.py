@@ -15,7 +15,6 @@ from itou.eligibility.models.common import (
     CommonEligibilityDiagnosisQuerySet,
 )
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.gps.models import FollowUpGroup
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
@@ -214,8 +213,6 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             result.administrative_criteria.set(administrative_criteria)
             result.schedule_certification()
 
-        # Sync GPS groups
-        FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
         # Sync job seeker assignment
         JobSeekerAssignment.objects.upsert_assignment(
             job_seeker, author, author_structure, ActionKind.GEIQ_ELIGIBILITY

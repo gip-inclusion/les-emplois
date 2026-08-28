@@ -17,7 +17,6 @@ from itou.eligibility.models.common import (
     AbstractSelectedAdministrativeCriteria,
     CommonEligibilityDiagnosisQuerySet,
 )
-from itou.gps.models import FollowUpGroup
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment
 
@@ -253,8 +252,6 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             diagnosis.administrative_criteria.add(*administrative_criteria)
             diagnosis.schedule_certification()
 
-        # Sync GPS groups
-        FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
         # Sync job seeker assignment
         JobSeekerAssignment.objects.upsert_assignment(
             job_seeker, author, author_prescriber_organization or author_siae, ActionKind.IAE_ELIGIBILITY

@@ -66,8 +66,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescriberorganization"
           ORDER BY "prescribers_prescriberorganization"."created_at" ASC,
                    "prescribers_prescriberorganization"."id" ASC
@@ -144,8 +143,7 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescriberorganization"
           ORDER BY "prescribers_prescriberorganization"."created_at" ASC,
                    "prescribers_prescriberorganization"."id" ASC

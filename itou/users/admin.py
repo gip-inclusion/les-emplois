@@ -29,7 +29,6 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
-from itou.gps.models import FollowUpGroupMembership
 from itou.insertion.models import Orientation
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
@@ -482,21 +481,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             )
         return "Aucune"
 
-    @admin.display(description="GPS")
-    def follow_up_groups_or_members(self, obj):
-        if obj.pk is None:
-            return self.get_empty_value_display()
-        if obj.is_job_seeker:
-            if memberships := FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=obj):
-                url = reverse("admin:gps_followupgroup_change", args=(memberships[0].follow_up_group_id,))
-                return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
-            return "Pas de groupe de suivi"
-        if obj.is_professional:
-            url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": obj.id})
-            count = FollowUpGroupMembership.objects.filter(member=obj).count()
-            return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
-        return ""
-
     @admin.display(description="affectations candidat")
     def job_seeker_assignments(self, obj):
         key = None
@@ -543,7 +527,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "is_staff",
                 "jobseeker_profile_link",
                 "disabled_notifications",
-                "follow_up_groups_or_members",
                 "job_seeker_assignments",
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
@@ -585,7 +568,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "address_in_qpv",
                         "created_by",
                         "disabled_notifications",
-                        "follow_up_groups_or_members",
                         "job_seeker_assignments",
                         "external_data_source_history_formatted",
                     ]

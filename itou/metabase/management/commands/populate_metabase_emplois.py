@@ -33,7 +33,6 @@ from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.insertion.models import MobilizationEvent
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
@@ -49,7 +48,6 @@ from itou.metabase.tables import (
     evaluated_job_applications,
     evaluated_siaes,
     evaluation_campaigns,
-    gps,
     insee_codes,
     institutions,
     job_applications,
@@ -119,8 +117,6 @@ class Command(BaseCommand):
             "evaluated_criteria": self.populate_evaluated_criteria,
             "users": self.populate_users,
             "memberships": self.populate_memberships,
-            "gps_groups": self.populate_gps_groups,
-            "gps_memberships": self.populate_gps_memberships,
             "mobilization_events": self.populate_mobilization_events,
         }
 
@@ -636,32 +632,6 @@ class Command(BaseCommand):
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
             store_df(df=df, table_name=table_name)
-
-    def populate_gps_groups(self):
-        queryset = FollowUpGroup.objects.all().annotate(beneficiary_department=F("beneficiary__department"))
-        metabase_db.populate_table(gps.GroupsTable, batch_size=100_000, querysets=[queryset])
-
-    def populate_gps_memberships(self):
-        queryset = (
-            FollowUpGroupMembership.objects.all()
-            .annotate(
-                companies_departments=ArrayAgg(
-                    "member__companymembership__company__department",
-                    filter=Q(member__companymembership__is_active=True),
-                    distinct=True,
-                    order_by="member__companymembership__company__department",
-                )
-            )
-            .annotate(
-                prescriber_departments=ArrayAgg(
-                    "member__prescribermembership__organization__department",
-                    filter=Q(member__prescribermembership__is_active=True),
-                    distinct=True,
-                    order_by="member__prescribermembership__organization__department",
-                )
-            )
-        )
-        metabase_db.populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
 
     def populate_mobilization_events(self):
         queryset = MobilizationEvent.objects.all().select_related(

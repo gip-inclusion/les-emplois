@@ -50,7 +50,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.notifications import JobSeekerCreatedByProxyNotification, JobSeekerCreatedByProxyNotificationForGPS
+from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils import iso_standards
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
@@ -437,10 +437,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             if self.has_data_changed(["last_name", "first_name"]) and not self._state.adding:
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
-                self.jobseeker_profile.ft_gps_id = None
-                self.jobseeker_profile.save(
-                    update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at", "ft_gps_id"]
-                )
+                self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
                 self.jobseeker_profile.identity_certifications.filter(
                     certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
                 ).delete()
@@ -684,7 +681,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         return True
 
     @classmethod
-    def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, gps=False, **fields):
+    def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, **fields):
         """
         Used when a "prescriber" user creates another user of kind "job seeker".
 
@@ -701,8 +698,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(username, email=fields.pop("email"), **fields)
-        Notification = JobSeekerCreatedByProxyNotificationForGPS if gps else JobSeekerCreatedByProxyNotification
-        Notification(
+        JobSeekerCreatedByProxyNotification(
             user,
             job_seeker=user,
             creator=proxy_user,
@@ -932,12 +928,6 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         ),
         choices=LackOfPoleEmploiId.choices,
         blank=True,
-    )
-    # This is currently only used for GPS and comes from FT datalake (it might be a user pk)
-    ft_gps_id = models.TextField(
-        verbose_name="identifiant unique France Travail pour GPS",
-        blank=True,
-        null=True,
     )
 
     asp_uid = models.TextField(
@@ -1276,13 +1266,8 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
-            self.ft_gps_id = None
             if update_fields is not None:
-                update_fields = set(update_fields) | {
-                    "pe_obfuscated_nir",
-                    "pe_last_certification_attempt_at",
-                    "ft_gps_id",
-                }
+                update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
             self.identity_certifications.filter(
                 certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
             ).delete()

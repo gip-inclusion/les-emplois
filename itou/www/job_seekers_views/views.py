@@ -28,7 +28,6 @@ from itou.asp.utils import guess_birth_place_from_nir
 from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
@@ -46,7 +45,6 @@ from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireWizardMixin
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
-from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
@@ -517,7 +515,7 @@ class GetOrCreateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         self.tunnel = request.GET.get("tunnel")
-        if self.tunnel not in ("sender", "hire", "gps", "standalone", "orientation"):
+        if self.tunnel not in ("sender", "hire", "standalone", "orientation"):
             raise Http404
         self.from_url = get_safe_url(request, "from_url")
         if not self.from_url:
@@ -566,7 +564,7 @@ class GetOrCreateJobSeekerStartView(View):
     def get(self, request, *args, **kwargs):
         if self.tunnel == "orientation":
             view_name = "job_seekers_views:search_by_email_for_sender"
-        elif self.tunnel in ("sender", "gps", "standalone"):
+        elif self.tunnel in ("sender", "standalone"):
             view_name = "job_seekers_views:check_nir_for_sender"
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
@@ -609,26 +607,21 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.auto_prescription_process = None
         self.standalone_creation = None
         self.is_orientation = False
-        self.is_gps = False
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
         self.is_orientation = self.job_seeker_session.get("config", {}).get("tunnel") == "orientation"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
-            if not self.is_gps:
-                self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.standalone_creation = not self.is_gps and self.company is None and not self.is_orientation
+            self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+        self.standalone_creation = self.company is None and not self.is_orientation
         self.hire_process = hire_process
         self.prescription_process = (
             not self.hire_process
-            and not self.is_gps
             and not self.standalone_creation
             and (request.from_prescriber or (request.from_employer and self.company != request.current_organization))
         )
         self.auto_prescription_process = (
             not self.hire_process
-            and not self.is_gps
             and not self.standalone_creation
             and request.from_employer
             and self.company == request.current_organization
@@ -642,8 +635,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         )
 
     def get_exit_url(self, job_seeker, created=False):
-        if self.is_gps:
-            return reverse("gps:group_list")
         if self.is_orientation:
             service_uid = self.job_seeker_session.get("orientation", {}).get("service_uid")
             return reverse(
@@ -675,7 +666,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
-            "is_gps": self.is_gps,
         }
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
@@ -772,7 +762,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
+        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
 
     def search_by_email_url(self, session_uuid):
         view_name = (
@@ -832,9 +822,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = JobSeekerExistsForm(
-            is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
-        )
+        self.form = JobSeekerExistsForm(initial=self.job_seeker_session.get("user", {}), data=request.POST or None)
 
     def _can_add_nir(self, job_seeker):
         return (self.request.from_authorized_prescriber or self.request.from_employer) and (
@@ -875,8 +863,6 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
-                    if self.is_gps:
-                        gps_utils.add_beneficiary(request, job_seeker, created=True)
                     if self.standalone_creation:
                         assign_user_as_job_seeker_last_advisor(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
@@ -895,8 +881,6 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     job_seeker.jobseeker_profile.nir = nir
                     job_seeker.jobseeker_profile.lack_of_nir_reason = ""
                     job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
-                    if self.is_gps:
-                        gps_utils.add_beneficiary(request, job_seeker, created=True)
                     if self.standalone_creation:
                         assign_user_as_job_seeker_last_advisor(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
@@ -1162,7 +1146,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     self.sender,
                     **self._get_user_data_from_session(),
                     acting_organization=request.current_organization,
-                    gps=self.is_gps,
                 )
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
@@ -1193,15 +1176,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             url = self.get_exit_url(self.profile.user, created=True)
             self.job_seeker_session.delete()
 
-            if self.is_gps:
-                notify_duplicate = (
-                    User.objects.filter(kind=UserKind.JOB_SEEKER, first_name=user.first_name, last_name=user.last_name)
-                    .exclude(pk=user.pk)
-                    .exists()
-                )
-                gps_utils.add_beneficiary(request, user, notify_duplicate, created=True)
-            else:
-                FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
             # Sync job seeker assignment to a professional
             JobSeekerAssignment.objects.upsert_assignment(
                 user, request.user, request.current_organization, ActionKind.CREATE

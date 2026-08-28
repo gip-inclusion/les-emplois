@@ -127,11 +127,6 @@
       'model': 'geiq_assessments.AssessmentTransitionLog',
     }),
     dict({
-      'field': 'creator',
-      'hidden': False,
-      'model': 'gps.FollowUpGroupMembership',
-    }),
-    dict({
       'field': 'beneficiary',
       'hidden': False,
       'model': 'insertion.Orientation',
@@ -254,16 +249,6 @@
       'field': 'job_seeker',
       'hidden': False,
       'model': 'eligibility.GEIQEligibilityDiagnosis',
-    }),
-    dict({
-      'field': 'beneficiary',
-      'hidden': False,
-      'model': 'gps.FollowUpGroup',
-    }),
-    dict({
-      'field': 'member',
-      'hidden': False,
-      'model': 'gps.FollowUpGroupMembership',
     }),
     dict({
       'field': 'user',
