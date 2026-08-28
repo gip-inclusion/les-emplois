@@ -46,11 +46,6 @@ urlpatterns = [
         views.switch_stalled_status,
         name="switch_stalled_status",
     ),
-    path(
-        "assign_oneself_as_advisor/<uuid:public_id>",
-        views.assign_oneself_as_last_advisor,
-        name="assign_oneself_as_advisor",
-    ),
     path("list", views.list_job_seekers, name="list"),
     path(
         "list-organization",
