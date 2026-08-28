@@ -275,7 +275,7 @@ def test_multiple(client, snapshot):
         job_seeker=job_app.job_seeker,
         updated_at=timezone.now() - datetime.timedelta(days=2),
     )
-    JobSeekerAssignmentFactory(
+    job_seeker_assignment2 = JobSeekerAssignmentFactory(
         job_seeker=job_app.job_seeker,
         professional=prescriber,
         prescriber_organization=organization,
@@ -294,7 +294,7 @@ def test_multiple(client, snapshot):
         job_seeker__jobseeker_profile__is_stalled=True,
         sender_prescriber_organization=organization,
     )
-    job_seeker_assignment2 = JobSeekerAssignmentFactory(
+    job_seeker_assignment3 = JobSeekerAssignmentFactory(
         job_seeker=job_app2.job_seeker,
         professional=prescriber,
         prescriber_organization=organization,
@@ -314,7 +314,7 @@ def test_multiple(client, snapshot):
         with_approval=True,
         sender_prescriber_organization=organization,
     )
-    JobSeekerAssignmentFactory(
+    job_seeker_assignment4 = JobSeekerAssignmentFactory(
         job_seeker=job_app3.job_seeker,
         professional=prescriber,
         prescriber_organization=organization,
@@ -324,7 +324,7 @@ def test_multiple(client, snapshot):
 
     company = CompanyFactory(for_snapshot=True)
     employer = CompanyMembershipFactory(company=company).user
-    job_seeker_assignment3 = JobSeekerAssignmentFactory(
+    job_seeker_assignment5 = JobSeekerAssignmentFactory(
         job_seeker=job_app3.job_seeker,
         professional=employer,
         company=company,
@@ -342,8 +342,14 @@ def test_multiple(client, snapshot):
         job_seeker__last_name="Waterford",
         job_seeker__public_id="44444444-4444-4444-4444-444444444444",
         with_iae_eligibility_diagnosis=True,
-        with_job_seeker_assignment=True,
     )
+    job_seeker_assignment6 = JobSeekerAssignmentFactory(
+        job_seeker=job_app4.job_seeker,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+    )
+
     # Other app for which the current user cannot see the personal information
     unauthorized_prescriber = PrescriberFactory(membership=True)
     job_app5 = JobApplicationFactory(
@@ -357,22 +363,52 @@ def test_multiple(client, snapshot):
         with_job_seeker_assignment=True,
     )
 
+    # These job seekers will be displayed with an action to create an assignment
+    JobSeekerAssignmentFactory(
+        professional=other_prescriber,
+        prescriber_organization=organization,
+        job_seeker__first_name="Olivia",
+        job_seeker__last_name="Moineau",
+        job_seeker__public_id="66666666-6666-6666-6666-666666666666",
+    )
+    JobSeekerAssignmentFactory(
+        professional=prescriber,
+        job_seeker__first_name="Paul",
+        job_seeker__last_name="Berthelot",
+        job_seeker__public_id="77777777-7777-7777-7777-777777777777",
+    )
+
+    active_assignments_of_prescriber = [
+        job_seeker_assignment2,
+        job_seeker_assignment3,
+        job_seeker_assignment4,
+        job_seeker_assignment6,
+    ]
+
     client.force_login(prescriber)
     with assertSnapshotQueries(snapshot(name="job seekers list SQL")):
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, selector="table")) == snapshot(
-            name="job seekers list table"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="table",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/job-seekers/{assignment.job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                        f"/job-seekers/{assignment.job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
+                    )
+                    for assignment in active_assignments_of_prescriber
+                ],
+            )
+        ) == snapshot(name="job seekers list table")
 
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):
             assert_contains_button_apply_for(response, application.job_seeker, with_city=True)
 
-        for assignment in [job_seeker_assignment, job_seeker_assignment2, job_seeker_assignment3]:
+        for assignment in [job_seeker_assignment, job_seeker_assignment4, job_seeker_assignment5]:
             assert_contains_last_advisor(response, assignment)
-            assert_contains_button_advisor_self_assign(
-                response, assignment.job_seeker, is_last_advisor=assignment.professional == prescriber
-            )
 
         # Job seeker does not have an address, so it is not in the URL
         assert_contains_button_apply_for(response, job_app4.job_seeker, with_city=False)
@@ -518,7 +554,17 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     client.force_login(prescriber)
     with assertSnapshotQueries(snapshot(name="job seekers created by organization list with SQL")):
         response = client.get(url_organization)
-        soup = parse_response_to_soup(response, selector="tbody")
+        soup = parse_response_to_soup(
+            response,
+            selector="tbody",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"/job-seekers/{alain.public_id}/assignments/{alain_assignment.pk}/edit",
+                    f"/job-seekers/{alain.public_id}/assignments/[JobSeekerAssignment PK]/edit",
+                )
+            ],
+        )
         assert pretty_indented(soup) == snapshot(name="job seekers list tbody")
 
         # Job seekers are displayed for the prescriber
@@ -528,9 +574,6 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
 
         for assignment in [alain_assignment, bernard_assignment, charlotte_assignment]:
             assert_contains_last_advisor(response, assignment)
-            assert_contains_button_advisor_self_assign(
-                response, assignment.job_seeker, is_last_advisor=assignment.professional == prescriber
-            )
 
         # Job seeker not displayed for the prescriber
         for job_seeker in [david, edouard]:

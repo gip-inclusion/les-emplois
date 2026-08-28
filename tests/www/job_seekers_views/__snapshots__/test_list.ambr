@@ -1812,7 +1812,22 @@
                        AND U0."author_kind" = %s
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
-                LIMIT 1) AS "valid_eligibility_diagnosis"
+                LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+               (SELECT U0."id" AS "id"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s))
+                       AND NOT U0."assigned_to_unknown_advisor"
+                       AND U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."professional_id" = %s
+                       AND NOT (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL))
+                ORDER BY U0."updated_at" DESC
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -1841,7 +1856,8 @@
                       3,
                       4,
                       5,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -1947,6 +1963,21 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+            (SELECT U0."id" AS "id"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s))
+                    AND NOT U0."assigned_to_unknown_advisor"
+                    AND U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."professional_id" = %s
+                    AND NOT (U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL))
+             ORDER BY U0."updated_at" DESC
+             LIMIT 1) AS "active_assignment",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -2023,6 +2054,7 @@
                    42,
                    43,
                    45,
+                   46,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 44 DESC,
                    "users_user"."id" DESC
@@ -2665,7 +2697,23 @@
                        AND U0."author_kind" = %s
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
-                LIMIT 1) AS "valid_eligibility_diagnosis"
+                LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+               (SELECT U0."id" AS "id"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s
+                            AND U0."professional_id" = %s))
+                       AND NOT U0."assigned_to_unknown_advisor"
+                       AND U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."professional_id" = %s
+                       AND NOT (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL))
+                ORDER BY U0."updated_at" DESC
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -2695,7 +2743,8 @@
                       3,
                       4,
                       5,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -2802,6 +2851,22 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+            (SELECT U0."id" AS "id"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s
+                         AND U0."professional_id" = %s))
+                    AND NOT U0."assigned_to_unknown_advisor"
+                    AND U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."professional_id" = %s
+                    AND NOT (U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL))
+             ORDER BY U0."updated_at" DESC
+             LIMIT 1) AS "active_assignment",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -2879,6 +2944,7 @@
                    42,
                    43,
                    45,
+                   46,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 44 DESC,
                    "users_user"."id" DESC
@@ -3491,7 +3557,23 @@
                        AND U0."author_kind" = %s
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
-                LIMIT 1) AS "valid_eligibility_diagnosis"
+                LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+               (SELECT U0."id" AS "id"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s
+                            AND U0."professional_id" = %s))
+                       AND NOT U0."assigned_to_unknown_advisor"
+                       AND U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."professional_id" = %s
+                       AND NOT (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL))
+                ORDER BY U0."updated_at" DESC
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -3507,7 +3589,8 @@
              GROUP BY "users_user"."id",
                       1,
                       2,
-                      4) subquery
+                      4,
+                      5) subquery
         ''',
       }),
       dict({
@@ -3584,6 +3667,22 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+            (SELECT U0."id" AS "id"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s
+                         AND U0."professional_id" = %s))
+                    AND NOT U0."assigned_to_unknown_advisor"
+                    AND U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."professional_id" = %s
+                    AND NOT (U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL))
+             ORDER BY U0."updated_at" DESC
+             LIMIT 1) AS "active_assignment",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -3647,10 +3746,11 @@
                    39,
                    40,
                    42,
+                   43,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 41 DESC,
                    "users_user"."id" DESC
-          LIMIT 4
+          LIMIT 5
         ''',
       }),
       dict({
@@ -3681,6 +3781,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
                                                    %s,
                                                    %s,
                                                    %s)
@@ -3840,6 +3941,7 @@
           WHERE "users_jobseekerassignment"."job_seeker_id" IN (%s,
                                                                 %s,
                                                                 %s,
+                                                                %s,
                                                                 %s)
           ORDER BY "users_jobseekerassignment"."last_action_at" DESC
         ''',
@@ -3935,6 +4037,55 @@
       <tbody>
           <tr>
               <td>
+                  <a class="btn-link" href="/job-seekers/details/77777777-7777-7777-7777-777777777777?back_url=/job-seekers/list">
+                      BERTHELOT Paul
+                  </a>
+              </td>
+              <td>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                          <i aria-hidden="true" class="ri-error-warning-line">
+                          </i>
+                          Éligibilité IAE à valider
+                      </span>
+                  </div>
+              </td>
+              <td>
+                  30/08/2024
+              </td>
+              <td>
+                  0
+              </td>
+              <td>
+                  1
+              </td>
+              <td>
+                  DERAY Odile (Non précisé)
+              </td>
+              <td class="text-end w-100px">
+                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777">
+                      <i aria-label="Postuler pour BERTHELOT Paul" class="ri-draft-line">
+                      </i>
+                  </a>
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill">
+                      </i>
+                  </button>
+                  <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
+                      <a class="dropdown-item" href="/eligibility/update/iae/77777777-7777-7777-7777-777777777777?back_url=/job-seekers/list">
+                          Valider son éligibilité IAE
+                      </a>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777&back_url=%2Fjob-seekers%2Flist" id="introjs-orienter-vers-service-insertion">
+                          Orienter vers un service d’insertion
+                      </a>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/77777777-7777-7777-7777-777777777777/assignments/create?back_url=/job-seekers/list">
+                          Ajouter mon intervention
+                      </a>
+                  </div>
+              </td>
+          </tr>
+          <tr>
+              <td>
                   <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
                       WATERFORD David
                   </a>
@@ -3965,16 +4116,19 @@
                       <i aria-label="Postuler pour WATERFORD David" class="ri-draft-line">
                       </i>
                   </a>
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
-                  <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
+                  <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
                       <a class="dropdown-item" href="/eligibility/update/iae/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
                           Mettre à jour son éligibilité IAE
                       </a>
-                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist" id="introjs-orienter-vers-service-insertion">
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist">
                           Orienter vers un service d’insertion
+                      </a>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/44444444-4444-4444-4444-444444444444/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
+                          Modifier mon intervention
                       </a>
                   </div>
               </td>
@@ -4015,11 +4169,11 @@
                       <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
                       </i>
                   </a>
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
-                  <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
+                  <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
                       <a class="dropdown-item" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
                           Valider son éligibilité IAE
                       </a>
@@ -4032,6 +4186,9 @@
                       </form>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist&city=brest-29">
                           Orienter vers un service d’insertion
+                      </a>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/22222222-2222-2222-2222-222222222222/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
+                          Modifier mon intervention
                       </a>
                   </div>
               </td>
@@ -4068,11 +4225,11 @@
                       <i aria-label="Postuler pour XERUS Charlotte" class="ri-draft-line">
                       </i>
                   </a>
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_4_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
-                  <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
+                  <div aria-labelledby="dropdown_4_action_menu" class="dropdown-menu">
                       <form action="/job-seekers/switch_stalled_status/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <input name="is_not_stalled_anymore" type="hidden" value="0"/>
@@ -4083,12 +4240,9 @@
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist&city=brest-29">
                           Orienter vers un service d’insertion
                       </a>
-                      <form action="/job-seekers/assign_oneself_as_advisor/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list" method="post">
-                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="dropdown-item" type="submit">
-                              Ajouter mon intervention
-                          </button>
-                      </form>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/33333333-3333-3333-3333-333333333333/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
+                          Modifier mon intervention
+                      </a>
                   </div>
               </td>
           </tr>
@@ -4128,11 +4282,11 @@
                       <i aria-label="Postuler pour ZORRO Alain" class="ri-draft-line">
                       </i>
                   </a>
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_4_action_menu" type="button">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_5_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
-                  <div aria-labelledby="dropdown_4_action_menu" class="dropdown-menu">
+                  <div aria-labelledby="dropdown_5_action_menu" class="dropdown-menu">
                       <a class="dropdown-item" href="/eligibility/update/iae/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">
                           Mettre à jour son éligibilité IAE
                       </a>
@@ -4146,12 +4300,9 @@
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&back_url=%2Fjob-seekers%2Flist&city=brest-29">
                           Orienter vers un service d’insertion
                       </a>
-                      <form action="/job-seekers/assign_oneself_as_advisor/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list" method="post">
-                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="dropdown-item" type="submit">
-                              Ajouter mon intervention
-                          </button>
-                      </form>
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/11111111-1111-1111-1111-111111111111/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
+                          Modifier mon intervention
+                      </a>
                   </div>
               </td>
           </tr>
@@ -4557,7 +4708,22 @@
                        AND U0."author_kind" = %s
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
-                LIMIT 1) AS "valid_eligibility_diagnosis"
+                LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+               (SELECT U0."id" AS "id"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s))
+                       AND NOT U0."assigned_to_unknown_advisor"
+                       AND U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."professional_id" = %s
+                       AND NOT (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" IS NULL))
+                ORDER BY U0."updated_at" DESC
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4572,7 +4738,8 @@
              GROUP BY "users_user"."id",
                       1,
                       2,
-                      4) subquery
+                      4,
+                      5) subquery
         ''',
       }),
       dict({
@@ -4648,6 +4815,21 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+          
+            (SELECT U0."id" AS "id"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s))
+                    AND NOT U0."assigned_to_unknown_advisor"
+                    AND U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."professional_id" = %s
+                    AND NOT (U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL))
+             ORDER BY U0."updated_at" DESC
+             LIMIT 1) AS "active_assignment",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -4710,6 +4892,7 @@
                    39,
                    40,
                    42,
+                   43,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 41 DESC,
                    "users_user"."id" DESC
@@ -4975,12 +5158,9 @@
                   <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29" id="introjs-orienter-vers-service-insertion">
                       Orienter vers un service d’insertion
                   </a>
-                  <form action="/job-seekers/assign_oneself_as_advisor/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization" method="post">
-                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                      <button class="dropdown-item" type="submit">
-                          Ajouter mon intervention
-                      </button>
-                  </form>
+                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/22222222-2222-2222-2222-222222222222/assignments/create?back_url=/job-seekers/list-organization">
+                      Ajouter mon intervention
+                  </a>
               </div>
           </td>
       </tr>
@@ -5026,6 +5206,9 @@
                   </a>
                   <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                       Orienter vers un service d’insertion
+                  </a>
+                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/11111111-1111-1111-1111-111111111111/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list-organization">
+                      Modifier mon intervention
                   </a>
               </div>
           </td>
@@ -5073,12 +5256,9 @@
                   <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                       Orienter vers un service d’insertion
                   </a>
-                  <form action="/job-seekers/assign_oneself_as_advisor/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization" method="post">
-                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                      <button class="dropdown-item" type="submit">
-                          Ajouter mon intervention
-                      </button>
-                  </form>
+                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/33333333-3333-3333-3333-333333333333/assignments/create?back_url=/job-seekers/list-organization">
+                      Ajouter mon intervention
+                  </a>
               </div>
           </td>
       </tr>

@@ -104,12 +104,15 @@ def build_services_search_url(request, job_seeker):
     return reverse("search:services_results", query=query)
 
 
-def get_last_assignment(request, job_seeker, archived=None):
-    """Retrieve last assignment of current user with job seeker."""
+def get_last_assignment(request, job_seeker, from_all_coworkers=False, archived=None):
+    """Retrieve last assignment of current user or organization with job seeker."""
 
     return (
         JobSeekerAssignment.objects.assigned_to(
-            professional=request.user, organization=request.current_organization, archived=archived
+            professional=request.user,
+            organization=request.current_organization,
+            from_all_coworkers=from_all_coworkers,
+            archived=archived,
         )
         .exclude(prescriber_organization=None, company=None)
         .exclude(assigned_to_unknown_advisor=True)
@@ -599,6 +602,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ),
         output_field=IntegerField(),
     )
+    subquery_active_assignment = Subquery(
+        assignments_qs.filter(job_seeker=OuterRef("pk"), professional=request.user, assigned_to_unknown_advisor=False)
+        .exclude(prescriber_organization=None, company=None)
+        .values("id")[:1],
+        output_field=IntegerField(),
+    )
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
         advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
     )
@@ -650,6 +659,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             job_applications_nb=Coalesce(subquery_count, 0),
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
+            active_assignment=subquery_active_assignment,
         )
         .select_related("jobseeker_profile")
         .prefetch_related(
@@ -723,12 +733,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or bool(suggest_next_step_url and job_seeker.contract_ending_soon)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
-        professional, organization = request.user, request.current_organization
-        last_assignment = job_seeker.last_assignment
-        job_seeker.user_is_last_advisor = last_assignment and (professional, organization) == (
-            last_assignment.advisor,
-            last_assignment.organization,
-        )
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
@@ -905,13 +909,12 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "standalone_creation": self.standalone_creation,
         }
 
-    def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
+    def get_active_assignment(self, job_seeker):
         # Retrieve the previous url: if the user was last on the list view, we only want his own assignments
         previous_url = self.job_seeker_session.get("config", {}).get("from_url")
-        from_all_coworkers = not (previous_url == reverse("job_seekers_views:list"))
-        return job_seeker.pk in User.objects.assigned_job_seeker_ids(
-            self.request.user, self.request.current_organization, from_all_coworkers=from_all_coworkers
-        )
+        from_all_coworkers = previous_url == reverse("job_seekers_views:list_organization")
+
+        return get_last_assignment(self.request, job_seeker, from_all_coworkers=from_all_coworkers, archived=False)
 
 
 class JobSeekerForSenderBaseView(JobSeekerBaseView):
@@ -1020,10 +1023,22 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
                 self.job_seeker_session.set("profile", {"nir": self.form.cleaned_data["nir"]})
                 return HttpResponseRedirect(self.search_by_email_url(self.job_seeker_session.name))
 
+            active_assignment = self.get_active_assignment(job_seeker)
+
             # The NIR we found is correct
             if self.form.data.get("confirm"):
                 if self.standalone_creation:
-                    assign_user_as_job_seeker_last_advisor(request, job_seeker)
+                    if active_assignment and active_assignment.advisor == self.request.user:
+                        return HttpResponseRedirect(
+                            reverse(
+                                "job_seekers_views:edit_assignment",
+                                kwargs={"public_id": job_seeker.public_id, "assignment_pk": active_assignment.pk},
+                            )
+                        )
+                    else:
+                        return HttpResponseRedirect(
+                            reverse("job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id})
+                        )
                 return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
             context = {
@@ -1031,7 +1046,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
                 "preview_mode": bool(self.form.data.get("preview")),
                 "job_seeker": job_seeker,
                 "can_view_personal_information": can_view_personal_information(self.request, job_seeker),
-                "is_job_seeker_in_list": self.is_job_seeker_in_user_jobseekers_list(job_seeker),
+                "active_assignment": active_assignment,
             }
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
@@ -1070,7 +1085,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         can_add_nir = False
         preview_mode = False
         job_seeker = None
-        is_job_seeker_in_list = False
+        active_assignment = None
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
@@ -1092,16 +1107,29 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
                 return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
+            active_assignment = self.get_active_assignment(job_seeker)
+
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
                 preview_mode = True
-                is_job_seeker_in_list = self.is_job_seeker_in_user_jobseekers_list(job_seeker)
 
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
                     if self.standalone_creation:
-                        assign_user_as_job_seeker_last_advisor(request, job_seeker)
+                        if active_assignment:
+                            return HttpResponseRedirect(
+                                reverse(
+                                    "job_seekers_views:edit_assignment",
+                                    kwargs={"public_id": job_seeker.public_id, "assignment_pk": active_assignment.pk},
+                                )
+                            )
+                        else:
+                            return HttpResponseRedirect(
+                                reverse(
+                                    "job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id}
+                                )
+                            )
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 if JobSeekerProfile.objects.filter(nir=nir).exclude(pk=job_seeker.jobseeker_profile.pk).exists():
@@ -1119,7 +1147,19 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     job_seeker.jobseeker_profile.lack_of_nir_reason = ""
                     job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
                     if self.standalone_creation:
-                        assign_user_as_job_seeker_last_advisor(request, job_seeker)
+                        if active_assignment and active_assignment.advisor == self.request.user:
+                            return HttpResponseRedirect(
+                                reverse(
+                                    "job_seekers_views:edit_assignment",
+                                    kwargs={"public_id": job_seeker.public_id, "assignment_pk": active_assignment.pk},
+                                )
+                            )
+                        else:
+                            return HttpResponseRedirect(
+                                reverse(
+                                    "job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id}
+                                )
+                            )
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
@@ -1129,7 +1169,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "preview_mode": preview_mode,
                 "job_seeker": job_seeker,
                 "can_view_personal_information": job_seeker and can_view_personal_information(request, job_seeker),
-                "is_job_seeker_in_list": is_job_seeker_in_list,
+                "active_assignment": active_assignment,
             }
         )
 
