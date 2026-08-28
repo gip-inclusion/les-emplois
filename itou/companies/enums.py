@@ -15,6 +15,20 @@ class CompanyKind(models.TextChoices):
     OPCS = "OPCS", "Organisation porteuse de la clause sociale"
 
     @classmethod
+    def for_job_description_filter(cls):
+        """EA/EATT companies support has been dropped on 11/05/2026.
+
+        Jobs descriptions from France Travail API can be EA (marked as
+        `entrepriseAdaptee` in their API), but they cannot be EATT
+        (the FT API has no way to distinguish between EA and EATT).
+
+        So as of 2026 no job description can be EATT.
+
+        That's why we're removing it from the filter interface.
+        """
+        return [(k, f"{k} - {v}") for k, v in CompanyKind.choices if k != "EATT"]
+
+    @classmethod
     def siae_choices(cls):
         """Returns a list of CompanyKinds which are SIAEs."""
         return [(k, v) for k, v in cls.choices if k in cls.siae_kinds()]
