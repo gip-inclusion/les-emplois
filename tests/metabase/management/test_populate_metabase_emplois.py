@@ -303,6 +303,7 @@ def test_populate_job_seekers(snapshot):
     assert rows == [
         {
             "id": user_1.pk,
+            "uid": user_1.public_id,
             "hash_nir": "28e41a0abf44151d54b9006aa6308d71d15284f7cc83a200b8fc6a9ffdf58352",
             "sexe_selon_nir": "Homme",
             "annee_naissance_selon_nir": 79,
@@ -365,6 +366,7 @@ def test_populate_job_seekers(snapshot):
         },
         {
             "id": user_2.pk,
+            "uid": user_2.public_id,
             "hash_nir": "d4d74522c83e8371e4ccafa994a70bb802b59d8e143177cf048e71c9b9d2e34a",
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 71,
@@ -427,6 +429,7 @@ def test_populate_job_seekers(snapshot):
         },
         {
             "id": user_3.pk,
+            "uid": user_3.public_id,
             "hash_nir": "2eb53772722d3026b539173c62ba7adc1756e5ab1f03b95ce4026c27d177bd34",
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 97,
@@ -883,6 +886,7 @@ def test_populate_users(snapshot):
         assert rows == [
             (
                 pro_user.id,
+                pro_user.public_id,
                 pro_user.email,
                 "professional",
                 pro_user.first_name,
@@ -1076,6 +1080,7 @@ def test_populate_companies(snapshot):
         assert rows == [
             (
                 company.pk,
+                company.uid,
                 company.convention.asp_id,
                 "ACME Inc.",
                 f"EI - ID {company.pk} - ACME Inc.",
@@ -1174,6 +1179,7 @@ def test_populate_organizations(snapshot):
     assert rows == [
         {
             "id": first_organisation.pk,
+            "uid": first_organisation.uid,
             "siret": first_organisation.siret,
             "nom": first_organisation.name,
             "type": first_organisation.kind,
@@ -1202,6 +1208,7 @@ def test_populate_organizations(snapshot):
         },
         {
             "id": second_organisation.pk,
+            "uid": second_organisation.uid,
             "siret": second_organisation.siret,
             "nom": second_organisation.name,
             "type": second_organisation.kind,

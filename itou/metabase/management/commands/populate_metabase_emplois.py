@@ -248,6 +248,7 @@ class Command(BaseCommand):
                 ),
             )
             .only(
+                "uid",
                 "convention",
                 "convention__asp_id",
                 "kind",
@@ -340,6 +341,7 @@ class Command(BaseCommand):
                 ),
             )
             .only(
+                "uid",
                 "siret",
                 "name",
                 "kind",
@@ -436,6 +438,7 @@ class Command(BaseCommand):
                 ),
             )
             .only(
+                "public_id",
                 "jobseeker_profile__nir",
                 "jobseeker_profile__birthdate",  # get_user_age_in_years
                 "date_joined",

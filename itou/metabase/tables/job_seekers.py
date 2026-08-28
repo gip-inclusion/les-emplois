@@ -182,6 +182,9 @@ def get_table():
     job_seekers_table.add_columns(
         [
             get_column_from_field(get_model_field(User, "pk"), name="id", comment="ID C1 du candidat"),
+            get_column_from_field(
+                get_model_field(User, "public_id"), name="uid", comment="identifiant universel unique du candidat"
+            ),
             {
                 "name": "hash_nir",
                 "type": "varchar",

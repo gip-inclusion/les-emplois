@@ -17,6 +17,7 @@ TABLE = MetabaseTable(name="structures_v0")
 TABLE.add_columns(
     [
         get_column_from_field(get_model_field(Company, "pk"), name="id"),
+        get_column_from_field(get_model_field(Company, "uid"), name="uid", comment="identifiant universel unique"),
         {
             "name": "id_asp",
             "type": "integer",
