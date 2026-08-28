@@ -130,6 +130,34 @@
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}
+
+    {% if request.from_authorized_prescriber %}
+        {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible=True extra_classes="mb-3" %}
+            {% fragment as title %}
+                Webinaire thématique et prise en main
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">Optimiser ses pratiques de prescription avec les Emplois de l’inclusion : bonnes pratiques, évolutions du service et échanges autour de cas concrets.</p>
+            {% endfragment %}
+            {% fragment as call_to_action %}
+                <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49064754839441-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+
+    {% if request.from_employer %}
+        {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible=True extra_classes="mb-3" %}
+            {% fragment as title %}
+                Webinaire thématique
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">Optimiser la gestion des recrutements et le traitement des candidatures : bonnes pratiques, évolutions du service et échanges autour de cas concrets.</p>
+            {% endfragment %}
+            {% fragment as call_to_action %}
+                <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49065016706449-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
 {% endblock %}
 
 {% block title_extra %}
