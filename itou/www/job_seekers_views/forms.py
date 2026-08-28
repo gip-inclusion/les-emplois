@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import OuterRef, Q, Subquery, TextChoices
+from django.db.models import Exists, OuterRef, Q, Subquery, TextChoices, Value
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
@@ -242,7 +242,12 @@ class FilterForm(forms.Form):
             advisors=ArrayAgg(
                 "job_seeker_assignments__professional",
                 distinct=True,
-            )
+            ),
+            archived=(
+                Value(True)
+                if assignments_filter == AssignmentsChoices.ARCHIVED
+                else ~Exists(Subquery(assignments.filter(job_seeker=OuterRef("pk")).filter(ended_at=None)))
+            ),
         )
 
         # Organization members
