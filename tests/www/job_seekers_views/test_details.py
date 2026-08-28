@@ -19,7 +19,7 @@ from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmen
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -138,6 +138,7 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
         eligibility_diagnosis__author_prescriber_organization=authorized_prescriber.prescriberorganization_set.first(),
         eligibility_diagnosis__with_job_seeker_assignment=True,
     )
+    assignment = JobSeekerAssignment.objects.get(job_seeker=job_seeker)
 
     client.force_login(authorized_prescriber)
     with assertSnapshotQueries(snapshot(name="SQL queries")):
@@ -147,6 +148,21 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
         selector="#main",
         replace_in_attr=[
             ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
+            (
+                "hx-post",
+                f"/job-seekers/display/{assignment.pk}",
+                "/job-seekers/display/[JobSeekerAssignment PK]",
+            ),
+            (
+                "id",
+                f"email-{assignment.pk}",
+                "email-[JobSeekerAssignment PK]",
+            ),
+            (
+                "id",
+                f"phone-{assignment.pk}",
+                "phone-[JobSeekerAssignment PK]",
+            ),
         ],
     )
     assert pretty_indented(soup) == snapshot(name="HTML page")
@@ -498,63 +514,35 @@ def test_update_iae_eligibility_buttons(client):
 
 
 class TestLastKnownAdvisor:
-    @freeze_time("2026-06-30")
-    def test_display_last_known_advisor(self, client, snapshot):
-        prescriber_organization = PrescriberOrganizationFactory(for_snapshot=True)
-        prescriber = PrescriberMembershipFactory(
-            user__public_id="788bc466-3747-4cdb-aafc-80c888d6b69d",
-            user__first_name="Pierre",
-            user__last_name="Dubois",
-            user__email="pierre.dubois@test.local",
-            user__phone="0606060606",
-            organization=prescriber_organization,
-        ).user
-        job_seeker = JobSeekerFactory(for_snapshot=True)
-        last_assignment = JobSeekerAssignmentFactory(
-            job_seeker=job_seeker,
-            professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
-            professional__first_name="Marie",
-            professional__last_name="Laforêt",
-            professional__email="marie.laforet@test.local",
-            professional__phone="0707070707",
-            created_at=timezone.now() - datetime.timedelta(days=7),
-            last_action_at=timezone.now() - datetime.timedelta(days=7),
-        )
-        last_advisor = last_assignment.advisor
+    def test_display_last_known_advisor(self, client):
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory(membership=True)
+        assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
+        advisor = assignment.advisor
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
         client.force_login(prescriber)
 
         response = client.get(url)
-        assertContains(response, "M'ajouter en tant qu'accompagnateur")
-        assertContains(response, last_advisor.get_full_name())
-        assertContains(response, last_assignment.created_at.strftime("%d/%m/%Y"))
+        assertContains(response, advisor.get_full_name())
+        assertContains(response, prescriber.get_full_name(), count=2)
 
         prescriber_assignment = JobSeekerAssignmentFactory(
             job_seeker=job_seeker,
             professional=prescriber,
-            prescriber_organization=prescriber_organization,
-            created_at=last_assignment.created_at - datetime.timedelta(days=7),
-            last_action_at=last_assignment.last_action_at - datetime.timedelta(days=7),
+            last_action_at=assignment.last_action_at - datetime.timedelta(days=7),
         )
 
         response = client.get(url)
-        assertContains(response, "Me désigner dernier accompagnateur connu")
-        assertContains(response, last_advisor.get_full_name())
-        assertContains(response, last_assignment.created_at.strftime("%d/%m/%Y"))
+        assertContains(response, advisor.get_full_name())
+        assertContains(response, prescriber.get_full_name(), count=2)
 
-        prescriber_assignment.created_at = timezone.now()
         prescriber_assignment.last_action_at = timezone.now()
-        prescriber_assignment.save(update_fields=["created_at", "updated_at", "last_action_at"])
+        prescriber_assignment.save()
 
         response = client.get(url)
-        assertNotContains(response, "M'ajouter en tant qu'accompagnateur")
-        assertNotContains(response, "Me désigner dernier accompagnateur connu")
-        assertContains(response, prescriber.get_full_name())
-        assertContains(response, prescriber_organization.name)
-        assertContains(response, prescriber_assignment.created_at.strftime("%d/%m/%Y"))
-        content = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
-        assert pretty_indented(content) == snapshot
+        assertNotContains(response, advisor.get_full_name())
+        assertContains(response, prescriber.get_full_name(), count=3)
 
     @freeze_time("2026-06-30")
     def test_display_advisor_contact_info(self, client, snapshot):
@@ -567,7 +555,7 @@ class TestLastKnownAdvisor:
             user__phone="0606060606",
             organization=prescriber_organization,
         ).user
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerFactory()
         assignment = JobSeekerAssignmentFactory(
             job_seeker=job_seeker,
             professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
@@ -579,32 +567,8 @@ class TestLastKnownAdvisor:
             last_action_at=timezone.now() - datetime.timedelta(days=7),
         )
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-
         client.force_login(prescriber)
 
-        # Prescriber is the last known advisor of the job seeker
-        prescriber_assignment = JobSeekerAssignmentFactory(
-            job_seeker=job_seeker,
-            professional=prescriber,
-            last_action_at=timezone.now(),
-        )
-
-        display_phone_url = reverse(
-            "job_seekers_views:display_advisor_contact_info", args=(prescriber_assignment.pk, "phone")
-        )
-        display_email_url = reverse(
-            "job_seekers_views:display_advisor_contact_info", args=(prescriber_assignment.pk, "email")
-        )
-        response = client.get(url)
-        assertNotContains(response, display_phone_url)
-        assertNotContains(response, display_email_url)
-        assertContains(response, prescriber.phone)
-        assertContains(response, prescriber.email)
-
-        # Prescriber is an advisor of the job seeker, but not the last one
-        prescriber_assignment.last_action_at = assignment.last_action_at - datetime.timedelta(days=7)
-        prescriber_assignment.created_at = assignment.created_at - datetime.timedelta(days=7)
-        prescriber_assignment.save()
         display_phone_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "phone"))
         display_email_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "email"))
 
@@ -612,15 +576,70 @@ class TestLastKnownAdvisor:
         assertContains(response, display_phone_url)
         assertContains(response, display_email_url)
 
-        simulated_page = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#last-known-advisor-{job_seeker.public_id}",
+            replace_in_attr=[
+                ("id", str(job_seeker.public_id), "[JobSeeker PublicID]"),
+                ("href", str(job_seeker.public_id), "[JobSeeker PublicID]"),
+            ],
+        )
 
         response = client.post(display_phone_url)
         assertContains(response, assignment.professional.phone)
-        update_page_with_htmx(simulated_page, f"#phone-{assignment.professional.pk}", response)
+        update_page_with_htmx(simulated_page, f"#phone-{assignment.pk}", response)
 
         response = client.post(display_email_url)
         assertContains(response, assignment.professional.email)
-        update_page_with_htmx(simulated_page, f"#email-{assignment.professional.pk}", response)
+        update_page_with_htmx(simulated_page, f"#email-{assignment.pk}", response)
+
+        assert pretty_indented(simulated_page) == snapshot
+
+    @freeze_time("2026-06-30")
+    def test_display_advisor_organization_contact_info(self, client, snapshot):
+        job_seeker = JobSeekerFactory()
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
+            professional__first_name="Marie",
+            professional__last_name="Laforêt",
+            professional__email="marie.laforet@test.local",
+            professional__phone="0707070707",
+            professional__is_active=False,
+            company=CompanyFactory(for_snapshot=True),
+            created_at=timezone.now() - datetime.timedelta(days=7),
+            last_action_at=timezone.now() - datetime.timedelta(days=7),
+        )
+        url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        client.force_login(PrescriberFactory(membership=True))
+
+        display_phone_url = reverse(
+            "job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "org_phone")
+        )
+        display_email_url = reverse(
+            "job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "org_email")
+        )
+
+        response = client.get(url)
+        assertContains(response, display_phone_url)
+        assertContains(response, display_email_url)
+
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#last-known-advisor-{job_seeker.public_id}",
+            replace_in_attr=[
+                ("id", str(job_seeker.public_id), "[JobSeeker PublicID]"),
+                ("href", str(job_seeker.public_id), "[JobSeeker PublicID]"),
+            ],
+        )
+
+        response = client.post(display_phone_url)
+        assertContains(response, assignment.company.phone)
+        update_page_with_htmx(simulated_page, f"#org_phone-{assignment.pk}", response)
+
+        response = client.post(display_email_url)
+        assertContains(response, assignment.company.email)
+        update_page_with_htmx(simulated_page, f"#org_email-{assignment.pk}", response)
 
         assert pretty_indented(simulated_page) == snapshot
 
@@ -650,13 +669,110 @@ class TestLastKnownAdvisor:
 
         response = client.post(display_phone_url)
         assertContains(response, assignment.professional.phone)
-        update_page_with_htmx(simulated_page, f"#phone-{assignment.professional.pk}", response)
+        update_page_with_htmx(simulated_page, f"#phone-{assignment.pk}", response)
 
         response = client.post(display_email_url)
         assertContains(response, assignment.professional.email)
-        update_page_with_htmx(simulated_page, f"#email-{assignment.professional.pk}", response)
+        update_page_with_htmx(simulated_page, f"#email-{assignment.pk}", response)
 
         assert pretty_indented(simulated_page) == snapshot
+
+    @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
+    @freeze_time("2026-08-08")
+    def test_last_assigment_display(self, snapshot, display_mode):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            display_mode=display_mode,
+            professional__for_snapshot=True,
+            last_action_kind=ActionKind.APPLY,
+        )
+        request = get_request(PrescriberFactory(membership=True))
+
+        template = load_template("job_seekers_views/includes/last_known_advisor.html")
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": assignment.job_seeker,
+                    "request": request,
+                    "csrf_token": "CSRF_TOKEN",
+                }
+            )
+        )
+        rendered = rendered.replace(
+            f"/job-seekers/display/{assignment.pk}",
+            "/job-seekers/display/[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"email-{assignment.pk}",
+            "email-[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"phone-{assignment.pk}",
+            "phone-[JobSeekerAssignment PK]",
+        )
+        if assignment.organization:
+            rendered = rendered.replace(
+                assignment.organization.display_name,
+                "[Org display name]",
+            )
+        assert pretty_indented(rendered) == snapshot
+
+    def test_oneself_assigment_display(self, client):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            professional__for_snapshot=True,
+            display_mode=JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP,
+        )
+        badge = '<span class="badge badge-xs rounded-pill bg-info-light text-info">c’est vous</span>'
+        url = reverse("job_seekers_views:details", kwargs={"public_id": assignment.job_seeker.public_id})
+
+        client.force_login(assignment.professional)
+        response = client.get(url)
+        assertContains(response, badge, html=True)
+
+        client.force_login(PrescriberFactory(membership=True))
+        response = client.get(url)
+        assertNotContains(response, badge, html=True)
+
+    def test_assignment_duration(self):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            professional__for_snapshot=True,
+            last_action_kind=ActionKind.APPLY,
+            created_at=datetime.datetime(2025, 12, 1, 11, tzinfo=datetime.UTC),
+        )
+        ongoing_str = "Depuis le 01/12/2025"
+        ended_str = "Du 01/12/2025 au 02/03/2026"
+
+        request = get_request(PrescriberFactory(membership=True))
+        template = load_template("job_seekers_views/includes/last_known_advisor.html")
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": assignment.job_seeker,
+                    "request": request,
+                    "csrf_token": "CSRF_TOKEN",
+                }
+            )
+        )
+        assert ongoing_str in rendered
+        assert ended_str not in rendered
+
+        assignment.ended_at = datetime.datetime(2026, 3, 2, 11, tzinfo=datetime.UTC)
+        assignment.end_reason = "MANUAL"
+        assignment.save()
+        del assignment.job_seeker.last_assignment  # Cleat cached property
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": assignment.job_seeker,
+                    "request": request,
+                    "csrf_token": "CSRF_TOKEN",
+                }
+            )
+        )
+        assert ongoing_str not in rendered
+        assert ended_str in rendered
 
 
 @freeze_time("2024-08-14")

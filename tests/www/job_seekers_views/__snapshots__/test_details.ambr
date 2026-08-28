@@ -1252,90 +1252,58 @@
 # ---
 # name: TestLastKnownAdvisor.test_display_advisor_contact_info
   '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-outline-primary" type="submit">
-                      Me désigner dernier accompagnateur connu
-                  </button>
-              </form>
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-[JobSeeker PublicID]">
+      <div class="d-flex gap-2 justify-content-between mb-3">
+          <h3 class="mb-0">
+              Dernier accompagnateur
+          </h3>
+          <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/[JobSeeker PublicID]">
+              Voir tout
+          </a>
+      </div>
+      <div class="c-box--accompagnateur__summary">
+          <i aria-hidden="true" class="ri-user-line">
+          </i>
+          <div>
+              <span class="d-block h5">
+                  Marie LAFORÊT
+              </span>
+              <span class="d-block mb-1 disabled">
+                  Aucune structure associée
+              </span>
+              <div>
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-arrow-right-line">
+                      </i>
+                      Depuis le 23/06/2026
+                  </span>
+              </div>
           </div>
       </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Marie LAFORÊT
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <i class="text-disabled">
-                      Sans organisation
-                  </i>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      23/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0707070707
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      marie.laforet@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
+      <div class="c-box--accompagnateur__detail">
+          <form id="display-contact-info-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+          <strong>
+              marie.laforet@test.local
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
+          <strong>
+              0707070707
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
       </div>
   </div>
   
@@ -1343,174 +1311,630 @@
 # ---
 # name: TestLastKnownAdvisor.test_display_advisor_contact_info_as_job_seeker
   '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <div class="d-flex gap-2 justify-content-between mb-3">
+          <h3 class="mb-0">
+              Dernier accompagnateur
+          </h3>
+      </div>
+      <div class="c-box--accompagnateur__summary">
+          <i aria-hidden="true" class="ri-user-line">
+          </i>
+          <div>
+              <span class="d-block h5">
+                  Marie LAFORÊT
+              </span>
+              <span class="d-block mb-1 disabled">
+                  Aucune structure associée
+              </span>
+              <div>
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-arrow-right-line">
+                      </i>
+                      Depuis le 30/06/2026
+                  </span>
+              </div>
           </div>
       </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Marie LAFORÊT
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <i class="text-disabled">
-                      Sans organisation
-                  </i>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      30/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0707070707
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      marie.laforet@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
+      <div class="c-box--accompagnateur__detail">
+          <form id="display-contact-info-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+          <strong>
+              marie.laforet@test.local
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
+          <strong>
+              0707070707
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
       </div>
   </div>
   
   '''
 # ---
-# name: TestLastKnownAdvisor.test_display_last_known_advisor
+# name: TestLastKnownAdvisor.test_display_advisor_organization_contact_info
   '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+  <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-[JobSeeker PublicID]">
+      <div class="d-flex gap-2 justify-content-between mb-3">
+          <h3 class="mb-0">
+              Dernier accompagnateur
+          </h3>
+          <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/[JobSeeker PublicID]">
+              Voir tout
+          </a>
+      </div>
+      <div class="c-box--accompagnateur__summary">
+          <i aria-hidden="true" class="ri-community-line disabled">
+          </i>
+          <div>
+              <span class="d-block h5 disabled">
+                  Accompagnateur non renseigné
+              </span>
+              <span class="d-block mb-1">
+                  Employeur pour ACME Inc.
+              </span>
+              <div>
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-arrow-right-line">
+                      </i>
+                      Depuis le 23/06/2026
+                  </span>
+              </div>
           </div>
       </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-788bc466-3747-4cdb-aafc-80c888d6b69d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Pierre DUBOIS
-                      <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
-                          c’est vous
-                      </span>
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <strong>
-                      Pres. Org.
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      30/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0606060606
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0606060606" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+      <div class="c-box--accompagnateur__detail">
+          <div class="alert alert-warning mt-3" role="status">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
                       </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      pierre.dubois@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dubois@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          Cette personne ne fait plus partie de la structure.
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <form id="display-contact-info-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+          <hr aria-hidden="true" class="my-4 mb-1" data-it-text="Contacter la structure"/>
+          <span class="visually-hidden">
+              Contacter la structure
+          </span>
+          <strong>
+              contact@acmeinc.com
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
+          <strong>
+              0612345678
+          </strong>
+          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+              </i>
+              <span class="visually-hidden">
+                  Copier
+              </span>
+          </button>
       </div>
   </div>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_NO_ORG]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <span class="d-block h5">
+                          Pierre DUPONT
+                      </span>
+                      <span class="d-block mb-1 disabled">
+                          Aucune structure associée
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-line">
+                          </i>
+                          <span>
+                              Envoyer un email
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-phone-line">
+                          </i>
+                          <span>
+                              Appeler
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-home-smile-line">
+                  </i>
+                  <div>
+                      <span class="d-block h5">
+                          Pierre DUPONT
+                      </span>
+                      <span class="d-block mb-1">
+                          Orienteur pour [Org display name]
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-line">
+                          </i>
+                          <span>
+                              Envoyer un email
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/phone" hx-swap="outerHTML" id="phone-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-phone-line">
+                          </i>
+                          <span>
+                              Appeler
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-home-smile-line">
+                  </i>
+                  <div>
+                      <span class="d-block h5">
+                          Pierre DUPONT
+                      </span>
+                      <span class="d-block mb-1">
+                          Orienteur pour [Org display name]
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <div class="alert alert-info mt-3" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  Pierre DUPONT ne fait plus partie de [Org display name].
+                              </p>
+                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                                  <div class="stable-text">
+                                      <i aria-hidden="true" class="ri-mail-send-line">
+                                      </i>
+                                      <span>
+                                          Contacter l’accompagnateur
+                                      </span>
+                                  </div>
+                                  <div class="loading-text">
+                                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                                      </span>
+                                      <span>
+                                          Affichage en cours
+                                      </span>
+                                  </div>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+                  <hr aria-hidden="true" class="my-4 mb-1" data-it-text="Contacter la structure"/>
+                  <span class="visually-hidden">
+                      Contacter la structure
+                  </span>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-line">
+                          </i>
+                          <span>
+                              Envoyer un email
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-phone-line">
+                          </i>
+                          <span>
+                              Appeler
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[INACTIVE_NO_ORG]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-user-line disabled">
+                  </i>
+                  <div>
+                      <span class="d-block h5">
+                          Pierre DUPONT
+                      </span>
+                      <span class="d-block mb-1 disabled">
+                          Aucune structure associée
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[INACTIVE_WITH_ORG]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-home-smile-line disabled">
+                  </i>
+                  <div>
+                      <span class="d-block h5 disabled">
+                          Accompagnateur non renseigné
+                      </span>
+                      <span class="d-block mb-1">
+                          Orienteur pour [Org display name]
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <div class="alert alert-warning mt-3" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-0">
+                                  Cette personne ne fait plus partie de la structure.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+                  <hr aria-hidden="true" class="my-4 mb-1" data-it-text="Contacter la structure"/>
+                  <span class="visually-hidden">
+                      Contacter la structure
+                  </span>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-line">
+                          </i>
+                          <span>
+                              Envoyer un email
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-phone-line">
+                          </i>
+                          <span>
+                              Appeler
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_last_assigment_display[UNKNOWN_ADVISOR]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+              <div class="d-flex gap-2 justify-content-between mb-3">
+                  <h3 class="mb-0">
+                      Dernier accompagnateur
+                  </h3>
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                      Voir tout
+                  </a>
+              </div>
+              <div class="c-box--accompagnateur__summary">
+                  <i aria-hidden="true" class="ri-home-smile-line disabled">
+                  </i>
+                  <div>
+                      <span class="d-block h5 disabled">
+                          Accompagnateur non renseigné
+                      </span>
+                      <span class="d-block mb-1">
+                          Orienteur pour [Org display name]
+                      </span>
+                      <div>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-arrow-right-line">
+                              </i>
+                              Depuis le 08/08/2026
+                          </span>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box--accompagnateur__detail">
+                  <div class="alert alert-info mt-3" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-0">
+                                  Cet accompagnement a été renseigné par une personne ne suivant plus cet usager : aucune personne n'y est associée.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+                  <form id="display-contact-info-form">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="CSRF_TOKEN"/>
+                  </form>
+                  <hr aria-hidden="true" class="my-4 mb-1" data-it-text="Contacter la structure"/>
+                  <span class="visually-hidden">
+                      Contacter la structure
+                  </span>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_email" hx-swap="outerHTML" id="org_email-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-line">
+                          </i>
+                          <span>
+                              Envoyer un email
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+                  <button class="btn btn-ico btn-block btn-outline-primary mt-3" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_org_phone" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/org_phone" hx-swap="outerHTML" id="org_phone-[JobSeekerAssignment PK]">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-phone-line">
+                          </i>
+                          <span>
+                              Appeler
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
+                          </span>
+                          <span>
+                              Affichage en cours
+                          </span>
+                      </div>
+                  </button>
+              </div>
+          </div>
+      </body>
+  </html>
   
   '''
 # ---
@@ -1603,7 +2027,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -1800,26 +2224,37 @@
                                               </div>
                                           </div>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -1923,7 +2358,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -2097,26 +2532,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -2232,7 +2678,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -2358,26 +2804,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -2493,7 +2950,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -2719,26 +3176,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -5492,7 +5960,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -5697,26 +6165,37 @@
                                               </div>
                                           </div>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -5832,7 +6311,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -6013,26 +6492,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -6136,7 +6626,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -6262,26 +6752,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -6385,7 +6886,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -6566,26 +7067,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -6701,7 +7213,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -6882,26 +7394,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -7005,7 +7528,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 order-3 order-xxl-2">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -7131,26 +7654,37 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
                                               </div>
                                           </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
                                           </div>
                                       </div>
                                   </div>
@@ -7385,28 +7919,6 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <button class="btn btn-outline-primary" type="submit">
-                                                          M'ajouter en tant qu'accompagnateur
-                                                      </button>
-                                                  </form>
-                                              </div>
-                                          </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
-                                          </div>
-                                      </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                                       <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
@@ -7468,6 +7980,37 @@
                                               </li>
                                           </ul>
                                       </div>
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
+                                              </div>
+                                          </div>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <hr class="mt-4 mb-3"/>
+                                              <p class="mb-0">
+                                                  Vous intervenez sur le parcours de cet usager ?
+                                                  <a class="btn-link" href="">
+                                                      Ajoutez votre intervention
+                                                  </a>
+                                              </p>
+                                          </div>
+                                      </div>
                                   </div>
                               </div>
                           </div>
@@ -7482,7 +8025,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -8169,9 +8712,79 @@
       }),
       dict({
         'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          WHERE EXISTS
+              (SELECT %s AS "a"
+               FROM "users_jobseekerassignment" U0
+               WHERE (((U0."company_id" IS NULL
+                        AND U0."prescriber_organization_id" IS NULL
+                        AND U0."professional_id" = %s)
+                       OR (U0."company_id" IS NULL
+                           AND U0."prescriber_organization_id" = %s
+                           AND U0."professional_id" = %s))
+                      AND U0."job_seeker_id" = ("users_user"."id"))
+               LIMIT 1)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."assigned_to_id",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.last_assignment[users/models.py]',
-          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
+          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
         ]),
         'sql': '''
           SELECT "users_jobseekerassignment"."id",
@@ -8297,92 +8910,6 @@
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
           WHERE "users_jobseekerassignment"."job_seeker_id" = %s
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_jobseekerassignment"
-          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
-                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
-                   AND "users_jobseekerassignment"."professional_id" = %s)
-                  OR ("users_jobseekerassignment"."company_id" IS NULL
-                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
-                      AND "users_jobseekerassignment"."professional_id" = %s))
-                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'can_view_approval_details[approvals/perms.py]',
-          'approval_details_box[utils/templatetags/approvals.py]',
-          'InclusionNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          WHERE EXISTS
-              (SELECT %s AS "a"
-               FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
-                      AND U0."job_seeker_id" = ("users_user"."id"))
-               LIMIT 1)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'QuerySet.first[<site-packages>/django/db/models/query.py]',
-          'Approval.pending_prolongation_request[approvals/models.py]',
-          'WithNode[utils/templatetags/approval_box.html]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'InclusionNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongationrequest"."id",
-                 "approvals_prolongationrequest"."approval_id",
-                 "approvals_prolongationrequest"."start_at",
-                 "approvals_prolongationrequest"."end_at",
-                 "approvals_prolongationrequest"."reason",
-                 "approvals_prolongationrequest"."reason_explanation",
-                 "approvals_prolongationrequest"."declared_by_id",
-                 "approvals_prolongationrequest"."declared_by_siae_id",
-                 "approvals_prolongationrequest"."prescriber_organization_id",
-                 "approvals_prolongationrequest"."created_at",
-                 "approvals_prolongationrequest"."created_by_id",
-                 "approvals_prolongationrequest"."updated_at",
-                 "approvals_prolongationrequest"."updated_by_id",
-                 "approvals_prolongationrequest"."report_file_id",
-                 "approvals_prolongationrequest"."require_phone_interview",
-                 "approvals_prolongationrequest"."contact_email",
-                 "approvals_prolongationrequest"."contact_phone",
-                 "approvals_prolongationrequest"."status",
-                 "approvals_prolongationrequest"."assigned_to_id",
-                 "approvals_prolongationrequest"."processed_at",
-                 "approvals_prolongationrequest"."processed_by_id",
-                 "approvals_prolongationrequest"."reminder_sent_at"
-          FROM "approvals_prolongationrequest"
-          WHERE ("approvals_prolongationrequest"."approval_id" = %s
-                 AND "approvals_prolongationrequest"."status" = %s)
-          ORDER BY "approvals_prolongationrequest"."created_at" DESC
-          LIMIT 1
         ''',
       }),
       dict({
@@ -8684,89 +9211,6 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                              </div>
-                                          </div>
-                                          <form id="display-contact-info-form">
-                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          </form>
-                                          <div id="card-03580247-b036-4578-bf9d-f92c9c2f68cd">
-                                              <ul class="list-data mb-3">
-                                                  <li>
-                                                      <small>
-                                                          Accompagnateur
-                                                      </small>
-                                                      <strong class="d-flex gap-2">
-                                                          Pierre DUPONT
-                                                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
-                                                              c’est vous
-                                                          </span>
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Type
-                                                      </small>
-                                                      <strong>
-                                                          Professionnel
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Organisation
-                                                      </small>
-                                                      <strong>
-                                                          Pres. Org.
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Accompagnateur depuis le
-                                                      </small>
-                                                      <strong>
-                                                          14/08/2024
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Téléphone
-                                                      </small>
-                                                      <strong>
-                                                          0612345678
-                                                      </strong>
-                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                          </i>
-                                                          <span class="visually-hidden">
-                                                              Copier
-                                                          </span>
-                                                      </button>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Adresse e-mail
-                                                      </small>
-                                                      <strong>
-                                                          pierre.dupont@test.local
-                                                      </strong>
-                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
-                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                          </i>
-                                                          <span class="visually-hidden">
-                                                              Copier
-                                                          </span>
-                                                      </button>
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
                                   </div>
                                   <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                                       <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
@@ -8835,6 +9279,40 @@
                                               </span>
                                           </a>
                                       </div>
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line">
+                                              </i>
+                                              <div>
+                                                  <span class="h5">
+                                                      Pierre DUPONT
+                                                  </span>
+                                                  <span class="badge badge-xs rounded-pill bg-info-light text-info">
+                                                      c’est vous
+                                                  </span>
+                                                  <span class="d-block mb-1">
+                                                      Prescripteur habilité pour Pres. Org.
+                                                  </span>
+                                                  <div>
+                                                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                                          <i aria-hidden="true" class="ri-arrow-right-line">
+                                                          </i>
+                                                          Depuis le 14/08/2024
+                                                      </span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="c-box--accompagnateur__detail">
+                                          </div>
+                                      </div>
                                   </div>
                               </div>
                           </div>
@@ -8849,7 +9327,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -9559,9 +10037,130 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'IfNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'WithNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          WHERE EXISTS
+              (SELECT %s AS "a"
+               FROM "users_jobseekerassignment" U0
+               WHERE (((U0."company_id" IS NULL
+                        AND U0."prescriber_organization_id" IS NULL
+                        AND U0."professional_id" = %s)
+                       OR (U0."company_id" IS NULL
+                           AND U0."prescriber_organization_id" = %s
+                           AND U0."professional_id" = %s))
+                      AND U0."job_seeker_id" = ("users_user"."id"))
+               LIMIT 1)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."assigned_to_id",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.last_assignment[users/models.py]',
-          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
+          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
         ]),
         'sql': '''
           SELECT "users_jobseekerassignment"."id",
@@ -9691,120 +10290,22 @@
       }),
       dict({
         'origin': list([
-          'Approval.is_suspended[approvals/models.py]',
-          'Approval.state[approvals/models.py]',
-          'approval_state_badge[utils/templatetags/badges.py]',
-          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
-          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
-          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
-          'IncludeNode[job_seekers_views/includes/eligibility_diagnosis.html]',
-          'IfNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'JobSeekerAssignment.is_still_member[users/models.py]',
+          'JobSeekerAssignment.display_mode[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'WithNode[job_seekers_views/includes/last_known_advisor.html]',
           'IncludeNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/details.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
-          FROM "approvals_suspension"
-          WHERE ("approvals_suspension"."approval_id" = %s
-                 AND "approvals_suspension"."end_at" >= %s
-                 AND "approvals_suspension"."start_at" <= %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[job_seekers_views/includes/eligibility_diagnosis.html]',
-          'WithNode[job_seekers_views/includes/eligibility_diagnosis.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."level",
-                 "eligibility_administrativecriteria"."name",
-                 "eligibility_administrativecriteria"."desc",
-                 "eligibility_administrativecriteria"."written_proof",
-                 "eligibility_administrativecriteria"."written_proof_url",
-                 "eligibility_administrativecriteria"."written_proof_validity",
-                 "eligibility_administrativecriteria"."kind",
-                 "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'can_view_approval_details[approvals/perms.py]',
-          'approval_details_box[utils/templatetags/approvals.py]',
-          'InclusionNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          WHERE EXISTS
-              (SELECT %s AS "a"
-               FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
-                      AND U0."job_seeker_id" = ("users_user"."id"))
-               LIMIT 1)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'QuerySet.first[<site-packages>/django/db/models/query.py]',
-          'Approval.pending_prolongation_request[approvals/models.py]',
-          'WithNode[utils/templatetags/approval_box.html]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'InclusionNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongationrequest"."id",
-                 "approvals_prolongationrequest"."approval_id",
-                 "approvals_prolongationrequest"."start_at",
-                 "approvals_prolongationrequest"."end_at",
-                 "approvals_prolongationrequest"."reason",
-                 "approvals_prolongationrequest"."reason_explanation",
-                 "approvals_prolongationrequest"."declared_by_id",
-                 "approvals_prolongationrequest"."declared_by_siae_id",
-                 "approvals_prolongationrequest"."prescriber_organization_id",
-                 "approvals_prolongationrequest"."created_at",
-                 "approvals_prolongationrequest"."created_by_id",
-                 "approvals_prolongationrequest"."updated_at",
-                 "approvals_prolongationrequest"."updated_by_id",
-                 "approvals_prolongationrequest"."report_file_id",
-                 "approvals_prolongationrequest"."require_phone_interview",
-                 "approvals_prolongationrequest"."contact_email",
-                 "approvals_prolongationrequest"."contact_phone",
-                 "approvals_prolongationrequest"."status",
-                 "approvals_prolongationrequest"."assigned_to_id",
-                 "approvals_prolongationrequest"."processed_at",
-                 "approvals_prolongationrequest"."processed_by_id",
-                 "approvals_prolongationrequest"."reminder_sent_at"
-          FROM "approvals_prolongationrequest"
-          WHERE ("approvals_prolongationrequest"."approval_id" = %s
-                 AND "approvals_prolongationrequest"."status" = %s)
-          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           LIMIT 1
         ''',
       }),
