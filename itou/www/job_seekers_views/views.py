@@ -24,11 +24,12 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.models import Company, Contract
+from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
@@ -271,6 +272,77 @@ class ContractsTabView(BaseJobSeekerDetailView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "contracts": self.get_contracts(self.request, self.approval),
+        }
+
+
+class AdvisorsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/advisors.html"
+
+    def get_context_data(self, **kwargs):
+        assignments = list(
+            JobSeekerAssignment.objects.filter(job_seeker=self.object)
+            .select_related("professional", "company", "prescriber_organization")
+            .order_by(
+                "-ended_at",  # ended assignments are sorted by ended_at field,
+                "-last_action_at",  # ongoing assignments are sorted by last_action_at
+            )
+        )
+
+        if employers_data := [
+            (assignment.professional_id, assignment.company_id) for assignment in assignments if assignment.company
+        ]:
+            employers_ids, companies_ids = zip(*employers_data)
+            companies_memberships = set(
+                (membership.user_id, membership.company_id)
+                for membership in CompanyMembership.objects.filter(
+                    user__in=employers_ids,
+                    company__in=companies_ids,
+                )
+            )
+        else:
+            companies_memberships = []
+
+        if prescribers_data := [
+            (assignment.professional_id, assignment.prescriber_organization_id)
+            for assignment in assignments
+            if assignment.prescriber_organization
+        ]:
+            prescribers_ids, organizations_ids = zip(*prescribers_data)
+            prescribers_memberships = set(
+                (membership.user_id, membership.organization_id)
+                for membership in PrescriberMembership.objects.filter(
+                    user__in=prescribers_ids,
+                    organization__in=organizations_ids,
+                )
+            )
+        else:
+            prescribers_memberships = []
+
+        active_assignments = []
+        ended_assignments = []
+        for assignment in assignments:
+            # Fill is_still_member
+            if assignment.company:
+                assignment.is_still_member = (
+                    assignment.professional_id,
+                    assignment.company_id,
+                ) in companies_memberships
+            elif assignment.prescriber_organization:
+                assignment.is_still_member = (
+                    assignment.professional_id,
+                    assignment.prescriber_organization_id,
+                ) in prescribers_memberships
+            else:
+                assignment.is_still_member = False
+            # Split ended and ongoing assignmnts
+            if assignment.ended_at:
+                ended_assignments.append(assignment)
+            else:
+                active_assignments.append(assignment)
+
+        return super().get_context_data(**kwargs) | {
+            "active_assignments": active_assignments,
+            "ended_assignments": ended_assignments,
         }
 
 
@@ -1608,9 +1680,12 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
 def display_advisor_contact_info(
     request, assignment_id, mode, template_name="job_seekers_views/includes/display_contact_info.html"
 ):
+    # FIXME(advisors) Check it's allowed to display this mode for this assignment.
     getter = {
         "email": lambda assignment: assignment.advisor.email,
         "phone": lambda assignment: assignment.advisor.phone,
+        "org_email": lambda assignment: assignment.organization.email,
+        "org_phone": lambda assignment: assignment.organization.phone,
     }.get(mode)
     if not getter:
         raise ValueError(f"Invalid mode: {mode}")
