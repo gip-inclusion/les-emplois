@@ -3009,9 +3009,9 @@ sqlparse==0.6.0 \
     #   -r base.txt
     #   django
     #   itoutils
-syrupy==5.5.3 \
-    --hash=sha256:0b260a0c9dad55e1fb83818973dc36fbc1aea3fd5381592f442a986686c4171a \
-    --hash=sha256:fa21e4ae77c89ec5abfca513338d8a7eb916da6618ca0f8db301476e0768e57a
+syrupy==6.0.0 \
+    --hash=sha256:3efa16d767bd8614413cc20057552e4aec14428c6e5ea788c1f7e03047e8a5e4 \
+    --hash=sha256:bf4f5f662a7b23a9e5711bd5597e301cd09c00f31be5fa4095f79da7b0585f3d
     # via
     #   -r test.in
     #   itoutils
