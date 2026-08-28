@@ -103,12 +103,6 @@ def assert_contains_last_advisor(response, job_seeker_assignment):
     assertContains(response, f"{last_advisor_name} ({last_advisor_org_name})")
 
 
-def assert_contains_button_advisor_self_assign(response, job_seeker, is_last_advisor):
-    form_url = reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": job_seeker.public_id})
-    assertion = assertNotContains if is_last_advisor else assertContains
-    assertion(response, form_url)
-
-
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_anonymous_user(client, url):
     response = client.get(url)

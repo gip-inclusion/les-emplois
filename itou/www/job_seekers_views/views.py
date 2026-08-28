@@ -122,31 +122,6 @@ def get_last_assignment(request, job_seeker, from_all_coworkers=False, archived=
     )
 
 
-def assign_user_as_job_seeker_last_advisor(request, job_seeker):
-    if (
-        job_seeker.last_assignment
-        and job_seeker.last_assignment.advisor == request.user
-        and job_seeker.last_assignment.organization == request.current_organization
-    ):
-        messages.info(
-            request,
-            f"Vous êtes déjà le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
-            extra_tags="toast",
-        )
-    else:
-        JobSeekerAssignment.objects.upsert_assignment(
-            job_seeker=job_seeker,
-            professional=request.user,
-            organization=request.current_organization,
-            last_action_kind=ActionKind.SELF_ASSIGN,
-        )
-        toast_title = "Accompagnateur mis à jour"
-        toast_message = (
-            f"Vous êtes désormais le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}."
-        )
-        messages.success(request, f"{toast_title}||{toast_message}", extra_tags="toast")
-
-
 class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
@@ -521,17 +496,6 @@ def switch_stalled_status(request, public_id):
         messages.success(request, "Modification réussie", extra_tags="toast")
     else:
         messages.error(request, "Modification impossible", extra_tags="toast")
-    return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
-
-
-@http_methods(db_write=["POST"])
-@check_request(lambda request: request.from_prescriber or request.from_employer)
-def assign_oneself_as_last_advisor(request, public_id):
-    job_seeker = get_object_or_404(
-        User.objects.filter(kind=UserKind.JOB_SEEKER),
-        public_id=public_id,
-    )
-    assign_user_as_job_seeker_last_advisor(request, job_seeker)
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
