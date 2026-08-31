@@ -29,7 +29,7 @@ class TestSearchServices:
         response = client.get(reverse("search:services_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?tab=onglet-insertion"',
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?type=insertion"',
         )
 
     def test_home_connected(self, client):
