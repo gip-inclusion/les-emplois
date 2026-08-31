@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## 2026-08-17
+
+### Ajouté
+
+- [Interface : Indiquer que la modification d’un candidat qui utilise un SSO est à faire sur les sites fournisseurs du SSO](https://github.com/gip-inclusion/les-emplois/pull/8464)
+
+### Supprimé
+
+- [Notifications : Retirer les mentions relatives aux enquêtes de satisfactions dans les emails transactionnels](https://github.com/gip-inclusion/les-emplois/pull/8569)
+
+### Tech
+
+- [Tech : Ajout des contrôles a posteriori et des bilans d'exécution à la commande `move_company_data`](https://github.com/gip-inclusion/les-emplois/pull/8433)
+
 ## 2026-08-10
 
 ### Ajouté
