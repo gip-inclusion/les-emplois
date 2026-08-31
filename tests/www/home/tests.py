@@ -10,7 +10,8 @@ def test_home_anonymous(client):
     response = client.get(url, follow=True)
     assertRedirects(response, reverse("search:home"))
     assertContains(
-        response, 'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud"'
+        response,
+        'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?host=localhost%3A8000"',
     )
 
     query = {REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM: "1"}
