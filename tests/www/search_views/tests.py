@@ -1585,6 +1585,17 @@ class TestSearchWithoutCity:
         assertNotContains(response, "Aucun résultat avec les filtres actuels.")
 
 
+class TestLandingScripts:
+    """The two halves of the embedding protocol have to reach the page."""
+
+    def test_the_host_scripts_are_loaded(self, client):
+        body = client.get(reverse("search:home")).content.decode()
+        # static() resolves the ManifestStaticFilesStorage hash (CI) or the
+        # plain path (local) for us.
+        assert static("js/plateforme_accueil_embed.js") in body
+        assert static("js/plateforme_accueil_matomo.js") in body
+
+
 class TestLandingHost:
     """One landing deployment serves every environment; it needs to be told which."""
 
