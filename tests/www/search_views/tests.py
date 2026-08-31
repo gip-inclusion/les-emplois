@@ -610,7 +610,7 @@ class TestSearchPrescriber:
         response = client.get(reverse("search:prescribers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?tab=onglet-accompagnateur"',
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?type=accompagnateur"',
         )
 
     def test_home_connected(self, client):
