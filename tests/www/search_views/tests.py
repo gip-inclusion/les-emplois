@@ -58,7 +58,7 @@ class TestSearchCompany:
         response = client.get(reverse("search:employers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud"',
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?host=localhost%3A8000"',
         )
 
     def test_home_connected(self, client):
@@ -610,7 +610,7 @@ class TestSearchPrescriber:
         response = client.get(reverse("search:prescribers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?type=accompagnateur"',
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?host=localhost%3A8000&amp;type=accompagnateur"',
         )
 
     def test_home_connected(self, client):
@@ -1583,3 +1583,16 @@ class TestSearchWithoutCity:
         response = client.get(reverse(url_name))
         assertContains(response, "Renseignez une ville pour lancer la recherche.")
         assertNotContains(response, "Aucun résultat avec les filtres actuels.")
+
+
+class TestShowcaseHost:
+    """One showcase deployment serves every environment; it needs to be told which."""
+
+    def test_the_environment_names_itself(self, client, settings):
+        settings.ITOU_FQDN = "demo.emplois.inclusion.beta.gouv.fr"
+        response = client.get(reverse("search:prescribers_home"))
+        assertContains(
+            response,
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud'
+            '?host=demo.emplois.inclusion.beta.gouv.fr&amp;type=accompagnateur"',
+        )
