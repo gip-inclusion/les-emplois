@@ -23,7 +23,7 @@ DBDUMP ?= $(CACHEDIR)/development_db.dump
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
-.PHONY: runserver venv buckets quality fix compile-deps
+.PHONY: runserver venv buckets quality fix compile-deps update_snapshots
 
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
@@ -66,6 +66,17 @@ fast_fix: $(VIRTUAL_ENV)
 
 fix: fast_fix
 	djlint --reformat itou
+
+update_snapshots: $(VIRTUAL_ENV)
+	@find tests -name '*.ambr' | sort | while read -r ambr; do \
+		py=$$(printf '%s' "$$ambr" | sed 's#/__snapshots__/#/#; s#\.ambr$$#.py#'); \
+		if [ -f "$$py" ]; then \
+			printf '%s\n' "$$py"; \
+		else \
+			printf '⚠ orphaned snapshot, no test module: %s\n' "$$ambr" >&2; \
+		fi; \
+	done | sort -u | xargs --no-run-if-empty \
+		pytest --snapshot-update --numprocesses=logical
 
 # Django.
 # =============================================================================
