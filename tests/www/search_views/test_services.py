@@ -100,8 +100,13 @@ class TestSearchServices:
     def test_category_error_suppression(self, client):
         vannes = create_city_vannes()
 
-        response = client.get(self.URL, {"city": vannes.slug})
-        assertContains(response, "Veuillez sélectionner une thématique pour voir les résultats.")
+        response = client.get(self.URL)
+        assertContains(
+            response,
+            '<p class="mb-0">Renseignez une ville et une thématique pour lancer la recherche.</p>',
+            html=True,
+            count=1,
+        )
         assertNotContains(response, "Votre formulaire contient une erreur")
 
         response = client.get(self.URL, {"city": vannes.slug, "category": "invalid"})
