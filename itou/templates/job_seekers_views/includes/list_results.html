@@ -23,7 +23,7 @@
                         {% if request.from_iae_actor %}<th scope="col">Situation IAE</th>{% endif %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_ACTION_AT_ASC name="Dernière action" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nbr de candidatures" only %}
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d'accompagnateurs" only %}
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d’accompagnateurs" only %}
                         <th scope="col">Dernier accompagnateur connu</th>
                         <th scope="col" class="text-end {% if request.current_organization.is_authorized or can_orient_towards_insertion_service %}w-100px{% else %}w-50px{% endif %}">
                             <span class="visually-hidden">Actions possibles sur les usagers</span>
@@ -71,7 +71,7 @@
                                     <i class="ri-draft-line" aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
                                 </a>
                                 {% if job_seeker.show_more_actions %}
-                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d’actions">
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
@@ -90,9 +90,9 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="is_not_stalled_anymore" value="{{ job_seeker.jobseeker_profile.is_not_stalled_anymore|yesno:"0,1" }}">
                                                     {% if job_seeker.jobseeker_profile.is_not_stalled_anymore %}
-                                                        <button type="submit" class="dropdown-item">L'usager est sans solution</button>
+                                                        <button type="submit" class="dropdown-item">L’usager est sans solution</button>
                                                     {% else %}
-                                                        <button type="submit" class="dropdown-item">L'usager n'est plus sans solution</button>
+                                                        <button type="submit" class="dropdown-item">L’usager n’est plus sans solution</button>
                                                     {% endif %}
                                                 </form>
                                             {% endif %}
