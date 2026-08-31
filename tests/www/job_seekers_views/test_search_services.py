@@ -106,7 +106,7 @@ def assert_has_more_actions(response, list_url, job_seeker):
         query["city"] = job_seeker.city_slug
     expected_url = reverse("search:services_results", query=query)
     assertContains(response, list_markup(expected_url), html=True)
-    assertContains(response, 'aria-label="Plus d\'actions"')
+    assertContains(response, 'aria-label="Plus d’actions"')
 
 
 def test_search_services_from_list_as_authorized_prescriber(client):
