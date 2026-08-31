@@ -64,10 +64,10 @@
         <div class="c-box c-box--results mb-3 mb-md-4">
             <div class="c-box--results__body">
                 <p class="mb-0">
-                    {% if suppress_category_error %}
-                        Veuillez sélectionner une thématique pour voir les résultats.
-                    {% else %}
+                    {% if form.is_bound %}
                         Aucun résultat avec les filtres actuels.
+                    {% else %}
+                        Renseignez une ville et une thématique pour lancer la recherche.
                     {% endif %}
                 </p>
             </div>

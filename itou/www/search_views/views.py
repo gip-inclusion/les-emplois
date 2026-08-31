@@ -404,7 +404,6 @@ def search_services_results(request, template_name="search/services/results.html
     form = ServiceSearchForm(data=request.GET or None)
     services = Service.objects.none()
 
-    suppress_category_error = False
     if form.is_valid():
         city = form.cleaned_data["city"]
         category = form.cleaned_data["category"]
@@ -420,19 +419,6 @@ def search_services_results(request, template_name="search/services/results.html
             reception=reception,
             service_types=form.cleaned_data["services"],
         ).select_related("structure", "source")
-    elif len(form.errors) == 1:
-        try:
-            # When searching for a job seeker (param job_seeker_public_id), the
-            # location is pre-filled with their city_slug. A category is
-            # also required, so the initial page load displays an error.
-            [category_error] = form.errors["category"]
-        except (KeyError, ValueError):
-            pass
-        else:
-            # Category not provided or empty.
-            suppress_category_error = not request.GET.get("category")
-            if suppress_category_error:
-                del form.errors["category"]
 
     banner_context = get_orient_for_job_seeker_context(request)
     job_seeker = banner_context["job_seeker"]
@@ -446,7 +432,6 @@ def search_services_results(request, template_name="search/services/results.html
         "form": form,
         "city": city,
         "category": category,
-        "suppress_category_error": suppress_category_error,
         "results": results,
         "detail_query_string": urlencode(detail_query),
         **banner_context,
