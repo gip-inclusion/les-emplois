@@ -1567,3 +1567,16 @@ class TestJobDescriptionSearchView:
             "<span>Effacer tout</span></a>"
         )
         assertContains(response, reset_button, html=True)
+
+
+class TestSearchWithoutCity:
+    """Landing on a results page without a search is not a search that found nothing."""
+
+    @pytest.mark.parametrize(
+        "url_name",
+        ["search:employers_results", "search:job_descriptions_results", "search:prescribers_results"],
+    )
+    def test_unsearched_page_does_not_claim_empty_results(self, client, url_name):
+        response = client.get(reverse(url_name))
+        assertContains(response, "Renseignez une ville pour lancer la recherche.")
+        assertNotContains(response, "Aucun résultat avec les filtres actuels.")

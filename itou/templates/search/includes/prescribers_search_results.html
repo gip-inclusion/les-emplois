@@ -31,7 +31,13 @@
     {% empty %}
         <div class="c-box c-box--results mb-3 mb-md-4">
             <div class="c-box--results__body">
-                <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
+                <p class="mb-0">
+                    {% if form.is_bound %}
+                        Aucun résultat avec les filtres actuels.
+                    {% else %}
+                        Renseignez une ville pour lancer la recherche.
+                    {% endif %}
+                </p>
             </div>
         </div>
     {% endfor %}
