@@ -1529,7 +1529,7 @@ class TestOrientationDetailsForServiceProvider:
             == snapshot
         )
 
-    def test_process(self, client):
+    def test_process(self, client, mailoutbox):
         link = OrientationProcessLinkFactory(
             orientation__status=OrientationStatus.PENDING,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1550,6 +1550,8 @@ class TestOrientationDetailsForServiceProvider:
         assertContains(response, "Cette orientation ne peut pas être mise à l’étude")
 
         assert orientation.updated_at == processing_at
+
+        assert len(mailoutbox) == 3  # email sent to sender, beneficiary and referent
 
     def test_cannot_process(self, client):
         link = OrientationProcessLinkFactory(
