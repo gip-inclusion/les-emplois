@@ -2,6 +2,13 @@
 
 <div class="c-box mb-3 mb-md-4">
     <h2 class="h3">Prescripteur</h2>
+    <div class="c-box--organization__summary w-100 mb-2">
+        <i class="ri-{{ orientation.sender_company|yesno:"community,home-smile" }}-line" aria-hidden="true"></i>
+        <div>
+            <span data-bs-toggle="tooltip" data-bs-title="{{ orientation.sender_organization.get_kind_display }}">{{ orientation.sender_organization.kind }}</span>
+            <span class="d-block h3">{{ orientation.sender_organization.display_name }}</span>
+        </div>
+    </div>
     {% if orientation.sender_is_referent %}
         {% partialdef referent-contact inline %}
             <ul class="fs-sm list-unstyled mb-0">

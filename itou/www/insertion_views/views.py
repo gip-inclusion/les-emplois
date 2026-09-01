@@ -669,6 +669,8 @@ def orientation_details_for_service_provider(request):
             "orientation",
             "orientation__beneficiary",
             "orientation__sender",
+            "orientation__sender_prescriber_organization",
+            "orientation__sender_company",
             "orientation__service",
             "orientation__service__structure",
             "orientation__service__source",

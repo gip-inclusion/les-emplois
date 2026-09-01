@@ -1382,12 +1382,14 @@ class TestOrientationDetailsForServiceProvider:
             credentials=["Pièce d'identité en cours de validité"],
         )
 
+        membership = PrescriberMembershipFactory(user__for_snapshot=True, organization__for_snapshot=True)
         process_link = OrientationProcessLinkFactory(
             id="1111111111zzzzzzzzzz3333333333_4",
             orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             orientation__beneficiary=JobSeekerFactory(for_snapshot=True),
             orientation__service=service,
-            orientation__sender=PrescriberFactory(for_snapshot=True),
+            orientation__sender=membership.user,
+            orientation__sender_prescriber_organization=membership.organization,
             orientation__referent_first_name="Lizzy",
             orientation__referent_last_name="Old",
             orientation__referent_email="referent@email.fake",
@@ -1414,11 +1416,15 @@ class TestOrientationDetailsForServiceProvider:
             structure__uid="structure-uid",
         )
 
+        membership = CompanyMembershipFactory(user__for_snapshot=True, company__for_snapshot=True)
         process_link = OrientationProcessLinkFactory(
             id="1111111111zzzzzzzzzz3333333333_4",
             orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             orientation__beneficiary=JobSeekerFactory(for_snapshot=True),
-            orientation__sender=EmployerFactory(for_snapshot=True),
+            orientation__sender=membership.user,
+            orientation__sender_prescriber_organization=None,
+            orientation__sender_company=membership.company,
+            orientation__sender_kind=SenderKind.EMPLOYER,
             orientation__service=service,
             orientation__beneficiary_contact_preferences=[
                 BeneficiaryContactPreference.EMAIL,
