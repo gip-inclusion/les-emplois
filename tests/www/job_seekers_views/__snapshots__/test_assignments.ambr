@@ -1,0 +1,132 @@
+# serializer version: 1
+# name: TestCreateOrEditAssignment.test_edit_view
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  D… J…
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-assignment-edit" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2F7614fc4b-aef9-4694-ab17-12324300180a%2Fassignments%2F[PK of Assignment]%2Fedit&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                      <div class="c-form mb-3 mb-md-4">
+                          <form id="id-membership-form" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <h2 class="h3">
+                                  Mon accompagnement
+                              </h2>
+                              <div class="form-group">
+                                  <label class="form-label">
+                                      Accompagnement
+                                  </label>
+                                  <div class="" id="id_is_ongoing">
+                                      <div class="form-check">
+                                          <input checked="" class="form-check-input" id="id_is_ongoing_0" name="is_ongoing" type="radio" value="True"/>
+                                          <label class="form-check-label" for="id_is_ongoing_0">
+                                              En cours
+                                          </label>
+                                      </div>
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_is_ongoing_1" name="is_ongoing" type="radio" value="False"/>
+                                          <label class="form-check-label" for="id_is_ongoing_1">
+                                              Terminé
+                                          </label>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_reason">
+                                      Motif de l'accompagnement
+                                  </label>
+                                  <textarea aria-describedby="id_reason_helptext" class="form-control" cols="40" id="id_reason" name="reason" rows="3"></textarea>
+                                  <div class="form-text" id="id_reason_helptext">
+                                      Raison de l’accompagnement et/ou actions menées avec l'usager.
+                                  </div>
+                              </div>
+                              <div class="c-info mb-3">
+                                  <span class="c-info__summary">
+                                      Cette information sera visible aux autres accompagnateurs. N’inscrivez aucune information confidentielle dans ce champ.
+                                  </span>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <hr class="mb-3"/>
+                                      <div class="form-row align-items-center justify-content-end gx-3">
+                                          <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                              <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-close-line ri-lg">
+                                                  </i>
+                                                  <span>
+                                                      Annuler
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                              <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" type="submit">
+                                                  <span>
+                                                      Modifier
+                                                  </span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
