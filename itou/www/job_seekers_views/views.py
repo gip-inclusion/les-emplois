@@ -56,6 +56,7 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
+    JobSeekerAssignmentForm,
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
@@ -101,6 +102,21 @@ def build_services_search_url(request, job_seeker):
     if job_seeker.city_slug:
         query["city"] = job_seeker.city_slug
     return reverse("search:services_results", query=query)
+
+
+def get_last_assignment(request, job_seeker, archived=None):
+    """Retrieve last assignment of current user with job seeker."""
+
+    return (
+        JobSeekerAssignment.objects.assigned_to(
+            professional=request.user, organization=request.current_organization, archived=archived
+        )
+        .exclude(prescriber_organization=None, company=None)
+        .exclude(assigned_to_unknown_advisor=True)
+        .filter(job_seeker=job_seeker)
+        .order_by("-last_action_at")
+        .first()
+    )
 
 
 def assign_user_as_job_seeker_last_advisor(request, job_seeker):
@@ -368,6 +384,70 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
             "ended_assignments": ended_assignments,
             "calendar_url": settings.ADVISORS_CALENDAR_URL,
         }
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@check_request(lambda request: request.from_prescriber or request.from_employer)
+def create_or_edit_assignment(
+    request, public_id, assignment_pk=None, template_name="job_seekers_views/assignment_edit.html"
+):
+    job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    prescriber_organization = request.current_organization if request.from_prescriber else None
+    company = request.current_organization if request.from_employer else None
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
+    active_assignment = get_last_assignment(request, job_seeker, archived=False)
+
+    if assignment_pk:
+        assignment = get_object_or_404(
+            JobSeekerAssignment, pk=assignment_pk, job_seeker=job_seeker, professional=request.user
+        )
+        # Cannot edit an assignment from another organization
+        if assignment.organization and assignment.organization != request.current_organization:
+            raise PermissionDenied
+    else:
+        # Cannot create an assignment if the current assignment has not ended
+        # Instead, redirect to the active assignment edition view
+        if active_assignment:
+            return HttpResponseRedirect(
+                reverse(
+                    "job_seekers_views:edit_assignment",
+                    kwargs={"public_id": public_id, "assignment_pk": active_assignment.pk},
+                    query={"back_url": back_url},
+                )
+            )
+        assignment = JobSeekerAssignment(
+            job_seeker=job_seeker,
+            professional=request.user,
+            prescriber_organization=prescriber_organization,
+            company=company,
+            last_action_kind=ActionKind.SELF_ASSIGN,
+        )
+
+    assignment_exists = assignment_pk is not None
+    active_assignment_exists = active_assignment and active_assignment != assignment
+
+    if request.method == "POST":
+        form = JobSeekerAssignmentForm(
+            data=request.POST, instance=assignment, active_assignment_exists=active_assignment_exists
+        )
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("job_seekers_views:advisors", args=(public_id,)))
+    else:
+        form = JobSeekerAssignmentForm(instance=assignment, active_assignment_exists=active_assignment_exists)
+
+    context = {
+        "form": form,
+        "job_seeker": job_seeker,
+        "assignment": assignment if assignment_exists else None,
+        "back_url": back_url,
+        "assignment_exists": assignment_exists,
+        "can_view_personal_information": can_view_personal_information(request, job_seeker),
+        "services_search_url": build_services_search_url(request, job_seeker),
+        "matomo_custom_title": f"{'Modification' if assignment_exists else 'Création'} accompagnement",
+    }
+
+    return render(request, template_name, context)
 
 
 @http_methods(db_write=["POST"])
