@@ -66,12 +66,8 @@ class ASPExchangeInformation(models.Model):
         null=True,
     )
 
-    # Once correctly processed by ASP, the employee record is archived:
-    # - it can't be changed anymore
-    # - a serialized version of the employee record is stored (as proof, and for API concerns)
-    # The API will not use JSON serializers on a regular basis,
-    # except for the archive serialization, which occurs once.
-    # It will only return a list of this JSON field for archived employee records.
+    # Once correctly processed by ASP, the JSON sent then received is archived:
+    # it is stored here but also on EmployeeRecordTransitionLog
     archived_json = models.JSONField(verbose_name="archive JSON de la fiche salarié", null=True, blank=True)
 
     class Meta:
