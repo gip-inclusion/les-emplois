@@ -119,7 +119,7 @@ def certify_criterion_with_api_france_travail(criterion):
     with pole_emploi_agent_api_client() as pe_client:
         # Predeclare needed scopes to avoid requesting 2 tokens
         # For rechercher_usager
-        pe_client.needed_scopes |= {"api_rechercheindividucertifiev1", "rechercherIndividuCertifie"}
+        pe_client.needed_scopes |= {"api_rechercher-usagerv2", "profil_accedant", "rechercheusager"}
         # For rqth
         pe_client.needed_scopes |= {"api_donnees-rqthv1"}
         user_found = False
