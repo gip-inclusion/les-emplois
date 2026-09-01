@@ -848,6 +848,14 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             return True
         return self.sender_prescriber_organization.is_authorized
 
+    # Transitions
+    @xwf_models.transition()
+    def process(self):
+        if not self.sender_is_referent:
+            self.email_orientation_processing_for_referent.send()
+        self.notification_processing_for_beneficiary.send()
+        self.notification_processing_for_sender.send()
+
     # Notifications
     @property
     def notification_new_for_beneficiary(self):
@@ -856,6 +864,18 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def notification_new_for_sender(self):
         return orientation_notifications.OrientationNewForSenderNotification(
+            self.sender, orientation=self, can_view_personal_information=self.sender_can_view_personal_information
+        )
+
+    @property
+    def notification_processing_for_beneficiary(self):
+        return orientation_notifications.OrientationProcessingForBeneficiaryNotification(
+            self.beneficiary, orientation=self
+        )
+
+    @property
+    def notification_processing_for_sender(self):
+        return orientation_notifications.OrientationProcessingForSenderNotification(
             self.sender, orientation=self, can_view_personal_information=self.sender_can_view_personal_information
         )
 
@@ -870,6 +890,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         }
         subject = "insertion/email/new_for_referent_subject.txt"
         body = "insertion/email/new_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_orientation_processing_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+        }
+        subject = "insertion/email/processing_for_referent_subject.txt"
+        body = "insertion/email/processing_for_referent_body.txt"
         return get_email_message(to, context, subject, body)
 
 

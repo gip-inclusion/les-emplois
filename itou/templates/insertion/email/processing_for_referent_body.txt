@@ -1,0 +1,15 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% block body %}
+
+Bonjour,
+
+La structure {{ orientation.service.name }} a bien pris en charge la demande d’orientation adressée par {{ orientation.sender.get_full_name }} ({{ orientation.sender_organization.display_name }}) pour {{ orientation.beneficiary.get_full_name }} vers le service {{ orientation.service.name }}, transmise le {{ orientation.created_at|date:"d/m/Y" }}.
+
+*Elle est actuellement en cours d’examen.* Une réponse sera apportée prochainement.
+
+*Pour toute question, vous pouvez contacter le référent du service :*
+{% if orientation.service.contact_full_name %}- {{ orientation.service.contact_full_name }}{% endif %}
+{% if orientation.service.contact_email %}- {{ orientation.service.contact_email }} {% endif %}{% if orientation.service.contact_phone %}- {{ orientation.service.contact_phone|format_phone }}{% endif %}
+
+{% endblock body %}

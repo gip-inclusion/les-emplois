@@ -190,3 +190,114 @@
 # name: test_new_orientation_for_structure[subject]
   '[TEST] Nouvelle demande d’orientation reçue'
 # ---
+# name: test_processing_orientation_for_beneficiary[body]
+  '''
+  Bonjour,
+  
+  Vous avez été orienté·e par Pierre DUPONT (Pres. Org.) vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
+  
+  *La structure structure-uid étudie actuellement votre demande.* Elle ou la personne qui vous accompagne vous recontactera pour vous donner une réponse. Vous n’avez pas de démarche à effectuer pour le moment.
+  
+  *Si vous avez des questions, vous pouvez contacter :*
+  - votre conseiller·e référent·e : Flora TRISTAN - prescriptrice@inclusion.gouv.fr
+  - la personne qui vous accompagne : Pierre DUPONT - pierre.dupont@test.local
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_processing_orientation_for_beneficiary[subject]
+  '[TEST] Votre demande est en cours d’examen'
+# ---
+# name: test_processing_orientation_for_referent[body]
+  '''
+  Bonjour,
+  
+  La structure Aide aux devoirs a bien pris en charge la demande d’orientation adressée par Pierre DUPONT (Pres. Org.) pour Jane DOE vers le service Aide aux devoirs, transmise le 13/08/2026.
+  
+  *Elle est actuellement en cours d’examen.* Une réponse sera apportée prochainement.
+  
+  *Pour toute question, vous pouvez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_processing_orientation_for_referent[subject]
+  '[TEST] Notification : une demande d’orientation est en cours d’examen'
+# ---
+# name: test_processing_orientation_for_sender[from_authorized_prescriber][body]
+  '''
+  Bonjour Jeanne,
+  
+  La structure Aide aux devoirs a bien pris en charge votre demande d’orientation pour Jane DOE vers le service Aide aux devoirs, transmise le 13/08/2026.
+  
+  *Elle est actuellement en cours d’examen.* Une réponse sera apportée prochainement.
+  
+  *Pour toute question, vous pouvez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_processing_orientation_for_sender[from_authorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation est en cours de traitement'
+# ---
+# name: test_processing_orientation_for_sender[from_employer][body]
+  '''
+  Bonjour Jeanne,
+  
+  La structure Aide aux devoirs a bien pris en charge votre demande d’orientation pour Jane DOE vers le service Aide aux devoirs, transmise le 13/08/2026.
+  
+  *Elle est actuellement en cours d’examen.* Une réponse sera apportée prochainement.
+  
+  *Pour toute question, vous pouvez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_processing_orientation_for_sender[from_employer][subject]
+  '[TEST] Votre demande d’orientation est en cours de traitement'
+# ---
+# name: test_processing_orientation_for_sender[from_unauthorized_prescriber][body]
+  '''
+  Bonjour Jeanne,
+  
+  La structure Aide aux devoirs a bien pris en charge votre demande d’orientation pour J… D… vers le service Aide aux devoirs, transmise le 13/08/2026.
+  
+  *Elle est actuellement en cours d’examen.* Une réponse sera apportée prochainement.
+  
+  *Pour toute question, vous pouvez contacter le référent du service :*
+  
+  - service.contact@email.fake 
+  
+  En cas d’absence de réponse dans un délai de 60 jours, cette demande sera automatiquement annulée.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_processing_orientation_for_sender[from_unauthorized_prescriber][subject]
+  '[TEST] Votre demande d’orientation est en cours de traitement'
+# ---

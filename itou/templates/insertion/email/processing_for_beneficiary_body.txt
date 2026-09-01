@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+Vous avez été orienté·e par {{ orientation.sender.get_full_name }} ({{ orientation.sender_organization.display_name }}) vers le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
+
+*La structure {{ orientation.service.structure }} étudie actuellement votre demande.* Elle ou la personne qui vous accompagne vous recontactera pour vous donner une réponse. Vous n’avez pas de démarche à effectuer pour le moment.
+
+*Si vous avez des questions, vous pouvez contacter :*
+{% if not orientation.sender_is_referent %}- votre conseiller·e référent·e : {{ orientation.referent_first_name|title }} {{ orientation.referent_last_name|upper }} - {{ orientation.referent_email }}{% endif %}
+- la personne qui vous accompagne : {{ orientation.sender.get_full_name }} - {{ orientation.sender.email }}
+
+{% endblock body %}
