@@ -117,6 +117,11 @@ def certify_criterion_with_api_france_travail(criterion):
     criterion.save(update_fields={"last_certification_attempt_at"})
 
     with pole_emploi_agent_api_client() as pe_client:
+        # Predeclare needed scopes to avoid requesting 2 tokens
+        # For rechercher_usager
+        pe_client.needed_scopes |= {"api_rechercheindividucertifiev1", "rechercherIndividuCertifie"}
+        # For rqth
+        pe_client.needed_scopes |= {"api_donnees-rqthv1"}
         user_found = False
         try:
             token = pe_client.rechercher_usager(jobseeker_profile=profile)
