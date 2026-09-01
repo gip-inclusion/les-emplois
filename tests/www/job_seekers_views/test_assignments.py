@@ -1,97 +1,241 @@
+import datetime
 import random
-import uuid
-from functools import partial
+from unittest import mock
 
-import pytest
-from django.contrib import messages
 from django.urls import reverse
-from pytest_django.asserts import assertMessages, assertRedirects
+from django.utils import timezone
+from pytest_django.asserts import assertRedirects
 
 from itou.users.enums import ActionKind, AssignmentEndReason
 from itou.users.models import JobSeekerAssignment
+from itou.www.job_seekers_views.forms import JobSeekerAssignmentForm
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
-    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
-class TestAssignOneselfAsAdvisor:
-    def test_view(self, client):
-        organization = PrescriberOrganizationFactory()
-        professional = PrescriberFactory(membership__organization=organization)
+class TestCreateOrEditAssignment:
+    def test_forbidden_access(self, client):
         job_seeker = JobSeekerFactory()
+        assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
+        create_url = reverse("job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id})
+        edit_url = reverse(
+            "job_seekers_views:edit_assignment",
+            kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
+        )
+
+        for user in [job_seeker, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.post(create_url)
+            assert response.status_code == 403
+            response = client.post(edit_url)
+            assert response.status_code == 403
+
+    def test_permission_to_edit(self, client):
+        user = PrescriberFactory(membership=True)
+        assignment = JobSeekerAssignmentFactory()
+        url = reverse(
+            "job_seekers_views:edit_assignment",
+            kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+        )
+
+        client.force_login(user)
+
+        response = client.get(url)
+        assert response.status_code == 404
+
+        assignment.professional = user
+        assignment.save()
+        response = client.get(url)
+        assert response.status_code == 200
+
+        assignment.prescriber_organization = PrescriberOrganizationFactory()
+        assignment.save()
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_create_view(self, client):
+        job_seeker = JobSeekerFactory()
+        professional = PrescriberFactory(membership=True)
+        url = reverse("job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(professional)
+
+        # The professional sets a reason
+        post_data = {
+            "reason": "iae",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.reason == "iae"
+        assert assignment.last_action_kind == ActionKind.SELF_ASSIGN
+        assignment.delete()
+
+        # Ensure other parameters are not taken into account
+        post_data = {
+            "reason": "iae",
+            "ended_at": timezone.now(),
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.reason == "iae"
+        assert assignment.ended_at is None
+
+        # Trying to create an assignment when one already exists redirects the user to the edit view
+        response = client.get(url)
+        back_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        redirect_url = reverse(
+            "job_seekers_views:edit_assignment",
+            kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
+            query={"back_url": back_url},
+        )
+        assertRedirects(response, redirect_url)
+
+    def test_edit_view(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        organization = PrescriberOrganizationFactory(for_snapshot=True)
+        professional = PrescriberFactory(membership=True, membership__organization=organization)
         assignment = JobSeekerAssignmentFactory(
             job_seeker=job_seeker,
+            professional=professional,
+            prescriber_organization=organization,
+            created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
+            updated_at=datetime.datetime(2024, 6, 24, 0, 0, 0, tzinfo=datetime.UTC),
         )
-        SUCCESS_MESSAGE = messages.Message(
-            messages.SUCCESS,
-            "Accompagnateur mis à jour||"
-            f"Vous êtes désormais le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
-            extra_tags="toast",
+        url = reverse(
+            "job_seekers_views:edit_assignment",
+            kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
         )
-        INFO_MESSAGE = messages.Message(
-            messages.INFO,
-            f"Vous êtes déjà le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
-            extra_tags="toast",
-        )
-
-        assert job_seeker.last_assignment == assignment
 
         client.force_login(professional)
-
-        response = client.post(
-            reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": job_seeker.public_id})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"%2Fjob-seekers%2F{job_seeker.public_id}%2Fassignments%2F{assignment.pk}%2Fedit",
+                    f"%2Fjob-seekers%2F{job_seeker.public_id}%2Fassignments%2F[PK of Assignment]%2Fedit",
+                ),
+            ],
         )
-        assertRedirects(response, reverse("job_seekers_views:list"), fetch_redirect_response=False)
-        del job_seeker.last_assignment
-        last_assignment = job_seeker.last_assignment
-        assert last_assignment.advisor == professional
-        assert last_assignment.organization == organization
-        assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
-        assertMessages(response, [SUCCESS_MESSAGE])
+        assert pretty_indented(html_details) == snapshot
 
-        response = client.post(
-            reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": job_seeker.public_id})
+        # The user clicks on "Accompagnement terminé"
+        post_data = {
+            "is_ongoing": "False",
+            "reason": "",
+        }
+        now = timezone.now()
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            response = client.post(url, data=post_data)
+
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment.refresh_from_db()
+        assert assignment.ended_at == now
+        assert assignment.end_reason == AssignmentEndReason.MANUAL
+
+        # If the assignment was archived, saving without changing anything won't change the ending date or end reason
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        post_data = {
+            "is_ongoing": "False",
+            "reason": "",
+        }
+        now = timezone.now()
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment_updated = JobSeekerAssignment.objects.get(pk=assignment.pk)
+        assert assignment.ended_at == assignment_updated.ended_at
+        assert assignment.end_reason == AssignmentEndReason.AUTOMATIC
+
+        # Cannot make an assignment active again if there's an ongoing assignment already
+        active_assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional,
+            prescriber_organization=organization,
         )
-        assertRedirects(response, reverse("job_seekers_views:list"), fetch_redirect_response=False)
-        del job_seeker.last_assignment
-        assert job_seeker.last_assignment == last_assignment
-        assertMessages(response, [SUCCESS_MESSAGE, INFO_MESSAGE])
+        post_data = {
+            "is_ongoing": "True",
+            "reason": "",
+        }
+        response = client.post(url, data=post_data)
+        assert not assignment.is_active
+        active_assignment.delete()
 
-    @pytest.mark.parametrize(
-        "professional_factory",
-        [
-            partial(PrescriberFactory, membership=True),
-            partial(EmployerFactory, membership=True),
-        ],
-        ids=["prescriber", "employer"],
-    )
-    def test_invalid(self, client, professional_factory):
-        # Needs to be logged in
-        response = client.get(
-            reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()})
+        # The professional follows again the job seeker
+        post_data = {
+            "is_ongoing": "True",
+            "reason": "",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment.refresh_from_db()
+        assert assignment.is_active
+
+        # The professional sets a reason
+        post_data = {
+            "is_ongoing": "True",
+            "reason": "iae",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.reason == "iae"
+
+        # Make sure an assignment is no longer assigned to an unknown advisor after edition
+        assignment.assigned_to_unknown_advisor = True
+        assignment.save()
+        post_data = {
+            "is_ongoing": "True",
+            "reason": "iae",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
+        assignment.refresh_from_db()
+        assert assignment.assigned_to_unknown_advisor is False
+
+    def test_form(self):
+        job_seeker = JobSeekerFactory()
+        professional = PrescriberFactory()
+
+        # Creation form
+        assignment = JobSeekerAssignment(job_seeker=job_seeker, professional=professional)
+        form = JobSeekerAssignmentForm(instance=assignment, active_assignment=None)
+        assert form.fields.get("is_ongoing") is None
+
+        # Edition form
+        assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional)
+        form = JobSeekerAssignmentForm(instance=assignment, active_assignment=assignment)
+        assert form.fields.get("is_ongoing") is not None
+
+        # Check the is_ongoing field is disabled if an active assignment
+        # exists and we try to make an archived assignment active again
+        archived_assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional,
+            ended_at=timezone.now(),
+            end_reason=AssignmentEndReason.AUTOMATIC,
         )
-        assert response.status_code == 302
-
-        professional = professional_factory()
-        client.force_login(professional)
-
-        # Needs to be a POST request
-        response = client.get(
-            reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()})
-        )
-        assert response.status_code == 405
-
-        # Needs to be an existing jobseeker
-        response = client.post(
-            reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()})
-        )
-        assert response.status_code == 404
+        form = JobSeekerAssignmentForm(instance=archived_assignment, active_assignment=assignment)
+        assert form.fields.get("is_ongoing") is not None
+        assert form.fields.get("is_ongoing").disabled
 
 
 class TestArchiveAssignment:

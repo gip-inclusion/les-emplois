@@ -27,6 +27,16 @@ urlpatterns = [
         name="advisors",
     ),
     path(
+        "<uuid:public_id>/assignments/create",
+        views.edit_assignment,
+        name="create_assignment",
+    ),
+    path(
+        "<uuid:public_id>/assignments/<int:assignment_pk>/edit",
+        views.edit_assignment,
+        name="edit_assignment",
+    ),
+    path(
         "<uuid:public_id>/assignments/<int:assignment_pk>/archive",
         views.archive_assignment,
         name="archive_assignment",

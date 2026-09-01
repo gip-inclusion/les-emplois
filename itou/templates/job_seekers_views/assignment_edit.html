@@ -1,0 +1,57 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+{% block title %}
+    Accompagnement de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information services_search_url=services_search_url service_search_event_option="services-search-from-assignment-edit" only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="c-form mb-3 mb-md-4">
+                        <form method="post" id="id-membership-form">
+                            {% csrf_token %}
+
+                            <h2 class="h3">Mon accompagnement</h2>
+
+                            {% bootstrap_form_errors form alert_error_type="all" %}
+
+                            {% if not is_new_assignment %}
+                                {% if form.is_ongoing.field.disabled %}
+                                    {% component_alert content=content variant="warning" extra_classes="mt-3 mb-3" %}
+                                        {% fragment as content %}
+                                            <p class="mb-0">Vous avez un accompagnement en cours avec cet usager.</p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                                {% bootstrap_field form.is_ongoing %}
+                            {% endif %}
+
+                            {% bootstrap_field form.reason %}
+                            {% component_info c_info__summary=c_info__summary extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Cette information sera visible aux autres accompagnateurs. N’inscrivez aucune information confidentielle dans ce champ.
+                                {% endfragment %}
+                            {% endcomponent_info %}
+
+                            {% itou_buttons_form primary_label=is_new_assignment|yesno:"Ajouter,Modifier" reset_url=back_url show_mandatory_fields_mention=False matomo_category="accompagnateur" matomo_action="submit" matomo_name=is_new_assignment|yesno:"ajouter,modifier"|add:"-accompagnement" %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
