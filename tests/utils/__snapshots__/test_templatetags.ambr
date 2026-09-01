@@ -630,7 +630,7 @@
   '''
 # ---
 # name: test_orientation_state_badge[EXPIR\xc9E]
-  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light">Expirée</span>'
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light text-primary">Expirée</span>'
 # ---
 # name: test_orientation_state_badge[OUVERTE]
   '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info">En cours de traitement</span>'
