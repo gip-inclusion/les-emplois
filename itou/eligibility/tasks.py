@@ -121,7 +121,7 @@ def certify_criterion_with_api_france_travail(criterion):
         # For rechercher_usager
         pe_client.needed_scopes |= {"api_rechercher-usagerv2", "profil_accedant", "rechercheusager"}
         # For rqth
-        pe_client.needed_scopes |= {"api_donnees-rqthv1"}
+        pe_client.needed_scopes |= {"api_donnees-rqthv1", "h2a"}
         user_found = False
         try:
             token = pe_client.rechercher_usager(jobseeker_profile=profile)

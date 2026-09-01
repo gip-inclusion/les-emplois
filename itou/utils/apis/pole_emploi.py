@@ -564,7 +564,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         return data["jetonUsager"]
 
     def rqth(self, jeton_usager):
-        self.needed_scopes |= {"api_donnees-rqthv1"}
+        self.needed_scopes |= {"api_donnees-rqthv1", "h2a"}
         data = self._request(
             f"{self.base_url}{Endpoints.RQTH}",
             method="GET",
