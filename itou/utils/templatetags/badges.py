@@ -173,7 +173,7 @@ def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
         OrientationStatus.PROCESSING: "bg-accent-03 text-primary",
         OrientationStatus.ACCEPTED: "bg-success",
         OrientationStatus.REFUSED: "bg-danger",
-        OrientationStatus.EXPIRED: "bg-emploi-light",
+        OrientationStatus.EXPIRED: "bg-emploi-light text-primary",
     }[orientation.status]
     attrs = [
         f'class="badge rounded-pill text-nowrap {extra_classes} {state_classes}"',
