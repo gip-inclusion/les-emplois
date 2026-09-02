@@ -21,7 +21,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -125,7 +125,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -229,7 +229,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -365,7 +365,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -425,7 +425,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -540,7 +540,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -657,7 +657,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -761,7 +761,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -865,7 +865,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -969,7 +969,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1073,7 +1073,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1177,7 +1177,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1281,7 +1281,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1385,7 +1385,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1567,7 +1567,7 @@
                                       </div>
                                   </div>
                                   <div>
-                                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                           <i aria-hidden="true" class="ri-arrow-right-line">
                                           </i>
                                           Depuis le 12/11/2025
@@ -1780,7 +1780,7 @@
                                       </div>
                                   </div>
                                   <div>
-                                      <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary">
+                                      <span class="badge badge-xs rounded-pill bg-disabled-color-light text-primary">
                                           <i aria-hidden="true" class="ri-time-line">
                                           </i>
                                           Du 12/11/2025 au 23/03/2026
@@ -2104,7 +2104,7 @@
                   Aucune structure associée
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 23/06/2026
@@ -2160,7 +2160,7 @@
                   Aucune structure associée
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 30/06/2026
@@ -2242,7 +2242,7 @@
                   Employeur pour ACME Inc.
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 23/06/2026
@@ -2322,7 +2322,7 @@
                           Aucune structure associée
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2399,7 +2399,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2476,7 +2476,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2586,7 +2586,7 @@
                           Aucune structure associée
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2631,7 +2631,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2725,7 +2725,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -10039,7 +10039,7 @@
                                                       Prescripteur habilité pour Pres. Org.
                                                   </span>
                                                   <div>
-                                                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                                           <i aria-hidden="true" class="ri-arrow-right-line">
                                                           </i>
                                                           Depuis le 14/08/2024
