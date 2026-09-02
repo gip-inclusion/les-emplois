@@ -163,7 +163,7 @@
                       <div class="c-title align-items-center">
                           <div class="c-title__main">
                               <h1>
-                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg" width="35"/>
+                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                   Fiches de poste
                                   <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                       <i aria-hidden="true" class="ri-check-line">
@@ -331,7 +331,7 @@
                       <div class="c-title align-items-center">
                           <div class="c-title__main">
                               <h1>
-                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg" width="35"/>
+                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                   Fiches de poste
                                   <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                       <i aria-hidden="true" class="ri-check-line">
@@ -341,7 +341,7 @@
                               </h1>
                           </div>
                           <div class="c-title__service d-none d-lg-block">
-                              <img alt="Les emplois de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                              <img alt="Les emplois de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion.svg"/>
                           </div>
                       </div>
                   </div>
@@ -411,7 +411,7 @@
                           <div class="col mb-3 mb-md-4">
                               <div class="c-box h-100">
                                   <div class="d-flex align-items-center gap-3">
-                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg" width="35"/>
+                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                       <div>
                                           <strong class="d-block fs-lg">
                                               Les emplois de l’inclusion
@@ -540,7 +540,7 @@
                           <div class="col mb-3 mb-md-4">
                               <div class="c-box h-100">
                                   <div class="d-flex align-items-center gap-3">
-                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg" width="35"/>
+                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                       <div>
                                           <strong class="d-block fs-lg">
                                               Les emplois de l’inclusion
