@@ -163,7 +163,7 @@
                       <div class="c-title align-items-center">
                           <div class="c-title__main">
                               <h1>
-                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
+                                  <img alt="La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                   Fiches de poste
                                   <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                       <i aria-hidden="true" class="ri-check-line">
@@ -331,7 +331,7 @@
                       <div class="c-title align-items-center">
                           <div class="c-title__main">
                               <h1>
-                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
+                                  <img alt="La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                   Fiches de poste
                                   <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                       <i aria-hidden="true" class="ri-check-line">
@@ -341,7 +341,7 @@
                               </h1>
                           </div>
                           <div class="c-title__service d-none d-lg-block">
-                              <img alt="Les emplois de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion.svg"/>
+                              <img alt="La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion.svg"/>
                           </div>
                       </div>
                   </div>
@@ -366,8 +366,8 @@
                               Se rattacher à une structure
                           </a>
                           <br/>
-                          <a aria-label="Découvrir Les emplois de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
-                              Découvrir Les emplois de l’inclusion
+                          <a aria-label="Découvrir La plateforme de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                              Découvrir La plateforme de l’inclusion
                           </a>
                       </div>
                   </div>
@@ -411,17 +411,17 @@
                           <div class="col mb-3 mb-md-4">
                               <div class="c-box h-100">
                                   <div class="d-flex align-items-center gap-3">
-                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
+                                      <img alt="La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                       <div>
                                           <strong class="d-block fs-lg">
-                                              Les emplois de l’inclusion
+                                              La plateforme de l’inclusion
                                           </strong>
                                           <p class="mb-0 fs-sm">
                                               Plateforme de l’inclusion
                                           </p>
                                       </div>
                                   </div>
-                                  <a aria-label="Accéder aux Emplois de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                                  <a aria-label="Accéder à La plateforme de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
                                       Accéder
                                   </a>
                               </div>
@@ -540,17 +540,17 @@
                           <div class="col mb-3 mb-md-4">
                               <div class="c-box h-100">
                                   <div class="d-flex align-items-center gap-3">
-                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
+                                      <img alt="La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion-mono.svg" width="35"/>
                                       <div>
                                           <strong class="d-block fs-lg">
-                                              Les emplois de l’inclusion
+                                              La plateforme de l’inclusion
                                           </strong>
                                           <p class="mb-0 fs-sm">
                                               Plateforme de l’inclusion
                                           </p>
                                       </div>
                                   </div>
-                                  <a aria-label="Accéder aux Emplois de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                                  <a aria-label="Accéder à La plateforme de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
                                       Accéder
                                   </a>
                               </div>

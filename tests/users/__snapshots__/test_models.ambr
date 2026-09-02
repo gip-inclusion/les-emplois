@@ -195,16 +195,16 @@
   '''
   Bonjour Monsieur John DOE,
   
-  Votre compte candidat vient d’être créé sur Les emplois de l’inclusion par Pierre DUPONT de Pres. Org..
+  Votre compte candidat vient d’être créé sur La plateforme de l’inclusion par Pierre DUPONT de Pres. Org..
   
   Pour finaliser votre inscription, merci de cliquer sur le lien suivant : [RESET PASSWORD LINK REMOVED]. Ce lien expirera dans 14 jours.
-  Dès votre arrivée sur le site des Emplois de l’inclusion, vous serez invité à définir un mot de passe pour votre compte candidat.
+  Dès votre arrivée sur le site de La plateforme de l’inclusion, vous serez invité à définir un mot de passe pour votre compte candidat.
   
   Cet e-mail a été généré et envoyé automatiquement, merci de ne pas y répondre.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l’inclusion
+  La plateforme de l’inclusion
   http://localhost:8000/
   '''
 # ---

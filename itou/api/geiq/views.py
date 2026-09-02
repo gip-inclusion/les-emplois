@@ -107,7 +107,7 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
         """
         # Liste des embauches réalisées en GEIQ
 
-        Retourne la liste complète des embauches réalisées en GEIQ connues de La plateforme de l'inclusion.
+        Retourne la liste complète des embauches réalisées en GEIQ connues de La plateforme de l’inclusion.
         Ces embauches représentent des candidatures acceptées.
 
         Elles ne seront plus listées par l'API une fois le contrat terminé.
