@@ -5149,7 +5149,7 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_déclinée" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature déclinée », si elle est passée par cet état\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_déclinée" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature déclinée », si elle est passée par cet état. Inclut les refus automatiques, qui ne sont pas une action de l\'\'employeur : filtrer sur candidature_refusée_automatiquement pour les exclure\'',
       }),
       dict({
         'origin': list([
@@ -5468,72 +5468,19 @@
                  "job_applications_jobapplication"."processed_at",
                  "job_applications_jobapplication"."contract_type",
           
-            (SELECT MIN(U0."timestamp") AS "first_timestamp"
+            (SELECT JSON_OBJECT(((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."transition" = %s)) RETURNING JSONB) AS "timestamps"
              FROM "job_applications_jobapplicationtransitionlog" U0
-             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                    AND U0."transition" = %s)
-             GROUP BY U0."job_application_id") AS "transition_accepted_date",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."transition" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_processing",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" IN (%s,
-                                                  %s))
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_accepted_or_refused",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_processing",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_postponed",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_prior_to_hire",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_accepted",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_refused",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_cancelled",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_obsolete",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "first_transition_delay_to_pool",
+             WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
+             GROUP BY U0."job_application_id") AS "first_transition_timestamps",
                  "users_user"."id",
                  "users_user"."first_name",
                  "users_user"."last_name",

@@ -22,7 +22,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import MobilizationEventKind
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplicationTransitionLog
+from itou.job_applications.models import JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.tables import geiq_assessments, job_applications, mobilization_events
 from itou.metabase.tables.utils import hash_content
@@ -624,6 +624,66 @@ def test_populate_job_applications_first_transition_delays(state):
     assert dict(zip(columns, row, strict=True)) == {
         column: datetime.timedelta(days=10) if column == expected_column else None for column in columns
     }
+
+
+@freeze_time("2026-03-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_job_applications_legacy_delays():
+    """`délai_prise_en_compte` filters on the `process` transition, not on the PROCESSING state.
+
+    The two are not perfectly interchangeable: `cancel_prior_to_hire` also lands on PROCESSING, so an application
+    going NEW -> PRIOR_TO_HIRE -> PROCESSING reaches that state without the employer ever invoking `process`.
+    The legacy column stays empty there while `délai_candidature_à_l_étude` is filled, which is why the
+    `process_transition` key is kept in FIRST_TRANSITION_FILTERS.
+    """
+    created_at = datetime.datetime(2023, 1, 2, tzinfo=datetime.UTC)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, created_at=created_at, state=JobApplicationState.ACCEPTED
+    )
+    for days, transition, from_state, to_state in [
+        (
+            5,
+            JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
+            JobApplicationState.NEW,
+            JobApplicationState.PRIOR_TO_HIRE,
+        ),
+        (
+            10,
+            JobApplicationWorkflow.TRANSITION_CANCEL_PRIOR_TO_HIRE,
+            JobApplicationState.PRIOR_TO_HIRE,
+            JobApplicationState.PROCESSING,
+        ),
+        (
+            40,
+            JobApplicationWorkflow.TRANSITION_ACCEPT,
+            JobApplicationState.PROCESSING,
+            JobApplicationState.ACCEPTED,
+        ),
+    ]:
+        JobApplicationTransitionLog.objects.create(
+            job_application=job_application,
+            transition=transition,
+            from_state=from_state,
+            to_state=to_state,
+            timestamp=created_at + datetime.timedelta(days=days),
+        )
+
+    management.call_command("populate_metabase_emplois", mode="job_applications")
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            'SELECT "date_embauche", "délai_prise_en_compte", "délai_de_réponse",'
+            ' "délai_candidature_à_l_étude", "délai_candidature_acceptée" FROM candidatures'
+        )
+        [row] = cursor.fetchall()
+
+    assert row == (
+        datetime.date(2023, 2, 11),  # date_embauche
+        None,  # délai_prise_en_compte: `process` was never invoked
+        datetime.timedelta(days=40),  # délai_de_réponse
+        datetime.timedelta(days=10),  # délai_candidature_à_l_étude
+        datetime.timedelta(days=40),  # délai_candidature_acceptée
+    )
 
 
 @freeze_time("2023-02-02")

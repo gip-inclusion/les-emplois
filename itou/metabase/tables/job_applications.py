@@ -1,7 +1,9 @@
 from operator import attrgetter
 
+from django.utils.dateparse import parse_datetime
+
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_choice,
@@ -77,9 +79,31 @@ def get_ja_sender_full_name_if_pe_or_spip(ja):
     return None
 
 
-def first_transition_delay_annotation(state):
-    """Intitulé de l'annotation portant le délai vers `state`."""
-    return f"first_transition_delay_to_{state.value}"
+FIRST_TRANSITION_FILTERS = {
+    **{
+        state.value: {"to_state": state}
+        for state in [state for state in JobApplicationState if state != JobApplicationState.NEW]
+    },
+    # Legacy, kept as is for the existing Metabase dashboards. This is the only transition based filter
+    # that is not redundant with a state based one: an application going NEW -> PRIOR_TO_HIRE -> PROCESSING
+    # never invokes `process`. See also `test_populate_job_applications_legacy_delays`.
+    "process_transition": {"transition": JobApplicationWorkflow.TRANSITION_PROCESS},
+}
+
+
+def _get_first_transition_timestamp(job_application, key):
+    timestamps = job_application.first_transition_timestamps
+    # None when the job application has no transition log at all
+    timestamp = timestamps[key] if timestamps else None
+    return parse_datetime(timestamp) if timestamp else None
+
+
+def _get_first_transition_delay(job_application, *keys):
+    """Delay from the job application creation to the earliest of its first transitions matching `keys`."""
+    timestamps = [
+        timestamp for key in keys if (timestamp := _get_first_transition_timestamp(job_application, key)) is not None
+    ]
+    return min(timestamps) - job_application.created_at if timestamps else None
 
 
 def first_transition_delay_column(state):
@@ -97,7 +121,7 @@ def first_transition_delay_column(state):
         "name": f"délai_{column_name}",
         "type": "interval",
         "comment": comment,
-        "fn": attrgetter(first_transition_delay_annotation(state)),
+        "fn": lambda o: _get_first_transition_delay(o, state.value),
     }
 
 
@@ -157,8 +181,9 @@ TABLE.add_columns(
             ),
         ),
         {
-            # TODO: mostly redundant with the `délai_candidature_à_l_étude` column generated below,
-            # remove once the Metabase dashboards have been migrated.
+            # TODO: mostly redundant with the `délai_candidature_à_l_étude` column generated below, see
+            # FIRST_TRANSITION_FILTERS for the edge case where they differ. Remove once the Metabase
+            # dashboards have been migrated.
             "name": "délai_prise_en_compte",
             "type": "interval",
             "comment": (
@@ -175,7 +200,9 @@ TABLE.add_columns(
                 "Temps écoulé rétroactivement de état nouveau à état accepté"
                 " ou refusé si la candidature est passée par ces états"
             ),
-            "fn": attrgetter("time_spent_from_new_to_accepted_or_refused"),
+            "fn": lambda o: _get_first_transition_delay(
+                o, JobApplicationState.ACCEPTED.value, JobApplicationState.REFUSED.value
+            ),
         },
         *[
             first_transition_delay_column(state)
@@ -254,7 +281,7 @@ TABLE.add_columns(
             "name": "date_embauche",
             "type": "date",
             "comment": "Date embauche le cas échéant",
-            "fn": attrgetter("transition_accepted_date"),
+            "fn": lambda o: _get_first_transition_timestamp(o, JobApplicationState.ACCEPTED.value),
         },
         {
             "name": "injection_ai",
