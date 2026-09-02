@@ -3677,7 +3677,7 @@
       <p>
           Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
       </p>
-      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/refusal-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           <span>
               Modifier le motif de refus
           </span>
@@ -3709,7 +3709,7 @@
               
               tant que le bilan n'a pas été validé.
       </p>
-      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/refusal-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           <span>
               Justifier le refus
           </span>
@@ -3771,7 +3771,7 @@
       <p>
           Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
       </p>
-      <a class="btn btn-outline-primary bg-white btn-block mb-3 disabled" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3 disabled" href="/geiq-assessments/contracts/[PK of EmployeeContract]/refusal-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           <span>
               Modifier le motif de refus
           </span>
@@ -3795,7 +3795,7 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" type="submit">
               Solliciter l’aide
@@ -3821,7 +3821,7 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
@@ -3831,7 +3831,7 @@
               </span>
           </button>
       </form>
-      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           Modifier votre justification
       </a>
   </div>
@@ -3856,7 +3856,7 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
@@ -3866,7 +3866,7 @@
               </span>
           </button>
       </form>
-      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           Justifier la demande d’aide
       </a>
   </div>
@@ -3882,7 +3882,7 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" type="submit">
               Solliciter l’aide
@@ -3901,7 +3901,7 @@
       <p>
           Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-primary btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
@@ -3924,7 +3924,7 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" disabled="" type="submit">
               Solliciter l’aide
@@ -3950,7 +3950,7 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" disabled="" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
@@ -3960,7 +3960,7 @@
               </span>
           </button>
       </form>
-      <a class="btn btn-primary btn-block mt-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+      <a class="btn btn-primary btn-block mt-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification?back_url=/geiq-assessments/[PK of Assessment]/contracts">
           Modifier votre justification
       </a>
   </div>
@@ -3976,7 +3976,7 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" disabled="" type="submit">
               Solliciter l’aide
@@ -3995,7 +3995,7 @@
       <p>
           Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude?back_url=/geiq-assessments/[PK of Assessment]/contracts" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-primary btn-block" disabled="" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
@@ -5457,7 +5457,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPOND Jean-Pierre
                                           </a>
                                           <i aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." class="ri-file-warning-line ri-lg text-warning" data-bs-placement="top" data-bs-title="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -5493,7 +5493,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -5527,7 +5527,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
@@ -5556,7 +5556,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Vous avez motivé la demande d’aide de ce contrat" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -5746,7 +5746,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPOND Jean-Pierre
                                           </a>
                                           <i aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." class="ri-file-warning-line ri-lg text-warning" data-bs-placement="top" data-bs-title="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -5782,7 +5782,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -5816,7 +5816,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
@@ -5845,7 +5845,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Vous avez motivé la demande d’aide de ce contrat" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6082,7 +6082,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPOND Jean-Pierre
                                           </a>
                                           <i aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." class="ri-file-warning-line ri-lg text-warning" data-bs-placement="top" data-bs-title="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -6118,7 +6118,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -6152,7 +6152,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
@@ -6181,7 +6181,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Vous devez encore motiver la demande d’aide de ce contrat" class="ri-error-warning-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6942,7 +6942,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONS Pean-Jierre
                                           </a>
                                       </td>
@@ -6954,7 +6954,7 @@
                                       </td>
                                       <td>
                                           Non
-                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract">
+                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               <i aria-label="Le GEIQ a motivé cette demande d’aide" class="ri-information-line ri-xl" role="button" tabindex="0">
                                               </i>
                                           </a>
@@ -6975,7 +6975,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6984,7 +6984,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -7013,7 +7013,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -7022,7 +7022,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
@@ -7218,7 +7218,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONS Pean-Jierre
                                           </a>
                                       </td>
@@ -7230,7 +7230,7 @@
                                       </td>
                                       <td>
                                           Non
-                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract">
+                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               <i aria-label="Le GEIQ a motivé cette demande d’aide" class="ri-information-line ri-xl" role="button" tabindex="0">
                                               </i>
                                           </a>
@@ -7251,7 +7251,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -7260,7 +7260,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -7289,7 +7289,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -7298,7 +7298,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
@@ -7541,7 +7541,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONS Pean-Jierre
                                           </a>
                                       </td>
@@ -7553,7 +7553,7 @@
                                       </td>
                                       <td>
                                           Non
-                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract">
+                                          <a class="text-info text-decoration-none lh-1" data-bs-title="Le GEIQ a motivé cette demande d’aide" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/contract?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               <i aria-label="Le GEIQ a motivé cette demande d’aide" class="ri-information-line ri-xl" role="button" tabindex="0">
                                               </i>
                                           </a>
@@ -7574,7 +7574,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver le refus pour ce contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver le refus pour ce contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-error-warning-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -7583,7 +7583,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               DUPONT Jean
                                           </a>
                                       </td>
@@ -7612,7 +7612,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                                   <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -7621,7 +7621,7 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
                                               MARTIN Cécile
                                           </a>
                                       </td>
