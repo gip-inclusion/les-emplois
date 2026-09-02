@@ -781,7 +781,7 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
             employee_record = (
                 EmployeeRecord.objects.select_for_update(of=("self",), no_key=True)
                 .select_related("job_application__approval")
-                .get()
+                .get(pk=self.employee_record.pk)
             )
             _check_and_remove_watched_data_updated_at(employee_record, archive)
             if employee_record.watched_data_updated_at is None:
