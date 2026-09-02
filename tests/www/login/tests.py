@@ -141,7 +141,7 @@ class TestPreLogin:
 
     def test_login_show_redirect_from_old_domain_notice(self, client):
         pre_login_url = reverse("account_login")
-        marker = "Vous venez de l’ancienne adresse"
+        marker = "Vous arrivez de l’ancienne adresse"
 
         response = client.get(pre_login_url)
         assertNotContains(response, marker)
