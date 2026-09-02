@@ -117,6 +117,7 @@ def test_update_with_approval_extension(factory, status):
 def test_notification_process_with_watched_data_updated_at_and_uptodate_approval_dates(faker):
     employee_record = EmployeeRecordFactory(status=Status.PROCESSED, watched_data_updated_at=timezone.now())
     notification = EmployeeRecordUpdateNotificationFactory(employee_record=employee_record)
+    EmployeeRecordUpdateNotificationFactory()  # Create an extra employee record to make sure we use a filter :'-(
 
     notification.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
     process_code, process_message = (
