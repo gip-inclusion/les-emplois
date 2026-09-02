@@ -494,6 +494,10 @@ class Command(BaseCommand):
                 time_spent_from_new_to_accepted_or_refused=time_spent_from_new_to(
                     to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED]
                 ),
+                **{
+                    job_applications.first_transition_delay_annotation(state): time_spent_from_new_to(to_state=state)
+                    for state in [state for state in JobApplicationState if state != JobApplicationState.NEW]
+                },
             )
             .only(
                 "archived_at",

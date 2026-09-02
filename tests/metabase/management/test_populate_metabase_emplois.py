@@ -22,8 +22,9 @@ from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import MobilizationEventKind
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplicationTransitionLog
 from itou.jobs.models import Rome
-from itou.metabase.tables import geiq_assessments, mobilization_events
+from itou.metabase.tables import geiq_assessments, job_applications, mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider
@@ -545,9 +546,17 @@ def test_populate_job_applications(snapshot):
                 "Employeur GEIQ",
                 ja.sender_company.pk,
                 "default",
-                None,
-                None,
-                None,
+                None,  # délai_prise_en_compte
+                None,  # délai_de_réponse
+                None,  # délai_candidature_à_l_étude
+                None,  # délai_candidature_en_attente
+                None,  # délai_action_préalable_à_l_embauche
+                None,  # délai_candidature_acceptée
+                None,  # délai_candidature_déclinée
+                None,  # délai_embauche_annulée
+                None,  # délai_embauché_ailleurs
+                None,  # délai_vivier_de_candidatures
+                None,  # motif_de_refus
                 ja.job_seeker_id,
                 ja.to_company_id,
                 ja.to_company.kind,
@@ -584,6 +593,37 @@ def test_populate_job_applications(snapshot):
                 datetime.date(2023, 2, 2),
             ),
         ]
+
+
+@freeze_time("2023-03-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize(
+    "state", [state for state in JobApplicationState if state != JobApplicationState.NEW], ids=str
+)
+def test_populate_job_applications_first_transition_delays(state):
+    created_at = datetime.datetime(2023, 1, 2, tzinfo=datetime.UTC)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, created_at=created_at, state=state)
+    for days in [10, 20]:  # Only the first transition to a given state should count
+        JobApplicationTransitionLog.objects.create(
+            job_application=job_application,
+            to_state=state,
+            timestamp=created_at + datetime.timedelta(days=days),
+        )
+
+    management.call_command("populate_metabase_emplois", mode="job_applications")
+
+    columns = [
+        job_applications.first_transition_delay_column(s)["name"]
+        for s in [state for state in JobApplicationState if state != JobApplicationState.NEW]
+    ]
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT {', '.join(f'"{column}"' for column in columns)} FROM candidatures")
+        [row] = cursor.fetchall()
+
+    expected_column = job_applications.first_transition_delay_column(state)["name"]
+    assert dict(zip(columns, row, strict=True)) == {
+        column: datetime.timedelta(days=10) if column == expected_column else None for column in columns
+    }
 
 
 @freeze_time("2023-02-02")

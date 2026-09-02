@@ -77,6 +77,30 @@ def get_ja_sender_full_name_if_pe_or_spip(ja):
     return None
 
 
+def first_transition_delay_annotation(state):
+    """Intitulé de l'annotation portant le délai vers `state`."""
+    return f"first_transition_delay_to_{state.value}"
+
+
+def first_transition_delay_column(state):
+    column_name = state.label.lower().replace("'", "_").replace("’", "_").replace(" ", "_")
+    comment = (
+        "Temps écoulé entre la création de la candidature et son premier passage"
+        f" par l'état « {state.label} », si elle est passée par cet état"
+    )
+    if state == JobApplicationState.REFUSED:
+        comment += (
+            ". Inclut les refus automatiques, qui ne sont pas une action de l'employeur :"
+            " filtrer sur candidature_refusée_automatiquement pour les exclure"
+        )
+    return {
+        "name": f"délai_{column_name}",
+        "type": "interval",
+        "comment": comment,
+        "fn": attrgetter(first_transition_delay_annotation(state)),
+    }
+
+
 TABLE = MetabaseTable(name="candidatures")
 TABLE.add_columns(
     [
@@ -133,14 +157,18 @@ TABLE.add_columns(
             ),
         ),
         {
+            # TODO: mostly redundant with the `délai_candidature_à_l_étude` column generated below,
+            # remove once the Metabase dashboards have been migrated.
             "name": "délai_prise_en_compte",
             "type": "interval",
             "comment": (
                 "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
             ),
-            "fn": attrgetter("time_spent_from_new_to_processing"),
+            "fn": lambda o: _get_first_transition_delay(o, "process_transition"),
         },
         {
+            # TODO: redundant with the `délai_candidature_acceptée` and `délai_candidature_déclinée`
+            # columns generated below, remove once the Metabase dashboards have been migrated.
             "name": "délai_de_réponse",
             "type": "interval",
             "comment": (
@@ -149,6 +177,10 @@ TABLE.add_columns(
             ),
             "fn": attrgetter("time_spent_from_new_to_accepted_or_refused"),
         },
+        *[
+            first_transition_delay_column(state)
+            for state in [state for state in JobApplicationState if state != JobApplicationState.NEW]
+        ],
         {
             "name": "motif_de_refus",
             "type": "varchar",
