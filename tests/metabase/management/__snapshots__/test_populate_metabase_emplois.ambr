@@ -4871,7 +4871,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 44,
+    'num_queries': 52,
     'queries': list([
       dict({
         'origin': list([
@@ -4932,7 +4932,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_candidatures" ("id" UUID,
-                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"id_utilisateur_origine_candidature" integer,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"nombre_caracteres_message_candidature" integer,"date_mise_à_jour_metabase" date)
+                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"délai_candidature_à_l_étude" interval,"délai_candidature_en_attente" interval,"délai_action_préalable_à_l_embauche" interval,"délai_candidature_acceptée" interval,"délai_candidature_déclinée" interval,"délai_embauche_annulée" interval,"délai_embauché_ailleurs" interval,"délai_vivier_de_candidatures" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"id_utilisateur_origine_candidature" integer,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"nombre_caracteres_message_candidature" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -5090,6 +5090,102 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_de_réponse" IS \'Temps écoulé rétroactivement de état nouveau à état accepté ou refusé si la candidature est passée par ces états\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_à_l_étude" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature à l\'\'étude », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_en_attente" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature en attente », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_action_préalable_à_l_embauche" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Action préalable à l’embauche », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_acceptée" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature acceptée », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_candidature_déclinée" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Candidature déclinée », si elle est passée par cet état. Inclut les refus automatiques, qui ne sont pas une action de l\'\'employeur : filtrer sur candidature_refusée_automatiquement pour les exclure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_embauche_annulée" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Embauche annulée », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_embauché_ailleurs" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Embauché ailleurs », si elle est passée par cet état\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."délai_vivier_de_candidatures" IS \'Temps écoulé entre la création de la candidature et son premier passage par l\'\'état « Vivier de candidatures », si elle est passée par cet état\'',
       }),
       dict({
         'origin': list([
@@ -5372,24 +5468,19 @@
                  "job_applications_jobapplication"."processed_at",
                  "job_applications_jobapplication"."contract_type",
           
-            (SELECT MIN(U0."timestamp") AS "first_timestamp"
+            (SELECT JSON_OBJECT(((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."transition" = %s)) RETURNING JSONB) AS "timestamps"
              FROM "job_applications_jobapplicationtransitionlog" U0
-             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                    AND U0."transition" = %s)
-             GROUP BY U0."job_application_id") AS "transition_accepted_date",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."transition" = %s)
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_processing",
-                 (
-                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
-                     FROM "job_applications_jobapplicationtransitionlog" U0
-                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                            AND U0."to_state" IN (%s,
-                                                  %s))
-                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_accepted_or_refused",
+             WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
+             GROUP BY U0."job_application_id") AS "first_transition_timestamps",
                  "users_user"."id",
                  "users_user"."first_name",
                  "users_user"."last_name",
@@ -5476,6 +5567,14 @@
                                      "parcours_de_création",
                                      "délai_prise_en_compte",
                                      "délai_de_réponse",
+                                     "délai_candidature_à_l_étude",
+                                     "délai_candidature_en_attente",
+                                     "délai_action_préalable_à_l_embauche",
+                                     "délai_candidature_acceptée",
+                                     "délai_candidature_déclinée",
+                                     "délai_embauche_annulée",
+                                     "délai_embauché_ailleurs",
+                                     "délai_vivier_de_candidatures",
                                      "motif_de_refus",
                                      "id_candidat",
                                      "id_structure",
