@@ -86,6 +86,20 @@ def log_retry_attempt(retry_state):
     logging.info("Attempt failed with outcome=%s", retry_state.outcome)
 
 
+def first_transition_timestamp(**filters):
+    """Timestamp of the outer job application's first transition matching `filters`."""
+    return (
+        JobApplicationTransitionLog.objects.filter(job_application=OuterRef("pk"), **filters)
+        .values("job_application")
+        .annotate(first_timestamp=Min("timestamp"))
+        .values("first_timestamp")
+    )
+
+
+def time_spent_from_new_to(**filters):
+    return Subquery(first_transition_timestamp(**filters)) - F("created_at")
+
+
 class Command(BaseCommand):
     help = "Populate metabase database."
 
@@ -471,33 +485,15 @@ class Command(BaseCommand):
             .exclude(origin=Origin.PE_APPROVAL)
             .filter(to_company_id__in=Company.objects.active())
             .annotate(
-                transition_accepted_date=JobApplicationTransitionLog.objects.filter(
-                    job_application=OuterRef("pk"),
-                    transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
-                )
-                .values("job_application")
-                .annotate(first_timestamp=Min("timestamp"))
-                .values("first_timestamp"),
-                time_spent_from_new_to_processing=Subquery(
-                    JobApplicationTransitionLog.objects.filter(
-                        job_application=OuterRef("pk"),
-                        transition=JobApplicationWorkflow.TRANSITION_PROCESS,
-                    )
-                    .values("job_application")
-                    .annotate(first_timestamp=Min("timestamp"))
-                    .values("first_timestamp")
-                )
-                - F("created_at"),
-                time_spent_from_new_to_accepted_or_refused=Subquery(
-                    JobApplicationTransitionLog.objects.filter(
-                        job_application=OuterRef("pk"),
-                        to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED],
-                    )
-                    .values("job_application")
-                    .annotate(first_timestamp=Min("timestamp"))
-                    .values("first_timestamp")
-                )
-                - F("created_at"),
+                transition_accepted_date=first_transition_timestamp(
+                    transition=JobApplicationWorkflow.TRANSITION_ACCEPT
+                ),
+                time_spent_from_new_to_processing=time_spent_from_new_to(
+                    transition=JobApplicationWorkflow.TRANSITION_PROCESS
+                ),
+                time_spent_from_new_to_accepted_or_refused=time_spent_from_new_to(
+                    to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED]
+                ),
             )
             .only(
                 "archived_at",
