@@ -128,7 +128,7 @@
             {% endif %}
         </ul>
         {% if assignment.advisor == request.user and assignment.organization == request.current_organization and not assignment.reason %}
-            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4 mt-3" %}
+            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0 mt-3" %}
                 {% fragment as c_info__summary %}
                     Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
                 {% endfragment %}
