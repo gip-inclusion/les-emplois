@@ -1,9 +1,9 @@
 {% if with_button %}
     <span class="btn btn-ico btn-block btn-outline-primary mt-3">
-        <strong>{{ info }}</strong>
+        <strong class="text-truncate">{{ info }}</strong>
         {% include 'includes/copy_to_clipboard.html' with content=info css_classes="btn-link" only_icon=True %}
     </span>
 {% else %}
-    <strong>{{ info }}</strong>
+    <strong class="text-truncate">{{ info }}</strong>
     {% include 'includes/copy_to_clipboard.html' with content=info css_classes="btn-link" only_icon=True %}
 {% endif %}
