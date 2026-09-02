@@ -36,8 +36,7 @@
                                 <div class="col mb-3 mb-md-4">
                                     {% brand as brand_name %}
                                     {% brand "à" as brand_a %}
-                                    {# TODO(branding): logo à basculer (logo-plateforme-inclusion) au flip du nom #}
-                                    {% component_box_nexus_activated_service name=brand_name logo="logo-emploi-inclusion-mono.svg" url=emplois_url aria_label="Accéder "|add:brand_a service=Service.EMPLOIS %}
+                                    {% component_box_nexus_activated_service name=brand_name logo="logo-plateforme-inclusion-mono.svg" url=emplois_url aria_label="Accéder "|add:brand_a service=Service.EMPLOIS %}
                                     {% endcomponent_box_nexus_activated_service %}
                                 </div>
                             {% endif %}
