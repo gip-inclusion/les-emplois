@@ -919,8 +919,6 @@ JOB_APPLICATIONS_SHOW_EXTERNAL_PERIOD = datetime.timedelta(
 pdi_jwt_key = os.getenv("PDI_JWT_KEY")
 PDI_JWT_KEY = json.loads(pdi_jwt_key) if pdi_jwt_key else None
 
-ENABLED_RECOMMENDATIONS_SAFIR_CODES = os.getenv("ENABLED_RECOMMENDATIONS_SAFIR_CODES", "").split(",")
-
 
 def _read_id_list(relative_path: str) -> set:
     path = pathlib.Path(itou.__path__[0]) / relative_path

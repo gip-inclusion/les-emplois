@@ -1,5 +1,4 @@
 from django import template
-from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -314,21 +313,6 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="institution-geiq-bilan-execution",
     ),
-    # Recommandations (only for members of FT organizations matching ENABLED_RECOMMENDATIONS_SAFIR_CODES setting)
-    "recommendations": NavItem(
-        label="Actions recommandées",
-        icon="ri-lightbulb-line",
-        target=reverse("recommendations:beneficiary_list"),
-        active_view_names=[
-            "recommendations:beneficiary_list",
-            "recommendations:beneficiary_profile",
-            "recommendations:beneficiary_actions",
-        ],
-        matomo_event_category="recommendations",
-        matomo_event_name="clic",
-        matomo_event_option="recommendations-list-jobseekers",
-        is_beta=True,
-    ),
 }
 
 
@@ -367,8 +351,6 @@ def nav(request):
                     items=organization_items,
                 )
             )
-            if request.current_organization.code_safir_pole_emploi in settings.ENABLED_RECOMMENDATIONS_SAFIR_CODES:
-                menu_items.append(NAV_ENTRIES["recommendations"])
         elif request.from_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
