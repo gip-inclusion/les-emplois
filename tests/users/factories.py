@@ -120,10 +120,14 @@ class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF
 
 
-class PrescriberFactory(UserFactory):
+class ProfessionalFactory(UserFactory):
+    """A pro user with no membership"""
+
     kind = UserKind.PROFESSIONAL
     identity_provider = IdentityProvider.PRO_CONNECT
 
+
+class PrescriberFactory(ProfessionalFactory):
     class Params:
         for_snapshot = factory.Trait(
             first_name="Pierre",
@@ -153,10 +157,7 @@ class PrescriberFactory(UserFactory):
             settings.disabled_notifications.set(NotificationRecord.objects.all())
 
 
-class EmployerFactory(UserFactory):
-    kind = UserKind.PROFESSIONAL
-    identity_provider = IdentityProvider.PRO_CONNECT
-
+class EmployerFactory(ProfessionalFactory):
     @factory.post_generation
     def membership(self, created, extracted, **kwargs):
         from tests.companies.factories import CompanyMembershipFactory
@@ -174,8 +175,8 @@ class EmployerFactory(UserFactory):
             settings.disabled_notifications.set(NotificationRecord.objects.all())
 
 
-class LaborInspectorFactory(UserFactory):
-    kind = UserKind.PROFESSIONAL
+class LaborInspectorFactory(ProfessionalFactory):
+    identity_provider = IdentityProvider.DJANGO
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
