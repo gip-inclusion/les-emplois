@@ -167,7 +167,7 @@ def test_edit_with_wrong_address(client, mocker):
     # Go to next step: summary
     url = response.redirect_chain[-1][0]
     post_data = {
-        "description": "Le meilleur des SIAEs !",
+        "description": "Le meilleur des SIAEs !",
         "provided_support": "On est très très forts pour tout",
     }
     response = client.post(url, data=post_data, follow=True)

@@ -174,11 +174,11 @@
   
   John DOE identifié avec l'adresse email john.doe@test.local souhaite devenir administrateur de la structure ACME Inc. (EI).
   
-  Ce statut permet d'avoir accès à certaines fonctionnalités, la liste complète est disponible ici : https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409.
+  Ce statut permet d'avoir accès à certaines fonctionnalités, la liste complète est disponible ici : https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409.
   
   Pour des raisons de sécurité nous vous invitons à vérifier que cette demande émane bien de John DOE.
   
-  Cliquez sur le lien suivant pour attribuer le statut d'administrateur à John DOE - john.doe@test.local :
+  Cliquez sur le lien suivant pour attribuer le statut d'administrateur à John DOE - john.doe@test.local :
   http://localhost:8000/company/confirm_admin_role/1000/d2f6o0-d1d01e00e170c0d5fd20
   
   Si vous ne souhaitez pas donner suite à cette demande, merci de ne pas prendre en compte ce message.

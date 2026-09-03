@@ -47,7 +47,7 @@
                         {% component_alert content=content variant="warning" title="Votre organisation ne compte actuellement aucun administrateur" %}
                             {% fragment as content %}
                                 <p>
-                                    Si vous estimez devoir assumer ce rôle, veuillez en faire la demande en cliquant sur ce lien :
+                                    Si vous estimez devoir assumer ce rôle, veuillez en faire la demande en cliquant sur ce lien :
                                     un e-mail sera envoyé à l'adresse d'authentification de l'entreprise.
                                 </p>
                                 <form method="post" action="{% url 'companies_views:request_admin_role' %}">
