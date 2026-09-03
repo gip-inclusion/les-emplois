@@ -131,7 +131,6 @@ INSTALLED_APPS = [
     "itou.archive",
     "itou.nexus",
     "itou.insertion",
-    "itou.recommendations",
     "itoutils.django.decoupage_administratif",
 ]
 
@@ -499,8 +498,6 @@ API_ESD = {
     "KEY": os.getenv("API_ESD_KEY"),
     "SECRET": os.getenv("API_ESD_SECRET"),
     "BASE_URL": os.getenv("API_ESD_BASE_URL"),
-    "RECOMMENDATIONS_KEY": os.getenv("API_ESD_RECOMMENDATIONS_KEY"),
-    "RECOMMENDATIONS_SECRET": os.getenv("API_ESD_RECOMMENDATIONS_SECRET"),
 }
 
 # France Travail Connect - technically one of ESD's APIs.
