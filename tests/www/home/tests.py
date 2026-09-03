@@ -8,12 +8,15 @@ from tests.users.factories import PrescriberFactory
 def test_home_anonymous(client):
     url = reverse("home:hp")
     response = client.get(url, follow=True)
-    assertRedirects(response, reverse("search:employers_home"))
-    assertContains(response, "Rechercher un emploi inclusif")
+    assertRedirects(response, reverse("search:home"))
+    assertContains(
+        response,
+        'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?host=localhost%3A8000"',
+    )
 
     query = {REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM: "1"}
     response = client.get(url, query_params=query)
-    assertRedirects(response, reverse("search:employers_home", query=query))
+    assertRedirects(response, reverse("search:home", query=query))
 
 
 def test_home_logged_in(client):

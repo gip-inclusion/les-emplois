@@ -2,7 +2,7 @@ import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.www.search_views.forms import ServiceSearchForm
 from tests.cities.factories import create_city_vannes
@@ -27,13 +27,15 @@ class TestSearchServices:
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:services_home"))
-        assertContains(response, "Rechercher un service d'insertion")
+        assertContains(
+            response,
+            'data-plateforme-accueil="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud?host=localhost%3A8000&amp;type=insertion"',
+        )
 
     def test_home_connected(self, client):
         client.force_login(EmployerFactory(membership=True))
-        with pytest.warns(RuntimeWarning, match="Access to 'search_services_home' while authenticated"):
-            response = client.get(reverse("search:services_home"))
-        assertRedirects(response, reverse("search:services_results"))
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
+            client.get(reverse("search:services_home"))
 
     def test_invalid_query_parameters(self, client):
         response = client.get(self.URL, {"city": "foo-44", "category": "foobar"})

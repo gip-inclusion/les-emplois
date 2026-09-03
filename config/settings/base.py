@@ -709,6 +709,12 @@ MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
 MATOMO_SITE_ID = os.getenv("MATOMO_SITE_ID")
 MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
+# Landing page embedded in an iframe on the search home, served by the
+# "plateforme-accueil" application.
+PLATEFORME_ACCUEIL_BASE_URL = os.getenv(
+    "PLATEFORME_ACCUEIL_BASE_URL", "https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud"
+)
+
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
 csp_img_src = [
@@ -747,6 +753,7 @@ SECURE_CSP = {
         "data:",  # Because of tarteaucitron.js
     ],
     "frame-ancestors": [
+        CSP.SELF,
         "https://pilotage.inclusion.beta.gouv.fr",
     ],
     "frame-src": [
@@ -756,6 +763,8 @@ SECURE_CSP = {
         "https://pilotage.inclusion.beta.gouv.fr",
         "https://inclusion.beta.gouv.fr",
         "https://api.data.inclusion.gouv.fr",
+        # Homepage
+        PLATEFORME_ACCUEIL_BASE_URL,
         "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
         "data:",  # For downloading Metabase questions as PNG on Firefox etc
     ],

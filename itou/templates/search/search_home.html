@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Les emplois de l'inclusion{% endblock %}
+
+{% block body_class %}p-home{% endblock %}
+
+{% block content %}
+    {# src is set by plateforme_accueil_embed.js, once it can catch the first resize message. #}
+    <iframe id="iframe-plateforme-accueil" data-plateforme-accueil="{{ iframe_url }}" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
+{% endblock %}
+
+{% block extra_script_files %}
+    <script src="{% static 'js/plateforme_accueil_embed.js' %}"></script>
+    <script src="{% static 'js/plateforme_accueil_matomo.js' %}"></script>
+{% endblock %}

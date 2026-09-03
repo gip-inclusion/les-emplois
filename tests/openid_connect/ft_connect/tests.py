@@ -279,7 +279,7 @@ class TestPoleEmploiConnect:
     def test_callback_other_missing_data(self, client):
         user_info = FT_CONNECT_USERINFO.copy()
         del user_info["given_name"]
-        mock_oauth_dance(client, user_info=user_info, expected_route="search:employers_home")
+        mock_oauth_dance(client, user_info=user_info, expected_route="search:home")
         assert not User.objects.exists()
 
     @respx.mock
@@ -447,7 +447,7 @@ class TestPoleEmploiConnect:
         response = client.get(url, data={"id_token": "123"})
         expected_url = (
             f"{constants.FRANCETRAVAIL_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
-            "redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
+            "redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2F"
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)
 

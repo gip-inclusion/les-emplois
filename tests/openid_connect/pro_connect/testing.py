@@ -115,7 +115,7 @@ def mock_oauth_dance(
         expected = reverse(
             "pro_connect:logout",
             query={
-                "redirect_url": previous_url or reverse("search:employers_home"),
+                "redirect_url": previous_url or reverse("search:home"),
                 "token": id_token,
             },
         )
@@ -123,7 +123,7 @@ def mock_oauth_dance(
     return response, id_token
 
 
-def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_url=reverse("search:employers_home")):
+def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_url=reverse("search:home")):
     expected_logout_url = add_url_params(
         reverse("pro_connect:logout"),
         {"redirect_url": expected_redirect_url, "token": id_token},

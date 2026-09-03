@@ -75,6 +75,9 @@ MATOMO_SITE_ID = 220
 SECURE_CSP["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
 SECURE_CSP["script-src"].append(MATOMO_BASE_URL)  # noqa: F405
 SECURE_CSP["connect-src"].append(MATOMO_BASE_URL)  # noqa: F405
+SECURE_CSP["frame-src"].append("http://localhost:*")  # noqa: F405
+SECURE_CSP["script-src"].append("http://localhost:*")  # noqa: F405
+SECURE_CSP["script-src-elem"].append("http://localhost:*")  # noqa: F405
 
 # use almost the same settings for metabase as base PG.
 PILOTAGE_DATASTORE_DB_HOST = os.getenv("PILOTAGE_DATASTORE_DB_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405

@@ -77,7 +77,7 @@
                                       </small>
                                       <div class="form-row align-items-center justify-content-end gx-3">
                                           <div class="form-group col-12 col-lg order-3 order-lg-1">
-                                              <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/employers">
+                                              <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/">
                                                   <i aria-hidden="true" class="ri-close-line ri-lg">
                                                   </i>
                                                   <span>
@@ -232,7 +232,7 @@
                                   <hr class="mb-3"/>
                                   <div class="form-row align-items-center justify-content-end gx-3">
                                       <div class="form-group col-12 col-lg order-3 order-lg-1">
-                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/employers">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/">
                                               <i aria-hidden="true" class="ri-close-line ri-lg">
                                               </i>
                                               <span>
