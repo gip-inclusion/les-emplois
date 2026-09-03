@@ -773,7 +773,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         default=list,
     )
     # `documents` are saved but not displayed for now; we still display `attachments` until we stop posting to DORA
-    documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="+")  #
+    documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="orientations")  #
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -823,6 +823,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def attachments_details(self):
         return [(form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.attachments]
+
+    @property
+    def documents_details(self):
+        return [
+            (
+                document.key.split("/")[-1],
+                reverse("insertion_views:document_download", kwargs={"document_id": document.pk}),
+            )
+            for document in self.documents.all()
+        ]
 
     @property
     def beneficiary_contact_preferences_display(self):

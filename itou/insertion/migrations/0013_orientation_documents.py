@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="orientation",
             name="documents",
-            field=models.ManyToManyField(related_name="+", to="files.file", verbose_name="documents joints"),
+            field=models.ManyToManyField(related_name="orientations", to="files.file", verbose_name="documents joints"),
         ),
     ]

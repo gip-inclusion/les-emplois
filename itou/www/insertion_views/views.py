@@ -1,3 +1,4 @@
+import datetime
 import enum
 import functools
 import logging
@@ -7,11 +8,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
@@ -20,7 +22,7 @@ from itoutils.django.decoupage_administratif.admin_division_parsing import get_d
 from rest_framework import status
 
 from itou.companies.models import Company
-from itou.files.models import save_file
+from itou.files.models import File, save_file
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind, OrientationStatus
@@ -660,7 +662,7 @@ def orientation_details_for_sender(request, orientation_id):
     orientation = get_object_or_404(
         insertion_models.Orientation.objects.select_related(
             "beneficiary", "service", "service__structure", "service__source"
-        ),
+        ).prefetch_related("documents"),
         id=orientation_id,
         sender_prescriber_organization=sender_prescriber_organization,
         sender_company=sender_company,
@@ -691,7 +693,7 @@ def orientation_details_for_service_provider(request):
             "orientation__service",
             "orientation__service__structure",
             "orientation__service__source",
-        ),
+        ).prefetch_related("orientation__documents"),
         id=request.GET.get("token"),
     )
     if not link.is_valid:
@@ -767,6 +769,60 @@ def orientation_details_for_service_provider(request):
     }
 
     return render(request, template_name, context)
+
+
+@readonly_view
+@login_not_required
+def document_download(request, document_id):
+    # FIXME: tests
+    user = request.user
+
+    link = None
+    if user.is_authenticated:
+        orientation_filter = {}
+        if request.from_prescriber:
+            orientation_filter = {"sender_prescriber_organization": request.current_organization}
+        elif request.from_employer:
+            orientation_filter = {"sender_company": request.current_organization}
+        else:
+            raise Http404
+
+        orientation_subquery = insertion_models.Orientation.objects.filter(
+            Q(sender=request.user) | Q(**orientation_filter)
+        )
+        queryset = File.objects.filter(orientations__in=orientation_subquery)
+
+    elif token_id := request.GET.get("token"):
+        is_valid_filter = Q(
+            created_at__gte=timezone.now()
+            - datetime.timedelta(seconds=insertion_models.OrientationProcessLink.MAX_VALIDTITY_SECONDS)
+        )
+        link = get_object_or_404(
+            insertion_models.OrientationProcessLink.objects.filter(is_valid_filter).select_related("orientation"),
+            id=token_id,
+        )
+        queryset = File.objects.filter(orientations__in=[link.orientation])
+
+    else:
+        raise Http404
+
+    document = get_object_or_404(queryset, id=document_id)
+    filename = document.key.split("/")[-1]
+    if user.is_authenticated:
+        logger.info(
+            "orientation document_download user=%s document=%s",
+            user.pk,
+            document.pk,
+        )
+    else:
+        logger.info(
+            "orientation document_download orientation_process_link=%s document=%s",
+            link.pk,
+            document.pk,
+        )
+    return HttpResponseRedirect(
+        document.url(parameters={"ResponseContentDisposition": content_disposition_header(False, filename)})
+    )
 
 
 @login_not_required
