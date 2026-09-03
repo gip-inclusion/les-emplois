@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     # ITOU apps.
+    "itou.audit_trail",
     "itou.utils",
     "itou.tasks",
     "itou.cities",
@@ -431,6 +432,8 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
+
+AUDIT_TRAIL_STORAGE_DURATION = datetime.timedelta(days=365)
 
 BOOTSTRAP5 = {
     "required_css_class": "form-group-required",
