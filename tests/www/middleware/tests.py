@@ -17,13 +17,22 @@ class TestRedirectToNewDomainMiddleware:
 
         settings.REDIRECT_TO_NEW_DOMAIN = True
         response = client.get(
+            "/search/employers/results",
+            HTTP_HOST="old.domain",
+        )
+        assert response.status_code == 302
+        assert response.url == "https://new.domain/search/employers/results?redirected-from-old-domain=1"
+
+        # Admin pages are redirected _without_ the extra
+        # `redirected-from-old-domain` query parameter.
+        response = client.get(
             "/admin/",
             query_params={"foo": "bar"},
             HTTP_HOST="old.domain",
             follow=False,
         )
         assert response.status_code == 302
-        assert response.url == "https://new.domain/admin/?foo=bar&redirected-from-old-domain=1"
+        assert response.url == "https://new.domain/admin/?foo=bar"
 
         response = client.get("/admin/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
