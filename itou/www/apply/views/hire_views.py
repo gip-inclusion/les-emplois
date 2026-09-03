@@ -108,7 +108,7 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
             or (self.eligibility_diagnosis and self.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER)
         ) and (suspension_explanation := self.company.get_active_suspension_text_with_dates()):
             raise PermissionDenied(
-                "Ce candidat ne dispose ni d’un PASS IAE ni du diagnostic d’un prescripteur habilité et vous ne "
+                "Ce candidat ne dispose ni d’un PASS IAE ni du diagnostic d’un prescripteur habilité et vous ne "
                 "pouvez pas effectuer d’auto-prescription suite aux mesures prises dans le cadre du contrôle "
                 "a posteriori. " + suspension_explanation
             )
