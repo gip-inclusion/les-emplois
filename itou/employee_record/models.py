@@ -709,7 +709,7 @@ class EmployeeRecordBatch:
 
 class EmployeeRecordUpdateNotificationWorkflow(xwf_models.Workflow):
     states = NotificationStatus.choices
-    initial_state = Status.NEW
+    initial_state = NotificationStatus.NEW
 
     transitions = (
         (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, NotificationStatus.NEW, NotificationStatus.SENT),
