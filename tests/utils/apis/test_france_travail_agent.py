@@ -3,7 +3,7 @@ import datetime
 
 import pytest
 
-from itou.recommendations.helpers import fetch_and_parse_user_data, get_user_data
+from itou.utils.apis.france_travail_agent import fetch_and_parse_user_data, get_user_data
 from itou.utils.apis.pole_emploi import Endpoints
 from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
 
@@ -11,7 +11,7 @@ from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
 class TestGetUserData:
     @pytest.fixture(autouse=True)
     def setup_method(self, mocker):
-        self.mock = mocker.patch("itou.recommendations.helpers.fetch_and_parse_user_data")
+        self.mock = mocker.patch("itou.utils.apis.france_travail_agent.fetch_and_parse_user_data")
 
     def test_success(self):
         self.mock.return_value = "fetched_data"
@@ -21,10 +21,6 @@ class TestGetUserData:
         assert res == "fetched_data"
 
         res = get_user_data("first_id")
-        assert self.mock.call_count == 1
-        assert res == "fetched_data"
-
-        res = get_user_data("second_id")
         assert self.mock.call_count == 2
         assert res == "fetched_data"
 
@@ -35,10 +31,6 @@ class TestGetUserData:
         assert self.mock.call_count == 1
         assert res is None
 
-        res = get_user_data("first_id")
-        assert self.mock.call_count == 2  # nothing was cached, call it again
-        assert res is None
-
 
 class TestFetchAndParseUserData:
     @pytest.fixture(autouse=True)
@@ -46,8 +38,8 @@ class TestFetchAndParseUserData:
         settings.API_ESD = {
             "BASE_URL": "https://pe.fake",
             "AUTH_BASE_URL_AGENT": "https://auth.fr",
-            "RECOMMENDATIONS_KEY": "foobar",
-            "RECOMMENDATIONS_SECRET": "pe-secret",
+            "KEY": "foobar",
+            "SECRET": "pe-secret",
         }
         respx_mock.post(
             f"{settings.API_ESD['AUTH_BASE_URL_AGENT']}/connexion/oauth2/access_token?realm=%2Fagent"

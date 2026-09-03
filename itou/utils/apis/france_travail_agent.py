@@ -2,25 +2,15 @@ import dataclasses
 import datetime
 import logging
 
-from django.core.cache import cache
-
-from itou.utils.apis.pole_emploi import Apps, pole_emploi_agent_api_client
+from itou.utils.apis.pole_emploi import pole_emploi_agent_api_client
 
 
 logger = logging.getLogger(__name__)
 
 
-CACHE_DURATION = 60 * 60  # 1 hour
-
-
 def get_user_data(ft_id):
-    cache_key = f"RECOMMENDATIONS_DATA_{ft_id}"
-    if user_data := cache.get(cache_key):
-        return user_data
     try:
-        user_data = fetch_and_parse_user_data(ft_id)
-        cache.set(cache_key, user_data, timeout=CACHE_DURATION)
-        return user_data
+        return fetch_and_parse_user_data(ft_id)
     except Exception:
         # We probably had an httpx.HttpError when calling the api
         # or a KeyError when parsing the data
@@ -194,7 +184,7 @@ class UserData:
 
 
 def fetch_and_parse_user_data(ft_id):
-    with pole_emploi_agent_api_client(app=Apps.SPS) as pe_client:
+    with pole_emploi_agent_api_client() as pe_client:
         token = pe_client.rechercher_usager(france_travail_id=ft_id)
 
         # Fetch administrative data
