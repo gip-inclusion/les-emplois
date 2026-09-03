@@ -7,7 +7,7 @@
 
 {% block title %}
     {% if city and category %}
-        Service{{ results.paginator.count|pluralizefr }} d'insertion « {{ category.label }} » autour de {{ city }}
+        Service{{ results.paginator.count|pluralizefr }} d'insertion « {{ category.label }} » autour de {{ city }}
         {% include "includes/pagination_for_title.html" with page=results only %}
     {% else %}
         Rechercher un service d'insertion
