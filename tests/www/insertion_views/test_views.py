@@ -12,6 +12,7 @@ from django.template.defaultfilters import urlencode
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 from freezegun import freeze_time
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
@@ -42,6 +43,7 @@ from itou.insertion.models import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from tests.companies.factories import CompanyMembershipFactory
+from tests.files.factories import FileFactory
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
@@ -1208,10 +1210,9 @@ class TestOrientationDetailsForSender:
                 duration_weekly_hours=5,
                 duration_weeks=8,
                 data_protection_commitment=False,  # not displayed
-                attachments=[
-                    "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-                ],
             )
+            document = FileFactory(key="orientations/cv.pdf")
+            orientation.documents.set([document])
 
             client.force_login(user)
             response = client.get(self.get_orientation_url(orientation))
@@ -1220,12 +1221,13 @@ class TestOrientationDetailsForSender:
                 parse_response_to_soup(
                     response,
                     selector="#main",
-                    replace_in_attr=[("href", orientation.attachments_details[0][1], "[computed URL of attachment]")],
+                    replace_in_attr=[("href", str(document.pk), "[PK of File]")],
                 )
             ) == snapshot(name="page")
             assertNotContains(response, "NonAffiché")
 
             orientation.delete()
+            document.delete()
 
     @pytest.mark.parametrize(
         "user_factory,status_code",
@@ -1456,20 +1458,15 @@ class TestOrientationDetailsForServiceProvider:
             orientation__duration_weekly_hours=5,
             orientation__duration_weeks=8,
             orientation__data_protection_commitment=False,  # not displayed
-            orientation__attachments=[
-                "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-            ],
         )
+        document = FileFactory(key="orientations/cv.pdf")
+        process_link.orientation.documents.set([document])
 
         response = client.get(self.get_process_link_url(process_link))
 
         assert pretty_indented(
             parse_response_to_soup(
-                response,
-                selector="#main",
-                replace_in_attr=[
-                    ("href", process_link.orientation.attachments_details[0][1], "[computed URL of attachment]")
-                ],
+                response, selector="#main", replace_in_attr=[("href", str(document.pk), "[PK of File]")]
             )
         ) == snapshot(name="page")
         assertNotContains(response, "NonAffiché")
@@ -1742,6 +1739,147 @@ class TestOrientationRefuseForServiceProvider:
             self.get_refuse_link_url(link),
             data={"refusal_reasons": [OrientationRefusalReason.NOT_MOBILE], "refusal_details": ""},
         )
+        assert response.status_code == 404
+
+
+class TestDocumentDownload:
+    def get_download_url(self, document, link=None):
+        return reverse(
+            "insertion_views:document_download",
+            kwargs={"document_id": document.pk},
+            query={"token": link.pk if link else ""},
+        )
+
+    @pytest.mark.parametrize("membership_factory", [CompanyMembershipFactory, PrescriberMembershipFactory])
+    def test_authenticated_access(self, client, membership_factory, caplog):
+        membership = membership_factory()
+        user = membership.user
+
+        if isinstance(membership, PrescriberMembership):
+            sender_kind = SenderKind.PRESCRIBER
+            prescriber_organization = membership.organization
+            company = None
+        else:
+            sender_kind = SenderKind.EMPLOYER
+            prescriber_organization = None
+            company = membership.company
+        orientation = OrientationFactory(
+            sender=user,
+            sender_kind=sender_kind,
+            sender_prescriber_organization=prescriber_organization,
+            sender_company=company,
+        )
+        document = FileFactory(key="orientations/document.pdf")
+        orientation.documents.set([document])
+
+        client.force_login(user)
+        response = client.get(self.get_download_url(document))
+        assert response.url == document.url(
+            parameters={"ResponseContentDisposition": content_disposition_header(False, "document.pdf")}
+        )
+        assert f"orientation document_download user={user.pk} document={document.pk}" in caplog.messages
+
+    @pytest.mark.parametrize("membership_factory", [CompanyMembershipFactory, PrescriberMembershipFactory])
+    def test_authenticated_access_other_member_in_organization(self, client, membership_factory, caplog):
+        membership = membership_factory()
+        user = membership.user
+        organization = membership.organization if isinstance(membership, PrescriberMembership) else membership.company
+        other_member = PrescriberFactory()
+        organization.members.add(other_member)
+
+        if isinstance(membership, PrescriberMembership):
+            sender_kind = SenderKind.PRESCRIBER
+            prescriber_organization = membership.organization
+            company = None
+        else:
+            sender_kind = SenderKind.EMPLOYER
+            prescriber_organization = None
+            company = membership.company
+        orientation = OrientationFactory(
+            sender=other_member,
+            sender_kind=sender_kind,
+            sender_prescriber_organization=prescriber_organization,
+            sender_company=company,
+        )
+        document = FileFactory(key="orientations/document.pdf")
+        orientation.documents.set([document])
+
+        client.force_login(user)
+        response = client.get(self.get_download_url(document))
+        assert response.url == document.url(
+            parameters={"ResponseContentDisposition": content_disposition_header(False, "document.pdf")}
+        )
+        assert f"orientation document_download user={user.pk} document={document.pk}" in caplog.messages
+
+    @pytest.mark.parametrize("is_authenticated", [True, False])
+    def test_magic_link_access(self, client, is_authenticated, caplog):
+        if is_authenticated:
+            client.force_login(random_user_kind_factory())
+
+        link = OrientationProcessLinkFactory()
+        document = FileFactory(key="orientations/document.pdf")
+        link.orientation.documents.set([document])
+
+        response = client.get(self.get_download_url(document, link))
+        assert response.url == document.url(
+            parameters={"ResponseContentDisposition": content_disposition_header(False, "document.pdf")}
+        )
+        assert (
+            f"orientation document_download orientation_process_link={link.pk} document={document.pk}"
+            in caplog.messages
+        )
+
+    def test_no_access_not_authenticated(self, client):
+        orientation = OrientationFactory()
+        document = FileFactory(key="orientations/document.pdf")
+        orientation.documents.set([document])
+
+        response = client.get(self.get_download_url(document))
+        assert response.status_code == 404
+
+    def test_no_access_not_authorized(self, client):
+        membership = PrescriberMembershipFactory()
+        user = membership.user
+        other_organization = PrescriberMembershipFactory(user=user).organization
+        client.force_login(user)
+
+        # Check the user is connected with the first created membership organization
+        response = client.get(reverse("dashboard:index"))
+        assert response.context["request"].current_organization == membership.organization
+
+        # The user did not send this specific orientation
+        orientation = OrientationFactory()
+        document = FileFactory(key="orientations/document.pdf")
+        orientation.documents.set([document])
+        response = client.get(self.get_download_url(document))
+        assert response.status_code == 404
+
+        # The user sent the orientation but on behalf of another organization
+        other_organization_orientation = OrientationFactory(
+            sender=user, sender_prescriber_organization=other_organization
+        )
+        other_document = FileFactory(key="orientations/other_document.pdf")
+        other_organization_orientation.documents.set([other_document])
+        response = client.get(self.get_download_url(other_document))
+        assert response.status_code == 404
+
+    def test_no_access_nonexistent_link(self, client):
+        link = OrientationProcessLinkFactory()
+        document = FileFactory(key="orientations/document.pdf")
+        link.orientation.documents.set([document])
+
+        response = client.get(self.get_download_url(document) + "?token=WRONG")
+        assert response.status_code == 404
+
+    def test_no_access_expired_link(self, client):
+        with freeze_time(
+            timezone.now() - datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDTITY_SECONDS + 1)
+        ):
+            link = OrientationProcessLinkFactory()
+        document = FileFactory(key="orientations/document.pdf")
+        link.orientation.documents.set([document])
+
+        response = client.get(self.get_download_url(document, link))
         assert response.status_code == 404
 
 
