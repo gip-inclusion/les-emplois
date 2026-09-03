@@ -1,16 +1,16 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Un nouvel utilisateur souhaite rejoindre votre structure sur {% brand %} !
+Un nouvel utilisateur souhaite rejoindre votre structure sur {% brand %} !
 
-Organisation :
+Organisation :
 
-- Nom : {{ siae.display_name }}
-- SIRET : {{ siae.siret }}
-- Type : {{ siae.kind }}
-- Email de contact : {{ siae.auth_email }}
+- Nom : {{ siae.display_name }}
+- SIRET : {{ siae.siret }}
+- Type : {{ siae.kind }}
+- Email de contact : {{ siae.auth_email }}
 
-Ouvrez le lien suivant pour procéder à l'inscription : {{ signup_magic_link }}
+Ouvrez le lien suivant pour procéder à l'inscription : {{ signup_magic_link }}
 
 Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. Transférez-lui cet email pour lui permettre de s'inscrire.
 
