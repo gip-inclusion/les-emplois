@@ -96,7 +96,6 @@ def test_unused_templates():
         # django-bootstrap5
         "django_bootstrap5/form_errors.html",
         "django_bootstrap5/messages.html",
-        "django_bootstrap5/widgets/radio_select.html",
         # Used in itou/siae_evaluations/models.py's Calendar model
         "siae_evaluations/default_calendar_html.html",
     ] + [

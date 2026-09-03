@@ -179,27 +179,27 @@
       <label class="form-label">
           Motif
       </label>
-      <div class="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason" required="">
+      <div id="id_reason">
           <div class="form-check">
-              <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
+              <input class="form-check-input" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_0" name="reason" required="" type="radio" value="SENIOR_CDI"/>
               <label class="form-check-label" for="id_reason_0">
                   CDI conclu avec une personne de plus de 57 ans
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" id="id_reason_1" name="reason" type="radio" value="COMPLETE_TRAINING"/>
+              <input class="form-check-input" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_1" name="reason" required="" type="radio" value="COMPLETE_TRAINING"/>
               <label class="form-check-label" for="id_reason_1">
                   Fin d'une formation
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" disabled="" id="id_reason_2" name="reason" type="radio" value="RQTH"/>
+              <input class="form-check-input" disabled="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_2" name="reason" required="" type="radio" value="RQTH"/>
               <label class="form-check-label" for="id_reason_2">
                   RQTH - Reconnaissance de la qualité de travailleur handicapé
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" disabled="" id="id_reason_3" name="reason" type="radio" value="SENIOR"/>
+              <input class="form-check-input" disabled="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_3" name="reason" required="" type="radio" value="SENIOR"/>
               <label class="form-check-label" for="id_reason_3">
                   50 ans et plus
               </label>
@@ -215,27 +215,27 @@
       <label class="form-label">
           Motif
       </label>
-      <div class="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason" required="">
+      <div id="id_reason">
           <div class="form-check">
-              <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
+              <input class="form-check-input" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_0" name="reason" required="" type="radio" value="SENIOR_CDI"/>
               <label class="form-check-label" for="id_reason_0">
                   CDI conclu avec une personne de plus de 57 ans
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" id="id_reason_1" name="reason" type="radio" value="COMPLETE_TRAINING"/>
+              <input class="form-check-input" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_1" name="reason" required="" type="radio" value="COMPLETE_TRAINING"/>
               <label class="form-check-label" for="id_reason_1">
                   Fin d'une formation
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" disabled="" id="id_reason_2" name="reason" type="radio" value="RQTH"/>
+              <input class="form-check-input" disabled="" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_2" name="reason" required="" type="radio" value="RQTH"/>
               <label class="form-check-label" for="id_reason_2">
                   RQTH - Reconnaissance de la qualité de travailleur handicapé
               </label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" id="id_reason_3" name="reason" type="radio" value="SENIOR"/>
+              <input class="form-check-input" hx-indicator="#new-prolongation-form" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#new-prolongation-form" hx-trigger="change" id="id_reason_3" name="reason" required="" type="radio" value="SENIOR"/>
               <label class="form-check-label" for="id_reason_3">
                   50 ans et plus
               </label>
