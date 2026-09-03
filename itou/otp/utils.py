@@ -109,7 +109,8 @@ def require_otp(user):
     if not user.is_authenticated:
         return False
 
-    if user.is_verified():  # user has already authenticated with MFA
+    # openid_connect can connect users from models but is_verified is set by otp middleware
+    if hasattr(user, "is_verified") and user.is_verified():  # user has already authenticated with MFA
         return False
 
     if getattr(user, "is_hijacked", False):

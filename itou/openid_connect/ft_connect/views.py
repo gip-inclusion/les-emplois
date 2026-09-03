@@ -207,10 +207,11 @@ def ft_connect_callback(request):
         triggers_context = triggers.get_current_context() or {}
         huey_import_user_pe_data(user, access_token, triggers_context=triggers_context)
 
-    login(request, user)
     # Keep token_data["id_token"] to logout from France Travail Connect
     request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session.modified = True
+
+    login(request, user)
 
     next_url = reverse("dashboard:index")
     return HttpResponseRedirect(next_url)
