@@ -101,6 +101,13 @@ class EmployeeRecordTransition(enum.StrEnum):
     UNARCHIVE_NEW = "unarchive_new"
     UNARCHIVE_PROCESSED = "unarchive_processed"
     UNARCHIVE_REJECTED = "unarchive_rejected"
+    UNARCHIVE_UPDATE_REJECTED = "unarchive_update_rejected"
+
+    PLAN_UPDATE = "plan_update"
+    WAIT_FOR_ASP_RESPONSE_FOR_UPDATE = "wait_for_asp_response_for_update"
+    REJECT_FOR_UPDATE = "reject_for_update"
+    RETRY_UPDATE = "retry_update"
+    RETRY_CREATE = "retry_create"
 
     @classmethod
     def without_asp_exchange(cls):
@@ -117,8 +124,15 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     states = Status.choices
     initial_state = Status.NEW
 
-    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
-    CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
+    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED, Status.UPDATE_REJECTED]
+    CAN_BE_ARCHIVED_STATES = [
+        Status.NEW,
+        Status.READY,
+        Status.REJECTED,
+        Status.PROCESSED,
+        Status.DISABLED,
+        Status.UPDATE_REJECTED,
+    ]
     transitions = (
         (
             EmployeeRecordTransition.READY,
@@ -127,13 +141,19 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
         ),
         (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, Status.READY, Status.SENT),
         (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
-        (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
+        (EmployeeRecordTransition.PROCESS, [Status.SENT, Status.UPDATE_SENT], Status.PROCESSED),
         (EmployeeRecordTransition.DISABLE, CAN_BE_DISABLED_STATES, Status.DISABLED),
         (EmployeeRecordTransition.ENABLE, Status.DISABLED, Status.NEW),
         (EmployeeRecordTransition.ARCHIVE, CAN_BE_ARCHIVED_STATES, Status.ARCHIVED),
         (EmployeeRecordTransition.UNARCHIVE_NEW, Status.ARCHIVED, Status.NEW),
         (EmployeeRecordTransition.UNARCHIVE_PROCESSED, Status.ARCHIVED, Status.PROCESSED),
         (EmployeeRecordTransition.UNARCHIVE_REJECTED, Status.ARCHIVED, Status.REJECTED),
+        (EmployeeRecordTransition.UNARCHIVE_UPDATE_REJECTED, Status.ARCHIVED, Status.UPDATE_REJECTED),
+        (EmployeeRecordTransition.PLAN_UPDATE, Status.PROCESSED, Status.UPDATE_PENDING),
+        (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE, Status.UPDATE_PENDING, Status.UPDATE_SENT),
+        (EmployeeRecordTransition.REJECT_FOR_UPDATE, Status.UPDATE_SENT, Status.UPDATE_REJECTED),
+        (EmployeeRecordTransition.RETRY_UPDATE, Status.UPDATE_REJECTED, Status.UPDATE_PENDING),
+        (EmployeeRecordTransition.RETRY_CREATE, Status.UPDATE_REJECTED, Status.READY),
     )
     log_model = "employee_record.EmployeeRecordTransitionLog"
 
@@ -251,7 +271,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         help_text="Typiquement les dates du PASS IAE lié",
         null=True,
     )
-    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut", max_length=10)
+    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut")
 
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id

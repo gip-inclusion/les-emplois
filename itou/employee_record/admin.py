@@ -332,6 +332,8 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                 models.EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
                 models.EmployeeRecordTransition.REJECT,
                 models.EmployeeRecordTransition.PROCESS,
+                models.EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+                models.EmployeeRecordTransition.REJECT_FOR_UPDATE,
             }
             context.update(
                 {

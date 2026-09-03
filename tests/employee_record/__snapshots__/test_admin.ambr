@@ -42,6 +42,7 @@
       </p>
       <input class="danger js-with-confirm" name="transition_ready" type="submit" value="Complétée"/>
       <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+      <input class="danger js-with-confirm" name="transition_plan_update" type="submit" value="Mise à jour en attente"/>
   </div>
   
   '''
@@ -54,6 +55,19 @@
       </p>
       <input class="danger js-with-confirm" name="transition_ready" type="submit" value="Complétée"/>
       <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+  </div>
+  
+  '''
+# ---
+# name: test_available_transitions[UPDATE_REJECTED][actions]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+      <p>
+          Changer l'état de la fiche salarié :
+      </p>
+      <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+      <input class="danger js-with-confirm" name="transition_retry_update" type="submit" value="Mise à jour en attente"/>
+      <input class="danger js-with-confirm" name="transition_retry_create" type="submit" value="Complétée"/>
   </div>
   
   '''

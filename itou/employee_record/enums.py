@@ -17,6 +17,9 @@ class Status(models.TextChoices):
     PROCESSED = "PROCESSED", "Intégrée"
     DISABLED = "DISABLED", "Désactivée"
     ARCHIVED = "ARCHIVED", "Archivée"
+    UPDATE_PENDING = "UPDATE_PENDING", "Mise à jour en attente"
+    UPDATE_SENT = "UPDATE_SENT", "Mise à jour envoyée"
+    UPDATE_REJECTED = "UPDATE_REJECTED", "Mise à jour en erreur"
 
     @classmethod
     def displayed_choices(cls):
