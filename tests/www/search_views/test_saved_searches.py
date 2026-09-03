@@ -104,7 +104,7 @@ class TestSavedSearches:
 
     @pytest.mark.parametrize("url", [DASHBOARD_URL, EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
     def test_display_saved_searches_and_delete_modal(self, client, url, snapshot):
-        SEARCH_LIST_MARKUP = """<div class="c-search__list__title">Recherches enregistrées :</div>"""
+        SEARCH_LIST_MARKUP = """<div class="c-search__list__title">Recherches enregistrées :</div>"""
         user = PrescriberFactory(membership=True)
         client.force_login(user)
 
