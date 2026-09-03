@@ -126,7 +126,6 @@ INSTALLED_APPS = [
     "itou.scripts",
     "itou.analytics",
     "itou.communications",
-    "itou.gps",
     "itou.rdv_insertion",
     "itou.archive",
     "itou.nexus",
