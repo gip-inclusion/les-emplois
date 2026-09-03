@@ -22,6 +22,7 @@ import tenacity
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
+from django.db.models.functions import JSONObject
 from django.utils import timezone
 
 import itou.metabase.db as metabase_db
@@ -37,7 +38,7 @@ from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, 
 from itou.insertion.models import MobilizationEvent
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.tables import (
@@ -84,6 +85,37 @@ logger = logging.getLogger(__name__)
 
 def log_retry_attempt(retry_state):
     logging.info("Attempt failed with outcome=%s", retry_state.outcome)
+
+
+def first_transition_timestamps():
+    """First transitions described by FIRST_TRANSITION_FILTERS, aggregated into a single JSON object.
+
+    Filtered aggregates in a single subquery avoid walking the (job_application_id) index once per annotation.
+
+    Example for a single job application:
+    {
+        "processing": "2026-03-01T10:00:00+00:00",
+        "postponed": None,
+        "accepted": "2026-03-05T14:22:00+00:00",
+        "refused": None,
+        "cancelled": None,
+        ...
+        "process_transition": "2026-03-01T10:00:00+00:00",
+    }
+    """
+    return Subquery(
+        JobApplicationTransitionLog.objects.filter(job_application=OuterRef("pk"))
+        .values("job_application")
+        .annotate(
+            timestamps=JSONObject(
+                **{
+                    key: Min("timestamp", filter=Q(**filters))
+                    for key, filters in job_applications.FIRST_TRANSITION_FILTERS.items()
+                }
+            )
+        )
+        .values("timestamps")
+    )
 
 
 class Command(BaseCommand):
@@ -470,35 +502,7 @@ class Command(BaseCommand):
             )
             .exclude(origin=Origin.PE_APPROVAL)
             .filter(to_company_id__in=Company.objects.active())
-            .annotate(
-                transition_accepted_date=JobApplicationTransitionLog.objects.filter(
-                    job_application=OuterRef("pk"),
-                    transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
-                )
-                .values("job_application")
-                .annotate(first_timestamp=Min("timestamp"))
-                .values("first_timestamp"),
-                time_spent_from_new_to_processing=Subquery(
-                    JobApplicationTransitionLog.objects.filter(
-                        job_application=OuterRef("pk"),
-                        transition=JobApplicationWorkflow.TRANSITION_PROCESS,
-                    )
-                    .values("job_application")
-                    .annotate(first_timestamp=Min("timestamp"))
-                    .values("first_timestamp")
-                )
-                - F("created_at"),
-                time_spent_from_new_to_accepted_or_refused=Subquery(
-                    JobApplicationTransitionLog.objects.filter(
-                        job_application=OuterRef("pk"),
-                        to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED],
-                    )
-                    .values("job_application")
-                    .annotate(first_timestamp=Min("timestamp"))
-                    .values("first_timestamp")
-                )
-                - F("created_at"),
-            )
+            .annotate(first_transition_timestamps=first_transition_timestamps())
             .only(
                 "archived_at",
                 "refusal_reason",
