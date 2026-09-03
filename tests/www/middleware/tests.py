@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 from tests.companies.factories import CompanyFactory
@@ -67,3 +68,61 @@ class TestRedirectToNewDomainMiddleware:
             follow=False,
         )
         assert response.status_code == 200  # no rediect
+
+
+def test_browser_id_cookie_not_set_for_viewers(client):
+    """Browser id cookies are used to track browser doing sensitive operations.
+    Someone that just browse the website is not concerned."""
+    response = client.get("/")
+    assert not response.cookies
+
+
+def test_browser_id_cookie_for_authenticated_users(client):
+    """At first POST, everyone gets a browser id cookie uniquely identifying its browser."""
+    response = client.post("/")
+    assert response.cookies[settings.BROWSER_ID_COOKIE_NAME]
+
+
+def test_browser_id_cookie_is_stable_between_requests(client):
+    """The browser id cookie tracks a browser:
+    it should not change from an HTTP query to another."""
+    cookies = set()
+
+    for _ in range(3):
+        response = client.post("/")
+        cookies.add(response.cookies[settings.BROWSER_ID_COOKIE_NAME].value)
+
+    assert len(cookies) == 1
+
+
+def test_browser_id_cookie_differ_for_different_browsers(client):
+    """The browser id cookie uniquely tracks a browser, this test simulates a second
+    browser, which gets a different browser_id cookie."""
+    cookies = set()
+
+    response = client.post("/")
+    cookies.add(response.cookies[settings.BROWSER_ID_COOKIE_NAME].value)
+
+    del client.cookies[settings.BROWSER_ID_COOKIE_NAME]
+
+    response = client.post("/")
+    cookies.add(response.cookies[settings.BROWSER_ID_COOKIE_NAME].value)
+
+    assert len(cookies) == 2
+
+
+def test_browser_id_cookie_is_kept_between_user_sessions(client):
+    """The browser id cookie tracks a browser, not a user."""
+    user_a = ItouStaffFactory()
+    user_b = ItouStaffFactory()
+    cookies = set()
+
+    client.force_login(user_a)
+    response = client.post("/")
+    cookies.add(response.cookies[settings.BROWSER_ID_COOKIE_NAME].value)
+
+    client.force_login(user_b)
+    response = client.post("/")
+    cookies.add(response.cookies[settings.BROWSER_ID_COOKIE_NAME].value)
+
+    assert len(cookies) == 1
