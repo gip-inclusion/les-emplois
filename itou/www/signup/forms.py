@@ -301,7 +301,7 @@ class PrescriberChooseOrgKindForm(forms.Form):
         kind = self.cleaned_data["kind"]
         org = PrescriberOrganization.objects.filter(siret=self.siret, kind=kind).first()
         if org:
-            error = "« {} » utilise déjà ce type d'organisation avec le même SIRET ({})."
+            error = "« {} » utilise déjà ce type d'organisation avec le même SIRET ({})."
             error_args = [org.display_name, self.siret]
             # Get the first member to display their name and the link to the invitation request
             member = org.memberships.first()
