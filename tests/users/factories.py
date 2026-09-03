@@ -126,6 +126,15 @@ class ProfessionalFactory(UserFactory):
     kind = UserKind.PROFESSIONAL
     identity_provider = IdentityProvider.PRO_CONNECT
 
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="James",
+            last_name="Bond",
+            email="jamse.bond@test.local",
+            public_id="2e93b0aa-67c5-47cb-bd8d-52655209e161",
+            phone="0700700700",
+        )
+
 
 class PrescriberFactory(ProfessionalFactory):
     class Params:
@@ -158,6 +167,15 @@ class PrescriberFactory(ProfessionalFactory):
 
 
 class EmployerFactory(ProfessionalFactory):
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Jean",
+            last_name="Michel",
+            email="jean.michel@test.local",
+            public_id="555457a3-0c12-4ad8-80bc-e0a351ce015e",
+            phone="0701020304",
+        )
+
     @factory.post_generation
     def membership(self, created, extracted, **kwargs):
         from tests.companies.factories import CompanyMembershipFactory
@@ -177,6 +195,15 @@ class EmployerFactory(ProfessionalFactory):
 
 class LaborInspectorFactory(ProfessionalFactory):
     identity_provider = IdentityProvider.DJANGO
+
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Jeanne",
+            last_name="d'Orléans",
+            email="jeanne.d.oreans@test.local",
+            public_id="62fefd61-ad4f-4f89-8eab-b3b3d5167538",
+            phone="0611223344",
+        )
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):

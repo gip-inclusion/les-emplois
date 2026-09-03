@@ -2634,7 +2634,7 @@ class TestJobApplicationXlsxExport:
                 "Candidature spontanée",
                 "Ma structure",
                 "",
-                "John DOE",
+                "Jean MICHEL",
                 datetime.datetime(2024, 7, 5),
                 "Candidature acceptée",
                 datetime.datetime(2024, 7, 5),

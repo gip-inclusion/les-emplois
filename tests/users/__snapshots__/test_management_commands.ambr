@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAutoAttributeCompanyAdmins.test_email_content[auto_admin_attribution email body]
   '''
-  Bonjour John DOE
+  Bonjour Jean MICHEL
   
   L'espace de travail de votre structure ACME Inc. (EI) sur Les emplois de l’inclusion ne disposait plus d'administrateur actif. Nous vous avons donc attribué automatiquement ce rôle afin d'en assurer la gestion.
   
