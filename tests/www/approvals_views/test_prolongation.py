@@ -328,7 +328,7 @@ class TestApprovalProlongation:
         )
         update_page_with_htmx(
             page,
-            "#id_reason",  # RQTH
+            '#id_reason input[value="RQTH"]',
             response,
         )
         response = client.post(
@@ -353,7 +353,7 @@ class TestApprovalProlongation:
         [reset_button] = page.select("a[aria-label='Annuler la saisie de ce formulaire']")
         assert pretty_indented(reset_button) == snapshot(name="reset button with correct back_url")
 
-        [reason] = page.select("#id_reason")
+        [reason] = page.select('#id_reason input[value="RQTH"]')
         expected_hx_post = reverse(
             "approvals:prolongation_form_for_reason",
             kwargs={"approval_id": self.approval.pk},
@@ -369,7 +369,7 @@ class TestApprovalProlongation:
         response = client.post(reason["hx-post"], data)
         update_page_with_htmx(
             page,
-            "#id_reason",  # RQTH
+            '#id_reason input[value="RQTH"]',
             response,
         )
         response = client.post(page_url, data)
@@ -955,13 +955,13 @@ class TestProlongationDerogationLink:
     def test_check_prescriber_email_button(self, client):
         client.force_login(self.employer)
         page = parse_response_to_soup(self._follow_derogation_link(client), selector="#main")
-        [reason] = page.select("#id_reason")
+        [reason] = page.select('#id_reason input[value="RQTH"]')
         data = {
             "reason": ProlongationReason.RQTH,
             # Workaround the validation of the initial page by providing enough data
             "end_at": self.approval.end_at + relativedelta(days=30),
             "email": PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first().email,
         }
-        update_page_with_htmx(page, "#id_reason", client.post(reason["hx-post"], data))
+        update_page_with_htmx(page, '#id_reason input[value="RQTH"]', client.post(reason["hx-post"], data))
         [button] = page.select("#check_prescriber_email button")
         assert client.post(button["hx-post"], data).status_code == 200

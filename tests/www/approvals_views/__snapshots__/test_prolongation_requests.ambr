@@ -28,27 +28,27 @@
                               <label class="form-label">
                                   Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
-                              <div class="" id="id_reason-reason" required="">
+                              <div id="id_reason-reason">
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" type="radio" value="IAE"/>
                                       <label class="form-check-label" for="id_reason-reason_0">
                                           L’IAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" type="radio" value="SIAE"/>
                                       <label class="form-check-label" for="id_reason-reason_1">
                                           La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
+                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
                                           La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
+                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
                                           Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
                                       </label>
@@ -192,7 +192,7 @@
                               <label class="form-label">
                                   Quelle(s) action(s) envisagez-vous de proposer au candidat ?
                               </label>
-                              <div class="" id="id_proposed_actions-proposed_actions">
+                              <div id="id_proposed_actions-proposed_actions">
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_proposed_actions-proposed_actions_0" name="proposed_actions-proposed_actions" type="checkbox" value="EXIT_IAE"/>
                                       <label class="form-check-label" for="id_proposed_actions-proposed_actions_0">
@@ -269,27 +269,27 @@
                               <label class="form-label">
                                   Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
-                              <div class="" id="id_reason-reason" required="">
+                              <div id="id_reason-reason">
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" type="radio" value="IAE"/>
                                       <label class="form-check-label" for="id_reason-reason_0">
                                           L’IAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" type="radio" value="SIAE"/>
                                       <label class="form-check-label" for="id_reason-reason_1">
                                           La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
+                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
                                           La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
+                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
                                           Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
                                       </label>
@@ -433,27 +433,27 @@
                               <label class="form-label">
                                   Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
-                              <div class="" id="id_reason-reason" required="">
+                              <div id="id_reason-reason">
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" type="radio" value="IAE"/>
                                       <label class="form-check-label" for="id_reason-reason_0">
                                           L’IAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" type="radio" value="SIAE"/>
                                       <label class="form-check-label" for="id_reason-reason_1">
                                           La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
+                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
                                           La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
+                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
                                           Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
                                       </label>
@@ -597,27 +597,27 @@
                               <label class="form-label">
                                   Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
-                              <div class="" id="id_reason-reason" required="">
+                              <div id="id_reason-reason">
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" type="radio" value="IAE"/>
                                       <label class="form-check-label" for="id_reason-reason_0">
                                           L’IAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
+                                      <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" type="radio" value="SIAE"/>
                                       <label class="form-check-label" for="id_reason-reason_1">
                                           La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
+                                      <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
                                           La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
                                       </label>
                                   </div>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
+                                      <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
                                           Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
                                       </label>
