@@ -5,6 +5,7 @@ from functools import partial
 import pytest
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -92,6 +93,22 @@ def test_delete_documents():
     orientation.delete_documents()
     assert not orientation.documents.exists()
     assert File.objects.exists()
+
+
+def test_orientation_documents():
+    orientation = OrientationFactory()
+    files = [
+        FileFactory(key="orientations/cv_2026.pdf"),
+        FileFactory(key="orientations/carte_identité.pdf"),
+        FileFactory(key="orientations/custom/name/by/user.pdf"),
+    ]
+    orientation.documents.set(files)
+
+    assert set(orientation.documents_details) == {
+        ("cv_2026.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[0].pk})),
+        ("carte_identité.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[1].pk})),
+        ("user.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[2].pk})),
+    }
 
 
 @pytest.mark.parametrize(
