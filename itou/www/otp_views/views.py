@@ -94,7 +94,7 @@ def enrollment_step_2_and_3_confirm_device(
             return HttpResponseRedirect(previous_step_url)
         try:
             key = binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
-        except (KeyError, binascii.Error):
+        except KeyError, binascii.Error:
             return HttpResponseRedirect(previous_step_url)
     else:
         key = generate_otp_key()

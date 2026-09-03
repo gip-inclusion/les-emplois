@@ -153,7 +153,7 @@ def get_prolongation_form(**kwargs):
 
     try:
         reason = kwargs["data"]["reason"]
-    except (KeyError, TypeError):  # "data" can be given but with a None value
+    except KeyError, TypeError:  # "data" can be given but with a None value
         pass
     else:
         if reason and reason not in ProlongationRequest.REASONS_NOT_NEED_PRESCRIBER_OPINION:

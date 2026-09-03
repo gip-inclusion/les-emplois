@@ -117,7 +117,7 @@ def etablissement_get_or_error(siret):
         city = address["libelleCommuneEtablissement"]
         establishments_status = data["etablissement"]["periodesEtablissement"][0]["etatAdministratifEtablissement"]
         is_head_office = data["etablissement"]["etablissementSiege"]
-    except (json.JSONDecodeError, KeyError, IndexError):
+    except json.JSONDecodeError, KeyError, IndexError:
         logger.exception("Invalid format of response from API Entreprise")
         return None, "Le format de la réponse API Entreprise est non valide."
 
