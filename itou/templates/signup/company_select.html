@@ -23,7 +23,7 @@
             </div>
         </div>
         <p id="currentProgressState">
-            <strong>Étape 2</strong>/3 : Rattachement à votre structure
+            <strong>Étape 2</strong>/3 : Rattachement à votre structure
         </p>
     </div>
 {% endblock %}
@@ -57,11 +57,11 @@
                         {% endcomponent_alert %}
 
                         <div class="mt-3 mt-md-4">
-                            <h3>Si vous tentez d'inscrire :</h3>
+                            <h3>Si vous tentez d'inscrire :</h3>
                             <p>
                                 <strong>Une SIAE</strong>
                                 <br>
-                                Vérifier que l’annexe financière valide ou provisoire de la structure a bien été enregistrée dans l’extranet IAE 2.0 de l’ASP :
+                                Vérifier que l’annexe financière valide ou provisoire de la structure a bien été enregistrée dans l’extranet IAE 2.0 de l’ASP :
                             </p>
                             <ul>
                                 <li>
@@ -74,13 +74,13 @@
                             </p>
 
                             <p>
-                                <strong>Un GEIQ</strong> :
+                                <strong>Un GEIQ</strong> :
                                 <br>
                                 Complétez <a href="{% tally_form_url "wA799W" %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien pour un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
                             </p>
 
                             <p>
-                                <strong>Si votre organisation est porteuse de la clause sociale</strong> :
+                                <strong>Si votre organisation est porteuse de la clause sociale</strong> :
                                 <br>
                                 Complétez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
                             </p>
@@ -136,7 +136,7 @@
                                 {% component_alert content=content variant="info" icon=False %}
                                     {% fragment as content %}
                                         <p>
-                                            En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
+                                            En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
                                         </p>
                                         <ul class="mb-0">
                                             <li>Pour les SIAE, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 de l’ASP,</li>

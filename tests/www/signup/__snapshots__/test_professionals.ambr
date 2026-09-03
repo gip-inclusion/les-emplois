@@ -24,7 +24,7 @@
                               <strong>
                                   Étape 2
                               </strong>
-                              /3 : Rattachement à votre structure
+                              /3 : Rattachement à votre structure
                           </p>
                       </div>
                   </div>
@@ -99,7 +99,7 @@
                       </div>
                       <div class="c-form mt-3 mt-md-4">
                           <h2 class="m-0">
-                              Vous êtes membre d’une institution partenaire ?
+                              Vous êtes membre d’une institution partenaire ?
                           </h2>
                           <p>
                               <strong>
@@ -215,7 +215,7 @@
                           <div class="c-info mb-3">
                               <button aria-controls="collapseInstitution" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseInstitution" data-bs-toggle="collapse" type="button">
                                   <span>
-                                      Vous êtes membre d’une institution partenaire ?
+                                      Vous êtes membre d’une institution partenaire ?
                                   </span>
                               </button>
                               <div class="c-info__detail collapse" id="collapseInstitution">
