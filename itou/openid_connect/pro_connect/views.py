@@ -33,6 +33,7 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectUserData,
 )
 from itou.otp.models import ItouTOTPDevice
+from itou.otp.signals import user_logged_in_with_2fa
 from itou.otp.utils import create_placeholder_for_external_totp_device
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
@@ -408,6 +409,7 @@ def pro_connect_callback(request):
             extra={"idp_id": idp_id, "mfa_allowlisted_idp": mfa_allowlisted_idp},
         )
         otp_login(request, create_placeholder_for_external_totp_device(user))
+        user_logged_in_with_2fa.send(sender=pro_connect_callback, request=request, user=user)
 
     accept_all_pending_invitations(request)
 

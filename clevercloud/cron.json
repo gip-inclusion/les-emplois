@@ -30,6 +30,7 @@
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "45 1 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run --max-runtime-minutes=100",
   "0 2 * * * $ROOT/clevercloud/run_management_command.sh cleanup_oidc_states",
+  "10 2 * * * $ROOT/clevercloud/run_management_command.sh cleanup_audit_trails",
   "50 2 * * * $ROOT/clevercloud/run_management_command.sh import_structures_and_services --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
   "30 3 * * * $ROOT/clevercloud/run_management_command.sh fetch_riae_contracts",

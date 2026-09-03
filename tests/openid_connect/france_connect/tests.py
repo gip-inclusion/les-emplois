@@ -22,6 +22,7 @@ from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
+from itou.audit_trail.models import AuditTrail, AuditTrailEventType
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
@@ -422,6 +423,13 @@ class TestFranceConnect:
         assert user.username == FC_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+
+    @respx.mock
+    def test_creates_audit_trail(self, client):
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        trail = AuditTrail.objects.get()
+        assert trail.event_type == AuditTrailEventType.LOG_IN
+        assert trail.data == {"idp": "FranceConnect"}
 
     @respx.mock
     def test_callback_mismatched_nonce(self, client):
