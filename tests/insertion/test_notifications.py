@@ -309,3 +309,13 @@ def test_expired_orientation_for_beneficiary(snapshot):
     assert email.to == [orientation.beneficiary.email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
+
+
+def test_orientation_new_link_for_structure(snapshot):
+    link = OrientationProcessLinkFactory(orientation__for_snapshot=True)
+    email = link.email_orientation_new_link_for_structure
+
+    assert email.to == [link.orientation.service.contact_email]
+    assert email.subject == snapshot(name="subject")
+    body = email.body.replace(str(link.pk), "[PK of OrientationProcessLink]")
+    assert body == snapshot(name="body")

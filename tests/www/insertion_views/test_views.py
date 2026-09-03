@@ -37,6 +37,7 @@ from itou.insertion.models import (
     GenericReferenceItemSource,
     MobilizationEvent,
     Orientation,
+    OrientationProcessLink,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
@@ -1468,13 +1469,20 @@ class TestOrientationDetailsForServiceProvider:
         response = client.get(reverse("insertion_views:orientation_details_for_service_provider", query=query))
         assert response.status_code == 404
 
-    def test_access_with_old_token(self, client):
-        # TODO: button to send an email with a new link
+    @pytest.mark.parametrize("is_authenticated", [True, False])
+    def test_access_with_old_token(self, client, is_authenticated):
         process_link = OrientationProcessLinkFactory(
             created_at=timezone.now() - datetime.timedelta(days=8)
         )  # created more than 7 days ago
+        if is_authenticated:
+            client.force_login(random_user_kind_factory())
         response = client.get(self.get_process_link_url(process_link))
-        assert response.status_code == 403
+        assertContains(response, "Demander un nouveau lien d’accès")
+        response = client.post(self.get_process_link_url(process_link))
+        assertContains(
+            response, "Un e-mail avec un nouveau lien d’accès a été envoyé à l’adresse de contact du service."
+        )
+        assert OrientationProcessLink.objects.filter(orientation=process_link.orientation).count() == 2
 
     @pytest.mark.parametrize("is_active, assertion", [(True, assertContains), (False, assertNotContains)])
     def test_hide_service_link_if_inactive(self, client, is_active, assertion):

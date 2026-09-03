@@ -400,7 +400,27 @@
 # name: test_new_orientation_for_structure[subject]
   '[TEST] Nouvelle demande d’orientation reçue'
 # ---
-<<<<<<< HEAD
+# name: test_orientation_new_link_for_structure[body]
+  '''
+  Bonjour,
+  
+  Un nouveau lien a été demandé pour accéder à une orientation réalisée par Pierre DUPONT de la structure Pres. Org. pour le service Aide aux devoirs.
+  
+  Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
+  
+  http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
+  
+  Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_orientation_new_link_for_structure[subject]
+  '[TEST] Nouveau lien de traitement d’orientation'
+# ---
 # name: test_processing_orientation_for_beneficiary[body]
   '''
   Bonjour,
@@ -512,8 +532,6 @@
 # name: test_processing_orientation_for_sender[from_unauthorized_prescriber][subject]
   '[TEST] Votre demande d’orientation est en cours de traitement'
 # ---
-||||||| parent of 501c98ff5 (insertion: send emails when orientation is refused)
-=======
 # name: test_refused_orientation_for_beneficiary[body]
   '''
   Bonjour,
@@ -709,4 +727,3 @@
 # name: test_refused_orientation_for_structure[subject]
   '[TEST] Vous venez de refuser une demande'
 # ---
->>>>>>> 501c98ff5 (insertion: send emails when orientation is refused)

@@ -691,8 +691,27 @@ def orientation_details_for_service_provider(request):
         id=request.GET.get("token"),
     )
     if not link.is_valid:
-        # TODO: button to send an email with a new link
-        raise PermissionDenied()
+        template_name = "insertion/orientations/ask_for_new_orientation_process_link.html"
+
+        context = {
+            "matomo_custom_title": "Demande d’un nouveau lien d’accès au détail d’une orientation "
+            " pour offreur de service",
+            "disable_button": False,
+        }
+
+        if request.method == "POST":
+            new_link = insertion_models.OrientationProcessLink.objects.create(orientation=link.orientation)
+            new_link.email_orientation_new_link_for_structure.send()
+            messages.success(
+                request,
+                "Nouveau lien généré||"
+                "Un e-mail avec un nouveau lien d’accès a été envoyé à l’adresse de contact du service.",
+                extra_tags="toast",
+            )
+            context["disable_button"] = True
+
+        return render(request, template_name, context)
+
     orientation = link.orientation
 
     if not link.first_opened_at:

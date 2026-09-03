@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+
+{% block title %}
+    Demande d’orientation : lien inactif{{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Lien inactif</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {# Beneficiary info #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="row mb-3">
+                            <div class="col-12 col-sm">
+                                <h2 class="h3">Demander un nouveau lien d’accès</h2>
+                                <p>
+                                    Le lien utilisé n’est plus actif et ne vous permet pas d’accéder aux détails de l’orientation.
+                                    Vous pouvez générer un nouveau lien, qui sera envoyé par e-mail à l’adresse de contact du service en cliquant sur le bouton ci-dessous.
+                                </p>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    {% itou_buttons_form show_mandatory_fields_mention=False primary_label="Recevoir un nouveau lien" primary_disabled=disable_button reset_url=None matomo_category="orientation" matomo_action="clic" matomo_name="demander-nouveau-lien" %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

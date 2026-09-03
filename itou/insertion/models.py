@@ -1086,3 +1086,14 @@ class OrientationProcessLink(models.Model):
         subject = "insertion/email/expired_for_structure_subject.txt"
         body = "insertion/email/expired_for_structure_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def email_orientation_new_link_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+        }
+        subject = "insertion/email/new_link_for_structure_subject.txt"
+        body = "insertion/email/new_link_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)

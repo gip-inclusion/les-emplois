@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+Un nouveau lien a été demandé pour accéder à une orientation réalisée par {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} pour le service {{ orientation.service.name }}.
+
+Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
+
+{{ process_link }}
+
+Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
+
+{% endblock body %}
