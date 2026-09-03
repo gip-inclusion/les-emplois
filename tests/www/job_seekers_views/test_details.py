@@ -1375,6 +1375,10 @@ class TestAdvisorsTab:
                 Préciser le motif de mon accompagnement
             </a>
         """
+        switch_organization_btn = "Me connecter à cette structure"
+        not_a_member_warning = (
+            "Vous ne faites plus partie de cette structure. Vous ne pouvez plus modifier cet accompagnement."
+        )
 
         # Assignment with different user
         client.force_login(user)
@@ -1382,6 +1386,8 @@ class TestAdvisorsTab:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertNotContains(response, edit_assignment_btn, html=True)
         assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
 
         # Assignment with no organization
         assignment.professional = user
@@ -1390,14 +1396,28 @@ class TestAdvisorsTab:
         assertContains(response, archive_assignment_btn, html=True)
         assertContains(response, edit_assignment_btn, html=True)
         assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
 
-        # Assignment with different organization
+        # Assignment with organization user is not a member of
         assignment.prescriber_organization = PrescriberOrganizationFactory()
         assignment.save()
         response = client.get(url)
         assertNotContains(response, archive_assignment_btn, html=True)
         assertNotContains(response, edit_assignment_btn, html=True)
         assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertContains(response, not_a_member_warning)
+
+        # Assignment with different organization
+        assignment.prescriber_organization = PrescriberOrganizationFactory(with_membership=True, membership__user=user)
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
 
         # Assignment with same organization
         assignment.prescriber_organization = organization
@@ -1406,6 +1426,8 @@ class TestAdvisorsTab:
         assertContains(response, archive_assignment_btn, html=True)
         assertContains(response, edit_assignment_btn, html=True)
         assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
 
         # Archived assignment
         assignment.ended_at = timezone.now()
@@ -1415,6 +1437,8 @@ class TestAdvisorsTab:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, edit_assignment_btn, html=True)
         assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
 
         # Assignment with reason
         assignment.reason = "iae"
@@ -1423,3 +1447,5 @@ class TestAdvisorsTab:
         assertNotContains(response, archive_assignment_btn, html=True)
         assertContains(response, edit_assignment_btn, html=True)
         assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)

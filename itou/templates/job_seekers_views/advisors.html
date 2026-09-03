@@ -42,7 +42,7 @@
                     <p class="h4">Historique des accompagnateurs ({{ ended_assignments|length }})</p>
                     {% if ended_assignments %}
                         {% for assignment in ended_assignments %}
-                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment request=request only %}
+                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
                         {% endfor %}
                     {% else %}
                         <div class="c-box mb-3 mb-md-4">
