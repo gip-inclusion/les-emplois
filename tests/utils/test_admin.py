@@ -48,7 +48,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
     SanctionsFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, UserFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory, UserFactory
 
 
 def get_all_subclasses(cls):
@@ -104,7 +104,7 @@ def test_all_admin(admin_client, mocker, subtests):
         job_application=JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker),
         to_state=JobApplicationState.PROCESSING,
     )
-    ActivatedService.objects.create(user=EmployerFactory(), service=Service.PILOTAGE)
+    ActivatedService.objects.create(user=ProfessionalFactory(), service=Service.PILOTAGE)
     # Insertion App
     source = insertion_models.GenericReferenceItem.objects.create(
         source=insertion_models.GenericReferenceItemSource.DATA_INCLUSION,

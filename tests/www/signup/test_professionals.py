@@ -4,7 +4,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
 
 
@@ -40,8 +40,7 @@ class TestProfessionalSignup:
         assertRedirects(response, next_url)
 
     def test_user_already_exists(self, client, pro_connect):
-        # FIXME(alaurent) Allow LaborInspector to use ProConnect
-        PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
+        ProfessionalFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
         start_url = reverse("signup:professional_user")
         response = client.get(start_url)
 
@@ -66,7 +65,7 @@ class TestProfessionalSignup:
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         client.force_login(user)
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot

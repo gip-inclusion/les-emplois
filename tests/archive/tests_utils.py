@@ -14,15 +14,15 @@ from itou.invitations.models import EmployerInvitation
 from itou.users.models import User
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import EmployerFactory
+from tests.users.factories import ProfessionalFactory
 
 
 class TestRelatedObjectsConsistency:
     def test_exclude_users_with_blocking_relations(self):
         # Smoke test: a user with a reverse FK to a non-CASCADE relation must be
         # excluded from the queryset, including hidden relations
-        clean = EmployerFactory()
-        blocked = EmployerFactory()
+        clean = ProfessionalFactory()
+        blocked = ProfessionalFactory()
         # JobApplication.archived_by has on_delete=PROTECT, so it should block deletion
         # even if it has related_name="+" (which makes it hidden to User._meta.related_objects)
         JobApplicationFactory(sent_by_prescriber_alone=True, archived_at="2025-01-01T00:00:00Z", archived_by=blocked)
@@ -57,7 +57,7 @@ class TestCountRelatedSubquery:
         assert sqs.source_expressions[1].value == 0
 
     def test_count_related_subquery_results(self, subtests):
-        employer = EmployerFactory()
+        employer = ProfessionalFactory()
         EmployerInvitationFactory(sender=employer, accepted_at=timezone.now())
         EmployerInvitationFactory(sender=employer)
 

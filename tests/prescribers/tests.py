@@ -36,14 +36,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerAssignmentFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 class TestPrescriberOrganizationManager:
@@ -281,7 +274,7 @@ class TestPrescriberOrganizationModel:
     def test_add_or_activate_membership(self, caplog):
         org = PrescriberOrganizationFactory()
         assert 0 == org.members.count()
-        admin_user = PrescriberFactory()
+        admin_user = ProfessionalFactory()
         org.add_or_activate_membership(admin_user)
         membership = org.memberships.get()
         assert membership.is_admin is True
@@ -294,7 +287,7 @@ class TestPrescriberOrganizationModel:
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
-        other_user = PrescriberFactory()
+        other_user = ProfessionalFactory()
         invit1, invit2 = PrescriberWithOrgInvitationFactory.create_batch(
             2, email=other_user.email, organization=org, sender=admin_user
         )
@@ -352,12 +345,6 @@ class TestPrescriberOrganizationModel:
         ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
-
-        employer = EmployerFactory()
-        org.add_or_activate_membership(employer)
-
-        labor_inspector = LaborInspectorFactory()
-        org.add_or_activate_membership(labor_inspector)
 
         non_professional = JobSeekerFactory()
         with pytest.raises(ValidationError):
@@ -1052,7 +1039,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
 def test_add_admin(admin_client, caplog, mailoutbox):
     organization = PrescriberOrganizationFactory(with_membership=True)
     membership = organization.memberships.first()
-    prescriber = PrescriberFactory()
+    prescriber = ProfessionalFactory()
     assert membership.is_admin
 
     change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])

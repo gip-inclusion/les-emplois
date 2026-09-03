@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 from itou.users.enums import IdentityProvider
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
+from tests.users.factories import DEFAULT_PASSWORD, ProfessionalFactory
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,7 @@ from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
     ids=["django", "pro_connect"],
 )
 def test_token_auth_with_login_password(client, identity_provider, expects_creation):
-    user = EmployerFactory(with_password=True, identity_provider=identity_provider)
+    user = ProfessionalFactory(with_password=True, identity_provider=identity_provider)
     assert not Token.objects.exists()
     response = client.post(reverse("v1:token-auth"), data={"username": user.email, "password": DEFAULT_PASSWORD})
     if expects_creation:
@@ -27,7 +27,7 @@ def test_token_auth_with_login_password(client, identity_provider, expects_creat
 
 
 def test_token_auth_with_token(client):
-    user = EmployerFactory()
+    user = ProfessionalFactory()
     token = Token(user=user)
     assert Token.objects.count() == 0
 

@@ -7,15 +7,15 @@ from itou.nexus.management.commands.populate_metabase_nexus import create_table,
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import ProfessionalFactory
 
 
 @freeze_time()
 def test_populate_metabase_nexus(snapshot):
-    authorized_prescriber = PrescriberFactory(email="1@mailinator.com")
-    employer = EmployerFactory(email="2@mailinator.com")
-    prescriber_1 = PrescriberFactory(email="3@mailinator.com")
-    prescriber_2 = PrescriberFactory(email="4@mailinator.com")
+    authorized_prescriber = ProfessionalFactory(email="1@mailinator.com")
+    employer = ProfessionalFactory(email="2@mailinator.com")
+    prescriber_1 = ProfessionalFactory(email="3@mailinator.com")
+    prescriber_2 = ProfessionalFactory(email="4@mailinator.com")
 
     company_1 = CompanyMembershipFactory(
         user=employer,

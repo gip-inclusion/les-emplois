@@ -17,7 +17,7 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberFactory
+from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import assert_previous_step, parse_response_to_soup, pretty_indented
 
 
@@ -209,7 +209,7 @@ class TestEmployeeDetailView:
         assertContains(response, user_info_edit_url)
         assertNotContains(response, user_info_not_allowed)
 
-        job_application.job_seeker.created_by = PrescriberFactory()
+        job_application.job_seeker.created_by = ProfessionalFactory()
         job_application.job_seeker.save()
         response = client.get(url)
         assertContains(response, user_info_edit_url)

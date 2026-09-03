@@ -9,7 +9,7 @@ from tests.invitations.factories import (
     PrescriberWithOrgInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import ProfessionalFactory
 
 
 class TestEmployerInvitationQuerySet:
@@ -98,7 +98,7 @@ class TestInvitationEmails:
 class TestPrescriberWithOrgInvitation:
     def test_add_or_activate_membership_to_organization(self):
         invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
-        PrescriberFactory(email=invitation.email)
+        ProfessionalFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
         invitation.add_invited_user()
         org_members_after = invitation.organization.members.count()
@@ -116,23 +116,6 @@ class TestPrescriberWithOrgInvitation:
         org_active_members_after = invitation.organization.active_members.count()
         assert org_members == org_members_after
         assert org_active_members + 1 == org_active_members_after
-
-    # FIXME: Remove once replaced with professional
-    def test_with_employer(self):
-        invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
-        EmployerFactory(email=invitation.email)
-        org_members = invitation.organization.members.count()
-        invitation.add_invited_user()
-        org_members_after = invitation.organization.members.count()
-        assert org_members + 1 == org_members_after
-
-    def test_with_labor_inspector(self):
-        invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
-        LaborInspectorFactory(email=invitation.email)
-        org_members = invitation.organization.members.count()
-        invitation.add_invited_user()
-        org_members_after = invitation.organization.members.count()
-        assert org_members + 1 == org_members_after
 
 
 class TestPrescriberWithOrgInvitationEmails:
@@ -173,7 +156,7 @@ class TestPrescriberWithOrgInvitationEmails:
 class TestCompanyInvitation:
     def test_add_or_activate_membership_to_company(self):
         invitation = EmployerInvitationFactory(email="hey@you.com")
-        EmployerFactory(email=invitation.email)
+        ProfessionalFactory(email=invitation.email)
         employers = invitation.company.members.count()
         invitation.add_invited_user()
         employers_after = invitation.company.members.count()
@@ -189,23 +172,6 @@ class TestCompanyInvitation:
         company_active_members_after = invitation.company.active_members.count()
         assert employers == employers_after
         assert company_active_members + 1 == company_active_members_after
-
-    # FIXME: Remove once replaced with professional
-    def test_with_prescriber(self):
-        invitation = EmployerInvitationFactory(email="hey@you.com")
-        PrescriberFactory(email=invitation.email)
-        employers = invitation.company.members.count()
-        invitation.add_invited_user()
-        employers_after = invitation.company.members.count()
-        assert employers + 1 == employers_after
-
-    def test_with_labor_inspector(self):
-        invitation = EmployerInvitationFactory(email="hey@you.com")
-        LaborInspectorFactory(email=invitation.email)
-        employers = invitation.company.members.count()
-        invitation.add_invited_user()
-        employers_after = invitation.company.members.count()
-        assert employers + 1 == employers_after
 
 
 class TestCompanyInvitationEmails:

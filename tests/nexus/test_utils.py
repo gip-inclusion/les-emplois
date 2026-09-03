@@ -16,13 +16,7 @@ from itou.nexus.utils import (
 )
 from itou.users.enums import IdentityProvider
 from tests.nexus.factories import NexusRessourceSyncStatusFactory, NexusUserFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
 
 
 def test_init_full_sync():
@@ -71,20 +65,19 @@ class TestGetServiceUsers:
         with pytest.raises(AssertionError):
             get_service_users()
 
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
 
         with pytest.raises(AssertionError):
             get_service_users(email=user.email, user=user)
 
-    @pytest.mark.parametrize("user_factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-    def test_emplois_user(self, user_factory):
-        user = user_factory()
+    def test_emplois_user(self):
+        user = ProfessionalFactory()
         expected = [build_user(serialize_user(user), Service.EMPLOIS)]
         assert get_service_users(user=user) == expected
         assert get_service_users(email=user.email) == expected
 
     def test_activated_services(self):
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         activated_service = ActivatedService.objects.create(
             user=user, service=random.choice([Service.PILOTAGE, Service.MON_RECAP])
         )
@@ -111,7 +104,7 @@ class TestDropDownStatus:
     @pytest.mark.parametrize("pc_on_emplois", [True, False])
     @pytest.mark.parametrize("pc_on_service", [True, False])
     def test_proconnect(self, pc_on_emplois, pc_on_service):
-        user = PrescriberFactory(
+        user = ProfessionalFactory(
             identity_provider=IdentityProvider.PRO_CONNECT if pc_on_emplois else IdentityProvider.DJANGO
         )
         NexusUserFactory(email=user.email, auth=Auth.MAGIC_LINK, source=Service.DORA)
@@ -123,7 +116,7 @@ class TestDropDownStatus:
         assert dropdown_status(email=user.email)["proconnect"] == (pc_on_emplois or pc_on_service)
 
     def test_activated_service(self):
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         expected = [Service.EMPLOIS]
         assert dropdown_status(user=user)["activated_services"] == expected
         assert dropdown_status(email=user.email)["activated_services"] == expected

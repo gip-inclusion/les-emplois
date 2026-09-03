@@ -17,7 +17,13 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 def test_selected_criteria_inline(admin_client):
@@ -161,7 +167,7 @@ class TestAdminForm:
     def test_add_eligibility_diagnostic_bad_job_seeker(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
         post_data = self.build_post_data(
-            kind, author, AuthorKind.PRESCRIBER, PrescriberFactory(), with_administrative_criteria=False
+            kind, author, AuthorKind.PRESCRIBER, ProfessionalFactory(), with_administrative_criteria=False
         )
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)

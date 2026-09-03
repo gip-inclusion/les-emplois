@@ -7,12 +7,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.communications import registry as notifications_registry
 from itou.communications.models import DisabledNotification, NotificationSettings
 from tests.institutions.factories import LaborInspectorFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 
 
 def test_staff_user_not_allowed(client):

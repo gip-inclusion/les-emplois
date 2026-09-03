@@ -13,7 +13,7 @@ from tests.companies.factories import (
 )
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, ProfessionalFactory
 
 
 FIXTURE_SIZE = 3
@@ -38,7 +38,7 @@ def get_test_data(factory):
         CompanyFactory,
         SiaeConventionFactory,
         CompanyMembershipFactory,
-        PrescriberFactory,
+        ProfessionalFactory,
         PrescriberMembershipFactory,
         PrescriberOrganizationFactory,
         InstitutionFactory,

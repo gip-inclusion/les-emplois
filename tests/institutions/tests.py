@@ -19,7 +19,7 @@ from tests.institutions.factories import (
     InstitutionWith2MembershipFactory,
 )
 from tests.invitations.factories import LaborInspectorInvitationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 class TestInstitutionModel:
@@ -57,7 +57,7 @@ class TestInstitutionModel:
     def test_add_or_activate_membership(self, caplog):
         institution = InstitutionFactory()
         assert 0 == institution.members.count()
-        admin_user = LaborInspectorFactory()
+        admin_user = ProfessionalFactory()
         institution.add_or_activate_membership(admin_user)
         membership = institution.memberships.get()
         assert membership.is_admin is True
@@ -71,7 +71,7 @@ class TestInstitutionModel:
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
-        other_user = LaborInspectorFactory()
+        other_user = ProfessionalFactory()
         invit1, invit2 = LaborInspectorInvitationFactory.create_batch(
             2, email=other_user.email, institution=institution, sender=admin_user
         )
@@ -130,12 +130,6 @@ class TestInstitutionModel:
         ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
-
-        prescriber = PrescriberFactory()
-        institution.add_or_activate_membership(prescriber)
-
-        employer = EmployerFactory()
-        institution.add_or_activate_membership(employer)
 
         non_professional = JobSeekerFactory()
         with pytest.raises(ValidationError):
@@ -236,7 +230,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
 def test_add_admin(admin_client, caplog, mailoutbox):
     institution = InstitutionFactory(department="", with_membership=True)
     membership = institution.memberships.first()
-    labor_inspector = LaborInspectorFactory()
+    labor_inspector = ProfessionalFactory()
     assert membership.is_admin
 
     change_url = reverse("admin:institutions_institution_change", args=[institution.pk])

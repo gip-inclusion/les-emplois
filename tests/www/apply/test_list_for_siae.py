@@ -26,7 +26,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, ProfessionalFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assert_previous_step,
@@ -430,7 +430,7 @@ class TestProcessListSiae:
         # Test with invalid value
         response = client.get(
             reverse("apply:list_for_siae"),
-            {"senders": [PrescriberFactory().pk]},
+            {"senders": [ProfessionalFactory().pk]},
         )
         assertContains(response, INVALID_VALUE_MESSAGE)
 

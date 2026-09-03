@@ -11,7 +11,7 @@ from tests.archive.factories import (
     AnonymizedProfessionalFactory,
     AnonymizedSIAEEligibilityDiagnosisFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 def test_datum_name_value():
@@ -65,7 +65,7 @@ def test_collect_archive_data_when_no_data_exists():
 
 def test_collect_archive_data_with_data():
     AnonymizedProfessionalFactory()
-    EmployerFactory.create_batch(2, notified_days_ago=1, email=None)
+    ProfessionalFactory.create_batch(2, notified_days_ago=1, email=None)
     AnonymizedJobSeekerFactory.create_batch(3)
     AnonymizedApplicationFactory.create_batch(4)
     AnonymizedApprovalFactory.create_batch(5)
@@ -73,9 +73,11 @@ def test_collect_archive_data_with_data():
     AnonymizedSIAEEligibilityDiagnosisFactory.create_batch(7)
     AnonymizedGEIQEligibilityDiagnosisFactory.create_batch(8)
     JobSeekerFactory.create_batch(9, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
-    EmployerFactory.create_batch(10, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
+    ProfessionalFactory.create_batch(10, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
     JobSeekerFactory.create_batch(11, joined_days_ago=DAYS_OF_INACTIVITY)
-    EmployerFactory.create_batch(12, joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now() - INACTIVITY_PERIOD)
+    ProfessionalFactory.create_batch(
+        12, joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now() - INACTIVITY_PERIOD
+    )
 
     assert archive.collect_archive_data() == {
         models.DatumCode.ANONYMIZED_PROFESSIONALS_DELETED: 1,

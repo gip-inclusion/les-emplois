@@ -1,7 +1,13 @@
 from django.contrib.auth.models import AnonymousUser
 
 from itou.utils.urls import get_zendesk_form_url
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 from tests.utils.testing import get_request
 
 
@@ -54,5 +60,5 @@ class TestZendeskUrl:
         assert get_zendesk_form_url(request) == snapshot(name="organization phone")
 
     def test_pro_no_organization(self, snapshot):
-        request = get_request(PrescriberFactory(for_snapshot=True))
+        request = get_request(ProfessionalFactory(for_snapshot=True))
         assert get_zendesk_form_url(request) == snapshot

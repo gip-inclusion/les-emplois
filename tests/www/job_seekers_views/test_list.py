@@ -39,6 +39,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
@@ -688,8 +689,8 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     Check that a job seeker created by an "orienteur solo" is not shared among
     all the "orienteurs solo"
     """
-    prescriber = PrescriberFactory()
-    other_prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
+    other_prescriber = ProfessionalFactory()
     organization = PrescriberOrganizationFactory()
 
     # Job seeker created by another prescriber
@@ -726,7 +727,6 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     )
 
     # The prescriber is now in another org (without it they can't use the website)
-    PrescriberMembershipFactory(user=prescriber)
     client.force_login(prescriber)
     response = client.get(reverse("job_seekers_views:list"))
     assertNotContains(response, alain.get_full_name())
@@ -1421,7 +1421,7 @@ def test_filtered_by_organization_members(client, org_factory, membership_factor
     professional = organization.members.first()
     member = organization.members.last()
     old_member = membership_factory(organization)(user__is_active=False, user__first_name="Charlie").user
-    other_pro_not_in_orga = PrescriberFactory(first_name="Deborah")
+    other_pro_not_in_orga = ProfessionalFactory(first_name="Deborah")
     prescriber_organization = is_prescriber_organization and organization or None
     company = is_company and organization or None
 

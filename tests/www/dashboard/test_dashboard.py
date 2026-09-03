@@ -49,6 +49,7 @@ from tests.users.factories import (
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -100,7 +101,7 @@ class TestDashboardView:
         company = CompanyFactory(
             with_membership=True, convention__pending_grace_period=True, subject_to_iae_rules=True
         )
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         company.members.add(user)
         client.force_login(user)
 
@@ -110,7 +111,7 @@ class TestDashboardView:
 
     def test_user_with_inactive_company_cannot_login_after_grace_period(self, client):
         company = CompanyFactory(with_membership=True, convention__after_grace_period=True, subject_to_iae_rules=True)
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         company.members.add(user)
         client.force_login(user)
 
@@ -995,7 +996,7 @@ class TestDashboardView:
             )
 
     @freeze_time("2025-05-19")
-    def test_jobseeker_eligibility_diagnoses(self, client, snapshot):
+    def test_jobseeker_iae_eligibility_diagnoses(self, client, snapshot):
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -1003,7 +1004,7 @@ class TestDashboardView:
         # An IAE diagnosis from a prescriber
         IAEEligibilityDiagnosisFactory(
             from_prescriber=True,
-            author=PrescriberFactory(for_snapshot=True),
+            author=ProfessionalFactory(for_snapshot=True),
             author_prescriber_organization__for_snapshot=True,
             job_seeker=user,
             criteria_kinds=[
@@ -1012,10 +1013,19 @@ class TestDashboardView:
                 AdministrativeCriteriaKind.PM,
             ],
         )
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#iae-eligibility-diagnosis")) == snapshot
+
+    @freeze_time("2025-05-19")
+    def test_jobseeker_geiq_eligibility_diagnoses(self, client, snapshot):
+        user = JobSeekerFactory(with_address=True)
+        client.force_login(user)
+        url = reverse("dashboard:index")
+
         # A GEIQ diagnosis from an employer with criteria (hence with allowance)
         GEIQEligibilityDiagnosisFactory(
             from_employer=True,
-            author=EmployerFactory(for_snapshot=True),
+            author=ProfessionalFactory(for_snapshot=True),
             author_geiq__for_snapshot=True,
             job_seeker=user,
             criteria_kinds=[
@@ -1025,12 +1035,7 @@ class TestDashboardView:
             ],
         )
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, selector="#iae-eligibility-diagnosis")) == snapshot(
-            name="IAE eligibility block on job seeker dashboard"
-        )
-        assert pretty_indented(parse_response_to_soup(response, selector="#geiq-eligibility-diagnosis")) == snapshot(
-            name="GEIQ eligibility block on job seeker dashboard"
-        )
+        assert pretty_indented(parse_response_to_soup(response, selector="#geiq-eligibility-diagnosis")) == snapshot
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):

@@ -57,6 +57,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
@@ -433,7 +434,7 @@ class TestProcessViews:
             count=1,
         )
 
-        gilles = EmployerFactory(first_name="Gilles", last_name="Pardoux")
+        gilles = ProfessionalFactory(first_name="Gilles", last_name="Pardoux")
         to_company.members.add(gilles)
         job_application.archived_by = gilles
         job_application.save(update_fields=["archived_by", "updated_at"])

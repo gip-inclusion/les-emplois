@@ -42,13 +42,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-    UserFactory,
-)
+from tests.users.factories import JobSeekerFactory, PrescriberFactory, ProfessionalFactory, UserFactory
 from tests.utils.testing import accept_legal_terms
 
 
@@ -124,7 +118,7 @@ class TestProConnectModel:
         we use it and we update it.
         """
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        PrescriberFactory(
+        ProfessionalFactory(
             username=pc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
@@ -142,7 +136,7 @@ class TestProConnectModel:
         The email is also different, so it will crash while trying to create a new user.
         """
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        PrescriberFactory(
+        ProfessionalFactory(
             username=pc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=users_enums.IdentityProvider.DJANGO,
@@ -157,7 +151,7 @@ class TestProConnectModel:
         allow login and update the sub.
         """
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        PrescriberFactory(
+        ProfessionalFactory(
             username="another_sub",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
             email=pc_user_data.email,
@@ -201,7 +195,7 @@ class TestProConnectModel:
         We user it and we update it with the data form the identity_provider.
         """
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
+        ProfessionalFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
         with triggers.fake_context():
             user, created = pc_user_data.create_or_update_user()
         assert not created
@@ -211,7 +205,7 @@ class TestProConnectModel:
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
     def test_update_user_from_user_info(self, pro_connect):
-        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        user = ProfessionalFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         pc_user = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
         new_pc_user = ProConnectUserData(
@@ -255,7 +249,7 @@ class TestProConnectModel:
         with pytest.raises(RegisterForbiddenException), triggers.fake_context():
             pc_user_data.create_or_update_user(login_only=True)
 
-        PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
+        ProfessionalFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
         pc_user_data.create_or_update_user(login_only=True)
 
 
@@ -332,7 +326,7 @@ class TestProConnectCallbackView:
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
         # Update all fields
-        PrescriberFactory(
+        ProfessionalFactory(
             first_name="Bernard",
             last_name="Blier",
             username="bernard_blier",
@@ -347,10 +341,9 @@ class TestProConnectCallbackView:
         assert user.has_sso_provider
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    @pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory])
-    def test_callback_allows_professionals(self, client, pro_connect, user_factory):
+    def test_callback_allows_professionals(self, client, pro_connect):
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        user = user_factory(username=pc_user_data.username, email=pc_user_data.email)
+        user = ProfessionalFactory(username=pc_user_data.username, email=pc_user_data.email)
         kind = user.kind
 
         pro_connect.mock_oauth_dance(client)
@@ -419,7 +412,7 @@ class TestProConnectCallbackView:
 
     def test_callback_update_sub_on_sub_conflict(self, client, pro_connect):
         oidc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        user = PrescriberFactory(
+        user = ProfessionalFactory(
             username="another_sub", email=oidc_user_data.email, identity_provider=IdentityProvider.PRO_CONNECT
         )
 
@@ -428,14 +421,14 @@ class TestProConnectCallbackView:
         assert user.username == pro_connect.oidc_userinfo["sub"]
 
     def test_callback_updating_email_collision(self, client, pro_connect):
-        PrescriberFactory(
+        ProfessionalFactory(
             first_name="Bernard",
             last_name="Blier",
             username="bernard_blier",
             email=pro_connect.oidc_userinfo["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        PrescriberFactory(
+        ProfessionalFactory(
             first_name=pro_connect.oidc_userinfo["given_name"],
             last_name=pro_connect.oidc_userinfo["usual_name"],
             username=pro_connect.oidc_userinfo["sub"],
@@ -459,7 +452,7 @@ class TestProConnectCallbackView:
         )
 
     def test_callback_update_FT_organization(self, client, pro_connect):
-        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        user = ProfessionalFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         assert not org.members.exists()
 
@@ -481,7 +474,7 @@ class TestProConnectCallbackView:
         assertQuerySetEqual(org.members.all(), [user])
 
     def test_callback_ft_users_with_no_org(self, client, pro_connect):
-        PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        ProfessionalFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
 
         oidc_userinfo = pro_connect.oidc_userinfo.copy()
         oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
@@ -498,7 +491,7 @@ class TestProConnectCallbackView:
         assert get_user(client).is_authenticated is False
 
     def test_callback_ft_users_unknown_safir(self, client, pro_connect):
-        PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        ProfessionalFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
 
         oidc_userinfo = pro_connect.oidc_userinfo_with_safir.copy()
         response = pro_connect.mock_oauth_dance(
@@ -528,7 +521,7 @@ class TestProConnectCallbackView:
         assert get_user(client).is_authenticated is False
 
     def test_callback_ft_users_unknown_safir_already_in_org(self, client, pro_connect):
-        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        user = ProfessionalFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="00000")
         org.add_or_activate_membership(user)
 
@@ -781,7 +774,7 @@ class TestProConnectLogout:
         When a local user wants to log out from his local account,
         he should be logged out without pro connect.
         """
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         client.force_login(user)
         response = client.post(reverse("account_logout"))
         assertRedirects(response, reverse("search:employers_home"))
@@ -926,7 +919,7 @@ class TestProConnectMapChannel:
 
 class TestProConnectNexusChannel:
     def test_callback_existing_user(self, client, pro_connect):
-        PrescriberFactory(email=pro_connect.oidc_userinfo["email"])
+        ProfessionalFactory(email=pro_connect.oidc_userinfo["email"])
 
         pro_connect.mock_oauth_dance(
             client,

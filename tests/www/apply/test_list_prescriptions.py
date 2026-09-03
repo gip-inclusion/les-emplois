@@ -27,7 +27,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
@@ -119,7 +119,7 @@ def test_as_unauthorized_prescriber(client, snapshot):
         sent_by_prescriber_alone=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
-        job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
+        job_seeker__created_by=ProfessionalFactory(),  # to check for useless queries
         job_seeker__with_mocked_address=True,
         sender=prescriber,
         with_iae_eligibility_diagnosis=True,
@@ -184,7 +184,7 @@ def test_filtered_by_sender(client):
     assertNotContains(response, INVALID_VALUE_MESSAGE)
 
     # Test with invalid value
-    response = client.get(reverse("apply:list_prescriptions"), {"senders": PrescriberFactory().pk})
+    response = client.get(reverse("apply:list_prescriptions"), {"senders": ProfessionalFactory().pk})
     assertContains(response, INVALID_VALUE_MESSAGE)
 
 
@@ -1027,7 +1027,7 @@ class TestAutocomplete:
     def test_as_prescriber(self, client, snapshot):
         org = PrescriberOrganizationFactory(authorized=True)
         prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
-        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(prescriber)
 
         job_application = JobApplicationFactory(
@@ -1041,7 +1041,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             sender_prescriber_organization=org,
-            sender=other_prescriber,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1105,7 +1105,7 @@ class TestAutocomplete:
     def test_as_unauthorized_prescriber(self, client):
         org = PrescriberOrganizationFactory()
         prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
-        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(prescriber)
 
         job_application = JobApplicationFactory(
@@ -1119,7 +1119,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_prescriber=True,
             sender_prescriber_organization=org,
-            sender=other_prescriber,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1128,7 +1128,7 @@ class TestAutocomplete:
         third_application = JobApplicationFactory(
             sent_by_prescriber=True,
             sender_prescriber_organization=org,
-            sender=PrescriberFactory(first_name="John", last_name="Black"),
+            sender=ProfessionalFactory(first_name="John", last_name="Black"),
             job_seeker=job_seeker,
         )
 
@@ -1177,7 +1177,7 @@ class TestAutocomplete:
     def test_as_employer(self, client, snapshot):
         company = CompanyFactory()
         employer = CompanyMembershipFactory(company=company, user__first_name="John", user__last_name="Doe").user
-        other_employer = EmployerFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(employer)
 
         job_application = JobApplicationFactory(
@@ -1191,7 +1191,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_employer=True,
             sender_company=company,
-            sender=other_employer,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1199,7 +1199,7 @@ class TestAutocomplete:
         third_application = JobApplicationFactory(
             sent_by_employer=True,
             sender_company=company,
-            sender=EmployerFactory(first_name="Jim", last_name="Beam"),
+            sender=ProfessionalFactory(first_name="Jim", last_name="Beam"),
             job_seeker__first_name="Roger",
             job_seeker__last_name="Smith",
             to_company__brand="Société C",

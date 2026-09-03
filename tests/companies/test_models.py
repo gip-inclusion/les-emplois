@@ -26,7 +26,7 @@ from tests.companies.factories import (
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 from tests.utils.testing import normalize_fields_history
 
 
@@ -264,7 +264,7 @@ class TestCompanyModel:
     def test_add_or_activate_membership(self, caplog):
         company = CompanyFactory()
         assert 0 == company.members.count()
-        admin_user = EmployerFactory()
+        admin_user = ProfessionalFactory()
         company.add_or_activate_membership(admin_user)
         membership = company.memberships.get()
         assert membership.is_admin is True
@@ -277,7 +277,7 @@ class TestCompanyModel:
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
-        other_user = EmployerFactory()
+        other_user = ProfessionalFactory()
         invit1, invit2 = EmployerInvitationFactory.create_batch(
             2, email=other_user.email, company=company, sender=admin_user
         )
@@ -335,12 +335,6 @@ class TestCompanyModel:
         ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
-
-        prescriber = PrescriberFactory()
-        company.add_or_activate_membership(prescriber)
-
-        labor_inspector = LaborInspectorFactory()
-        company.add_or_activate_membership(labor_inspector)
 
         non_professional = JobSeekerFactory()
         with pytest.raises(ValidationError):

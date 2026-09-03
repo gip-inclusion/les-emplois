@@ -59,6 +59,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import default_storage_ls_files, get_session_name, parse_response_to_soup, pretty_indented
 
@@ -1752,8 +1753,8 @@ class TestApplyAsPrescriber:
         reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
-        prescriber = PrescriberFactory()
-        organization = PrescriberMembershipFactory(user=prescriber).organization
+        prescriber = PrescriberFactory(membership=True)
+        organization = prescriber.prescribermembership_set.get().organization
         client.force_login(prescriber)
 
         dummy_job_seeker = JobSeekerFactory.build(
@@ -3250,7 +3251,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
             jobseeker_profile__pole_emploi_id="1234567A",
-            created_by=PrescriberFactory(),
+            created_by=ProfessionalFactory(),
         )
         is_prescriber = user_factory and user_factory.func is PrescriberFactory
         is_auto_prescription = user_factory is None
@@ -3913,7 +3914,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
     def test_as_authorized_prescriber_with_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = PrescriberFactory()
+        self.job_seeker.created_by = ProfessionalFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
@@ -3933,7 +3934,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
     def test_as_company_with_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = EmployerFactory()
+        self.job_seeker.created_by = ProfessionalFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
 
@@ -3970,7 +3971,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
-        self.job_seeker.created_by = EmployerFactory()
+        self.job_seeker.created_by = ProfessionalFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
 
@@ -3994,7 +3995,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self, client):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = EmployerFactory()
+        self.job_seeker.created_by = ProfessionalFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_that_last_step_doesnt_crash_with_direct_access(client, self.company.members.first())
