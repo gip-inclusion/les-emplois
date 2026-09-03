@@ -1,3 +1,5 @@
+import datetime as dt
+import secrets
 from math import ceil
 
 import sentry_sdk
@@ -180,3 +182,38 @@ def _get_redirect_url(request):
     query = QueryDict(request.GET.urlencode(), mutable=True)
     query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
     return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
+
+
+def browser_id_cookie(get_response):
+    """Set a cookie to browsers interacting with the website.
+
+    This allow to track a browser from a session to another in the audit trail.
+
+    POSTing triggers the initial creation of a cookie, not
+    authentication: we want to have a value for this cookie **before**
+    the user authentication so the event can be tracked.
+
+    See docs/audit_trail.md for more information.
+    """
+
+    def middleware(request):
+        """Cookies contain 16 random bytes, so 128 bits (like a UUID)."""
+        request.browser_id_cookie = request.COOKIES.get(settings.BROWSER_ID_COOKIE_NAME)
+        if request.method == "POST" and not request.browser_id_cookie:
+            request.browser_id_cookie = secrets.token_urlsafe(16)
+
+        response = get_response(request)
+
+        if request.method == "POST" and request.browser_id_cookie:
+            # Renew the cookie (push its expiration).
+            response.set_cookie(
+                settings.BROWSER_ID_COOKIE_NAME,
+                request.browser_id_cookie,
+                max_age=dt.timedelta(days=45),
+                httponly=True,
+                samesite="Strict",
+            )
+
+        return response
+
+    return middleware
