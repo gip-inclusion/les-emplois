@@ -244,19 +244,35 @@ class TestEmployeeRecordModel:
 
     def test_unarchive(self, faker, subtests):
         specs = {
-            None: Status.NEW,
-            "0000": Status.PROCESSED,
-            faker.numerify("31##"): Status.ARCHIVED,
-            faker.numerify("32##"): Status.REJECTED,
-            faker.numerify("33##"): Status.REJECTED,
-            faker.numerify("340#"): Status.REJECTED,
-            "3436": Status.PROCESSED,
-            faker.numerify("35##"): Status.ARCHIVED,
+            (None, None): Status.NEW,
+            ("0000", None): Status.PROCESSED,
+            (faker.numerify("31##"), None): Status.ARCHIVED,
+            (faker.numerify("32##"), (Status.REJECTED,)): Status.REJECTED,
+            (
+                faker.numerify("33##"),
+                (
+                    Status.UPDATE_REJECTED,
+                    Status.REJECTED,
+                ),
+            ): Status.REJECTED,
+            (faker.numerify("340#"), (Status.REJECTED,)): Status.REJECTED,
+            (faker.numerify("32##"), (Status.UPDATE_REJECTED,)): Status.UPDATE_REJECTED,
+            (faker.numerify("33##"), (Status.UPDATE_REJECTED,)): Status.UPDATE_REJECTED,
+            (faker.numerify("340#"), (Status.REJECTED, Status.UPDATE_REJECTED)): Status.UPDATE_REJECTED,
+            ("3436", None): Status.PROCESSED,
+            (faker.numerify("35##"), None): Status.ARCHIVED,
         }
 
-        for code, expected_status in specs.items():
+        for (code, old_transition_from), expected_status in specs.items():
             with subtests.test(code=code):
                 employee_record = BareEmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=code)
+                if old_transition_from is not None:
+                    for old_state in old_transition_from:
+                        employee_record.logs.create(
+                            from_state=old_state,
+                            to_state=Status.ARCHIVED,
+                            transition=EmployeeRecordTransition.ARCHIVE,
+                        )
                 employee_record.unarchive()
                 assert employee_record.status == expected_status
 
@@ -870,6 +886,23 @@ def test_transition_log(faker):
                     "archive": faker.pydict(value_types=[int, str]),
                 },
             ),
+            (EmployeeRecordTransition.PLAN_UPDATE, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
             (EmployeeRecordTransition.DISABLE, {}),
             (EmployeeRecordTransition.ENABLE, {"user": ProfessionalFactory()}),
             (EmployeeRecordTransition.ARCHIVE, {}),
@@ -899,6 +932,98 @@ def test_transition_log(faker):
         [
             (EmployeeRecordTransition.ARCHIVE, {}),
             (EmployeeRecordTransition.UNARCHIVE_NEW, {}),
+        ],
+        [
+            (EmployeeRecordTransition.READY, {"user": ProfessionalFactory()}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.PLAN_UPDATE, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.REJECT_FOR_UPDATE,
+                {
+                    "code": "3446",
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.RETRY_CREATE,
+                {},
+            ),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.PLAN_UPDATE, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.REJECT_FOR_UPDATE,
+                {
+                    "code": faker.numerify("33##"),
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.ARCHIVE, {}),
+            (EmployeeRecordTransition.UNARCHIVE_UPDATE_REJECTED, {}),
+            (EmployeeRecordTransition.PLAN_UPDATE, {"user": ProfessionalFactory()}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
         ],
     ]
     for specs in lifecycle_specs:

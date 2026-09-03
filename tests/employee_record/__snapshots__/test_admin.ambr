@@ -6,6 +6,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_new" type="submit" value="Nouvelle"/>
+      <input class="danger js-with-confirm" name="transition_unarchive_update_rejected" type="submit" value="Mise à jour en erreur"/>
   </div>
   
   '''
@@ -58,6 +59,17 @@
   
   '''
 # ---
+# name: test_available_transitions[UPDATE_REJECTED][actions]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+      <p>
+          Changer l'état de la fiche salarié :
+      </p>
+      <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+  </div>
+  
+  '''
+# ---
 # name: test_available_transitions_for_unarchive[0000]
   '''
   <div class="submit-row" id="employee-record-transitions">
@@ -65,6 +77,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_processed" type="submit" value="Intégrée"/>
+      <input class="danger js-with-confirm" name="transition_unarchive_update_rejected" type="submit" value="Mise à jour en erreur"/>
   </div>
   
   '''
@@ -76,6 +89,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_rejected" type="submit" value="En erreur"/>
+      <input class="danger js-with-confirm" name="transition_unarchive_update_rejected" type="submit" value="Mise à jour en erreur"/>
   </div>
   
   '''
@@ -87,6 +101,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_processed" type="submit" value="Intégrée"/>
+      <input class="danger js-with-confirm" name="transition_unarchive_update_rejected" type="submit" value="Mise à jour en erreur"/>
   </div>
   
   '''
@@ -98,6 +113,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_new" type="submit" value="Nouvelle"/>
+      <input class="danger js-with-confirm" name="transition_unarchive_update_rejected" type="submit" value="Mise à jour en erreur"/>
   </div>
   
   '''

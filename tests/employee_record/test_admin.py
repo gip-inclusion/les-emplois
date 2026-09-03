@@ -86,7 +86,7 @@ def test_available_transitions(snapshot, client, status):
     for user in [superuser, rw_user]:
         client.force_login(user)
         response = client.get(url)
-        if status not in {Status.READY, Status.SENT}:
+        if status not in {Status.READY, Status.SENT, Status.UPDATE_PENDING, Status.UPDATE_SENT}:
             assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot(
                 name="actions"
             )

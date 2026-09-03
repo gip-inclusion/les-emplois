@@ -41,6 +41,7 @@ class ASPExchangeInformation(models.Model):
     ASP_PROCESSING_SUCCESS_CODE = "0000"
     ASP_DUPLICATE_ERROR_CODE = "3436"
     ASP_UNIQUE_ID_MISMATCH_CODE = "3437"
+    ASP_UNKNOWN_APPROVAL_CODE = "3446"
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="code de traitement ASP", null=True)
@@ -99,6 +100,12 @@ class EmployeeRecordTransition(enum.StrEnum):
     UNARCHIVE_NEW = "unarchive_new"
     UNARCHIVE_PROCESSED = "unarchive_processed"
     UNARCHIVE_REJECTED = "unarchive_rejected"
+    UNARCHIVE_UPDATE_REJECTED = "unarchive_update_rejected"
+
+    PLAN_UPDATE = "plan_update"
+    WAIT_FOR_ASP_RESPONSE_FOR_UPDATE = "wait_for_asp_response_for_update"
+    REJECT_FOR_UPDATE = "reject_for_update"
+    RETRY_CREATE = "retry_create"
 
     @classmethod
     def without_asp_exchange(cls):
@@ -115,8 +122,15 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     states = Status.choices
     initial_state = Status.NEW
 
-    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
-    CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
+    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED, Status.UPDATE_REJECTED]
+    CAN_BE_ARCHIVED_STATES = [
+        Status.NEW,
+        Status.READY,
+        Status.REJECTED,
+        Status.PROCESSED,
+        Status.DISABLED,
+        Status.UPDATE_REJECTED,
+    ]
     transitions = (
         (
             EmployeeRecordTransition.READY,
@@ -125,13 +139,18 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
         ),
         (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, Status.READY, Status.SENT),
         (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
-        (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
+        (EmployeeRecordTransition.PROCESS, [Status.SENT, Status.UPDATE_SENT], Status.PROCESSED),
         (EmployeeRecordTransition.DISABLE, CAN_BE_DISABLED_STATES, Status.DISABLED),
         (EmployeeRecordTransition.ENABLE, Status.DISABLED, Status.NEW),
         (EmployeeRecordTransition.ARCHIVE, CAN_BE_ARCHIVED_STATES, Status.ARCHIVED),
         (EmployeeRecordTransition.UNARCHIVE_NEW, Status.ARCHIVED, Status.NEW),
         (EmployeeRecordTransition.UNARCHIVE_PROCESSED, Status.ARCHIVED, Status.PROCESSED),
         (EmployeeRecordTransition.UNARCHIVE_REJECTED, Status.ARCHIVED, Status.REJECTED),
+        (EmployeeRecordTransition.UNARCHIVE_UPDATE_REJECTED, Status.ARCHIVED, Status.UPDATE_REJECTED),
+        (EmployeeRecordTransition.PLAN_UPDATE, [Status.PROCESSED, Status.UPDATE_REJECTED], Status.UPDATE_PENDING),
+        (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE, Status.UPDATE_PENDING, Status.UPDATE_SENT),
+        (EmployeeRecordTransition.REJECT_FOR_UPDATE, Status.UPDATE_SENT, Status.UPDATE_REJECTED),
+        (EmployeeRecordTransition.RETRY_CREATE, Status.UPDATE_REJECTED, Status.READY),
     )
     log_model = "employee_record.EmployeeRecordTransitionLog"
 
@@ -256,7 +275,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         help_text="Typiquement les dates du PASS IAE lié",
         null=True,
     )
-    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut", max_length=10)
+    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut")
 
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id
@@ -411,9 +430,26 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
+    def wait_for_asp_response_for_update(self, *, file, line_number, archive):
+        """
+        An employee record is sent to ASP for an update via a JSON file,
+        The file name is stored for further feedback processing (also done via a file)
+        """
+        self.clean()
+        self.set_asp_batch_information(file, line_number, archive)
+
+    @xwf_models.transition()
     def reject(self, *, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
+        """
+        self.clean()
+        self.set_asp_processing_information(code, label, archive)
+
+    @xwf_models.transition()
+    def reject_for_update(self, *, code, label, archive):
+        """
+        Update status after an ASP rejection of the update of the employee record
         """
         self.clean()
         self.set_asp_processing_information(code, label, archive)
@@ -449,6 +485,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         # Remove proof of processing after delay
         self.archived_json = None
 
+    @xworkflows.transition_check(EmployeeRecordTransition.RETRY_CREATE)
+    def check_retry_create(self):
+        return self.asp_processing_code == EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE
+
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_NEW)
     def check_unarchive_new(self):
         return self.status_based_on_asp_processing_code is Status.NEW
@@ -462,17 +502,24 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         return self.status_based_on_asp_processing_code is Status.REJECTED
 
     def unarchive(self):
-        for transition_name in [
-            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
-            EmployeeRecordTransition.UNARCHIVE_REJECTED,
-            EmployeeRecordTransition.UNARCHIVE_NEW,
-        ]:
-            transition = getattr(self, transition_name)
-            if transition.is_available():
-                # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
-                # we might want to automatically go to PENDING_UPDATE
-                return transition()
-
+        if self.status_based_on_asp_processing_code is Status.NEW:
+            return self.unarchive_new()
+        elif self.status_based_on_asp_processing_code is Status.PROCESSED:
+            # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
+            # we might want to automatically go to PENDING_UPDATE
+            return self.unarchive_processed()
+        elif self.status_based_on_asp_processing_code is Status.REJECTED:
+            # It can be either REJECTED or UPDATE_REJECTED
+            if (
+                last_reject_log := self.logs.filter(from_state__in=(Status.REJECTED, Status.UPDATE_REJECTED))
+                .order_by("-timestamp")
+                .first()
+            ):
+                match last_reject_log.from_state:
+                    case Status.REJECTED:
+                        return self.unarchive_rejected()
+                    case Status.UPDATE_REJECTED:
+                        return self.unarchive_update_rejected()
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
 
