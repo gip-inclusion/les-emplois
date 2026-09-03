@@ -1311,7 +1311,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="prescriber-presentation" href="/prescribers/overview">
-                                      Présentation
+                                      Fiche de présentation
                                   </a>
                               </li>
                               <li>
