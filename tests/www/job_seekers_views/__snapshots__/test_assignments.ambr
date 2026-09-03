@@ -68,7 +68,7 @@
                                   <label class="form-label">
                                       Accompagnement
                                   </label>
-                                  <div class="" id="id_is_ongoing">
+                                  <div id="id_is_ongoing">
                                       <div class="form-check">
                                           <input checked="" class="form-check-input" id="id_is_ongoing_0" name="is_ongoing" type="radio" value="True"/>
                                           <label class="form-check-label" for="id_is_ongoing_0">
