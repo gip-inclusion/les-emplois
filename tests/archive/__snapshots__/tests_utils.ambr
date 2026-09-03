@@ -67,6 +67,11 @@
       'model': 'approvals.Suspension',
     }),
     dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'audit_trail.AuditTrail',
+    }),
+    dict({
       'field': 'created_by',
       'hidden': False,
       'model': 'companies.Company',

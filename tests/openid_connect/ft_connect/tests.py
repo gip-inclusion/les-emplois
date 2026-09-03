@@ -20,6 +20,7 @@ from django.utils import crypto, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
+from itou.audit_trail.models import AuditTrail, AuditTrailEventType
 from itou.external_data.apis import ft_connect
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.ft_connect import constants
@@ -538,6 +539,14 @@ class TestPoleEmploiConnect:
         # The following redirection is tested in self.test_logout_with_redirection
         assert response.status_code == 302
         assert not auth.get_user(client).is_authenticated
+
+    @respx.mock
+    def test_creates_audit_trail(self, client):
+        user_info = FT_CONNECT_USERINFO.copy()
+        mock_oauth_dance(client, user_info=user_info, expected_route="dashboard:edit_user_info")
+        trail = AuditTrail.objects.get()
+        assert trail.event_type == AuditTrailEventType.LOG_IN
+        assert trail.data == {"idp": "FranceTravail"}
 
 
 @pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.FRANCE_CONNECT])

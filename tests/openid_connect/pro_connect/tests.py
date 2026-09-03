@@ -23,6 +23,7 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+from itou.audit_trail.models import AuditTrail, AuditTrailEventType
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.models import InvalidKindException, RegisterForbiddenException
 from itou.openid_connect.pro_connect import constants
@@ -909,6 +910,12 @@ class TestProConnectMapChannel:
         response = client.post(reverse("account_logout"))
         pro_connect.assert_and_mock_forced_logout(client, response)
         assert get_user(client).is_authenticated is False
+
+    def test_creates_audit_trail(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(client)
+        trail = AuditTrail.objects.get()
+        assert trail.event_type == AuditTrailEventType.LOG_IN
+        assert trail.data == {"idp": "ProConnect"}
 
 
 class TestProConnectNexusChannel:

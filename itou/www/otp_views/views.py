@@ -15,6 +15,7 @@ from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
+from itou.otp.signals import user_logged_in_with_2fa
 from itou.otp.utils import (
     create_otp_backup_code,
     get_user_devices,
@@ -119,6 +120,9 @@ def enrollment_step_2_and_3_confirm_device(
             device.save()
             messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
             otp_login(request, device)  # mark the user as verified
+            user_logged_in_with_2fa.send(
+                sender=enrollment_step_2_and_3_confirm_device, request=request, user=request.user
+            )
             backup_code = create_otp_backup_code(request.user)
             if len(get_user_devices(request.user)) > 1:
                 # User added _another_ device, redirect user to where they
@@ -155,6 +159,7 @@ class VerifyOTPView(FormView):
 
     def form_valid(self, form):
         otp_login(self.request, self.request.user.otp_device)
+        user_logged_in_with_2fa.send(sender=self.__class__, request=self.request, user=self.request.user)
         return super().form_valid(form)
 
     def get_success_url(self):
