@@ -120,7 +120,7 @@ def _add_user_kind_error_message(request, existing_user):
         format_html(
             "Un compte {} existe déjà avec cette adresse e-mail. "
             "Vous devez créer un compte ProConnect avec une autre adresse e-mail pour "
-            "devenir professionnel sur la plateforme. Besoin d'aide ? "
+            "devenir professionnel sur la plateforme. Besoin d'aide ? "
             "<a href='{}' target='_blank'>Contactez-nous</a>.",
             existing_user.get_kind_display(),
             get_zendesk_form_url(request),
