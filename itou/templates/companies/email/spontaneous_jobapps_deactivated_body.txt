@@ -4,7 +4,7 @@ Bonjour,
 
 Nous vous informons que la réception des candidatures spontanées pour la structure {{ structure.kind }} {{ structure.display_name }} a été suspendue automatiquement, car ce mode de recrutement n’a pas été actualisé depuis plus de 3 mois.
 
-Si vous souhaitez continuer à recevoir des candidatures spontanées, vous pouvez réactiver cette fonctionnalité depuis votre espace :
+Si vous souhaitez continuer à recevoir des candidatures spontanées, vous pouvez réactiver cette fonctionnalité depuis votre espace :
 
 Structure > Métiers et recrutements sur {% brand %}
 

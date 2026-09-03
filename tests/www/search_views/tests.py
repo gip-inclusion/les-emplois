@@ -52,7 +52,7 @@ def distance_radio(simulated_page, distance, checked: bool):
 class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
-    applications_open_str = "Cette structure vous intéresse ?"
+    applications_open_str = "Cette structure vous intéresse ?"
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:employers_home"))
