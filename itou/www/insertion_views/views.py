@@ -40,11 +40,9 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_register_mobilization_event,
 )
-from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
-from itou.utils.phone import normalize_phone_number
 from itou.utils.readonly import ReadonlyViewMixin, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -360,7 +358,6 @@ class OrientationWizardView(WizardView):
     }
 
     def setup_wizard(self):
-        self.dora_client = DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN)
         self.service = get_object_or_404(
             insertion_models.Service.objects.select_related("kind", "structure", "fee", "source").prefetch_related(
                 "publics",
@@ -414,73 +411,7 @@ class OrientationWizardView(WizardView):
                 return self.render_to_response(self.get_context_data(**kwargs))
 
             cleaned = self.form.cleaned_data
-            attachments = []
-            for field in ("credentials_documents_files", "credentials_proof_files"):
-                for uploaded_file in cleaned.get(field) or []:
-                    uploaded_file.seek(0)
-                    attachments.append((uploaded_file.name, uploaded_file))
-
             referent_data = self.wizard_session.get(OrientationStep.REFERENT)
-            payload = {
-                "di_service_id": self.service.uid,
-                "di_service_name": self.service.name,
-                "di_service_address_line": self.service.address_on_one_line or "à distance",
-                "di_contact_email": self.service.contact_email,
-                "di_contact_name": self.service.contact_full_name,
-                "di_contact_phone": self.service.contact_phone,
-                "di_structure_name": self.service.structure.name,
-                "beneficiary_first_name": self.job_seeker.first_name,
-                "beneficiary_last_name": self.job_seeker.last_name,
-                "beneficiary_email": self.job_seeker.email,
-                "beneficiary_phone": normalize_phone_number(self.job_seeker.phone or "") or "",
-                "referent_first_name": referent_data["referent_first_name"],
-                "referent_last_name": referent_data["referent_last_name"],
-                "referent_email": referent_data["referent_email"],
-                "referent_phone": referent_data["referent_phone"],
-                "data_protection_commitment": cleaned["gdpr_consent"],
-            }
-            if orientation_reason := referent_data.get("orientation_reason"):
-                payload["orientation_reasons"] = orientation_reason
-            if pole_emploi_id := self.job_seeker.jobseeker_profile.pole_emploi_id:
-                payload["beneficiary_france_travail_number"] = pole_emploi_id
-            if (organization := request.current_organization) and (prescriber := request.user):
-                emplois_data = {
-                    "beneficiary_id": str(self.job_seeker.public_id),
-                    "structure_id": str(organization.uid),
-                    "structure_name": organization.name,
-                    "prescriber_id": str(prescriber.public_id),
-                    "prescriber_email": prescriber.email,
-                    "prescriber_first_name": prescriber.first_name,
-                    "prescriber_last_name": prescriber.last_name,
-                }
-                if prescriber_phone := normalize_phone_number(prescriber.phone or referent_data["referent_phone"]):
-                    emplois_data["prescriber_phone"] = prescriber_phone
-                if organization.siret:
-                    emplois_data["structure_siret"] = organization.siret
-                payload["emplois_data"] = emplois_data
-
-            try:
-                orientation_response = self.dora_client.create_orientation(payload, attachments)
-            except DoraAPIException:
-                logger.info(
-                    "orientation wizard submission_failed reason=create_orientation "
-                    "user=%s service_uid=%s job_seeker=%s",
-                    request.user.pk,
-                    self.service.uid,
-                    self.job_seeker.public_id,
-                )
-                messages.error(
-                    request,
-                    "Votre demande n'a pas été transmise suite à un problème technique. Merci de réessayer.",
-                )
-                return self.render_to_response(self.get_context_data(**kwargs))
-
-            logger.info(
-                "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
-                request.user.pk,
-                self.service.uid,
-                self.job_seeker.public_id,
-            )
 
             if request.from_employer:
                 sender_kind = SenderKind.EMPLOYER
@@ -491,11 +422,10 @@ class OrientationWizardView(WizardView):
                 sender_prescriber_organization = request.current_organization
                 sender_company = None
 
-            orientation = insertion_models.Orientation.from_data(
+            orientation = insertion_models.Orientation.objects.create(
                 service=self.service,
                 beneficiary=self.job_seeker,
                 sender=request.user,
-                id=orientation_response["emplois_sync_uid"],
                 sender_kind=sender_kind,
                 sender_prescriber_organization=sender_prescriber_organization,
                 sender_company=sender_company,
@@ -505,16 +435,21 @@ class OrientationWizardView(WizardView):
                 referent_email=referent_data["referent_email"],
                 orientation_reasons=referent_data.get("orientation_reason", ""),
                 data_protection_commitment=cleaned["gdpr_consent"],
-                attachments=orientation_response.get("beneficiary_attachments", []),
             )
-            # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
-            # otherwise issue a redundant UPDATE probe before the INSERT.
-            orientation.save(force_insert=True)
+
+            logger.info(
+                "orientation wizard created orientation=%s for user=%s service_uid=%s job_seeker=%s",
+                orientation.pk,
+                request.user.pk,
+                self.service.uid,
+                self.job_seeker.public_id,
+            )
 
             documents = []
-            for attachment_tuple in attachments:
-                file = save_file(folder="orientations/", file=attachment_tuple[1], anonymize_filename=False)
-                documents.append(file)
+            for field in ("credentials_documents_files", "credentials_proof_files"):
+                for uploaded_file in cleaned.get(field) or []:
+                    file = save_file(folder="orientations/", file=uploaded_file, anonymize_filename=False)
+                    documents.append(file)
             orientation.documents.set(documents)
 
             # Send notifications
@@ -668,8 +603,12 @@ def orientation_details_for_sender(request, orientation_id):
         sender_company=sender_company,
     )
 
+    for doc in orientation.documents.all():
+        print(doc.__dict__)
+
     context = {
         "orientation": orientation,
+        "documents": orientation.documents.all(),
         "can_view_personal_information": can_view_personal_information(request, orientation.beneficiary),
         "can_process": False,
         "back_url": get_safe_url(request, "back_url"),

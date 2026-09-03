@@ -1,6 +1,7 @@
 import datetime
 import logging
 import secrets
+import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
@@ -654,7 +655,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     PROCESSING_EXPIRATION_PERIOD_DAYS = 60  # arbitrarily set to twice the PENDING period
     REMINDER_EMAIL_DELAY_DAYS = 10  # as in DORA
 
-    id = models.UUIDField(primary_key=True, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
     beneficiary = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -765,14 +766,6 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         default=False,
     )
 
-    # `attachments` will be removed in favor of `documents` when we stop posting orientations to DORA
-    attachments = ArrayField(
-        models.CharField(max_length=1024),
-        verbose_name="documents joints",
-        blank=True,
-        default=list,
-    )
-    # `documents` are saved but not displayed for now; we still display `attachments` until we stop posting to DORA
     documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="orientations")  #
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
@@ -812,17 +805,9 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     def __str__(self):
         return str(self.id)
 
-    @classmethod
-    def from_data(cls, service, beneficiary, sender, **kwargs):
-        return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
-
     @property
     def sender_organization(self):
         return self.sender_prescriber_organization or self.sender_company
-
-    @property
-    def attachments_details(self):
-        return [(form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.attachments]
 
     @property
     def documents_details(self):
