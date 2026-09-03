@@ -139,7 +139,7 @@
 # ---
 # name: TestOrientationDetailsForSender.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -368,14 +368,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'orientation_details_for_sender[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -527,12 +522,6 @@
                  AND "insertion_orientation"."sender_prescriber_organization_id" = %s)
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2635,7 +2624,7 @@
 # ---
 # name: TestOrientationsList.test_list_display[queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -2864,16 +2853,11 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'OrientationsFilterForm._get_choices_for_beneficiary[www/insertion_views/forms.py]',
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2928,6 +2912,7 @@
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2982,6 +2967,7 @@
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_service"."structure_id" AS "service__structure__id",
@@ -2999,6 +2985,7 @@
           'pager[utils/pagination.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -3011,6 +2998,7 @@
           'add_user_can_view_personal_information[users/perms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -3190,12 +3178,6 @@
           ORDER BY "insertion_orientation"."updated_at" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

@@ -43,7 +43,7 @@ from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.phone import normalize_phone_number
-from itou.utils.readonly import ReadonlyViewMixin
+from itou.utils.readonly import ReadonlyViewMixin, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.insertion_views.forms import (
@@ -119,7 +119,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
         }
 
 
-class ServiceDetailView(LoginNotRequiredMixin, DetailView):
+class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
     model = insertion_models.Service
     queryset = insertion_models.Service.objects.select_related(
         "source",
@@ -233,6 +233,7 @@ class OrientationStep(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
+@readonly_view
 def start_orientation(request, service_uid):
     service = get_object_or_404(
         insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES),
@@ -270,7 +271,7 @@ def start_orientation(request, service_uid):
     )
 
 
-class OrientationSelectJobSeekerView(FormView):
+class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
     form_class = OrientationSelectJobSeekerForm
     template_name = "insertion/orientation_select_job_seeker.html"
 
@@ -341,7 +342,7 @@ class OrientationResultBaseView(TemplateView):
         }
 
 
-class OrientationConfirmationView(OrientationResultBaseView):
+class OrientationConfirmationView(ReadonlyViewMixin, OrientationResultBaseView):
     template_name = "insertion/orientation_confirmation.html"
     matomo_custom_title = "Demande d'orientation transmise"
 
@@ -584,6 +585,7 @@ class OrientationWizardView(WizardView):
         }
 
 
+@readonly_view
 @require_POST
 def dismiss_orientation_disclaimer(request, session_uuid):
     try:
@@ -607,6 +609,7 @@ def dismiss_orientation_disclaimer(request, session_uuid):
     )
 
 
+@readonly_view
 @check_request(can_orient_towards_insertion_service)
 def orientations_list(request):
     template_name = "insertion/orientations/list.html"
@@ -645,6 +648,7 @@ def orientations_list(request):
     )
 
 
+@readonly_view
 @check_request(can_orient_towards_insertion_service)
 def orientation_details_for_sender(request, orientation_id):
     template_name = "insertion/orientations/details.html"
