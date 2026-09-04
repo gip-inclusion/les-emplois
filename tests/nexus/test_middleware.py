@@ -116,10 +116,10 @@ class TestDropDownMiddleware:
         response = client.get(reverse("dashboard:index"))
         assert response.wsgi_request.nexus_dropdown == {}
 
-    def test_inactive_user(self, client):
-        user = PrescriberFactory(is_active=False)
+    def test_not_using_pro_connect(self, client):
+        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         client.force_login(user)
-        response = client.get(reverse("dashboard:index"))
+        response = client.get(reverse("nexus:index"))
         assert response.wsgi_request.nexus_dropdown == {}
 
     def test_unauthenticated_user(self, client):
