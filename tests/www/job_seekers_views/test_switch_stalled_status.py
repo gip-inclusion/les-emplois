@@ -9,7 +9,7 @@ from tests.utils.testing import normalize_fields_history
 
 
 def test_view(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
     profile = JobSeekerProfileFactory(is_stalled=True)
     assert profile.is_stalled is True
     assert profile.is_not_stalled_anymore is None
@@ -61,7 +61,7 @@ def test_view_access_and_error(client):
     response = client.get(reverse("job_seekers_views:switch_stalled_status", kwargs={"public_id": uuid.uuid4()}))
     assert response.status_code == 302
 
-    prescriber = PrescriberFactory(membership__organization__authorized=False)
+    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=False)
     client.force_login(prescriber)
 
     # Needs to be a POST request
@@ -71,7 +71,7 @@ def test_view_access_and_error(client):
     response = client.post(reverse("job_seekers_views:switch_stalled_status", kwargs={"public_id": uuid.uuid4()}))
     assert response.status_code == 403
 
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
     client.force_login(prescriber)
 
     # Needs to be an existing jobseeker

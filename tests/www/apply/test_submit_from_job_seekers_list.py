@@ -36,7 +36,7 @@ class TestApplyAsPrescriber:
             with_jobs=True,
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
-        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
         job_seeker = JobSeekerFactory(
             first_name="Alain",
             last_name="Zorro",
@@ -238,7 +238,7 @@ class TestApplyAsPrescriber:
             with_jobs=True,
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
-        prescriber = PrescriberFactory(membership__organization__authorized=False)
+        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=False)
         job_seeker = JobSeekerFactory(
             first_name="Alain",
             last_name="Zorro",
@@ -410,7 +410,7 @@ class TestApplyAsPrescriber:
     def test_cannot_apply_as_prescriber_with_incorrect_public_id(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = JobDescriptionFactory(company=company)
-        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
 
         client.force_login(prescriber)
 

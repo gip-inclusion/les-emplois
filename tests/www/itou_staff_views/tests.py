@@ -127,7 +127,7 @@ class TestExportJobApplications:
             job_app.save()
             ProlongationFactory(
                 for_snapshot=True,
-                validated_by=PrescriberFactory(membership__organization__authorized=True),
+                validated_by=PrescriberFactory(membership=True, membership__organization__authorized=True),
                 declared_by_siae=siae,
                 approval=approval,
             )
@@ -877,7 +877,7 @@ class TestMergeUsers:
     def test_merge_assignments(self, client, caplog):
         org = PrescriberOrganizationFactory()
         company = CompanyFactory()
-        prescriber_1 = PrescriberFactory(membership__organization=org)
+        prescriber_1 = PrescriberFactory(membership=True, membership__organization=org)
         prescriber_2 = ProfessionalFactory()
 
         # JSA(job_seeker, from_user, None)

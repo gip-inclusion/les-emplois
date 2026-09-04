@@ -148,6 +148,9 @@ class PrescriberFactory(ProfessionalFactory):
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("membership argument is mandatory")
+
         if not create:
             return
 
@@ -178,6 +181,9 @@ class EmployerFactory(ProfessionalFactory):
 
     @factory.post_generation
     def membership(self, created, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("membership argument is mandatory")
+
         from tests.companies.factories import CompanyMembershipFactory
 
         if created and extracted is True:
@@ -207,6 +213,9 @@ class LaborInspectorFactory(ProfessionalFactory):
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("membership argument is mandatory")
+
         if not create:
             return
 

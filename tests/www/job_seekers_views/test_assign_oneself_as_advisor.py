@@ -13,7 +13,7 @@ from tests.users.factories import EmployerFactory, JobSeekerAssignmentFactory, J
 
 def test_view(client):
     organization = PrescriberOrganizationFactory()
-    professional = PrescriberFactory(membership__organization=organization)
+    professional = PrescriberFactory(membership=True, membership__organization=organization)
     job_seeker = JobSeekerFactory()
     assignment = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,

@@ -33,13 +33,14 @@ ACTIVITY_MARKUP = "<h3>Son activité</h3>"
         pytest.param(partial(EmployerFactory, membership=True), 403, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), 403, id="LaborInspector"),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=False),
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=False),
             404,
             id="PrescriberWithUnauthorizedOrganization",
         ),
         pytest.param(
             partial(
                 PrescriberFactory,
+                membership=True,
                 membership__organization__name="Orga courante",
                 membership__organization__authorized=True,
                 membership__is_admin=False,
@@ -50,6 +51,7 @@ ACTIVITY_MARKUP = "<h3>Son activité</h3>"
         pytest.param(
             partial(
                 PrescriberFactory,
+                membership=True,
                 membership__organization__name="Orga courante",
                 membership__organization__authorized=True,
                 membership__is_admin=True,

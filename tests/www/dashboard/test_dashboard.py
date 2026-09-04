@@ -1109,12 +1109,12 @@ class TestDashboardView:
         pytest.param(partial(EmployerFactory, membership=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=False),
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=False),
             assertNotContains,
             id="PrescriberWithOrganization",
         ),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=True),
             assertContains,
             id="AuthorizedPrescriber",
         ),
@@ -1128,7 +1128,7 @@ def test_prolongation_requests_access(client, factory, assertion):
 
 
 def test_prolongation_requests_badge(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
     ProlongationRequestFactory.create_batch(3, prescriber_organization=prescriber.prescriberorganization_set.first())
 
     client.force_login(prescriber)

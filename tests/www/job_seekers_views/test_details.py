@@ -472,8 +472,8 @@ def test_update_iae_eligibility_buttons(client):
     update_eligibility_str = "Mettre à jour son éligibilité IAE"
     validate_eligibility_str = "Valider son éligibilité IAE"
 
-    authorized_prescriber = PrescriberFactory(membership__organization__authorized=True)
-    unauthorized_prescriber = PrescriberFactory(membership__organization__authorized=False)
+    authorized_prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+    unauthorized_prescriber = PrescriberFactory(membership=True, membership__organization__authorized=False)
 
     job_seeker = JobSeekerFactory()
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
@@ -1013,7 +1013,7 @@ class TestContracts:
         for user, expected_status in [
             (LaborInspectorFactory(membership=True), 403),
             (PrescriberFactory(membership=True), 403),
-            (PrescriberFactory(membership__organization__authorized=True), 200),
+            (PrescriberFactory(membership=True, membership__organization__authorized=True), 200),
             (EmployerFactory(membership=True), 403),
         ]:
             client.force_login(user)

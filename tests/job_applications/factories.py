@@ -53,7 +53,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.SelfAttribute("job_seeker"),
         )
         sent_by_prescriber_alone = factory.Trait(
-            sender=factory.SubFactory(PrescriberFactory),
+            sender=factory.SubFactory(PrescriberFactory, membership=False),  # FIXME
             sender_kind=SenderKind.PRESCRIBER,
         )
         sent_by_prescriber = factory.Trait(
@@ -87,7 +87,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 job_seeker=factory.SelfAttribute("..job_seeker"),
                 author=factory.Maybe(
                     "..sender_is_job_seeker",
-                    yes_declaration=factory.SubFactory(PrescriberFactory),
+                    yes_declaration=factory.SubFactory(PrescriberFactory, membership=False),  # FIXME
                     no_declaration=factory.SelfAttribute("..sender"),
                 ),
             ),

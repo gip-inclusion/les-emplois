@@ -1334,7 +1334,7 @@ class TestOrientationsList:
         organization = membership.organization
         user = membership.user
         other_user = PrescriberFactory(
-            first_name="Daphnée", last_name="Delavigne", membership__organization=organization
+            first_name="Daphnée", last_name="Delavigne", membership=True, membership__organization=organization
         )
 
         beneficiary = JobSeekerFactory(for_snapshot=True)

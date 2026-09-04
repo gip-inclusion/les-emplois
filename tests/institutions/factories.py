@@ -37,7 +37,7 @@ class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = InstitutionMembership
 
-    user = factory.SubFactory(LaborInspectorFactory)
+    user = factory.SubFactory(LaborInspectorFactory, membership=False)  # FIXME
     institution = factory.SubFactory(InstitutionFactory)
     is_admin = True
     is_active = True

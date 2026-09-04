@@ -37,7 +37,11 @@ from tests.utils.testing import (
     ],
 )
 def test_list_view_access(client, authorized_organization, expected):
-    client.force_login(users_factories.PrescriberFactory(membership__organization__authorized=authorized_organization))
+    client.force_login(
+        users_factories.PrescriberFactory(
+            membership=True, membership__organization__authorized=authorized_organization
+        )
+    )
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
     assert response.status_code == expected
@@ -346,7 +350,7 @@ class TestProlongationReportFileView:
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_nonexistent(self, client):
-        prescriber = users_factories.PrescriberFactory(membership__organization__authorized=True)
+        prescriber = users_factories.PrescriberFactory(membership=True, membership__organization__authorized=True)
         client.force_login(prescriber)
         response = client.get(
             reverse("approvals:prolongation_request_report_file", kwargs={"prolongation_request_id": 0})
@@ -354,7 +358,7 @@ class TestProlongationReportFileView:
         assert response.status_code == 404
 
     def test_other_organization(self, client):
-        prescriber = users_factories.PrescriberFactory(membership__organization__authorized=True)
+        prescriber = users_factories.PrescriberFactory(membership=True, membership__organization__authorized=True)
         request = approvals_factories.ProlongationRequestFactory()
         client.force_login(prescriber)
         response = client.get(
@@ -367,7 +371,7 @@ class TestProlongationReportFileView:
 
     def test_no_report_file(self, client):
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
-        prescriber = users_factories.PrescriberFactory(membership__organization=org)
+        prescriber = users_factories.PrescriberFactory(membership=True, membership__organization=org)
         request = approvals_factories.ProlongationRequestFactory(prescriber_organization=org, report_file=None)
         client.force_login(prescriber)
         response = client.get(
@@ -381,7 +385,7 @@ class TestProlongationReportFileView:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_ok(self, client, xlsx_file):
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
-        prescriber = users_factories.PrescriberFactory(membership__organization=org)
+        prescriber = users_factories.PrescriberFactory(membership=True, membership__organization=org)
         key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
         file = FileFactory(key=key)
         request = approvals_factories.ProlongationRequestFactory(

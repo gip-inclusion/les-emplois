@@ -134,13 +134,14 @@ def test_refused_access(client, url):
     "user_factory,assertion",
     [
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=False),
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=False),
             assertNotContains,
             id="PrescriberAloneInOrganization",
         ),
         pytest.param(
             lambda: PrescriberFactory.create_batch(
                 2,
+                membership=True,
                 membership__organization=PrescriberOrganizationFactory(with_membership=True),
                 membership__is_active=True,
             )[0],
@@ -150,6 +151,7 @@ def test_refused_access(client, url):
         pytest.param(
             lambda: PrescriberFactory.create_batch(
                 2,
+                membership=True,
                 membership__organization=PrescriberOrganizationFactory(with_membership=True),
                 membership__is_active=factory.Iterator([True, False]),
             )[0],
@@ -461,6 +463,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     prescriber_not_in_org_anymore = PrescriberFactory(
         first_name="Simon",
         last_name="Jérémi",
+        membership=True,
         membership__organization=organization,
         membership__is_active=False,
     )

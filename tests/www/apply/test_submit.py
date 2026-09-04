@@ -259,7 +259,7 @@ class TestApply:
             with_jobs=True, with_membership=True, block_job_applications=True, subject_to_iae_rules=True
         )
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
 
         response = client.post(reverse(view_name, kwargs={"session_uuid": apply_session.name}), post_data)
@@ -282,7 +282,7 @@ class TestApply:
             with_jobs=True, with_membership=True, spontaneous_applications_open_since=None, subject_to_iae_rules=True
         )
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
 
         response = client.post(reverse(view_name, kwargs={"session_uuid": apply_session.name}), post_data)
@@ -304,7 +304,7 @@ class TestApply:
         # No block is active, but one of the selected jobs is no longer active.
         company = CompanyFactory(with_jobs=True, with_membership=True, subject_to_iae_rules=True)
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
 
         jobs = company.job_description_through.all()
         inactive_job = jobs[0]
@@ -3226,7 +3226,9 @@ class TestApplicationView:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            pytest.param(partial(PrescriberFactory, membership__organization__authorized=True), id="prescriber"),
+            pytest.param(
+                partial(PrescriberFactory, membership=True, membership__organization__authorized=True), id="prescriber"
+            ),
             pytest.param(partial(EmployerFactory, membership=True), id="employer"),
             pytest.param(None, id="auto_prescripting_employer"),
         ],

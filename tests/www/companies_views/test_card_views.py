@@ -286,7 +286,7 @@ class TestCardView:
         """
         company = CompanyFactory(with_membership=True)
         job_description = JobDescriptionFactory(company=company)
-        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",
@@ -318,7 +318,7 @@ class TestCardView:
         assertNotContains(response, BANNER_TXT)
 
         # If prescriber but not authorized, show the alert with masked name
-        unauthorized_prescriber = PrescriberFactory(membership__organization__authorized=False)
+        unauthorized_prescriber = PrescriberFactory(membership=True, membership__organization__authorized=False)
         client.force_login(unauthorized_prescriber)
         response = client.get(url)
         assertContains(response, BANNER_TXT_MASK)
@@ -494,7 +494,7 @@ class TestJobDescriptionCardView:
         """
         company = CompanyFactory()
         job_description = JobDescriptionFactory(company=company)
-        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",

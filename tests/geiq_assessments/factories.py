@@ -67,7 +67,7 @@ class AssessmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory)
         )
 
     campaign = factory.SubFactory(AssessmentCampaignFactory)
-    created_by = factory.SubFactory(EmployerFactory, membership__company__kind=CompanyKind.GEIQ)
+    created_by = factory.SubFactory(EmployerFactory, membership=True, membership__company__kind=CompanyKind.GEIQ)
     label_geiq_id = factory.Sequence(int)
     label_antennas = []
 
