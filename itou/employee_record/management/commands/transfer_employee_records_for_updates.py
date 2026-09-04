@@ -1,17 +1,15 @@
 import paramiko
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from sentry_sdk.crons import monitor
 
-from itou.approvals.models import Approval
 from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
-from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
-from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
-from itou.employee_record.serializers import EmployeeRecordBatchSerializer
+from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordForUpdateBatchSerializer
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
+from itou.employee_record.serializers import EmployeeRecordForUpdateBatchSerializer
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
 from itou.utils.iterators import chunks
@@ -25,9 +23,9 @@ class Command(EmployeeRecordTransferCommand):
         raw_batch = EmployeeRecordBatch(employee_records)
         # Ability to use ASP test serializers (using fake SIRET numbers)
         if self.asp_test:
-            batch_data = TestEmployeeRecordBatchSerializer(raw_batch).data
+            batch_data = TestEmployeeRecordForUpdateBatchSerializer(raw_batch).data
         else:
-            batch_data = EmployeeRecordBatchSerializer(raw_batch).data
+            batch_data = EmployeeRecordForUpdateBatchSerializer(raw_batch).data
 
         try:
             remote_path = self.upload_json_file(batch_data, sftp, dry_run)
@@ -74,8 +72,8 @@ class Command(EmployeeRecordTransferCommand):
         for idx, raw_employee_record in enumerate(batch["lignesTelechargement"], 1):
             # UPDATE notifications are sent in specific files and are not mixed
             # with "standard" employee records (CREATION).
-            if raw_employee_record.get("typeMouvement") != MovementType.CREATION:
-                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.CREATION}")
+            if raw_employee_record.get("typeMouvement") != MovementType.UPDATE:
+                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.UPDATE}")
 
             line_number = raw_employee_record["numLigne"]
             processing_code = raw_employee_record["codeTraitement"]
@@ -95,10 +93,10 @@ class Command(EmployeeRecordTransferCommand):
                 )
                 # Do not count as an error
                 continue
-            if employee_record.status in [Status.PROCESSED, Status.REJECTED]:
+            if employee_record.status in [Status.PROCESSED, Status.UPDATE_REJECTED]:
                 self.logger.info(f"Skipping, employee record is already {employee_record.status}")
                 continue
-            if employee_record.status != Status.SENT:
+            if employee_record.status != Status.UPDATE_SENT:
                 self.logger.info(f"Skipping, incoherent status for {employee_record=}")
                 continue
 
@@ -109,35 +107,9 @@ class Command(EmployeeRecordTransferCommand):
                     self.logger.info(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
                 if not dry_run:
-                    # One special case added for support concerns:
-                    # 3436 processing code are automatically converted as PROCESSED
-                    if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
-                        employee_record.process(
-                            code=processing_code,
-                            label=processing_label,
-                            archive=raw_employee_record,
-                            as_duplicate=True,
-                        )
-
-                        # If the ASP mark the employee record as duplicate,
-                        # and there is a suspension or a prolongation for the associated approval,
-                        # then we create a notification to be sure the ASP has the correct end date.
-                        try:
-                            approval = Approval.objects.get(number=employee_record.approval_number)
-                        except Approval.DoesNotExist:
-                            pass  # No point to send a notification about an approval if it doesn't exist
-                        else:
-                            if approval.suspension_set.exists() or approval.prolongation_set.exists():
-                                # Mimic the SQL trigger function "create_employee_record_notification()"
-                                EmployeeRecordUpdateNotification.objects.update_or_create(
-                                    status=NotificationStatus.NEW,
-                                    employee_record=employee_record,
-                                    defaults={"updated_at": timezone.now},
-                                )
-
-                        continue
-
-                    employee_record.reject(code=processing_code, label=processing_label, archive=raw_employee_record)
+                    employee_record.reject_for_update(
+                        code=processing_code, label=processing_label, archive=raw_employee_record
+                    )
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
@@ -174,7 +146,7 @@ class Command(EmployeeRecordTransferCommand):
         self.logger.info("Starting UPLOAD of employee records")
         employee_records_to_send = (
             EmployeeRecord.objects.full_fetch()
-            .filter(status=Status.READY, job_application__state=JobApplicationState.ACCEPTED)
+            .filter(status=Status.UPDATE_PENDING, job_application__state=JobApplicationState.ACCEPTED)
             .order_by("updated_at", "pk")
         )
         for batch in chunks(
@@ -185,7 +157,7 @@ class Command(EmployeeRecordTransferCommand):
     def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
             self.logger.info("Preflight activated, checking for possible serialization errors...")
-            self.preflight(EmployeeRecord)
+            self.preflight(EmployeeRecord, for_update=True)
         elif parse_file:
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
             # so use an atomic block to avoid creating more incoherence when something breaks.

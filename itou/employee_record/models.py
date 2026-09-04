@@ -414,9 +414,26 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
+    def wait_for_asp_response_for_update(self, *, file, line_number, archive):
+        """
+        An employee record is sent to ASP for an update via a JSON file,
+        The file name is stored for further feedback processing (also done via a file)
+        """
+        self.clean()
+        self.set_asp_batch_information(file, line_number, archive)
+
+    @xwf_models.transition()
     def reject(self, *, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
+        """
+        self.clean()
+        self.set_asp_processing_information(code, label, archive)
+
+    @xwf_models.transition()
+    def reject_for_update(self, *, code, label, archive):
+        """
+        Update status after an ASP rejection of the update of the employee record
         """
         self.clean()
         self.set_asp_processing_information(code, label, archive)
