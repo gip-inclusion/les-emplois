@@ -1,0 +1,66 @@
+[
+    {
+        "model": "approvals.suspension",
+        "pk": 2,
+        "fields": {
+            "approval": 15,
+            "start_at": "2024-03-01",
+            "end_at": "2025-06-01",
+            "siae": 3852,
+            "reason": "SUSPENDED_CONTRACT",
+            "reason_explanation": "",
+            "created_at": "2024-03-01T09:00:00Z",
+            "updated_at": "2024-03-01T09:00:00Z",
+            "created_by": null,
+            "updated_by": null
+        }
+    },
+    {
+        "model": "approvals.suspension",
+        "pk": 3,
+        "fields": {
+            "approval": 7,
+            "start_at": "2024-01-01",
+            "end_at": "2025-09-01",
+            "siae": 3852,
+            "reason": "SUSPENDED_CONTRACT",
+            "reason_explanation": "",
+            "created_at": "2024-01-01T09:00:00Z",
+            "updated_at": "2024-01-01T09:00:00Z",
+            "created_by": null,
+            "updated_by": null
+        }
+    },
+    {
+        "model": "approvals.suspension",
+        "pk": 4,
+        "fields": {
+            "approval": 13,
+            "start_at": "2024-01-01",
+            "end_at": "2025-09-01",
+            "siae": 3852,
+            "reason": "SUSPENDED_CONTRACT",
+            "reason_explanation": "",
+            "created_at": "2024-01-01T09:00:00Z",
+            "updated_at": "2024-01-01T09:00:00Z",
+            "created_by": null,
+            "updated_by": null
+        }
+    },
+    {
+        "model": "approvals.suspension",
+        "pk": 5,
+        "fields": {
+            "approval": 10,
+            "start_at": "2024-01-01",
+            "end_at": "2025-09-01",
+            "siae": 3852,
+            "reason": "SUSPENDED_CONTRACT",
+            "reason_explanation": "",
+            "created_at": "2024-01-01T09:00:00Z",
+            "updated_at": "2024-01-01T09:00:00Z",
+            "created_by": null,
+            "updated_by": null
+        }
+    }
+]

@@ -364,14 +364,20 @@ class TestApprovalAdmin:
         approval.refresh_from_db()
         assert approval.start_at == start_at
         assert approval.end_at == today
-        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+        assert (
+            f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at}), "
+            f"closed by pk={get_user(admin_client).pk}." in caplog.messages
+        )
         approval_content_type = ContentType.objects.get_for_model(Approval)
         support_remark = PkSupportRemark.objects.filter(
             content_type=approval_content_type,
             object_id=approval.pk,
         ).get()
         user = User.objects.get(pk=get_user(admin_client).pk)
-        assert support_remark.remark == f"2025-08-21 : PASS IAE clôturé par {user.get_full_name()}."
+        assert support_remark.remark == (
+            f"2025-08-21 : PASS IAE clôturé par l'utilisateur {user.get_full_name()} "
+            f"({user.get_kind_display()}, id: {user.pk})."
+        )
 
     @freeze_time()
     def test_terminate_approval_with_future_suspension_and_prolongation(self, admin_client, caplog):
@@ -399,7 +405,10 @@ class TestApprovalAdmin:
             suspension.refresh_from_db()
         assert f"Terminating approval pk={approval.pk}, deleting 1 future approvals.Prolongation." in caplog.messages
         assert f"Terminating approval pk={approval.pk}, deleting 1 future approvals.Suspension." in caplog.messages
-        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+        assert (
+            f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at}), "
+            f"closed by pk={get_user(admin_client).pk}." in caplog.messages
+        )
 
     @freeze_time()
     def test_terminate_approval_with_ongoing_suspension(self, admin_client, caplog):
@@ -427,7 +436,10 @@ class TestApprovalAdmin:
             f"setting approvals.Suspension pk={suspension.pk} end_at={today} (was {original_suspension_end_at})."
             in caplog.messages
         )
-        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+        assert (
+            f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at}), "
+            f"closed by pk={get_user(admin_client).pk}." in caplog.messages
+        )
 
     @freeze_time()
     def test_terminate_approval_with_ongoing_prolongation(self, admin_client, caplog):
@@ -455,7 +467,10 @@ class TestApprovalAdmin:
             f"setting approvals.Prolongation pk={prolongation.pk} end_at={today} (was {original_prolongation_end_at})."
             in caplog.messages
         )
-        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+        assert (
+            f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at}), "
+            f"closed by pk={get_user(admin_client).pk}." in caplog.messages
+        )
 
     @freeze_time()
     def test_terminate_approval_with_ongoing_suspension_during_prolongation(self, admin_client):

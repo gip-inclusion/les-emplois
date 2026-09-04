@@ -20,6 +20,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.approvals.utils import SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from tests.companies.factories import CompanyFactory, ContractFactory
@@ -134,6 +135,16 @@ class SuspensionFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory)
 
     class Meta:
         model = Suspension
+
+    class Params:
+        # Makes the approval eligible for closure on its own (see can_close_approval).
+        long_enough_to_close = factory.Trait(
+            start_at=factory.LazyFunction(
+                lambda: (
+                    timezone.localdate() - SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE - datetime.timedelta(days=2)
+                )
+            ),
+        )
 
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.Faker(
