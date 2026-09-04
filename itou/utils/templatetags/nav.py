@@ -242,7 +242,7 @@ NAV_ENTRIES = {
         matomo_event_option="fiches-salaries-asp",
     ),
     "employer-company": NavItem(
-        label="Présentation",
+        label="Fiche de présentation",
         target=reverse("companies_views:overview"),
         active_view_names=["companies_views:overview"],
         matomo_event_category="offcanvasNav",
@@ -250,12 +250,12 @@ NAV_ENTRIES = {
         matomo_event_option="structure-presentation",
     ),
     "employer-jobs": NavItem(
-        label="Métiers et recrutements",
+        label="Fiches de postes",
         target=reverse("companies_views:job_description_list"),
         active_view_names=["companies_views:job_description_list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
-        matomo_event_option="metiers-recrutement",
+        matomo_event_option="fiches-de-postes",
     ),
     "employer-members": NavItem(
         label="Collaborateurs",

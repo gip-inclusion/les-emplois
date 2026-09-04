@@ -10,16 +10,16 @@
             <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
         {% endfragment %}
         {% fragment as cta %}
-            <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+            <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "fiches-de-postes" %}>
                 <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
-                <span>Gérer les métiers et recrutements</span>
+                <span>Gérer les fiches de postes</span>
             </a>
         {% endfragment %}
         {% fragment as list %}
             <li class="d-flex justify-content-between align-items-center mb-3">
-                <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
+                <a href="{% url 'companies_views:overview' %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
                     <i class="ri-eye-line ri-lg fw-normal" aria-hidden="true"></i>
-                    <span>Voir la fiche publique</span>
+                    <span>Fiche de présentation</span>
                 </a>
             </li>
             {% if request.is_current_organization_admin %}
@@ -34,7 +34,7 @@
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
                         <i class="ri-team-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Gérer les collaborateurs</span>
+                        <span>Collaborateurs</span>
                     </a>
                 </li>
             {% endif %}
@@ -42,7 +42,7 @@
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'companies_views:show_financial_annexes' %}" class="btn-link btn-ico">
                         <i class="ri-folder-chart-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Voir les annexes financières</span>
+                        <span>Annexes financières</span>
                     </a>
                     {% if not request.current_organization.is_active %}
                         <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>

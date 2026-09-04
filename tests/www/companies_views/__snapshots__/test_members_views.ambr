@@ -37,12 +37,12 @@
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="structure-presentation" href="/company/overview">
-                                  Présentation
+                                  Fiche de présentation
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="voir-liste-metiers" href="/company/job_description_list">
-                                  Métiers et recrutements
+                              <a class="nav-link" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="fiches-de-postes" href="/company/job_description_list">
+                                  Fiches de postes
                               </a>
                           </li>
                           <li class="nav-item">
