@@ -15,6 +15,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
 from itou.jobs.models import ROME_DOMAINS
+from itou.prescribers.enums import PrescriberOrganizationCategory
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
@@ -156,12 +157,24 @@ class JobDescriptionSearchForm(SiaeSearchForm):
 class PrescriberSearchForm(forms.Form):
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 5
+    CATEGORY_ALL = ""
 
     distance = forms.ChoiceField(
         label="Distance",
         required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
+        widget=forms.RadioSelect,
+    )
+
+    category = forms.ChoiceField(
+        label="Type de structure",
+        required=False,
+        initial=CATEGORY_ALL,
+        choices=[
+            (CATEGORY_ALL, "Habilitées à prescrire des emplois inclusifs"),
+            *PrescriberOrganizationCategory.choices,
+        ],
         widget=forms.RadioSelect,
     )
 
@@ -174,7 +187,7 @@ class PrescriberSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Rechercher un prescripteur autour de…",
+                "data-placeholder": "Rechercher un accompagnement autour de…",
             }
         ),
     )
