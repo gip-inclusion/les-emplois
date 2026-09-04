@@ -878,6 +878,8 @@ SERIALIZATION_MODULES = {
 # OTP
 # ------------------------------------------------------------------------------
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
+OTP_RESET_REQUEST_VALIDITY = datetime.timedelta(days=15)
+OTP_RESET_LINK_VALIDITY = datetime.timedelta(hours=24)
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 REQUIRE_MFA_FOR_PROS = os.getenv("REQUIRE_MFA_FOR_PROS", "False") == "True"
 SHOW_UPCOMING_MFA_FOR_PROS_BANNER = os.getenv("SHOW_UPCOMING_MFA_FOR_PROS_BANNER", "False") == "True"

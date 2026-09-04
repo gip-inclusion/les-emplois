@@ -19,11 +19,13 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
-from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
+from itou.otp.enums import ResetRequestState
+from itou.otp.models import Itou2FAResetRequest, ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
-from tests.otp.factories import ItouTOTPDeviceFactory
+from tests.otp.factories import Itou2FAResetRequestFactory, ItouTOTPDeviceFactory
+from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -748,3 +750,128 @@ class TestConfirmTOTPDeviceForm:
             device=unsaved_device_for_form,
         )
         assert "name" not in form.errors
+
+
+def test_2fa_reset_full_process(client, settings, mailoutbox, django_capture_on_commit_callbacks):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    # Step 1: the user asks for a reset:
+    assert not Itou2FAResetRequest.objects.exists()
+    response = client.post(reverse("otp_views:reset_request_init"), follow=True)
+    assertContains(response, "Votre demande a bien été transmise.")
+    assert Itou2FAResetRequest.objects.exists()
+
+    reset_request = Itou2FAResetRequest.objects.first()
+
+    # Step 2: admin validate the request
+    with django_capture_on_commit_callbacks(execute=True):  # To run _async_send_message huey task
+        reset_request.accept()
+    reset_link = reset_request.reset_links.first()
+    assert reset_link.nonce
+    email = mailoutbox.pop()
+    assert email.to == [user.email]
+    assert "Réinitialisation de vos paramètres de 2FA" in email.subject
+    assert reset_link.nonce in email.body
+
+    # Step 3: User clicks the reset link
+    assert ItouTOTPDevice.objects.exists()
+    response = client.get(reverse("otp_views:reset_request_do_reset", kwargs={"nonce": reset_link.nonce}))
+    assert not ItouTOTPDevice.objects.filter(disabled_at__isnull=True).exists()
+    assert not ItouStaticDevice.objects.exists()
+    assert not ItouStaticToken.objects.exists()
+    assertContains(response, "Votre double authentification a été réinitialisée")
+
+
+def test_2fa_reset_mail_to_admins_when_reset_request_submitted(client, settings, mailoutbox):
+    settings.REQUIRE_MFA_FOR_PROS = True
+    org = PrescriberOrganizationWith2MembershipFactory(membership=True)
+    user = org.members.filter(prescribermembership__is_admin=False).first()
+
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    client.post(reverse("otp_views:reset_request_init"))
+    assert len(mailoutbox) == 2
+    assert any("demande une réinitialisation de ses paramètres de 2FA" in mail.subject for mail in mailoutbox)
+    assert any("demandé une réinitialisation de vos paramètres de 2FA" in mail.subject for mail in mailoutbox)
+
+
+def test_2fa_reset_cannot_request_twice(client, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    assert Itou2FAResetRequest.objects.count() == 0
+    client.post(reverse("otp_views:reset_request_init"))
+    assert Itou2FAResetRequest.objects.count() == 1
+    response = client.post(reverse("otp_views:reset_request_init"))
+    assertContains(response, "Une demande de réinitialisation est déjà en cours pour votre compte.")
+    assert Itou2FAResetRequest.objects.count() == 1
+
+
+def test_2fa_reset_cannot_request_twice_even_if_accepted(client, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    assert Itou2FAResetRequest.objects.count() == 0
+    client.post(reverse("otp_views:reset_request_init"))
+    assert Itou2FAResetRequest.objects.count() == 1
+    Itou2FAResetRequest.objects.first().accept()
+    response = client.post(reverse("otp_views:reset_request_init"))
+    assertContains(response, "Une demande de réinitialisation est déjà en cours pour votre compte.")
+    assert Itou2FAResetRequest.objects.count() == 1
+    assert Itou2FAResetRequest.objects.first().state == ResetRequestState.ACCEPTED
+
+
+@pytest.mark.parametrize("accept_it", [True, False])
+def test_2fa_reset_self_cancel(client, settings, accept_it):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+    reset_request_cancel_url = reverse("otp_views:reset_request_self_cancel")
+
+    response = client.get(reset_request_cancel_url)
+    assertContains(response, "Vous n’avez pas de demande de réinitialisation en cours.")
+    reset_request = Itou2FAResetRequestFactory(user=user)
+    response = client.get(reset_request_cancel_url)
+    assertContains(response, "Vous avez une demande de réinitialisation en cours")
+    if accept_it:
+        reset_request.accept()
+    response = client.post(reset_request_cancel_url, follow=True)
+    assertContains(response, "Demande de réinitialisation annulée")
+    reset_request.refresh_from_db()
+    assert reset_request.state == ResetRequestState.DENIED
+
+
+def test_2fa_reset_mail_to_self_when_reset_request_submitted(client, settings, mailoutbox):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    ItouTOTPDeviceFactory(name="1", user=user)
+    client.force_login(user)
+
+    client.post(reverse("otp_views:reset_request_init"))
+    email = mailoutbox.pop()
+    assert email.to == [user.email]
+    assert "Vous avez demandé une réinitialisation de vos paramètres de 2FA" in email.subject
+
+
+@pytest.mark.parametrize("accept_it", [True, False])
+def test_2fa_reset_cleaned_after_successful_login(client, settings, accept_it):
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+    client.force_login(user)
+    device = ItouTOTPDeviceFactory(name="1", user=user)
+    reset_request = Itou2FAResetRequestFactory(user=user)
+
+    assert Itou2FAResetRequest.objects.first().state == ResetRequestState.PENDING
+    if accept_it:
+        reset_request.accept()
+        assert Itou2FAResetRequest.objects.first().state == ResetRequestState.ACCEPTED
+    client.post(reverse("otp_views:verify_otp"), data={"otp_token": TOTP(device.bin_key).token()})
+    assert Itou2FAResetRequest.objects.first().state == ResetRequestState.DENIED

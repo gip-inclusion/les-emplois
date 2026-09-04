@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from itou.www.otp_views import views
 
@@ -28,4 +29,13 @@ urlpatterns = [
         name="login_with_backup_code",
     ),
     path("verify", views.VerifyOTPView.as_view(), name="verify_otp"),
+    path("reset-request/step-1", views.reset_request_init, name="reset_request_init"),
+    path("reset-request/created", views.reset_request_created, name="reset_request_created"),
+    path("reset-request/cancel", views.reset_request_cancel, name="reset_request_self_cancel"),
+    path(
+        "reset-request/cancelled",
+        TemplateView.as_view(template_name="otp_views/reset_request_self_cancelled.html"),
+        name="reset_request_self_cancelled",
+    ),
+    path("reset-request/reset/<str:nonce>", views.reset_request_do_reset, name="reset_request_do_reset"),
 ]

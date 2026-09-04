@@ -25,25 +25,26 @@
                         <p>
                             Lors de la configuration de la double authentification, un code de récupération à usage unique vous a été remis. Saisissez-le ci-dessous pour accéder à votre compte.
                         </p>
-
-                        {% component_alert title=title content=content variant="info" call_to_action=call_to_action %}
-                            {% fragment as title %}
-                                Vous n’avez pas non plus votre code de récupération ?
-                            {% endfragment %}
-                            {% fragment as content %}
-                                Sans code de récupération, il n’est pas possible d'accéder à votre compte de manière autonome. Veuillez contacter notre support.
-                            {% endfragment %}
-                            {% fragment as call_to_action %}
-                                <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="btn btn-block btn-primary has-external-link">Contacter le support</a>
-                            {% endfragment %}
-                        {% endcomponent_alert %}
-
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <fieldset>
                                 {% bootstrap_form_errors form type="all" %}
                                 {% bootstrap_field form.code wrapper_class="form-group form-group-input-w-lg-33" %}
                             </fieldset>
+                            {% component_alert title=title content=content variant="info" call_to_action=call_to_action %}
+                                {% fragment as title %}
+                                    Vous n’avez pas votre code de récupération ?
+                                {% endfragment %}
+                                {% fragment as content %}
+                                    Vous pouvez demander la réinitialisation de votre double authentification.
+                                    Elle sera examinée par un administrateur de votre structure ou, à défaut, par notre support.
+                                {% endfragment %}
+                                {% fragment as call_to_action %}
+                                    <a href="{% url 'otp_views:reset_request_init' %}" target="_blank" rel="noopener" class="btn btn-block btn-primary">
+                                        Demander la réinitialisation de votre double authentification
+                                    </a>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                             {% itou_buttons_form primary_label="Valider" reset_url=None %}
                         </form>
                     </div>

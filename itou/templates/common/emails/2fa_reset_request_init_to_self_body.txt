@@ -1,0 +1,30 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Vous, ou quelqu’un essayant de prendre le contrôle de votre compte,
+avez fait une demande de réinitialisation de votre double
+authentification.
+
+Si vous n’êtes pas à l’origine de cette demande, vous pouvez l’
+<a href="{% url 'otp_views:reset_request_self_cancel' %}">annuler</a>,
+et contacter <a href="mailto:security@inclusion.gouv.fr">security@inclusion.gouv.fr</a>
+sans attendre.
+
+{% if org_has_admins %}
+    <strong>
+        Rapprochez-vous des administrateurs
+    </strong>
+    de votre structure afin qu’ils puissent la traiter.
+    Sans réponse de leur part, contactez le support technique des emplois de l’inclusion.
+    Vous recevrez également un e-mail dès que votre demande aura été traitée.
+{% else %}
+    <strong>
+        Votre demande a bien été transmise au support technique des emplois de l’inclusion.
+    </strong>
+    Vous serez notifié par <strong>e-mail</strong>
+    dès que votre <strong>demande aura été traitée</strong>.
+{% endif %}
+
+{% endblock body %}

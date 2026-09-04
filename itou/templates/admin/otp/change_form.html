@@ -1,0 +1,29 @@
+{% extends 'admin/change_form.html' %}
+{% block object-tools-items %}
+    {% if original.state == 'pending' %}
+        <li>
+            <form method="post" action="{% url "admin:2fa_reset_request_accept" original.pk %}" class="js-with-confirm">
+                {% csrf_token %}
+                <input type="submit" value="Accepter la requête" />
+            </form>
+        </li>
+        <li>
+            <form method="post" action="{% url "admin:2fa_reset_request_deny" original.pk %}">
+                {% csrf_token %}
+                <input type="submit" value="Refuser la requête" />
+            </form>
+        </li>
+    {% endif %}
+    {{ block.super }}
+    <script nonce="{{ csp_nonce }}">
+        (function() {
+            Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
+                form.addEventListener("submit", function(e) {
+                    if (!confirm("Êtes-vous sur de valider cette demande de ré-initialisation de 2FA ?")) {
+                        e.preventDefault();
+                    }
+                })
+            })
+        }());
+    </script>
+{% endblock %}
