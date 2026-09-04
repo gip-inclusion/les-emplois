@@ -1,0 +1,29 @@
+# serializer version: 1
+# name: test_nothing_to_report[False]
+  list([
+    'Checking employee records waiting for an ASP response',
+    'No missing file found',
+  ])
+# ---
+# name: test_nothing_to_report[True]
+  list([
+    'Checking employee records waiting for an ASP response',
+    'No missing file found',
+  ])
+# ---
+# name: test_report[False]
+  list([
+    'Checking employee records waiting for an ASP response',
+    'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecord that seems to have been lost',
+    'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecordUpdateNotification that seems to have been lost',
+    "Found missing files: [('EmployeeRecord', 'RIAE_FS_20000101120001.json', 1), ('EmployeeRecordUpdateNotification', 'RIAE_FS_20000101120001.json', 1)] but no Slack webhook configured",
+  ])
+# ---
+# name: test_report[True]
+  list([
+    'Checking employee records waiting for an ASP response',
+    'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecord that seems to have been lost',
+    'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecordUpdateNotification that seems to have been lost',
+    "Found missing files: [('EmployeeRecord', 'RIAE_FS_20000101120001.json', 1), ('EmployeeRecordUpdateNotification', 'RIAE_FS_20000101120001.json', 1)] and notification successfully sent to Slack",
+  ])
+# ---
