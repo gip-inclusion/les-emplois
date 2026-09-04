@@ -20,4 +20,4 @@ fi
 
 cd "$APP_HOME" || exit
 django-admin transfer_employee_records --wet-run "$@"
-django-admin transfer_employee_records_updates --wet-run "$@"
+django-admin transfer_employee_records_for_updates --wet-run "$@"
