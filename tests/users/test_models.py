@@ -57,8 +57,8 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
     UserFactory,
-    random_pro_user_factory,
 )
 from tests.utils.testing import normalize_fields_history
 
@@ -541,7 +541,7 @@ class TestModel:
         job_seeker = JobSeekerFactory()
         assert "candidat" == job_seeker.get_kind_display()
 
-        professional = random_pro_user_factory()
+        professional = ProfessionalFactory()
         assert "professionnel" == professional.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
