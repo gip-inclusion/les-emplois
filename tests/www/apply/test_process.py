@@ -687,7 +687,6 @@ class TestProcessViews:
             phone="0612345678",
             email="prescriber@mailinator.com",
             membership__organization__siret="11122233300001",
-            membership=True,
         )
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -771,9 +770,9 @@ class TestProcessViews:
 
         for user in [
             JobSeekerFactory(),
-            EmployerFactory(membership=True),
-            PrescriberFactory(membership=True),
-            LaborInspectorFactory(membership=True),
+            EmployerFactory(),
+            PrescriberFactory(),
+            LaborInspectorFactory(),
         ]:
             with subtests.test(user_kind=user.kind.label):
                 client.force_login(user)

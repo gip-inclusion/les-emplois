@@ -83,7 +83,7 @@ class TestChangeEmailView:
         response = client.get(url)
         assert response.status_code == 403
 
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         client.force_login(prescriber)
         response = client.get(url)
         assert response.status_code == 403

@@ -24,7 +24,6 @@ class TestZendeskUrl:
         request = get_request(
             LaborInspectorFactory(
                 for_snapshot=True,
-                membership=True,
                 membership__institution__name="Ministère des affaires étranges",
             )
         )
@@ -34,7 +33,6 @@ class TestZendeskUrl:
         request = get_request(
             EmployerFactory(
                 for_snapshot=True,
-                membership=True,
                 membership__company__for_snapshot=True,
             )
         )
@@ -48,7 +46,6 @@ class TestZendeskUrl:
         request = get_request(
             PrescriberFactory(
                 for_snapshot=True,
-                membership=True,
                 membership__organization__for_snapshot=True,
                 membership__organization__phone="0123456789",
             )

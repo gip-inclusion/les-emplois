@@ -183,9 +183,7 @@ class ProlongationRequestFactory(BaseProlongationFactory):
         authorized=True,
     )
     assigned_to = factory.SubFactory(
-        PrescriberFactory,
-        membership=True,
-        membership__organization=factory.SelfAttribute("...prescriber_organization"),
+        PrescriberFactory, membership__organization=factory.SelfAttribute("...prescriber_organization")
     )
 
     class Meta:
@@ -233,7 +231,7 @@ class ProlongationRequestDenyInformationFactory(factory.django.DjangoModelFactor
 
 
 class ProlongationFactory(AutoNowOverrideMixin, BaseProlongationFactory):
-    validated_by = factory.SubFactory(PrescriberFactory, membership=True, membership__organization__authorized=True)
+    validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
 
     class Meta:
         model = Prolongation

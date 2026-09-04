@@ -158,13 +158,11 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     admin_prescribers = PrescriberFactory.create_batch(
         9,
-        membership=True,
         membership__organization=prolongation_request.prescriber_organization,
         membership__is_admin=True,
     )
     regular_prescribers = PrescriberFactory.create_batch(
         3,
-        membership=True,
         membership__organization=prolongation_request.prescriber_organization,
         membership__is_admin=False,
     )

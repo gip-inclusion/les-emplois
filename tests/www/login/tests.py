@@ -412,9 +412,7 @@ class TestExistingUserLogin:
 
 
 def test_pro_connect_activation_view(client, pro_connect):
-    user = random.choice([PrescriberFactory, EmployerFactory])(
-        identity_provider=IdentityProvider.DJANGO, membership=True
-    )
+    user = random.choice([PrescriberFactory, EmployerFactory])(identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
     url = reverse("dashboard:activate_pro_connect_account")

@@ -45,9 +45,9 @@ class TestListAssessmentsView:
     def test_unauthorized_access(self, client):
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True), 403),
-            (LaborInspectorFactory(membership=True), 404),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(), 403),
+            (LaborInspectorFactory(), 404),
         ]:
             client.force_login(user)
             response = client.get(self.URL)
@@ -875,9 +875,9 @@ class TestAssessmentDetailsForInstitutionView:
         url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True), 403),
-            (LaborInspectorFactory(membership=True), 404),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(), 403),
+            (LaborInspectorFactory(), 404),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -1581,9 +1581,9 @@ class TestAssessmentReviewView:
         url = reverse("geiq_assessments_views:assessment_review", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True), 403),
-            (LaborInspectorFactory(membership=True), 404),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(), 403),
+            (LaborInspectorFactory(), 404),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -1592,9 +1592,9 @@ class TestAssessmentReviewView:
         url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True), 403),
-            (LaborInspectorFactory(membership=True), 404),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(), 403),
+            (LaborInspectorFactory(), 404),
         ]:
             client.force_login(user)
             response = client.get(url)

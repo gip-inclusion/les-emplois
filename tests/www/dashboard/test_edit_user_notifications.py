@@ -19,7 +19,7 @@ def test_staff_user_not_allowed(client):
 
 
 def test_labor_inspector_not_allowed(client):
-    labor_inspector = LaborInspectorFactory(membership=True)
+    labor_inspector = LaborInspectorFactory()
     client.force_login(labor_inspector)
     url = reverse("dashboard:edit_user_notifications")
     response = client.get(url)
@@ -28,7 +28,6 @@ def test_labor_inspector_not_allowed(client):
 
 def test_employer_allowed(client, snapshot):
     employer = EmployerFactory(
-        membership=True,
         # Fixed company kind as query count differs (in snapshots) whether SIAE or not.
         membership__company__subject_to_iae_rules=True,
     )
@@ -40,7 +39,7 @@ def test_employer_allowed(client, snapshot):
 
 
 def test_prescriber_allowed(client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     client.force_login(prescriber)
     url = reverse("dashboard:edit_user_notifications")
     with assertSnapshotQueries(snapshot(name="view queries")):
@@ -59,7 +58,6 @@ def test_job_seeker_allowed(client, snapshot):
 
 def test_employer_create_update_notification_settings(client, snapshot):
     employer = EmployerFactory(
-        membership=True,
         membership__company__subject_to_iae_rules=True,  # Add some notifications, fix to prevent flaky test
     )
     company = employer.company_set.first()
@@ -115,7 +113,7 @@ def test_employer_create_update_notification_settings(client, snapshot):
 
 
 def test_prescriber_create_update_notification_settings(client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     organization = prescriber.prescriberorganization_set.first()
     client.force_login(prescriber)
     url = reverse("dashboard:edit_user_notifications")

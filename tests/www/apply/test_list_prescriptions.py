@@ -114,7 +114,7 @@ def test_queries(client, snapshot):
 
 
 def test_as_unauthorized_prescriber(client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         job_seeker__first_name="Supersecretname",
@@ -152,7 +152,7 @@ def test_filtered_by_state(client):
     Thibault wants to filter a list of job applications
     by the default initial state.
     """
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_application, *others = JobApplicationFactory.create_batch(
         3, sent_by_prescriber_alone=True, sender=prescriber, state=factory.Iterator(JobApplicationWorkflow.states)
     )
@@ -216,7 +216,7 @@ def test_filtered_by_job_seeker(client):
 
 
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     application = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
@@ -253,7 +253,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
 
 
 def test_filtered_by_company(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_application, *others = JobApplicationFactory.create_batch(3, sent_by_prescriber_alone=True, sender=prescriber)
     client.force_login(prescriber)
 
@@ -287,7 +287,7 @@ def test_filtered_by_eligibility_state_prescriber(client):
 
 
 def test_filters(client, snapshot):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions"))
     assert response.status_code == 200
@@ -296,7 +296,7 @@ def test_filters(client, snapshot):
 
 
 def test_archived(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     active = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     archived = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, archived_at=timezone.now())
     archived_badge_html = """\
@@ -348,7 +348,7 @@ def test_archived(client):
 
 
 def test_htmx_filters(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, state=JobApplicationState.ACCEPTED)
     client.force_login(prescriber)
 
@@ -384,7 +384,7 @@ def test_empty_snapshot(client, snapshot):
 
 
 def test_exports_as_prescriber(client):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
     assert_previous_step(response, reverse("dashboard:index"))
@@ -414,7 +414,7 @@ def test_exports_as_employer(client):
 
 
 def test_exports_back_to_list(client):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(
         reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
@@ -1016,7 +1016,7 @@ class TestAutocomplete:
     ]
 
     def test_invalid_access(self, client):
-        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+        for user in [JobSeekerFactory(), LaborInspectorFactory()]:
             client.force_login(user)
             for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
                 response = client.get(

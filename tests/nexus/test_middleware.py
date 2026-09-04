@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from itoutils.django.nexus.token import generate_auto_login_token
@@ -31,7 +29,7 @@ class TestAutoLoginMiddleware:
         user = random_pro_user_factory()
         params = {"auto_login": generate_auto_login_token(user)}
         # Another user is logged in
-        client.force_login(EmployerFactory(membership=True))
+        client.force_login(EmployerFactory())
 
         response = client.get(reverse("home:hp", query=params))
         assertRedirects(
@@ -107,9 +105,7 @@ class TestDropDownMiddleware:
         response = client.get(reverse("nexus:homepage"))
         assert response.wsgi_request.nexus_dropdown == {}
 
-    @pytest.mark.parametrize(
-        "factory", [JobSeekerFactory, partial(LaborInspectorFactory, membership=True), ItouStaffFactory]
-    )
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
     def test_wrong_user_kind(self, client, factory):
         user = factory()
         client.force_login(user)

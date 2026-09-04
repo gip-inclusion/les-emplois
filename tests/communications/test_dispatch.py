@@ -73,7 +73,7 @@ class TestBaseNotification:
         notifications_registry.unregister(NonManageableNonApplicableNotification)
 
     def setup_method(self):
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr")
         self.organization = self.user.prescriberorganization_set.first()
 
     def test_method_init(self):
@@ -227,7 +227,7 @@ class TestEmailNotification:
         notifications_registry.unregister(FakeEmailNotification)
 
     def setup_method(self):
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr")
         self.organization = self.user.prescriberorganization_set.first()
 
     def test_method_build(self, email_notification):
@@ -281,7 +281,7 @@ class TestEmailNotification:
     def test_method_send_for_employer_that_left_his_company(
         self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         company = user.companymembership_set.first().company
         user.companymembership_set.update(is_active=False)
 
@@ -339,12 +339,12 @@ class TestEmailNotification:
 class TestProfiledNotification:
     def setup_method(self):
         self.job_seeker = JobSeekerFactory()
-        self.employer = EmployerFactory(membership=True)
+        self.employer = EmployerFactory()
         self.employer_structure = self.employer.company_set.first()
-        self.prescriber = PrescriberFactory(membership=True)
+        self.prescriber = PrescriberFactory()
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
-        self.prescriber_single = PrescriberFactory(membership=False)
-        self.labor_inspector = LaborInspectorFactory(membership=True)
+        self.prescriber_single = PrescriberFactory()
+        self.labor_inspector = LaborInspectorFactory()
         self.institution = self.labor_inspector.institution_set.first()
 
         class TestJobSeekerNotification(JobSeekerNotification, BaseNotification):

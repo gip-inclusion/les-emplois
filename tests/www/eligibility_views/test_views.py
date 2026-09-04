@@ -25,10 +25,10 @@ class TestUpdateEligibilityView:
         "factory,status_code",
         [
             [partial(JobSeekerFactory, for_snapshot=True), 403],
-            (partial(PrescriberFactory, membership=True, membership__organization__authorized=True), 200),
-            (partial(PrescriberFactory, membership=True, membership__organization__authorized=False), 403),
-            (partial(EmployerFactory, membership=True), 403),
-            [partial(LaborInspectorFactory, membership=True), 403],
+            (partial(PrescriberFactory, membership__organization__authorized=True), 200),
+            (partial(PrescriberFactory, membership__organization__authorized=False), 403),
+            (EmployerFactory, 403),
+            [LaborInspectorFactory, 403],
         ],
         ids=[
             "job_seeker",
@@ -51,7 +51,7 @@ class TestUpdateEligibilityView:
         assert response.status_code == status_code
 
     def test_standalone_no_valid_eligibility_diagnosis(self, client, snapshot):
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_seeker = JobSeekerFactory(for_snapshot=True)
 
         client.force_login(prescriber)
@@ -82,7 +82,7 @@ class TestUpdateEligibilityView:
     def test_standalone_no_valid_eligibility_diagnosis_prefilled(self, client, snapshot):
         # If no valid diagnosis exists but the job seeker profile was updated recently,
         # the form should be prefilled with the criteria from the job seeker profile.
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__isolated_parent=True)
 
         client.force_login(prescriber)
@@ -111,7 +111,7 @@ class TestUpdateEligibilityView:
 
     @freeze_time("2025-03-22")
     def test_standalone_valid_eligibility_diagnosis(self, client, snapshot):
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_seeker = JobSeekerFactory(for_snapshot=True)
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=job_seeker, from_prescriber=True, author_prescriber_organization__for_snapshot=True
@@ -145,7 +145,7 @@ class TestUpdateEligibilityView:
         assert new_eligibility_diagnosis.author == prescriber
 
     def test_valid_approval(self, client):
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_seeker = JobSeekerFactory(for_snapshot=True)
         ApprovalFactory(user=job_seeker)
 

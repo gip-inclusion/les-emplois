@@ -37,7 +37,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 EmployerFactory,
-                membership=True,
                 membership__company__for_snapshot=True,
                 membership__company__not_in_territorial_experimentation=True,
             ),
@@ -46,7 +45,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 LaborInspectorFactory,
-                membership=True,
                 membership__institution__name="ACME Inc.",
             ),
             id="LaborInspector",
@@ -54,7 +52,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 PrescriberFactory,
-                membership=True,
                 membership__organization__authorized=False,
                 membership__organization__for_snapshot=True,
                 membership__organization__not_in_territorial_experimentation=True,
@@ -64,7 +61,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 PrescriberFactory,
-                membership=True,
                 membership__organization__authorized=True,
                 membership__organization__for_snapshot=True,
                 membership__organization__not_in_territorial_experimentation=True,

@@ -603,7 +603,6 @@ class TestProConnectLoginWithRequiredMfa:
         settings.REQUIRE_MFA_FOR_PROS = True
         PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
 
@@ -620,7 +619,6 @@ class TestProConnectLoginWithRequiredMfa:
         settings.PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [pro_connect.oidc_userinfo["idp_id"]]
         PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
 
@@ -638,7 +636,6 @@ class TestProConnectLoginWithRequiredMfa:
         settings.REQUIRE_MFA_FOR_PROS = True
         user = PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
         settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
@@ -655,7 +652,6 @@ class TestProConnectLoginWithRequiredMfa:
         settings.REQUIRE_MFA_FOR_PROS = True
         user = PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
         settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
@@ -681,7 +677,6 @@ class TestProConnectLoginWithRequiredMfa:
         settings.REQUIRE_MFA_FOR_PROS = True
         user = PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
         settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
@@ -751,7 +746,6 @@ class TestProConnectLogout:
         """
         PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
-            membership=True,
             has_completed_welcoming_tour=True,
         )
         response = pro_connect.mock_oauth_dance(

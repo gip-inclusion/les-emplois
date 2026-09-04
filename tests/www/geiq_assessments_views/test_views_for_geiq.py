@@ -69,9 +69,9 @@ class TestListAssessmentsView:
         url = reverse("geiq_assessments_views:list_for_geiq")
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -186,9 +186,9 @@ class TestCreateAssessmentView:
         url = reverse("geiq_assessments_views:create")
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -422,10 +422,10 @@ class TestAssessmentDetailsForGEIQView:
         url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -779,10 +779,10 @@ class TestAssessmentGetFile:
         url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 404),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 404),
         ]:
             client.force_login(user)
             for url in [
@@ -887,10 +887,10 @@ class TestAssessmentSyncFile:
         url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             for url in [
@@ -1094,10 +1094,10 @@ class TestAssessmentUploadActionFinancialAssessment:
         url = reverse("geiq_assessments_views:upload_action_financial_assessment", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -1168,10 +1168,10 @@ class TestAssessmentComment:
         url = reverse("geiq_assessments_views:assessment_comment", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -1237,10 +1237,10 @@ class TestAssessmentContractsSync:
         url = reverse("geiq_assessments_views:assessment_contracts_sync", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.post(url)
@@ -1369,10 +1369,10 @@ class TestAssessmentKPI:
         url = reverse("geiq_assessments_views:assessment_kpi", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -1469,10 +1469,10 @@ class TestAssessmentResult:
         url = reverse("geiq_assessments_views:assessment_result", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
-            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(url)

@@ -16,7 +16,7 @@ CGU_FORM_BTN = "J'accepte</button>"
 
 
 def test_legal_terms_post_updates_timestamp_when_acceptance_required(client):
-    user = EmployerFactory(membership=True, terms_accepted_at=None)
+    user = EmployerFactory(terms_accepted_at=None)
     client.force_login(user)
 
     response = client.get(reverse("legal-terms"))
@@ -39,7 +39,7 @@ def test_legal_terms_post_updates_timestamp_when_acceptance_required(client):
 def test_legal_terms_post_updates_timestamp_when_accepted_terms_are_outdated(client):
     latest_terms_datetime = get_latest_terms_datetime()
     terms_accepted_at = latest_terms_datetime - datetime.timedelta(days=1)
-    user = EmployerFactory(membership=True, terms_accepted_at=terms_accepted_at)
+    user = EmployerFactory(terms_accepted_at=terms_accepted_at)
     client.force_login(user)
     next_url = reverse("dashboard:edit_user_info")
 
@@ -96,7 +96,7 @@ def test_legal_terms_post_with_wrong_terms_slug_displays_a_message(client):
     This can happen when the terms were updated while they had the form open...
     In this rare case, the user lands back on the form but with the very latest terms version.
     """
-    user = EmployerFactory(membership=True, terms_accepted_at=None)
+    user = EmployerFactory(terms_accepted_at=None)
     client.force_login(user)
     response = client.post(
         reverse("legal-terms"),

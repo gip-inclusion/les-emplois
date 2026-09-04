@@ -203,7 +203,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
 
 
 def test_documents_step_credential_documents(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
         is_orientable_with_form=True,
@@ -278,7 +278,7 @@ def test_start_requires_login(client):
 
 @pytest.mark.parametrize("is_blacklisted, status_code", [(True, 404), (False, 302)])
 def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, status_code):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     source_value = "source-name"
     if is_blacklisted:
         settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
@@ -293,7 +293,7 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
 def test_start_orientation_redirects_when_external_link_preferred(client):
     # A DI service that both is form-orientable and has an external link prefers the link:
     # direct access to the form flow must bounce back to the service detail page.
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     service = ServiceFactory(
         is_orientable_with_form=True,
         source__value="other",
@@ -309,7 +309,7 @@ def test_start_orientation_redirects_when_external_link_preferred(client):
 
 
 def test_orientation_select_job_seeker_redirects_when_external_link_preferred(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     service = ServiceFactory(
         is_orientable_with_form=True,
         source__value="other",
@@ -325,13 +325,13 @@ def test_orientation_select_job_seeker_redirects_when_external_link_preferred(cl
 
 
 def test_session_isolation_between_users(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
         is_orientable_with_form=True,
         structure__name="Structure orientation wizard",
     )
-    intruder = PrescriberFactory(membership=True)
+    intruder = PrescriberFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -370,7 +370,7 @@ def test_orientation_wizard_shows_banner_and_generic_title(client):
 
 
 def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(first_name="", last_name="DUPONT", phone="0606060606", email="test@example.org")
     service = ServiceFactory(
         uid="test-orientation-incomplete-uid",
@@ -410,7 +410,7 @@ def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snap
 
 
 def test_documents_step_redirects_to_error_page_when_orientation_submission_fails(client, mocker):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
         is_orientable_with_form=True,
@@ -481,7 +481,7 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
 def test_documents_step_normalizes_beneficiary_phone_for_dora(
     client, mocker, service_kwargs, expected_di_service_address_line
 ):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="+33601901570")
     service = ServiceFactory(
         is_orientable_with_form=True,
@@ -723,7 +723,7 @@ def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(
 
 
 def test_conformity_step_allows_missing_beneficiary_phone(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(
         first_name="Jean",
         last_name="Dupont",
@@ -750,7 +750,7 @@ def test_conformity_step_allows_missing_beneficiary_phone(client):
 
 
 def test_orientation_banner_quitter_ignores_back_url(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory()
     service = ServiceFactory(is_orientable_with_form=True)
     service_detail_url = (
@@ -765,7 +765,7 @@ def test_orientation_banner_quitter_ignores_back_url(client):
 
 
 def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory()
     service = ServiceFactory(is_orientable_with_form=True)
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -785,7 +785,7 @@ def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
 
 def test_no_error_when_special_chars_in_uid(client):
     """Check that reset url and redirection to orientation_select_job_seeker have encoded uids"""
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     service = ServiceFactory(
         is_orientable_with_form=True,
         structure__name="Structure orientation wizard",
@@ -805,7 +805,7 @@ def test_no_error_when_special_chars_in_uid(client):
 
 
 def test_orientation_create_job_seeker_starts_with_search_by_email(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     service = ServiceFactory(is_orientable_with_form=True)
     create_job_seeker_url = reverse(
         "job_seekers_views:get_or_create_start",

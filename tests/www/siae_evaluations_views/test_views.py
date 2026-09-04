@@ -406,7 +406,7 @@ class TestViewProof:
         assertRedirects(response, f"{reverse('account_login')}?next={url}")
 
     def test_access_nonexistent_id(self, client):
-        client.force_login(EmployerFactory(membership=True))
+        client.force_login(EmployerFactory())
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": 0})
         response = client.get(url)
         assert response.status_code == 404
@@ -483,7 +483,7 @@ class TestViewProof:
     "user_factory, expected_status",
     [
         (lambda: JobSeekerFactory(), 403),
-        (lambda: PrescriberFactory(membership=True), 403),
+        (PrescriberFactory, 403),
         (lambda: CompanyMembershipFactory(company__evaluable_kind=True).user, 404),
         # '12' below could actually be anything else than 14, see also EvaluationCampaignFactory
         (lambda: InstitutionMembershipFactory(institution__department="12").user, 404),

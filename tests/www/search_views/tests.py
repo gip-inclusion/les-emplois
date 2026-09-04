@@ -539,7 +539,7 @@ class TestSearchCompany:
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",
         )
         job_seeker_public_id = job_application.job_seeker.public_id
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
 
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         guerande = create_city_guerande()
@@ -1515,7 +1515,7 @@ class TestJobDescriptionSearchView:
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",
         )
         job_seeker_public_id = job_application.job_seeker.public_id
-        prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
 
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         guerande = create_city_guerande()

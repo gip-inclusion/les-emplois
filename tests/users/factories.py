@@ -1,5 +1,4 @@
 import datetime
-import functools
 import random
 import string
 
@@ -148,16 +147,15 @@ class PrescriberFactory(ProfessionalFactory):
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("membership argument is mandatory")
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
 
-        if not create:
+        if not create or extracted is False:
             return
 
-        if extracted or kwargs:
-            from tests.prescribers.factories import PrescriberMembershipFactory
+        from tests.prescribers.factories import PrescriberMembershipFactory
 
-            PrescriberMembershipFactory(user=self, **kwargs)
+        PrescriberMembershipFactory(user=self, **kwargs)
 
     @factory.post_generation
     def with_disabled_notifications(obj, create, extracted, **kwargs):
@@ -180,14 +178,16 @@ class EmployerFactory(ProfessionalFactory):
         )
 
     @factory.post_generation
-    def membership(self, created, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("membership argument is mandatory")
+    def membership(self, create, extracted, **kwargs):
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
+
+        if not create or extracted is False:
+            return
 
         from tests.companies.factories import CompanyMembershipFactory
 
-        if created and extracted is True:
-            CompanyMembershipFactory(user=self, **kwargs)
+        CompanyMembershipFactory(user=self, **kwargs)
 
     @factory.post_generation
     def with_disabled_notifications(obj, create, extracted, **kwargs):
@@ -213,16 +213,15 @@ class LaborInspectorFactory(ProfessionalFactory):
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("membership argument is mandatory")
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
 
-        if not create:
+        if not create or extracted is False:
             return
 
-        if extracted or kwargs:
-            from tests.institutions.factories import InstitutionMembershipFactory
+        from tests.institutions.factories import InstitutionMembershipFactory
 
-            InstitutionMembershipFactory(user=self, **kwargs)
+        InstitutionMembershipFactory(user=self, **kwargs)
 
 
 class JobSeekerFactory(UserFactory):
@@ -477,30 +476,18 @@ def random_user_kind_factory(**kwargs):
     factory = None
     if identity_provider := kwargs.get("identity_provider"):
         if identity_provider == IdentityProvider.PRO_CONNECT:
-            factory = random.choice(
-                [
-                    functools.partial(PrescriberFactory, membership=True),
-                    functools.partial(EmployerFactory, membership=True),
-                ]
-            )
+            factory = random.choice([PrescriberFactory, EmployerFactory])
         elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]:
             factory = JobSeekerFactory
     if factory is None:
         factory = random.choice(
-            [
-                ItouStaffFactory,
-                JobSeekerFactory,
-                functools.partial(PrescriberFactory, membership=True),
-                functools.partial(EmployerFactory, membership=True),
-                functools.partial(LaborInspectorFactory, membership=True),
-            ]
+            [ItouStaffFactory, JobSeekerFactory, PrescriberFactory, EmployerFactory, LaborInspectorFactory]
         )
     return factory(**kwargs)
 
 
 def random_pro_user_factory(**kwargs):
     """Return a professional user with a random membership kind"""
-    kwargs["membership"] = True  # FIXME when the 3 factories always have membership=True
     return random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(**kwargs)
 
 
@@ -518,7 +505,7 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    professional = factory.SubFactory(PrescriberFactory, membership=True)
+    professional = factory.SubFactory(PrescriberFactory)
     last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)
 
     @factory.post_generation

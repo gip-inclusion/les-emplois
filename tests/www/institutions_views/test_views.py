@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -25,9 +23,9 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), False],
-            [partial(PrescriberFactory, membership=True), False],
-            [partial(LaborInspectorFactory, membership=True), True],
+            [EmployerFactory, False],
+            [PrescriberFactory, False],
+            [LaborInspectorFactory, True],
         ],
         ids=[
             "job_seeker",

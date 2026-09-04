@@ -19,7 +19,6 @@ from tests.www.stats.test_views import has_activated_pilotage_in_nexus
 )
 def test_index_stats_for_employer(snapshot, client, kind):
     employer = EmployerFactory(
-        membership=True,
         membership__company__kind=kind,
     )
     client.force_login(employer)
@@ -38,7 +37,6 @@ def test_index_stats_for_authorized_prescriber(snapshot, client):
         - {PrescriberOrganizationKind.OTHER}  # Can't be authorized
     )
     prescriber = PrescriberFactory(
-        membership=True,
         membership__organization__authorized=True,
         membership__organization__kind=random.choice(list(possible_kinds)),
     )
@@ -53,7 +51,6 @@ def test_index_stats_for_authorized_prescriber(snapshot, client):
 @pytest.mark.parametrize("kind", STATS_PH_ORGANISATION_KIND_WHITELIST)
 def test_index_stats_for_authorized_prescriber_whitelist(snapshot, client, kind):
     prescriber = PrescriberFactory(
-        membership=True,
         membership__organization__authorized=True,
         membership__organization__kind=kind,
     )
@@ -68,7 +65,6 @@ def test_index_stats_for_authorized_prescriber_whitelist(snapshot, client, kind)
 @pytest.mark.parametrize("kind", {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT})
 def test_index_stats_for_authorized_prescriber_with_custom_layout(snapshot, client, kind):
     prescriber = PrescriberFactory(
-        membership=True,
         membership__organization__authorized=True,
         membership__organization__kind=kind,
     )
@@ -82,7 +78,6 @@ def test_index_stats_for_authorized_prescriber_with_custom_layout(snapshot, clie
 
 def test_index_stats_for_non_authorized_prescriber(snapshot, client):
     prescriber = PrescriberFactory(
-        membership=True,
         membership__organization__authorized=False,
         membership__organization__kind=PrescriberOrganizationKind.OTHER,
     )
@@ -96,7 +91,7 @@ def test_index_stats_for_non_authorized_prescriber(snapshot, client):
 
 @pytest.mark.parametrize("kind", InstitutionKind)
 def test_index_stats_for_labor_inspector(snapshot, client, kind):
-    labor_inspector = LaborInspectorFactory(membership=True, membership__institution__kind=kind)
+    labor_inspector = LaborInspectorFactory(membership__institution__kind=kind)
     client.force_login(labor_inspector)
 
     response = client.get(reverse("dashboard:index_stats"))

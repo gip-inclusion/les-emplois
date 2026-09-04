@@ -62,9 +62,9 @@ class TestExportJobApplications:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
@@ -127,7 +127,7 @@ class TestExportJobApplications:
             job_app.save()
             ProlongationFactory(
                 for_snapshot=True,
-                validated_by=PrescriberFactory(membership=True, membership__organization__authorized=True),
+                validated_by=PrescriberFactory(membership__organization__authorized=True),
                 declared_by_siae=siae,
                 approval=approval,
             )
@@ -173,9 +173,9 @@ class TestExportPEApiRejections:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 302),  # redirects to dashboard if no file
         ],
@@ -237,9 +237,9 @@ class TestExportCTA:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
@@ -285,9 +285,9 @@ class TestImportAciConvergencePHC:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
@@ -371,9 +371,9 @@ class TestMergeUsers:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {"for_snapshot": True}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
@@ -877,7 +877,7 @@ class TestMergeUsers:
     def test_merge_assignments(self, client, caplog):
         org = PrescriberOrganizationFactory()
         company = CompanyFactory()
-        prescriber_1 = PrescriberFactory(membership=True, membership__organization=org)
+        prescriber_1 = PrescriberFactory(membership__organization=org)
         prescriber_2 = ProfessionalFactory()
 
         # JSA(job_seeker, from_user, None)
@@ -1080,9 +1080,9 @@ class TestExportFS3437:
         "factory,factory_kwargs,expected_status",
         [
             pytest.param(JobSeekerFactory, {}, 403, id="job_seeker"),
-            pytest.param(EmployerFactory, {"membership": True}, 403, id="employer"),
-            pytest.param(PrescriberFactory, {"membership": True}, 403, id="prescriber"),
-            pytest.param(LaborInspectorFactory, {"membership": True}, 403, id="labor_inspector"),
+            pytest.param(EmployerFactory, {}, 403, id="employer"),
+            pytest.param(PrescriberFactory, {}, 403, id="prescriber"),
+            pytest.param(LaborInspectorFactory, {}, 403, id="labor_inspector"),
             pytest.param(ItouStaffFactory, {}, 302, id="staff"),
             pytest.param(ItouStaffFactory, {"is_superuser": True}, 200, id="superuser"),
         ],
@@ -1138,9 +1138,9 @@ class TestImportFS3437FromAsp:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {"membership": True}, 403),
-            (LaborInspectorFactory, {"membership": True}, 403),
+            (EmployerFactory, {}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],

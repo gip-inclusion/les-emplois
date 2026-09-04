@@ -221,7 +221,7 @@ class TestApply:
 
     def test_404_when_trying_to_apply_for_a_prescriber(self, client):
         company = CompanyFactory(with_jobs=True)
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, prescriber, {})
         for viewname in (
@@ -259,7 +259,7 @@ class TestApply:
             with_jobs=True, with_membership=True, block_job_applications=True, subject_to_iae_rules=True
         )
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
 
         response = client.post(reverse(view_name, kwargs={"session_uuid": apply_session.name}), post_data)
@@ -282,7 +282,7 @@ class TestApply:
             with_jobs=True, with_membership=True, spontaneous_applications_open_since=None, subject_to_iae_rules=True
         )
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
 
         response = client.post(reverse(view_name, kwargs={"session_uuid": apply_session.name}), post_data)
@@ -304,7 +304,7 @@ class TestApply:
         # No block is active, but one of the selected jobs is no longer active.
         company = CompanyFactory(with_jobs=True, with_membership=True, subject_to_iae_rules=True)
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
 
         jobs = company.job_description_through.all()
         inactive_job = jobs[0]
@@ -377,7 +377,7 @@ class TestApply:
             params |= {"job_description_id": job_description.pk}
             expected_session |= {"selected_jobs": [job_description.pk]}
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(url, params)
 
@@ -1734,7 +1734,7 @@ class TestApplyAsPrescriber:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
@@ -1753,7 +1753,7 @@ class TestApplyAsPrescriber:
         reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         organization = prescriber.prescribermembership_set.get().organization
         client.force_login(prescriber)
 
@@ -2131,7 +2131,7 @@ class TestApplyAsPrescriber:
 
     def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_birthdate(self, client):
         company = CompanyFactory(with_membership=True)
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         client.force_login(prescriber)
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
@@ -2164,7 +2164,7 @@ class TestApplyAsPrescriber:
 
     def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_pole_emploi_id(self, client):
         company = CompanyFactory(with_membership=True)
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         client.force_login(prescriber)
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=None,  # Make sure the view is accessible
@@ -2830,7 +2830,7 @@ class TestApplyAsCompany:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_another_employer(self, client, pdf_file):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
-        employer = EmployerFactory(membership=True)
+        employer = EmployerFactory()
         client.force_login(employer)
 
         dummy_job_seeker = JobSeekerFactory.build(
@@ -2845,7 +2845,7 @@ class TestApplyAsCompany:
 
     def test_check_info_as_employer_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
-        employer = EmployerFactory(membership=True)
+        employer = EmployerFactory()
         client.force_login(employer)
         dummy_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_hexa_address=True,
@@ -3226,10 +3226,8 @@ class TestApplicationView:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            pytest.param(
-                partial(PrescriberFactory, membership=True, membership__organization__authorized=True), id="prescriber"
-            ),
-            pytest.param(partial(EmployerFactory, membership=True), id="employer"),
+            pytest.param(partial(PrescriberFactory, membership__organization__authorized=True), id="prescriber"),
+            pytest.param(EmployerFactory, id="employer"),
             pytest.param(None, id="auto_prescripting_employer"),
         ],
     )
@@ -3255,7 +3253,7 @@ class TestApplicationView:
             jobseeker_profile__pole_emploi_id="1234567A",
             created_by=ProfessionalFactory(),
         )
-        is_prescriber = user_factory and user_factory.func is PrescriberFactory
+        is_prescriber = user.prescribermembership_set.exists()
         is_auto_prescription = user_factory is None
 
         client.force_login(user)
@@ -4204,7 +4202,7 @@ class TestApplicationGEIQEligibilityView:
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
         job_seeker = JobSeekerFactory()
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         apply_session = fake_session_initialization(
             client, self.geiq, job_seeker, {"selected_jobs": self.geiq.job_description_through.all()}
         )
@@ -4558,7 +4556,7 @@ class TestCheckPreviousApplicationsView:
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_prescriber(self, client, snapshot):
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         self._login_and_setup_session(client, prescriber)
 
         # Create a very recent application
@@ -4729,7 +4727,7 @@ class TestCheckPreviousApplicationsView:
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_another_employer(self, client, snapshot):
-        employer = EmployerFactory(membership=True)
+        employer = EmployerFactory()
         self._login_and_setup_session(client, employer)
 
         # Create a very recent application
