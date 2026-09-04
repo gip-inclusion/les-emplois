@@ -113,16 +113,22 @@ def close_approval(approval, *, closed_by, end_at="today"):
     _clip_approval_dependency(approval, Prolongation, new_end, closed_by)
     _clip_approval_dependency(approval, Suspension, new_end, closed_by)
     logger.info(
-        "Terminating approval pk=%(approval_id)d, end_at=%(end_at)s (was %(initial_end_at)s).",
+        "Terminating approval pk=%(approval_id)d, end_at=%(end_at)s (was %(initial_end_at)s), "
+        "closed by pk=%(closed_by_pk)s.",
         {
             "approval_id": approval.pk,
             "initial_end_at": approval.end_at,
             "end_at": new_end,
+            "closed_by_pk": closed_by.pk,
         },
     )
     approval.end_at = new_end
     approval.save(update_fields=["end_at", "updated_at"])
-    add_support_remark_to_obj(approval, f"{new_end} : PASS IAE clôturé par {closed_by.get_full_name()}.")
+    add_support_remark_to_obj(
+        approval,
+        f"{new_end} : PASS IAE clôturé par l'utilisateur {closed_by.get_full_name()} "
+        f"({closed_by.get_kind_display()}, id: {closed_by.id}).",
+    )
 
 
 def get_user_last_accepted_siae_job_application(user):
