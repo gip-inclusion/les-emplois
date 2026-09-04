@@ -178,5 +178,8 @@ def _get_redirect_url(request):
         return None
 
     query = QueryDict(request.GET.urlencode(), mutable=True)
-    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
+    if request.resolver_match.app_name != "admin":
+        # Django-admin redirects the request (by removing all query
+        # params) if a query param is not a filterable column.
+        query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
     return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
