@@ -24,7 +24,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import random_pro_user_factory
+from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -50,7 +50,7 @@ class TestPrescriberSignup:
     @pytest.mark.parametrize("already_has_membership", [True, False])
     def test_professional_is_member_of_france_travail(self, client, mailoutbox, already_has_membership):
         email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
-        user = random_pro_user_factory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         if already_has_membership:
@@ -115,7 +115,7 @@ class TestPrescriberSignup:
         assert email.subject == "[TEST] Votre rôle d’administrateur"
 
     def test_professional_is_not_member_of_france_travail(self, client):
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         url = reverse("signup:choose_pro_membership_kind")
@@ -127,7 +127,7 @@ class TestPrescriberSignup:
 
     def test_professional_is_already_member_of_ft_organization(self, client, snapshot):
         email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
-        user = random_pro_user_factory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         organization = PrescriberOrganizationFactory(france_travail=True, for_snapshot=True)
@@ -150,7 +150,7 @@ class TestPrescriberSignup:
         """
         Test joining an authorized organization of *known* kind.
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         mock_call_ban_geocoding_api = mocker.patch(
@@ -208,7 +208,7 @@ class TestPrescriberSignup:
         """
         Test joining an authorized organization of *unknown* kind.
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         mock_call_ban_geocoding_api = mocker.patch(
@@ -278,7 +278,7 @@ class TestPrescriberSignup:
         """
         Test joining an unauthorized organization.
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         mock_call_ban_geocoding_api = mocker.patch(
@@ -337,7 +337,7 @@ class TestPrescriberSignup:
         """
         Test checking for existing org with existing SIREN but in an other department
         """
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         siret1 = "26570134200056"
@@ -363,7 +363,7 @@ class TestPrescriberSignup:
         """
         Test checking for existing org with existing SIREN but in the same department
         """
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         siret1 = "26570134200056"
@@ -401,7 +401,7 @@ class TestPrescriberSignup:
         """
         Test check for existing org if the organization does not have a member
         """
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         siret = "26570134200148"
@@ -429,7 +429,7 @@ class TestPrescriberSignup:
         - user can't create 2 PLIE with the same SIRET
         - user can create a PLIE and a ML with the same SIRET
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         mock_call_ban_geocoding_api = mocker.patch(
@@ -476,7 +476,7 @@ class TestPrescriberSignup:
         * the kind of the new organization is the same as an existing one
         * there is no duplicate of the (kind, siret) pair
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         mock_call_ban_geocoding_api = mocker.patch(
@@ -507,7 +507,7 @@ class TestPrescriberSignup:
         mock_call_ban_geocoding_api.assert_called_once()
 
     def test_form_to_request_for_an_invitation(self, client, mailoutbox):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         siret = "26570134200148"
@@ -556,7 +556,7 @@ class TestPrescriberSignup:
         """
         HIDDEN_PRESCRIBER_KINDS should not be displayed or chosen in the form
         """
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -595,9 +595,7 @@ class TestPrescribersViewsExceptions:
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        user = random_pro_user_factory(
-            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"]
-        )
+        user = ProfessionalFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
         client.force_login(user)
 
         client.get(reverse("signup:prescriber_check_already_exists"))
@@ -644,7 +642,7 @@ class TestPrescribersViewsExceptions:
         He wants to join a Pôle emploi organization
         but his e-mail suffix is wrong. An error should be raised.
         """
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         # Go through each step to ensure session data is recorded properly.
@@ -664,7 +662,7 @@ class TestPrescribersViewsExceptions:
         assert not user.prescriberorganization_set.exists()
 
     def test_permission_denied_when_skiping_first_step(self, client, subtests):
-        client.force_login(random_pro_user_factory())
+        client.force_login(ProfessionalFactory())
         urls = [
             reverse("signup:prescriber_request_invitation", kwargs={"membership_id": 1}),
             reverse("signup:prescriber_choose_org"),
