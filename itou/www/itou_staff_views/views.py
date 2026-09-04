@@ -460,7 +460,7 @@ def merge_users_confirm(
         if request.method == "POST" and form.is_valid():
             try:
                 success_message = format_html(
-                    'Fusion {} & {} effectuée : (<a href="{}">admin</a>)',
+                    'Fusion {} & {} effectuée : (<a href="{}">admin</a>)',
                     to_user.email,
                     from_user.email,
                     merge_utils.admin_url(to_user),
