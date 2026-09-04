@@ -51,10 +51,16 @@
                             </p>
                             <p>
                                 {% if standalone_creation %}
-                                    {% if is_job_seeker_in_list %}
-                                        Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                                    {% if active_assignment %}
+                                        {% if active_assignment.advisor == request.user and active_assignment.organization == request.current_organization %}
+                                            Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
+                                        {% elif active_assignment.organization == request.current_organization %}
+                                            Cet usager figure déjà dans la liste d'accompagnements de votre structure.
+                                            <br>
+                                            Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
+                                        {% endif %}
                                     {% else %}
-                                        Cet usager sera ajouté à votre liste d'accompagnements et vous serez automatiquement désigné comme dernier accompagnateur connu.
+                                        Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
                                 {% else %}
                                     L'identité du candidat est une information clé pour la structure.
@@ -70,10 +76,13 @@
                             {% endif %}
                         </div>
                         <div class="modal-footer">
-
-                            {% if standalone_creation and is_job_seeker_in_list %}
+                            {% if standalone_creation %}
                                 {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
-                                {% bootstrap_button "M'ajouter en tant qu'accompagnateur" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                {% if active_assignment and active_assignment.advisor == request.user and active_assignment.organization == request.current_organization %}
+                                    {% bootstrap_button "Modifier mon intervention" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                {% else %}
+                                    {% bootstrap_button "Ajouter mon intervention" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                {% endif %}
                             {% else %}
                                 {# Reload this page with a new form. #}
                                 {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}

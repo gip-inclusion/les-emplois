@@ -12,9 +12,15 @@ from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.models import Contract
-from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, JobSeekerProfileQuerySet, NirModificationRequest, User
+from itou.users.models import (
+    JobSeekerAssignment,
+    JobSeekerProfile,
+    JobSeekerProfileQuerySet,
+    NirModificationRequest,
+    User,
+)
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
@@ -540,3 +546,43 @@ class NirModificationRequestForm(forms.ModelForm):
         nir_modification_request.requested_by = self.requested_by
         nir_modification_request.save()
         return nir_modification_request
+
+
+class JobSeekerAssignmentForm(forms.ModelForm):
+    ONGOING_CHOICES = (("True", "En cours"), ("False", "Terminé"))
+    reason = forms.CharField(
+        required=False,
+        label="Motif de l'accompagnement",
+        help_text="Raison de l’accompagnement et/ou actions menées avec l'usager.",
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    class Meta:
+        model = JobSeekerAssignment
+        fields = ["reason"]
+
+    def __init__(self, active_assignment, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.active_assignment = active_assignment
+        if self.instance.pk:
+            self.fields["is_ongoing"] = forms.ChoiceField(
+                label="Accompagnement",
+                required=False,
+                initial=self.instance.ended_at is None,
+                disabled=active_assignment and self.instance != active_assignment,
+                widget=forms.RadioSelect,
+                choices=self.ONGOING_CHOICES,
+            )
+
+    def save(self, commit=False):
+        assignment = super().save(commit)
+        # We need to change the ownership of the assignment in case it was previously assigned to an unknown advisor.
+        assignment.assigned_to_unknown_advisor = False
+        if self.fields.get("is_ongoing"):
+            if self.instance.ended_at is None and self.cleaned_data["is_ongoing"] == "False":
+                assignment.ended_at = timezone.now()
+                assignment.end_reason = AssignmentEndReason.MANUAL
+            elif self.instance.ended_at and self.cleaned_data["is_ongoing"] == "True":
+                assignment.ended_at = None
+                assignment.end_reason = None
+        assignment.save()

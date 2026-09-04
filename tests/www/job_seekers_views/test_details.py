@@ -150,19 +150,34 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
         replace_in_attr=[
             ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
             (
-                "hx-post",
-                f"/job-seekers/display/{assignment.pk}",
-                "/job-seekers/display/[JobSeekerAssignment PK]",
+                "action",
+                f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/archive",
+                f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/archive",
             ),
             (
                 "id",
-                f"email-{assignment.pk}",
-                "email-[JobSeekerAssignment PK]",
+                f"archive-assignment-{assignment.pk}-modal",
+                "archive-assignment-[JobSeekerAssignment PK]-modal",
+            ),
+            (
+                "data-bs-target",
+                f"archive-assignment-{assignment.pk}-modal",
+                "archive-assignment-[JobSeekerAssignment PK]-modal",
             ),
             (
                 "id",
-                f"phone-{assignment.pk}",
-                "phone-[JobSeekerAssignment PK]",
+                f"archive-assignment-{assignment.pk}-modal-title",
+                "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+            ),
+            (
+                "aria-labelledby",
+                f"archive-assignment-{assignment.pk}-modal-title",
+                "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+            ),
+            (
+                "href",
+                f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
             ),
         ],
     )
@@ -721,6 +736,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -778,6 +794,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -794,6 +811,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
+                    "last_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -801,6 +819,101 @@ class TestLastAdvisor:
         )
         assert ongoing_str not in rendered
         assert ended_str in rendered
+
+    def test_buttons_displayed(self, client):
+        assignment = JobSeekerAssignmentFactory()
+        job_seeker = assignment.job_seeker
+        organization = PrescriberOrganizationFactory()
+        user = PrescriberFactory(membership=True, membership__organization=organization)
+        url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        archive_assignment_btn = f"""
+            <button class="btn btn-ico btn-outline-primary w-100 mt-3"
+                  data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
+                <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
+                <span>Terminer mon accompagnement</span>
+            </button>
+        """
+        create_assignment_url = (
+            reverse("job_seekers_views:create_assignment", kwargs={"public_id": job_seeker.public_id})
+            + f"?back_url={url}"
+        )
+        create_assignment_btn = f"""
+            <a href="{create_assignment_url}" class="btn-link" data-matomo-event="true"
+                  data-matomo-category="accompagnateur" data-matomo-action="clic"
+                  data-matomo-option="ajouter-accompagnement">
+                Ajoutez votre intervention
+            </a>
+        """
+        no_previous_assignment_text = "Vous intervenez sur le parcours de cet usager ?"
+        previous_assignment_text = "Vous intervenez de nouveau sur le parcours de cet usager ?"
+        edit_assignment_url = (
+            reverse(
+                "job_seekers_views:edit_assignment",
+                kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
+            )
+            + f"?back_url={url}"
+        )
+        edit_assignment_btn = f"""
+            <a class="btn btn-ico btn-outline-primary w-100 mt-3" href={edit_assignment_url}
+                  data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="modifier-accompagnement">
+                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                <span>Modifier mon accompagnement</span>
+            </a>
+        """
+
+        client.force_login(user)
+
+        # Last advisor exists but is not the user
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
+
+        # User is last advisor with no organization
+        assignment.professional = user
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
+        assertContains(response, edit_assignment_btn, html=True)
+
+        # User is last advisor with different organization
+        assignment.prescriber_organization = PrescriberOrganizationFactory()
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
+
+        # User is last advisor with same organization
+        assignment.prescriber_organization = organization
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, create_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+
+        # User is last advisor but assignment has ended
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
+
+        # No assignment
+        assignment.delete()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, create_assignment_btn, html=True)
+        assertContains(response, no_previous_assignment_text)
+        assertNotContains(response, edit_assignment_btn, html=True)
 
 
 @freeze_time("2024-08-14")
@@ -1088,6 +1201,36 @@ class TestAdvisorsTab:
                         str(assignment.pk),
                         "[JobSeekerAssignment PK]",
                     ),
+                    (
+                        "action",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/archive",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/archive",
+                    ),
+                    (
+                        "id",
+                        f"archive-assignment-{assignment.pk}-modal",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal",
+                    ),
+                    (
+                        "data-bs-target",
+                        f"archive-assignment-{assignment.pk}-modal",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal",
+                    ),
+                    (
+                        "id",
+                        f"archive-assignment-{assignment.pk}-modal-title",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+                    ),
+                    (
+                        "aria-labelledby",
+                        f"archive-assignment-{assignment.pk}-modal-title",
+                        "archive-assignment-[JobSeekerAssignment PK]-modal-title",
+                    ),
+                    (
+                        "href",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
+                    ),
                 ],
             )
         ) == snapshot(name="active_only")
@@ -1115,6 +1258,11 @@ class TestAdvisorsTab:
                         "id",
                         str(assignment.pk),
                         "[JobSeekerAssignment PK]",
+                    ),
+                    (
+                        "href",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/{assignment.pk}/edit",
+                        f"/job-seekers/{job_seeker.public_id}/assignments/[JobSeekerAssignment PK]/edit",
                     ),
                 ],
             )
@@ -1193,3 +1341,111 @@ class TestAdvisorsTab:
         rendered = template.render(Context({"assignment": assignment, "request": request}))
         assert ongoing_str not in rendered
         assert ended_str in rendered
+
+    def test_buttons_displayed(self, client):
+        assignment = JobSeekerAssignmentFactory()
+        organization = PrescriberOrganizationFactory()
+        user = PrescriberFactory(membership=True, membership__organization=organization)
+        url = reverse("job_seekers_views:advisors", kwargs={"public_id": assignment.job_seeker.public_id})
+        archive_assignment_btn = f"""
+            <button class="btn btn-ico btn-outline-primary w-100 w-md-auto"
+                  data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
+                <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
+                <span>Terminer mon accompagnement</span>
+            </button>
+        """
+        edit_assignment_url = (
+            reverse(
+                "job_seekers_views:edit_assignment",
+                kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+            )
+            + f"?back_url={url}"
+        )
+        edit_assignment_btn = f"""
+            <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" href={edit_assignment_url}
+                  data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="modifier-accompagnement">
+                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                <span>Modifier mon accompagnement</span>
+            </a>
+        """
+        fill_assignment_reason_btn = f"""
+            <a href={edit_assignment_url} data-matomo-event="true" data-matomo-category="accompagnateur"
+                  data-matomo-action="clic" data-matomo-option="renseigner-motif-accompagnement">
+                Préciser le motif de mon accompagnement
+            </a>
+        """
+        switch_organization_btn = "Me connecter à cette structure"
+        not_a_member_warning = (
+            "Vous ne faites plus partie de cette structure. Vous ne pouvez plus modifier cet accompagnement."
+        )
+
+        # Assignment with different user
+        client.force_login(user)
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
+
+        # Assignment with no organization
+        assignment.professional = user
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
+
+        # Assignment with organization user is not a member of
+        assignment.prescriber_organization = PrescriberOrganizationFactory()
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertContains(response, not_a_member_warning)
+
+        # Assignment with different organization
+        assignment.prescriber_organization = PrescriberOrganizationFactory(with_membership=True, membership__user=user)
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertNotContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
+
+        # Assignment with same organization
+        assignment.prescriber_organization = organization
+        assignment.save()
+        response = client.get(url)
+        assertContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
+
+        # Archived assignment
+        assignment.ended_at = timezone.now()
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)
+
+        # Assignment with reason
+        assignment.reason = "iae"
+        assignment.save()
+        response = client.get(url)
+        assertNotContains(response, archive_assignment_btn, html=True)
+        assertContains(response, edit_assignment_btn, html=True)
+        assertNotContains(response, fill_assignment_reason_btn, html=True)
+        assertNotContains(response, switch_organization_btn)
+        assertNotContains(response, not_a_member_warning)

@@ -32,7 +32,7 @@
                     <p class="h4">Accompagnateurs actuels ({{ active_assignments|length }})</p>
                     {% if active_assignments %}
                         {% for assignment in active_assignments %}
-                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment request=request only %}
+                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
                         {% endfor %}
                     {% else %}
                         <div class="c-box">
@@ -42,10 +42,10 @@
                     <p class="h4">Historique des accompagnateurs ({{ ended_assignments|length }})</p>
                     {% if ended_assignments %}
                         {% for assignment in ended_assignments %}
-                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment request=request only %}
+                            {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
                         {% endfor %}
                     {% else %}
-                        <div class="c-box">
+                        <div class="c-box mb-3 mb-md-4">
                             <p class="mb-0">Aucun ancien accompagnateur</p>
                         </div>
                     {% endif %}

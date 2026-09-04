@@ -21,7 +21,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -125,7 +125,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -229,7 +229,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -365,7 +365,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -425,7 +425,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -540,7 +540,7 @@
                           </div>
                       </div>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -735,7 +735,7 @@
                                       </div>
                                   </div>
                                   <div>
-                                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                           <i aria-hidden="true" class="ri-arrow-right-line">
                                           </i>
                                           Depuis le 12/11/2025
@@ -766,12 +766,73 @@
                                       </i>
                                   </li>
                               </ul>
+                              <div class="c-info mb-0 mt-3">
+                                  <span class="c-info__summary">
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                  </span>
+                                  <div class="c-info__detail">
+                                      <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Préciser le motif de mon accompagnement
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="c-box--results__footer">
+                              <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                                  <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Modifier mon accompagnement
+                                      </span>
+                                  </a>
+                                  <button class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
+                                      <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Terminer mon accompagnement
+                                      </span>
+                                  </button>
+                                  <div aria-hidden="true" aria-labelledby="archive-assignment-[JobSeekerAssignment PK]-modal-title" class="modal" id="archive-assignment-[JobSeekerAssignment PK]-modal" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <form action="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/archive?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a" class="js-prevent-multiple-submit" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <div class="modal-content">
+                                                  <div class="modal-header">
+                                                      <h3 class="modal-title" id="archive-assignment-[JobSeekerAssignment PK]-modal-title">
+                                                          Terminer l'accompagnement
+                                                      </h3>
+                                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                                                      </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                      <p>
+                                                          Une fois votre accompagnement terminé, cet usager n'apparaîtra plus dans votre liste d'accompagnements.
+                                                      </p>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                      <button class="btn btn-outline-primary btn-block w-100 w-md-auto" data-bs-dismiss="modal" type="button">
+                                                          <span>
+                                                              Annuler
+                                                          </span>
+                                                      </button>
+                                                      <button class="btn btn-primary btn-block w-100 w-md-auto" data-matomo-action="submit" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="terminer-accompagnement">
+                                                          <span>
+                                                              Confirmer
+                                                          </span>
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                       <p class="h4">
                           Historique des accompagnateurs (0)
                       </p>
-                      <div class="c-box">
+                      <div class="c-box mb-3 mb-md-4">
                           <p class="mb-0">
                               Aucun ancien accompagnateur
                           </p>
@@ -948,7 +1009,7 @@
                                       </div>
                                   </div>
                                   <div>
-                                      <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary">
+                                      <span class="badge badge-xs rounded-pill bg-disabled-color-light text-primary">
                                           <i aria-hidden="true" class="ri-time-line">
                                           </i>
                                           Du 12/11/2025 au 23/03/2026
@@ -979,6 +1040,27 @@
                                       </i>
                                   </li>
                               </ul>
+                              <div class="c-info mb-0 mt-3">
+                                  <span class="c-info__summary">
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                  </span>
+                                  <div class="c-info__detail">
+                                      <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          Préciser le motif de mon accompagnement
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="c-box--results__footer">
+                              <div class="d-flex flex-column justify-content-md-end flex-md-row gap-3">
+                                  <a class="btn btn-ico btn-outline-primary w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                      </i>
+                                      <span>
+                                          Modifier mon accompagnement
+                                      </span>
+                                  </a>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -1272,7 +1354,7 @@
                   Aucune structure associée
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 23/06/2026
@@ -1304,6 +1386,15 @@
                   Copier
               </span>
           </button>
+          <div class="c-box--accompagnateur__detail">
+              <hr class="mt-4 mb-3"/>
+              <p class="mb-0">
+                  Vous intervenez sur le parcours de cet usager ?
+                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/[JobSeeker PublicID]/assignments/create?back_url=/job-seekers/details/[JobSeeker PublicID]">
+                      Ajoutez votre intervention
+                  </a>
+              </p>
+          </div>
       </div>
   </div>
   
@@ -1328,7 +1419,7 @@
                   Aucune structure associée
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 30/06/2026
@@ -1360,6 +1451,15 @@
                   Copier
               </span>
           </button>
+          <div class="c-box--accompagnateur__detail">
+              <hr class="mt-4 mb-3"/>
+              <p class="mb-0">
+                  Vous intervenez sur le parcours de cet usager ?
+                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/apply/11111111-1111-1111-1111-111111111111/jobseeker/details">
+                      Ajoutez votre intervention
+                  </a>
+              </p>
+          </div>
       </div>
   </div>
   
@@ -1410,7 +1510,7 @@
                   Employeur pour ACME Inc.
               </span>
               <div>
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-arrow-right-line">
                       </i>
                       Depuis le 23/06/2026
@@ -1459,6 +1559,15 @@
                   Copier
               </span>
           </button>
+          <div class="c-box--accompagnateur__detail">
+              <hr class="mt-4 mb-3"/>
+              <p class="mb-0">
+                  Vous intervenez sur le parcours de cet usager ?
+                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/[JobSeeker PublicID]/assignments/create?back_url=/job-seekers/details/[JobSeeker PublicID]">
+                      Ajoutez votre intervention
+                  </a>
+              </p>
+          </div>
       </div>
   </div>
   
@@ -1490,7 +1599,7 @@
                           Aucune structure associée
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1567,7 +1676,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1644,7 +1753,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1754,7 +1863,7 @@
                           Aucune structure associée
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1799,7 +1908,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -1893,7 +2002,7 @@
                           Orienteur pour [Org display name]
                       </span>
                       <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                               <i aria-hidden="true" class="ri-arrow-right-line">
                               </i>
                               Depuis le 08/08/2026
@@ -2271,13 +2380,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -2579,13 +2690,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -2851,13 +2964,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -3223,13 +3338,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -6100,13 +6217,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -6427,13 +6546,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -6687,13 +6808,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -7002,13 +7125,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -7329,13 +7454,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -7589,13 +7716,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -7913,13 +8042,15 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
-                                              <hr class="mt-4 mb-3"/>
-                                              <p class="mb-0">
-                                                  Vous intervenez sur le parcours de cet usager ?
-                                                  <a class="btn-link" href="">
-                                                      Ajoutez votre intervention
-                                                  </a>
-                                              </p>
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -7936,7 +8067,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -8618,6 +8749,42 @@
       }),
       dict({
         'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'get_last_assignment[www/job_seekers_views/views.py]',
+          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND NOT ("users_jobseekerassignment"."company_id" IS NULL
+                          AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
+                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_approval_details[approvals/perms.py]',
           'approval_details_box[utils/templatetags/approvals.py]',
           'InclusionNode[job_seekers_views/details.html]',
@@ -9207,7 +9374,7 @@
                                                       Prescripteur habilité pour Pres. Org.
                                                   </span>
                                                   <div>
-                                                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                                           <i aria-hidden="true" class="ri-arrow-right-line">
                                                           </i>
                                                           Depuis le 14/08/2024
@@ -9216,6 +9383,57 @@
                                               </div>
                                           </div>
                                           <div class="c-box--accompagnateur__detail">
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <div class="d-flex flex-column justify-content-md-end">
+                                                      <a class="btn btn-ico btn-outline-primary w-100 mt-3" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="modifier-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                                          </i>
+                                                          <span>
+                                                              Modifier mon accompagnement
+                                                          </span>
+                                                      </a>
+                                                      <button class="btn btn-ico btn-outline-primary w-100 mt-3" data-bs-target="#archive-assignment-[JobSeekerAssignment PK]-modal" data-bs-toggle="modal">
+                                                          <i aria-hidden="true" class="ri-stop-circle-line ri-lg">
+                                                          </i>
+                                                          <span>
+                                                              Terminer mon accompagnement
+                                                          </span>
+                                                      </button>
+                                                      <div aria-hidden="true" aria-labelledby="archive-assignment-[JobSeekerAssignment PK]-modal-title" class="modal" id="archive-assignment-[JobSeekerAssignment PK]-modal" tabindex="-1">
+                                                          <div class="modal-dialog modal-dialog-centered">
+                                                              <form action="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/archive?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" class="js-prevent-multiple-submit" method="post">
+                                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                                  <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                          <h3 class="modal-title" id="archive-assignment-[JobSeekerAssignment PK]-modal-title">
+                                                                              Terminer l'accompagnement
+                                                                          </h3>
+                                                                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                                                                          </button>
+                                                                      </div>
+                                                                      <div class="modal-body">
+                                                                          <p>
+                                                                              Une fois votre accompagnement terminé, cet usager n'apparaîtra plus dans votre liste d'accompagnements.
+                                                                          </p>
+                                                                      </div>
+                                                                      <div class="modal-footer">
+                                                                          <button class="btn btn-outline-primary btn-block w-100 w-md-auto" data-bs-dismiss="modal" type="button">
+                                                                              <span>
+                                                                                  Annuler
+                                                                              </span>
+                                                                          </button>
+                                                                          <button class="btn btn-primary btn-block w-100 w-md-auto" data-matomo-action="submit" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="terminer-accompagnement">
+                                                                              <span>
+                                                                                  Confirmer
+                                                                              </span>
+                                                                          </button>
+                                                                      </div>
+                                                                  </div>
+                                                              </form>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -9232,7 +9450,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -9933,6 +10151,42 @@
           FROM "approvals_suspension"
           WHERE "approvals_suspension"."approval_id" IN (%s)
           ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'get_last_assignment[www/job_seekers_views/views.py]',
+          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND NOT ("users_jobseekerassignment"."company_id" IS NULL
+                          AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
+                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          ORDER BY "users_jobseekerassignment"."last_action_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({

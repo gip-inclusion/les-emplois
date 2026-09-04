@@ -1,5 +1,6 @@
 {% load components %}
 {% load enums %}
+{% load matomo %}
 
 {% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
 
@@ -127,18 +128,43 @@
                 </li>
             {% endif %}
         </ul>
-        {% if assignment.advisor == request.user and assignment.organization == request.current_organization and not assignment.reason %}
-            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4 mt-3" %}
-                {% fragment as c_info__summary %}
-                    Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
-                {% endfragment %}
-                {% fragment as c_info__detail %}
-                    {# FIXME Add link :Préciser le motif de mon accompagnement #}
-                {% endfragment %}
-            {% endcomponent_info %}
+        {% if assignment.advisor == request.user and not assignment.reason %}
+            {% if assignment.organization == request.current_organization or not assignment.organization %}
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0 mt-3" %}
+                    {% fragment as c_info__summary %}
+                        Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        <a href="{% url 'job_seekers_views:edit_assignment' public_id=assignment.job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "accompagnateur" "clic" "renseigner-motif-accompagnement" %}>Préciser le motif de mon accompagnement</a>
+                    {% endfragment %}
+                {% endcomponent_info %}
+            {% endif %}
         {% endif %}
     </div>
-    {% if assignment.advisor == request.user and assignment.organization == request.current_organization %}
-        {# FIXME: Add links/actions #}
+    {% if assignment.advisor == request.user %}
+        <div class="c-box--results__footer">
+            {% if assignment.organization == request.current_organization or not assignment.organization %}
+                {% include "job_seekers_views/includes/assignment_actions.html" with in_last_advisor_box=False %}
+            {% elif assignment.is_still_member %}
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail borderless=True extra_classes="mb-0 mt-3" %}
+                    {% fragment as c_info__summary %}
+                        Connectez-vous à la structure {{ assignment.organization.display_name }} pour modifier {% if assignment.is_active %}ou terminer {% endif %}cet accompagnement.
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        <form action="{% url 'dashboard:switch_organization' %}?next_url={{ request.get_full_path|urlencode }}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-link ps-0" name="organization_key" value="{{ assignment.organization.organization_switch_key }}">Me connecter à cette structure</button>
+                        </form>
+                    {% endfragment %}
+                {% endcomponent_info %}
+            {% else %}
+                {% component_alert content=content variant="warning" extra_classes="mt-3 mb-0" %}
+                    {% fragment as content %}
+                        <p class="mb-0">Vous ne faites plus partie de cette structure. Vous ne pouvez plus modifier cet accompagnement.</p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
+        </div>
     {% endif %}
 </div>
