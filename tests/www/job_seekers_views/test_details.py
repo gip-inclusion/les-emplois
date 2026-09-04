@@ -707,7 +707,7 @@ class TestLastAdvisor:
 
     @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
     @freeze_time("2026-08-08")
-    def test_last_assigment_display(self, snapshot, display_mode):
+    def test_last_assignment_display(self, snapshot, display_mode):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             display_mode=display_mode,
@@ -745,7 +745,7 @@ class TestLastAdvisor:
             )
         assert pretty_indented(rendered) == snapshot
 
-    def test_oneself_assigment_display(self, client):
+    def test_oneself_assignment_display(self, client):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             professional__for_snapshot=True,
@@ -1122,7 +1122,7 @@ class TestAdvisorsTab:
 
     @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
     @freeze_time("2026-08-08")
-    def test_assigment_display(self, snapshot, display_mode):
+    def test_assignment_display(self, snapshot, display_mode):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             display_mode=display_mode,
@@ -1156,7 +1156,43 @@ class TestAdvisorsTab:
             )
         assert pretty_indented(rendered) == snapshot
 
-    def test_oneself_assigment_display(self, client):
+    @pytest.mark.parametrize("action_kind", ActionKind)
+    @freeze_time("2026-08-08")
+    def test_assignment_display_actions(self, snapshot, action_kind):
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker__for_snapshot=True,
+            display_mode=JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP,  # pick one arbitrarily
+            professional__for_snapshot=True,
+            last_action_kind=action_kind,
+        )
+        request = get_request(PrescriberFactory())
+
+        template = load_template("job_seekers_views/includes/advisor.html")
+        rendered = template.render(Context({"assignment": assignment, "request": request}))
+        rendered = rendered.replace(
+            f"/job-seekers/display/{assignment.pk}",
+            "/job-seekers/display/[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"card-{assignment.pk}",
+            "card-[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"email-{assignment.pk}",
+            "email-[JobSeekerAssignment PK]",
+        )
+        rendered = rendered.replace(
+            f"phone-{assignment.pk}",
+            "phone-[JobSeekerAssignment PK]",
+        )
+        if assignment.organization:
+            rendered = rendered.replace(
+                assignment.organization.display_name,
+                "[Org display name]",
+            )
+        assert pretty_indented(rendered) == snapshot
+
+    def test_oneself_assignment_display(self, client):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             professional__for_snapshot=True,
