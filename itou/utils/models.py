@@ -109,8 +109,8 @@ def check_nullable_date_order_constraint(
 
 
 class AbstractFieldsHistoryModel(models.Model):
-    FIELDS_HISTORY_TRIGGER_NAME = None
-    FIELDS_HISTORY_TRIGGER_FIELDS = None
+    FIELDS_HISTORY_TRIGGER_NAME: str | None = None
+    FIELDS_HISTORY_TRIGGER_FIELDS: list[str] | None = None
 
     fields_history = ArrayField(
         models.JSONField(

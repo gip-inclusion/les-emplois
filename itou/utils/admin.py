@@ -3,7 +3,7 @@ from functools import partial
 
 from django import forms
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
+from django.contrib.admin import ListFilter, ModelAdmin, StackedInline, TabularInline
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
@@ -85,7 +85,7 @@ class ItouGISMixin:
 
 
 class ItouTabularInline(TabularInline):
-    list_select_related = None
+    list_select_related: tuple[str, ...] | None = None
 
     def get_queryset(self, request):
         select_related_fields = set(self.list_select_related or [])
@@ -266,6 +266,9 @@ class ItouModelMixin:
         return with_triggers_context(super().change_view)(
             request, object_id, form_url=form_url, extra_context=extra_context
         )
+
+
+type ListFilterType = tuple[str | type[ListFilter], ...]
 
 
 class ItouModelAdmin(ItouModelMixin, ModelAdmin):

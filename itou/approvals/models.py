@@ -644,10 +644,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         any_day = timezone.localdate()  # It is not meaningful
         res = timeuntil(any_day + delta, now=any_day)
         res = res.replace("année", "an")
-        res = res.split(", ")
-        if any(v in res[0] for v in ["an", "mois"]):
-            return "Environ " + " et ".join(res)
-        return " et ".join(res)
+        res_items = res.split(", ")
+        if any(v in res_items[0] for v in ["an", "mois"]):
+            return "Environ " + " et ".join(res_items)
+        return " et ".join(res_items)
 
     @cached_property
     def remainder(self):
@@ -1496,7 +1496,7 @@ class CommonProlongation(models.Model):
 
     class Meta:
         abstract = True
-        constraints = [
+        constraints: list[models.BaseConstraint] = [
             # Report file is not yet defined as mandatory for these reasons. May change though
             models.CheckConstraint(
                 name="check_%(class)s_reason_and_report_file_coherence",

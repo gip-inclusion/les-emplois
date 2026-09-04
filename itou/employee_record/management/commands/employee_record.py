@@ -1,6 +1,6 @@
-import argparse
 import uuid
 
+from django.core.management import CommandParser
 from itoutils.django.commands import dry_runnable
 
 from itou.employee_record.models import EmployeeRecord
@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
     ATOMIC_HANDLE = True
 
-    def add_arguments(self, parser: argparse.ArgumentParser):
+    def add_arguments(self, parser: CommandParser):
         super().add_arguments(parser)
         subparsers = parser.add_subparsers(dest="command", required=True)
 

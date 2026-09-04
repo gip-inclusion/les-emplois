@@ -66,7 +66,7 @@ class _PersonSerializer(serializers.Serializer):
         birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
         return birth_place["codeComInsee"]
 
-    def get_codeInseePays(self, obj: EmployeeRecord) -> str:
+    def get_codeInseePays(self, obj: EmployeeRecord) -> str | None:
         birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
         return birth_place["codeInseePays"]
 

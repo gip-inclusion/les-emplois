@@ -1140,7 +1140,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         help_text=(
             "Identifiant France Travail chiffré, utilisé dans la communication à France Travail. "
             "Son existence implique que le nom, prénom, date de naissance et NIR de ce candidat "
-            "sont connus et valides du point de vue de France Travail.",
+            "sont connus et valides du point de vue de France Travail."
         ),
     )
 

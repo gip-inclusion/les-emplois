@@ -711,7 +711,7 @@ class GetOrCreateJobSeekerStartView(View):
 
 
 class ExpectedJobSeekerSessionMixin:
-    EXPECTED_SESSION_KIND = None
+    EXPECTED_SESSION_KIND: JobSeekerSessionKinds | None = None
 
     def __init__(self):
         self.job_seeker_session = None

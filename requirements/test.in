@@ -23,3 +23,9 @@ python-crontab  # https://gitlab.com/doctormo/python-crontab/
 requests-mock  # https://github.com/jamielennox/requests-mock
 respx  # https://lundberg.github.io/respx/
 syrupy  # https://github.com/tophat/syrupy
+
+
+# Type anotation
+# ------------------------------------------------------------------------------
+django-stubs  # https://github.com/typeddjango/django-stubs
+mypy  # https://github.com/python/mypy

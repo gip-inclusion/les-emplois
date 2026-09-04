@@ -104,7 +104,7 @@ class CommonUserInfoFormsMixin:
 
 
 class BaseFillJobSeekerInfosView(CommonUserInfoFormsMixin, TemplateView):
-    template_name = None
+    template_name: str | None = None
 
     def get_back_url(self):
         raise NotImplementedError
@@ -159,7 +159,7 @@ class BaseFillJobSeekerInfosView(CommonUserInfoFormsMixin, TemplateView):
 
 
 class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
-    template_name = None
+    template_name: str | None = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -282,7 +282,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
 
 @method_decorator(with_triggers_context, name="dispatch")
 class BaseConfirmationView(JobSeekerAndContractInfosNeededMixin, TemplateView):
-    template_name = None
+    template_name: str | None = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -377,7 +377,7 @@ class BaseConfirmationView(JobSeekerAndContractInfosNeededMixin, TemplateView):
 
 
 class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
-    template_name = None
+    template_name: str | None = None
     form_class = CheckJobSeekerGEIQEligibilityForm
 
     def test_func(self):

@@ -3,7 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Exists, OuterRef, Q, TextChoices
+from django.db.models import Exists, Model, OuterRef, Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -174,7 +174,7 @@ class CreateProlongationForm(forms.ModelForm):
     end_at = forms.DateField(widget=DuetDatePickerWidget())
 
     class Meta:
-        model = Prolongation
+        model: type[Model] = Prolongation
         fields = [
             "reason",
             "end_at",

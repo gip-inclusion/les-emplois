@@ -55,7 +55,7 @@ def get_external_link_markup(url, text):
     )
 
 
-def get_url_param_value(url: str, key: str) -> str:
+def get_url_param_value(url: str, key: str) -> str | None:
     """Get a parameter value from a provided URL.
 
     :param url: string of target URL

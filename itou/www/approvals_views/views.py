@@ -168,7 +168,7 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
     model = Approval
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
-    active_tab = None
+    active_tab: str | None = None
 
     def can_view_contracts(self):
         return self.request.from_authorized_prescriber or self.request.from_employer
@@ -346,7 +346,7 @@ class ApprovalPrintableDisplay(ReadonlyViewMixin, ApprovalBaseViewMixin, Templat
 
 
 class ContractsView(BaseApprovalDetailView):
-    queryset = Approval.objects
+    queryset = Approval.objects.all()
     template_name = "approvals/contracts.html"
     active_tab = "contracts"
 
@@ -488,7 +488,7 @@ class DeclareProlongationHTMXFragmentView(ReadonlyViewMixin, TemplateView):
     """
 
     # Select form errors to be cleared
-    clear_errors = []
+    clear_errors: tuple[str, ...] = ()
 
     def _clear_errors(self):
         # Clear given form errors if validation is not needed (but triggered)

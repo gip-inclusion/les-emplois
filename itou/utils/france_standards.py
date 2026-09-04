@@ -6,7 +6,7 @@ from itou.utils import iso_standards
 @functools.total_ordering
 class NIR:
     def __init__(self, value: str):
-        self.value = str(value) if value else None
+        self.value = str(value)
 
     def __str__(self):
         return self.value

@@ -319,7 +319,7 @@ class OrientationSelectJobSeekerView(FormView):
 
 
 class OrientationResultBaseView(TemplateView):
-    matomo_custom_title = None
+    matomo_custom_title: str | None = None
 
     def get_context_data(self, **kwargs):
         service = get_object_or_404(
