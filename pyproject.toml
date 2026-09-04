@@ -6,6 +6,14 @@ requires-python = ">=3.13"
 [tool.ruff]
 line-length = 119
 
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = [
+    "misc",
+    "var-annotated",
+    "attr-defined",
+]
+
 [tool.ruff.lint]
 # see prefixes in https://beta.ruff.rs/docs/rules/
 select = [

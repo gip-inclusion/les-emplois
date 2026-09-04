@@ -89,8 +89,8 @@ class CollectionDiffer:
         key: str | list[str] | tuple[list[str], list[str]],
         watched_data: collections.abc.Mapping[str, DataKey],
         *,
-        current_data_converters: ConverterMapping = None,
-        comparative_data_converters: ConverterMapping = None,
+        current_data_converters: ConverterMapping | None = None,
+        comparative_data_converters: ConverterMapping | None = None,
     ):
         self.current_collection = current_collection
         self.comparative_collection = comparative_collection
@@ -232,5 +232,6 @@ def if_not_set_converter(default):
 
 def apply_diff(diff_item: DiffItem, *, on=None, setter=setattr):
     item = on or diff_item.current_item
-    for attribute_name, data_diff in diff_item.data.items():
-        setter(item, attribute_name, data_diff.after)
+    if diff_item.data:
+        for attribute_name, data_diff in diff_item.data.items():
+            setter(item, attribute_name, data_diff.after)

@@ -1,9 +1,13 @@
+from typing import Any
+
 from allauth.account.adapter import get_adapter
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import PermissionDenied
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.db import models
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -139,12 +143,12 @@ def _toast_invitation_sent(invitations):
 
 
 class BaseInviteUserView(UserPassesTestMixin, TemplateView):
-    invitation_model = None
-    form_class = None
-    formset_class = None
+    invitation_model: type[models.Model] | None = None
+    form_class: type[forms.BaseForm] | None = None
+    formset_class: type[forms.BaseModelFormSet] | None = None
     organization = None
-    form_post_url = None
-    back_url = None
+    form_post_url: Any = None
+    back_url: Any = None
     template_name = "invitations_views/create.html"
 
     def setup(self, request, *args, **kwargs):

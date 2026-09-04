@@ -38,14 +38,14 @@ class AcceptedFilter(admin.SimpleListFilter):
 
 class BaseInvitationAdmin(ItouModelAdmin):
     date_hierarchy = "sent_at"
-    list_display = ("email", "first_name", "last_name", "sender", "sent_at", "is_valid", "accepted")
+    list_display: tuple[str, ...] = ("email", "first_name", "last_name", "sender", "sent_at", "is_valid", "accepted")
     ordering = ("-sent_at",)
-    search_fields = ("email", "sender__email")
+    search_fields: tuple[str, ...] = ("email", "sender__email")
     # https://code.djangoproject.com/ticket/30354
     list_filter = (AcceptedFilter, IsValidFilter)
     readonly_fields = ("is_valid", "created_at", "sent_at", "accepted_at", "acceptance_link")
-    raw_id_fields = ("sender",)
-    list_select_related = ("sender",)
+    raw_id_fields: tuple[str, ...] = ("sender",)
+    list_select_related: tuple[str, ...] = ("sender",)
 
     def has_add_permission(self, *args, **kwargs):
         return False

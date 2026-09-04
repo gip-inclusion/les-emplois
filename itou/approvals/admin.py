@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import admin, messages
-from django.db.models import F, Q
+from django.db.models import F, Model, Q
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -28,6 +28,7 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouStackedInline,
     ItouTabularInline,
+    ListFilterType,
     PkSupportRemarkInline,
     ReadonlyMixin,
     get_admin_view_link,
@@ -125,11 +126,11 @@ class SuspensionInline(ReadonlyMixin, ItouTabularInline):
 
 
 class ProlongationInline(ReadonlyMixin, ItouTabularInline):
-    model = models.Prolongation
+    model: type[Model] = models.Prolongation
     extra = 0
     show_change_link = True
-    fields = ("start_at", "end_at", "duration", "reason", "declared_by", "validated_by")
-    raw_id_fields = ("declared_by", "validated_by")
+    fields: tuple[str, ...] = ("start_at", "end_at", "duration", "reason", "declared_by", "validated_by")
+    raw_id_fields: tuple[str, ...] = ("declared_by", "validated_by")
     readonly_fields = ("duration",)
 
     @admin.display(description="Durée")
@@ -517,7 +518,7 @@ class SuspensionAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouMode
 
 class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display_links = ("pk", "approval")
-    raw_id_fields = (
+    raw_id_fields: tuple[str, ...] = (
         "approval",
         "declared_by",
         "declared_by_siae",
@@ -527,7 +528,7 @@ class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
         "updated_by",
     )
     exclude = ("report_file",)
-    list_filter = ("reason",)
+    list_filter: ListFilterType = ("reason",)
     readonly_fields = (
         "created_at",
         "created_by",
@@ -536,7 +537,7 @@ class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
         "report_file_link",
     )
     inlines = (PkSupportRemarkInline,)
-    list_select_related = ("approval", "declared_by")
+    list_select_related: tuple[str, ...] = ("approval", "declared_by")
     search_fields = ["declared_by_siae__siret", "approval__number"]
 
     def get_list_display(self, request):

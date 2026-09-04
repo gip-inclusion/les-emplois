@@ -50,12 +50,12 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class ProConnectStateData:
-    previous_url: str = None
-    next_url: str = None
-    user_email: str = None
+    previous_url: str | None = None
+    next_url: str | None = None
+    user_email: str | None = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
-    channel: str = None
+    channel: str | None = None
 
 
 def _redirect_to_login_page_on_error(error_msg=None, request=None):

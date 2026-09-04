@@ -16,7 +16,7 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
-    template_name = None
+    template_name: str | None = None
     # Any child class should include the following templates :
     # "eligibility/includes/iae/help_for_prescriber.html"
     # "eligibility/includes/iae/form_content_for_prescriber.html"
@@ -93,7 +93,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
 
 
 class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
-    template_name = None
+    template_name: str | None = None
     form_class = AdministrativeCriteriaForm
 
     def setup(self, *args, **kwargs):

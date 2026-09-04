@@ -254,14 +254,17 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     def get_orientation_emetteur_sous_type(self, obj) -> CompanyKind | PrescriberOrganizationKind | None:
         if sender_org := self._get_sender_org(obj):
             return sender_org.kind
+        return None
 
     def get_orientation_emetteur_organisme(self, obj) -> str | None:
         if sender_org := self._get_sender_org(obj):
             return sender_org.name
+        return None
 
     def get_orientation_emetteur_organisme_telephone(self, obj) -> str | None:
         if sender_org := self._get_sender_org(obj):
             return sender_org.phone
+        return None
 
     def get_orientation_candidat_cv(self, obj) -> str:
         """Return the stable resume_download route.

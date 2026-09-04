@@ -304,10 +304,10 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
         return LabelPrescriberKind.AUTRE
 
     @extend_schema_field(serializers.ChoiceField(choices=get_precision_prescripteur_choices()))
-    def get_precision_prescripteur(self, obj) -> str | None:
+    def get_precision_prescripteur(self, obj) -> str:
         if org := getattr(obj, "sender_prescriber_organization", None):
-            return PrescriberOrganizationKind(org.kind).label
-        return enums.SenderKind(obj.sender_kind).label
+            return str(PrescriberOrganizationKind(org.kind).label)
+        return str(enums.SenderKind(obj.sender_kind).label)
 
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelDiagAuthorKind.choices)))
     def get_auteur_diagnostic(self, obj) -> str | None:

@@ -16,7 +16,7 @@ class DiffItemKind(Enum):
 
 @dataclass
 class DiffItem:
-    key: str
+    key: str | None
     kind: DiffItemKind
     label: str
     raw: dict | None = None

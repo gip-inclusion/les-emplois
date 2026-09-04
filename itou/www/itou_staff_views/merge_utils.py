@@ -162,8 +162,8 @@ MODEL_MAPPING = {
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
     (JobSeekerAssignment, "professional"): handle_job_seeker_assignment,
-    (User._meta.get_field("groups").remote_field.through, "user"): noop,
-    (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,
+    (User._meta.get_field("groups").remote_field.through, "user"): noop,  # type: ignore
+    (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,  # type: ignore
 }
 
 MODEL_REPR_MAPPING = {
