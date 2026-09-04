@@ -13,6 +13,11 @@
     {% endif %}
 {% endblock %}
 
+{% block global_messages %}
+    {{ block.super }}
+    {% include "insertion/includes/orientations/tmp_banner.html" with request=request only %}
+{% endblock %}
+
 {% block title_navinfo %}
     {% component_navinfo c_navinfo__back_url=back_url %}
     {% endcomponent_navinfo %}
