@@ -457,7 +457,7 @@ class OrientationWizardView(WizardView):
             try:
                 orientation_response = self.dora_client.create_orientation(payload, attachments)
             except DoraAPIException:
-                logger.info(
+                logger.error(
                     "orientation wizard submission_failed reason=create_orientation "
                     "user=%s service_uid=%s job_seeker=%s",
                     request.user.pk,
