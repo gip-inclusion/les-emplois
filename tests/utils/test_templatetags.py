@@ -1,4 +1,5 @@
 from datetime import UTC, date, datetime
+from types import SimpleNamespace
 from urllib.parse import urlsplit
 
 import pytest
@@ -18,6 +19,7 @@ from pytest_django.asserts import assertHTMLEqual
 from itou.insertion.enums import OrientationStatus
 from itou.insertion.models import GenericReferenceItemKind
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.templatetags.badges import criterion_certification_badge, orientation_state_badge
@@ -27,7 +29,7 @@ from itou.utils.templatetags.demo_accounts import (
     prescribers_accounts_tag,
 )
 from itou.utils.templatetags.dora import dora_orientation_url
-from itou.utils.templatetags.nav import NAV_ENTRIES
+from itou.utils.templatetags.nav import NAV_ENTRIES, NavGroup, nav
 from itou.utils.templatetags.str_filters import urlize_new_tab
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -148,6 +150,33 @@ class TestNav:
         for entry in NAV_ENTRIES.values():
             for view_name in entry.active_view_names:
                 assert view_name in named_urls
+
+    @pytest.mark.parametrize(
+        ("organization_kind", "is_current_organization_admin", "should_display"),
+        [
+            (PrescriberOrganizationKind.DEPT, True, True),
+            (PrescriberOrganizationKind.DEPT, False, False),
+            (PrescriberOrganizationKind.OTHER, True, False),
+        ],
+    )
+    def test_accredited_organizations_visibility(
+        self, organization_kind, is_current_organization_admin, should_display
+    ):
+        request = SimpleNamespace(
+            user=SimpleNamespace(is_job_seeker=False),
+            from_prescriber=True,
+            from_authorized_prescriber=False,
+            current_organization=SimpleNamespace(kind=organization_kind, is_authorized=True),
+            is_current_organization_admin=is_current_organization_admin,
+            resolver_match=None,
+        )
+
+        menu_items = nav(request)["menu_items"]
+        organization_group = next(
+            item for item in menu_items if isinstance(item, NavGroup) and item.label == "Organisation"
+        )
+
+        assert (NAV_ENTRIES["prescriber-accredited-organizations'"] in organization_group.items) is should_display
 
 
 class TestThemeInclusion:

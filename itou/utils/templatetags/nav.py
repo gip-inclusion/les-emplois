@@ -2,6 +2,7 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
@@ -165,7 +166,7 @@ NAV_ENTRIES = {
         matomo_event_option="orientations-prescripteurs",
     ),
     "prescriber-overview": NavItem(
-        label="Présentation",
+        label="Fiche de présentation",
         target=reverse("prescribers_views:overview"),
         active_view_names=["prescribers_views:overview"],
         matomo_event_category="offcanvasNav",
@@ -187,6 +188,14 @@ NAV_ENTRIES = {
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="collaborateurs",
+    ),
+    "prescriber-accredited-organizations'": NavItem(
+        label="Organisations conventionnées",
+        target=reverse("prescribers_views:list_accredited_organizations"),
+        active_view_names=["prescribers_views:list_accredited_organizations"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="prescribers-list-accredited-organizations",
     ),
     # Employers.
     "employer-job-apps": NavItem(
@@ -344,6 +353,11 @@ def nav(request):
                 ),
                 NAV_ENTRIES["prescriber-members"],
             ]
+            if (
+                request.current_organization.kind == PrescriberOrganizationKind.DEPT
+                and request.is_current_organization_admin
+            ):
+                organization_items.append(NAV_ENTRIES["prescriber-accredited-organizations'"])
             menu_items.append(
                 NavGroup(
                     label="Organisation",

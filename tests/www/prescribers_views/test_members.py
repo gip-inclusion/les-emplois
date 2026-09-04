@@ -137,7 +137,7 @@ class TestMembers:
         TAB_MARKUP = f"""<a class="nav-link" href="{reverse("prescribers_views:overview")}" data-matomo-event="true"
                         data-matomo-category="prescribers" data-matomo-action="clic"
                         data-matomo-option="organisation-presentation">
-                        Présentation</a>"""
+                        Fiche de présentation</a>"""
         organization = factory()
         client.force_login(organization.members.first())
         response = client.get(reverse("prescribers_views:members"))
