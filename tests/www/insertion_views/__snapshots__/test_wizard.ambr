@@ -470,9 +470,9 @@
                                   <input accept=".doc,.docx,.pdf,.png,.jpeg,.jpg,.odt,.xls,.xlsx,.ods" class="form-control" id="id_credentials_proof_files" multiple="" name="credentials_proof_files" type="file"/>
                                   <div class="mt-1 mb-2">
                                       <p class="small text-nuance-06 mb-0">
-                                          Taille maximale : 5 Mo
+                                          Taille maximale : 5 Mo
                                           <br/>
-                                          Formats supportés : doc, docx, pdf, png, jpeg, jpg, odt, xls, xlsx, ods
+                                          Formats supportés : doc, docx, pdf, png, jpeg, jpg, odt, xls, xlsx, ods
                                       </p>
                                   </div>
                               </div>
