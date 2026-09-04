@@ -145,6 +145,8 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     # Maintenance: if enabled we will skip all the remaning middlewares
     "itou.www.middleware.maintenance",
+    # browser_id_cookie is before AuthenticationMiddleware so at login we already have a value
+    "itou.www.middleware.browser_id_cookie",
     # Django stack again
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -328,6 +330,8 @@ STATICFILES_FINDERS = (
 STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
 
 CSRF_USE_SESSIONS = True
+
+BROWSER_ID_COOKIE_NAME = "browserid"
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
