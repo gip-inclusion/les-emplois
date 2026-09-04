@@ -4,7 +4,7 @@
     {% component_alert title=title content=content call_to_action=call_to_action variant="important" dismissible_once=True extra_id="mon-recap-banner-2025-07" extra_classes="mb-4" %}
         {% fragment as title %}
             {% if request.current_organization.department in mon_recap_banner_departments %}
-                Le saviez-vous ?
+                Le saviez-vous ?
             {% else %}
                 Facilitez vos accompagnements avec Mon Récap
             {% endif %}
