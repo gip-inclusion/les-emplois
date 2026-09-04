@@ -20,7 +20,7 @@ from tests.users.factories import (
 
 class TestAutoLoginMiddleware:
     def test_middleware_for_authenticated_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         client.force_login(user)
         params = {"auto_login": generate_auto_login_token(user)}
         response = client.get(reverse("home:hp", query=params))
@@ -28,7 +28,7 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == ["Nexus auto login: user is already logged in"]
 
     def test_middleware_for_wrong_authenticated_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         params = {"auto_login": generate_auto_login_token(user)}
         # Another user is logged in
         client.force_login(EmployerFactory(membership=True))
@@ -58,7 +58,7 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == [f"Nexus auto login: no user found for jwt={jwt}"]
 
     def test_middleware_for_unlogged_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         params = {"auto_login": generate_auto_login_token(user)}
 
         response = client.get(reverse("home:hp", query=params))

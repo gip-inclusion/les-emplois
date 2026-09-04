@@ -52,7 +52,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    random_pro_user_factory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -858,8 +858,8 @@ class TestMergeUsers:
         )
         membership_model = membership_factory._meta.model
 
-        user_1 = random_pro_user_factory()
-        user_2 = random_pro_user_factory()
+        user_1 = ProfessionalFactory()
+        user_2 = ProfessionalFactory()
         # Inactive membership that would not be found by membership_model.objects default manager
         membership = membership_factory(user=user_1, is_active=False, updated_by=user_2)
 

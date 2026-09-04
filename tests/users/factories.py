@@ -489,8 +489,9 @@ def random_user_kind_factory(**kwargs):
     return factory(**kwargs)
 
 
-# Temporary method before merging all 3 user kinds
 def random_pro_user_factory(**kwargs):
+    """Return a professional user with a random membership kind"""
+    kwargs["membership"] = True  # FIXME when the 3 factories always have membership=True
     return random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(**kwargs)
 
 

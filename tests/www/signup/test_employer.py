@@ -21,7 +21,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import get_tally_form_url, get_zendesk_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import JobSeekerFactory, random_pro_user_factory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
 
 
@@ -47,7 +47,7 @@ class TestCompanySignup:
         - as a member of a company (see MembershipAbstract.is_active).
 
         """
-        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
@@ -113,7 +113,7 @@ class TestCompanySignup:
 
     @freeze_time("2024-09-15 15:53:54")
     def test_join_a_company_without_members_but_invalid_auth_email(self, client, mailoutbox):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.OPCS, auth_email="Non renseigné")
@@ -149,7 +149,7 @@ class TestCompanySignup:
         assert len(mailoutbox) == 0
 
     def test_join_company_with_active_member(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True, for_snapshot=True)
@@ -178,7 +178,7 @@ class TestCompanySignup:
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
-        user = random_pro_user_factory(
+        user = ProfessionalFactory(
             username=pro_connect.oidc_userinfo["sub"],
             email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
@@ -245,7 +245,7 @@ class TestCompanySignup:
         assert 1 == user.company_set.count()
 
     def test_user_invalid_company_id(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
@@ -262,7 +262,7 @@ class TestCompanySignup:
         )
 
     def test_join_invalid_company_id(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
@@ -282,7 +282,7 @@ class TestCompanySignup:
 
     @respx.mock
     def test_create_facilitator(self, client, mocker, mailoutbox, settings, snapshot):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         settings.API_INSEE_AUTH_URL = "https://insee.fake"
@@ -331,7 +331,7 @@ class TestCompanySignup:
         assert len(mailoutbox) == 0
 
     def test_facilitator_base_signup_process(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         url = reverse("signup:company_select")
@@ -341,7 +341,7 @@ class TestCompanySignup:
         assertContains(response, reverse("signup:facilitator_search"))
 
     def test_company_select_does_not_die_under_requests(self, client, snapshot):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         companies = (
@@ -371,7 +371,7 @@ class TestCompanySignup:
         assertContains(response, "00005", count=2)
 
     def test_ignores_inactive_members(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
         company = CompanyFactory(siret="40219166200001", with_jobs=True)
         membership_1 = CompanyMembershipFactory(company=company, is_active=False, user__is_active=True)
@@ -381,7 +381,7 @@ class TestCompanySignup:
         assertNotContains(response, self.to_join_msg(membership_2.user))
 
     def test_admin_users_appears_first(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
         company = CompanyFactory(siret="40219166200001")
         membership_1 = CompanyMembershipFactory(company=company, is_admin=False)
@@ -394,7 +394,7 @@ class TestCompanySignup:
         assertContains(response, self.to_join_msg(membership_2.user))
 
     def test_with_next_param(self, client):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         next_url = reverse("dashboard:index")
@@ -410,7 +410,7 @@ class TestCompanySignup:
 
     @pytest.mark.parametrize("with_membership", [True, False])
     def test_cannot_join_ea_eatt(self, client, with_membership):
-        user = random_pro_user_factory()
+        user = ProfessionalFactory()
         client.force_login(user)
 
         CompanyFactory(

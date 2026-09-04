@@ -6,7 +6,7 @@ from tests.invitations.factories import (
     LaborInspectorInvitationFactory,
     PrescriberWithOrgInvitationFactory,
 )
-from tests.users.factories import random_pro_user_factory
+from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import get_request
 
 
@@ -16,7 +16,7 @@ def test_anonymous_user():
 
 
 def test_accept_invitations():
-    user = random_pro_user_factory()
+    user = ProfessionalFactory()
     request = get_request(user)
 
     valid_invitation_1 = PrescriberWithOrgInvitationFactory(email=user.email)
