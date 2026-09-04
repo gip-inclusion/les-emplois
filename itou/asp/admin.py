@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from itou.asp import models
-from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
+from itou.utils.admin import ItouModelAdmin, ListFilterType, ReadonlyMixin
 
 
 class PeriodFilter(admin.SimpleListFilter):
@@ -39,8 +39,8 @@ class CountryFilter(admin.SimpleListFilter):
 
 
 class ASPModelAdmin(ReadonlyMixin, ItouModelAdmin):
-    list_display = ("pk", "code", "name", "start_date", "end_date")
-    list_filter = (PeriodFilter,)
+    list_display: tuple[str, ...] = ("pk", "code", "name", "start_date", "end_date")
+    list_filter: ListFilterType = (PeriodFilter,)
     ordering = ("name",)
 
     search_fields = [

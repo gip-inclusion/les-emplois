@@ -4,6 +4,7 @@ from collections.abc import Callable
 from pprint import pformat
 from typing import NamedTuple
 
+import django.db
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
@@ -237,7 +238,7 @@ class SentOrientationInline(OrientationInline):
 
 
 class EligibilityDiagnosisInline(ReadonlyMixin, ItouTabularInline):
-    model = EligibilityDiagnosis
+    model: type[django.db.models.Model] = EligibilityDiagnosis
     fk_name = "job_seeker"
     extra = 0
     fields = (
@@ -341,7 +342,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         "upcoming_deletion_notified_at",
     )
     list_display_links = ("pk", "email")
-    list_filter = UserAdmin.list_filter + (
+    list_filter = tuple(UserAdmin.list_filter) + (
         "kind",
         CreatedByProxyFilter,
         "identity_provider",

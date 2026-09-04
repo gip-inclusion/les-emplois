@@ -42,7 +42,7 @@ class AbstractEmployeeRecordViewSet(
     queryset = EmployeeRecord.objects.full_fetch()
 
     # Lookup path from the model to `to_company`, used for company filtering.
-    company_lookup = None
+    company_lookup: str | None = None
 
     def get_queryset(self):
         queryset = super().get_queryset()

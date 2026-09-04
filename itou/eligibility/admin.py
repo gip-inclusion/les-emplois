@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.contrib.admin import ListFilter
 from django.forms import ValidationError
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
@@ -10,6 +11,7 @@ from itou.job_applications import models as job_applications_models
 from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
+    ListFilterType,
     PkSupportRemarkInline,
     ReadonlyMixin,
     get_admin_view_link,
@@ -130,7 +132,7 @@ class HasApprovalFilter(admin.SimpleListFilter):
 
 
 class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
-    list_display = (
+    list_display: tuple[str, ...] = (
         "pk",
         "job_seeker",
         "author",
@@ -140,19 +142,19 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "expires_at",
     )
     list_display_links = ("pk", "job_seeker")
-    raw_id_fields = (
+    raw_id_fields: tuple[str, ...] = (
         "job_seeker",
         "author",
         "author_prescriber_organization",
     )
-    readonly_fields = (
+    readonly_fields: tuple[str, ...] = (
         "created_at",
         "updated_at",
         "expires_at",
         "is_valid",
     )
     search_fields = ("pk", "job_seeker__email", "author__email")
-    list_filter = (
+    list_filter: tuple[str | type[ListFilter], ...] = (
         IsValidFilter,
         "author_kind",
     )
@@ -228,8 +230,9 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
 
 class AbstractAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
     # Administrative criteria are updated via fixtures
+    raw_id_fields: tuple[str, ...]
     list_display_links = ("pk", "name")
-    list_filter = ("level",)
+    list_filter: ListFilterType = ("level",)
     readonly_fields = ("created_at",)
     search_fields = ("name", "desc")
 

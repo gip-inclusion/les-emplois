@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, F, Max, OuterRef, Subquery
 from django.db.models.functions import Greatest
-from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -44,7 +43,7 @@ class ASPExchangeInformation(models.Model):
     ASP_DUPLICATE_ERROR_CODE = "3436"
     ASP_UNIQUE_ID_MISMATCH_CODE = "3437"
 
-    ASP_MOVEMENT_TYPE = None  # Must be specified in descendant classes
+    ASP_MOVEMENT_TYPE: MovementType | None = None  # Must be specified in descendant classes
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="code de traitement ASP", null=True)
@@ -72,7 +71,7 @@ class ASPExchangeInformation(models.Model):
 
     class Meta:
         abstract = True
-        constraints = [
+        constraints: list[models.BaseConstraint] = [
             models.UniqueConstraint(
                 fields=["asp_batch_file", "asp_batch_line_number"],
                 name="unique_%(class)s_asp_batch_file_and_line",
@@ -304,12 +303,12 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     processed_as_duplicate = models.BooleanField(verbose_name="déjà intégrée par l'ASP", default=False)
 
     # Added typing helper: improved type checking for `objects` methods
-    objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
+    objects = EmployeeRecordQuerySet.as_manager()
 
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "fiche salarié"
         verbose_name_plural = "fiches salarié"
-        constraints = ASPExchangeInformation.Meta.constraints + [
+        constraints: list[models.BaseConstraint] = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
                 fields=["asp_measure", "siret", "approval_number"],
                 name="unique_asp_measure_siret_approval_number",

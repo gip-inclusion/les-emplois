@@ -1,4 +1,5 @@
 from django.db import models
+from django_stubs_ext import StrOrPromise
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -304,7 +305,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
         return LabelPrescriberKind.AUTRE
 
     @extend_schema_field(serializers.ChoiceField(choices=get_precision_prescripteur_choices()))
-    def get_precision_prescripteur(self, obj) -> str | None:
+    def get_precision_prescripteur(self, obj) -> StrOrPromise:
         if org := getattr(obj, "sender_prescriber_organization", None):
             return PrescriberOrganizationKind(org.kind).label
         return enums.SenderKind(obj.sender_kind).label

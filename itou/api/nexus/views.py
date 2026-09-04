@@ -1,8 +1,11 @@
 import logging
+from collections.abc import Callable
 
+from django.db import models
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.nexus.serializers import (
@@ -29,10 +32,10 @@ class NexusApiMixin:
 
 
 class NexusApiObjectsMixin(NexusApiMixin):
-    serializer = None
-    model_class = None
-    build_obj = None
-    sync_objs = None
+    serializer: type[Serializer] | None = None
+    model_class: type[models.Model] | None = None
+    build_obj: Callable | None = None
+    sync_objs: Callable | None = None
 
     def post(self, request, *args, **kwargs):
         assert "id" in self.serializer().get_fields()  # Required in our custom validation error handling

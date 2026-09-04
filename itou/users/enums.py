@@ -30,7 +30,7 @@ class IdentityProvider(models.TextChoices):
 
 
 IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
-    IdentityProvider.DJANGO: tuple(UserKind.values),
+    IdentityProvider.DJANGO: tuple(UserKind),
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.FT_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.PRO_CONNECT: (UserKind.PROFESSIONAL,),

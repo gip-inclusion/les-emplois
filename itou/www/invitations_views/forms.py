@@ -213,14 +213,14 @@ class NewLaborInspectorInvitationForm(SignupForm):
 
     first_name = forms.CharField(
         label="Prénom",
-        max_length=User._meta.get_field("first_name").max_length,
+        max_length=User._meta.get_field("first_name").max_length,  # type: ignore
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
         label="Nom",
-        max_length=User._meta.get_field("last_name").max_length,
+        max_length=User._meta.get_field("last_name").max_length,  # type: ignore
         required=True,
         strip=True,
     )

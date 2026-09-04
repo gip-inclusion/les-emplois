@@ -42,8 +42,8 @@ class ItouAdminImageInput(forms.FileInput):
 
 
 class ContentTypeValidator:
-    content_type = None
-    extension = None
+    content_type: str | None = None
+    extension: str | None = None
 
     def __init__(self):
         self.extension_validator = FileExtensionValidator(allowed_extensions=[self.extension])

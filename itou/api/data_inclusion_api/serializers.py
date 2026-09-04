@@ -51,7 +51,7 @@ class BaseStructureSerializer(serializers.ModelSerializer):
         dt = obj.updated_at or obj.created_at
         return dt.astimezone(timezone.get_current_timezone()).isoformat()
 
-    def get_lien_source(self, obj) -> str:
+    def get_lien_source(self, obj) -> str | None:
         card_url = obj.get_card_url()
         if card_url:
             return self.context["request"].build_absolute_uri(card_url)
@@ -65,7 +65,7 @@ class CompanySerializer(BaseStructureSerializer):
     class Meta(BaseStructureSerializer.Meta):
         model = Company
 
-    def get_siret(self, obj) -> str:
+    def get_siret(self, obj) -> str | None:
         if obj.source == CompanySource.USER_CREATED:
             if re.search(r"999\d\d$", obj.siret) is None:
                 # Though this siae may refer to another siae with its asp_id, it owns a proper siret,

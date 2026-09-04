@@ -147,7 +147,7 @@ class OIDConnectUserData:
     username: str
     identity_provider: IdentityProvider
     kind: UserKind
-    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
+    allowed_identity_provider_migration: ClassVar[tuple[()] | tuple[IdentityProvider]] = ()
     allow_sub_update: ClassVar[bool] = False
 
     def is_sub_update_allowed(self, user):
@@ -156,7 +156,7 @@ class OIDConnectUserData:
         return user.allow_next_sso_sub_update or self.allow_sub_update
 
     @property
-    def login_allowed_user_kinds(self) -> tuple[UserKind]:
+    def login_allowed_user_kinds(self) -> tuple[UserKind, ...]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
     def _check_valid_kind(self, user):

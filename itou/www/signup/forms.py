@@ -59,12 +59,12 @@ def _get_organization_data_from_api(siret):
 class FullnameFormMixin(forms.Form):
     first_name = forms.CharField(
         label="Prénom",
-        max_length=User._meta.get_field("first_name").max_length,
+        max_length=User._meta.get_field("first_name").max_length,  # type: ignore
     )
 
     last_name = forms.CharField(
         label="Nom",
-        max_length=User._meta.get_field("last_name").max_length,
+        max_length=User._meta.get_field("last_name").max_length,  # type: ignore
     )
 
 
@@ -92,7 +92,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
         validators=[validate_nir],
         help_text="Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés.",
     )
-    title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
+    title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)  # type: ignore
 
     _nir_submitted = None
     _email_submitted = None
@@ -245,7 +245,7 @@ class CheckAlreadyExistsForm(forms.Form):
             'target="_blank" class="has-external-link">annuaire-entreprises.data.gouv.fr</a>'
         ),
     )
-    department = forms.ChoiceField(
+    department: forms.ChoiceField | None = forms.ChoiceField(
         label="Département",
         choices=DEPARTMENTS.items(),
     )

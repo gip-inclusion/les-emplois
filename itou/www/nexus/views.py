@@ -29,7 +29,7 @@ TALLY_URL = "https://tally.so/embed/Bza9Je?dynamicHeight=1"
 # All class using this mixin will redirect unauthenticated users to nexus login page
 @method_decorator(login_required(login_url=reverse_lazy("nexus:login")), name="dispatch")
 class NexusMixin:
-    menu = None
+    menu: str | None = None
 
     # method_decorator requires the method to exist on the decorated class; define a passthrough.
     def dispatch(self, request, *args, **kwargs):

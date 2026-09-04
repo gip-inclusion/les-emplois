@@ -166,7 +166,7 @@ class MergeUserConfirmForm(forms.Form):
         choices=(("to_user", "to_user"), ("from_user", "from_user")),
     )
 
-    def clean(self) -> None:
+    def clean(self):
         cleaned_data = super().clean()
         if self.errors:
             self.add_error(None, "Vous devez choisir l'identité à conserver")

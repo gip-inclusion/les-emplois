@@ -14,7 +14,9 @@ from django.contrib.staticfiles.finders import BaseFinder
 
 
 # ITOU_CACHE is used in demo/prod with a sensible XDG compatible default
-_CACHE_HOME = os.getenv("ITOU_CACHE", os.getenv("XDG_CACHE_HOME", os.path.join(os.getenv("HOME"), ".cache")))
+_CACHE_HOME = os.getenv(
+    "ITOU_CACHE", os.getenv("XDG_CACHE_HOME", os.path.join(os.getenv("HOME", default="/"), ".cache"))
+)
 # Where the downloaded assets (NPM packages, zip files, etc) will be stored
 WORKING_DIR = pathlib.Path(_CACHE_HOME) / "itou_cached_assets"
 # Where the static assets will be stored for django's FileSystemFinder to find
@@ -315,7 +317,9 @@ def extract(filepath: pathlib.Path, extract_infos):
             for file_origin, file_destination in compute_moves(t.getnames(), extract_infos):
                 os.makedirs(os.path.dirname(file_destination), exist_ok=True)
                 with open(file_destination, "wb") as f:
-                    f.write(t.extractfile(file_origin).read())
+                    member = t.extractfile(file_origin)
+                    assert member
+                    f.write(member.read())
     else:
         raise ValueError(f"Unsupported suffix for {filepath}")
 

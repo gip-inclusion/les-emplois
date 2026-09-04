@@ -80,7 +80,7 @@ def rename_table_atomically(from_table_name, to_table_name, schema=None):
         )
 
 
-def create_table(table_name: str, columns: list[str, str], schema=None, reset=False):
+def create_table(table_name: str, columns: list[tuple[str, str]], schema=None, reset=False):
     """Create table from columns names and types"""
     with get_connection(schema=schema) as conn, conn.cursor() as cursor:
         if reset:
