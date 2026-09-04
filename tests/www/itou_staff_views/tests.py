@@ -356,7 +356,7 @@ class TestImportAciConvergencePHC:
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
-                    <li>Feuille « Convergence », ligne 2 : Le numéro SIRET doit être composé de 14 chiffres.</li>
+                    <li>Feuille « Convergence », ligne 2 : Le numéro SIRET doit être composé de 14 chiffres.</li>
                 </ul>
             </div>
             """,
