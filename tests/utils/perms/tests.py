@@ -79,7 +79,7 @@ class TestEmployeeRecord:
 class TestUtils:
     def test_can_edit_personal_information(self):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
-        unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
@@ -140,7 +140,7 @@ class TestUtils:
 
     def test_can_view_personal_information(self):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
-        unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)

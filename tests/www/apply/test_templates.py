@@ -374,7 +374,7 @@ class TestCertifiedBadge:
         [
             (partial(EmployerFactory, membership=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
-            (PrescriberFactory, False),
+            (partial(PrescriberFactory, membership__organization__authorized=False), False),
         ],
         ids=["employer", "authorized_prescriber", "prescriber"],
     )
