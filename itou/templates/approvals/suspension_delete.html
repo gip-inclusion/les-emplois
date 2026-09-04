@@ -22,18 +22,18 @@
                     <div class="c-stepper mb-3 mb-md-4">
                         {% include 'approvals/includes/progress_bar.html' with ratio=80 only %}
                         <p id="currentProgressState">
-                            <strong>Étape 2/2</strong> : Confirmation
+                            <strong>Étape 2/2</strong> : Confirmation
                         </p>
                     </div>
 
                     <div class="c-form">
                         <h2 class="h3">Confirmation</h2>
                         <p>
-                            <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
+                            <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
                         </p>
                         {% component_alert title=title content=content variant="danger" %}
                             {% fragment as title %}
-                                Attention : la suppression définitive de cette suspension aura pour conséquence de :
+                                Attention : la suppression définitive de cette suspension aura pour conséquence de :
                             {% endfragment %}
                             {% fragment as content %}
                                 <ul class="mb-0">

@@ -105,7 +105,7 @@
                   2 jours
                   <br/>
                   <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                      Comment est calculée cette durée ?
+                      Comment est calculée cette durée ?
                   </a>
               </strong>
           </li>
@@ -172,7 +172,7 @@
                   356210 jours (Environ 975 ans et 3 mois)
                   <br/>
                   <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                      Comment est calculée cette durée ?
+                      Comment est calculée cette durée ?
                   </a>
               </strong>
           </li>
@@ -229,7 +229,7 @@
                   356216 jours (Environ 975 ans et 3 mois)
                   <br/>
                   <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                      Comment est calculée cette durée ?
+                      Comment est calculée cette durée ?
                   </a>
               </strong>
           </li>
@@ -2650,7 +2650,7 @@
       <div class="c-info">
           <button aria-controls="collapseProlongationInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseProlongationInfo" data-bs-toggle="collapse" type="button">
               <span>
-                  Comment gérer mes prolongations ?
+                  Comment gérer mes prolongations ?
               </span>
           </button>
           <div class="c-info__detail collapse" id="collapseProlongationInfo">
@@ -5162,7 +5162,7 @@
       <div class="c-info">
           <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse" type="button">
               <span>
-                  Comment gérer mes suspensions ?
+                  Comment gérer mes suspensions ?
               </span>
           </button>
           <div class="c-info__detail collapse" id="collapseSuspensionInfo">
@@ -5274,7 +5274,7 @@
       <div class="c-info">
           <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse" type="button">
               <span>
-                  Comment gérer mes suspensions ?
+                  Comment gérer mes suspensions ?
               </span>
           </button>
           <div class="c-info__detail collapse" id="collapseSuspensionInfo">
@@ -5402,7 +5402,7 @@
                                   PASS IAE de DOE Jane
                               </h1>
                           </div>
-                          <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
+                          <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" href="/approvals/display/[Public ID of Approval]" rel="noopener" target="_blank">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>

@@ -19,7 +19,7 @@
   
   Une demande de prolongation du PASS IAE a été transmise à un membre de votre organisation, cette demande est toujours en attente de réponse. Si des démarches sont en cours, veuillez ne pas tenir compte de ce message.
   
-  Rappel du message initial :
+  Rappel du message initial :
   
   ********************************************************************
   👉 Cette demande est à traiter exclusivement sur votre tableau de bord prescripteur.
@@ -30,37 +30,37 @@
   
   John DOE de la structure ACME Inc. a besoin de votre accord pour prolonger un PASS IAE.
   
-  L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
+  L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
   
   - Email de l’employeur: email@example.com
-  - Numéro de téléphone de l’employeur : +33123456789
+  - Numéro de téléphone de l’employeur : +33123456789
   
   - Numéro de PASS : 999999999999
   - Prénom : Jane
   - Nom : DOE
-  - Date de naissance : 01/01/1990
+  - Date de naissance : 01/01/1990
   - Début de la prolongation : 01/01/2000
   - Fin de la prolongation : 31/01/2000
   - Motif de prolongation : 50 ans et plus
-  - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
+  - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
   
   Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur Les emplois de l’inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
   
-  Précisions en cas de refus :
+  Précisions en cas de refus :
   
   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
   
-  * Motifs de refus et actions associées :
+  * Motifs de refus et actions associées :
   
-  1/ L’IAE ne correspond plus aux besoins / à la situation de la personne :
+  1/ L’IAE ne correspond plus aux besoins / à la situation de la personne :
   
-  Actions possibles :
+  Actions possibles :
   - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire
   - Orientation vers un partenaire de l’accompagnement social/professionnel
   
   2/ La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne
   
-  Action possible :
+  Action possible :
   - Orientation vers un autre type de SIAE
   
   ---
