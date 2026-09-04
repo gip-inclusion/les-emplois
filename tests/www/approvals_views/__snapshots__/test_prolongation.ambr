@@ -250,7 +250,7 @@
   <div class="c-info mb-3">
       <button aria-controls="disabledChoicesCollapseInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#disabledChoicesCollapseInfo" data-bs-toggle="collapse" type="button">
           <span>
-              Pourquoi n’est-il pas possible de sélectionner certains éléments ?
+              Pourquoi n’est-il pas possible de sélectionner certains éléments ?
           </span>
       </button>
       <div class="c-info__detail collapse" id="disabledChoicesCollapseInfo">

@@ -752,7 +752,7 @@ def close(request, approval_id, template_name="approvals/close.html"):
         logger.info("user=%s closed approval=%s", request.user.pk, approval.pk)
         messages.success(
             request,
-            f"PASS IAE clôturé||Le PASS IAE de {approval.user.get_inverted_full_name()} a bien été clôturé.",
+            f"PASS IAE clôturé||Le PASS IAE de {approval.user.get_inverted_full_name()} a bien été clôturé.",
             extra_tags="toast",
         )
         return HttpResponseRedirect(back_url)

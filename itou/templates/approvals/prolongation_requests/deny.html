@@ -31,11 +31,11 @@
                         </div>
                         <p id="currentProgressState">
                             {% if wizard.steps.current == "reason" %}
-                                <strong>Étape 1</strong> : Motif du refus
+                                <strong>Étape 1</strong> : Motif du refus
                             {% elif wizard.steps.current == "reason_explanation" %}
-                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Explications supplémentaires
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Explications supplémentaires
                             {% elif wizard.steps.current == "proposed_actions" %}
-                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Solution envisagée
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Solution envisagée
                             {% endif %}
                         </p>
                     </div>
