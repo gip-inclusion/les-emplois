@@ -144,7 +144,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
         self.logger.info("Successfully parsed %d/%d files", successfully_parsed_files, len(result_files))
 
-    def preflight(self, object_class):
+    def preflight(self, object_class, for_update=False):
         """Parse new notifications or employee records and attempt to tackle serialization errors.
         Serialization of EmployeeRecordBatch objects does not allow detailed information
         on what specific employee record is faulty.
@@ -156,13 +156,16 @@ class EmployeeRecordTransferCommand(BaseCommand):
         and border it as well as possible."""
         assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
 
-        objects_to_serialize = (
-            EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
-            if object_class == EmployeeRecordUpdateNotification
-            else EmployeeRecord.objects.filter(
+        if object_class == EmployeeRecordUpdateNotification:
+            objects_to_serialize = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
+        elif for_update:
+            objects_to_serialize = EmployeeRecord.objects.filter(
+                status=Status.UPDATE_PENDING, job_application__state=JobApplicationState.ACCEPTED
+            )
+        else:
+            objects_to_serialize = EmployeeRecord.objects.filter(
                 status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
             )
-        )
 
         object_serializer = (
             EmployeeRecordUpdateNotificationSerializer
