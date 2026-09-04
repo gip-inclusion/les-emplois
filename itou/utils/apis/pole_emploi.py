@@ -75,8 +75,8 @@ def get_credentials(app):
             }
         case Apps.SPS:
             return {
-                "key": settings.API_ESD["RECOMMENDATIONS_KEY"],
-                "secret": settings.API_ESD["RECOMMENDATIONS_SECRET"],
+                "key": settings.API_ESD["SPS_KEY"],
+                "secret": settings.API_ESD["SPS_SECRET"],
             }
     raise ValueError(f"Unknown app: {app}")
 

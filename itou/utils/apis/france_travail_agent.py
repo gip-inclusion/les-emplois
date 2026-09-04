@@ -14,7 +14,7 @@ CACHE_DURATION = 60 * 60  # 1 hour
 
 
 def get_user_data(ft_id):
-    cache_key = f"RECOMMENDATIONS_DATA_{ft_id}"
+    cache_key = f"SPS_DATA_{ft_id}"
     if user_data := cache.get(cache_key):
         return user_data
     try:
