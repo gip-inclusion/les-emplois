@@ -1,0 +1,8 @@
+{% load components %}
+{% if request.from_prescriber or request.from_employer %}
+    {% component_alert_global content=content variant="info" %}
+        {% fragment as content %}
+            Un problème technique a empêché l'envoi du formulaire d'orientation ces derniers jours. Le problème est désormais corrigé. Nous nous excusons pour la gêne occasionnée.
+        {% endfragment %}
+    {% endcomponent_alert_global %}
+{% endif %}

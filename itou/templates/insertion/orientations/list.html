@@ -3,6 +3,11 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
+{% block global_messages %}
+    {{ block.super }}
+    {% include "insertion/includes/orientations/tmp_banner.html" with request=request only %}
+{% endblock %}
+
 {% block title %}Orientations émises {{ block.super }}{% endblock %}
 
 {% block title_content %}
