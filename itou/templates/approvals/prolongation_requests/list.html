@@ -29,7 +29,7 @@
                         <h2 class="mb-0">Prolongations</h2>
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les prolongations">
                             <div class="d-flex align-items-center">
-                                <strong class="me-2">Filtres :</strong>
+                                <strong class="me-2">Filtres :</strong>
                                 <form action="{% url "approvals:prolongation_requests_list" %}" hx-boost="true" hx-trigger="change">
                                     {{ form.only_pending }}
                                     {{ form.only_pending.label_tag }}
@@ -57,7 +57,7 @@
                                         </th>
                                         <th scope="col">Statut</th>
                                         <th scope="col" class="text-end w-50px">
-                                            <span class="visually-hidden">Actions possibles sur les prolongations de PASS IAE</span>
+                                            <span class="visually-hidden">Actions possibles sur les prolongations de PASS IAE</span>
                                         </th>
                                     </tr>
                                 </thead>

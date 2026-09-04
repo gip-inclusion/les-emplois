@@ -2,28 +2,28 @@
 {% block body %}
 
 {% if job_application.to_company.is_subject_to_iae_rules %}
-Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
+Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
 
-PASS IAE N° : {{ job_application.approval.number_with_spaces }}
-Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.get_remainder_display }}*.
+PASS IAE N° : {{ job_application.approval.number_with_spaces }}
+Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.get_remainder_display }}*.
 
-Délivré pour l'embauche de :
-Nom : {{ job_application.approval.user.last_name|upper }}
-Prénom : {{ job_application.approval.user.first_name|title }}
-Date de naissance : {{ job_application.approval.user.jobseeker_profile.birthdate|date:"d/m/Y" }}
+Délivré pour l'embauche de :
+Nom : {{ job_application.approval.user.last_name|upper }}
+Prénom : {{ job_application.approval.user.first_name|title }}
+Date de naissance : {{ job_application.approval.user.jobseeker_profile.birthdate|date:"d/m/Y" }}
 
-Pour un contrat d'insertion :
-Débutant le : {{ job_application.hiring_start_at|date:"d/m/Y" }}
-Se terminant le : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}
+Pour un contrat d'insertion :
+Débutant le : {{ job_application.hiring_start_at|date:"d/m/Y" }}
+Se terminant le : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}
 
-Au sein de la structure :
+Au sein de la structure :
 {{ job_application.to_company.display_name }}
 {{ job_application.to_company.get_kind_display }}
 {{ job_application.to_company.address_line_1 }}{% if job_application.to_company.address_line_2 %}
 {{ job_application.to_company.address_line_2 }}{% endif %}
 {{ job_application.to_company.post_code }} {{ job_application.to_company.city }}
 
-Votre contact : {{ itou_help_center_url }}
+Votre contact : {{ itou_help_center_url }}
 
 
 * Le reliquat est calculé sur la base d’un nombre de jours calendaires.
@@ -31,7 +31,7 @@ Si le PASS IAE n'est pas suspendu, il décroit donc tous les jours (samedi, dim
 {% else %}
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
 
-Votre contact : {{ itou_help_center_url }}
+Votre contact : {{ itou_help_center_url }}
 {% endif %}
 
 {% endblock body %}

@@ -116,7 +116,7 @@ class ProlongationRequestGrantedForJobSeekerNotification(JobSeekerNotification, 
 class ApprovalClosedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to the job seeker when an employer closes their PASS IAE."""
 
-    name = "PASS IAE clôturé"
+    name = "PASS IAE clôturé"
     category = NotificationCategory.IAE_PASS
     can_be_disabled = False
     subject_template = "approvals/email/closed/jobseeker_subject.txt"

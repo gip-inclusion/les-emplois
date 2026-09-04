@@ -41,7 +41,7 @@ PRESCRIBER_ORGANIZATION_EMPTY_LABEL = "Sélectionnez l'organisation du prescript
 
 
 class TestApprovalProlongation:
-    PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
+    PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
