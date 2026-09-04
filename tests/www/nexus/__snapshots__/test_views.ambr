@@ -281,7 +281,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          <a aria-label="Lien vers la fiche de poste : Agent / Agente cariste de livraison ferroviaire" class="btn-link" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="clic-fiche-poste" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/portal/service/emplois" title="Agent / Agente cariste de livraison ferroviaire">
+                                          <a aria-label="Lien vers la fiche de poste : Agent / Agente cariste de livraison ferroviaire" class="btn-link" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="clic-fiche-poste" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/portal/service/emplois" title="Agent / Agente cariste de livraison ferroviaire">
                                               Agent / Agente cariste de livraison ferroviaire
                                           </a>
                                       </td>
@@ -833,7 +833,7 @@
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
-                              Besoin d'aide ?
+                              Besoin d'aide ?
                           </span>
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
@@ -955,11 +955,11 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  Besoin d'aide ?
+                                  Besoin d'aide ?
                               </span>
                           </a>
                       </li>
@@ -1021,7 +1021,7 @@
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
-                              Besoin d'aide ?
+                              Besoin d'aide ?
                           </span>
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
@@ -1143,11 +1143,11 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  Besoin d'aide ?
+                                  Besoin d'aide ?
                               </span>
                           </a>
                       </li>
@@ -1209,7 +1209,7 @@
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
-                              Besoin d'aide ?
+                              Besoin d'aide ?
                           </span>
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
@@ -1331,11 +1331,11 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  Besoin d'aide ?
+                                  Besoin d'aide ?
                               </span>
                           </a>
                       </li>
@@ -1401,7 +1401,7 @@
                   </div>
                   <a class="btn btn-link" href="https://tally.so/embed/Bza9Je?dynamicHeight=1">
                       <span>
-                          Besoin d'aide ?
+                          Besoin d'aide ?
                       </span>
                   </a>
               </div>
@@ -1645,7 +1645,7 @@
                               <img alt="" height="152" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-monrecap.png" width="216"/>
                           </div>
                           <h2 class="h3 mb-md-4">
-                              Commandez en quelques clics vos premiers carnets !
+                              Commandez en quelques clics vos premiers carnets !
                           </h2>
                           <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer" target="_blank">
                               <span>
