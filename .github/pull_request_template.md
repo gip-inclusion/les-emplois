@@ -23,13 +23,13 @@
  +-------------------------|--------------------------+
 | API                      | Insertion                |
 | Accessibilité            | Notifications            |
-| Admin                    | Page d’accueil           |
-| Annexes financières      | PASS IAE                 |
-| Candidature              | Performances             |
-| Connexion                | Pilotage                 |
-| Contrôle a posteriori    | Prescripteur             |
-| Demandes de prolongation | Profil salarié           |
-| Demandeur d’emploi       | Recherche employeur      |
+| Accompagnements          | Page d’accueil           |
+| Admin                    | PASS IAE                 |
+| Annexes financières      | Performances             |
+| Candidature              | Pilotage                 |
+| Connexion                | Prescripteur             |
+| Contrôle a posteriori    | Profil salarié           |
+| Demandes de prolongation | Recherche employeur      |
 | Employeur                | Recherche fiche de poste |
 | Fiche de poste           | Recherche prescripteur   |
 | Fiche entreprise         | Stabilité                |
