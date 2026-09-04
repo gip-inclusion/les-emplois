@@ -8,8 +8,10 @@ from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
-from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
+    EmployeeRecordForUpdateBatchSerializer,
+    EmployeeRecordForUpdateSerializer,
     EmployeeRecordSerializer,
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
@@ -17,7 +19,11 @@ from itou.employee_record.serializers import (
     _PersonSerializer,
     _SituationSerializer,
 )
-from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
+from tests.employee_record.factories import (
+    EmployeeRecordFactory,
+    EmployeeRecordUpdateNotificationFactory,
+    EmployeeRecordWithProfileFactory,
+)
 from tests.users.factories import JobSeekerFactory
 
 
@@ -255,6 +261,72 @@ class TestEmployeeRecordUpdateNotificationSerializer:
                 assert element.get("typeMouvement") == MovementType.MODIFICATION
 
 
+class TestEmployeeRecordForUpdateSerializer:
+    def test_employee_for_update_serializer(self):
+        # High-level : just check basic information
+        start_at = timezone.localdate()
+        end_at = timezone.localdate() + timedelta(weeks=52)
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.MODIFICATION_PENDING)
+        approval = employee_record.job_application.approval
+        approval.start_at = start_at
+        approval.end_at = end_at
+        employee_record.save()
+
+        serializer = EmployeeRecordForUpdateSerializer(employee_record)
+        data = serializer.data
+
+        assert data is not None
+        assert data.get("siret") == employee_record.siret
+        assert data.get("mesure") == employee_record.asp_measure
+        assert data.get("typeMouvement") == MovementType.MODIFICATION
+
+        personal_data = data.get("personnePhysique")
+
+        assert personal_data is not None
+        assert personal_data.get("passIae") == employee_record.approval_number
+        assert personal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
+        assert personal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
+
+    def test_different_siret_between_er_and_asp(self):
+        # Do not trust denormalized SIRET: it can be out of date.
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.MODIFICATION_PENDING, siret="OLD_SIRET")
+        serializer = EmployeeRecordForUpdateSerializer(employee_record)
+        data = serializer.data
+
+        assert data["siret"] != "OLD_SIRET"
+        assert data["siret"] == employee_record.job_application.to_company.siret_from_asp_source()
+
+    def test_batch_serializer(self, subtests):
+        start_at = timezone.localdate()
+        end_at = timezone.localdate() + timedelta(weeks=52)
+
+        # Add some EmployeeRecordUpdateNotification objects
+        for idx in range(10):
+            employee_record = EmployeeRecordWithProfileFactory(
+                status=Status.MODIFICATION_PENDING,
+                asp_batch_line_number=idx,
+            )
+            approval = employee_record.job_application.approval
+            approval.start_at = start_at
+            approval.end_at = end_at
+
+        records_to_update = EmployeeRecord.objects.filter(status=Status.MODIFICATION_PENDING)
+
+        batch = EmployeeRecordBatch(records_to_update)
+        data = EmployeeRecordForUpdateBatchSerializer(batch).data
+
+        assert data is not None
+
+        elements = data.get("lignesTelechargement")
+
+        assert len(records_to_update) == len(elements)
+        for idx, element in enumerate(elements, 1):
+            with subtests.test(idx):
+                assert element.get("numLigne") == idx
+                assert element.get("siret") is not None
+                assert element.get("typeMouvement") == MovementType.MODIFICATION
+
+
 @pytest.mark.parametrize(
     "field,value,key",
     [
@@ -279,6 +351,30 @@ def test_update_notification_use_static_serializers_on_missing_fields(snapshot, 
     assert data[key] == snapshot()
 
 
+@pytest.mark.parametrize(
+    "field,value,key",
+    [
+        ("birth_country", None, "personnePhysique"),
+        ("hexa_lane_type", "", "adresse"),
+        ("hexa_lane_name", "", "adresse"),
+        ("hexa_post_code", "", "adresse"),
+        ("hexa_commune", None, "adresse"),
+        ("education_level", "", "situationSalarie"),
+        ("nir", "", "personnePhysique"),
+    ],
+)
+def test_employee_record_for_update_use_static_serializers_on_missing_fields(snapshot, field, value, key):
+    employee_record = EmployeeRecordWithProfileFactory(
+        job_application__for_snapshot=True,
+        job_application__job_seeker__born_outside_france=True,
+        job_application__job_seeker__jobseeker_profile__birth_place=None,
+        **{f"job_application__job_seeker__jobseeker_profile__{field}": value},
+    )
+
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
+    assert data[key] == snapshot()
+
+
 def test_update_notification_use_static_serializers_on_missing_ntt_field(snapshot):
     notification = EmployeeRecordUpdateNotificationFactory(
         employee_record__job_application__for_snapshot=True,
@@ -291,6 +387,18 @@ def test_update_notification_use_static_serializers_on_missing_ntt_field(snapsho
     assert data["personnePhysique"] == snapshot()
 
 
+def test_employee_record_for_update_use_static_serializers_on_missing_ntt_field(snapshot):
+    notification = EmployeeRecordFactory(
+        job_application__for_snapshot=True,
+        # such NIR starting with an 8 requires a NTT
+        job_application__job_seeker__jobseeker_profile__nir="890012345678901",
+        ntt=None,
+    )
+
+    data = EmployeeRecordForUpdateSerializer(notification).data
+    assert data["personnePhysique"] == snapshot()
+
+
 def test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields(snapshot):
     notification = EmployeeRecordUpdateNotificationFactory(
         employee_record__job_application__for_snapshot=True,
@@ -299,6 +407,17 @@ def test_update_notification_use_static_serializers_on_missing_pole_emploi_since
     )
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["situationSalarie"] == snapshot()
+
+
+def test_employee_record_for_update_use_static_serializers_on_missing_pole_emploi_since_fields(snapshot):
+    employee_record = EmployeeRecordWithProfileFactory(
+        job_application__for_snapshot=True,
+        job_application__job_seeker__jobseeker_profile__pole_emploi_id="1234567U",
+        job_application__job_seeker__jobseeker_profile__pole_emploi_since="",
+    )
+
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
     assert data["situationSalarie"] == snapshot()
 
 
@@ -326,6 +445,30 @@ def test_update_notification_use_static_serializers_on_missing_eiti_fields(snaps
     assert data["situationSalarie"] == snapshot()
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("mean_monthly_income_before_process", None),
+        ("mean_monthly_income_before_process", 0.0),
+        ("actor_met_for_business_creation", ""),
+    ],
+)
+def test_employee_for_update_use_static_serializers_on_missing_eiti_fields(snapshot, field, value):
+    factory_profile_path = "job_application__job_seeker__jobseeker_profile"
+    employee_record = EmployeeRecordWithProfileFactory(
+        job_application__for_snapshot=True,
+        job_application__to_company__kind=CompanyKind.EITI,
+        **{
+            f"{factory_profile_path}__actor_met_for_business_creation": "Actor Étude",
+            f"{factory_profile_path}__mean_monthly_income_before_process": 12345.67,
+            f"{factory_profile_path}__{field}": value,
+        },
+    )
+
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
+    assert data["situationSalarie"] == snapshot()
+
+
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
 def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
     employee_record = EmployeeRecordWithProfileFactory(
@@ -343,6 +486,11 @@ def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record update notification")
+
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.MODIFICATION
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record for update")
 
 
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
@@ -373,6 +521,11 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record update notification")
 
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.MODIFICATION
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record for update")
+
 
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
 def test_situation_salarie_serializer_with_most_fields_filled(snapshot, kind):
@@ -401,6 +554,11 @@ def test_situation_salarie_serializer_with_most_fields_filled(snapshot, kind):
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record update notification")
+
+    data = EmployeeRecordForUpdateSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.MODIFICATION
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record for update")
 
 
 @pytest.mark.parametrize("pole_emploi_id", ["1234567A", "12345678912", ""])
