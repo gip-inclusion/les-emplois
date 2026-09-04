@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestAdvisorsTab.test_assigment_display[ACTIVE_NO_ORG]
+# name: TestAdvisorsTab.test_assignment_display[ACTIVE_NO_ORG]
   '''
   <html>
       <head>
@@ -101,7 +101,7 @@
   
   '''
 # ---
-# name: TestAdvisorsTab.test_assigment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
+# name: TestAdvisorsTab.test_assignment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
   '''
   <html>
       <head>
@@ -205,7 +205,7 @@
   
   '''
 # ---
-# name: TestAdvisorsTab.test_assigment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
+# name: TestAdvisorsTab.test_assignment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
   '''
   <html>
       <head>
@@ -343,7 +343,7 @@
   
   '''
 # ---
-# name: TestAdvisorsTab.test_assigment_display[INACTIVE_NO_ORG]
+# name: TestAdvisorsTab.test_assignment_display[INACTIVE_NO_ORG]
   '''
   <html>
       <head>
@@ -403,7 +403,7 @@
   
   '''
 # ---
-# name: TestAdvisorsTab.test_assigment_display[INACTIVE_WITH_ORG]
+# name: TestAdvisorsTab.test_assignment_display[INACTIVE_WITH_ORG]
   '''
   <html>
       <head>
@@ -518,7 +518,7 @@
   
   '''
 # ---
-# name: TestAdvisorsTab.test_assigment_display[UNKNOWN_ADVISOR]
+# name: TestAdvisorsTab.test_assignment_display[UNKNOWN_ADVISOR]
   '''
   <html>
       <head>
@@ -1464,7 +1464,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_NO_ORG]
+# name: TestLastAdvisor.test_last_assignment_display[ACTIVE_NO_ORG]
   '''
   <html>
       <head>
@@ -1541,7 +1541,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
+# name: TestLastAdvisor.test_last_assignment_display[ACTIVE_WITH_ORG_AND_MEMBERSHIP]
   '''
   <html>
       <head>
@@ -1618,7 +1618,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
+# name: TestLastAdvisor.test_last_assignment_display[ACTIVE_WITH_ORG_NO_MEMBERSHIP]
   '''
   <html>
       <head>
@@ -1728,7 +1728,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[INACTIVE_NO_ORG]
+# name: TestLastAdvisor.test_last_assignment_display[INACTIVE_NO_ORG]
   '''
   <html>
       <head>
@@ -1773,7 +1773,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[INACTIVE_WITH_ORG]
+# name: TestLastAdvisor.test_last_assignment_display[INACTIVE_WITH_ORG]
   '''
   <html>
       <head>
@@ -1867,7 +1867,7 @@
   
   '''
 # ---
-# name: TestLastAdvisor.test_last_assigment_display[UNKNOWN_ADVISOR]
+# name: TestLastAdvisor.test_last_assignment_display[UNKNOWN_ADVISOR]
   '''
   <html>
       <head>

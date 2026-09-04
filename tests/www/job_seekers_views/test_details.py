@@ -707,7 +707,7 @@ class TestLastAdvisor:
 
     @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
     @freeze_time("2026-08-08")
-    def test_last_assigment_display(self, snapshot, display_mode):
+    def test_last_assignment_display(self, snapshot, display_mode):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             display_mode=display_mode,
@@ -745,7 +745,7 @@ class TestLastAdvisor:
             )
         assert pretty_indented(rendered) == snapshot
 
-    def test_oneself_assigment_display(self, client):
+    def test_oneself_assignment_display(self, client):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             professional__for_snapshot=True,
@@ -1122,7 +1122,7 @@ class TestAdvisorsTab:
 
     @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
     @freeze_time("2026-08-08")
-    def test_assigment_display(self, snapshot, display_mode):
+    def test_assignment_display(self, snapshot, display_mode):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             display_mode=display_mode,
@@ -1156,7 +1156,7 @@ class TestAdvisorsTab:
             )
         assert pretty_indented(rendered) == snapshot
 
-    def test_oneself_assigment_display(self, client):
+    def test_oneself_assignment_display(self, client):
         assignment = JobSeekerAssignmentFactory(
             job_seeker__for_snapshot=True,
             professional__for_snapshot=True,
