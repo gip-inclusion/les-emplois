@@ -20,7 +20,7 @@
         <img src="{% static_theme_images 'nexus/nx-illustration-monrecap.png' %}" height="152" width="216" alt="">
     </div>
     {% if Service.MON_RECAP in activated_services %}
-        <h2 class="h3 mb-md-4">Commandez en quelques clics vos premiers carnets !</h2>
+        <h2 class="h3 mb-md-4">Commandez en quelques clics vos premiers carnets !</h2>
         {% if monrecap_url %}
             <a href="{{ monrecap_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %} target="_blank">
                 <span>Commander des carnets</span>

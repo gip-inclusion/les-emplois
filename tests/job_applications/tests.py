@@ -1405,7 +1405,7 @@ class TestJobApplicationNotifications:
         )
         accepted_by = job_application.to_company.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
-        assert "Date de fin du contrat : Non renseigné" in email.body
+        assert "Date de fin du contrat : Non renseigné" in email.body
 
     @pytest.mark.parametrize("authorized_prescriber", [True, False])
     @pytest.mark.parametrize("is_shared_with_job_seeker", [True, False])
@@ -1541,7 +1541,7 @@ class TestJobApplicationNotifications:
         )
         accepted_by = job_application.to_company.members.first()
         email = job_application.notifications_deliver_approval(accepted_by).build()
-        assert "Se terminant le : Non renseigné" in email.body
+        assert "Se terminant le : Non renseigné" in email.body
 
     def test_notifications_deliver_approval_when_subject_to_eligibility_rules(self):
         job_application = JobApplicationFactory(

@@ -826,3 +826,84 @@ def detect_missing_csrf_token():
 @pytest.fixture(autouse=True)
 def do_not_bypass_terms_acceptance(settings):
     settings.BYPASS_TERMS_ACCEPTANCE = False
+
+
+TEMPLATE_TYPO_IGNORE_LIST = (
+    "account",
+    "admin",
+    "apply",
+    "common/emails",
+    "dashboard",
+    "eligibility",
+    "employee_record",
+    "employees",
+    "geiq_assessments/email",
+    "geiq_assessments_views",
+    "insertion",
+    "invitations_views",
+    "job_seekers_views",
+    "prescribers",
+    "releases/list.html",
+    "siae_evaluations",
+    "users/emails",
+)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def detect_typography_rules():
+    from django.template.base import Template
+
+    detected_errors = {
+        " :": "A colon should follow a no-break space",
+        " ?": "A question mark should follow a narrow no-break space",
+        " !": "An exclamation mark should follow a narrow no-break space",
+        " ;": "A semicolon should follow a narrow no-break space",
+        "« ": "Left-pointing double angle quotation mark should be followed by a no-break space",
+        " »": "Right-pointing double angle quotation mark should follow a no-break space",
+        "PASS IAE": "PASS IAE requires a non-breaking space between PASS and IAE",
+    }
+
+    origin_render = Template.render
+
+    RECURSIVE_FLAG = "_FLAG_TO_DETECT_RECURSIVE_RENDER_CALL"
+
+    def render(self, context):
+        first_render_call = not getattr(Template, RECURSIVE_FLAG, False)
+        if first_render_call:
+            setattr(Template, RECURSIVE_FLAG, True)
+        try:
+            result = origin_render(self, context)
+        finally:
+            if first_render_call:
+                setattr(Template, RECURSIVE_FLAG, False)
+
+        ignore_check = (
+            # self.origin.template_name can be None (mostly in template tag tests)
+            self.origin.template_name is None
+            # Ignore templates that have not been fixed yet
+            or self.origin.template_name.startswith(TEMPLATE_TYPO_IGNORE_LIST)
+            # Emails subjects are processed by textwrap.shorten which drops unbreakable spaces: no need to enforce them
+            or ("email" in self.origin.template_name and self.origin.template_name.endswith("_subject.txt"))
+        )
+        if first_render_call and not ignore_check:
+            errors_found = []
+            for error_str, error_explanation in detected_errors.items():
+                if (error_index := result.find(error_str)) != -1:
+                    end_of_line_index = result.find("\n", error_index)
+                    if end_of_line_index != -1:
+                        end_of_line = result[error_index:end_of_line_index]
+                        if (
+                            # Ignore the finding (useful for well-formatted JS script)
+                            "no-typography-rule-check" in end_of_line
+                            # Ignore: probable CSS line
+                            or " !important;" in end_of_line
+                        ):
+                            continue
+                    error_context = result[max(0, error_index - 30) : error_index + 30]
+                    errors_found.append((error_explanation, error_context))
+            if errors_found:
+                pytest.fail(f"Typography mistake detected: {errors_found}")
+
+        return result
+
+    Template.render = render

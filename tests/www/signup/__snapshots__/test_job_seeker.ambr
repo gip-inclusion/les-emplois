@@ -120,7 +120,7 @@
           </div>
           <div class="mt-n2 mb-3">
               <button class="btn-link fs-sm" data-bs-target="#no-email-modal" data-bs-toggle="modal" type="button">
-                  Pas d'adresse e-mail ?
+                  Pas d'adresse e-mail ?
               </button>
               <div aria-labelledby="no-email-modal-label" aria-modal="true" class="modal fade" id="no-email-modal" role="dialog" tabindex="-1">
                   <div class="modal-dialog modal-dialog-centered">
@@ -167,7 +167,7 @@
           </div>
       </div>
       <p>
-          Vous n'avez pas de numéro de sécurité sociale ?
+          Vous n'avez pas de numéro de sécurité sociale ?
           <a aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" class="has-external-link" href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" rel="noopener" target="_blank">
               ameli.fr
           </a>
@@ -211,7 +211,7 @@
               <div class="modal-content">
                   <div class="modal-header">
                       <h3 class="modal-title">
-                          Êtes-vous sûr de vouloir annuler ?
+                          Êtes-vous sûr de vouloir annuler ?
                       </h3>
                   </div>
                   <div class="modal-body">
@@ -335,7 +335,7 @@
           <input class="form-control is-valid" disabled="" id="id_email" maxlength="320" name="email" type="email" value="jane.doe@test.local"/>
       </div>
       <p class="text-secondary fs-sm">
-          Ces informations sont incorrectes ?
+          Ces informations sont incorrectes ?
           <a class="btn-link" href="/signup/job_seeker">
               Retourner au formulaire
           </a>

@@ -51,7 +51,7 @@
     });
 
     {% if MATOMO_BASE_URL and send_to_matomo %}
-    // Matomo :
+    // Matomo:
     tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
     tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
     tarteaucitron.user.matomoMore = function () {

@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="sur le PASS IAE" %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="sur le PASS IAE" %}
         {% fragment as c_title__main %}
             <h1>PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
         {% endfragment %}

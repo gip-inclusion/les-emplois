@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     {% if devices %}
-                        <p>Voici la liste de vos appareils configurés :</p>
+                        <p>Voici la liste de vos appareils configurés :</p>
                         <div class="table-responsive mt-3 mt-md-4">
                             <table class="table table-sm">
                                 <caption class="visually-hidden">Liste de vos appareils configurés</caption>
@@ -92,7 +92,7 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil {{ device.name }} ?</h3>
+                            <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil {{ device.name }} ?</h3>
                         </div>
                         <div class="modal-body">
                             {% if user.otp_device == device and devices|length > 1 %}

@@ -635,7 +635,7 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
             messages.error(
                 request,
                 format_html(
-                    'L\'adresse semble erronée. Veuillez la <a href="{}">corriger</a> avant de pouvoir « Publier ».',
+                    'L\'adresse semble erronée. Veuillez la <a href="{}">corriger</a> avant de pouvoir « Publier ».',
                     reverse("companies_views:edit_company_step_contact_infos"),
                 ),
             )

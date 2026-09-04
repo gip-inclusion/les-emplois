@@ -769,7 +769,7 @@ class TestDashboardView:
             <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche"
                 class="btn-link has-external-link"
                 target="_blank">
-                Comment est calculée cette durée ?</a>
+                Comment est calculée cette durée ?</a>
             """,
             html=True,
         )  # Durée de validité

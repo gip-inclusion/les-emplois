@@ -33,7 +33,7 @@
                             ce comportement en selectionnant celui de gauche.
                         </p>
                         <p class="mb-0">
-                            <strong>Attention : si les identités ne correspondent pas, il ne faut probablement pas fusionner les comptes mais plutôt inviter le nouveau collaborateur</strong>
+                            <strong>Attention : si les identités ne correspondent pas, il ne faut probablement pas fusionner les comptes mais plutôt inviter le nouveau collaborateur</strong>
                         </p>
                     {% endfragment %}
                 {% endcomponent_alert %}
@@ -47,22 +47,22 @@
                                     <a href="{{ to_user_admin_link }}">Lien vers l'admin</a>
                                 </li>
                                 <li>
-                                    Adresse e-mail : <strong>{{ to_user.email }}</strong>
+                                    Adresse e-mail : <strong>{{ to_user.email }}</strong>
                                 </li>
                                 <li>
-                                    Prénom : <strong>{{ to_user.first_name|title }}</strong>
+                                    Prénom : <strong>{{ to_user.first_name|title }}</strong>
                                 </li>
                                 <li>
-                                    Nom : <strong>{{ to_user.last_name|upper }}</strong>
+                                    Nom : <strong>{{ to_user.last_name|upper }}</strong>
                                 </li>
                                 <li>
-                                    Type : <strong>{{ to_user.get_kind_display }}</strong>
+                                    Type : <strong>{{ to_user.get_kind_display }}</strong>
                                 </li>
                                 <li>
-                                    Connexion : <strong>{{ to_user.get_identity_provider_display }}</strong>
+                                    Connexion : <strong>{{ to_user.get_identity_provider_display }}</strong>
                                 </li>
                                 <li>
-                                    Identifiant unique (du SSO) : <strong>{{ to_user.username }}</strong>
+                                    Identifiant unique (du SSO) : <strong>{{ to_user.username }}</strong>
                                 </li>
                             </ul>
                             {% if to_user_error %}
@@ -83,22 +83,22 @@
                                     <a href="{{ from_user_admin_link }}">Lien vers l'admin</a>
                                 </li>
                                 <li>
-                                    Adresse e-mail : <strong>{{ from_user.email }}</strong>
+                                    Adresse e-mail : <strong>{{ from_user.email }}</strong>
                                 </li>
                                 <li>
-                                    Prénom : <strong>{{ from_user.first_name|title }}</strong>
+                                    Prénom : <strong>{{ from_user.first_name|title }}</strong>
                                 </li>
                                 <li>
-                                    Nom : <strong>{{ from_user.last_name|upper }}</strong>
+                                    Nom : <strong>{{ from_user.last_name|upper }}</strong>
                                 </li>
                                 <li>
-                                    Type : <strong>{{ from_user.get_kind_display }}</strong>
+                                    Type : <strong>{{ from_user.get_kind_display }}</strong>
                                 </li>
                                 <li>
-                                    Connexion : <strong>{{ from_user.get_identity_provider_display }}</strong>
+                                    Connexion : <strong>{{ from_user.get_identity_provider_display }}</strong>
                                 </li>
                                 <li>
-                                    Identifiant unique (du SSO) : <strong>{{ from_user.username }}</strong>
+                                    Identifiant unique (du SSO) : <strong>{{ from_user.username }}</strong>
                                 </li>
                             </ul>
                             {% if from_user_error %}

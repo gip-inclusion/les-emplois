@@ -315,7 +315,7 @@ def render_stats_cd(request, page_title, *, extra_context=None, with_department_
     department = request.current_organization.department
     params = get_params_for_departement(department, with_department_name=with_department_name)
     context = {
-        "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
+        "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
         "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
         "pilotage_webinar_banners": [],

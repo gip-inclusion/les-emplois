@@ -79,7 +79,7 @@
                                                         <strong>Dans votre application, cliquez sur « + » ou sur « ajouter » puis scannez ce QR code depuis l’application.</strong>
                                                     </p>
                                                     <p class="fs-sm fst-italic text-muted">
-                                                        Exemples d'application : Google Authenticator, Authy, Microsoft Authenticator
+                                                        Exemples d'application : Google Authenticator, Authy, Microsoft Authenticator
                                                     </p>
                                                     <p>
                                                         <img src="{{ qrcode }}" width="250" alt="QR code pour la configuration de l’authentification à deux facteurs">
@@ -183,8 +183,8 @@
         <script nonce="{{ csp_nonce }}">
             document.getElementById("confirmation-checkbox").addEventListener("change", (event) => {
                 const button = document.getElementById("end-button");
-                button.classList.toggle("disabled", !event.target.checked);
-                button.href = event.target.checked ? "{{ post_save_url }}" : "";
+                button.classList.toggle("disabled", !event.target.checked); // no-typography-rule-check
+                button.href = event.target.checked ? "{{ post_save_url }}" : ""; // no-typography-rule-check
             })
         </script>
     {% endif %}

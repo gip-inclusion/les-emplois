@@ -113,7 +113,7 @@
                                                 <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
                                                    class="btn-link"
                                                    {% matomo_event "candidature" "clic" "clic-metiers" %}
-                                                   aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
+                                                   aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
                                                    title="{{ job_description.display_name }}">
                                                     {{ job_description.display_name|truncatechars:50 }}
                                                 </a>

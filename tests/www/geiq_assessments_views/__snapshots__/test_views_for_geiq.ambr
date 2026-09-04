@@ -1183,7 +1183,7 @@
                                                   <li class="d-flex">
                                                       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
                                                       <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dd.ets">paul@dd.ets</a>
-                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
+                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -1208,7 +1208,7 @@
                                                   <li class="d-flex">
                                                       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
                                                       <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dre.ets">paul@dre.ets</a>
-                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dre.ets" type="button">
+                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dre.ets" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -1544,7 +1544,7 @@
                               <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dd.ets">
                                   paul@dd.ets
                               </a>
-                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
                                   <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                   </i>
                                   <span class="visually-hidden">
@@ -2571,14 +2571,14 @@
                                           </span>
                                       </label>
                                       <p class="small text-nuance-06 mb-0">
-                                          Taille maximale : 5 Mo
+                                          Taille maximale : 5 Mo
                                           <br/>
-                                          Type de fichier : PDF
+                                          Type de fichier : PDF
                                       </p>
                                   </div>
                                   <div class="file-dropzone-preview d-none p-5">
                                       <p>
-                                          Fichier sélectionné :
+                                          Fichier sélectionné :
                                       </p>
                                       <div class="fs-sm mb-3">
                                           <strong class="file-dropzone-filename">

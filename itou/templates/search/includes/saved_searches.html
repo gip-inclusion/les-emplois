@@ -1,7 +1,7 @@
 {% load matomo %}
 <div class="c-search__list" id="savedSearchesList"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     {% if saved_searches %}
-        <div class="c-search__list__title">Recherches enregistrées :</div>
+        <div class="c-search__list__title">Recherches enregistrées :</div>
         <div class="c-search__list__slider">
             <div data-it-sliding-search="true">
                 {% for saved_search in saved_searches %}

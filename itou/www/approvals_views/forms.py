@@ -427,7 +427,7 @@ class ProlongationRequestDenyInformationReasonForm(forms.ModelForm):
         self.fields[
             "reason"
         ].label = (
-            f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_inverted_full_name()} ?"
+            f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_inverted_full_name()} ?"
         )
 
 
@@ -444,7 +444,7 @@ class ProlongationRequestDenyInformationReasonExplanationForm(forms.ModelForm):
 
 class ProlongationRequestDenyInformationProposedActionsForm(forms.ModelForm):
     proposed_actions = forms.MultipleChoiceField(
-        label="Quelle(s) action(s) envisagez-vous de proposer au candidat ?",
+        label="Quelle(s) action(s) envisagez-vous de proposer au candidat ?",
         choices=ProlongationRequestDenyProposedAction.choices,
         widget=forms.CheckboxSelectMultiple(),
     )
@@ -573,7 +573,7 @@ class SuspensionEndDateForm(forms.Form):
 
     first_day_back_to_work = forms.DateField(
         widget=DuetDatePickerWidget(),
-        label="A quelle date le salarié va-t-il réintégrer votre entreprise ?",
+        label="A quelle date le salarié va-t-il réintégrer votre entreprise ?",
         help_text=(
             "La date de fin de suspension sera mise à jour, le PASS sera de nouveau actif "
             "à la date de réintégration du candidat."

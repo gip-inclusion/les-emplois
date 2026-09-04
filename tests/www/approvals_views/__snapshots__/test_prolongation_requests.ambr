@@ -26,7 +26,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -106,7 +106,7 @@
                           <strong>
                               Étape 2
                           </strong>
-                          /2 : Explications supplémentaires
+                          /2 : Explications supplémentaires
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
@@ -178,7 +178,7 @@
                           <strong>
                               Étape 3
                           </strong>
-                          /3 : Solution envisagée
+                          /3 : Solution envisagée
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
@@ -190,7 +190,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="proposed_actions"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Quelle(s) action(s) envisagez-vous de proposer au candidat ?
+                                  Quelle(s) action(s) envisagez-vous de proposer au candidat ?
                               </label>
                               <div class="" id="id_proposed_actions-proposed_actions">
                                   <div class="form-check">
@@ -267,7 +267,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -347,7 +347,7 @@
                           <strong>
                               Étape 2
                           </strong>
-                          /3 : Explications supplémentaires
+                          /3 : Explications supplémentaires
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
@@ -431,7 +431,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -511,7 +511,7 @@
                           <strong>
                               Étape 2
                           </strong>
-                          /2 : Explications supplémentaires
+                          /2 : Explications supplémentaires
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
@@ -595,7 +595,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -675,7 +675,7 @@
                           <strong>
                               Étape 2
                           </strong>
-                          /2 : Explications supplémentaires
+                          /2 : Explications supplémentaires
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
@@ -1016,7 +1016,7 @@
                       <div aria-label="Actions sur les prolongations" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
                           <div class="d-flex align-items-center">
                               <strong class="me-2">
-                                  Filtres :
+                                  Filtres :
                               </strong>
                               <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
                                   <input id="id_only_pending" name="only_pending" type="checkbox"/>
@@ -1066,7 +1066,7 @@
                       <div aria-label="Actions sur les prolongations" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
                           <div class="d-flex align-items-center">
                               <strong class="me-2">
-                                  Filtres :
+                                  Filtres :
                               </strong>
                               <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
                                   <input id="id_only_pending" name="only_pending" type="checkbox"/>
@@ -1111,7 +1111,7 @@
                                   </th>
                                   <th class="text-end w-50px" scope="col">
                                       <span class="visually-hidden">
-                                          Actions possibles sur les prolongations de PASS IAE
+                                          Actions possibles sur les prolongations de PASS IAE
                                       </span>
                                   </th>
                               </tr>
@@ -1618,7 +1618,7 @@
                       <div aria-label="Actions sur les prolongations" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
                           <div class="d-flex align-items-center">
                               <strong class="me-2">
-                                  Filtres :
+                                  Filtres :
                               </strong>
                               <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
                                   <input id="id_only_pending" name="only_pending" type="checkbox"/>
@@ -1663,7 +1663,7 @@
                                   </th>
                                   <th class="text-end w-50px" scope="col">
                                       <span class="visually-hidden">
-                                          Actions possibles sur les prolongations de PASS IAE
+                                          Actions possibles sur les prolongations de PASS IAE
                                       </span>
                                   </th>
                               </tr>
@@ -1792,7 +1792,7 @@
               <strong>
                   email@example.com
               </strong>
-              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
                   <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                   </i>
                   <span class="visually-hidden">
@@ -1807,7 +1807,7 @@
               <strong>
                   +33123456789
               </strong>
-              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
                   <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                   </i>
                   <span class="visually-hidden">
@@ -1934,7 +1934,7 @@
                                   <strong>
                                       email@example.com
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -1949,7 +1949,7 @@
                                   <strong>
                                       +33123456789
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -2014,7 +2014,7 @@
                                       356167 jours (Environ 975 ans et 1 mois)
                                       <br/>
                                       <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                                          Comment est calculée cette durée ?
+                                          Comment est calculée cette durée ?
                                       </a>
                                   </strong>
                               </li>
@@ -2042,7 +2042,7 @@
                                       <address class="m-0">
                                           112 rue de la Croix-Nivert, 75015 Paris
                                       </address>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2056,7 +2056,7 @@
                                       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
                                           contact@acmeinc.com
                                       </a>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2068,7 +2068,7 @@
                                       <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                                       </i>
                                       06 12 34 56 78
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2204,7 +2204,7 @@
                                   <strong>
                                       email@example.com
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -2219,7 +2219,7 @@
                                   <strong>
                                       +33123456789
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -2284,7 +2284,7 @@
                                       356167 jours (Environ 975 ans et 1 mois)
                                       <br/>
                                       <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                                          Comment est calculée cette durée ?
+                                          Comment est calculée cette durée ?
                                       </a>
                                   </strong>
                               </li>
@@ -2312,7 +2312,7 @@
                                       <address class="m-0">
                                           112 rue de la Croix-Nivert, 75015 Paris
                                       </address>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2326,7 +2326,7 @@
                                       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
                                           contact@acmeinc.com
                                       </a>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2338,7 +2338,7 @@
                                       <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                                       </i>
                                       06 12 34 56 78
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2499,7 +2499,7 @@
                                   <strong>
                                       email@example.com
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -2514,7 +2514,7 @@
                                   <strong>
                                       +33123456789
                                   </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
                                       <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                       </i>
                                       <span class="visually-hidden">
@@ -2579,7 +2579,7 @@
                                       356167 jours (Environ 975 ans et 1 mois)
                                       <br/>
                                       <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                                          Comment est calculée cette durée ?
+                                          Comment est calculée cette durée ?
                                       </a>
                                   </strong>
                               </li>
@@ -2618,7 +2618,7 @@
                                       <address class="m-0">
                                           112 rue de la Croix-Nivert, 75015 Paris
                                       </address>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2632,7 +2632,7 @@
                                       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
                                           contact@acmeinc.com
                                       </a>
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
@@ -2644,7 +2644,7 @@
                                       <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                                       </i>
                                       06 12 34 56 78
-                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span class="visually-hidden">
