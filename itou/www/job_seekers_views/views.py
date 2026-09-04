@@ -6,7 +6,6 @@ from functools import cached_property
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
@@ -583,14 +582,13 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .values("advisors_count"),
         output_field=IntegerField(),
     )
-    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
-        advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
-    )
+    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
 
     form = FilterForm(
         queryset,
         request.GET,
         request=request,
+        from_all_coworkers=list_organization,
     )
 
     base_queryset = queryset
