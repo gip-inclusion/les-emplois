@@ -81,7 +81,7 @@ class ImportACIConvergencePHCForm(forms.Form):
                     try:
                         validate_siret(siret)
                     except ValidationError as e:
-                        self.add_error("__all__", f"Feuille « {sheet_name} », ligne {row_index} : {e.message}")
+                        self.add_error("__all__", f"Feuille « {sheet_name} », ligne {row_index} : {e.message}")
                     else:
                         document_sirets.add(siret)
             return {"document_sirets": document_sirets}
