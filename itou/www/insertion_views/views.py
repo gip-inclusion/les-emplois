@@ -30,8 +30,8 @@ from itou.insertion.utils import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     add_user_can_view_personal_information,
     can_orient_towards_insertion_service,
@@ -527,6 +527,11 @@ class OrientationWizardView(WizardView):
             if event is not None:
                 event.orientation = orientation
                 event.save(update_fields=["orientation"])
+
+            # Sync job seeker assignment
+            JobSeekerAssignment.objects.upsert_assignment(
+                self.job_seeker, request.user, request.current_organization, ActionKind.ORIENT
+            )
 
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",

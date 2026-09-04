@@ -11,6 +11,8 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 from itou.files.models import File
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation
 from itou.job_applications.enums import SenderKind
+from itou.users.enums import ActionKind
+from itou.users.models import JobSeekerAssignment
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
@@ -23,11 +25,13 @@ from tests.utils.testing import get_session_name, parse_response_to_soup, pretty
 
 @pytest.mark.usefixtures("temporary_bucket")
 def test_orientation_wizard_happy_path(client, snapshot, mocker):
-    prescriber = PrescriberMembershipFactory(
+    membership = PrescriberMembershipFactory(
         organization__authorized=True,
         organization__for_snapshot=True,
         user__for_snapshot=True,
-    ).user
+    )
+    prescriber = membership.user
+    prescriber_organization = membership.organization
     job_seeker = JobSeekerFactory(
         for_snapshot=True,
         email="usager@example.org",
@@ -149,7 +153,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
     assert orientation.beneficiary == job_seeker
     assert orientation.sender == prescriber
     assert orientation.sender_kind == SenderKind.PRESCRIBER
-    assert orientation.sender_prescriber_organization == prescriber.prescribermembership_set.get().organization
+    assert orientation.sender_prescriber_organization == prescriber_organization
     assert orientation.sender_company is None
     assert orientation.service == service
     assert orientation.referent_first_name == "Jean"
@@ -166,6 +170,15 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         File.objects.filter(key__in=["orientations/doc.pdf", "orientations/proof.pdf"]),
         ordered=False,
     )
+
+    # Check JobSeekerAssignment
+    # ----------------------------------------------------------------------
+    assert JobSeekerAssignment.objects.filter(
+        job_seeker=job_seeker,
+        professional=prescriber,
+        prescriber_organization=prescriber_organization,
+        last_action_kind=ActionKind.ORIENT,
+    ).exists()
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload == {
@@ -569,6 +582,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     view.dora_client.create_orientation.return_value = {"emplois_sync_uid": "job-seeker-uid"}
     mocker.patch("itou.www.insertion_views.views.insertion_models.Orientation.from_data")
     mocker.patch("itou.www.insertion_views.views.insertion_models.MobilizationEvent")
+    mocker.patch("itou.www.insertion_views.views.JobSeekerAssignment")
 
     request = mocker.Mock()
     request.user.pk = 1
@@ -638,6 +652,15 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
     assert orientation.sender_company == organization
     assert orientation.sender_prescriber_organization is None
     assert orientation.attachments == []
+
+    # Check JobSeekerAssignment
+    # ----------------------------------------------------------------------
+    assert JobSeekerAssignment.objects.filter(
+        job_seeker=job_seeker,
+        professional=user,
+        company=organization,
+        last_action_kind=ActionKind.ORIENT,
+    ).exists()
 
 
 def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, mocker):
