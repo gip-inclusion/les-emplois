@@ -589,17 +589,14 @@ HUEY = {
     },
 }
 
-# Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
+# Email https://anymail.readthedocs.io/en/stable/esps/brevo/
 ANYMAIL = {
-    # it's the default but our probes need this at import time.
-    "MAILJET_API_URL": "https://api.mailjet.com/v3.1/",
-    "MAILJET_API_KEY": os.getenv("API_MAILJET_KEY_APP"),
-    "MAILJET_SECRET_KEY": os.getenv("API_MAILJET_SECRET_APP"),
+    "BREVO_API_KEY": os.getenv("BREVO_API_KEY"),
 }
 
 EMAIL_BACKEND = "itou.emails.tasks.AsyncEmailBackend"
 # This is the "real" email backend used by the async wrapper / email backend
-ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+ASYNC_EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600

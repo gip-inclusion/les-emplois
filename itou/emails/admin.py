@@ -26,7 +26,8 @@ class EmailStatusFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        filter_q = Q(esp_response__isnull=True) | Q(esp_response__Messages__contains=[{"Status": "error"}])
+        # Brevo returns a "messageId" on success, and a "code" on error.
+        filter_q = Q(esp_response__isnull=True) | Q(esp_response__has_key="code")
         if self.value() == "0":
             return queryset.filter(filter_q)
         elif self.value() == "1":
@@ -65,25 +66,14 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
 
     @admin.display(description="transmis au fournisseur d’e-mail", boolean=True)
     def sent_to_esp(self, obj):
-        if obj.esp_response:
-            return all(msg["Status"] == "success" for msg in obj.esp_response["Messages"])
-        return False
+        return bool(obj.esp_response) and "messageId" in obj.esp_response
 
     def details(self, obj):
         if obj.esp_response:
-            [message] = obj.esp_response["Messages"]
-            if message["Status"] == "success":
-                context = {"email_statuses": {"To": [], "Cc": [], "Bcc": []}}
-                for section in context["email_statuses"]:
-                    context["email_statuses"][section] = [
-                        {
-                            "id": recipient["MessageID"],
-                            "email": recipient["Email"],
-                        }
-                        for recipient in message.get(section, [])
-                    ]
-                return loader.render_to_string("admin/emails/mailjet_status.html", context)
-            return format_html("<pre><code>{}</code></pre>", pformat(message["Errors"], width=120))
+            message_id = obj.esp_response.get("messageId")
+            if message_id:
+                return loader.render_to_string("admin/emails/brevo_status.html", {"message_id": message_id})
+            return format_html("<pre><code>{}</code></pre>", pformat(obj.esp_response, width=120))
         return ""
 
     def get_urls(self):
@@ -97,19 +87,20 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
             return update_wrapper(wrapper, view)
 
         view_email_url = path(
-            "<int:message_id>/mailjet.json",
-            wrap(self.mailjet_view),
-            name=f"{self.opts.app_label}_{self.opts.model_name}_mailjet",
+            "<str:message_id>/brevo.json",
+            wrap(self.brevo_view),
+            name=f"{self.opts.app_label}_{self.opts.model_name}_brevo",
         )
         return [*urls, view_email_url]
 
-    def mailjet_view(self, request, message_id, *args, **kwargs):
-        # Proxy Mailjet API to avoid giving API credentials to clients.
+    def brevo_view(self, request, message_id, *args, **kwargs):
+        # Proxy Brevo API to avoid giving API credentials to clients.
         # Middlewares processing the response expect a Django response.
         return JsonResponse(
             httpx.get(
-                f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}",
-                auth=(settings.ANYMAIL["MAILJET_API_KEY"], settings.ANYMAIL["MAILJET_SECRET_KEY"]),
+                "https://api.brevo.com/v3/smtp/statistics/events",
+                params={"messageId": message_id},
+                headers={"api-key": settings.ANYMAIL["BREVO_API_KEY"]},
             )
             .raise_for_status()
             .json()
