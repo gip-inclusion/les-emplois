@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.approvals.constants import CLOSURE_PENDING_APPLICATION_MAX_AGE
 from itou.approvals.utils import can_close_approval
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -116,12 +117,16 @@ class TestCanCloseApproval:
     def test_pending_application_older_than_window(self):
         approval = ApprovalFactory(with_jobapplication=True)
         _make_long_suspension(approval)
-        # 61 days ago (just past the 60-day window)
         JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker=approval.user,
             state=JobApplicationState.NEW,
-            created_at=timezone.make_aware(datetime.datetime(2024, 4, 1)),
+            created_at=timezone.make_aware(
+                datetime.datetime.combine(
+                    TODAY - CLOSURE_PENDING_APPLICATION_MAX_AGE - datetime.timedelta(days=1),
+                    datetime.time.min,
+                )
+            ),
         )
         assert can_close_approval(approval) is True
 

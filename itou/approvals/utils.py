@@ -4,6 +4,7 @@ import logging
 from django.db.models import Max, Q
 from django.utils import timezone
 
+from itou.approvals.constants import CLOSURE_PENDING_APPLICATION_MAX_AGE
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Contract
 from itou.utils.admin import add_support_remark_to_obj
@@ -22,7 +23,7 @@ def can_close_approval(approval):
     0. It isn't already ending today or earlier (nothing left to close).
     1. At least one suspension has been running (or ran) for more than 12
        consecutive months, and no accepted hiring occurred after it ended.
-    2. The job seeker has no pending applications in the last 60 days.
+    2. The job seeker has no recent pending applications.
     3. The job seeker has no ongoing contract in the ASP data.
     """
     today = timezone.localdate()
@@ -55,7 +56,7 @@ def can_close_approval(approval):
 
     if (
         approval.user.job_applications.pending()
-        .filter(created_at__date__gte=today - datetime.timedelta(days=60))
+        .filter(created_at__date__gte=today - CLOSURE_PENDING_APPLICATION_MAX_AGE)
         .exists()
     ):
         return False
