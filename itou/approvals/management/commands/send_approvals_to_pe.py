@@ -50,14 +50,14 @@ class Command(BaseCommand):
             Q(user__jobseeker_profile__nir="")
             | Q(user__jobseeker_profile__birthdate=None)
             | Q(user__first_name="")
-            | Q(user__last_name="")
+            | Q(user__last_name="", user__jobseeker_profile__birth_name="")
         ).update(pe_notification_status=api_enums.PEApiNotificationStatus.READY)
         approvals_models.CancelledApproval.objects.filter(
             pe_notification_status=api_enums.PEApiNotificationStatus.PENDING,
             start_at__lte=today,
-        ).exclude(Q(user_nir="") | Q(user_birthdate=None) | Q(user_first_name="") | Q(user_last_name="")).update(
-            pe_notification_status=api_enums.PEApiNotificationStatus.READY
-        )
+        ).exclude(
+            Q(user_nir="") | Q(user_birthdate=None) | Q(user_first_name="") | Q(user_last_name="", user_birth_name="")
+        ).update(pe_notification_status=api_enums.PEApiNotificationStatus.READY)
 
         # Send READY Approvals
         queryset = approvals_models.Approval.objects.filter(

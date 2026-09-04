@@ -1075,6 +1075,7 @@ class TestApplyAsAuthorizedPrescriber:
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -1083,6 +1084,7 @@ class TestApplyAsAuthorizedPrescriber:
             "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1274,6 +1276,7 @@ class TestApplyAsAuthorizedPrescriber:
             with_ban_geoloc_address=True,
             first_name="John",
             last_name="DOE",
+            jobseeker_profile__birth_name="Smith",
         )
         existing_job_seeker = JobSeekerFactory()
 
@@ -1391,6 +1394,7 @@ class TestApplyAsAuthorizedPrescriber:
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -1400,6 +1404,7 @@ class TestApplyAsAuthorizedPrescriber:
             "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1876,6 +1881,7 @@ class TestApplyAsPrescriber:
         post_data = {
             "title": "MME",  # inconsistent title
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -1887,6 +1893,7 @@ class TestApplyAsPrescriber:
         post_data = {
             "title": "M",
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
             "lack_of_nir": False,
@@ -1902,6 +1909,7 @@ class TestApplyAsPrescriber:
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -1910,6 +1918,7 @@ class TestApplyAsPrescriber:
             "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -2607,6 +2616,7 @@ class TestApplyAsCompany:
         post_data = {
             "title": "M",  # inconsistent title
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -2618,6 +2628,7 @@ class TestApplyAsCompany:
         post_data = {
             "title": "MME",
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
             "lack_of_nir": False,
@@ -2632,6 +2643,7 @@ class TestApplyAsCompany:
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -2640,6 +2652,7 @@ class TestApplyAsCompany:
             "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -3609,6 +3622,7 @@ class UpdateJobSeekerTestMixin:
                 "title": "MME",  # Inconsistent title
                 "first_name": self.job_seeker.first_name,
                 "last_name": self.job_seeker.last_name,
+                "birth_name": self.job_seeker.jobseeker_profile.birth_name,
                 "birthdate": self.job_seeker.jobseeker_profile.birthdate,
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
@@ -3620,6 +3634,7 @@ class UpdateJobSeekerTestMixin:
                 "title": "M",
                 "first_name": self.job_seeker.first_name,
                 "last_name": self.job_seeker.last_name,
+                "birth_name": self.job_seeker.jobseeker_profile.birth_name,
                 "birthdate": datetime.date(1978, 11, 20),  # Inconsistent birthdate
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
@@ -3637,6 +3652,7 @@ class UpdateJobSeekerTestMixin:
             "title": "M",
             "first_name": NEW_FIRST_NAME,
             "last_name": "New last name",
+            "birth_name": self.job_seeker.jobseeker_profile.birth_name,
             "birthdate": self.job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
@@ -3650,12 +3666,14 @@ class UpdateJobSeekerTestMixin:
         # (nir value is retrieved from the job_seeker and stored in the session)
         lack_of_nir_reason = post_data.pop("lack_of_nir_reason")
         nir = post_data.pop("nir", None)
+        birth_name = post_data.pop("birth_name", None)
         birthdate = post_data.pop("birthdate", None)
         birth_place = post_data.pop("birth_place", None)
         birth_country = post_data.pop("birth_country", None)
         expected_job_seeker_session = {
             "user": post_data,
             "profile": {
+                "birth_name": birth_name or self.job_seeker.jobseeker_profile.birth_name,
                 "birth_place": birth_place or self.job_seeker.jobseeker_profile.birth_place,
                 "birth_country": birth_country or self.job_seeker.jobseeker_profile.birth_country,
                 "birthdate": birthdate or self.job_seeker.jobseeker_profile.birthdate,
@@ -4130,6 +4148,7 @@ def test_detect_existing_job_seeker(client):
         "title": job_seeker.title,
         "first_name": "JEREMY",  # Try without the accent and in uppercase
         "last_name": job_seeker.last_name,
+        "birth_name": job_seeker.jobseeker_profile.birth_name,
         "birthdate": birthdate,
         "lack_of_nir_reason": "",
         "lack_of_nir": False,
@@ -4166,6 +4185,7 @@ def test_detect_existing_job_seeker(client):
     # session data is updated and we are correctly redirected to step 2
     expected_job_seeker_session["profile"] |= {
         "lack_of_nir_reason": post_data.pop("lack_of_nir_reason", ""),
+        "birth_name": post_data.pop("birth_name"),
         "birthdate": post_data.pop("birthdate"),
         "birth_country": post_data.pop("birth_country"),
         "birth_place": post_data.pop("birth_place"),

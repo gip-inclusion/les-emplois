@@ -32,7 +32,8 @@ def client():
 def _build_params_from(job_seeker):
     jobseeker_profile = job_seeker.jobseeker_profile
     params = {
-        "nomNaissance": job_seeker.last_name.upper(),
+        # `birth_name` is new and may be empty.
+        "nomNaissance": (jobseeker_profile.birth_name or job_seeker.last_name).upper(),
         "prenoms[]": job_seeker.first_name.upper().split(" "),
         "anneeDateNaissance": jobseeker_profile.birthdate.year,
         "moisDateNaissance": jobseeker_profile.birthdate.month,
@@ -51,7 +52,12 @@ def _request(client, endpoint, job_seeker):
     return client.get(endpoint, params=params).raise_for_status().json()
 
 
-USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
+USER_REQUIRED_FIELDS = ["first_name", "title"]
+# We cannot include "birth_name" and "last_name" in the required
+# fields below, because only one of them may be there.
+# - recent users (and users who recently updated their profile) have a
+#   birth name, but not necessarily a last name.
+# - older users have a last name but an empty birth name.
 JOBSEEKER_PROFILE_REQUIRED_FIELDS = ["birthdate", "birth_country", "birth_place"]
 
 
@@ -66,7 +72,7 @@ def has_required_info(job_seeker):
     for field in profile_required_fields:
         if not getattr(profile, field):
             return False
-    return True
+    return bool(profile.birth_name or job_seeker.last_name)
 
 
 def certify_criteria(criteria, client, job_seeker):

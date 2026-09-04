@@ -4,6 +4,7 @@ import random
 import string
 
 import factory.fuzzy
+import faker
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -29,6 +30,8 @@ from tests.utils.factory_boy import AutoNowOverrideMixin
 DEFAULT_PASSWORD = "$up3rP4ssw0rd!*****"
 HASHED_DEFAULT_PASSWORD = make_password(DEFAULT_PASSWORD)
 UNUSABLE_PASSWORD = make_password(None)
+
+fake = faker.Faker("fr_FR")
 
 
 def default_password(obj):
@@ -190,6 +193,7 @@ class LaborInspectorFactory(UserFactory):
 
 class JobSeekerFactory(UserFactory):
     title = factory.fuzzy.FuzzyChoice(Title.values)
+    last_name = factory.LazyFunction(lambda: random.choice(["", fake.last_name()]))
     kind = UserKind.JOB_SEEKER
     jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
@@ -397,6 +401,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             eiti_contributions=factory.fuzzy.FuzzyChoice(EITIContributions.values),
         )
         for_snapshot = factory.Trait(
+            birth_name="Smith",
             birthdate=datetime.date(1990, 1, 1),
             nir="290010101010125",
             asp_uid="a08dbdb523633cfc59dfdb297307a1",
@@ -408,6 +413,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
+    birth_name = factory.Faker("last_name")
     # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 

@@ -26,7 +26,7 @@ class _PersonSerializer(serializers.Serializer):
 
     civilite = serializers.SerializerMethodField()  # Required
     nomUsage = serializers.SerializerMethodField()  # Required
-    nomNaissance = NullField()  # Optional
+    nomNaissance = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.birth_name")
     prenom = serializers.SerializerMethodField()  # Required
     dateNaissance = serializers.DateField(
         format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
@@ -53,7 +53,8 @@ class _PersonSerializer(serializers.Serializer):
         return None
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_application.job_seeker.last_name).upper()
+        job_seeker = obj.job_application.job_seeker
+        return unidecode(job_seeker.get_last_name_for_display()).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
         # ASP limits first names to 30 chars

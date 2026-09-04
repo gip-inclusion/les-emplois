@@ -902,7 +902,8 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     user = JobSeekerFactory(
         pk=424243,
         first_name="Balthazar",
-        last_name="Durand",
+        last_name="KeepMeUnchanged",
+        jobseeker_profile__birth_name="Durand",
         jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
         jobseeker_profile__nir="187062112345678",
     )
@@ -951,7 +952,69 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
 
     user.refresh_from_db()
     assert user.first_name == "Durand"
-    assert user.last_name == "Balthazar"
+    assert user.last_name == "KeepMeUnchanged"
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.birth_name == "Balthazar"
+
+
+@freeze_time("2022-09-13")
+def test_pe_certify_users_with_swap_no_initial_birth_name(settings, respx_mock, caplog, snapshot):
+    user = JobSeekerFactory(
+        pk=424243,
+        first_name="Balthazar",
+        last_name="Simon",
+        jobseeker_profile__birth_name="",
+        jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
+        jobseeker_profile__nir="187062112345678",
+    )
+    settings.API_ESD = {
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL_PARTENAIRE": "https://auth.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+    respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+        200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+    )
+    respx_mock.post(
+        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        json={
+            "dateNaissance": "1987-06-21",
+            "nirCertifie": "1870621123456",
+            "nomNaissance": "SIMON",
+            "prenom": "BALTHAZAR",
+        },
+    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_RESPONSE_ERROR)
+    respx_mock.post(
+        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        json={
+            "dateNaissance": "1987-06-21",
+            "nirCertifie": "1870621123456",
+            "nomNaissance": "BALTHAZAR",
+            "prenom": "SIMON",
+        },
+    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_RESPONSE_KNOWN)
+    call_command("pe_certify_users", wet_run=True)
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.pe_certify_users succeeded in "
+    )
+    assert caplog.messages[:-1] == snapshot()
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+        2022, 9, 13, 0, 0, tzinfo=datetime.UTC
+    )
+    assert user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+    assertQuerySetEqual(
+        user.jobseeker_profile.identity_certifications.all(),
+        [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],
+        transform=lambda certification: certification.certifier,
+    )
+
+    user.refresh_from_db()
+    assert user.first_name == "Simon"
+    assert user.last_name == ""
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.birth_name == "Balthazar"
 
 
 def test_pe_certify_users_retry(caplog, snapshot):
@@ -975,11 +1038,12 @@ def test_pe_certify_users_retry(caplog, snapshot):
         call_command("pe_certify_users", wet_run=True)
 
     def recherche_call(user, swap):
+        birth_name = user.jobseeker_profile.birth_name or user.last_name
         return mock.call(
-            user.first_name if not swap else user.last_name,
-            user.last_name if not swap else user.first_name,
-            user.jobseeker_profile.birthdate,
-            user.jobseeker_profile.nir,
+            first_name=user.first_name if not swap else birth_name,
+            birth_name=birth_name if not swap else user.first_name,
+            birthdate=user.jobseeker_profile.birthdate,
+            nir=user.jobseeker_profile.nir,
         )
 
     assert recherche.mock_calls == [
