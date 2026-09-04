@@ -20,9 +20,9 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
+from itou.users.enums import ActionKind, AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.models import NirModificationRequest, User
+from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils import triggers
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
@@ -30,6 +30,7 @@ from itou.utils.brevo import BrevoListID
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -1602,3 +1603,48 @@ def test_archive_old_assignments_command():
     ended_assignment.refresh_from_db()
     assert ended_assignment.ended_at == old_ended_at
     assert ended_assignment.end_reason == AssignmentEndReason.MANUAL
+
+
+def test_update_assignments_with_orientations():
+    older_assignment = JobSeekerAssignmentFactory(prescriber_organization=PrescriberOrganizationFactory())
+    older_assignment_datetime = older_assignment.last_action_at
+    OrientationFactory(
+        beneficiary=older_assignment.job_seeker,
+        sender=older_assignment.professional,
+        sender_prescriber_organization=older_assignment.prescriber_organization,
+    )
+
+    older_orientation = OrientationFactory()
+    newer_assignment = JobSeekerAssignmentFactory(
+        job_seeker=older_orientation.beneficiary,
+        professional=older_orientation.sender,
+        prescriber_organization=older_orientation.sender_prescriber_organization,
+        company=older_orientation.sender_company,
+    )
+    newer_assignment_datetime = newer_assignment.last_action_at
+
+    orientation_alone = OrientationFactory()
+    second_orientation_alone = OrientationFactory(
+        beneficiary=orientation_alone.beneficiary,
+        sender=orientation_alone.sender,
+        sender_prescriber_organization=orientation_alone.sender_prescriber_organization,
+    )
+
+    call_command("update_assignments_with_orientations", wet_run=True)
+
+    older_assignment.refresh_from_db()
+    newer_assignment.refresh_from_db()
+    # older was updated
+    assert older_assignment.last_action_kind == ActionKind.ORIENT
+    assert older_assignment.last_action_at != older_assignment_datetime
+    # newer was not
+    assert newer_assignment.last_action_kind != ActionKind.ORIENT
+    assert newer_assignment.last_action_at == newer_assignment_datetime
+
+    assert JobSeekerAssignment.objects.filter(
+        job_seeker=orientation_alone.beneficiary,
+        professional=orientation_alone.sender,
+        prescriber_organization=orientation_alone.sender_prescriber_organization,
+        last_action_kind=ActionKind.ORIENT,
+        last_action_at=second_orientation_alone.created_at,
+    ).exists()
