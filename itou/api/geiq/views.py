@@ -104,11 +104,10 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
 
     @extend_schema(operation_id="list")
     def get(self, request, *args, **kwargs):
-        # TODO(branding): nom en dur dans la description OpenAPI — à basculer manuellement au flip du nom
         """
         # Liste des embauches réalisées en GEIQ
 
-        Retourne la liste complète des embauches réalisées en GEIQ connues des Emplois de l'inclusion.
+        Retourne la liste complète des embauches réalisées en GEIQ connues de La plateforme de l’inclusion.
         Ces embauches représentent des candidatures acceptées.
 
         Elles ne seront plus listées par l'API une fois le contrat terminé.

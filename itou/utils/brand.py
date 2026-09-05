@@ -7,9 +7,9 @@ the product only requires updating this mapping.
 """
 
 FORMS = {
-    None: "Les emplois de l’inclusion",
-    "de": "des Emplois de l’inclusion",
-    "à": "aux Emplois de l’inclusion",
+    None: "La plateforme de l’inclusion",
+    "de": "de La plateforme de l’inclusion",
+    "à": "à La plateforme de l’inclusion",
 }
 
 
