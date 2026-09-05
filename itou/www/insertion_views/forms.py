@@ -4,7 +4,8 @@ from django.forms import ValidationError
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.files.forms import ItouMultiFileField
-from itou.insertion.enums import OrientationStatus
+from itou.insertion.enums import OrientationRefusalReason, OrientationStatus
+from itou.insertion.models import Orientation
 from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -216,3 +217,31 @@ class OrientationsFilterForm(forms.Form):
 
     def get_qs_filters_counter(self):
         return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+
+
+class RefusalOrientationForm(forms.ModelForm):
+    refusal_reasons = forms.MultipleChoiceField(
+        required=True,
+        label="Motifs de refus",
+        choices=OrientationRefusalReason.choices,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    refusal_details = forms.CharField(
+        required=False,
+        label="Détaillez ici le motif du refus",
+        help_text="Commentaire privé à destination du prescripteur (n’est pas envoyé à l’usager).",
+        widget=forms.Textarea(attrs={"rows": 3}),
+        strip=True,
+    )
+
+    class Meta:
+        model = Orientation
+        fields = ["refusal_reasons", "refusal_details"]
+
+    def clean(self):
+        super().clean()
+        if (
+            OrientationRefusalReason.OTHER in (self.cleaned_data.get("refusal_reasons") or [])
+            and not self.cleaned_data["refusal_details"]
+        ):
+            self.add_error("refusal_details", forms.ValidationError("Veuillez détailler le motif du refus."))

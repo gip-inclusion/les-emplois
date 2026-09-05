@@ -170,12 +170,12 @@ def criterion_certification_badge(selected_criterion, job_application):
 def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
     state_classes = {
         OrientationStatus.PENDING: "bg-info",
+        OrientationStatus.PROCESSING: "bg-accent-03 text-primary",
         OrientationStatus.ACCEPTED: "bg-success",
-        OrientationStatus.REJECTED: "bg-danger",
-        OrientationStatus.EXPIRED: "bg-emploi-light",
+        OrientationStatus.REFUSED: "bg-danger",
+        OrientationStatus.EXPIRED: "bg-emploi-light text-primary",
     }[orientation.status]
     attrs = [
-        f'id="state_{orientation.pk}"',
         f'class="badge rounded-pill text-nowrap {extra_classes} {state_classes}"',
     ]
     label = OrientationStatus(orientation.status).label

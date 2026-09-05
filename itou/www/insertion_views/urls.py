@@ -47,5 +47,6 @@ urlpatterns = [
         views.orientation_details_for_service_provider,
         name="orientation_details_for_service_provider",
     ),
+    path("orientations/refuse/", views.refuse_orientation, name="refuse_orientation"),
     path("orientations/", views.orientations_list, name="orientations_list"),
 ]

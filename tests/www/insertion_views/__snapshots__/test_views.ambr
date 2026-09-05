@@ -17,7 +17,7 @@
                           <div class="c-title__main">
                               <h1>
                                   S’hair vice
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -396,6 +396,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."refusal_reasons",
+                 "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
                  "insertion_orientation"."processing_date",
                  "insertion_orientation"."duration_weekly_hours",
@@ -579,7 +581,7 @@
                           <div class="c-title__main">
                               <h1>
                                   S’hair vice
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -718,7 +720,7 @@
                           <div class="c-title__main">
                               <h1>
                                   Service complet
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-success" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-success">
                                       Validée
                                   </span>
                               </h1>
@@ -928,7 +930,7 @@
                           <div class="c-title__main">
                               <h1>
                                   S’hair vice
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -942,6 +944,56 @@
                                       Accéder au détail du service
                                   </span>
                               </a>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <form method="post">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                          <i aria-hidden="true" class="ri-check-line fw-medium">
+                                          </i>
+                                          <span>
+                                              Accepter
+                                          </span>
+                                      </button>
+                                  </form>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=1111111111zzzzzzzzzz3333333333_4">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Décliner
+                                      </span>
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                                          Autres actions
+                                          <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                                              1
+                                          </span>
+                                      </button>
+                                      <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                                          <form method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="étudier" name="action" type="submit" value="process">
+                                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                                  </i>
+                                                  <span>
+                                                      Étudier
+                                                  </span>
+                                              </button>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -1017,6 +1069,18 @@
                           <h2 class="h3">
                               Prescripteur
                           </h2>
+                          <div class="c-box--organization__summary w-100 mb-2">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <div>
+                                  <span data-bs-title="France Travail" data-bs-toggle="tooltip">
+                                      FT
+                                  </span>
+                                  <span class="d-block h3">
+                                      Pres. Org.
+                                  </span>
+                              </div>
+                          </div>
                           <ul class="fs-sm list-unstyled mb-0">
                               <li>
                                   <i aria-hidden="true" class="ri-user-line me-2">
@@ -1075,7 +1139,7 @@
 # ---
 # name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 4,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -1110,6 +1174,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."refusal_reasons",
+                 "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
                  "insertion_orientation"."processing_date",
                  "insertion_orientation"."duration_weekly_hours",
@@ -1193,6 +1259,72 @@
                  T4."first_login",
                  T4."upcoming_deletion_notified_at",
                  T4."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
                  "insertion_service"."id",
                  "insertion_service"."address_line_1",
                  "insertion_service"."address_line_2",
@@ -1270,6 +1402,8 @@
           INNER JOIN "insertion_orientation" ON ("insertion_orientationprocesslink"."orientation_id" = "insertion_orientation"."id")
           INNER JOIN "users_user" ON ("insertion_orientation"."beneficiary_id" = "users_user"."id")
           INNER JOIN "users_user" T4 ON ("insertion_orientation"."sender_id" = T4."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("insertion_orientation"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_company" ON ("insertion_orientation"."sender_company_id" = "companies_company"."id")
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_genericreferenceitem" ON ("insertion_service"."source_id" = "insertion_genericreferenceitem"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
@@ -1294,6 +1428,46 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "django_session"
+          WHERE "django_session"."session_key" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "django_session" ("session_key",
+                                        "session_data",
+                                        "expire_date")
+          VALUES (%s, %s, %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
@@ -1315,7 +1489,7 @@
                           <div class="c-title__main">
                               <h1>
                                   Service complet
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -1329,6 +1503,56 @@
                                       Accéder au détail du service
                                   </span>
                               </a>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <form method="post">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                          <i aria-hidden="true" class="ri-check-line fw-medium">
+                                          </i>
+                                          <span>
+                                              Accepter
+                                          </span>
+                                      </button>
+                                  </form>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=1111111111zzzzzzzzzz3333333333_4">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Décliner
+                                      </span>
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                                          Autres actions
+                                          <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                                              1
+                                          </span>
+                                      </button>
+                                      <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                                          <form method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="étudier" name="action" type="submit" value="process">
+                                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                                  </i>
+                                                  <span>
+                                                      Étudier
+                                                  </span>
+                                              </button>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -1457,6 +1681,18 @@
                           <h2 class="h3">
                               Prescripteur
                           </h2>
+                          <div class="c-box--organization__summary w-100 mb-2">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <span data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip">
+                                      EI
+                                  </span>
+                                  <span class="d-block h3">
+                                      ACME Inc.
+                                  </span>
+                              </div>
+                          </div>
                           <ul class="fs-sm list-unstyled mb-0">
                               <li>
                                   <i aria-hidden="true" class="ri-user-line me-2">
@@ -1510,6 +1746,290 @@
           </div>
       </section>
   </main>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[EXPIR\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-emploi-light text-primary">
+                                  Expirée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[OUVERTE]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-info">
+                                  En cours de traitement
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--action">
+                      <h2 class="visually-hidden">
+                          Actions rapides
+                      </h2>
+                      <div class="form-row align-items-center gx-3">
+                          <div class="form-group col-12 col-lg-auto">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Accepter
+                                      </span>
+                                  </button>
+                              </form>
+                          </div>
+                          <div class="form-group col-12 col-lg-auto">
+                              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=[PK of OrientationProcessLink]">
+                                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Décliner
+                                  </span>
+                              </a>
+                          </div>
+                          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                              <div class="dropdown">
+                                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                                      Autres actions
+                                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                                          1
+                                      </span>
+                                  </button>
+                                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                                      <form method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="étudier" name="action" type="submit" value="process">
+                                              <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                              </i>
+                                              <span>
+                                                  Étudier
+                                              </span>
+                                          </button>
+                                      </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[REFUS\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-danger">
+                                  Déclinée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[VALID\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-success">
+                                  Validée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[\xc9TUDE]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-accent-03 text-primary">
+                                  À l’étude
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--action">
+                      <h2 class="visually-hidden">
+                          Actions rapides
+                      </h2>
+                      <div class="form-row align-items-center gx-3">
+                          <div class="form-group col-12 col-lg-auto">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Accepter
+                                      </span>
+                                  </button>
+                              </form>
+                          </div>
+                          <div class="form-group col-12 col-lg-auto">
+                              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=[PK of OrientationProcessLink]">
+                                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Décliner
+                                  </span>
+                              </a>
+                          </div>
+                          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                              <div class="dropdown">
+                                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                                      Autres actions
+                                  </button>
+                                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une orientation au statut « En cours de traitement » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                                          <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                          </i>
+                                          <span>
+                                              Étudier
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
   
   '''
 # ---
@@ -1574,25 +2094,33 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="ÉTUDE"/>
                                       <label class="form-check-label" for="id_statuses_1">
+                                          À l’étude
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
-                                          Refusée
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Déclinée
                                       </label>
                                   </div>
                               </li>
@@ -1629,25 +2157,33 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="ÉTUDE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
+                                              À l’étude
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
-                                              Refusée
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Déclinée
                                           </label>
                                       </div>
                                   </li>
@@ -1769,25 +2305,33 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="ÉTUDE"/>
                                       <label class="form-check-label" for="id_statuses_1">
+                                          À l’étude
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
-                                          Refusée
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Déclinée
                                       </label>
                                   </div>
                               </li>
@@ -1873,25 +2417,33 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="ÉTUDE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
+                                              À l’étude
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
-                                              Refusée
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Déclinée
                                           </label>
                                       </div>
                                   </li>
@@ -1998,7 +2550,7 @@
                                               </a>
                                           </td>
                                           <td>
-                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info">
                                                   En cours de traitement
                                               </span>
                                           </td>
@@ -2037,8 +2589,8 @@
                                               </a>
                                           </td>
                                           <td>
-                                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_00000000-1111-2222-3333-555555555555">
-                                                  Refusée
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger">
+                                                  Déclinée
                                               </span>
                                           </td>
                                           <td>
@@ -2479,6 +3031,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."refusal_reasons",
+                 "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
                  "insertion_orientation"."processing_date",
                  "insertion_orientation"."duration_weekly_hours",
