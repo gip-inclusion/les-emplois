@@ -31,6 +31,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.htmx.testing import update_page_with_htmx
 from tests.utils.testing import get_request, load_template, parse_response_to_soup, pretty_indented
@@ -47,17 +48,15 @@ def test_refused_access(client):
     job_seeker = JobSeekerFactory()
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-    for user in [job_seeker, LaborInspectorFactory(membership=True)]:
+    for user in [job_seeker, LaborInspectorFactory()]:
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
 
 
 def test_not_a_job_seeker(client):
-    not_a_job_seeker = random.choice(
-        [PrescriberFactory(), EmployerFactory(), ItouStaffFactory(), LaborInspectorFactory()]
-    )
-    client.force_login(PrescriberFactory(membership=True))
+    not_a_job_seeker = random.choice([ProfessionalFactory, ItouStaffFactory])()
+    client.force_login(PrescriberFactory())
     url = reverse("job_seekers_views:details", kwargs={"public_id": not_a_job_seeker.public_id})
     response = client.get(url)
     assert response.status_code == 404
@@ -517,7 +516,7 @@ def test_update_iae_eligibility_buttons(client):
 class TestLastAdvisor:
     def test_display_last_advisor(self, client):
         job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
         advisor = assignment.advisor
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
@@ -639,7 +638,7 @@ class TestLastAdvisor:
             last_action_at=timezone.now() - datetime.timedelta(days=7),
         )
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
 
         display_phone_url = reverse(
             "job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "org_phone")
@@ -714,7 +713,7 @@ class TestLastAdvisor:
             professional__for_snapshot=True,
             last_action_kind=ActionKind.APPLY,
         )
-        request = get_request(PrescriberFactory(membership=True))
+        request = get_request(PrescriberFactory())
 
         template = load_template("job_seekers_views/includes/last_advisor.html")
         rendered = template.render(
@@ -758,7 +757,7 @@ class TestLastAdvisor:
         response = client.get(url)
         assertContains(response, badge, html=True)
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         response = client.get(url)
         assertNotContains(response, badge, html=True)
 
@@ -772,7 +771,7 @@ class TestLastAdvisor:
         ongoing_str = "Depuis le 01/12/2025"
         ended_str = "Du 01/12/2025 au 02/03/2026"
 
-        request = get_request(PrescriberFactory(membership=True))
+        request = get_request(PrescriberFactory())
         template = load_template("job_seekers_views/includes/last_advisor.html")
         rendered = template.render(
             Context(
@@ -854,12 +853,11 @@ class TestCanSeeExternalJobApplication(TestCase):
         super().setUpClass()
         cls.job_seeker = JobSeekerFactory()
         cls.authorized_prescriber = PrescriberFactory(
-            membership=True,
             membership__organization__authorized=True,
         )
 
     def test_only_authorized_prescriber_can_see_external_job_applications(self):
-        request = get_request(EmployerFactory())
+        request = get_request(ProfessionalFactory())
         assert not can_see_external_job_applications(self.job_seeker, request)
 
     def test_authorized_prescriber_can_see_external_job_applications_if_approval_exists(self):
@@ -959,7 +957,6 @@ class TestContracts:
         )
         job_seeker = approval.user
         authorized_prescriber = PrescriberFactory(
-            membership=True,
             membership__organization__authorized=True,
         )
 
@@ -1012,10 +1009,10 @@ class TestContracts:
     def test_forbidden(self, client):
         job_seeker = JobSeekerFactory()
         for user, expected_status in [
-            (LaborInspectorFactory(membership=True), 403),
-            (PrescriberFactory(membership=True), 403),
+            (LaborInspectorFactory(), 403),
+            (PrescriberFactory(), 403),
             (PrescriberFactory(membership__organization__authorized=True), 200),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(), 403),
         ]:
             client.force_login(user)
             response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
@@ -1027,7 +1024,7 @@ class TestAdvisorsTab:
         job_seeker = JobSeekerFactory()
         url = reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id})
 
-        for user in [job_seeker, LaborInspectorFactory(membership=True)]:
+        for user in [job_seeker, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == 403
@@ -1041,8 +1038,7 @@ class TestAdvisorsTab:
         response = client.get(advisors_tab_url)
         assert response.status_code == 403
 
-        factory = random.choice([PrescriberFactory, EmployerFactory])
-        user = factory(membership=True)
+        user = random.choice([PrescriberFactory, EmployerFactory])()
         JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=user)
         client.force_login(user)
         response = client.get(url)
@@ -1053,7 +1049,6 @@ class TestAdvisorsTab:
         job_seeker = JobSeekerFactory(for_snapshot=True)
         url = reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id})
         user = PrescriberFactory(
-            membership=True,
             membership__organization__for_snapshot=True,
             for_snapshot=True,
         )
@@ -1129,7 +1124,7 @@ class TestAdvisorsTab:
             professional__for_snapshot=True,
             last_action_kind=ActionKind.APPLY,
         )
-        request = get_request(PrescriberFactory())
+        request = get_request(ProfessionalFactory())
 
         template = load_template("job_seekers_views/includes/advisor.html")
         rendered = template.render(Context({"assignment": assignment, "request": request}))
@@ -1169,7 +1164,7 @@ class TestAdvisorsTab:
         response = client.get(url)
         assertContains(response, badge, html=True)
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         response = client.get(url)
         assertNotContains(response, badge, html=True)
 
@@ -1183,7 +1178,7 @@ class TestAdvisorsTab:
         ongoing_str = "Depuis le 01/12/2025"
         ended_str = "Du 01/12/2025 au 02/03/2026"
 
-        request = get_request(PrescriberFactory(membership=True))
+        request = get_request(PrescriberFactory())
         template = load_template("job_seekers_views/includes/advisor.html")
         rendered = template.render(Context({"assignment": assignment, "request": request}))
         assert ongoing_str in rendered

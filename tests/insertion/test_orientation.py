@@ -11,7 +11,7 @@ from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
 from tests.insertion.factories import OrientationFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 def test_orientation_default_status():
@@ -23,7 +23,7 @@ def test_orientation_default_status():
 def test_orientation_prescriber_sender_constraint():
     organization = PrescriberOrganizationFactory()
     orientation = OrientationFactory(
-        sender=PrescriberFactory(),
+        sender=ProfessionalFactory(),
         sender_kind=SenderKind.PRESCRIBER,
         sender_prescriber_organization=organization,
         sender_company=None,
@@ -34,7 +34,7 @@ def test_orientation_prescriber_sender_constraint():
 def test_orientation_employer_sender_constraint():
     company = CompanyFactory()
     orientation = OrientationFactory(
-        sender=EmployerFactory(),
+        sender=ProfessionalFactory(),
         sender_kind=SenderKind.EMPLOYER,
         sender_company=company,
         sender_prescriber_organization=None,
@@ -46,7 +46,7 @@ def test_orientation_rejects_inconsistent_sender_organization():
     with pytest.raises(IntegrityError):
         Orientation.objects.create(
             beneficiary=JobSeekerFactory(),
-            sender=PrescriberFactory(),
+            sender=ProfessionalFactory(),
             sender_kind=SenderKind.PRESCRIBER,
             sender_prescriber_organization=None,
             sender_company=None,

@@ -2,7 +2,7 @@ from django.core.management import call_command
 
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
-from tests.users.factories import EmployerFactory, JobSeekerProfileFactory
+from tests.users.factories import JobSeekerProfileFactory, ProfessionalFactory
 
 
 def test_no_inconsistencies_no_slack(caplog):
@@ -26,7 +26,7 @@ def test_no_inconsistencies_with_slack_webhook(caplog, settings, mocker):
 
 
 def test_inconsistencies_with_slack_webhook(caplog, settings, mocker):
-    inconsistent_profile = JobSeekerProfileFactory(user=EmployerFactory())
+    inconsistent_profile = JobSeekerProfileFactory(user=ProfessionalFactory())
 
     slack_mock = mocker.patch("itou.utils.management.commands.check_inconsistencies.send_slack_message")
     settings.SLACK_INCONSISTENCIES_WEBHOOK_URL = "http://slack.fake"

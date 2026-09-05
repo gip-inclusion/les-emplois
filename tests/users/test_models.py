@@ -50,15 +50,12 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import (
     DEFAULT_PASSWORD,
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
     UserFactory,
-    random_pro_user_factory,
 )
 from tests.utils.testing import normalize_fields_history
 
@@ -165,7 +162,7 @@ class TestModel:
         assert unique_username == uuid.UUID(unique_username, version=4).hex
 
     def test_create_job_seeker_by_proxy(self, client, snapshot):
-        proxy_user = PrescriberFactory(for_snapshot=True)
+        proxy_user = ProfessionalFactory(for_snapshot=True)
 
         sent_emails = []
 
@@ -308,7 +305,7 @@ class TestModel:
         job_seeker = JobSeekerFactory()
         assert not job_seeker.is_handled_by_proxy
 
-        prescriber = PrescriberFactory()
+        prescriber = ProfessionalFactory()
         job_seeker = JobSeekerFactory(created_by=prescriber)
         assert job_seeker.is_handled_by_proxy
 
@@ -326,14 +323,14 @@ class TestModel:
         user = JobSeekerFactory(identity_provider=IdentityProvider.FT_CONNECT)
         assert user.has_sso_provider
 
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         assert user.has_sso_provider
 
-        user = PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         assert user.has_sso_provider
 
     def test_update_external_data_source_history_field(self):
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         assert not user.external_data_source_history
 
         provider = IdentityProvider.FRANCE_CONNECT
@@ -488,7 +485,7 @@ class TestModel:
             )
         user = {
             UserKind.JOB_SEEKER: JobSeekerFactory,
-            UserKind.PROFESSIONAL: random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory]),
+            UserKind.PROFESSIONAL: ProfessionalFactory,
             UserKind.ITOU_STAFF: ItouStaffFactory,
         }[kind].build(**factory_kwargs)
 
@@ -504,7 +501,7 @@ class TestModel:
         )
 
     def test_is_account_creator(self):
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
 
         job_seeker = JobSeekerFactory(created_by=user)
         assert job_seeker.is_created_by(user)
@@ -512,7 +509,7 @@ class TestModel:
         job_seeker = JobSeekerFactory()
         assert not job_seeker.is_created_by(user)
 
-        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
+        job_seeker = JobSeekerFactory(created_by=ProfessionalFactory())
         assert not job_seeker.is_created_by(user)
 
     def test_has_verified_email(self):
@@ -541,7 +538,7 @@ class TestModel:
         job_seeker = JobSeekerFactory()
         assert "candidat" == job_seeker.get_kind_display()
 
-        professional = random_pro_user_factory()
+        professional = ProfessionalFactory()
         assert "professionnel" == professional.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
@@ -1077,9 +1074,9 @@ def test_user_and_job_seeker_profile_field_history(obj_attr, field, value):
     "factory",
     [
         JobSeekerFactory,
-        PrescriberFactory,
-        EmployerFactory,
-        LaborInspectorFactory,
+        ProfessionalFactory,
+        ProfessionalFactory,
+        ProfessionalFactory,
     ],
 )
 def test_user_not_is_staff_nor_superuser(factory):
@@ -1213,7 +1210,7 @@ def test_save_erases_ft_fields_if_details_change():
 @pytest.mark.parametrize("membership_active", [False, True])
 @pytest.mark.parametrize("organization_authorized", [False, True])
 def test_is_prescriber_with_authorized_org_memberships(user_active, membership_active, organization_authorized):
-    prescriber = PrescriberFactory(is_active=user_active)
+    prescriber = ProfessionalFactory(is_active=user_active)
     PrescriberMembershipFactory(
         is_active=membership_active, user=prescriber, organization__authorized=organization_authorized
     )
@@ -1254,12 +1251,10 @@ class TestJobSeekerAssignment:
             f"company={company_id}"
         )
 
-    @pytest.mark.parametrize(
-        "factory", [lambda: None, PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory]
-    )
+    @pytest.mark.parametrize("factory", [lambda: None, ProfessionalFactory, ItouStaffFactory])
     def test_upsert_only_on_job_seeker(self, factory):
         not_a_job_seeker = factory()
-        prescriber = PrescriberFactory()
+        prescriber = ProfessionalFactory()
 
         with pytest.raises(AssertionError):
             JobSeekerAssignment.objects.upsert_assignment(
@@ -1280,9 +1275,10 @@ class TestJobSeekerAssignment:
         job_seeker = JobSeekerFactory()
         professional = random.choice(
             [
-                PrescriberFactory(),
-                EmployerFactory(),
-                LaborInspectorFactory(),  # irrealistic case but technically possible
+                # FIXME
+                ProfessionalFactory(),
+                ProfessionalFactory(),
+                ProfessionalFactory(),  # irrealistic case but technically possible
             ]
         )
 
@@ -1304,7 +1300,7 @@ class TestJobSeekerAssignment:
         JobSeekerAssignment.objects.count() == 2
 
     def test_unique_constraint(self):
-        professional = random.choice([PrescriberFactory(), EmployerFactory()])
+        professional = ProfessionalFactory()
         organization = PrescriberOrganizationFactory()
         assignment = JobSeekerAssignmentFactory(professional=professional, prescriber_organization=organization)
 
@@ -1337,7 +1333,7 @@ class TestJobSeekerAssignment:
 
     def test_constraint_company_and_prescriber_organization(self):
         job_seeker = JobSeekerFactory()
-        professional = random.choice([PrescriberFactory(), EmployerFactory()])
+        professional = ProfessionalFactory()
         prescriber_organization = PrescriberOrganizationFactory()
         company = CompanyFactory()
 
@@ -1352,7 +1348,7 @@ class TestJobSeekerAssignment:
 
     def test_constraint_unknown_advisor_without_organization_or_company(self):
         job_seeker = JobSeekerFactory()
-        professional = random.choice([PrescriberFactory(), EmployerFactory()])
+        professional = ProfessionalFactory()
 
         with pytest.raises(IntegrityError):
             JobSeekerAssignment(
@@ -1369,7 +1365,7 @@ class TestJobSeekerAssignment:
     )
     def test_assign_job_seeker(self, with_prescriber_organization, with_company, snapshot):
         job_seeker = JobSeekerFactory()
-        professional = random.choice([PrescriberFactory(), EmployerFactory()])
+        professional = ProfessionalFactory()
         prescriber_organization = PrescriberOrganizationFactory() if with_prescriber_organization else None
         company = CompanyFactory() if with_company else None
         organization = prescriber_organization or company or None

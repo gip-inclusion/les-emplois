@@ -33,8 +33,8 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
     random_user_kind_factory,
 )
 from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented, reload_module
@@ -257,9 +257,7 @@ class TestExistingUserLogin:
             ),
             (
                 "DJANGO+PC",
-                random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(
-                    identity_provider=IdentityProvider.DJANGO, email="django+pc@mailinator.com"
-                ),
+                ProfessionalFactory(identity_provider=IdentityProvider.DJANGO, email="django+pc@mailinator.com"),
             ),
             (
                 "PC",
@@ -341,9 +339,7 @@ class TestExistingUserLogin:
         "user_factory",
         [
             JobSeekerFactory,
-            PrescriberFactory,
-            EmployerFactory,
-            LaborInspectorFactory,
+            ProfessionalFactory,
             ItouStaffFactory,
         ],
     )
@@ -415,9 +411,8 @@ class TestExistingUserLogin:
         assertContains(response, pro_connect_url + '"')
 
 
-@pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory])
-def test_pro_connect_activation_view(client, pro_connect, factory):
-    user = factory(identity_provider=IdentityProvider.DJANGO, membership=True)
+def test_pro_connect_activation_view(client, pro_connect):
+    user = random.choice([PrescriberFactory, EmployerFactory])(identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
     url = reverse("dashboard:activate_pro_connect_account")

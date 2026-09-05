@@ -19,7 +19,6 @@ from tests.www.stats.test_views import has_activated_pilotage_in_nexus
 )
 def test_index_stats_for_employer(snapshot, client, kind):
     employer = EmployerFactory(
-        membership=True,
         membership__company__kind=kind,
     )
     client.force_login(employer)
@@ -79,7 +78,8 @@ def test_index_stats_for_authorized_prescriber_with_custom_layout(snapshot, clie
 
 def test_index_stats_for_non_authorized_prescriber(snapshot, client):
     prescriber = PrescriberFactory(
-        membership__organization__authorized=False, membership__organization__kind=PrescriberOrganizationKind.OTHER
+        membership__organization__authorized=False,
+        membership__organization__kind=PrescriberOrganizationKind.OTHER,
     )
     client.force_login(prescriber)
 

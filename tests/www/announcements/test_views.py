@@ -1,4 +1,3 @@
-import random
 from unittest.mock import patch
 
 import pytest
@@ -10,7 +9,7 @@ from pytest_django.asserts import assertContains
 
 from itou.communications.models import UserKindTag
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory, random_pro_user_factory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -29,7 +28,7 @@ class TestNewsRender:
     def test_all_news_rendered_html(self, client, snapshot):
         campaign = AnnouncementCampaignFactory(for_snapshot=True, with_items_for_every_user_kind=True)
 
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         client.force_login(user)
         response = client.get(reverse("announcements:news"))
 
@@ -50,13 +49,7 @@ class TestNewsRender:
         url = reverse("announcements:news")
 
         # professionals receive all items
-        user = random.choice(
-            [
-                PrescriberFactory(membership=True),
-                EmployerFactory(membership=True),
-                LaborInspectorFactory(membership=True),
-            ]
-        )
+        user = random_pro_user_factory()
         client.force_login(user)
         response = client.get(url)
         self._assert_all_items_rendered(response, campaign)
@@ -118,7 +111,7 @@ class TestNewsRender:
             content = parse_response_to_soup(response, ".s-section__container")
             assert pretty_indented(content) == snapshot(name="none_exists")
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         url = reverse("announcements:news")
 
         assert_content_matches_snapshot(client.get(url))

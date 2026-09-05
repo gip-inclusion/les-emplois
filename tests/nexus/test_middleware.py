@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from itoutils.django.nexus.token import generate_auto_login_token
@@ -13,14 +11,14 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
     random_pro_user_factory,
 )
 
 
 class TestAutoLoginMiddleware:
     def test_middleware_for_authenticated_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         client.force_login(user)
         params = {"auto_login": generate_auto_login_token(user)}
         response = client.get(reverse("home:hp", query=params))
@@ -28,10 +26,10 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == ["Nexus auto login: user is already logged in"]
 
     def test_middleware_for_wrong_authenticated_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         params = {"auto_login": generate_auto_login_token(user)}
         # Another user is logged in
-        client.force_login(EmployerFactory(membership=True))
+        client.force_login(EmployerFactory())
 
         response = client.get(reverse("home:hp", query=params))
         assertRedirects(
@@ -48,7 +46,7 @@ class TestAutoLoginMiddleware:
         ]
 
     def test_middleware_with_no_existing_user(self, client, caplog):
-        jwt = generate_auto_login_token(EmployerFactory.build())
+        jwt = generate_auto_login_token(ProfessionalFactory.build())
         response = client.get(reverse("home:hp", query={"auto_login": jwt}))
         assertRedirects(
             response,
@@ -58,7 +56,7 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == [f"Nexus auto login: no user found for jwt={jwt}"]
 
     def test_middleware_for_unlogged_user(self, client, caplog):
-        user = random_pro_user_factory(membership=True)
+        user = random_pro_user_factory()
         params = {"auto_login": generate_auto_login_token(user)}
 
         response = client.get(reverse("home:hp", query=params))
@@ -91,7 +89,7 @@ class TestAutoLoginMiddleware:
 
 class TestDropDownMiddleware:
     def test_context(self, client):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
@@ -101,15 +99,13 @@ class TestDropDownMiddleware:
         }
 
     def test_nexus_page(self, client):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("nexus:homepage"))
         assert response.wsgi_request.nexus_dropdown == {}
 
-    @pytest.mark.parametrize(
-        "factory", [JobSeekerFactory, partial(LaborInspectorFactory, membership=True), ItouStaffFactory]
-    )
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
     def test_wrong_user_kind(self, client, factory):
         user = factory()
         client.force_login(user)
@@ -117,7 +113,7 @@ class TestDropDownMiddleware:
         assert response.wsgi_request.nexus_dropdown == {}
 
     def test_not_using_pro_connect(self, client):
-        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
         client.force_login(user)
         response = client.get(reverse("nexus:index"))
         assert response.wsgi_request.nexus_dropdown == {}

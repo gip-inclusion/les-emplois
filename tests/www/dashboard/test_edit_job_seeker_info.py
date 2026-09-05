@@ -19,7 +19,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -70,7 +70,7 @@ class TestEditJobSeekerInfo:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
         )
-        prescriber = PrescriberFactory()
+        professional = ProfessionalFactory()
         post_data = {
             "email": job_seeker.email,
             "title": job_seeker.title,
@@ -87,7 +87,7 @@ class TestEditJobSeekerInfo:
         }
         form = EditJobSeekerInfoForm(
             instance=job_seeker,
-            editor=prescriber,
+            editor=professional,
             data=post_data,
         )
 
@@ -111,7 +111,7 @@ class TestEditJobSeekerInfo:
         }
         form = EditJobSeekerInfoForm(
             instance=job_seeker,
-            editor=prescriber,
+            editor=professional,
             data=post_data,
         )
 
@@ -557,7 +557,7 @@ class TestEditJobSeekerInfo:
         job_application.job_seeker.save()
 
         # Log as other member of the same organization
-        other_prescriber = PrescriberFactory()
+        other_prescriber = ProfessionalFactory()
         prescribers_factories.PrescriberMembershipFactory(
             user=other_prescriber, organization=job_application.sender_prescriber_organization
         )
@@ -583,11 +583,11 @@ class TestEditJobSeekerInfo:
     def test_edit_not_allowed(self, client):
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, job_seeker__created_by=PrescriberFactory()
+            sent_by_prescriber_alone=True, job_seeker__created_by=ProfessionalFactory()
         )
 
         # Lambda prescriber not member of the sender organization
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )

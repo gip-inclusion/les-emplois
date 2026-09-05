@@ -39,6 +39,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
@@ -119,10 +120,10 @@ def test_anonymous_user(client, url):
 def test_refused_access(client, url):
     forbidden_users = [
         JobSeekerFactory(),
-        LaborInspectorFactory(membership=True),
+        LaborInspectorFactory(),
     ]
     if url == reverse("job_seekers_views:list"):
-        forbidden_users.append(EmployerFactory(membership=True))
+        forbidden_users.append(EmployerFactory())
     for user in forbidden_users:
         client.force_login(user)
         response = client.get(url)
@@ -173,19 +174,19 @@ def test_displayed_tabs(client, user_factory, assertion):
     "user_factory, url",
     [
         (
-            partial(PrescriberFactory, membership=True),
+            PrescriberFactory,
             reverse("job_seekers_views:list"),
         ),
         (
-            partial(PrescriberFactory, membership=True),
+            PrescriberFactory,
             reverse("job_seekers_views:list_organization"),
         ),
         (
-            partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
+            partial(EmployerFactory, membership__company__subject_to_iae_rules=True),
             reverse("job_seekers_views:list_organization"),
         ),
         (
-            partial(EmployerFactory, membership=True, membership__company__not_subject_to_iae_rules=True),
+            partial(EmployerFactory, membership__company__not_subject_to_iae_rules=True),
             reverse("job_seekers_views:list_organization"),
         ),
     ],
@@ -207,9 +208,9 @@ def test_displayed_top_filters(client, user_factory, url, snapshot):
 @pytest.mark.parametrize(
     "user_factory",
     [
-        partial(PrescriberFactory, membership=True),
-        partial(PrescriberFactory, membership=True, membership__organization__authorized=True),
-        partial(EmployerFactory, membership=True, membership__company__subject_to_iae_rules=True),
+        PrescriberFactory,
+        partial(PrescriberFactory, membership__organization__authorized=True),
+        partial(EmployerFactory, membership__company__subject_to_iae_rules=True),
     ],
     ids=[
         "prescriber",
@@ -345,7 +346,7 @@ def test_multiple(client, snapshot):
         with_job_seeker_assignment=True,
     )
     # Other app for which the current user cannot see the personal information
-    unauthorized_prescriber = PrescriberFactory(membership=True)
+    unauthorized_prescriber = PrescriberFactory()
     job_app5 = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=unauthorized_prescriber,
@@ -689,7 +690,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     all the "orienteurs solo"
     """
     prescriber = PrescriberFactory()
-    other_prescriber = PrescriberFactory()
+    other_prescriber = ProfessionalFactory()
     organization = PrescriberOrganizationFactory()
 
     # Job seeker created by another prescriber
@@ -726,7 +727,6 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     )
 
     # The prescriber is now in another org (without it they can't use the website)
-    PrescriberMembershipFactory(user=prescriber)
     client.force_login(prescriber)
     response = client.get(reverse("job_seekers_views:list"))
     assertNotContains(response, alain.get_full_name())
@@ -1013,7 +1013,7 @@ def test_filtered_by_approval_state(client, factory, url):
 
 def test_iae_filters_as_non_iae_actor(client, subtests):
     company = CompanyFactory(not_subject_to_iae_rules=True)
-    user = EmployerFactory(membership=True, membership__company=company)
+    user = EmployerFactory(membership__company=company)
 
     # Eligibility and approval both expired
     job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
@@ -1421,7 +1421,7 @@ def test_filtered_by_organization_members(client, org_factory, membership_factor
     professional = organization.members.first()
     member = organization.members.last()
     old_member = membership_factory(organization)(user__is_active=False, user__first_name="Charlie").user
-    other_pro_not_in_orga = PrescriberFactory(first_name="Deborah")
+    other_pro_not_in_orga = ProfessionalFactory(first_name="Deborah")
     prescriber_organization = is_prescriber_organization and organization or None
     company = is_company and organization or None
 

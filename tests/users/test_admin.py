@@ -22,11 +22,10 @@ from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.models import IdentityCertification, JobSeekerProfile, NirModificationRequest, User
 from tests.users.factories import (
     UNUSABLE_PASSWORD,
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import normalize_fields_history
 
@@ -355,7 +354,7 @@ def test_change_asp_uid(admin_client, submitted_asp_uid, expected_asp_uid, expec
 def test_nir_modification_request_changelist(admin_client):
     job_seekers = JobSeekerFactory.create_batch(2)
     nir_modification_requests = [
-        NirModificationRequest(jobseeker_profile=job_seeker.jobseeker_profile, requested_by=EmployerFactory())
+        NirModificationRequest(jobseeker_profile=job_seeker.jobseeker_profile, requested_by=ProfessionalFactory())
         for job_seeker in job_seekers
     ]
     NirModificationRequest.objects.bulk_create(nir_modification_requests)
@@ -369,9 +368,7 @@ def test_nir_modification_request_changelist(admin_client):
 
 def test_nir_modification_request_display_requested_by_kind(admin_client):
     job_seeker = JobSeekerFactory()
-    (requested_by, display_kind) = random.choice(
-        [(job_seeker, "candidat"), (EmployerFactory(), "professionnel"), (PrescriberFactory(), "professionnel")]
-    )
+    (requested_by, display_kind) = random.choice([(job_seeker, "candidat"), (ProfessionalFactory(), "professionnel")])
     nir_modification_request = NirModificationRequest.objects.create(
         jobseeker_profile=job_seeker.jobseeker_profile, requested_by=requested_by
     )
@@ -449,19 +446,15 @@ def _user_list(users):
         (JobSeekerFactory, True),
         (partial(JobSeekerFactory, password=UNUSABLE_PASSWORD), False),
         (partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
-        (partial(PrescriberFactory, identity_provider=IdentityProvider.DJANGO), True),
-        (PrescriberFactory, False),
-        (partial(EmployerFactory, identity_provider=IdentityProvider.DJANGO), True),
-        (EmployerFactory, False),
+        (partial(ProfessionalFactory, identity_provider=IdentityProvider.DJANGO), True),
+        (ProfessionalFactory, False),
     ],
     ids=[
         "job_seeker_with_django",
         "job_seeker_with_django_but_unusable_password",
         "job_seeker_with_franceconnect",
-        "prescriber_with_django",
-        "prescriber_with_proconnect",
-        "employer_with_django",
-        "employer_with_proconnect",
+        "professional_with_django",
+        "professional_with_proconnect",
     ],
 )
 def test_disable_password_auth(admin_client, mailoutbox, factory, should_reset):
@@ -516,14 +509,12 @@ def test_disable_password_auth(admin_client, mailoutbox, factory, should_reset):
 def test_disable_password_auth_mixed_batch(admin_client, mailoutbox):
     job_seeker_django = JobSeekerFactory()
     job_seeker_fc = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
-    prescriber_django = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-    prescriber_pc = PrescriberFactory()
-    employer_django = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
-    employer_pc = EmployerFactory()
+    professional_django = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
+    professional_pc = ProfessionalFactory()
 
-    all_users = [job_seeker_django, job_seeker_fc, prescriber_django, prescriber_pc, employer_django, employer_pc]
-    expected_updated = {job_seeker_django, prescriber_django, employer_django}
-    expected_skipped = {job_seeker_fc, prescriber_pc, employer_pc}
+    all_users = [job_seeker_django, job_seeker_fc, professional_django, professional_pc]
+    expected_updated = {job_seeker_django, professional_django}
+    expected_skipped = {job_seeker_fc, professional_pc}
     passwords_before = {user.pk: user.password for user in expected_skipped}
 
     response = admin_client.post(
@@ -556,12 +547,12 @@ def test_disable_password_auth_mixed_batch(admin_client, mailoutbox):
             messages.Message(
                 messages.SUCCESS,
                 "Désactivation de l’authentification par mot de passe pour "
-                f"3 utilisateurs :{_user_list(expected_updated)}",
+                f"2 utilisateurs :{_user_list(expected_updated)}",
             ),
             messages.Message(
                 messages.WARNING,
                 "Impossible de désactiver l’authentification par mot de passe pour "
-                f"3 utilisateurs :{_user_list(expected_skipped)}"
+                f"2 utilisateurs :{_user_list(expected_skipped)}"
                 "<br><i>(Fournisseur d’identité non-Django ou mot de passe déjà inutilisable)</i>",
             ),
         ],

@@ -7,7 +7,13 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 NO_INFO_MARKUP = "<strong>Oups ! Aucune information en vue !</strong>"
@@ -24,8 +30,8 @@ ACTIVITY_MARKUP = "<h3>Son activité</h3>"
     "user_factory,status_code",
     [
         pytest.param(JobSeekerFactory, 403, id="JobSeeker"),
-        pytest.param(partial(EmployerFactory, membership=True), 403, id="Employer"),
-        pytest.param(partial(LaborInspectorFactory, membership=True), 403, id="LaborInspector"),
+        pytest.param(EmployerFactory, 403, id="Employer"),
+        pytest.param(LaborInspectorFactory, 403, id="LaborInspector"),
         pytest.param(
             partial(PrescriberFactory, membership__organization__authorized=False),
             404,
@@ -62,7 +68,7 @@ def test_access(client, user_factory, status_code):
 
 
 def test_access_prescriber_with_multiple_organizations(client):
-    user = PrescriberFactory()
+    user = ProfessionalFactory()
     current_org = PrescriberOrganizationFactory(
         name="Orga courante", membership__user=user, authorized=True, with_membership=True
     )

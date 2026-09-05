@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
@@ -13,7 +11,7 @@ def one_request_per_minute(mocker):
     mocker.patch("itou.utils.throttling.FailSafeUserRateThrottle.rate", "1/minute")
 
 
-@pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
+@pytest.mark.parametrize("user_factory", [None, PrescriberFactory])
 def test_throttling(client, user_factory, one_request_per_minute):
     if user_factory is not None:
         client.force_login(user_factory())

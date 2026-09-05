@@ -31,10 +31,10 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
-    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -53,7 +53,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.SelfAttribute("job_seeker"),
         )
         sent_by_prescriber_alone = factory.Trait(
-            sender=factory.SubFactory(PrescriberFactory),
+            sender=factory.SubFactory(PrescriberFactory, membership=False),  # FIXME
             sender_kind=SenderKind.PRESCRIBER,
         )
         sent_by_prescriber = factory.Trait(
@@ -87,7 +87,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 job_seeker=factory.SelfAttribute("..job_seeker"),
                 author=factory.Maybe(
                     "..sender_is_job_seeker",
-                    yes_declaration=factory.SubFactory(PrescriberFactory),
+                    yes_declaration=factory.SubFactory(PrescriberFactory, membership=False),  # FIXME
                     no_declaration=factory.SelfAttribute("..sender"),
                 ),
             ),
@@ -266,6 +266,6 @@ class JobApplicationCommentFactory(factory.django.DjangoModelFactory):
 
     job_application = factory.SubFactory(JobApplicationFactory)
     created_at = factory.LazyFunction(datetime.now)
-    created_by = factory.SubFactory(EmployerFactory)  # Usually a member of the company, but he might have left
+    created_by = factory.SubFactory(ProfessionalFactory)  # Usually a member of the company, but he might have left
     message = factory.Faker("sentence", nb_words=40)
     company = factory.SelfAttribute(".job_application.to_company")

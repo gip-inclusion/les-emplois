@@ -14,7 +14,13 @@ from itou.communications.dispatch.utils import (
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 class TestBaseNotification:
@@ -67,7 +73,7 @@ class TestBaseNotification:
         notifications_registry.unregister(NonManageableNonApplicableNotification)
 
     def setup_method(self):
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr")
         self.organization = self.user.prescriberorganization_set.first()
 
     def test_method_init(self):
@@ -182,7 +188,7 @@ class TestBaseNotification:
         }
 
     def test_method_get_context_employer(self):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         company = CompanyMembershipFactory(user=user).company
         assert BaseNotification(user, company).get_context() == {
             "user": user,
@@ -221,7 +227,7 @@ class TestEmailNotification:
         notifications_registry.unregister(FakeEmailNotification)
 
     def setup_method(self):
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr")
         self.organization = self.user.prescriberorganization_set.first()
 
     def test_method_build(self, email_notification):
@@ -242,17 +248,17 @@ class TestEmailNotification:
         self.user.prescribermembership_set.update(is_active=False)
 
         admin_1 = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user
         admin_2 = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user
         PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=False,
         )
@@ -275,22 +281,22 @@ class TestEmailNotification:
     def test_method_send_for_employer_that_left_his_company(
         self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         company = user.companymembership_set.first().company
         user.companymembership_set.update(is_active=False)
 
         admin_1 = CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=True,
         ).user
         admin_2 = CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=True,
         ).user
         CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=False,
         )
@@ -319,7 +325,7 @@ class TestEmailNotification:
 
         # But we still forward it if the user left his organozation
         admin = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user
@@ -333,12 +339,12 @@ class TestEmailNotification:
 class TestProfiledNotification:
     def setup_method(self):
         self.job_seeker = JobSeekerFactory()
-        self.employer = EmployerFactory(membership=True)
+        self.employer = EmployerFactory()
         self.employer_structure = self.employer.company_set.first()
-        self.prescriber = PrescriberFactory(membership=True)
+        self.prescriber = PrescriberFactory()
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
-        self.prescriber_single = PrescriberFactory(membership=False)
-        self.labor_inspector = LaborInspectorFactory(membership=True)
+        self.prescriber_single = PrescriberFactory()
+        self.labor_inspector = LaborInspectorFactory()
         self.institution = self.labor_inspector.institution_set.first()
 
         class TestJobSeekerNotification(JobSeekerNotification, BaseNotification):

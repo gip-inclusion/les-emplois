@@ -1,4 +1,3 @@
-import random
 from datetime import date
 
 import pytest
@@ -9,14 +8,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.communications.models import AnnouncementCampaign, UserKindTag
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-    random_user_kind_factory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, random_pro_user_factory, random_user_kind_factory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -193,15 +185,7 @@ class TestRenderAnnouncementCampaign:
             user_kind_tags=[UserKindTag.PRESCRIBER, UserKindTag.EMPLOYER],
         )
 
-        client.force_login(
-            random.choice(
-                [
-                    PrescriberFactory(membership=True),
-                    EmployerFactory(membership=True),
-                    LaborInspectorFactory(membership=True),
-                ]
-            )
-        )
+        client.force_login(random_pro_user_factory())
         response = client.get(reverse("search:employers_results"))
         assert response.status_code == 200
         content = parse_response_to_soup(response, "#news-modal")

@@ -30,7 +30,7 @@ class TestSearchServices:
         assertContains(response, "Rechercher un service d'insertion")
 
     def test_home_connected(self, client):
-        client.force_login(EmployerFactory(membership=True))
+        client.force_login(EmployerFactory())
         with pytest.warns(RuntimeWarning, match="Access to 'search_services_home' while authenticated"):
             response = client.get(reverse("search:services_home"))
         assertRedirects(response, reverse("search:services_results"))
@@ -87,7 +87,7 @@ class TestSearchServices:
         vannes = create_city_vannes()
         ServiceFactory(coordinates=vannes.coords, city="Vannes")
         job_seeker = JobSeekerFactory()
-        client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
 
         response = client.get(
             self.URL, {"city": vannes.slug, "category": CATEGORY, "job_seeker_public_id": job_seeker.public_id}

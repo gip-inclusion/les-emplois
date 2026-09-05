@@ -27,7 +27,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
@@ -114,12 +114,12 @@ def test_queries(client, snapshot):
 
 
 def test_as_unauthorized_prescriber(client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
-        job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
+        job_seeker__created_by=ProfessionalFactory(),  # to check for useless queries
         job_seeker__with_mocked_address=True,
         sender=prescriber,
         with_iae_eligibility_diagnosis=True,
@@ -152,7 +152,7 @@ def test_filtered_by_state(client):
     Thibault wants to filter a list of job applications
     by the default initial state.
     """
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_application, *others = JobApplicationFactory.create_batch(
         3, sent_by_prescriber_alone=True, sender=prescriber, state=factory.Iterator(JobApplicationWorkflow.states)
     )
@@ -184,7 +184,7 @@ def test_filtered_by_sender(client):
     assertNotContains(response, INVALID_VALUE_MESSAGE)
 
     # Test with invalid value
-    response = client.get(reverse("apply:list_prescriptions"), {"senders": PrescriberFactory().pk})
+    response = client.get(reverse("apply:list_prescriptions"), {"senders": ProfessionalFactory().pk})
     assertContains(response, INVALID_VALUE_MESSAGE)
 
 
@@ -216,7 +216,7 @@ def test_filtered_by_job_seeker(client):
 
 
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     application = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
@@ -253,7 +253,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
 
 
 def test_filtered_by_company(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_application, *others = JobApplicationFactory.create_batch(3, sent_by_prescriber_alone=True, sender=prescriber)
     client.force_login(prescriber)
 
@@ -287,7 +287,7 @@ def test_filtered_by_eligibility_state_prescriber(client):
 
 
 def test_filters(client, snapshot):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions"))
     assert response.status_code == 200
@@ -296,7 +296,7 @@ def test_filters(client, snapshot):
 
 
 def test_archived(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     active = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     archived = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, archived_at=timezone.now())
     archived_badge_html = """\
@@ -348,7 +348,7 @@ def test_archived(client):
 
 
 def test_htmx_filters(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, state=JobApplicationState.ACCEPTED)
     client.force_login(prescriber)
 
@@ -384,7 +384,7 @@ def test_empty_snapshot(client, snapshot):
 
 
 def test_exports_as_prescriber(client):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
     assert_previous_step(response, reverse("dashboard:index"))
@@ -414,7 +414,7 @@ def test_exports_as_employer(client):
 
 
 def test_exports_back_to_list(client):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
 
     response = client.get(
         reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
@@ -1016,7 +1016,7 @@ class TestAutocomplete:
     ]
 
     def test_invalid_access(self, client):
-        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+        for user in [JobSeekerFactory(), LaborInspectorFactory()]:
             client.force_login(user)
             for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
                 response = client.get(
@@ -1027,7 +1027,7 @@ class TestAutocomplete:
     def test_as_prescriber(self, client, snapshot):
         org = PrescriberOrganizationFactory(authorized=True)
         prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
-        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(prescriber)
 
         job_application = JobApplicationFactory(
@@ -1041,7 +1041,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             sender_prescriber_organization=org,
-            sender=other_prescriber,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1105,7 +1105,7 @@ class TestAutocomplete:
     def test_as_unauthorized_prescriber(self, client):
         org = PrescriberOrganizationFactory()
         prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
-        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(prescriber)
 
         job_application = JobApplicationFactory(
@@ -1119,7 +1119,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_prescriber=True,
             sender_prescriber_organization=org,
-            sender=other_prescriber,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1128,7 +1128,7 @@ class TestAutocomplete:
         third_application = JobApplicationFactory(
             sent_by_prescriber=True,
             sender_prescriber_organization=org,
-            sender=PrescriberFactory(first_name="John", last_name="Black"),
+            sender=ProfessionalFactory(first_name="John", last_name="Black"),
             job_seeker=job_seeker,
         )
 
@@ -1177,7 +1177,7 @@ class TestAutocomplete:
     def test_as_employer(self, client, snapshot):
         company = CompanyFactory()
         employer = CompanyMembershipFactory(company=company, user__first_name="John", user__last_name="Doe").user
-        other_employer = EmployerFactory(first_name="Jane", last_name="Doe")
+        other_professional = ProfessionalFactory(first_name="Jane", last_name="Doe")
         client.force_login(employer)
 
         job_application = JobApplicationFactory(
@@ -1191,7 +1191,7 @@ class TestAutocomplete:
         other_job_application = JobApplicationFactory(
             sent_by_employer=True,
             sender_company=company,
-            sender=other_employer,
+            sender=other_professional,
             job_seeker__first_name="Robert",
             job_seeker__last_name="Cooledge",
             to_company__brand="Entreprise B",
@@ -1199,7 +1199,7 @@ class TestAutocomplete:
         third_application = JobApplicationFactory(
             sent_by_employer=True,
             sender_company=company,
-            sender=EmployerFactory(first_name="Jim", last_name="Beam"),
+            sender=ProfessionalFactory(first_name="Jim", last_name="Beam"),
             job_seeker__first_name="Roger",
             job_seeker__last_name="Smith",
             to_company__brand="Société C",

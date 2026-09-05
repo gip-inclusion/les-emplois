@@ -17,7 +17,13 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 def test_selected_criteria_inline(admin_client):
@@ -102,10 +108,10 @@ class TestAdminForm:
 
     def user_factory(self, kind, author_kind):
         if author_kind == AuthorKind.PRESCRIBER:
-            return PrescriberFactory(membership=True, membership__organization__authorized=True)
+            return PrescriberFactory(membership__organization__authorized=True)
         if kind == "iae":
-            return EmployerFactory(membership=True, membership__company__subject_to_iae_rules=True)
-        return EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ)
+            return EmployerFactory(membership__company__subject_to_iae_rules=True)
+        return EmployerFactory(membership__company__kind=CompanyKind.GEIQ)
 
     def get_diag_model(self, kind):
         if kind == "iae":
@@ -147,7 +153,7 @@ class TestAdminForm:
         assert diagnostic.administrative_criteria.count() == 1
 
     def test_add_eligibility_diagnostic_no_criteria(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        author = PrescriberFactory(membership__organization__authorized=True)
         post_data = self.build_post_data(
             kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
         )
@@ -159,9 +165,9 @@ class TestAdminForm:
         assert diagnostic.administrative_criteria.count() == 0
 
     def test_add_eligibility_diagnostic_bad_job_seeker(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        author = PrescriberFactory(membership__organization__authorized=True)
         post_data = self.build_post_data(
-            kind, author, AuthorKind.PRESCRIBER, PrescriberFactory(), with_administrative_criteria=False
+            kind, author, AuthorKind.PRESCRIBER, ProfessionalFactory(), with_administrative_criteria=False
         )
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -185,7 +191,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_bad_author_kind(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
+        author = PrescriberFactory(membership__organization__authorized=True)
         post_data = self.build_post_data(
             kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
         )
@@ -200,7 +206,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_bad_membership(self, admin_client, kind):
-        author = PrescriberFactory(membership=True)
+        author = PrescriberFactory()
         post_data = self.build_post_data(
             kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
         )
@@ -215,7 +221,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind):
-        author = PrescriberFactory(membership=True)
+        author = PrescriberFactory()
         post_data = self.build_post_data(
             kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
         )
@@ -241,7 +247,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_employer_bad_company_kind(self, admin_client, kind):
-        author = EmployerFactory(membership=True)
+        author = EmployerFactory()
         post_data = self.build_post_data(
             kind, author, AuthorKind.EMPLOYER, JobSeekerFactory(), with_administrative_criteria=False
         )

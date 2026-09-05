@@ -57,9 +57,9 @@
                       <p>
                           Vous êtes connecté(e) en tant que
                           <b>
-                              DOE John
+                              D'ORLÉANS Jeanne
                           </b>
-                          (john.doe@test.local)
+                          (jeanne.d.oreans@test.local)
                       </p>
                       <p class="mb-0">
                           1 collaborateur (dont 1 administrateur)
@@ -90,7 +90,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          DOE John
+                                          D'ORLÉANS Jeanne
                                           <button class="badge badge-xs rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
                                               Admin
                                               <span class="visually-hidden">
@@ -99,8 +99,8 @@
                                           </button>
                                       </td>
                                       <td>
-                                          <a class="btn-link" href="mailto:john.doe@test.local">
-                                              john.doe@test.local
+                                          <a class="btn-link" href="mailto:jeanne.d.oreans@test.local">
+                                              jeanne.d.oreans@test.local
                                           </a>
                                       </td>
                                       <td>

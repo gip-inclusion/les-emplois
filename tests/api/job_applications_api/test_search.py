@@ -16,13 +16,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from tests.api.utils import _str_with_tz
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
 
 
 VALID_SEARCH_DATA = {
@@ -92,9 +86,7 @@ class TestJobApplicationSearchApi:
         "user_factory",
         [
             lambda: JobSeekerFactory(),
-            lambda: PrescriberFactory(),
-            lambda: EmployerFactory(),
-            lambda: LaborInspectorFactory(),
+            ProfessionalFactory,
             lambda: ItouStaffFactory(is_superuser=True),
         ],
     )

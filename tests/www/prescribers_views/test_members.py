@@ -13,7 +13,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -24,16 +24,11 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), False],
-            [partial(PrescriberFactory, membership=True), True],
-            [partial(LaborInspectorFactory, membership=True), False],
+            [EmployerFactory, False],
+            [PrescriberFactory, True],
+            [LaborInspectorFactory, False],
         ],
-        ids=[
-            "job_seeker",
-            "employer",
-            "prescriber",
-            "labor_inspector",
-        ],
+        ids=["job_seeker", "employer", "prescriber", "labor_inspector"],
     )
     def test_permission(self, client, factory, access):
         user = factory()
@@ -243,7 +238,7 @@ class TestUserMembershipDeactivation:
         Non-admin user can't change memberships
         """
         organization = PrescriberOrganizationFactory(with_membership=True)
-        guest = PrescriberFactory()
+        guest = ProfessionalFactory()
         organization.members.add(guest)
 
         client.force_login(guest)
@@ -271,7 +266,7 @@ class TestUserMembershipDeactivation:
     def test_deactivate_non_member(self, client, method, mailoutbox):
         organization = PrescriberOrganizationFactory()
         admin_membership = PrescriberMembershipFactory(organization=organization, is_admin=True)
-        other_user = PrescriberFactory()
+        other_user = ProfessionalFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_user.public_id}))

@@ -10,7 +10,13 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.nexus.factories import NexusUserFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_static_hash
 
 
@@ -31,7 +37,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 EmployerFactory,
-                membership=True,
                 membership__company__for_snapshot=True,
                 membership__company__not_in_territorial_experimentation=True,
             ),
@@ -40,7 +45,6 @@ def test_navigation_not_authenticated(snapshot, client):
         pytest.param(
             partial(
                 LaborInspectorFactory,
-                membership=True,
                 membership__institution__name="ACME Inc.",
             ),
             id="LaborInspector",
@@ -64,9 +68,7 @@ def test_navigation_not_authenticated(snapshot, client):
             id="PrescriberWithAuthorizedOrganization",
         ),
         pytest.param(
-            partial(
-                PrescriberFactory,
-            ),
+            ProfessionalFactory,
             id="ProfessionalWithoutOrganization",
         ),
     ],
@@ -118,7 +120,7 @@ def test_nav_dropdown_with_multiple_org_types(snapshot, client):
 
 @pytest.mark.parametrize("case", ["default", "no_proconnect", "all_activated"])
 def test_nexus_dropdown(snapshot, client, case, pro_connect):
-    user = PrescriberFactory(
+    user = ProfessionalFactory(
         for_snapshot=True,
         identity_provider=IdentityProvider.DJANGO if case == "no_proconnect" else IdentityProvider.PRO_CONNECT,
     )

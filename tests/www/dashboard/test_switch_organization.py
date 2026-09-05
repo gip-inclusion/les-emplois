@@ -3,9 +3,9 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertRedirects
 
 from tests.companies.factories import CompanyFactory
-from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.prescribers import factories as prescribers_factories
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory, random_pro_user_factory
 
 
 class TestSwitchCompany:
@@ -142,10 +142,7 @@ class TestSwitchOrganization:
     def test_not_allowed_user(self, client):
         organization = prescribers_factories.PrescriberOrganizationFactory()
 
-        for user in (
-            JobSeekerFactory(),
-            PrescriberFactory(membership=True),
-        ):
+        for user in (JobSeekerFactory(), random_pro_user_factory()):
             client.force_login(user)
             url = reverse("dashboard:switch_organization")
             response = client.post(url, data={"organization_key": organization.organization_switch_key})
@@ -154,7 +151,7 @@ class TestSwitchOrganization:
     def test_usual_case(self, client):
         url = reverse("dashboard:switch_organization")
 
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         orga1 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
         orga2 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
         client.force_login(user)
@@ -176,7 +173,7 @@ class TestSwitchOrganization:
     def test_bad_request(self, client):
         url = reverse("dashboard:switch_organization")
 
-        user = PrescriberFactory()
+        user = ProfessionalFactory()
         prescribers_factories.PrescriberMembershipFactory(user=user)
         prescribers_factories.PrescriberMembershipFactory(user=user)
         client.force_login(user)
@@ -206,7 +203,7 @@ class TestSwitchInstitution:
     def test_usual_case(self, client):
         url = reverse("dashboard:switch_organization")
 
-        user = LaborInspectorFactory()
+        user = ProfessionalFactory()
         institution1 = InstitutionMembershipFactory(user=user).institution
         institution2 = InstitutionMembershipFactory(user=user).institution
         client.force_login(user)
@@ -228,7 +225,7 @@ class TestSwitchInstitution:
     def test_bad_request(self, client):
         url = reverse("dashboard:switch_organization")
 
-        user = LaborInspectorFactory()
+        user = ProfessionalFactory()
         InstitutionMembershipFactory(user=user).institution
         InstitutionMembershipFactory(user=user).institution
         client.force_login(user)

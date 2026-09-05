@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestConfirmAdminRole.test_promotes_user_to_admin[add_admin email body]
   '''
-  Bonjour John DOE
+  Bonjour Jean MICHEL
   
   Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation ACME Inc. (EI) sur Les emplois de l’inclusion.
   
@@ -81,9 +81,9 @@
                       <p>
                           Vous êtes connecté(e) en tant que
                           <b>
-                              DOE John
+                              MICHEL Jean
                           </b>
-                          (john.doe@test.local)
+                          (jean.michel@test.local)
                       </p>
                       <div class="c-info mb-3 mb-md-4">
                           <span class="c-info__summary">
@@ -134,7 +134,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          DOE John
+                                          MICHEL Jean
                                           <button class="badge badge-xs rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
                                               Admin
                                               <span class="visually-hidden">
@@ -143,8 +143,8 @@
                                           </button>
                                       </td>
                                       <td>
-                                          <a class="btn-link" href="mailto:john.doe@test.local">
-                                              john.doe@test.local
+                                          <a class="btn-link" href="mailto:jean.michel@test.local">
+                                              jean.michel@test.local
                                           </a>
                                       </td>
                                       <td>
@@ -172,13 +172,13 @@
   '''
   Bonjour,
   
-  John DOE identifié avec l'adresse email john.doe@test.local souhaite devenir administrateur de la structure ACME Inc. (EI).
+  Jean MICHEL identifié avec l'adresse email jean.michel@test.local souhaite devenir administrateur de la structure ACME Inc. (EI).
   
   Ce statut permet d'avoir accès à certaines fonctionnalités, la liste complète est disponible ici : https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409.
   
-  Pour des raisons de sécurité nous vous invitons à vérifier que cette demande émane bien de John DOE.
+  Pour des raisons de sécurité nous vous invitons à vérifier que cette demande émane bien de Jean MICHEL.
   
-  Cliquez sur le lien suivant pour attribuer le statut d'administrateur à John DOE - john.doe@test.local :
+  Cliquez sur le lien suivant pour attribuer le statut d'administrateur à Jean MICHEL - jean.michel@test.local :
   http://localhost:8000/company/confirm_admin_role/1000/d2f6o0-d1d01e00e170c0d5fd20
   
   Si vous ne souhaitez pas donner suite à cette demande, merci de ne pas prendre en compte ce message.

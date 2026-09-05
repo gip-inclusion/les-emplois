@@ -51,11 +51,10 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import excel_date_format, get_request, get_rows_from_streaming_response
 
@@ -172,7 +171,7 @@ class TestJobApplicationModel:
 
     def test_application_on_non_job_seeker(self):
         with pytest.raises(ValidationError) as excinfo:
-            JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=PrescriberFactory()).clean()
+            JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=ProfessionalFactory()).clean()
         assert "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat" in str(
             excinfo.value
         )
@@ -283,7 +282,7 @@ class TestJobApplicationModel:
             lambda: JobApplicationFactory(
                 sent_by_employer=True,
                 sender_company=None,
-                sender=EmployerFactory(),
+                sender=ProfessionalFactory(),
             ),
             "employer_sender_coherence",
             id="sent_by_employer_without_company",
@@ -298,7 +297,7 @@ class TestJobApplicationModel:
         pytest.param(
             lambda: JobApplicationFactory(
                 sent_by_employer=True,
-                sender=EmployerFactory(),
+                sender=ProfessionalFactory(),
                 sender_company=None,
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             ),
@@ -560,7 +559,7 @@ def test_prescriptions_of_for_employer_without_company():
 
 def test_prescriptions_of_for_employer_is_based_on_company():
     job_application = JobApplicationFactory(sent_by_another_employer=True)
-    dummy_employer = EmployerFactory.build()
+    dummy_employer = ProfessionalFactory.build()
     assert list(JobApplication.objects.prescriptions_of(dummy_employer, job_application.sender_company)) == [
         job_application
     ]
@@ -1085,7 +1084,7 @@ class TestJobApplicationQuerySet:
 
     def test_is_active_company_member(self):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         assert JobApplication.objects.is_active_company_member(user).count() == 0
 
         job_application.to_company.add_or_activate_membership(user)
@@ -2230,7 +2229,7 @@ class TestJobApplicationWorkflow:
         for job_application in user.job_applications.all():
             mailoutbox.clear()
             with django_capture_on_commit_callbacks(execute=True):
-                job_application.refuse(user=EmployerFactory())
+                job_application.refuse(user=ProfessionalFactory())
             # Check sent email.
             assert len(mailoutbox) == 1
             assert "Candidature déclinée" in mailoutbox[0].subject
@@ -2634,7 +2633,7 @@ class TestJobApplicationXlsxExport:
                 "Candidature spontanée",
                 "Ma structure",
                 "",
-                "John DOE",
+                "Jean MICHEL",
                 datetime.datetime(2024, 7, 5),
                 "Candidature acceptée",
                 datetime.datetime(2024, 7, 5),
@@ -2962,7 +2961,7 @@ class TestJobApplicationAdminForm:
 
     def test_application_on_non_job_seeker(self):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
-        job_application.job_seeker = PrescriberFactory()
+        job_application.job_seeker = ProfessionalFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."] == form.errors[

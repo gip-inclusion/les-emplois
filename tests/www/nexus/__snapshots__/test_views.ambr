@@ -822,11 +822,11 @@
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
-                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                           <i aria-hidden="true" class="ri-account-circle-line">
                           </i>
                           <span class="visually-hidden">
-                              John D.
+                              James B.
                           </span>
                       </span>
                       <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
@@ -946,11 +946,11 @@
                   <hr/>
                   <ul>
                       <li>
-                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                               <i aria-hidden="true" class="ri-account-circle-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  John D.
+                                  James B.
                               </span>
                           </span>
                       </li>
@@ -1010,11 +1010,11 @@
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
-                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                           <i aria-hidden="true" class="ri-account-circle-line">
                           </i>
                           <span class="visually-hidden">
-                              John D.
+                              James B.
                           </span>
                       </span>
                       <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
@@ -1134,11 +1134,11 @@
                   <hr/>
                   <ul>
                       <li>
-                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                               <i aria-hidden="true" class="ri-account-circle-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  John D.
+                                  James B.
                               </span>
                           </span>
                       </li>
@@ -1198,11 +1198,11 @@
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
-                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                           <i aria-hidden="true" class="ri-account-circle-line">
                           </i>
                           <span class="visually-hidden">
-                              John D.
+                              James B.
                           </span>
                       </span>
                       <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
@@ -1271,9 +1271,6 @@
                                   <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                       Fiches de poste
                                   </span>
-                                  <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
-                                      0
-                                  </span>
                               </a>
                           </li>
                           <li>
@@ -1322,11 +1319,11 @@
                   <hr/>
                   <ul>
                       <li>
-                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="john.doe@test.local" data-bs-toggle="tooltip">
+                          <span aria-label="Accéder à votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="jamse.bond@test.local" data-bs-toggle="tooltip">
                               <i aria-hidden="true" class="ri-account-circle-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
-                                  John D.
+                                  James B.
                               </span>
                           </span>
                       </li>

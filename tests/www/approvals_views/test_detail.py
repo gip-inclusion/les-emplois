@@ -41,7 +41,7 @@ class TestApprovalDetailView:
     def test_wrong_user_type(self, client):
         approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
-        user = LaborInspectorFactory(membership=True)
+        user = LaborInspectorFactory()
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
@@ -564,14 +564,12 @@ class TestContractView:
         url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
 
         for user in [
-            LaborInspectorFactory(membership=True),
+            LaborInspectorFactory(),
             JobSeekerFactory(),  # random job seeker
             approval.user,  # The approval job seeker
             job_application.sender,  # non authorized prescriber linked to the approval's job seeker
-            PrescriberFactory(
-                membership=True, membership__organization__authorized=True
-            ),  # random authorized prescriber
-            EmployerFactory(membership=True),  # random employer
+            PrescriberFactory(membership__organization__authorized=True),  # random authorized prescriber
+            EmployerFactory(),  # random employer
         ]:
             client.force_login(user)
             response = client.get(url)

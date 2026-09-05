@@ -22,13 +22,7 @@ from tests.insertion.factories import (
     StructureFactory,
 )
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
 
 
 @pytest.mark.no_django_db
@@ -285,7 +279,7 @@ class TestMobilizationEvent:
 
         with transaction.atomic():
             with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
-                MobilizationEventFactory(user=EmployerFactory())
+                MobilizationEventFactory(user=ProfessionalFactory())
 
     def test_service_external_link_coherence(self):
         service = ServiceFactory()
@@ -310,8 +304,8 @@ class TestMobilizationEvent:
         "user_factory,organization_factory",
         [
             (None, None),
-            (PrescriberFactory, PrescriberOrganizationFactory),
-            (EmployerFactory, CompanyFactory),
+            (ProfessionalFactory, PrescriberOrganizationFactory),
+            (ProfessionalFactory, CompanyFactory),
         ],
     )
     @pytest.mark.parametrize(
@@ -337,7 +331,7 @@ class TestMobilizationEvent:
         assert MobilizationEvent.objects.filter(session_key="session123", kind=kind).count() == 1
 
     def test_create_mobilization_event_bad_user_kind(self):
-        user = random.choice([JobSeekerFactory(), ItouStaffFactory(), LaborInspectorFactory()])
+        user = random.choice([JobSeekerFactory(), ItouStaffFactory(), ProfessionalFactory()])
         MobilizationEvent.objects.create_mobilization_event(
             session_key="session123",
             kind=MobilizationEventKind.STRUCTURE_CONTACT,

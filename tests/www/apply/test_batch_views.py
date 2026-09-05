@@ -19,7 +19,7 @@ class TestBatchArchive:
     def test_invalid_access(self, client):
         archivable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.REFUSED)
         assert archivable_app.can_be_archived
-        for user in [archivable_app.job_seeker, archivable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [archivable_app.job_seeker, archivable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(reverse("apply:batch_archive"), data={"application_ids": [archivable_app.pk]})
             assert response.status_code == 403
@@ -270,7 +270,7 @@ class TestBatchAddToPool:
     def test_invalid_access(self, client):
         addable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.PROCESSING)
         assert addable_app.add_to_pool.is_available()
-        for user in [addable_app.job_seeker, addable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [addable_app.job_seeker, addable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(
                 reverse("apply:batch_add_to_pool"),
@@ -568,7 +568,7 @@ class TestBatchPostpone:
     def test_invalid_access(self, client):
         postponable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.PROCESSING)
         assert postponable_app.postpone.is_available()
-        for user in [postponable_app.job_seeker, postponable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [postponable_app.job_seeker, postponable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(
                 reverse("apply:batch_postpone"),
@@ -866,7 +866,7 @@ class TestBatchProcess:
     def test_invalid_access(self, client):
         processable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         assert processable_app.process.is_available()
-        for user in [processable_app.job_seeker, processable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [processable_app.job_seeker, processable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(reverse("apply:batch_process"))
             assert response.status_code == 403
@@ -1116,7 +1116,7 @@ class TestBatchRefuse:
     def test_invalid_access(self, client):
         refusable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         assert refusable_app.refuse.is_available()
-        for user in [refusable_app.job_seeker, refusable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [refusable_app.job_seeker, refusable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(
                 reverse("apply:batch_refuse"),
@@ -1707,7 +1707,7 @@ class TestBatchTransfer:
         transferable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         company = CompanyFactory(with_membership=True)
         assert transferable_app.transfer.is_available()
-        for user in [transferable_app.job_seeker, transferable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [transferable_app.job_seeker, transferable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(
                 reverse("apply:batch_transfer"),
@@ -1988,7 +1988,7 @@ class TestBatchUnarchive:
         unarchivable_app = JobApplicationFactory(
             sent_by_prescriber=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
         )
-        for user in [unarchivable_app.job_seeker, unarchivable_app.sender, LaborInspectorFactory(membership=True)]:
+        for user in [unarchivable_app.job_seeker, unarchivable_app.sender, LaborInspectorFactory()]:
             client.force_login(user)
             response = client.post(reverse("apply:batch_unarchive"), data={"application_ids": [unarchivable_app.pk]})
             assert response.status_code == 403

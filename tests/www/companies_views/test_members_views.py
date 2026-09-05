@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -16,7 +14,7 @@ from tests.companies.factories import (
     EmployerFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -27,9 +25,9 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), True],
-            [partial(PrescriberFactory, membership=True), False],
-            [partial(LaborInspectorFactory, membership=True), False],
+            [EmployerFactory, True],
+            [PrescriberFactory, False],
+            [LaborInspectorFactory, False],
         ],
         ids=[
             "job_seeker",
@@ -254,7 +252,7 @@ class TestUserMembershipDeactivation:
     def test_deactivate_non_member(self, client, method, mailoutbox):
         company = CompanyFactory()
         admin_membership = CompanyMembershipFactory(company=company, is_admin=True)
-        other_user = EmployerFactory()
+        other_user = ProfessionalFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(reverse("companies_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
@@ -516,7 +514,7 @@ class TestRequestAdminRole:
         assert response.status_code == 403
 
     def test_post_requires_employer(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         client.force_login(user)
         response = client.post(self.URL)
         assert response.status_code == 403

@@ -1,5 +1,4 @@
 import datetime
-import functools
 import random
 import string
 
@@ -120,10 +119,23 @@ class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF
 
 
-class PrescriberFactory(UserFactory):
+class ProfessionalFactory(UserFactory):
+    """A pro user with no membership"""
+
     kind = UserKind.PROFESSIONAL
     identity_provider = IdentityProvider.PRO_CONNECT
 
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="James",
+            last_name="Bond",
+            email="jamse.bond@test.local",
+            public_id="2e93b0aa-67c5-47cb-bd8d-52655209e161",
+            phone="0700700700",
+        )
+
+
+class PrescriberFactory(ProfessionalFactory):
     class Params:
         for_snapshot = factory.Trait(
             first_name="Pierre",
@@ -135,13 +147,15 @@ class PrescriberFactory(UserFactory):
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
-        if not create:
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
+
+        if not create or extracted is False:
             return
 
-        if extracted or kwargs:
-            from tests.prescribers.factories import PrescriberMembershipFactory
+        from tests.prescribers.factories import PrescriberMembershipFactory
 
-            PrescriberMembershipFactory(user=self, **kwargs)
+        PrescriberMembershipFactory(user=self, **kwargs)
 
     @factory.post_generation
     def with_disabled_notifications(obj, create, extracted, **kwargs):
@@ -153,16 +167,27 @@ class PrescriberFactory(UserFactory):
             settings.disabled_notifications.set(NotificationRecord.objects.all())
 
 
-class EmployerFactory(UserFactory):
-    kind = UserKind.PROFESSIONAL
-    identity_provider = IdentityProvider.PRO_CONNECT
+class EmployerFactory(ProfessionalFactory):
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Jean",
+            last_name="Michel",
+            email="jean.michel@test.local",
+            public_id="555457a3-0c12-4ad8-80bc-e0a351ce015e",
+            phone="0701020304",
+        )
 
     @factory.post_generation
-    def membership(self, created, extracted, **kwargs):
+    def membership(self, create, extracted, **kwargs):
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
+
+        if not create or extracted is False:
+            return
+
         from tests.companies.factories import CompanyMembershipFactory
 
-        if created and extracted is True:
-            CompanyMembershipFactory(user=self, **kwargs)
+        CompanyMembershipFactory(user=self, **kwargs)
 
     @factory.post_generation
     def with_disabled_notifications(obj, create, extracted, **kwargs):
@@ -174,18 +199,29 @@ class EmployerFactory(UserFactory):
             settings.disabled_notifications.set(NotificationRecord.objects.all())
 
 
-class LaborInspectorFactory(UserFactory):
-    kind = UserKind.PROFESSIONAL
+class LaborInspectorFactory(ProfessionalFactory):
+    identity_provider = IdentityProvider.DJANGO
+
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Jeanne",
+            last_name="d'Orléans",
+            email="jeanne.d.oreans@test.local",
+            public_id="62fefd61-ad4f-4f89-8eab-b3b3d5167538",
+            phone="0611223344",
+        )
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
-        if not create:
+        if extracted is True:
+            raise ValueError("membership=True is the default value, no need to use it anymore")
+
+        if not create or extracted is False:
             return
 
-        if extracted or kwargs:
-            from tests.institutions.factories import InstitutionMembershipFactory
+        from tests.institutions.factories import InstitutionMembershipFactory
 
-            InstitutionMembershipFactory(user=self, **kwargs)
+        InstitutionMembershipFactory(user=self, **kwargs)
 
 
 class JobSeekerFactory(UserFactory):
@@ -440,29 +476,18 @@ def random_user_kind_factory(**kwargs):
     factory = None
     if identity_provider := kwargs.get("identity_provider"):
         if identity_provider == IdentityProvider.PRO_CONNECT:
-            factory = random.choice(
-                [
-                    functools.partial(PrescriberFactory, membership=True),
-                    functools.partial(EmployerFactory, membership=True),
-                ]
-            )
+            factory = random.choice([PrescriberFactory, EmployerFactory])
         elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]:
             factory = JobSeekerFactory
     if factory is None:
         factory = random.choice(
-            [
-                ItouStaffFactory,
-                JobSeekerFactory,
-                functools.partial(PrescriberFactory, membership=True),
-                functools.partial(EmployerFactory, membership=True),
-                functools.partial(LaborInspectorFactory, membership=True),
-            ]
+            [ItouStaffFactory, JobSeekerFactory, PrescriberFactory, EmployerFactory, LaborInspectorFactory]
         )
     return factory(**kwargs)
 
 
-# Temporary method before merging all 3 user kinds
 def random_pro_user_factory(**kwargs):
+    """Return a professional user with a random membership kind"""
     return random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(**kwargs)
 
 
@@ -480,7 +505,7 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    professional = factory.SubFactory(PrescriberFactory, membership=True)
+    professional = factory.SubFactory(PrescriberFactory)
     last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)
 
     @factory.post_generation

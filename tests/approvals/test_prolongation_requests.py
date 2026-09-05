@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import PrescriberFactory, ProfessionalFactory
 
 
 def test_unique_approval_for_pending_constraint():
@@ -157,10 +157,14 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
 ):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     admin_prescribers = PrescriberFactory.create_batch(
-        9, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=True
+        9,
+        membership__organization=prolongation_request.prescriber_organization,
+        membership__is_admin=True,
     )
     regular_prescribers = PrescriberFactory.create_batch(
-        3, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=False
+        3,
+        membership__organization=prolongation_request.prescriber_organization,
+        membership__is_admin=False,
     )
 
     with freeze_time(prolongation_request.created_at + relativedelta(days=30)):
@@ -181,7 +185,7 @@ def test_clean_declared_by_coherence():
     prolongation_request = ProlongationRequestFactory()
     prolongation_request.clean()
 
-    employer = EmployerFactory()
+    employer = ProfessionalFactory()
     prolongation_request.declared_by = employer
     with pytest.raises(ValidationError) as error:
         prolongation_request.clean()

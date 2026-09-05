@@ -23,7 +23,7 @@ from tests.geiq_assessments.factories import (
     EmployeePrequalificationFactory,
 )
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.users.factories import EmployerFactory
+from tests.users.factories import ProfessionalFactory
 
 
 def test_campaign_is_open_property():
@@ -98,7 +98,7 @@ def test_assessment_date_order_constraints():
     ]:
         previous_field_value = getattr(assessment, previous_field)
         if date_field == "submitted_at":
-            assessment.submitted_by = EmployerFactory()
+            assessment.submitted_by = ProfessionalFactory()
             assessment.summary_document_file = FileFactory()
             assessment.action_financial_assessment_file = FileFactory()
             assessment.structure_financial_assessment_file = FileFactory()
@@ -136,7 +136,7 @@ def test_assessment_full_submission_or_no_submission_constraint():
             assessment.state = AssessmentState.SUBMITTED
             assessment.save()
     # Add required submission fields
-    assessment.submitted_by = EmployerFactory()
+    assessment.submitted_by = ProfessionalFactory()
     assessment.summary_document_file = FileFactory()
     assessment.structure_financial_assessment_file = FileFactory()
     assessment.action_financial_assessment_file = FileFactory()
@@ -156,7 +156,7 @@ def test_assessment_state_submitted_at_constraint():
             assessment.save()
 
     assessment.submitted_at = timezone.now() + datetime.timedelta(hours=1)
-    assessment.submitted_by = EmployerFactory()
+    assessment.submitted_by = ProfessionalFactory()
     assessment.summary_document_file = FileFactory()
     assessment.structure_financial_assessment_file = FileFactory()
     assessment.action_financial_assessment_file = FileFactory()
@@ -175,7 +175,7 @@ def test_assessment_responsible_persons_legal_commitment_number():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
@@ -201,7 +201,7 @@ def test_assessment_full_or_no_review_constraint():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
@@ -224,7 +224,7 @@ def test_assessment_state_reviewed_at_constraint():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
@@ -253,7 +253,7 @@ def test_assessment_full_or_no_final_review_constraint():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
         reviewed_at=timezone.now() + datetime.timedelta(hours=1),
@@ -280,7 +280,7 @@ def test_assessment_state_final_reviewed_at_constraint():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
         reviewed_at=timezone.now() + datetime.timedelta(hours=1),
@@ -531,7 +531,7 @@ def test_transition_submit():
     assessment = AssessmentFactory(campaign__year=2023, with_submission_requirements=True)
     assert assessment.state == AssessmentState.NEW
 
-    assessment.submit(user=EmployerFactory())
+    assessment.submit(user=ProfessionalFactory())
 
     transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
     assert transition.assessment.state == AssessmentState.SUBMITTED
@@ -548,7 +548,7 @@ def test_transition_review():
             campaign__year=2023,
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=1),
-            submitted_by=EmployerFactory(),
+            submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
             review_comment="Bravo !",
@@ -573,7 +573,7 @@ def test_transition_ask_for_institution_fix():
             campaign__year=2023,
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=1),
-            submitted_by=EmployerFactory(),
+            submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
             review_comment="Bravo !",
@@ -606,7 +606,7 @@ def test_transition_ask_for_geiq_fix():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
@@ -636,7 +636,7 @@ def test_transition_ask_for_geiq_fix():
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
         review_comment="Bravo !",
@@ -690,7 +690,7 @@ def test_transition_ask_for_institution_or_geiq_fix_with_errors(transition, from
         campaign__year=2023,
         with_submission_requirements=True,
         submitted_at=timezone.now() + datetime.timedelta(hours=1),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
         **assessment_kwargs,
@@ -728,7 +728,7 @@ def test_transition_final_review(is_reviewed):
             campaign__year=2023,
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=1),
-            submitted_by=EmployerFactory(),
+            submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
             review_comment="Bravo !",

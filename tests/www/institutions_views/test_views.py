@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -14,7 +12,7 @@ from tests.institutions.factories import (
     LaborInspectorFactory,
 )
 from tests.invitations.factories import LaborInspectorInvitationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -25,9 +23,9 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), False],
-            [partial(PrescriberFactory, membership=True), False],
-            [partial(LaborInspectorFactory, membership=True), True],
+            [EmployerFactory, False],
+            [PrescriberFactory, False],
+            [LaborInspectorFactory, True],
         ],
         ids=[
             "job_seeker",
@@ -231,7 +229,7 @@ class TestMembers:
     def test_deactivate_non_member(self, client, method, mailoutbox):
         institution = InstitutionFactory()
         admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
-        other_user = LaborInspectorFactory()
+        other_user = ProfessionalFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(reverse("institutions_views:deactivate_member", kwargs={"public_id": other_user.public_id}))

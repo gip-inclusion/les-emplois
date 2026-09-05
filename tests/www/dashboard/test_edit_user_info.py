@@ -1,6 +1,5 @@
 import math
 from datetime import UTC, date, datetime
-from functools import partial
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -790,7 +789,6 @@ class TestEditUserInfoView:
             first_name="Not Bob",
             last_name="Not Saint Clair",
             phone="0600000000",
-            membership=True,
         )
         client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")
@@ -824,7 +822,7 @@ class TestEditUserInfoView:
         [
             (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT),
             (JobSeekerFactory, IdentityProvider.FT_CONNECT),
-            (partial(PrescriberFactory, membership=True), IdentityProvider.PRO_CONNECT),
+            (PrescriberFactory, IdentityProvider.PRO_CONNECT),
         ],
         ids=[
             "job_seeker_with_france_connect",

@@ -9,11 +9,7 @@ from pytest_django.asserts import assertMessages, assertRedirects
 
 from itou.users.enums import IdentityProvider
 from itou.www.dashboard.forms import EditUserEmailForm
-from tests.users.factories import (
-    DEFAULT_PASSWORD,
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 
 
 class TestChangeEmailView:
@@ -87,7 +83,7 @@ class TestChangeEmailView:
         response = client.get(url)
         assert response.status_code == 403
 
-        prescriber = PrescriberFactory(membership=True)
+        prescriber = PrescriberFactory()
         client.force_login(prescriber)
         response = client.get(url)
         assert response.status_code == 403
