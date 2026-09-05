@@ -8,8 +8,10 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.template.defaultfilters import urlencode
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
@@ -36,6 +38,7 @@ from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
     OrientationFactory,
+    OrientationProcessLinkFactory,
     RemoteReceptionFactory,
     ServiceFactory,
     StructureFactory,
@@ -47,9 +50,16 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    random_user_kind_factory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
+
+
+REL_CANONICAL_MARKUP_FOR_SERVICE_PROVIDER = f"""
+        <link rel="canonical" href="{reverse("insertion_views:orientation_details_for_service_provider")}">
+        """
+META_ROBOTS_MARKUP = '<meta name="robots" content="noindex">'
 
 
 class TestStructures:
@@ -1040,9 +1050,9 @@ class TestServices:
         assertion(response, f'body.set("service_uid", "{service.uid}");')
 
 
-class TestOrientationDetails:
+class TestOrientationDetailsForSender:
     def get_orientation_url(self, orientation):
-        return reverse("insertion_views:orientation_details", kwargs={"orientation_id": orientation.id})
+        return reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
 
     def get_job_seeker_details_url(self, job_seeker):
         return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
@@ -1309,6 +1319,171 @@ class TestOrientationDetails:
                 <span>Accéder au détail du service</span>
             </a>"""
         assertion(response, servce_button_markup, html=True)
+
+    def test_meta_robots_and_canonical_for_sender(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        user = membership.user
+        organization = membership.organization
+
+        orientation = OrientationFactory(
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+        assertContains(response, META_ROBOTS_MARKUP, html=True)
+        assertContains(response, REL_CANONICAL_MARKUP_FOR_SERVICE_PROVIDER, html=True)
+
+
+class TestOrientationDetailsForServiceProvider:
+    def get_process_link_url(self, link):
+        return reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
+
+    @pytest.mark.parametrize("is_authenticated", [True, False])
+    def test_access(self, client, is_authenticated):
+        # Having an account and being authenticated does not prevent accessing the process page.
+        process_link = OrientationProcessLinkFactory()
+        assert process_link.first_opened_at is None
+
+        if is_authenticated:
+            client.force_login(random_user_kind_factory())
+
+        now = timezone.now()
+        with freeze_time(now):
+            response = client.get(self.get_process_link_url(process_link))
+        assert response.status_code == 200
+        process_link.refresh_from_db()
+        assert process_link.first_opened_at == now
+
+        client.get(self.get_process_link_url(process_link))
+        assert response.status_code == 200
+        process_link.refresh_from_db()
+        assert process_link.first_opened_at == now
+
+    @freeze_time("2026-07-24")
+    def test_detail_basic_dora(self, client, snapshot):
+        service = ServiceFactory(
+            uid="source--service",
+            name="S’hair vice",
+            updated_on="2025-01-15",
+            source__value="dora",
+            source__label="Dora",
+            source_link="https://domain.fake/services/test-service-uid",
+            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
+            credentials=["Pièce d'identité en cours de validité"],
+        )
+
+        process_link = OrientationProcessLinkFactory(
+            id="1111111111zzzzzzzzzz3333333333_4",
+            orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            orientation__beneficiary=JobSeekerFactory(for_snapshot=True),
+            orientation__service=service,
+            orientation__sender=PrescriberFactory(for_snapshot=True),
+            orientation__referent_first_name="Lizzy",
+            orientation__referent_last_name="Old",
+            orientation__referent_email="referent@email.fake",
+            orientation__referent_phone="0203040506",
+        )
+
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(self.get_process_link_url(process_link))
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="page")
+
+    @freeze_time("2026-07-24")
+    def test_detail_with_all_fields_dora(self, client, snapshot):
+        service = ServiceFactory(
+            uid="test-service-full-uid",
+            name="Service complet",
+            updated_on="2025-06-01",
+            source__value="dora",
+            access_conditions_dora=["Être orienté par un prescripteur."],
+            mobilizations_details="Contacter le service par téléphone.",
+            contact_email="contact@service.fr",
+            contact_phone="01 23 45 67 89",
+            structure__name="Structure complète",
+            structure__uid="structure-uid",
+        )
+
+        process_link = OrientationProcessLinkFactory(
+            id="1111111111zzzzzzzzzz3333333333_4",
+            orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            orientation__beneficiary=JobSeekerFactory(for_snapshot=True),
+            orientation__sender=EmployerFactory(for_snapshot=True),
+            orientation__service=service,
+            orientation__beneficiary_contact_preferences=[
+                BeneficiaryContactPreference.EMAIL,
+                BeneficiaryContactPreference.PHONE,
+                BeneficiaryContactPreference.OTHER,
+            ],
+            orientation__beneficiary_other_contact_method="courrier postal",
+            orientation__beneficiary_availability=datetime.date(2026, 7, 31),
+            orientation__requirements=["NonAffiché"],
+            orientation__situation=["NonAffiché"],
+            orientation__situation_other="NonAffiché",
+            orientation__referent_first_name="Lizzy",
+            orientation__referent_last_name="Old",
+            orientation__referent_email="referent@email.fake",
+            orientation__referent_phone="0203040506",
+            orientation__orientation_reasons="Pour améliorer l’embauchabilité de cette bénéficiaire.",
+            orientation__status=OrientationStatus.PENDING,
+            orientation__duration_weekly_hours=5,
+            orientation__duration_weeks=8,
+            orientation__data_protection_commitment=False,  # not displayed
+            orientation__attachments=[
+                "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
+            ],
+        )
+
+        response = client.get(self.get_process_link_url(process_link))
+
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="#main",
+                replace_in_attr=[
+                    ("href", process_link.orientation.attachments_details[0][1], "[computed URL of attachment]")
+                ],
+            )
+        ) == snapshot(name="page")
+        assertNotContains(response, "NonAffiché")
+
+    @pytest.mark.parametrize("query", [{}, {"token": ""}, {"token": "bad_token"}])
+    def test_access_without_token_or_bad_token(self, client, query):
+        response = client.get(reverse("insertion_views:orientation_details_for_service_provider", query=query))
+        assert response.status_code == 404
+
+    def test_access_with_old_token(self, client):
+        # TODO: button to send an email with a new link
+        process_link = OrientationProcessLinkFactory(
+            created_at=timezone.now() - datetime.timedelta(days=8)
+        )  # created more than 7 days ago
+        response = client.get(self.get_process_link_url(process_link))
+        assert response.status_code == 403
+
+    @pytest.mark.parametrize("is_active, assertion", [(True, assertContains), (False, assertNotContains)])
+    def test_hide_service_link_if_inactive(self, client, is_active, assertion):
+        service = ServiceFactory(is_active=is_active)
+        process_link = OrientationProcessLinkFactory(orientation__service=service)
+        service_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+
+        response = client.get(self.get_process_link_url(process_link))
+        service_button_markup = f"""
+            <a href="{service_url}?back_url={urlencode(self.get_process_link_url(process_link))}"
+               class="btn btn-lg btn-secondary" data-matomo-event="true"
+               data-matomo-category="orientation-detail" data-matomo-action="clic"
+               data-matomo-option="voir-service">
+                <span>Accéder au détail du service</span>
+            </a>"""
+        assertion(response, service_button_markup, html=True)
+
+    def test_meta_robots_and_canonical_for_service_provider(self, client):
+        process_link = OrientationProcessLinkFactory()
+        response = client.get(self.get_process_link_url(process_link))
+        assertContains(response, META_ROBOTS_MARKUP, html=True)
+        assertContains(response, REL_CANONICAL_MARKUP_FOR_SERVICE_PROVIDER, html=True)
 
 
 class TestOrientationsList:

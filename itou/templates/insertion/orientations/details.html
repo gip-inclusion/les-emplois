@@ -6,6 +6,13 @@
 {% load matomo %}
 {% load str_filters %}
 
+{% block meta_robots %}
+    <meta name="robots" content="noindex">
+{% endblock %}
+{% block canonical %}
+    <link rel="canonical" href="{% url "insertion_views:orientation_details_for_service_provider" %}">
+{% endblock %}
+
 {% block title %}
     Demande d’orientation : {{ orientation.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
@@ -50,7 +57,7 @@
                             <div class="col-12 col-sm">
                                 <h2 class="h3{% if can_view_personal_information %} mb-0{% endif %}">Usager</h2>
                             </div>
-                            {% if can_view_personal_information %}
+                            {% if can_view_personal_information and not can_process %}
                                 <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
                                     <a href="{% url "job_seekers_views:details" public_id=orientation.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                        class="btn btn-ico btn-outline-primary"
@@ -160,32 +167,10 @@
 
                 {# Sidebar #}
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% include "insertion/includes/orientation_service_info.html" with service=orientation.service request=request only %}
-
-                    {% if orientation.service.contact_full_name or orientation.service.contact_email or orientation.service.contact_phone %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Contact</h2>
-                            <ul class="fs-sm list-unstyled mb-0">
-                                {% if orientation.service.contact_full_name %}
-                                    <li>
-                                        <i class="ri-user-line me-2" aria-hidden="true"></i>
-                                        <span>{{ orientation.service.contact_full_name }}</span>
-                                    </li>
-                                {% endif %}
-                                {% if orientation.service.contact_email %}
-                                    <li>
-                                        <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                        <a href="mailto:{{ orientation.service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ orientation.service.contact_email }}</a>
-                                    </li>
-                                {% endif %}
-                                {% if orientation.service.contact_phone %}
-                                    <li>
-                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
-                                        {{ orientation.service.contact_phone|format_phone }}
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
+                    {% if can_process %}
+                        {% include "insertion/includes/orientation_sidebar_for_service_provider.html" with orientation=orientation request=request only %}
+                    {% else %}
+                        {% include "insertion/includes/orientation_sidebar_for_sender.html" with service=orientation.service request=request only %}
                     {% endif %}
                 </div>
             </div>

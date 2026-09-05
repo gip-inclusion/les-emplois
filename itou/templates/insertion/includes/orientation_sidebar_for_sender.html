@@ -1,0 +1,29 @@
+{% load format_filters %}
+
+{% include "insertion/includes/orientation_service_info.html" with service=service request=request only %}
+
+{% if service.contact_full_name or service.contact_email or service.contact_phone %}
+    <div class="c-box mb-3 mb-md-4">
+        <h2 class="h3">Contact</h2>
+        <ul class="fs-sm list-unstyled mb-0">
+            {% if service.contact_full_name %}
+                <li class="d-flex">
+                    <i class="ri-user-line me-2" aria-hidden="true"></i>
+                    <span>{{ service.contact_full_name }}</span>
+                </li>
+            {% endif %}
+            {% if service.contact_email %}
+                <li class="d-flex">
+                    <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                    <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
+                </li>
+            {% endif %}
+            {% if service.contact_phone %}
+                <li class="d-flex">
+                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                    {{ service.contact_phone|format_phone }}
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}

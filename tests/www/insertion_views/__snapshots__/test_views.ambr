@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestOrientationDetails.test_detail_basic_dora[page]
+# name: TestOrientationDetailsForSender.test_detail_basic_dora[page]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -137,7 +137,7 @@
   
   '''
 # ---
-# name: TestOrientationDetails.test_detail_basic_dora[queries]
+# name: TestOrientationDetailsForSender.test_detail_basic_dora[queries]
   dict({
     'num_queries': 13,
     'queries': list([
@@ -374,7 +374,7 @@
       }),
       dict({
         'origin': list([
-          'orientation_details[www/insertion_views/views.py]',
+          'orientation_details_for_sender[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -561,7 +561,7 @@
     ]),
   })
 # ---
-# name: TestOrientationDetails.test_detail_basic_not_dora[page]
+# name: TestOrientationDetailsForSender.test_detail_basic_not_dora[page]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -700,7 +700,7 @@
   
   '''
 # ---
-# name: TestOrientationDetails.test_detail_with_all_fields_dora[page]
+# name: TestOrientationDetailsForSender.test_detail_with_all_fields_dora[page]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -888,17 +888,620 @@
                               Contact
                           </h2>
                           <ul class="fs-sm list-unstyled mb-0">
-                              <li>
+                              <li class="d-flex">
                                   <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
                                   </i>
                                   <a aria-label="Contact par mail" class="text-break" href="mailto:contact@service.fr">
                                       contact@service.fr
                                   </a>
                               </li>
-                              <li>
+                              <li class="d-flex">
                                   <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                                   </i>
                                   01 23 45 67 89
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[page]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-navinfo">
+                          <div class="c-navinfo__info">
+                              Mise à jour le 24/07/2026
+                          </div>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  S’hair vice
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                      En cours de traitement
+                                  </span>
+                              </h1>
+                              <p>
+                                  Demande d’orientation
+                              </p>
+                          </div>
+                          <div class="c-title__cta">
+                              <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/source--service/?back_url=/insertion/orientations/process/%3Ftoken%3D1111111111zzzzzzzzzz3333333333_4">
+                                  <span>
+                                      Accéder au détail du service
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h2 class="h3 mb-0">
+                                      Usager
+                                  </h2>
+                              </div>
+                          </div>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Prénom
+                                  </small>
+                                  <strong>
+                                      Jane
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Nom
+                                  </small>
+                                  <strong>
+                                      DOE
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Adresse e-mail
+                                  </small>
+                                  <strong>
+                                      jane.doe@test.local
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Téléphone
+                                  </small>
+                                  <strong>
+                                      0612345678
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions et critères requis
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  Avoir plus de 18 ans
+                              </li>
+                              <li>
+                                  Résider en France
+                              </li>
+                              <li>
+                                  Pièce d'identité en cours de validité
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Prescripteur
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-user-line me-2">
+                                  </i>
+                                  <span>
+                                      DUPONT Pierre
+                                  </span>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:pierre.dupont@test.local">
+                                      pierre.dupont@test.local
+                                  </a>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  06 12 34 56 78
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conseiller référent
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-user-line me-2">
+                                  </i>
+                                  <span>
+                                      OLD Lizzy
+                                  </span>
+                              </li>
+                              <li class="d-flex">
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:referent@email.fake">
+                                      referent@email.fake
+                                  </a>
+                              </li>
+                              <li class="d-flex">
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  02 03 04 05 06
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[queries]
+  dict({
+    'num_queries': 4,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'orientation_details_for_service_provider[www/insertion_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_orientationprocesslink"."id",
+                 "insertion_orientationprocesslink"."orientation_id",
+                 "insertion_orientationprocesslink"."created_at",
+                 "insertion_orientationprocesslink"."first_opened_at",
+                 "insertion_orientation"."id",
+                 "insertion_orientation"."beneficiary_id",
+                 "insertion_orientation"."sender_id",
+                 "insertion_orientation"."sender_kind",
+                 "insertion_orientation"."sender_prescriber_organization_id",
+                 "insertion_orientation"."sender_company_id",
+                 "insertion_orientation"."service_id",
+                 "insertion_orientation"."beneficiary_contact_preferences",
+                 "insertion_orientation"."beneficiary_other_contact_method",
+                 "insertion_orientation"."beneficiary_availability",
+                 "insertion_orientation"."requirements",
+                 "insertion_orientation"."situation",
+                 "insertion_orientation"."situation_other",
+                 "insertion_orientation"."referent_last_name",
+                 "insertion_orientation"."referent_first_name",
+                 "insertion_orientation"."referent_phone",
+                 "insertion_orientation"."referent_email",
+                 "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."status",
+                 "insertion_orientation"."processing_date",
+                 "insertion_orientation"."duration_weekly_hours",
+                 "insertion_orientation"."duration_weeks",
+                 "insertion_orientation"."data_protection_commitment",
+                 "insertion_orientation"."attachments",
+                 "insertion_orientation"."created_at",
+                 "insertion_orientation"."updated_at",
+                 "insertion_orientation"."dora_status_updated_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."fields_history",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."terms_accepted_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 "insertion_service"."id",
+                 "insertion_service"."address_line_1",
+                 "insertion_service"."address_line_2",
+                 "insertion_service"."post_code",
+                 "insertion_service"."city",
+                 "insertion_service"."insee_city_id",
+                 "insertion_service"."coordinates",
+                 "insertion_service"."uid",
+                 "insertion_service"."source_id",
+                 "insertion_service"."source_link",
+                 "insertion_service"."structure_id",
+                 "insertion_service"."name",
+                 "insertion_service"."description",
+                 "insertion_service"."description_short",
+                 "insertion_service"."kind_id",
+                 "insertion_service"."fee_id",
+                 "insertion_service"."fee_details",
+                 "insertion_service"."publics_details",
+                 "insertion_service"."access_conditions_di",
+                 "insertion_service"."access_conditions_dora",
+                 "insertion_service"."eligibility_zones",
+                 "insertion_service"."mobilizations_details",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",
+                 "insertion_service"."mobilization_modes_beneficiaries_other",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link_text",
+                 "insertion_service"."mobilization_modes_professionals_other",
+                 "insertion_service"."credentials",
+                 "insertion_service"."credentials_documents",
+                 "insertion_service"."credentials_online_form",
+                 "insertion_service"."opening_hours",
+                 "insertion_service"."opening_hours_text",
+                 "insertion_service"."contact_full_name",
+                 "insertion_service"."contact_email",
+                 "insertion_service"."contact_phone",
+                 "insertion_service"."contact_is_public",
+                 "insertion_service"."is_orientable_with_form",
+                 "insertion_service"."average_orientation_response_delay_days",
+                 "insertion_service"."dora_synced_at",
+                 "insertion_service"."updated_on",
+                 "insertion_service"."is_active",
+                 "insertion_service"."created_at",
+                 "insertion_service"."updated_at",
+                 "insertion_genericreferenceitem"."id",
+                 "insertion_genericreferenceitem"."source",
+                 "insertion_genericreferenceitem"."kind",
+                 "insertion_genericreferenceitem"."value",
+                 "insertion_genericreferenceitem"."label",
+                 "insertion_genericreferenceitem"."description",
+                 "insertion_genericreferenceitem"."created_at",
+                 "insertion_genericreferenceitem"."updated_at",
+                 "insertion_structure"."id",
+                 "insertion_structure"."address_line_1",
+                 "insertion_structure"."address_line_2",
+                 "insertion_structure"."post_code",
+                 "insertion_structure"."city",
+                 "insertion_structure"."insee_city_id",
+                 "insertion_structure"."coordinates",
+                 "insertion_structure"."uid",
+                 "insertion_structure"."source_id",
+                 "insertion_structure"."source_link",
+                 "insertion_structure"."siret",
+                 "insertion_structure"."name",
+                 "insertion_structure"."description",
+                 "insertion_structure"."website",
+                 "insertion_structure"."email",
+                 "insertion_structure"."phone",
+                 "insertion_structure"."opening_hours",
+                 "insertion_structure"."updated_on",
+                 "insertion_structure"."is_active",
+                 "insertion_structure"."created_at",
+                 "insertion_structure"."updated_at"
+          FROM "insertion_orientationprocesslink"
+          INNER JOIN "insertion_orientation" ON ("insertion_orientationprocesslink"."orientation_id" = "insertion_orientation"."id")
+          INNER JOIN "users_user" ON ("insertion_orientation"."beneficiary_id" = "users_user"."id")
+          INNER JOIN "users_user" T4 ON ("insertion_orientation"."sender_id" = T4."id")
+          INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
+          INNER JOIN "insertion_genericreferenceitem" ON ("insertion_service"."source_id" = "insertion_genericreferenceitem"."id")
+          INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
+          WHERE "insertion_orientationprocesslink"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
+          'orientation_details_for_service_provider[www/insertion_views/views.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_orientationprocesslink"
+          SET "first_opened_at" = %s
+          WHERE "insertion_orientationprocesslink"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_detail_with_all_fields_dora[page]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-navinfo">
+                          <div class="c-navinfo__info">
+                              Mise à jour le 24/07/2026
+                          </div>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Service complet
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                      En cours de traitement
+                                  </span>
+                              </h1>
+                              <p>
+                                  Demande d’orientation
+                              </p>
+                          </div>
+                          <div class="c-title__cta">
+                              <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/test-service-full-uid/?back_url=/insertion/orientations/process/%3Ftoken%3D1111111111zzzzzzzzzz3333333333_4">
+                                  <span>
+                                      Accéder au détail du service
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h2 class="h3 mb-0">
+                                      Usager
+                                  </h2>
+                              </div>
+                          </div>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Prénom
+                                  </small>
+                                  <strong>
+                                      Jane
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Nom
+                                  </small>
+                                  <strong>
+                                      DOE
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Adresse e-mail
+                                  </small>
+                                  <strong>
+                                      jane.doe@test.local
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Téléphone
+                                  </small>
+                                  <strong>
+                                      0612345678
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Contact privilégié
+                                  </small>
+                                  E-mail, téléphone, autre (courrier postal)
+                              </li>
+                              <li>
+                                  <small>
+                                      Disponibilité
+                                  </small>
+                                  Disponible à partir du 31 juillet 2026
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions et critères requis
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  Être orienté par un prescripteur.
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Motifs de l’orientation
+                          </h2>
+                          <blockquote class="blockquote mb-0">
+                              Pour améliorer l’embauchabilité de cette bénéficiaire.
+                          </blockquote>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Pièces jointes
+                          </h2>
+                          <ul class="mb-0 list-unstyled">
+                              <li class="mb-2">
+                                  <a class="btn-link btn-ico" href="[computed URL of attachment]" rel="noopener noreferrer" target="_blank">
+                                      <i aria-hidden="true" class="ri-download-line fw-medium">
+                                      </i>
+                                      <span>
+                                          cv.pdf
+                                      </span>
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Durée de la prestation
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Volume total
+                                  </small>
+                                  <strong>
+                                      40 h
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Par semaine
+                                  </small>
+                                  <strong>
+                                      5 h
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Prescripteur
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-user-line me-2">
+                                  </i>
+                                  <span>
+                                      DOE John
+                                  </span>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:john.doe@test.local">
+                                      john.doe@test.local
+                                  </a>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  06 06 06 06 06
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conseiller référent
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-user-line me-2">
+                                  </i>
+                                  <span>
+                                      OLD Lizzy
+                                  </span>
+                              </li>
+                              <li class="d-flex">
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:referent@email.fake">
+                                      referent@email.fake
+                                  </a>
+                              </li>
+                              <li class="d-flex">
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  02 03 04 05 06
                               </li>
                           </ul>
                       </div>

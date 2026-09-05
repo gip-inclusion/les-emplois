@@ -12,6 +12,7 @@ from itou.insertion.models import (
     GenericReferenceItemSource,
     MobilizationEvent,
     Orientation,
+    OrientationProcessLink,
     Service,
     Structure,
 )
@@ -130,3 +131,10 @@ class OrientationFactory(factory.django.DjangoModelFactory):
     referent_phone = "0142030405"
     data_protection_commitment = True
     status = OrientationStatus.PENDING
+
+
+class OrientationProcessLinkFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = OrientationProcessLink
+
+    orientation = factory.SubFactory(OrientationFactory)

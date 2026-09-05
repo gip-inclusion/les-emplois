@@ -3,13 +3,14 @@ import datetime
 import pytest
 from django.conf import settings
 from django.db import IntegrityError
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.insertion.enums import BeneficiaryContactPreference, OrientationStatus, OrientationTransition
-from itou.insertion.models import Orientation, OrientationTransitionLog
+from itou.insertion.models import Orientation, OrientationProcessLink, OrientationTransitionLog
 from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
-from tests.insertion.factories import OrientationFactory, ServiceFactory
+from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
@@ -69,6 +70,19 @@ def test_orientation_attachments(temporary_dora_bucket_name):
         assert attachment_detail[0] == f"document{idx}.pdf"
         assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail[1]
         assert temporary_dora_bucket_name in attachment_detail[1]
+
+
+@pytest.mark.parametrize(
+    "sender_email,referent_email,expected_sender_is_referent",
+    [
+        ("sender@email.fake", "sender@email.fake", True),
+        ("Sender_email+presScripteur12@email.fake", "sender_email+presscripteur12@email.fake", True),
+        ("sender@email.fake", "referent@email.fake", False),
+    ],
+)
+def test_sender_is_referent(sender_email, referent_email, expected_sender_is_referent):
+    orientation = OrientationFactory(sender__email=sender_email, referent_email=referent_email)
+    assert orientation.sender_is_referent == expected_sender_is_referent
 
 
 @pytest.mark.parametrize(
@@ -150,3 +164,17 @@ def test_transition_expire():
     )
     assert log.orientation.status == OrientationStatus.EXPIRED
     assert log.orientation.updated_at == timestamp
+
+
+def test_orientation_process_link_expiration():
+    now = timezone.now()
+
+    with freeze_time(now):
+        process_link = OrientationProcessLinkFactory()
+    assert process_link.is_valid
+
+    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDTITY_SECONDS)):
+        assert process_link.is_valid
+
+    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDTITY_SECONDS + 1)):
+        assert not process_link.is_valid
