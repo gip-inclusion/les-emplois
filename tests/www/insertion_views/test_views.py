@@ -42,6 +42,7 @@ from itou.insertion.models import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from tests.companies.factories import CompanyMembershipFactory
+from tests.files.factories import FileFactory
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
@@ -1198,10 +1199,9 @@ class TestOrientationDetailsForSender:
                 duration_weekly_hours=5,
                 duration_weeks=8,
                 data_protection_commitment=False,  # not displayed
-                attachments=[
-                    "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-                ],
             )
+            document = FileFactory(key="orientations/cv.pdf")
+            orientation.documents.set([document])
 
             client.force_login(user)
             response = client.get(self.get_orientation_url(orientation))
@@ -1210,12 +1210,13 @@ class TestOrientationDetailsForSender:
                 parse_response_to_soup(
                     response,
                     selector="#main",
-                    replace_in_attr=[("href", orientation.attachments_details[0][1], "[computed URL of attachment]")],
+                    replace_in_attr=[("href", str(document.pk), "[PK of File]")],
                 )
             ) == snapshot(name="page")
             assertNotContains(response, "NonAffiché")
 
             orientation.delete()
+            document.delete()
 
     @pytest.mark.parametrize(
         "user_factory,status_code",
@@ -1446,10 +1447,9 @@ class TestOrientationDetailsForServiceProvider:
             orientation__duration_weekly_hours=5,
             orientation__duration_weeks=8,
             orientation__data_protection_commitment=False,  # not displayed
-            orientation__attachments=[
-                "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-            ],
         )
+        document = FileFactory(key="orientations/cv.pdf")
+        process_link.orientation.documents.set([document])
 
         response = client.get(self.get_process_link_url(process_link))
 
@@ -1458,7 +1458,7 @@ class TestOrientationDetailsForServiceProvider:
                 response,
                 selector="#main",
                 replace_in_attr=[
-                    ("href", process_link.orientation.attachments_details[0][1], "[computed URL of attachment]")
+                    ("href", str(document.pk), "[PK of File]")
                 ],
             )
         ) == snapshot(name="page")

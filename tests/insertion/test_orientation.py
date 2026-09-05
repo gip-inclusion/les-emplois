@@ -5,6 +5,7 @@ from functools import partial
 import pytest
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -19,6 +20,7 @@ from itou.insertion.models import Orientation, OrientationProcessLink, Orientati
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.files.factories import FileFactory
 from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -79,6 +81,17 @@ def test_orientation_attachments(temporary_dora_bucket_name):
         assert attachment_detail[0] == f"document{idx}.pdf"
         assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail[1]
         assert temporary_dora_bucket_name in attachment_detail[1]
+
+
+def test_orientation_documents():
+    orientation = OrientationFactory()
+    files = [FileFactory(key="orientations/cv_2026.pdf"), FileFactory(key="orientations/carte_identité.pdf")]
+    orientation.documents.set(files)
+
+    assert set(orientation.documents_details) == {
+        ("cv_2026.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[0].pk})),
+        ("carte_identité.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[1].pk})),
+    }
 
 
 @pytest.mark.parametrize(

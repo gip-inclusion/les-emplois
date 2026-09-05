@@ -136,7 +136,6 @@ class OrientationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Orientation
 
-    id = factory.LazyFunction(uuid.uuid4)  # Expected in Dora response
     beneficiary = factory.SubFactory("tests.users.factories.JobSeekerFactory")
     sender = factory.SubFactory("tests.users.factories.PrescriberFactory")
     sender_kind = SenderKind.PRESCRIBER

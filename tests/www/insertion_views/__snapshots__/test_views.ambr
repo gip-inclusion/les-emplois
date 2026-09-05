@@ -139,7 +139,7 @@
 # ---
 # name: TestOrientationDetailsForSender.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -368,14 +368,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'orientation_details_for_sender[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -403,7 +398,6 @@
                  "insertion_orientation"."duration_weekly_hours",
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
-                 "insertion_orientation"."attachments",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
                  "insertion_orientation"."dora_status_updated_at",
@@ -530,9 +524,20 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'orientation_details_for_sender[www/insertion_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+        'sql': '''
+          SELECT ("insertion_orientation_documents"."orientation_id") AS "_prefetch_related_val_orientation_id",
+                 "files_file"."id",
+                 "files_file"."key",
+                 "files_file"."last_modified"
+          FROM "files_file"
+          INNER JOIN "insertion_orientation_documents" ON ("files_file"."id" = "insertion_orientation_documents"."file_id")
+          WHERE "insertion_orientation_documents"."orientation_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -830,7 +835,7 @@
                           </h2>
                           <ul class="mb-0 list-unstyled">
                               <li class="mb-2">
-                                  <a class="btn-link btn-ico" href="[computed URL of attachment]" rel="noopener noreferrer" target="_blank">
+                                  <a class="btn-link btn-ico" href="/insertion/orientations/document/[PK of File]/" rel="noopener noreferrer" target="_blank">
                                       <i aria-hidden="true" class="ri-download-line fw-medium">
                                       </i>
                                       <span>
@@ -1139,7 +1144,7 @@
 # ---
 # name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1181,7 +1186,6 @@
                  "insertion_orientation"."duration_weekly_hours",
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
-                 "insertion_orientation"."attachments",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
                  "insertion_orientation"."dora_status_updated_at",
@@ -1409,6 +1413,21 @@
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           WHERE "insertion_orientationprocesslink"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'orientation_details_for_service_provider[www/insertion_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT ("insertion_orientation_documents"."orientation_id") AS "_prefetch_related_val_orientation_id",
+                 "files_file"."id",
+                 "files_file"."key",
+                 "files_file"."last_modified"
+          FROM "files_file"
+          INNER JOIN "insertion_orientation_documents" ON ("files_file"."id" = "insertion_orientation_documents"."file_id")
+          WHERE "insertion_orientation_documents"."orientation_id" IN (%s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1642,7 +1661,7 @@
                           </h2>
                           <ul class="mb-0 list-unstyled">
                               <li class="mb-2">
-                                  <a class="btn-link btn-ico" href="[computed URL of attachment]" rel="noopener noreferrer" target="_blank">
+                                  <a class="btn-link btn-ico" href="/insertion/orientations/document/[PK of File]/?token=1111111111zzzzzzzzzz3333333333_4" rel="noopener noreferrer" target="_blank">
                                       <i aria-hidden="true" class="ri-download-line fw-medium">
                                       </i>
                                       <span>
@@ -2635,7 +2654,7 @@
 # ---
 # name: TestOrientationsList.test_list_display[queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -2864,16 +2883,11 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'OrientationsFilterForm._get_choices_for_beneficiary[www/insertion_views/forms.py]',
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2928,6 +2942,7 @@
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2982,6 +2997,7 @@
           'OrientationsFilterForm.__init__[www/insertion_views/forms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_service"."structure_id" AS "service__structure__id",
@@ -2999,6 +3015,7 @@
           'pager[utils/pagination.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -3011,6 +3028,7 @@
           'add_user_can_view_personal_information[users/perms.py]',
           'orientations_list[www/insertion_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -3038,7 +3056,6 @@
                  "insertion_orientation"."duration_weekly_hours",
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
-                 "insertion_orientation"."attachments",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
                  "insertion_orientation"."dora_status_updated_at",
@@ -3190,12 +3207,6 @@
           ORDER BY "insertion_orientation"."updated_at" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

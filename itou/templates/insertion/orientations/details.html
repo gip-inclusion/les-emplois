@@ -131,14 +131,14 @@
                         </div>
                     {% endif %}
 
-                    {# Attachments #}
-                    {% if orientation.attachments|length %}
+                    {# Documents #}
+                    {% if orientation.documents_details|length %}
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Pièces jointes</h2>
                             <ul class="mb-0 list-unstyled">
-                                {% for document_name, document_url in orientation.attachments_details %}
+                                {% for document_name, document_url in orientation.documents_details %}
                                     <li class="mb-2">
-                                        <a class="btn-link btn-ico" href="{{ document_url }}" target="_blank" rel="noopener noreferrer">
+                                        <a class="btn-link btn-ico" href="{{ document_url }}{% if can_process %}?token={{ link.pk }}{% endif %}" target="_blank" rel="noopener noreferrer">
                                             <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                                             <span>{{ document_name }}</span>
                                         </a>
