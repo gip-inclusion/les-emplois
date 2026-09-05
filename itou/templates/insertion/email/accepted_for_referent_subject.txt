@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Notification de l’acceptation d’une demande d’orientation
+
+{% endblock %}

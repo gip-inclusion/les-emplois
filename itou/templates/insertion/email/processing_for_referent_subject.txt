@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Notification : une demande d’orientation est en cours d’examen
+
+{% endblock %}

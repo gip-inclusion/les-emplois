@@ -1,0 +1,16 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+{{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} vous a adressé un bénéficiaire pour le service {{ orientation.service.name }}, le {{ orientation.created_at|date:"d/m/Y" }}.
+
+Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
+
+N’ayant pas reçu de réponses de votre de part dans le délai limite de {{ orientation.PENDING_EXPIRATION_PERIOD_DAYS }} jours, cette demande a été automatiquement annulée.
+
+Nous vous remercions par avance pour votre engagement.
+
+{{ process_link }}
+
+{% endblock body %}

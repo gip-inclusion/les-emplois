@@ -37,6 +37,7 @@ from itou.insertion.models import (
     GenericReferenceItemSource,
     MobilizationEvent,
     Orientation,
+    OrientationProcessLink,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
@@ -1468,13 +1469,20 @@ class TestOrientationDetailsForServiceProvider:
         response = client.get(reverse("insertion_views:orientation_details_for_service_provider", query=query))
         assert response.status_code == 404
 
-    def test_access_with_old_token(self, client):
-        # TODO: button to send an email with a new link
+    @pytest.mark.parametrize("is_authenticated", [True, False])
+    def test_access_with_old_token(self, client, is_authenticated):
         process_link = OrientationProcessLinkFactory(
             created_at=timezone.now() - datetime.timedelta(days=8)
         )  # created more than 7 days ago
+        if is_authenticated:
+            client.force_login(random_user_kind_factory())
         response = client.get(self.get_process_link_url(process_link))
-        assert response.status_code == 403
+        assertContains(response, "Demander un nouveau lien d’accès")
+        response = client.post(self.get_process_link_url(process_link))
+        assertContains(
+            response, "Un e-mail avec un nouveau lien d’accès a été envoyé à l’adresse de contact du service."
+        )
+        assert OrientationProcessLink.objects.filter(orientation=process_link.orientation).count() == 2
 
     @pytest.mark.parametrize("is_active, assertion", [(True, assertContains), (False, assertNotContains)])
     def test_hide_service_link_if_inactive(self, client, is_active, assertion):
@@ -1519,7 +1527,7 @@ class TestOrientationDetailsForServiceProvider:
             == snapshot
         )
 
-    def test_process(self, client):
+    def test_process(self, client, mailoutbox):
         link = OrientationProcessLinkFactory(
             orientation__status=OrientationStatus.PENDING,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1541,6 +1549,8 @@ class TestOrientationDetailsForServiceProvider:
 
         assert orientation.updated_at == processing_at
 
+        assert len(mailoutbox) != 0
+
     def test_cannot_process(self, client):
         link = OrientationProcessLinkFactory(
             orientation__status=random.choice(list(set(OrientationStatus.values) - {OrientationStatus.PENDING.value})),
@@ -1554,7 +1564,7 @@ class TestOrientationDetailsForServiceProvider:
         assert orientation.status == link.orientation.status
 
     @pytest.mark.parametrize("from_status", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
-    def test_accept(self, client, from_status):
+    def test_accept(self, client, mailoutbox, from_status):
         link = OrientationProcessLinkFactory(
             orientation__status=from_status,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1574,6 +1584,8 @@ class TestOrientationDetailsForServiceProvider:
         response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
         assertContains(response, "Cette orientation a déjà été traitée.")
         assert orientation.updated_at == accepted_at
+
+        assert len(mailoutbox) != 0
 
     @pytest.mark.parametrize(
         "from_status", [OrientationStatus.ACCEPTED, OrientationStatus.REFUSED, OrientationStatus.EXPIRED]
@@ -1613,7 +1625,7 @@ class TestOrientationRefuseForServiceProvider:
         assert response.status_code == 404
 
     @pytest.mark.parametrize("from_status", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
-    def test_refuse(self, client, from_status):
+    def test_refuse(self, client, mailoutbox, from_status):
         link = OrientationProcessLinkFactory(
             orientation__status=from_status,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1656,6 +1668,8 @@ class TestOrientationRefuseForServiceProvider:
             OrientationRefusalReason.SESSION_FULL,
         ]
         assert orientation.updated_at == refused_at
+
+        assert len(mailoutbox) != 0
 
     def test_refuse_incorrect_data(self, client):
         with freeze_time(timezone.now()):  # ensure created_at == updated_at
