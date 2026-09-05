@@ -25,7 +25,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory
 from tests.utils.testing import (
     BASE_NUM_QUERIES,
     get_rows_from_streaming_response,
@@ -240,33 +240,34 @@ class TestCompanyAdmin:
     def test_add_membership_invalid_user(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory()
         employer = EmployerFactory()
-        prescriber = PrescriberFactory()
 
-        for bad_value in [prescriber.pk, "", str(employer.pk + 1)]:
+        payload = {
+            "id": company.id,
+            "siret": company.siret,
+            "kind": company.kind,
+            "name": company.name,
+            "phone": company.phone,
+            "email": company.email,
+            "memberships-TOTAL_FORMS": "1",
+            "memberships-INITIAL_FORMS": "0",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-company": company.pk,
+            "memberships-0-user": "",  # to override
+            "memberships-0-is_admin": "on",
+            "memberships-0-is_active": "on",
+            "job_description_through-TOTAL_FORMS": "0",
+            "job_description_through-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        }
+
+        for bad_value in ["", employer.pk + 1]:
+            payload["memberships-0-user"] = bad_value
             response = admin_client.post(
                 reverse("admin:companies_company_change", args=[company.pk]),
-                data={
-                    "id": company.id,
-                    "siret": company.siret,
-                    "kind": company.kind,
-                    "name": company.name,
-                    "phone": company.phone,
-                    "email": company.email,
-                    "memberships-TOTAL_FORMS": "1",
-                    "memberships-INITIAL_FORMS": "0",
-                    "memberships-MIN_NUM_FORMS": "0",
-                    "memberships-MAX_NUM_FORMS": "1000",
-                    "memberships-0-id": bad_value,
-                    "memberships-0-company": company.pk,
-                    "memberships-0-user": "",
-                    "memberships-0-is_admin": "on",
-                    "memberships-0-is_active": "on",
-                    "job_description_through-TOTAL_FORMS": "0",
-                    "job_description_through-INITIAL_FORMS": "0",
-                    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-                    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-                    "_continue": "Enregistrer+et+continuer+les+modifications",
-                },
+                data=payload,
             )
             assert response.status_code == 200
             member_formset = [
@@ -275,8 +276,16 @@ class TestCompanyAdmin:
                 if formset.opts.model._meta.model_name == "companymembership"
             ][0]
             assert member_formset.forms[0].errors["user"]
+            assert company.members.count() == 0
 
-        assert company.members.count() == 0
+        # Assert the same payload with a valid user works so that we know the previous loop is useful
+        payload["memberships-0-user"] = employer.pk
+        response = admin_client.post(
+            reverse("admin:companies_company_change", args=[company.pk]),
+            data=payload,
+        )
+        assert response.status_code == 302
+        assert company.members.count() == 1
 
 
 @freeze_time("2024-05-17T11:11:11+02:00")
