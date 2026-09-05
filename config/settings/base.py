@@ -443,7 +443,7 @@ SELECT2_THEME = "bootstrap-5"
 
 ITOU_ENVIRONMENT = ItouEnvironment(os.getenv("ITOU_ENVIRONMENT", ItouEnvironment.PROD))
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
+ITOU_FQDN = os.getenv("ITOU_FQDN", "plateforme.inclusion.gouv.fr")
 ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.gouv.fr")
 PILOTAGE_INSTITUTION_EMAIL_CONTACT = os.getenv(
     "PILOTAGE_INSTITUTION_EMAIL_CONTACT", "pilotage+institution@inclusion.gouv.fr"
