@@ -277,6 +277,7 @@ class TestServices:
             data-matomo-option="voir-coordonnees-contact">
         Voir les coordonnées de contact du service
     </button>"""
+    MISSING_CONTACT_LABEL = "Informations de contact non renseignées"
     DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
     FORMS_TO_FILL = "Documents à compléter"
 
@@ -551,7 +552,7 @@ class TestServices:
             reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}),
         )
         assertNotContains(response, "c-box--action")
-        assertNotContains(response, "Informations de contact non renseignées")
+        assertNotContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_orientable_and_user_not_authenticated(self, client):
         service = ServiceFactory(
@@ -630,8 +631,8 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Voir les coordonnées de contact du service")
-        assertContains(response, "Informations de contact non renseignées")
+        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory(membership=True)
