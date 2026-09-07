@@ -91,6 +91,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     structure = factory.SubFactory(StructureFactory)
     name = factory.Sequence(lambda n: f"Service {n}")
     description = "Description du service."
+    contact_email = "contact@email.fake"
     updated_on = datetime.date(2025, 1, 1)
 
     @factory.post_generation

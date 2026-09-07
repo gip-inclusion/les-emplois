@@ -129,6 +129,20 @@
                               </a>
                           </div>
                       </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Contact
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:contact@email.fake">
+                                      contact@email.fake
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </div>
               </div>
           </div>
@@ -691,6 +705,20 @@
                                   Voir la fiche structure
                               </a>
                           </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Contact
+                          </h2>
+                          <ul class="fs-sm list-unstyled mb-0">
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:contact@email.fake">
+                                      contact@email.fake
+                                  </a>
+                              </li>
+                          </ul>
                       </div>
                   </div>
               </div>
@@ -2079,6 +2107,11 @@
                                       </span>
                                   </a>
                               </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                                      Voir les coordonnées de contact du service
+                                  </button>
+                              </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                                   <div class="dropdown">
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
@@ -2224,6 +2257,11 @@
                                       </span>
                                   </a>
                               </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                                      Voir les coordonnées de contact du service
+                                  </button>
+                              </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                                   <div class="dropdown">
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
@@ -2363,12 +2401,10 @@
           Actions rapides
       </h2>
       <div class="form-row align-items-center gx-3">
-          <div class="form-group col-12 col-lg">
-              <p class="mb-0 fst-italic text-white">
-                  <i aria-hidden="true" class="ri-information-line fw-normal me-1">
-                  </i>
-                  Informations de contact non renseignées
-              </p>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
@@ -2405,6 +2441,11 @@
                       Orienter un bénéficiaire
                   </span>
               </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
@@ -2670,6 +2711,11 @@
                   </span>
               </a>
           </div>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
+          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
@@ -2705,6 +2751,11 @@
                       Lien externe
                   </span>
               </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
@@ -2742,6 +2793,11 @@
                   </span>
               </a>
           </div>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
+          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
@@ -2777,6 +2833,11 @@
                       Orienter un bénéficiaire
                   </span>
               </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                  Voir les coordonnées de contact du service
+              </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">

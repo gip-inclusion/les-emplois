@@ -468,9 +468,9 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def has_orientation_action(self):
-        return (self.is_orientable_with_form and not self.from_non_orientable_di_source) or bool(
-            self.mobilization_modes_professionals_external_form_link
-        )
+        return (
+            self.is_orientable_with_form and bool(self.contact_email) and not self.from_non_orientable_di_source
+        ) or bool(self.mobilization_modes_professionals_external_form_link)
 
     def has_mobilization_modes(self):
         return (not self.is_dora and bool(self.mobilizations.all())) or (
