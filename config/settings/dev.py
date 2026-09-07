@@ -97,3 +97,5 @@ del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 
 FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
+
+OVERVIEW_TAB_TEST_DEPARTMENT = "13"
