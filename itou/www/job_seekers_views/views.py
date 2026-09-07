@@ -378,11 +378,13 @@ class OverviewTabView(BaseJobSeekerDetailView):
             approval.suspension_set.order_by("-start_at").first() if approval and approval.is_suspended else None
         )
         prolongation = approval.prolongation_set.order_by("-end_at").first() if approval else None
+        contract = get_contracts(approval).first() if approval else None
 
         return context | {
             "approval": approval,
             "suspension": suspension,
             "prolongation": prolongation,
+            "contract": contract,
         }
 
 

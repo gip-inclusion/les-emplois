@@ -1,0 +1,71 @@
+<div id="overview-contract" class="row gx-3 align-items-start">
+    <div class="col-auto">
+        <i class="ri-xl ri-briefcase-line"></i>
+    </div>
+    <div class="col">
+        <div class="row gx-4 align-items-start justify-content-between">
+            {% if contract %}
+
+                {# The contract has ended #}
+
+                {% if contract.has_ended %}
+                    <div class="col-6">
+                        <span class="fw-semibold">Dernier contrat IAE : {{ contract.company.display_name }}, du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}.</span>
+                        Le motif de fin n'est pas transmis par l'ASP.
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">période · source ASP, synchronisée le {{ contract.updated_at|date:"d/m/Y" }}</span>
+                        <br>
+                        <a href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}">Voir le suivi des contrats</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">terminé</span>
+                    </div>
+
+                    {# The contract has an end date set #}
+
+                {% elif contract.end_date %}
+                    <div class="col-6">
+                        <span class="fw-semibold">Contrat avec {{ contract.company.display_name }} du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}.</span>
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">période · source ASP, synchronisée le {{ contract.updated_at|date:"d/m/Y" }}</span>
+                        <br>
+                        <a class="btn btn-outline-primary mt-2" href="#">Préparer la suite du parcours</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">fin prévue</span>
+                    </div>
+
+                    {# The contract is ongoing with no end date set #}
+
+                {% else %}
+                    <div class="col-6">
+                        <span class="fw-semibold">En poste: contrat avec {{ contract.company.display_name }} depuis le {{ contract.start_date|date:"d/m/Y" }}.</span>
+                        Aucune date de fin déclarée à ce jour.
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">période · source ASP, synchronisée le {{ contract.updated_at|date:"d/m/Y" }}</span>
+                        <br>
+                        <a class="btn btn-outline-primary mt-2" href="#">Préparer la suite du parcours</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">en cours</span>
+                    </div>
+                {% endif %}
+
+                {# No contract #}
+
+            {% else %}
+                <div class="col-6">
+                    <span class="fw-semibold">Aucun contrat IAE trouvé.</span>
+                    Absence d'enregistrement dans l'extranet, ou récupération impossible, ce n'est pas la preuve d'une absence d'emploi.
+                    <br>
+                    <span class="fs-sm text-muted fw-normal">absence d'information · vérifié le {% now "d/m/Y" %}</span>
+                    <br>
+                    <a class="btn btn-outline-primary mt-2" href="#">Vérifier auprès de l'employeur</a>
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">non trouvé</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

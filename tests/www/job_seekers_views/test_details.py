@@ -1561,3 +1561,49 @@ class TestOverviewTab:
         assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
             name="prolonged approval"
         )
+
+    @freeze_time("2026-09-11")
+    def test_overview_contract(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        user = PrescriberFactory()
+        url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(user)
+
+        # No contract found
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-contract")) == snapshot(
+            name="no contract"
+        )
+
+        # An approval is needed to retrieve the latest contract
+        ApprovalFactory(user=job_seeker, start_at="2026-01-01", end_at="2027-12-31")
+
+        # Contract is ongoing with no end date
+        contract = ContractFactory(job_seeker=job_seeker, company__name="SIAE", start_date="2026-02-02")
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-contract")) == snapshot(
+            name="contract without end date"
+        )
+
+        # Contract is ongoing and has an end date
+        contract.end_date = "2026-12-12"
+        contract.save()
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-contract")) == snapshot(
+            name="contract with end date"
+        )
+
+        # Contract has ended
+        contract.end_date = "2026-09-01"
+        contract.save()
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-contract")) == snapshot(
+            name="ended contract"
+        )
