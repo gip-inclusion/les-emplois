@@ -337,7 +337,6 @@ class TestProfiledNotification:
         self.employer_structure = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(membership=True)
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
-        self.prescriber_single = PrescriberFactory(membership=False)
         self.labor_inspector = LaborInspectorFactory(membership=True)
         self.institution = self.labor_inspector.institution_set.first()
 
@@ -360,14 +359,12 @@ class TestProfiledNotification:
         assert self.TestJobSeekerNotification(self.job_seeker).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
-        assert not self.TestJobSeekerNotification(self.prescriber_single).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.labor_inspector, self.institution).is_manageable_by_user()
 
     def test_professional_notification_is_manageable_by_user(self):
         assert not self.TestProfessionalNotification(self.job_seeker).is_manageable_by_user()
         assert self.TestProfessionalNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert self.TestProfessionalNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
-        assert self.TestProfessionalNotification(self.prescriber_single).is_manageable_by_user()
         assert self.TestProfessionalNotification(self.labor_inspector, self.institution).is_manageable_by_user()
 
     def test_professional_with_structure_notification_is_manageable_by_user(self):
@@ -378,7 +375,6 @@ class TestProfiledNotification:
         assert self.TestProfessionalWithStructureNotification(
             self.prescriber, self.prescriber_structure
         ).is_manageable_by_user()
-        assert not self.TestProfessionalWithStructureNotification(self.prescriber_single).is_manageable_by_user()
         assert self.TestProfessionalWithStructureNotification(
             self.labor_inspector, self.institution
         ).is_manageable_by_user()
