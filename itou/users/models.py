@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -89,6 +89,29 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    def with_advisors_count(self, active=True):
+        status_filter = Q()
+        annotation_name = "advisors_nb"
+        match active:
+            case True:
+                status_filter = Q(job_seeker_assignments__ended_at=None)
+                annotation_name = "active_advisors_nb"
+            case False:
+                status_filter = ~Q(job_seeker_assignments__ended_at=None)
+                annotation_name = "old_advisors_nb"
+
+        return self.alias(
+            known_advisors_nb=Count(
+                "job_seeker_assignments__professional",
+                distinct=True,
+                filter=Q(job_seeker_assignments__assigned_to_unknown_advisor=False) & status_filter,
+            ),
+            unknown_advisors_nb=Count(
+                "job_seeker_assignments__assigned_to_unknown_advisor",
+                filter=Q(job_seeker_assignments__assigned_to_unknown_advisor=True) & status_filter,
+            ),
+        ).annotate(**{annotation_name: F("known_advisors_nb") + F("unknown_advisors_nb")})
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
