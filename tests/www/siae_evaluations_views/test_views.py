@@ -11,10 +11,12 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.utils import constants as global_constants
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -467,6 +469,44 @@ class TestViewProof:
             assertRedirects(response, crit.proof.url(), fetch_redirect_response=False)
         pdf_file.seek(0)
         assert httpx.get(response.url).content == pdf_file.read()
+
+    def test_access_siae_member_of_a_prescriber_organization(self, client):
+        # request.organizations contains every organization of the user, whatever its kind.
+        job_app = EvaluatedJobApplicationFactory()
+        criterion = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
+        membership = CompanyMembershipFactory(company_id=job_app.evaluated_siae.siae_id)
+        PrescriberMembershipFactory(user=membership.user)
+        url = reverse(
+            "siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": criterion.pk}
+        )
+        client.force_login(membership.user)
+        session = client.session
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = membership.company.organization_switch_key
+        session.save()
+        with freeze_time():
+            response = client.get(url)
+            assertRedirects(response, criterion.proof.url(), fetch_redirect_response=False)
+
+    def test_access_institution_member_of_a_prescriber_organization(self, client):
+        # request.organizations contains every organization of the user, whatever its kind.
+        membership = InstitutionMembershipFactory()
+        PrescriberMembershipFactory(user=membership.user)
+        job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__institution=membership.institution
+        )
+        criterion = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
+        url = reverse(
+            "siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": criterion.pk}
+        )
+        client.force_login(membership.user)
+        session = client.session
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            membership.institution.organization_switch_key
+        )
+        session.save()
+        with freeze_time():
+            response = client.get(url)
+            assertRedirects(response, criterion.proof.url(), fetch_redirect_response=False)
 
     def test_access_other_institution(self, client):
         job_app = EvaluatedJobApplicationFactory(evaluated_siae__evaluation_campaign__institution__department="01")
