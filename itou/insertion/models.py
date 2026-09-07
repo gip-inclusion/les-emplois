@@ -862,6 +862,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         self.notification_refused_for_beneficiary.send()
         self.notification_refused_for_sender.send()
 
+    @xwf_models.transition()
+    def expire(self):
+        process_link = OrientationProcessLink.objects.create(orientation=self)
+        process_link.email_expired_orientation_for_structure.send()
+        if not self.sender_is_referent:
+            self.email_expired_orientation_for_referent.send()
+        self.notification_expired_for_beneficiary.send()
+        self.notification_expired_for_sender.send()
+
     # Notifications
     @property
     def notification_new_for_beneficiary(self):
@@ -886,6 +895,14 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def notification_refused_for_sender(self):
         return orientation_notifications.RefusedOrientationForSender(self.sender, orientation=self)
+
+    @property
+    def notification_expired_for_beneficiary(self):
+        return orientation_notifications.ExpiredOrientationForBeneficiary(self.beneficiary, orientation=self)
+
+    @property
+    def notification_expired_for_sender(self):
+        return orientation_notifications.ExpiredOrientationForSender(self.sender, orientation=self)
 
     # Emails (to users that do not have an account)
     @property
@@ -919,6 +936,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         }
         subject = "insertion/email/refused_for_referent_subject.txt"
         body = "insertion/email/refused_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_expired_orientation_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+        }
+        subject = "insertion/email/expired_for_referent_subject.txt"
+        body = "insertion/email/expired_for_referent_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -999,4 +1026,15 @@ class OrientationProcessLink(models.Model):
         }
         subject = "insertion/email/refused_for_structure_subject.txt"
         body = "insertion/email/refused_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_expired_orientation_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+        }
+        subject = "insertion/email/expired_for_structure_subject.txt"
+        body = "insertion/email/expired_for_structure_body.txt"
         return get_email_message(to, context, subject, body)
