@@ -1561,6 +1561,13 @@ class TestOverviewTab:
             job_seeker=job_seeker,
             created_at=timezone.now() - relativedelta(days=31),
         )
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional__first_name="Gordon",
+            professional__last_name="Freeman",
+            company=CompanyFactory(name="Black Mesa"),
+            created_at=timezone.now() - relativedelta(months=7),
+        )
         overview_tab_url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
 
         client.force_login(user)
@@ -1761,3 +1768,47 @@ class TestOverviewTab:
 
         rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
         assert pretty_indented(rendered) == snapshot(name="accepted job app")
+
+    @freeze_time("2026-09-11")
+    def test_overview_assignment(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        prescriber = PrescriberFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_assignment.html")
+
+        # No assignment
+        job_seeker.active_advisors_nb = 0
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no assignment")
+
+        # 1 active assignment
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=prescriber,
+            last_action_kind=ActionKind.APPLY,
+            created_at=timezone.now() - relativedelta(months=3),
+        )
+        job_seeker.active_advisors_nb = 1
+        del job_seeker.last_assignment
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="one active assignment")
+
+        # Several active assignments
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=EmployerFactory(for_snapshot=True),
+            last_action_kind=ActionKind.ACCEPT,
+            last_action_at=timezone.now() - relativedelta(months=6),
+        )
+        job_seeker.active_advisors_nb = 2
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="several active assignments")
+
+        # No active assignment
+        assignment.ended_at = timezone.now() - relativedelta(months=1)
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        job_seeker.active_advisors_nb = 0
+        del job_seeker.last_assignment
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no active assignment")

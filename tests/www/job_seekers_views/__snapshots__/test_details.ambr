@@ -3114,6 +3114,156 @@
   
   '''
 # ---
+# name: TestOverviewTab.test_overview_assignment[no active assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-unfollow-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Accompagné de juin 2026 à août 2026 par 
+      
+          DUPONT Pierre (Aucune structure associée)
+      
+  .
+                          </span>
+                          Accompagnement clos automatiquement le 11/08/2026.
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="accompagnements" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir les anciens accompagnements
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                              ancien
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[no assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-shield-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Aucun accompagnateur actuel.
+                          </span>
+                          Cet usager n'a encore jamais été accompagné.
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="creer-accompagnement" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Se positionner comme accompagnateur
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              jamais accompagné
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[one active assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Accompagné depuis juin 2026 par 
+      
+          DUPONT Pierre (Aucune structure associée)
+      
+  .
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="info-contact-accompagnateur" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir ses coordonnées
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              accompagnateur
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[several active assignments]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-group-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Actuellement suivi par plusieurs accompagnateurs.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="accompagnements" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir les accompagnements
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              2 accompagnements
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
 # name: TestOverviewTab.test_overview_contract[contract with end date]
   '''
   <html>
@@ -3531,6 +3681,35 @@
                           <div class="col-auto">
                               <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
                                   nouvelle
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-4"/>
+              <div class="row gx-3 align-items-start" id="overview-assignment">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-user-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <span class="fw-semibold">
+                                  Accompagné depuis février 2026 par 
+      
+          FREEMAN Gordon (Black Mesa)
+      
+  .
+                              </span>
+                              <br/>
+                              <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="info-contact-accompagnateur" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/overview/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  Voir ses coordonnées
+                              </a>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                                  accompagnateur
                               </span>
                           </div>
                       </div>
