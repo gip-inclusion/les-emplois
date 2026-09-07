@@ -772,7 +772,7 @@ class Migration(migrations.Migration):
                     "pole_emploi_id",
                     models.CharField(
                         blank=True,
-                        help_text="L’identifiant doit respecter l’un des deux formats autorisés :  8 caractères (7 "
+                        help_text="L’identifiant doit respecter l’un des deux formats autorisés :  8 caractères (7 "
                         "chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.",
                         max_length=11,
                         validators=[itou.utils.validators.validate_pole_emploi_id],
