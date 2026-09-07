@@ -24,7 +24,7 @@ def get_template_context(context, service):
         Service.EMPLOIS: {
             "name": product_name(),
             "description": "Le service de recrutement et de gestion des PASS IAE.",
-            "logo": "logo-emploi-inclusion-mono.svg",  # TODO(branding): logo à basculer au flip du nom
+            "logo": "logo-plateforme-inclusion-mono.svg",
             "etoile": "nexus/nx-forme-etoile-emplois.png",
             "items_short": [
                 "Publiez vos recrutements",
@@ -255,7 +255,7 @@ def get_services_context():
     return {
         Service.EMPLOIS: {
             "name": product_name(),
-            "logo": "logo-emploi-inclusion.svg",  # TODO(branding): logo à basculer au flip du nom
+            "logo": "logo-plateforme-inclusion.svg",
             "one_click_activation": False,
         },
         Service.DORA: {

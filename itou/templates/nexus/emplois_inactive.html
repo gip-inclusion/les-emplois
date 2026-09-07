@@ -6,14 +6,12 @@
 {% block title %}Fiches de poste {{ block.super }}{% endblock %}
 
 {% block service_title %}
-    {# TODO(branding): logo à basculer (logo-plateforme-inclusion) au flip du nom #}
-    <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" width="35" alt="{% brand %}">
+    <img src="{% static_theme_images 'logo-plateforme-inclusion-mono.svg' %}" height="35" width="35" alt="{% brand %}">
     Fiches de poste
 {% endblock %}
 
 {% block service_logo %}
-    {# TODO(branding): logo à basculer (logo-plateforme-inclusion) au flip du nom #}
-    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="50" alt="{% brand %}">
+    <img src="{% static_theme_images 'logo-plateforme-inclusion.svg' %}" height="50" alt="{% brand %}">
 {% endblock %}
 
 {% block description %}

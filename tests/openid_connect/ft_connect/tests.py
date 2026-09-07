@@ -334,8 +334,9 @@ class TestPoleEmploiConnect:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La connexion via France Travail Connect a fonctionné mais le compte lié sur Les emplois de "
-                        "l’inclusion est désactivé. Veuillez vous rapprocher du support pour débloquer la situation "
+                        "La connexion via France Travail Connect a fonctionné mais le compte lié sur La plateforme "
+                        "de l’inclusion est désactivé. Veuillez vous rapprocher du support pour débloquer la "
+                        "situation "
                         'en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a> et en leur'
                         f" fournissant l’identifiant public de ce compte : {user.public_id}."
                     ),

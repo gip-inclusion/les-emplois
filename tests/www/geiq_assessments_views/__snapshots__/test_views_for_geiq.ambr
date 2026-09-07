@@ -1300,7 +1300,7 @@
   '''
   Bonjour,
   
-  La structure `Un Joli GEIQ` a transmis son bilan d’exécution sur le site des Emplois de l’inclusion.
+  La structure `Un Joli GEIQ` a transmis son bilan d’exécution sur le site de La plateforme de l’inclusion.
   
   Références du dossier :
   
@@ -1316,7 +1316,7 @@
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l’inclusion
+  La plateforme de l’inclusion
   http://localhost:8000/
   '''
 # ---
