@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Cette demande d’orientation a expiré 🎉
+
+{% endblock %}
