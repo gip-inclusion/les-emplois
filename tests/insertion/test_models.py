@@ -105,6 +105,11 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
     [
         pytest.param({"is_orientable_with_form": True}, True, id="orientable_with_form"),
         pytest.param(
+            {"is_orientable_with_form": True, "contact_email": ""},
+            False,
+            id="orientable_with_form_without_contact_email",
+        ),
+        pytest.param(
             {"mobilization_modes_professionals_external_form_link": "https://example.com"},
             True,
             id="external_form_link",

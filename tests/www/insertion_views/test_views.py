@@ -583,6 +583,15 @@ class TestServices:
         assertNotContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
+    def test_detail_not_orientable_because_of_missing_email(self, client):
+        user = PrescriberFactory(membership=True)
+        service = ServiceFactory(
+            is_orientable_with_form=True, contact_email="", contact_full_name="Ludwig B.", contact_phone="3949"
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
+
     def test_detail_non_orientable_di_sources(self, client, settings):
         user = PrescriberFactory(membership=True)
         blacklisted_source = "blacklisted-source"

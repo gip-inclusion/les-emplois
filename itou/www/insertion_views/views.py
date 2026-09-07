@@ -233,7 +233,9 @@ class OrientationStep(enum.StrEnum):
 
 def start_orientation(request, service_uid):
     service = get_object_or_404(
-        insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES),
+        insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES).exclude(
+            contact_email=""
+        ),
         uid=service_uid,
         is_orientable_with_form=True,
     )
