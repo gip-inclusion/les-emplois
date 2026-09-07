@@ -3245,6 +3245,209 @@
   
   '''
 # ---
+# name: TestOverviewTab.test_overview_jobapp[accepted jobapp]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-user-follow-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Embauche déclarée à SIAE 2 le 11/09/2026,
+                  </span>
+                  à la suite de la candidature du 11/09/2026.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      acceptation saisie le 11/09/2026
+                  </span>
+                  <br/>
+                  <a href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details">
+                      Ouvrir la candidature
+                  </a>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                      acceptée
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[new job app]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-file-list-3-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Candidature à SIAE déposée le 11/09/2026,
+                  </span>
+                  candidature spontanée.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      envoyée le 11/09/2026 par DUPONT Pierre (FT)
+                  </span>
+                  <br/>
+                  <a href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details">
+                      Ouvrir la candidature
+                  </a>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                      nouvelle
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[no job app]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-corner-up-right-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Aucune candidature récupérée.
+                  </span>
+                  Il est possible que le candidat est déposé une candidature en autonomie ou qu'il soit suivi par une autre structure.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      vérifié le 11/09/2026
+                  </span>
+                  <br/>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                      aucune candidature
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[processing job app]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-file-list-3-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Candidature à SIAE déposée le 11/09/2026,
+                  </span>
+                  candidature spontanée.
+                          
+                              Sans réponse depuis le 11/09/2026.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      envoyée le 11/09/2026 par DUPONT Pierre (FT)
+                  </span>
+                  <br/>
+                  <a href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details">
+                      Ouvrir la candidature
+                  </a>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                      à l'étude
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[refused jobapp]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-file-list-3-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Candidature à SIAE refusée le 11/09/2026
+                  </span>
+                  - motif de refus : un des freins à l'emploi du candidat est incompatible avec le poste proposé.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      refus saisi le 11/09/2026 par SIAE
+                  </span>
+                  <br/>
+                  <a href="#">
+                      Voir le motif de refus
+                  </a>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">
+                      refusée
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[transferred jobapp]
+  '''
+  <div class="row gx-3 align-items-start" id="overview-jobapp">
+      <div class="col-auto">
+          <i class="ri-xl ri-corner-up-right-line">
+          </i>
+      </div>
+      <div class="col">
+          <div class="row gx-4 align-items-start justify-content-between">
+              <div class="col-6">
+                  <span class="fw-semibold">
+                      Candidature transférée le 11/09/2026 de la structure SIAE vers la structure SIAE 2.
+                  </span>
+                  Le nouvel employeur reprend l'instruction.
+                  <br/>
+                  <span class="fs-sm text-muted fw-normal">
+                      transférée par MICHEL Jean (SIAE).
+                  </span>
+                  <br/>
+                  <a href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details">
+                      Suivre la candidature
+                  </a>
+              </div>
+              <div class="col-auto">
+                  <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                      transférée
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_both_diag_from_company[snapshot with GEIQ diag]
   '''
   <main class="s-main" id="main" role="main">

@@ -16,7 +16,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
@@ -1606,4 +1606,78 @@ class TestOverviewTab:
 
         assert pretty_indented(parse_response_to_soup(response, selector="#overview-contract")) == snapshot(
             name="ended contract"
+        )
+
+    @freeze_time("2026-09-11")
+    def test_overview_jobapp(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        user = PrescriberFactory(for_snapshot=True, membership__organization__name="FT")
+        organization = user.prescriberorganization_set.get()
+        url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(user)
+
+        # No job application found
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="no job app"
+        )
+
+        # New job application
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
+        job_app = JobApplicationFactory(
+            id="11111111-1111-1111-1111-111111111111",
+            sent_by_prescriber=True,
+            sender=user,
+            sender_prescriber_organization=organization,
+            to_company=CompanyFactory(name="SIAE", subject_to_iae_rules=True),
+            job_seeker=job_seeker,
+            state=JobApplicationState.NEW,
+        )
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="new job app"
+        )
+
+        # Job application not yet processed
+        job_app.process()
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="processing job app"
+        )
+
+        # Refused job application
+        employer = EmployerFactory(for_snapshot=True, membership__company=job_app.to_company)
+        job_app.refusal_reason = RefusalReason.INCOMPATIBLE
+        job_app.answer = "refusé"
+        job_app.refuse(user=employer)
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="refused jobapp"
+        )
+
+        # Transferred job application
+        company = CompanyFactory(name="SIAE 2", subject_to_iae_rules=True)
+        CompanyMembershipFactory(user=employer, company=company)
+        job_app.transfer(user=employer, target_company=company)
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="transferred jobapp"
+        )
+
+        # Accepted job application
+        job_app.accept(user=employer)
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-jobapp")) == snapshot(
+            name="accepted jobapp"
         )

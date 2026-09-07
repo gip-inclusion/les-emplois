@@ -379,12 +379,19 @@ class OverviewTabView(BaseJobSeekerDetailView):
         )
         prolongation = approval.prolongation_set.order_by("-end_at").first() if approval else None
         contract = get_contracts(approval).first() if approval else None
+        job_app = (
+            self.object.job_applications.filter(sender_prescriber_organization=self.request.current_organization)
+            .with_accepted_at()
+            .order_by("-updated_at")
+            .first()
+        )
 
         return context | {
             "approval": approval,
             "suspension": suspension,
             "prolongation": prolongation,
             "contract": contract,
+            "job_app": job_app,
         }
 
 
