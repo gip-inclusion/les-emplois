@@ -105,3 +105,23 @@ class RefusedOrientationForSender(ProfessionalNotification, EmailNotification):
         return context | {
             "reasons": [OrientationRefusalReason(reason).label for reason in orientation.refusal_reasons]
         }
+
+
+@notifications_registry.register
+class ExpiredOrientationForBeneficiary(JobSeekerNotification, EmailNotification):
+    """Notification sent to the beneficiary when an orientation is expired."""
+
+    name = "Expiration d’une orientation"
+    category = NotificationCategory.ORIENTATION
+    subject_template = "insertion/email/expired_for_beneficiary_subject.txt"
+    body_template = "insertion/email/expired_for_beneficiary_body.txt"
+
+
+@notifications_registry.register
+class ExpiredOrientationForSender(ProfessionalNotification, EmailNotification):
+    """Notification sent to the sender when an orientation is expired."""
+
+    name = "Expiration d’une orientation"
+    category = NotificationCategory.ORIENTATION
+    subject_template = "insertion/email/expired_for_sender_subject.txt"
+    body_template = "insertion/email/expired_for_sender_body.txt"
