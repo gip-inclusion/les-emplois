@@ -39,4 +39,6 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src="https://tally.so/widgets/embed.js"></script>
+    <script src='{% static "js/overview_survey_test_popup.js" %}' data-delaypopup="true" data-userkind="prescripteur" data-page="synthese-usager"></script>
 {% endblock %}
