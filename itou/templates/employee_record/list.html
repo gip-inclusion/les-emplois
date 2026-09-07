@@ -9,7 +9,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Salariés</h1>
+            <h1>Accompagnements</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -28,6 +28,11 @@
                     {% if num_rejected_employee_records %}
                         <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
                     {% endif %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'job_seekers_views:list_organization' %}" {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>
+                    Usagers accompagnés
                 </a>
             </li>
         </ul>

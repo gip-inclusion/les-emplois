@@ -779,7 +779,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Accompagnements
+                                  Usagers accompagnés
                               </h1>
                           </div>
                           <div aria-label="Actions sur les candidatures" class="c-title__cta" role="group">
@@ -929,8 +929,8 @@
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="col-12">
-                      <h2>
-                          Tous les accompagnements de la structure
+                      <h2 class="mb-3 mb-md-4">
+                          Tous les usagers accompagnés de la structure
                       </h2>
                   </div>
               </div>
@@ -1101,7 +1101,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Accompagnements
+                                  Usagers accompagnés
                               </h1>
                           </div>
                           <div aria-label="Actions sur les candidatures" class="c-title__cta" role="group">
@@ -1234,8 +1234,8 @@
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="col-12">
-                      <h2>
-                          Mes accompagnements
+                      <h2 class="mb-3 mb-md-4">
+                          Usagers accompagnés
                       </h2>
                   </div>
               </div>

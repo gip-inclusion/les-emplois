@@ -14,7 +14,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur les candidatures" %}
         {% fragment as c_title__main %}
-            <h1>Accompagnements</h1>
+            <h1>Usagers accompagnés</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% url "job_seekers_views:get_or_create_start" as get_or_create_url %}
@@ -45,6 +45,28 @@
             </li>
         </ul>
     {% endif %}
+    {% if request.current_organization.can_use_employee_record %}
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>
+                    PASS IAE
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'employee_record_views:list' %}" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
+                    <span>Fiches salarié ASP</span>
+                    {% if num_rejected_employee_records %}
+                        <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link active" href="{% url 'job_seekers_views:list_organization' %}" {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>
+                    Usagers accompagnés
+                </a>
+            </li>
+        </ul>
+    {% endif %}
 {% endblock title_extra %}
 
 {% block content %}
@@ -53,19 +75,17 @@
     {% endif %}
     <section class="s-section">
         <div class="s-section__container container">
-            {% if request.from_prescriber %}
-                <div class="s-section__row row">
-                    <div class="col-12">
-                        <h2>
-                            {% if list_organization %}
-                                Tous les accompagnements de la structure
-                            {% else %}
-                                Mes accompagnements
-                            {% endif %}
-                        </h2>
-                    </div>
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <h2 class="mb-3 mb-md-4">
+                        {% if request.from_prescriber and list_organization %}
+                            Tous les usagers accompagnés de la structure
+                        {% else %}
+                            Usagers accompagnés
+                        {% endif %}
+                    </h2>
                 </div>
-            {% endif %}
+            </div>
             {% if list_organization %}
                 {% url 'job_seekers_views:list_organization' as url_list %}
             {% else %}

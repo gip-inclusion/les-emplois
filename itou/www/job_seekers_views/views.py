@@ -30,6 +30,8 @@ from itou.asp.utils import guess_birth_place_from_nir
 from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
@@ -643,6 +645,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "end_of_journey_filter_active": end_of_journey_filter_active,
         "contracts_ending_soon_count": contracts_ending_soon_count,
         "suggest_next_step_url": suggest_next_step_url,
+        "num_rejected_employee_records": (
+            EmployeeRecord.objects.for_company(request.current_organization).filter(status=Status.REJECTED).count()
+            if request.from_employer and request.current_organization.can_use_employee_record
+            else 0
+        ),
     }
 
     return render(request, "job_seekers_views/includes/list_results.html" if request.htmx else template_name, context)
