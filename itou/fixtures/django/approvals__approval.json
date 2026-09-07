@@ -366,5 +366,28 @@
     },
     "model": "approvals.approval",
     "pk": 17
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-31T08:49:35.399Z",
+      "created_by": null,
+      "eligibility_diagnosis": 56,
+      "end_at": "2026-10-31",
+      "number": "999990000013",
+      "origin": "default",
+      "origin_prescriber_organization_kind": "",
+      "origin_sender_kind": "employer",
+      "origin_siae_kind": "EI",
+      "origin_siae_siret": "34445638900016",
+      "pe_notification_endpoint": null,
+      "pe_notification_exit_code": null,
+      "pe_notification_status": "notification_pending",
+      "pe_notification_time": null,
+      "public_id": "fa459f51-95aa-4729-b3ca-0f0d6fa7ca32",
+      "start_at": "2025-09-01",
+      "user": 96
+    },
+    "model": "approvals.approval",
+    "pk": 18
   }
 ]
