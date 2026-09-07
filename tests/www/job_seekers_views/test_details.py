@@ -16,10 +16,10 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
-from itou.www.job_seekers_views.views import can_see_external_job_applications
+from itou.www.job_seekers_views.views import JobApplication, can_see_external_job_applications
 from tests.approvals.factories import (
     ApprovalFactory,
     ProlongationFactory,
@@ -1705,3 +1705,59 @@ class TestOverviewTab:
         contract.end_date = timezone.localdate() - relativedelta(days=42)
         rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
         assert pretty_indented(rendered) == snapshot(name="ended contract")
+
+    @freeze_time("2026-09-11")
+    def test_overview_jobapp(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_jobapp.html")
+
+        # No job application found
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": None, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no job app")
+
+        # New job application
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
+        org = PrescriberOrganizationFactory(for_snapshot=True)
+        prescriber = PrescriberFactory(first_name="Annie", last_name="Jardin")
+        job_app = JobApplicationFactory(
+            id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            sent_by_prescriber=True,
+            sender_prescriber_organization=org,
+            sender=prescriber,
+            to_company__name="SIAE",
+            job_seeker=job_seeker,
+            state=JobApplicationState.NEW,
+        )
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="new job app")
+
+        # Job application being processed
+        job_app.process()
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="processing job app")
+
+        # Refused job application
+        employer = EmployerFactory(first_name="Pierre", last_name="Clément", membership__company=job_app.to_company)
+        job_app.refusal_reason = RefusalReason.INCOMPATIBLE
+        job_app.answer = "refusé"
+        job_app.refuse(user=employer)
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="refused job app")
+
+        # Transferred job application
+        company = CompanyFactory(name="SIAE 2", subject_to_iae_rules=True)
+        CompanyMembershipFactory(user=employer, company=company)
+        job_app.transfer(user=employer, target_company=company)
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="transferred job app")
+
+        # Accepted job application
+        job_app.accept(user=employer)
+        job_app = JobApplication.objects.with_accepted_at().get()
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="accepted job app")
