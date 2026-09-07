@@ -23,7 +23,8 @@
         <div class="s-section__container container">
             <h2>Ce qu'il faut savoir aujourd'hui</h2>
             <div class="c-box c-box--overview">
-                {# TODO: contract #}
+                {% include "job_seekers_views/includes/overview_contract.html" with job_seeker=job_seeker contract=contract request=request only %}
+                <hr class="mt-4">
                 {% include "job_seekers_views/includes/overview_approval.html" with job_seeker=job_seeker approval=approval suspension=suspension prolongation=prolongation request=request only %}
                 {# TODO: job app #}
                 {# TODO: assignment #}

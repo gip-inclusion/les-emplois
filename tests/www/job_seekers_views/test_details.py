@@ -1675,3 +1675,33 @@ class TestOverviewTab:
             )
         )
         assert pretty_indented(rendered) == snapshot(name="prolonged approval")
+
+    @freeze_time("2026-09-11")
+    def test_overview_contract(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_contract.html")
+
+        # No contract found
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": None, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no contract")
+
+        # Contract is ongoing with no end date
+        contract = ContractFactory(
+            job_seeker=job_seeker,
+            company__name="SIAE",
+            start_date=timezone.localdate() - relativedelta(months=6),
+            end_date=None,
+        )
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="contract without end date")
+
+        # Contract is ongoing and has an end date
+        contract.end_date = timezone.localdate() + relativedelta(days=42)
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="contract with end date")
+
+        # Contract has ended
+        contract.end_date = timezone.localdate() - relativedelta(days=42)
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="ended contract")
