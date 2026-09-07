@@ -217,8 +217,7 @@ NAV_ENTRIES = {
         matomo_event_option="orientations-employeurs",
     ),
     "employer-assignments": NavItem(
-        label="Accompagnements",
-        icon="ri-user-line",
+        label="Usagers accompagnés",
         target=reverse("job_seekers_views:list_organization"),
         active_view_names=["job_seekers_views:list_organization"],
         matomo_event_category="offcanvasNav",
@@ -355,12 +354,14 @@ def nav(request):
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
             menu_items.append(NAV_ENTRIES["employer-orientations"])
-            menu_items.append(NAV_ENTRIES["employer-assignments"])
             if request.current_organization.is_subject_to_iae_rules:
-                employee_group_items = [NAV_ENTRIES["employer-approvals"]]
+                employee_group_items = [
+                    NAV_ENTRIES["employer-approvals"],
+                ]
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
-                menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
+                employee_group_items.append(NAV_ENTRIES["employer-assignments"])
+                menu_items.append(NavGroup(label="Accompagnements", icon="ri-team-line", items=employee_group_items))
             elif employer_has_access_to_assessments(request):
                 menu_items.append(NAV_ENTRIES["employer-geiq-assessments"])
             company_group_items = [NAV_ENTRIES["employer-company"], NAV_ENTRIES["employer-jobs"]]
