@@ -411,7 +411,7 @@ def get_jobseeker_overview_data(request, job_seeker):
                         JobApplicationState.REFUSED: 2,
                     }
 
-                    job_app = sorted(list(job_apps), key=lambda jobapp: state_order[jobapp.state])[0]
+                    job_app = sorted(list(job_apps), key=lambda jobapp: state_order.get(jobapp.state, 3))[0]
                     return {
                         "approval": approval,
                         "contract": contract,
@@ -430,13 +430,21 @@ def job_seeker_overview(request, public_id, template_name="job_seekers_views/ove
     if not overview_data or request.current_organization.department != settings.OVERVIEW_TAB_TEST_DEPARTMENT:
         raise PermissionDenied
 
+    has_applied_for_job_seeker = (
+        JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        .filter(job_seeker=job_seeker)
+        .exists()
+    )
+
     context = {
         "job_seeker": job_seeker,
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),
+        "can_see_external_job_applications": can_see_external_job_applications(job_seeker, request),
         "matomo_custom_title": "Synthèse usager",
         "show_overview_tab": True,
+        "has_applied_for_job_seeker": has_applied_for_job_seeker,
         "suspension": None,  # Not handled yet
         "prolongation": None,  # Not handled yet
         **overview_data,
