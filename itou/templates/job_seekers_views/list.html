@@ -14,7 +14,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur les candidatures" %}
         {% fragment as c_title__main %}
-            <h1>Usagers accompagnés</h1>
+            <h1>Accompagnements</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% url "job_seekers_views:get_or_create_start" as get_or_create_url %}
@@ -35,17 +35,16 @@
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item">
                 <a class="nav-link{% if not list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list' %}">
-                    Mes accompagnements
+                    Usagers accompagnés
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link{% if list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list_organization' %}">
-                    Tous les accompagnements de la structure
+                    Usagers accompagnés de la structure
                 </a>
             </li>
         </ul>
-    {% endif %}
-    {% if request.current_organization.can_use_employee_record %}
+    {% elif request.current_organization.can_use_employee_record %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>
@@ -79,7 +78,7 @@
                 <div class="col-12">
                     <h2 class="mb-3 mb-md-4">
                         {% if request.from_prescriber and list_organization %}
-                            Tous les usagers accompagnés de la structure
+                            Usagers accompagnés de la structure
                         {% else %}
                             Usagers accompagnés
                         {% endif %}

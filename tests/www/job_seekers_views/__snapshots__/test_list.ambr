@@ -779,7 +779,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Usagers accompagnés
+                                  Accompagnements
                               </h1>
                           </div>
                           <div aria-label="Actions sur les candidatures" class="c-title__cta" role="group">
@@ -802,12 +802,12 @@
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
                               <a class="nav-link" href="/job-seekers/list">
-                                  Mes accompagnements
+                                  Usagers accompagnés
                               </a>
                           </li>
                           <li class="nav-item">
                               <a class="nav-link active" href="/job-seekers/list-organization">
-                                  Tous les accompagnements de la structure
+                                  Usagers accompagnés de la structure
                               </a>
                           </li>
                       </ul>
@@ -930,7 +930,7 @@
               <div class="s-section__row row">
                   <div class="col-12">
                       <h2 class="mb-3 mb-md-4">
-                          Tous les usagers accompagnés de la structure
+                          Usagers accompagnés de la structure
                       </h2>
                   </div>
               </div>
@@ -1101,7 +1101,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Usagers accompagnés
+                                  Accompagnements
                               </h1>
                           </div>
                           <div aria-label="Actions sur les candidatures" class="c-title__cta" role="group">
@@ -1124,12 +1124,12 @@
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
                               <a class="nav-link active" href="/job-seekers/list">
-                                  Mes accompagnements
+                                  Usagers accompagnés
                               </a>
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" href="/job-seekers/list-organization">
-                                  Tous les accompagnements de la structure
+                                  Usagers accompagnés de la structure
                               </a>
                           </li>
                       </ul>

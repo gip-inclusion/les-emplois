@@ -1269,7 +1269,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
                           <span>
                               Accompagnements
@@ -1283,13 +1283,8 @@
                                   </a>
                               </li>
                               <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les accompagnements de la structure
-                                  </a>
-                              </li>
-                              <li>
                                   <a href="/approvals/prolongation/requests?only_pending=on">
-                                      Gérer les prolongations de PASS IAE
+                                      Prolongations de PASS IAE
                                   </a>
                               </li>
                           </ul>
@@ -1297,7 +1292,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
                           <span>
                               Organisation
@@ -1656,7 +1651,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
                           <span>
                               Accompagnements
@@ -1669,17 +1664,12 @@
                                       Mes accompagnements
                                   </a>
                               </li>
-                              <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les accompagnements de la structure
-                                  </a>
-                              </li>
                           </ul>
                       </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
                           <span>
                               Organisation
@@ -2353,7 +2343,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
                           <span>
                               Accompagnements
@@ -2366,17 +2356,12 @@
                                       Mes accompagnements
                                   </a>
                               </li>
-                              <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les accompagnements de la structure
-                                  </a>
-                              </li>
                           </ul>
                       </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
                           <span>
                               Organisation
@@ -2680,7 +2665,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
                           <span>
                               Accompagnements
@@ -2693,17 +2678,12 @@
                                       Mes accompagnements
                                   </a>
                               </li>
-                              <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les accompagnements de la structure
-                                  </a>
-                              </li>
                           </ul>
                       </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
                           <span>
                               Organisation
@@ -2992,7 +2972,7 @@
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
                           <span>
                               Accompagnements
@@ -3005,17 +2985,12 @@
                                       Mes accompagnements
                                   </a>
                               </li>
-                              <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les accompagnements de la structure
-                                  </a>
-                              </li>
                           </ul>
                       </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
                           <span>
                               Organisation
