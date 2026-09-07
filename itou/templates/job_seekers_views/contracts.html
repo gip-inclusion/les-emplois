@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block title_extra %}
-    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker active_nav_tab="contracts" back_url=back_url only %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_overview_tab=show_overview_tab active_nav_tab="contracts" back_url=back_url only %}
 {% endblock %}
 
 {% block content %}

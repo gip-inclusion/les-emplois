@@ -1,0 +1,39 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-advisors" only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_overview_tab=show_overview_tab active_nav_tab="overview" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section id="job-seeker-overview" class="s-section">
+        <div class="s-section__container container">
+            <h2>Ce qu'il faut savoir aujourd'hui</h2>
+            <div class="c-box c-box--overview">
+                {# TODO: contract #}
+                {% include "job_seekers_views/includes/overview_approval.html" with job_seeker=job_seeker approval=approval suspension=suspension prolongation=prolongation request=request only %}
+                {# TODO: job app #}
+                {# TODO: assignment #}
+                {# TODO: inactivity period #}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}
