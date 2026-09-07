@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2026-08-31
+
+### Ajouté
+
+- [Accompagnements : Ajout d'un champ `last_action_at`](https://github.com/gip-inclusion/les-emplois/pull/8627)
+- [Admin : Ajout d'un champ texte pour commenter les passe IAE annulés](https://github.com/gip-inclusion/les-emplois/pull/8617)
+- [Nouveau filtre “handicap” pour afficher les offres EA/EATT et offres des employeurs handi-engagés publiées sur le site de France Travail](https://github.com/gip-inclusion/les-emplois/pull/8607)
+- [Page d'accueil : Ajout d'une carte présentant Mon Récap sur l'accueil connecté](https://github.com/gip-inclusion/les-emplois/pull/8599)
+
+### Modifié
+
+- [Accompagnateurs : Évolution de l'affichage des accompagnateurs](https://github.com/gip-inclusion/les-emplois/pull/8505)
+- [Candidature : Ajout de vérifications sur la date de début de contrat en IAE](https://github.com/gip-inclusion/les-emplois/pull/8521)
+- [Contrôle a posteriori : Ne contrôler que les SIAE conventionnées](https://github.com/gip-inclusion/les-emplois/pull/8608)
+- [Interface : Nouvelle alerte pour date max de PASS réalisées au plus tard le jour de l’embauche](https://github.com/gip-inclusion/les-emplois/pull/8641)
+- [Tech : Nettoyage post évolution de l'affichage des accompagnateurs](https://github.com/gip-inclusion/les-emplois/pull/8616)
+
 ## 2026-08-24
 
 ### Modifié
