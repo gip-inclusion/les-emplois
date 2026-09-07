@@ -43,6 +43,7 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 users.jobseekerassignment -o "$FIXTURES_DIRECTORY/users__job_seeker_assignment.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 users.jobseekerprofile -o "$FIXTURES_DIRECTORY/users__jobseeker_profile.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 users.user -o "$FIXTURES_DIRECTORY/users__user.json"
+./manage.py dumpdata --format json-no-auto-fields --indent 2 auth.group -o "$FIXTURES_DIRECTORY/auth__group.json"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do

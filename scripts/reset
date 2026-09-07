@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Runs every week to reset https://demo.plateforme.inclusion.gouv.fr/"""
+
 import argparse
 import os
 import pathlib
@@ -67,9 +69,11 @@ def main(bucket_name, admin_password, dora_token):
     env = os.environ.copy()
     env["REQUIREMENTS_PATH"] = "requirements/base.txt"
     subprocess.run(["make", "populate_db"], check=True, env=env)
-    u = User.objects.get(username="admin")
-    u.set_password(admin_password)
-    u.save(update_fields=["password"])
+
+    for admin in "admin", "itouadmin":
+        u = User.objects.get(username=admin)
+        u.set_password(admin_password)
+        u.save(update_fields=["password"])
 
     ServiceToken.objects.create(key=dora_token, service=Service.DORA, purpose="Pour l'API nexus")
 
