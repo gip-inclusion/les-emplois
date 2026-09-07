@@ -164,7 +164,7 @@ def test_displayed_tabs(client, user_factory, assertion):
     assertion(
         response,
         f"""<a class="nav-link" href="{reverse("job_seekers_views:list_organization")}">
-        Tous les accompagnements de la structure</a>""",
+        Usagers accompagnés de la structure</a>""",
         html=True,
     )
 

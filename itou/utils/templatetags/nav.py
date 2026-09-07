@@ -133,16 +133,8 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidats-utilisateur",
     ),
-    "prescriber-jobseekers-organization": NavItem(
-        label="Tous les accompagnements de la structure",
-        target=reverse("job_seekers_views:list_organization"),
-        active_view_names=["job_seekers_views:list_organization"],
-        matomo_event_category="offcanvasNav",
-        matomo_event_name="clic",
-        matomo_event_option="candidats-organisation",
-    ),
     "prescriber-approval-prolongations": NavItem(
-        label="Gérer les prolongations de PASS\xa0IAE",
+        label="Prolongations de PASS\xa0IAE",
         target=reverse("approvals:prolongation_requests_list", query={"only_pending": "on"}),
         active_view_names=["approvals:prolongation_requests_list"],
     ),
@@ -331,10 +323,9 @@ def nav(request):
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
-            jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             if request.from_authorized_prescriber:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
-            menu_items.append(NavGroup(label="Accompagnements", icon="ri-user-line", items=jobseekers_items))
+            menu_items.append(NavGroup(label="Accompagnements", icon="ri-team-line", items=jobseekers_items))
             organization_items = [
                 (
                     NAV_ENTRIES["prescriber-overview"]
@@ -346,7 +337,7 @@ def nav(request):
             menu_items.append(
                 NavGroup(
                     label="Organisation",
-                    icon="ri-team-line",
+                    icon="ri-community-line",
                     items=organization_items,
                 )
             )

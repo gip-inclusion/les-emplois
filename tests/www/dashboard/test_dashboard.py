@@ -62,7 +62,7 @@ def administrative_criteria_annex_1():
 
 
 class TestDashboardView:
-    SUSPEND_TEXT = "Suspendre un PASS IAE"
+    SUSPEND_TEXT = "Demander une suspension de PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
@@ -1118,7 +1118,7 @@ class TestDashboardView:
 def test_prolongation_requests_access(client, factory, assertion):
     client.force_login(factory())
     response = client.get(reverse("dashboard:index"))
-    assertion(response, "Gérer mes prolongations de PASS IAE")
+    assertion(response, "Prolongations de PASS IAE")
     assertion(response, reverse("approvals:prolongation_requests_list"))
 
 
