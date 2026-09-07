@@ -11,7 +11,9 @@ from django.views import generic
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import SingleObjectMixin
 
+from itou.companies.models import Company
 from itou.files.models import save_file
+from itou.institutions.models import Institution
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
@@ -838,13 +840,22 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 
 @readonly_view
 def view_proof(request, evaluated_administrative_criteria_id):
+    # request.organizations contains every organization the user belongs to, whatever its kind: we only keep those
+    # matching the lookup as other kinds (e.g. PrescriberOrganization) would break the query.
     if request.from_employer:
-        org_lookup = "evaluated_job_application__evaluated_siae__siae__in"
+        org_filter = {
+            "evaluated_job_application__evaluated_siae__siae__in": [
+                org for org in request.organizations if isinstance(org, Company)
+            ]
+        }
     elif request.from_institution:
-        org_lookup = "evaluated_job_application__evaluated_siae__evaluation_campaign__institution__in"
+        org_filter = {
+            "evaluated_job_application__evaluated_siae__evaluation_campaign__institution__in": [
+                org for org in request.organizations if isinstance(org, Institution)
+            ]
+        }
     else:
         raise Http404(request.user.kind)
-    org_filter = {org_lookup: request.organizations}
     criteria = get_object_or_404(
         EvaluatedAdministrativeCriteria.objects.select_related("proof"),
         pk=evaluated_administrative_criteria_id,
