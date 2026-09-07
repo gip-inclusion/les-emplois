@@ -1210,6 +1210,10 @@ class Contract(models.Model):
     )
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
+    @property
+    def has_ended(self):
+        return self.end_date and self.end_date < timezone.localdate()
+
 
 class SiaeACIConvergencePHC(models.Model):
     siret = models.CharField(
