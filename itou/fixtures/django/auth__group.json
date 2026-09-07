@@ -1,0 +1,10 @@
+[
+  {
+    "fields": {
+      "name": "itou-admin",
+      "permissions": []
+    },
+    "model": "auth.group",
+    "pk": 3
+  }
+]

@@ -308,5 +308,15 @@
     },
     "model": "account.emailaddress",
     "pk": 45
+  },
+  {
+    "fields": {
+      "email": "itouadmin@example.com",
+      "primary": true,
+      "user": 148,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 46
   }
 ]

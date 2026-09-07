@@ -13,8 +13,13 @@ def admin_accounts_tag():
     action_url = reverse("login:demo")
     return [
         {
-            "title": "Admin",
+            "title": "Super-utilisateur",
             "email": "admin@test.com",
+            "action_url": action_url,
+        },
+        {
+            "title": "Itou admin",
+            "email": "itouadmin@example.com",
             "action_url": action_url,
         },
     ]
