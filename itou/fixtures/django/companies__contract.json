@@ -87,5 +87,17 @@
       "start_date": "2025-08-01",
       "updated_at": "2025-08-01T09:00:00Z"
     }
+  },
+  {
+    "model": "companies.contract",
+    "pk": 11,
+    "fields": {
+      "company": 3852,
+      "details": "[]",
+      "end_date": "2026-08-15",
+      "job_seeker": 98,
+      "start_date": "2024-08-15",
+      "updated_at": "2026-08-15T09:00:00Z"
+    }
   }
 ]
