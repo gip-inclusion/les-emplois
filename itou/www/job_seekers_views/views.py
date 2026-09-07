@@ -385,6 +385,7 @@ class OverviewTabView(BaseJobSeekerDetailView):
             .order_by("-updated_at")
             .first()
         )
+        assignment = self.object.last_assignment
 
         return context | {
             "approval": approval,
@@ -392,6 +393,7 @@ class OverviewTabView(BaseJobSeekerDetailView):
             "prolongation": prolongation,
             "contract": contract,
             "job_app": job_app,
+            "assignment": assignment,
         }
 
 
