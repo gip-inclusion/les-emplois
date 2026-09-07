@@ -86,7 +86,7 @@
             {% fragment as title %}
                 Votre structure
                 {% if request.current_organization.siret %}
-                    (inscrite avec le numéro SIRET : {{ request.current_organization.siret }})
+                    (inscrite avec le numéro SIRET : {{ request.current_organization.siret }})
                 {% endif %}
                 n'est plus conventionnée.
             {% endfragment %}
@@ -119,7 +119,7 @@
                 </p>
                 {% if request.current_organization.requires_authorization_proof %}
                     <p class="mb-0">
-                        Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
+                        Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
                         <a href="{% tally_form_url "wgDzz1" idprescriber=request.current_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}"
                            rel="noopener"
                            target="_blank"
