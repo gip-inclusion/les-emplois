@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 2026-08-24
+
+### Modifié
+
+- [Accompagnateur : Ajout de la page "Accompagnements" pour les GEIQ et OPCS](https://github.com/gip-inclusion/les-emplois/pull/8584)
+- [Employeur : Rendre obligatoire la saisie du commentaire de mise en attente de candidature](https://github.com/gip-inclusion/les-emplois/pull/8456)
+- [Prescripteur habilité : Ajout d'un filtre "Fin de parcours IAE à venir" dans la page "Mes accompagnements"](https://github.com/gip-inclusion/les-emplois/pull/8500)
+
 ## 2026-08-17
 
 ### Ajouté
