@@ -54,6 +54,7 @@ from tests.users.factories import (
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
+    PrescriberFactory,
     ProfessionalFactory,
     UserFactory,
 )
@@ -61,6 +62,46 @@ from tests.utils.testing import normalize_fields_history
 
 
 ERROR_LOG_NOT_PROFESSIONAL = "We should not try to add a JobSeekerAssignment on user=%s"
+
+
+class TestQuerySet:
+    def test_with_advisors_count(self):
+        job_seeker = JobSeekerFactory()
+
+        professional = PrescriberFactory()
+        professional2 = PrescriberFactory()
+
+        # active assignments (2 advisors)
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional)
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=professional, prescriber_organization=PrescriberOrganizationFactory()
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional,
+            prescriber_organization=PrescriberOrganizationFactory(),
+            assigned_to_unknown_advisor=True,
+        )
+
+        # old assignments (2 advisors)
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional2, ended=True)
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional2,
+            prescriber_organization=PrescriberOrganizationFactory(),
+            ended=True,
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional2,
+            prescriber_organization=PrescriberOrganizationFactory(),
+            assigned_to_unknown_advisor=True,
+            ended=True,
+        )
+
+        assert User.objects.with_advisors_count(active=None).get(pk=job_seeker.pk).advisors_nb == 4
+        assert User.objects.with_advisors_count(active=True).get(pk=job_seeker.pk).active_advisors_nb == 2
+        assert User.objects.with_advisors_count(active=False).get(pk=job_seeker.pk).old_advisors_nb == 2
 
 
 class TestManager:
