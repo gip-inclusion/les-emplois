@@ -26,7 +26,7 @@ class FranceConnectUserData(OIDConnectUserData):
     kind: UserKind = UserKind.JOB_SEEKER
     title: str | None = None
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
-    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
+    allowed_identity_provider_migration: ClassVar[tuple[()] | tuple[IdentityProvider]] = ()
 
     @staticmethod
     def user_info_mapping_dict(user_info: dict):

@@ -18,7 +18,7 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, g
 class InsertionAdmin(ReadonlyMixin, ItouModelAdmin):
     show_facets = admin.ShowFacets.ALWAYS
 
-    extra_readonly_fields = ()
+    extra_readonly_fields: list[str] | tuple[str, ...] = ()
 
     def get_readonly_fields(self, request, obj=None):
         own_fields = [field.name for field in self.model._meta.fields + self.model._meta.many_to_many]
@@ -37,7 +37,7 @@ class GenericReferenceItemAdmin(InsertionAdmin):
 class ServicesInline(ReadonlyMixin, ItouTabularInline):
     model = Service
     show_change_link = True
-    fields = readonly_fields = ["uid", "name", "kind", "created_at", "updated_at"]
+    fields = readonly_fields = ["uid", "name", "kind", "created_at", "updated_at"]  # type: ignore
     ordering = ["uid"]
 
 
@@ -168,7 +168,7 @@ class MobilizationEventAdmin(InsertionAdmin):
     ordering = ["-created_at"]
     show_full_result_count = False
 
-    fields = readonly_fields = [
+    fields = readonly_fields = [  # type: ignore
         "pk",
         "kind",
         "user",

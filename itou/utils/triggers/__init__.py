@@ -97,17 +97,16 @@ class FieldsHistory(core.Trigger):
     when: core.When = core.Before
     operation: core.Operation = core.Update
     declare: list[tuple[str, str]] | None = [("_rows_diff", "jsonb"), ("current_context", "jsonb")]
-    fields: list[str] | None = None
 
     HISTORY_FIELD_NAME = "fields_history"
 
     def __init__(
         self,
         *,
-        fields: list[str] | None = None,
+        fields: list[str],
         **kwargs: Any,
     ):
-        self.fields = fields or self.fields
+        self.fields = fields
 
         if not self.fields:
             raise ValueError("Must provide at least one field")

@@ -39,7 +39,7 @@ class OrganizationAbstract(models.Model):
     Base model for Company, Prescriber Organization and Institution models.
     """
 
-    ORGANIZATION_KIND = None
+    ORGANIZATION_KIND: OrganizationKind | None = None
 
     name = models.CharField(verbose_name="nom", max_length=255)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)

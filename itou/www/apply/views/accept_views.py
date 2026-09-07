@@ -216,7 +216,7 @@ class IAEEligibilityForAcceptView(
 
 
 class AcceptHTMXFragmentView(UserPassesTestMixin, TemplateView):
-    NO_ERROR_FIELDS = []
+    NO_ERROR_FIELDS: tuple = ()
 
     def test_func(self):
         return self.request.from_employer

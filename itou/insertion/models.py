@@ -800,7 +800,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def duration_total(self) -> int | None:
         if not self.duration_weeks or not self.duration_weekly_hours:
-            return
+            return None
         return self.duration_weekly_hours * self.duration_weeks
 
 

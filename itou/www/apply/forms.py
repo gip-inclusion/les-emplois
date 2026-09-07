@@ -12,6 +12,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.safestring import SafeString
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
@@ -298,7 +299,7 @@ class HiringStartAtErrorCode(enum.Enum):
                         reverse("apply:postpone", kwargs={"job_application_id": job_application_id}),
                     )
                 else:
-                    postpone_suggestion = ""
+                    postpone_suggestion = SafeString("")
                 context["postpone_suggestion"] = postpone_suggestion
                 message = """\
                     <p>

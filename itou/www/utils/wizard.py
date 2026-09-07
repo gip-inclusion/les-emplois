@@ -17,10 +17,10 @@ Steps = namedtuple("Steps", ["current", "step1", "count", "next", "prev"])
 
 
 class WizardView(TemplateView):
-    url_name = None  # Must match the name set in urls.py
-    expected_session_kind = None
+    url_name: str | None = None  # Must match the name set in urls.py
+    expected_session_kind: str | None = None
     steps_config = {}
-    template_name = None
+    template_name: str | None = None
 
     @classmethod
     def initialize_session_and_start(cls, request, reset_url, extra_session_data=None):
