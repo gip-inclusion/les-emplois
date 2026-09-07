@@ -53,6 +53,7 @@
   "55 23 * * * $ROOT/clevercloud/run_management_command.sh purge_orphaned_support_remarks --wet-run",
 
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
+  "30 11 * * MON-FRI $ROOT/clevercloud/run_management_command.sh detect_missing_asp_files",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
