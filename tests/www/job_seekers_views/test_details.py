@@ -3,6 +3,7 @@ import random
 import uuid
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.template import Context
 from django.test import TestCase
 from django.urls import reverse
@@ -19,7 +20,12 @@ from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
-from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1480,3 +1486,78 @@ class TestAdvisorsTab:
         assertNotContains(response, fill_assignment_reason_btn, html=True)
         assertNotContains(response, switch_organization_btn)
         assertNotContains(response, not_a_member_warning)
+
+
+class TestOverviewTab:
+    @freeze_time("2026-09-11")
+    def test_overview_approval(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        user = PrescriberFactory()
+        url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(user)
+
+        # No approval ever delivered
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="no approval"
+        )
+
+        # Approval is valid with over 90 days left
+        approval = ApprovalFactory(user=job_seeker, public_id="11111111-1111-1111-1111-111111111111")
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="valid approval"
+        )
+
+        # Approval is valid with less than or 90 days left
+        TWO_YEARS = relativedelta(years=2)
+        NINETY_DAYS = relativedelta(days=90)
+        approval.start_at = "2024-07-01"
+        approval.end_at = timezone.localdate() + NINETY_DAYS - relativedelta(days=1)
+        approval.save()
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="soon expired approval"
+        )
+
+        # Approval is suspended
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=timezone.localdate(),
+            end_at=timezone.localdate() + NINETY_DAYS,
+            siae__name="SIAE 1",
+        )
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="suspended approval"
+        )
+        suspension.delete()
+
+        # Approval is expired
+        approval.start_at = timezone.localdate() - TWO_YEARS - NINETY_DAYS
+        approval.end_at = approval.start_at + NINETY_DAYS
+        approval.save()
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="expired approval"
+        )
+
+        # Approval is prolonged
+        ProlongationFactory(
+            approval=approval, end_at=timezone.localdate() + NINETY_DAYS, declared_by_siae__name="SIAE 2"
+        )
+
+        response = client.get(url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#overview-approval")) == snapshot(
+            name="prolonged approval"
+        )

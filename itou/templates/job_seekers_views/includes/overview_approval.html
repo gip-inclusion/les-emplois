@@ -1,0 +1,126 @@
+{% load str_filters %}
+
+<div id="overview-approval" class="row gx-3 align-items-start">
+    {% if approval %}
+
+        {% if suspension and suspension.is_in_progress %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-pass-pending-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">PASS IAE suspendu depuis le {{ suspension.start_at|date:"d/m/Y" }} - motif déclaré : {{ suspension.get_reason_display|lower }}.</span>
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">suspension · saisie le {{ suspension.created_at|date:"d/m/Y" }} par {{ suspension.siae.display_name }}</span>
+                        <br>
+                        <a href="{% url "approvals:details" public_id=approval.public_id %}">Voir la suspension</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">suspendu</span>
+                    </div>
+                </div>
+            </div>
+
+        {% elif prolongation and prolongation.is_in_progress %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-add-circle-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">PASS IAE prolongé jusqu'au {{ prolongation.end_at|date:"d/m/Y" }} - motif : {{ prolongation.get_reason_display|lower }}.</span>
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">prolongation accordée le {{ prolongation.created_at|date:"d/m/Y" }} · demandée par {{ prolongation.declared_by_siae.display_name }}</span>
+                        <br>
+                        <a href="{% url "approvals:details" public_id=approval.public_id %}">Voir le PASS IAE</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">prolongé</span>
+                    </div>
+                </div>
+            </div>
+
+        {% elif approval.is_valid %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-pass-valid-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    {% if approval.remainder.days <= 90 %}
+                        <div class="col-6">
+                            <span class="fw-semibold">PASS IAE expire dans {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}, le {{ approval.remainder_as_date|date:"d/m/Y" }}.</span>
+                            A renouveler avant toute nouvelle embauche.
+                            <br>
+                            <span class="fs-sm text-muted fw-normal">objet à validité réglementaire · {{ approval.get_origin_display }} le {{ approval.created_at|date:"d/m/Y" }}</span>
+                            <br>
+                            <a href="{% url "approvals:details" public_id=approval.public_id %}">Voir le PASS IAE</a>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">bientôt expiré</span>
+                        </div>
+                    {% else %}
+                        <div class="col-6">
+                            <span class="fw-semibold">PASS IAE valide jusqu'au {{ approval.end_at|date:"d/m/Y" }}.</span>
+                            Aucune démarche à prévoir pour une embauche en SIAE.
+                            <br>
+                            <span class="fs-sm text-muted fw-normal">objet à validité réglementaire · {{ approval.get_origin_display }} le {{ approval.created_at|date:"d/m/Y" }}</span>
+                            <br>
+                            <a href="{% url "approvals:details" public_id=approval.public_id %}">Voir le PASS IAE</a>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">en cours</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% else %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-pass-expired-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">PASS IAE expiré le {{ approval.end_at|date:"d/m/Y" }}.</span>
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">objet à validité réglementaire · délivré le {{ approval.created_at|date:"d/m/Y" }} par Les emplois de l'inclusion</span>
+                        <br>
+                        <a href="{% url "approvals:details" public_id=approval.public_id %}">Voir le PASS IAE</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">expiré</span>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="col-auto">
+            <i class="ri-xl ri-shield-line"></i>
+        </div>
+        <div class="col">
+            <div class="row gx-4 align-items-start justify-content-between">
+                <div class="col-6">
+                    <span class="fw-semibold">Aucun PASS IAE au dossier.</span>
+                    <br>
+                    <span class="fs-sm text-muted fw-normal">absence d'information · vérifié le {% now "d/m/Y" %}</span>
+                    <br>
+                    <a class="btn btn-outline-primary mt-2" href="{% url "eligibility_views:update_iae" job_seeker_public_id=job_seeker.public_id %}">
+                        Valider son éligibilité IAE
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">jamais délivré</span>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+</div>
