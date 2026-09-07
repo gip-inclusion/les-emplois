@@ -49,13 +49,13 @@
                                 {% if request.user.identity_provider == "PC" %}
                                     <ul class="list-unstyled">
                                         <li>
-                                            Prénom : <strong>{{ user.first_name|title }}</strong>
+                                            Prénom : <strong>{{ user.first_name|title }}</strong>
                                         </li>
                                         <li>
-                                            Nom : <strong>{{ user.last_name|upper }}</strong>
+                                            Nom : <strong>{{ user.last_name|upper }}</strong>
                                         </li>
                                         <li>
-                                            Adresse e-mail : <strong>{{ user.email }}</strong>
+                                            Adresse e-mail : <strong>{{ user.email }}</strong>
                                         </li>
                                     </ul>
                                     {% component_alert content=content variant="info" icon=False %}
@@ -73,13 +73,13 @@
                                 {% elif ic_account_url %}
                                     <ul class="list-unstyled">
                                         <li>
-                                            Prénom : <strong>{{ user.first_name|title }}</strong>
+                                            Prénom : <strong>{{ user.first_name|title }}</strong>
                                         </li>
                                         <li>
-                                            Nom : <strong>{{ user.last_name|upper }}</strong>
+                                            Nom : <strong>{{ user.last_name|upper }}</strong>
                                         </li>
                                         <li>
-                                            Adresse e-mail : <strong>{{ user.email }}</strong>
+                                            Adresse e-mail : <strong>{{ user.email }}</strong>
                                         </li>
                                     </ul>
                                     <a class="btn btn-outline-primary btn-ico" href="{{ ic_account_url }}">

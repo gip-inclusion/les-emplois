@@ -797,9 +797,9 @@ class TestEditUserInfoView:
         assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
         assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
         assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-        assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
-        assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
-        assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
+        assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
+        assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
+        assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
         assertContains(response, "Ces informations doivent être modifiées sur votre compte ")
 
         post_data = {

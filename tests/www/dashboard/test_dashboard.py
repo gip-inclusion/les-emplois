@@ -690,7 +690,7 @@ class TestDashboardView:
         client.force_login(user)
 
         response = client.get(reverse("dashboard:index"))
-        assertContains(response, "Vous n’avez pas encore de CV ?")
+        assertContains(response, "Vous n’avez pas encore de CV ?")
         assertContains(response, "Créez-en un grâce à notre partenaire Diagoriente.")
         assertContains(
             response,

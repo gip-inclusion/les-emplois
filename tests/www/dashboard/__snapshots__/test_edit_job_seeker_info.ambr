@@ -6,7 +6,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -39,7 +39,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -72,7 +72,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -105,7 +105,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -684,7 +684,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -1200,7 +1200,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -1233,7 +1233,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
@@ -1266,7 +1266,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h3 class="modal-title" id="ask_for_confirmation_label">
-                      Confirmer les modifications ?
+                      Confirmer les modifications ?
                   </h3>
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
