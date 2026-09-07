@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2026-09-07
+
+### Ajouté
+
+- [Employeur : Repérer les salariés en fin de contrat et suggérer une suite de parcours](https://github.com/gip-inclusion/les-emplois/pull/8628)
+- [GEIQ : Tableau de bord pilotage (pour la FFGEIQ et la DGEFP)](https://github.com/gip-inclusion/les-emplois/pull/8646)
+- [Insertion : Ajout d’une bannière mentionnant un récent problème technique autour des orientations](https://github.com/gip-inclusion/les-emplois/pull/8713)
+- [Prescripteur : Permettre de demander un bilan d'accompagnement à la SIAE](https://github.com/gip-inclusion/les-emplois/pull/8632)
+
+### Modifié
+
+- [Contrôle a posteriori : Améliorations UI/UX](https://github.com/gip-inclusion/les-emplois/pull/8573)
+- [Contrôle a posteriori : Certification des critères de niveau 2](https://github.com/gip-inclusion/les-emplois/pull/8536)
+- [Interface : Renommage et réorganisation des items du menu "Structure" des employeurs](https://github.com/gip-inclusion/les-emplois/pull/8709)
+- [Marque : Préparer le changement de nom de l'application](https://github.com/gip-inclusion/les-emplois/pull/8453)
+- [PASS IAE : Renommage de la rubrique "Salariés et PASS IAE" en "PASS IAE"](https://github.com/gip-inclusion/les-emplois/pull/8648)
+
+### Supprimé
+
+- [Prescripteur : Suppression de la bêta SPS abandonnée](https://github.com/gip-inclusion/les-emplois/pull/8695)
+
 ## 2026-08-31
 
 ### Ajouté
