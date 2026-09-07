@@ -1,0 +1,112 @@
+{% load enums %}
+{% load matomo %}
+{% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
+{% enums "users" "AssignmentEndReason" as AssignmentEndReason %}
+
+{% partialdef advisor_with_org %}
+    {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+        {{ assignment.professional.get_inverted_full_name }} ({{ assignment.organization.display_name }})
+    {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG or assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG %}
+        {{ assignment.professional.get_inverted_full_name }} (Aucune structure associée)
+    {% else %}
+        un accompagnateur non référencé ({{ assignment.organization.display_name }})
+    {% endif %}
+{% endpartialdef %}
+
+<div id="overview-assignment" class="row gx-3 align-items-start">
+    {% if job_seeker.active_advisors_nb == 0 %}
+
+        {% with assignment=job_seeker.last_assignment %}
+
+            {% if assignment %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-user-unfollow-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Accompagné de {{ assignment.created_at|date:"F Y" }} à {{ assignment.ended_at|date:"F Y" }} par {% partial advisor_with_org %}.</span>
+                                Accompagnement {% if assignment.end_reason == AssignmentEndReason.MANUAL %}clos manuellement{% else %}clos automatiquement{% endif %} le {{ assignment.ended_at|date:"d/m/Y" }}.
+                            </div>
+                            <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les anciens accompagnements</a>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">ancien</span>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-shield-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Aucun accompagnateur actuel.</span>
+                                Cet usager n'a encore jamais été accompagné.
+                            </div>
+                            <a class="btn btn-outline-primary mt-2"
+                               href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "test-synthese" "clic" "creer-accompagnement" %}>
+                                Se positionner comme accompagnateur
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">jamais accompagné</span>
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+    {% elif job_seeker.active_advisors_nb == 1 %}
+
+        {% with assignment=job_seeker.last_assignment %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-user-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="fw-semibold">Accompagné depuis {{ assignment.created_at|date:"F Y" }} par {% partial advisor_with_org %}.</span>
+                        </div>
+                        <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">accompagnateur</span>
+                    </div>
+                </div>
+            </div>
+
+        {% endwith %}
+
+    {% else %}
+
+        <div class="col-auto">
+            <i class="ri-xl ri-group-line"></i>
+        </div>
+        <div class="col">
+            <div class="row gx-4 align-items-start justify-content-between">
+                <div class="col-6">
+                    <div class="mb-2">
+                        <span class="fw-semibold">Actuellement suivi par plusieurs accompagnateurs.</span>
+                    </div>
+                    <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">{{ job_seeker.active_advisors_nb }} accompagnements</span>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+</div>
