@@ -78,4 +78,8 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    {% if is_in_overview_test_perimeter and not show_overview_tab %}
+        <script src="https://tally.so/widgets/embed.js"></script>
+        <script src='{% static "js/overview_survey_control_popup.js" %}' data-delaypopup="true" data-userkind="prescripteur" data-page="synthese-usager"></script>
+    {% endif %}
 {% endblock script %}
