@@ -1,0 +1,191 @@
+{% load components %}
+{% load enums %}
+{% load matomo %}
+{% load url_add_query %}
+{% enums "job_applications" "JobApplicationState" as JobApplicationState %}
+
+{% partialdef open-jobapps-cta %}
+    {% if has_applied_for_job_seeker %}
+        <a href="{% url "apply:list_prescriptions" %}?job_seeker={{ job_seeker.pk }}" {% matomo_event "test-synthese" "clic" "voir-candidatures" %}>
+            {% if job_app and job_app.sender == request.user or job_app.sender_prescriber_organization == request.current_organization %}
+                Voir les candidatures
+            {% else %}
+                Voir les candidatures de mon organisation
+            {% endif %}
+        </a>
+    {% else %}
+        {% url "search:employers_results" as search_url %}
+        {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+        <a href="{{ url_query }}" {% matomo_event "test-synthese" "clic" "postuler-pour-usager" %}>
+            Postuler pour {{ job_seeker.get_inverted_full_name }}
+        </a>
+    {% endif %}
+{% endpartialdef %}
+
+<div id="overview-jobapp" class="row gx-3 align-items-start">
+    {% if job_app %}
+
+        {% if job_app.sender_prescriber_organization == request.current_organization or job_app.sender == request.user or can_see_external_job_applications %}
+
+            {% if job_app.transferred_at and job_app.state == JobApplicationState.NEW %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-corner-up-right-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Candidature transférée le {{ job_app.transferred_at|date:"d/m/Y" }} de la structure {{ job_app.transferred_from.display_name }} vers la structure {{ job_app.to_company.display_name }}.</span>
+                                Le nouvel employeur reprend l'instruction.
+                            </div>
+                            {% partial open-jobapps-cta %}
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">transférée</span>
+                        </div>
+                    </div>
+                </div>
+
+            {% elif job_app.state == JobApplicationState.NEW or job_app.state == JobApplicationState.PROCESSING %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-file-list-3-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} déposée le {{ job_app.created_at|date:"d/m/Y" }}.</span>
+                                {% if job_app.state == JobApplicationState.PROCESSING %}
+                                    Sans réponse depuis le {{ job_app.updated_at|date:"d/m/Y" }}.
+                                {% endif %}
+                                <br>
+                                {% with selected_jobs=job_app.selected_jobs.all %}
+                                    {% if not selected_jobs %}
+                                        Candidature spontanée
+                                    {% elif selected_jobs|length == 1 %}
+                                        Poste sélectionné : {{ selected_jobs.0.display_name }}
+                                    {% else %}
+                                        Postes sélectionnés :
+                                        <ul class="list-unstyled mb-0">
+                                            {% for job in selected_jobs %}
+                                                <li>{{ job.display_name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            {% partial open-jobapps-cta %}
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                                {% if job_app.state == JobApplicationState.PROCESSING %}
+                                    à l'étude
+                                {% else %}
+                                    nouvelle
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            {% elif job_app.state == JobApplicationState.REFUSED %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-file-list-3-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} refusée le {{ job_app.processed_at|date:"d/m/Y" }} </span>
+                                - motif de refus : {{ job_app.get_refusal_reason_display|lower }}.
+                            </div>
+                            {% partial open-jobapps-cta %}
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">refusée</span>
+                        </div>
+                    </div>
+                </div>
+
+            {% elif job_app.state == JobApplicationState.ACCEPTED %}
+
+                <div class="col-auto">
+                    <i class="ri-xl ri-user-follow-line"></i>
+                </div>
+                <div class="col">
+                    <div class="row gx-4 align-items-start justify-content-between">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <span class="fw-semibold">Embauche déclarée à {{ job_app.to_company.display_name }} le {{ job_app.hiring_start_at|date:"d/m/Y" }}, </span>
+                                à la suite de la candidature du {{ job_app.created_at|date:"d/m/Y" }}.
+                            </div>
+                            {% partial open-jobapps-cta %}
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">acceptée</span>
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+
+        {% else %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-corner-up-right-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="fw-semibold">Candidature externe déposée le {{ job_app.created_at|date:"d/m/Y" }}.</span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-primary text-white flex-shrink-0">externe</span>
+                    </div>
+                </div>
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="external_jobapps_infos" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Périmètre de suivi : Accès limité aux candidatures réalisées par votre structure
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        <p>
+                            Votre visibilité sur les candidatures de cet usager se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des candidatures de cet usager, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
+                        </p>
+                        <p class="mb-0">
+                            <a class="btn-link has-external-link" rel="noopener noreferrer" target="_blank" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_info %}
+                {% partial open-jobapps-cta %}
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="col-auto">
+            <i class="ri-xl ri-close-circle-line"></i>
+        </div>
+        <div class="col">
+            <div class="row gx-4 align-items-start justify-content-between">
+                <div class="col-6">
+                    <div class="mb-2">
+                        <span class="fw-semibold">Aucune candidature déposée dans les 6 derniers mois.</span>
+                        Il est possible que le candidat ait déposé une candidature en autonomie ou qu'il soit suivi par une autre structure.
+                    </div>
+                    {% partial open-jobapps-cta %}
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">aucune candidature</span>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>

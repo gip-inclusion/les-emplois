@@ -3257,6 +3257,284 @@
   
   '''
 # ---
+# name: TestOverviewTab.test_overview_jobapp[accepted job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-follow-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Embauche déclarée à SIAE 2 le 11/09/2026,
+                              </span>
+                              à la suite de la candidature du 11/09/2026.
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                              acceptée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[external job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-corner-up-right-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Candidature externe déposée le 11/09/2026.
+                              </span>
+                          </div>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-primary text-white flex-shrink-0">
+                              externe
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-info mb-3 mb-md-4">
+                      <button aria-controls="external_jobapps_infos" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#external_jobapps_infos" data-bs-toggle="collapse" type="button">
+                          <span>
+                              Périmètre de suivi : Accès limité aux candidatures réalisées par votre structure
+                          </span>
+                      </button>
+                      <div class="c-info__detail collapse" id="external_jobapps_infos">
+                          <p>
+                              Votre visibilité sur les candidatures de cet usager se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des candidatures de cet usager, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
+                          </p>
+                          <p class="mb-0">
+                              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297" rel="noopener noreferrer" target="_blank">
+                                  En savoir plus
+                              </a>
+                          </p>
+                      </div>
+                  </div>
+                  <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                      Voir les candidatures de mon organisation
+                  </a>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[new job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Candidature à SIAE déposée le 11/09/2026.
+                              </span>
+                              <br/>
+                              Candidature spontanée
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              nouvelle
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[no job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-close-circle-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Aucune candidature déposée dans les 6 derniers mois.
+                              </span>
+                              Il est possible que le candidat ait déposé une candidature en autonomie ou qu'il soit suivi par une autre structure.
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                              aucune candidature
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[processing job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Candidature à SIAE déposée le 11/09/2026.
+                              </span>
+                              Sans réponse depuis le 11/09/2026.
+                              <br/>
+                              Candidature spontanée
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              à l'étude
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[refused job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Candidature à SIAE refusée le 11/09/2026
+                              </span>
+                              - motif de refus : un des freins à l'emploi du candidat est incompatible avec le poste proposé.
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">
+                              refusée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[transferred job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-corner-up-right-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <div class="mb-2">
+                              <span class="fw-semibold">
+                                  Candidature transférée le 11/09/2026 de la structure SIAE vers la structure SIAE 2.
+                              </span>
+                              Le nouvel employeur reprend l'instruction.
+                          </div>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                              Voir les candidatures de mon organisation
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              transférée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
 # name: TestOverviewTab.test_tab
   '''
   <section class="s-section" id="job-seeker-overview">
@@ -3312,6 +3590,34 @@
                           <div class="col-auto">
                               <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
                                   en cours
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-4"/>
+              <div class="row gx-3 align-items-start" id="overview-jobapp">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-file-list-3-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <div class="mb-2">
+                                  <span class="fw-semibold">
+                                      Candidature à SIAE 2 déposée le 15/08/2026.
+                                  </span>
+                                  <br/>
+                                  Candidature spontanée
+                              </div>
+                              <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-candidatures" href="/apply/prescriptions/list?job_seeker=[JobSeeker PK]">
+                                  Voir les candidatures
+                              </a>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                                  nouvelle
                               </span>
                           </div>
                       </div>
