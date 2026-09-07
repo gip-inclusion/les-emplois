@@ -88,7 +88,7 @@ class PoleEmploiFieldsMixin:
                     </p>
                     <p class="mb-0">
                         Pour continuer, veuillez renseigner un identifiant qui respecte l’un des deux formats
-                        autorisés : 8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.
+                        autorisés : 8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.
                     </p>
                 </div>
             """)

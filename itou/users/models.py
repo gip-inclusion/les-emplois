@@ -910,7 +910,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     pole_emploi_id = models.CharField(
         verbose_name="identifiant France Travail",
         help_text=(
-            "L’identifiant doit respecter l’un des deux formats autorisés :  "
+            "L’identifiant doit respecter l’un des deux formats autorisés :  "
             "8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres."
         ),
         max_length=11,
