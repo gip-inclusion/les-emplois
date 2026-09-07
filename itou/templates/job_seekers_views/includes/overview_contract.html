@@ -1,0 +1,67 @@
+{% load matomo %}
+
+<div id="overview-contract" class="row gx-3 align-items-start">
+    <div class="col-auto">
+        <i class="ri-xl ri-briefcase-line"></i>
+    </div>
+    <div class="col">
+        <div class="row gx-4 align-items-start justify-content-between">
+            {% if contract %}
+
+                {% if contract.has_ended %}
+
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="fw-semibold">Dernier contrat IAE : {{ contract.company.display_name }}, du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}.</span>
+                        </div>
+                        <a href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "suivi-contrat" %}>Voir le suivi des contrats</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">terminé</span>
+                    </div>
+
+                {% elif contract.end_date %}
+
+                    {# The contract has an end date set but is still ongoing #}
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="fw-semibold">Contrat IAE avec {{ contract.company.display_name }} du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}.</span>
+                        </div>
+                        {# FIXME <a class="btn btn-outline-primary mt-2" href="#">Préparer la suite du parcours</a> #}
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">fin prévue</span>
+                    </div>
+
+                {% else %}
+
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="fw-semibold">En poste: contrat IAE avec {{ contract.company.display_name }} depuis le {{ contract.start_date|date:"d/m/Y" }}.</span>
+                            Aucune date de fin déclarée à ce jour.
+                        </div>
+                        {# FIXME <a class="btn btn-outline-primary mt-2" href="#">Préparer la suite du parcours</a> #}
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">en cours</span>
+                    </div>
+
+                {% endif %}
+
+            {% else %}
+
+                <div class="col-6">
+                    <div class="mb-2">
+                        <span class="fw-semibold">Aucun contrat IAE trouvé.</span>
+                        Absence d'enregistrement dans l'extranet, ou récupération impossible, ce n'est pas la preuve d'une absence d'emploi.
+                    </div>
+                    {# FIXME <a class="btn btn-outline-primary mt-2" href="#">Vérifier auprès de l'employeur</a> #}
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">non trouvé</span>
+                </div>
+
+            {% endif %}
+        </div>
+    </div>
+</div>
