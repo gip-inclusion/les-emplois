@@ -208,14 +208,21 @@ def test_transition_accept(sender_is_referent, mailoutbox, django_capture_on_com
     assert sender_email.to == [orientation.sender.email]
 
 
-def test_transition_refuse():
-    orientation = OrientationFactory()
+@pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
+def test_transition_refuse(sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
+    orientation = OrientationFactory(
+        status=OrientationStatus.PENDING, service__contact_email="service.contact@email.fake"
+    )
+    if sender_is_referent:
+        orientation.referent_email = orientation.sender.email
+        orientation.save()
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
-        with transaction.atomic():
-            orientation.refusal_reasons = [OrientationRefusalReason.NOT_ELIGIBLE]
-            orientation.refusal_details = "Quelques détails…"
-            orientation.refuse()
+        with django_capture_on_commit_callbacks(execute=True):
+            with transaction.atomic():
+                orientation.refusal_reasons = [OrientationRefusalReason.NOT_ELIGIBLE]
+                orientation.refusal_details = "Quelques détails…"
+                orientation.refuse()
 
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
@@ -226,6 +233,18 @@ def test_transition_refuse():
     )
     assert log.orientation.status == OrientationStatus.REFUSED
     assert log.orientation.updated_at == timestamp
+
+    assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
+
+    # Notifications
+    if sender_is_referent:
+        [structure_email, beneficiary_email, sender_email] = mailoutbox
+    else:
+        [structure_email, referent_email, beneficiary_email, sender_email] = mailoutbox
+        assert referent_email.to == [orientation.referent_email]
+    assert structure_email.to == [orientation.service.contact_email]
+    assert beneficiary_email.to == [orientation.beneficiary.email]
+    assert sender_email.to == [orientation.sender.email]
 
 
 def test_transition_expire():
