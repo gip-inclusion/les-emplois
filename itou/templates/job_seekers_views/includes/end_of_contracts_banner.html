@@ -4,35 +4,70 @@
 
 {% if show_end_of_contracts_banner %}
     <div id="fins-de-contrats-banner"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
-        {% if end_of_journey_filter_active %}
-            {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-contract-info-suggest" extra_classes="mb-3 mb-md-4" %}
-                {% fragment as title %}
-                    Suggérer une suite de parcours aux salariés
-                {% endfragment %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        Vous pouvez suggérer une suite de parcours directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
-                    </p>
-                {% endfragment %}
-            {% endcomponent_alert %}
-        {% elif contracts_ending_soon_count %}
-            {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-contract-ending-soon-banner" extra_classes="mb-3 mb-md-4" %}
-                {% fragment as title %}
-                    Vous avez {{ contracts_ending_soon_count }} salarié{{ contracts_ending_soon_count|pluralizefr }} en fin de contrat
-                {% endfragment %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        {% if contracts_ending_soon_count == 1 %}
-                            Le contrat de ce salarié arrive à échéance dans moins de 30 jours. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
-                        {% else %}
-                            Le contrat de ces salariés arrive à échéance dans moins de 30 jours. Préparez au mieux leur fin de contrat en suggérant une suite de parcours adaptée à leur situation.
-                        {% endif %}
-                    </p>
-                {% endfragment %}
-                {% fragment as call_to_action %}
-                    <a class="btn btn-sm btn-primary" href="{% url 'job_seekers_views:list_organization' %}?contract_ending_soon=on" {% matomo_event "employeurs" "clic" "afficher-fins-de-contrats" %}>Afficher ce{{ contracts_ending_soon_count|pluralizefr }} salarié{{ contracts_ending_soon_count|pluralizefr }}</a>
-                {% endfragment %}
-            {% endcomponent_alert %}
+        {% if request.from_employer %}
+            {% if end_of_journey_filter_active %}
+                {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-contract-info-suggest" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Suggérer une suite de parcours aux salariés
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            Vous pouvez suggérer une suite de parcours directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% elif contracts_ending_soon_count %}
+                {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-contract-ending-soon-banner" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Vous avez {{ contracts_ending_soon_count }} salarié{{ contracts_ending_soon_count|pluralizefr }} en fin de contrat
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            {% if contracts_ending_soon_count == 1 %}
+                                Le contrat de ce salarié arrive à échéance dans moins de 30 jours. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+                            {% else %}
+                                Le contrat de ces salariés arrive à échéance dans moins de 30 jours. Préparez au mieux leur fin de contrat en suggérant une suite de parcours adaptée à leur situation.
+                            {% endif %}
+                        </p>
+                    {% endfragment %}
+                    {% fragment as call_to_action %}
+                        <a class="btn btn-sm btn-primary" href="{% url 'job_seekers_views:list_organization' %}?contract_ending_soon=on" {% matomo_event "employeurs" "clic" "afficher-fins-de-contrats" %}>Afficher ce{{ contracts_ending_soon_count|pluralizefr }} salarié{{ contracts_ending_soon_count|pluralizefr }}</a>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
+        {% else %}
+            {% if end_of_journey_filter_active %}
+                {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-contract-info-support-request" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Demandez un bilan d’accompagnement à la SIAE
+                    {% endfragment %}
+                    {% fragment as content %}
+                        {# Reached directly from the dashboard, so it also states what the list holds. #}
+                        <p class="mb-0">
+                            Les bénéficiaires affichés arrivent en fin de contrat de travail. Pour chacun, ouvrez le menu « ⋮ » à droite de sa ligne et cliquez sur « Demander un bilan d’accompagnement à la SIAE ».
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% elif contracts_ending_soon_count %}
+                {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-contract-ending-soon-prescriber-banner" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Vous accompagnez {{ contracts_ending_soon_count }} bénéficiaire{{ contracts_ending_soon_count|pluralizefr }} en fin de contrat de travail
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            {% if contracts_ending_soon_count == 1 %}
+                                Le contrat de travail de ce bénéficiaire arrive à échéance dans moins de 30 jours. Agissez avant sa sortie pour éviter une rupture de parcours.
+                            {% else %}
+                                Le contrat de travail de ces bénéficiaires arrive à échéance dans moins de 30 jours. Agissez avant leur sortie pour éviter une rupture de parcours.
+                            {% endif %}
+                        </p>
+                    {% endfragment %}
+                    {% fragment as call_to_action %}
+                        {# Prescribers have two lists: keep the one they are on. #}
+                        <a class="btn btn-sm btn-primary" href="{{ request.path }}?contract_ending_soon=on" {% matomo_event "candidat" "clic" "afficher-fins-de-contrat" %}>Afficher ce{{ contracts_ending_soon_count|pluralizefr }} bénéficiaire{{ contracts_ending_soon_count|pluralizefr }}</a>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
         {% endif %}
     </div>
 {% endif %}
