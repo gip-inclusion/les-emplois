@@ -638,7 +638,8 @@ def siae_job_applications_list(
     )
 
     evaluated_job_applications = (
-        EvaluatedJobApplication.objects.filter(evaluated_siae=evaluated_siae)
+        EvaluatedJobApplication.objects.with_job_seeker_last_name_for_display()
+        .filter(evaluated_siae=evaluated_siae)
         .select_related(
             "evaluated_siae__evaluation_campaign__calendar",
             "evaluated_siae__siae",
@@ -647,7 +648,7 @@ def siae_job_applications_list(
             "job_application__approval",
         )
         .prefetch_related("evaluated_administrative_criteria")
-        .order_by("job_application__job_seeker__last_name", "job_application__job_seeker__first_name")
+        .order_by("job_seeker_last_name_for_display")
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))

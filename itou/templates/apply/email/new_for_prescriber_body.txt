@@ -7,7 +7,7 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 
 *Candidat* :
 
-- Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
+- Nom : {{ job_application.job_seeker.get_last_name_for_display|upper|mask_unless:can_view_personal_information }}
 - Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information %}
 - Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone and can_view_personal_information %}
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate and can_view_personal_information %}
