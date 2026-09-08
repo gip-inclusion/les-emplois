@@ -16,7 +16,7 @@ def get_missing_orientation_beneficiary_field_labels(job_seeker: User) -> list[s
     missing = []
     if not job_seeker.first_name or not job_seeker.first_name.strip():
         missing.append("Prénom")
-    if not job_seeker.last_name or not job_seeker.last_name.strip():
+    if not job_seeker.get_last_name_for_display().strip():
         missing.append("Nom")
     if not job_seeker.email or not job_seeker.email.strip():
         missing.append("Adresse e-mail")
@@ -75,7 +75,7 @@ def get_orientation_jwt(request) -> str | None:
         jwt_claims["beneficiary"] = {
             "uid": str(job_seeker.public_id),
             "first_name": job_seeker.first_name,
-            "last_name": job_seeker.last_name,
+            "last_name": job_seeker.get_last_name_for_display(),
             "email": job_seeker.email,
             "phone": job_seeker.phone,
             "france_travail_id": job_seeker.jobseeker_profile.pole_emploi_id,

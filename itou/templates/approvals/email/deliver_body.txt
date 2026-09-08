@@ -8,7 +8,7 @@ PASS IAE N° : {{ job_application.approval.number_with_spaces }}
 Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.get_remainder_display }}*.
 
 Délivré pour l'embauche de :
-Nom : {{ job_application.approval.user.last_name|upper }}
+Nom : {{ job_application.approval.user.get_last_name_for_display|upper }}
 Prénom : {{ job_application.approval.user.first_name|title }}
 Date de naissance : {{ job_application.approval.user.jobseeker_profile.birthdate|date:"d/m/Y" }}
 

@@ -67,7 +67,7 @@
                             </li>
                             <li>
                                 <small>Nom</small>
-                                <strong>{{ orientation.beneficiary.last_name|upper|mask_unless:can_view_personal_information }}</strong>
+                                <strong>{{ orientation.beneficiary.get_last_name_for_display|upper|mask_unless:can_view_personal_information }}</strong>
                             </li>
                             {% if can_view_personal_information %}
                                 <li>

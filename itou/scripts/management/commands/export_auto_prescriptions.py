@@ -72,7 +72,7 @@ class Command(XlsxExportMixin, BaseCommand):
                 ja.approval.end_at,
                 ja.job_seeker.pk,
                 ja.job_seeker.first_name,
-                ja.job_seeker.last_name,
+                ja.job_seeker.get_last_name_for_display(),
                 ja.hiring_start_at,
             ]
             for ja in queryset.iterator()
