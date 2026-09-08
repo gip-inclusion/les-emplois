@@ -21,7 +21,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibi
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
@@ -234,6 +234,52 @@ class TestDashboardView:
         # The dashboard counter matches the filtered "Accompagnements" list results.
         list_response = client.get(reverse("job_seekers_views:list_organization"), {"contract_ending_soon": "on"})
         assert list(list_response.context["page_obj"].object_list) == [job_seeker]
+
+    @freeze_time("2026-01-15")
+    def test_dashboard_contracts_ending_soon_count_for_prescriber(self, client):
+        organization = prescribers_factories.PrescriberOrganizationFactory(authorized=True, with_membership=True)
+        prescriber = organization.members.first()
+        client.force_login(prescriber)
+        today = date(2026, 1, 15)
+        url = reverse("dashboard:index")
+
+        # No contract ending soon yet: the entry is shown without a badge.
+        response = client.get(url)
+        assertContains(response, "Fins de contrat de travail")
+        assert response.context["contracts_ending_soon_count"] == 0
+
+        # A job seeker followed by the prescriber, whose contract ends in 20 days, is counted whatever the SIAE.
+        job_seeker = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=organization
+        ).job_seeker
+        ContractFactory(
+            job_seeker=job_seeker,
+            start_date=today - timedelta(days=200),
+            end_date=today + timedelta(days=20),
+        )
+        # A contract ending later is not counted.
+        other_job_seeker = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=organization
+        ).job_seeker
+        ContractFactory(
+            job_seeker=other_job_seeker,
+            start_date=today - timedelta(days=200),
+            end_date=today + timedelta(days=90),
+        )
+
+        response = client.get(url)
+        assert response.context["contracts_ending_soon_count"] == 1
+
+        # The dashboard counter matches the filtered "Mes accompagnements" list results.
+        list_response = client.get(reverse("job_seekers_views:list"), {"contract_ending_soon": "on"})
+        assert list(list_response.context["page_obj"].object_list) == [job_seeker]
+
+        # An unauthorized prescriber gets neither the entry nor the counter.
+        organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
+        organization.save()
+        response = client.get(url)
+        assertNotContains(response, "Fins de contrat de travail")
+        assert response.context["contracts_ending_soon_count"] is None
 
     def test_dashboard_applications_to_process(self, client):
         non_geiq_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
