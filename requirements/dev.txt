@@ -791,9 +791,9 @@ django-markdownify==0.9.7 \
     --hash=sha256:2e59dfd445ad6362288f7bc1574e45d8356848463e261b878fd70df6a272c47f \
     --hash=sha256:ca3a6361f952d1c1b661c13229f69219a36e745358aa0f377212aef8f09e4cf3
     # via -r test.txt
-django-otp==1.7.0 \
-    --hash=sha256:406d2d7f797dc313569270e06d6c360c7d986c9f653eab80b190d663ed5f1133 \
-    --hash=sha256:961ccf2d80a67303cb46d97427b16c476ee075acfa2b4c82a59d8f1e0745a454
+django-otp==1.7.3 \
+    --hash=sha256:3ce501173bf1b936146ffe5ff0cfdae1a0c7eb46cce1e9e3fdddd984d993c74f \
+    --hash=sha256:7d52fb0f76c4c1c86cbc71c196d3f79941b0b84aff980e45193bef89a70a7a12
     # via -r test.txt
 django-pgtrigger==4.17.0 \
     --hash=sha256:06048cdeb57e20987fd0bf7dd673512a1413a08868eea248d70dbb970e967175 \
