@@ -448,6 +448,25 @@ Merci.
 """  # noqa: E501 # Line too long
 
 
+def _pro_support_request_company_email():
+    # Contracts are the most precise, but they are delayed. Fallback to job applications if needs be.
+    return Coalesce(
+        Subquery(
+            Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False)
+            .exclude(company__email="")
+            .order_by(F("start_date").desc())
+            .values("company__email")[:1]
+        ),
+        Subquery(
+            JobApplication.objects.accepted()
+            .filter(job_seeker=OuterRef("pk"))
+            .exclude(to_company__email="")
+            .order_by(F("hiring_start_at").desc(nulls_last=True))
+            .values("to_company__email")[:1]
+        ),
+    )
+
+
 def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
     # V1 opens a pre-filled mailto to the employing SIAE: no email is
     # sent nor stored server-side.
@@ -525,25 +544,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
-            # Contracts are the most precise, but they are delayed.
-            # Fallback to job applications if needs be.
-            queryset = queryset.annotate(
-                pro_support_request_company_email=Coalesce(
-                    Subquery(
-                        Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False)
-                        .exclude(company__email="")
-                        .order_by(F("start_date").desc())
-                        .values("company__email")[:1]
-                    ),
-                    Subquery(
-                        JobApplication.objects.accepted()
-                        .filter(job_seeker=OuterRef("pk"))
-                        .exclude(to_company__email="")
-                        .order_by(F("hiring_start_at").desc(nulls_last=True))
-                        .values("to_company__email")[:1]
-                    ),
-                )
-            )
+            queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
 
     queryset = (
         queryset.annotate(
