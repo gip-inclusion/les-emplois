@@ -38,8 +38,8 @@ FC_USERINFO = {
     "gender": "female",
     "given_name": "Angela Claire Louise",
     "given_name_array": ["Angela", "Claire", "Louise"],
-    "family_name": "DUBOIS",
-    "preferred_username": "MARTIN",
+    "family_name": "DUBOIS",  # birth name
+    "preferred_username": "MARTIN",  # last name
     "email": "wossewodda-3728@yopmail.com",
     "birthdate": "1962-08-24",
     "sub": "d303068c700ea93405ae193550a7d99be03744c08be08901e8e1c180869b2f54v1",
@@ -257,12 +257,15 @@ class TestFranceConnect:
 
         user.delete()
 
-    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
+    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog, certified_name):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
+            last_name="" if certified_name == "birth_name" else "Initial",
+            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -273,15 +276,23 @@ class TestFranceConnect:
         with triggers.fake_context():
             user, created = fc_user_data.create_or_update_user()
         assert created is False
-        assert user.last_name == job_seeker.last_name
+        if certified_name == "birth_name":
+            assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
+            assert user.last_name == "MARTIN"
+        else:
+            assert user.last_name == job_seeker.last_name
+            assert user.jobseeker_profile.birth_name == "DUBOIS"
         assert user.first_name == job_seeker.first_name
-        assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
+        if certified_name == "birth_name":
+            not_updated_fields = "birth_name, birthdate, first_name, title"
+        else:
+            not_updated_fields = "birthdate, first_name, last_name, title"
         assert (
-            "Not updating fields birth_name, birthdate, first_name, last_name, title "
+            f"Not updating fields {not_updated_fields} "
             f"on job seeker pk={job_seeker.pk} "
             "because their identity has been certified." in caplog.messages
         )
