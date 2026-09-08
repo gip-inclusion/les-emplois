@@ -3093,7 +3093,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3450,6 +3450,44 @@
                     GROUP BY V0."id",
                              1))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*)
+          FROM
+            (SELECT
+               (SELECT U0."end_date" AS "end_date"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" IS NOT NULL
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_contract_end_date"
+             FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
+             WHERE ("users_user"."kind" = %s
+                    AND "users_user"."id" IN
+                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE ((U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" IS NULL
+                               AND U0."professional_id" = %s)
+                              OR (U0."company_id" IS NULL
+                                  AND U0."prescriber_organization_id" = %s
+                                  AND U0."professional_id" = %s)))
+                    AND
+                      (SELECT U0."end_date" AS "end_date"
+                       FROM "companies_contract" U0
+                       WHERE (U0."end_date" IS NOT NULL
+                              AND U0."job_seeker_id" = ("users_user"."id"))
+                       ORDER BY 1 DESC
+                       LIMIT 1) BETWEEN %s AND %s)
+             GROUP BY "users_user"."id") subquery
         ''',
       }),
       dict({
@@ -4162,7 +4200,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -4517,6 +4555,43 @@
                     GROUP BY V0."id",
                              1))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*)
+          FROM
+            (SELECT
+               (SELECT U0."end_date" AS "end_date"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" IS NOT NULL
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                ORDER BY 1 DESC
+                LIMIT 1) AS "last_contract_end_date"
+             FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
+             WHERE ("users_user"."kind" = %s
+                    AND "users_user"."id" IN
+                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE ((U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" IS NULL
+                               AND U0."professional_id" = %s)
+                              OR (U0."company_id" IS NULL
+                                  AND U0."prescriber_organization_id" = %s)))
+                    AND
+                      (SELECT U0."end_date" AS "end_date"
+                       FROM "companies_contract" U0
+                       WHERE (U0."end_date" IS NOT NULL
+                              AND U0."job_seeker_id" = ("users_user"."id"))
+                       ORDER BY 1 DESC
+                       LIMIT 1) BETWEEN %s AND %s)
+             GROUP BY "users_user"."id") subquery
         ''',
       }),
       dict({

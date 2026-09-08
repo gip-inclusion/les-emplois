@@ -15,6 +15,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.asp.models import Commune
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
@@ -1302,6 +1303,46 @@ def test_end_of_contracts_banners_for_siae(client):
 
 
 @freeze_time("2026-01-15")
+def test_end_of_contracts_banners_for_prescriber(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:list")
+    today = datetime.date(2026, 1, 15)
+    pedagogic_banner = "Demandez un bilan d’accompagnement à la SIAE"
+
+    # No contract ending soon: neither banner.
+    response = client.get(url)
+    assertNotContains(response, "Afficher ce bénéficiaire")
+    assertNotContains(response, "Afficher ces bénéficiaires")
+    assertNotContains(response, pedagogic_banner)
+
+    # A job seeker with a contract ending soon: discovery banner on the unfiltered list. Unlike the SIAE
+    # one, the contract is counted whatever the company.
+    job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat de travail")
+    assertContains(response, "Afficher ce bénéficiaire")
+    assertNotContains(response, pedagogic_banner)
+
+    # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assertContains(response, pedagogic_banner)
+    assertNotContains(response, "Afficher ce bénéficiaire")
+
+    # An unauthorized prescriber gets no banner.
+    organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
+    organization.save()
+    response = client.get(url)
+    assertNotContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat de travail")
+
+
+@freeze_time("2026-01-15")
 @override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
 def test_suggest_next_step_action_in_list(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
@@ -1352,6 +1393,43 @@ def test_suggest_next_step_banner_on_job_seeker_card(client):
     assertContains(response, "Le contrat arrive bientôt à échéance")
     assertContains(response, "04/02/2026")
     assertContains(response, f"https://tally.example/r/wSUGGEST?iduser={employer.pk}&kindcompany={company.kind}")
+
+
+@freeze_time("2026-01-15")
+def test_pro_support_request_banner_on_job_seeker_card(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    today = datetime.date(2026, 1, 15)
+    job_seeker = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        author=prescriber,
+        author_prescriber_organization=organization,
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    contract = ContractFactory(
+        job_seeker=job_seeker,
+        company__email="",
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    # The employing SIAE has no e-mail: the banner still warns, without the action.
+    response = client.get(url)
+    assertContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
+    assertContains(response, "04/02/2026")
+    assertNotContains(response, "Demander un bilan d’accompagnement")
+
+    # With an e-mail, the action is offered and the mail is pre-filled.
+    contract.company.email = "siae@example.com"
+    contract.company.save()
+    response = client.get(url)
+    assertContains(response, "Demander un bilan d’accompagnement")
+    assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
+    assertContains(response, "Jean%20DUPONT%20arrive")
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
@@ -1757,9 +1835,10 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
     assertNotContains(response, mailto_label)
 
     # With the filter active, the action should be displayed, unless
-    # the company does not have any email.
+    # the company does not have any email. The label alone is not a reliable signal: the banner
+    # explaining where to find the action also spells it out.
     response = client.get(url, {"approval_ending_soon": "on"})
-    assertNotContains(response, mailto_label)
+    assertNotContains(response, "mailto:")
 
     # Now with a company that has an e-mail.
     company = job_application.to_company

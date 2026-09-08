@@ -192,38 +192,51 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
-        # SIAE job seeker card banner: shown when a contract with this SIAE ends within 30 days and the
-        # Tally form is configured. Same business definition (scoped to the current SIAE) as the list.
+        # Job seeker card banner, shown when an IAE contract ends within 30 days: the SIAE is offered the
+        # Tally form for its own contract, the authorized prescriber a support request for the whole journey.
         # Lives in the details tab view only, so the query does not run on the other tabs.
         contract_ending_soon_date = None
         suggest_next_step_url = None
-        if (
+        pro_support_request_mailto = None
+        show_suggest_next_step = (
             self.request.from_employer
             and self.request.current_organization.is_subject_to_iae_rules
             and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID
-        ):
+        )
+        if show_suggest_next_step or self.request.from_authorized_prescriber:
             today = timezone.localdate()
-            last_contract_end_date = (
-                Contract.objects.filter(
-                    job_seeker=self.object, company=self.request.current_organization, end_date__isnull=False
-                )
-                .order_by("-end_date")
-                .values_list("end_date", flat=True)
-                .first()
-            )
+            contracts = Contract.objects.filter(job_seeker=self.object, end_date__isnull=False)
+            if show_suggest_next_step:
+                # A SIAE only looks at its own contract; a prescriber follows the whole IAE journey.
+                contracts = contracts.filter(company=self.request.current_organization)
+            last_contract_end_date = contracts.order_by("-end_date").values_list("end_date", flat=True).first()
             if last_contract_end_date and today <= last_contract_end_date <= today + datetime.timedelta(
                 days=IAE_CONTRACT_ENDING_SOON_DAYS
             ):
                 contract_ending_soon_date = last_contract_end_date
-                suggest_next_step_url = get_tally_form_url(
-                    settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
-                    iduser=self.request.user.pk,
-                    kindcompany=self.request.current_organization.kind,
-                )
+                if show_suggest_next_step:
+                    suggest_next_step_url = get_tally_form_url(
+                        settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
+                        iduser=self.request.user.pk,
+                        kindcompany=self.request.current_organization.kind,
+                    )
+                else:
+                    company_email = (
+                        User.objects.filter(pk=self.object.pk)
+                        .annotate(company_email=_pro_support_request_company_email())
+                        .values_list("company_email", flat=True)
+                        .first()
+                    )
+                    # The job seeker's name is in the mail body: no action when it must stay masked.
+                    if company_email and context["can_view_personal_information"]:
+                        pro_support_request_mailto = _build_pro_support_request_mailto(
+                            company_email, self.object.get_full_name()
+                        )
 
         return context | {
             "approval": self.approval,
             "contract_ending_soon_date": contract_ending_soon_date,
+            "pro_support_request_mailto": pro_support_request_mailto,
             "suggest_next_step_url": suggest_next_step_url,
             "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -448,6 +461,25 @@ Merci.
 """  # noqa: E501 # Line too long
 
 
+def _pro_support_request_company_email():
+    # Contracts are the most precise, but they are delayed. Fallback to job applications if needs be.
+    return Coalesce(
+        Subquery(
+            Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False)
+            .exclude(company__email="")
+            .order_by(F("start_date").desc())
+            .values("company__email")[:1]
+        ),
+        Subquery(
+            JobApplication.objects.accepted()
+            .filter(job_seeker=OuterRef("pk"))
+            .exclude(to_company__email="")
+            .order_by(F("hiring_start_at").desc(nulls_last=True))
+            .values("to_company__email")[:1]
+        ),
+    )
+
+
 def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
     # V1 opens a pre-filled mailto to the employing SIAE: no email is
     # sent nor stored server-side.
@@ -525,25 +557,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
-            # Contracts are the most precise, but they are delayed.
-            # Fallback to job applications if needs be.
-            queryset = queryset.annotate(
-                pro_support_request_company_email=Coalesce(
-                    Subquery(
-                        Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False)
-                        .exclude(company__email="")
-                        .order_by(F("start_date").desc())
-                        .values("company__email")[:1]
-                    ),
-                    Subquery(
-                        JobApplication.objects.accepted()
-                        .filter(job_seeker=OuterRef("pk"))
-                        .exclude(to_company__email="")
-                        .order_by(F("hiring_start_at").desc(nulls_last=True))
-                        .values("to_company__email")[:1]
-                    ),
-                )
-            )
+            queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
 
     queryset = (
         queryset.annotate(
@@ -564,16 +578,20 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
     )
 
-    show_end_of_contracts_banner = request.from_employer and request.current_organization.is_subject_to_iae_rules
+    show_suggest_next_step = request.from_employer and request.current_organization.is_subject_to_iae_rules
+    # Authorized prescribers get the same banners, pointing to the support request instead of the Tally form.
+    show_end_of_contracts_banner = show_suggest_next_step or request.from_authorized_prescriber
     today = timezone.localdate()
     contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
 
-    # Discovery banner: count over the SIAE assigned job seekers (unfiltered), only shown when the
-    # end-of-journey filter is not active.
+    # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
+    # end-of-journey filter is not active. A SIAE only counts its own contracts, a prescriber all of them.
     contracts_ending_soon_count = None
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
         contracts_ending_soon_count = (
-            annotate_last_contract_end_date(base_queryset, company=request.current_organization)
+            annotate_last_contract_end_date(
+                base_queryset, company=request.current_organization if request.from_employer else None
+            )
             .filter(last_contract_end_date__range=contract_window)
             .count()
         )
@@ -581,7 +599,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
     # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
     suggest_next_step_url = None
-    if show_end_of_contracts_banner and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
+    if show_suggest_next_step and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
         suggest_next_step_url = get_tally_form_url(
             settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
             iduser=request.user.pk,
@@ -593,7 +611,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     except ValueError:
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
-    if show_end_of_contracts_banner:
+    if show_suggest_next_step:
         queryset = annotate_last_contract_end_date(queryset, company=request.current_organization)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
@@ -612,7 +630,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 job_seeker.get_full_name(),
             )
         job_seeker.contract_ending_soon = bool(
-            show_end_of_contracts_banner
+            show_suggest_next_step
             and job_seeker.last_contract_end_date
             and contract_window[0] <= job_seeker.last_contract_end_date <= contract_window[1]
         )
