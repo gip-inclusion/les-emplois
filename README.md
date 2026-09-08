@@ -123,6 +123,14 @@ Afin de créer les *buckets* nécessaires au développement et aux tests, lancer
 $ make buckets
 ```
 
+## Obtenir une base de données de développement
+
+```sh
+$ make resetdb
+```
+
+**Note** : Si votre version locale cliente de postgresql est inférieure à celle du serveur définie dans [docker-compose.yml](./docker-compose.yml), les commandes `pg_dump`/`pg_restore` vont échouer. Cela ne bloque que la réutilisation de la base de données en cache qui accélèrera le process lors d'une commande successive, mais il est conseillé d'installer une version locale compatible.
+
 ## Accéder au serveur de développement
 
 Démarrer le serveur de développement avec la commande :
@@ -144,12 +152,6 @@ export RUNSERVER_DOMAIN=100.1.2.3:8000
 puis `direnv allow`, `direnv reload` et enfin relancez `make runserver`.
 
 Vous pouvez y accéder à l'adresse http://100.1.2.3:8000/ depuis n'importe quel appareil de votre réseau local.
-
-## Obtenir une base de données de développement
-
-```sh
-$ make resetdb
-```
 
 ## Utiliser les commandes `make` sans connexion à internet
 
