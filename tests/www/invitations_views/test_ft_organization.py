@@ -8,9 +8,7 @@ from itou.utils import constants as global_constants
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
-from tests.users.factories import (
-    PrescriberFactory,
-)
+from tests.users.factories import ProfessionalFactory
 
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
@@ -26,9 +24,9 @@ class TestPEOrganizationInvitation:
     )
     def test_successful(self, client, suffix):
         organization = PrescriberOrganizationFactory(france_travail=True)
-        organization.members.add(PrescriberFactory())
+        organization.members.add(ProfessionalFactory())
         sender = organization.members.first()
-        guest = PrescriberFactory.build(email=f"sabine.lagrange{suffix}")
+        guest = ProfessionalFactory.build(email=f"sabine.lagrange{suffix}")
         post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -44,7 +42,7 @@ class TestPEOrganizationInvitation:
 
     def test_unsuccessful(self, client):
         organization = PrescriberOrganizationFactory(france_travail=True)
-        organization.members.add(PrescriberFactory())
+        organization.members.add(ProfessionalFactory())
         sender = organization.members.first()
         client.force_login(sender)
         post_data = {

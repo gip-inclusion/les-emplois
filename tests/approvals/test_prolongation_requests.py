@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import PrescriberFactory, ProfessionalFactory
 
 
 def test_unique_approval_for_pending_constraint():
@@ -181,7 +181,7 @@ def test_clean_declared_by_coherence():
     prolongation_request = ProlongationRequestFactory()
     prolongation_request.clean()
 
-    employer = EmployerFactory()
+    employer = ProfessionalFactory()
     prolongation_request.declared_by = employer
     with pytest.raises(ValidationError) as error:
         prolongation_request.clean()

@@ -33,11 +33,10 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
-    PrescriberFactory,
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerAssignmentFactory, JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -267,31 +266,31 @@ class TestCommandSendUsersToBrevo:
         with triggers.fake_context():
             changed_email.save(update_fields=["email"])
 
-        annie = EmployerFactory(
+        annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
             identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        bob = EmployerFactory(
+        bob = ProfessionalFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
             identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        cindy = EmployerFactory(
+        cindy = ProfessionalFactory(
             first_name="Cindy",
             last_name="Cinnamon",
             email="cindy.cinnamon@mailinator.com",
             identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        dave = EmployerFactory(
+        dave = ProfessionalFactory(
             first_name="Dave",
             last_name="Doll",
             email="dave.doll@mailinator.com",
             identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        eve = EmployerFactory(
+        eve = ProfessionalFactory(
             first_name="Eve",
             last_name="Ebi",
             email="eve.ebi@mailinator.com",
@@ -370,13 +369,13 @@ class TestCommandSendUsersToBrevo:
     def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
         pe = PrescriberOrganizationFactory(france_travail=True)
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
-        alice = PrescriberFactory(
+        alice = ProfessionalFactory(
             first_name="Alice",
             last_name="Aamar",
             email="alice.aamar@mailinator.com",
         )
         PrescriberMembershipFactory(user=alice, organization=pe)
-        justin = PrescriberFactory(
+        justin = ProfessionalFactory(
             first_name="Justin",
             last_name="Wood",
             email="justin.wood@mailinator.com",
@@ -443,12 +442,12 @@ class TestCommandSendUsersToBrevo:
     @freeze_time("2023-05-02")
     def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
         # Prescribers without memberships are ignored
-        PrescriberFactory(
+        ProfessionalFactory(
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
         )
-        sonny = PrescriberFactory(
+        sonny = ProfessionalFactory(
             first_name="Sonny",
             last_name="Sunder",
             email="sonny.sunder@mailinator.com",
@@ -456,23 +455,23 @@ class TestCommandSendUsersToBrevo:
         # Inactive memberships are also ignored.
         PrescriberMembershipFactory(user=sonny, is_active=False)
         # Members of unauthorized organizations are orienteurs.
-        timmy = PrescriberFactory(
+        timmy = ProfessionalFactory(
             first_name="Timmy",
             last_name="Timber",
             email="timmy.timber@mailinator.com",
         )
         PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
         # Inactive users are ignored.
-        PrescriberFactory(
+        ProfessionalFactory(
             with_verified_email=True,
             is_active=False,
             date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
         )
         # Ignored, email is not the primary email when not using ProConnect
-        not_primary = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        not_primary = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # New email not verified is ignored.
-        changed_email = PrescriberFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
+        changed_email = ProfessionalFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
         changed_email.email = "changed@mailinator.com"
         with triggers.fake_context():
             changed_email.save(update_fields=["email"])
@@ -703,12 +702,12 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2023-05-02")
     def test_wet_run_batch(self, caplog, respx_mock, mocker, snapshot):
-        annie = EmployerFactory(
+        annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
         )
-        bob = EmployerFactory(
+        bob = ProfessionalFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
@@ -765,7 +764,7 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2023-05-02")
     def test_wet_run_errors(self, caplog, respx_mock, snapshot):
-        annie = EmployerFactory(
+        annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
@@ -1285,17 +1284,17 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         CompanyMembershipFactory(company=company_2, user=self.employer_1.user, is_admin=False, is_active=False)
 
         # Add an admin to both companies
-        other_admin = EmployerFactory()
+        other_admin = ProfessionalFactory()
         admin_membership_1 = CompanyMembershipFactory(user=other_admin, company=self.employer_1.company)
         admin_membership_2 = CompanyMembershipFactory(user=other_admin, company=company_2)
 
         # Add another active user so that both companies have 2 or more active users
-        other_active_member = EmployerFactory()
+        other_active_member = ProfessionalFactory()
         CompanyMembershipFactory(user=other_active_member, company=self.employer_1.company, is_admin=False)
         CompanyMembershipFactory(user=other_active_member, company=company_2, is_admin=False)
 
         # an inactive user with active membership and admin (that's bad)
-        inactive_admin = EmployerFactory(is_active=False)
+        inactive_admin = ProfessionalFactory(is_active=False)
         CompanyMembershipFactory(user=inactive_admin, company=self.employer_1.company)
         CompanyMembershipFactory(user=inactive_admin, company=company_2)
 
@@ -1324,19 +1323,19 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         )
 
         # Add an admin to both organizations
-        other_admin = PrescriberFactory()
+        other_admin = ProfessionalFactory()
         admin_membership_1 = PrescriberMembershipFactory(user=other_admin, organization=self.prescriber_1.organization)
         admin_membership_2 = PrescriberMembershipFactory(user=other_admin, organization=organization_2)
 
         # Add another active user so that both organizations have 2 or more active users
-        other_active_member = PrescriberFactory()
+        other_active_member = ProfessionalFactory()
         PrescriberMembershipFactory(
             user=other_active_member, organization=self.prescriber_1.organization, is_admin=False
         )
         PrescriberMembershipFactory(user=other_active_member, organization=organization_2, is_admin=False)
 
         # an inactive user with active membership and admin (that's bad)
-        inactive_admin = PrescriberFactory(is_active=False)
+        inactive_admin = ProfessionalFactory(is_active=False)
         PrescriberMembershipFactory(user=inactive_admin, organization=self.prescriber_1.organization)
         PrescriberMembershipFactory(user=inactive_admin, organization=organization_2)
 
@@ -1365,21 +1364,21 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         )
 
         # Add an admin to both institutions
-        other_admin = LaborInspectorFactory()
+        other_admin = ProfessionalFactory()
         admin_membership_1 = InstitutionMembershipFactory(
             user=other_admin, institution=self.labor_inspector_1.institution
         )
         admin_membership_2 = InstitutionMembershipFactory(user=other_admin, institution=institution_2)
 
         # Add another active user so that both institutions have 2 or more active users
-        other_active_member = LaborInspectorFactory()
+        other_active_member = ProfessionalFactory()
         InstitutionMembershipFactory(
             user=other_active_member, institution=self.labor_inspector_1.institution, is_admin=False
         )
         InstitutionMembershipFactory(user=other_active_member, institution=institution_2, is_admin=False)
 
         # an inactive user with active membership and admin (that's bad)
-        inactive_admin = LaborInspectorFactory(is_active=False)
+        inactive_admin = ProfessionalFactory(is_active=False)
         InstitutionMembershipFactory(user=inactive_admin, institution=self.labor_inspector_1.institution)
         InstitutionMembershipFactory(user=inactive_admin, institution=institution_2)
 

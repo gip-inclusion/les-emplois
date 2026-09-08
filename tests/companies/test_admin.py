@@ -25,7 +25,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, ItouStaffFactory
+from tests.users.factories import ItouStaffFactory, ProfessionalFactory
 from tests.utils.testing import (
     BASE_NUM_QUERIES,
     get_rows_from_streaming_response,
@@ -151,7 +151,7 @@ class TestCompanyAdmin:
     def test_add_admin(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
-        employer = EmployerFactory()
+        professional = ProfessionalFactory()
         assert membership.is_admin
 
         change_url = reverse("admin:companies_company_change", args=[company.pk])
@@ -177,7 +177,7 @@ class TestCompanyAdmin:
                 "memberships-0-is_admin": "on",
                 "memberships-0-is_active": "on",
                 "memberships-1-company": company.pk,
-                "memberships-1-user": employer.pk,
+                "memberships-1-user": professional.pk,
                 "memberships-1-is_admin": "on",
                 "memberships-1-is_active": "on",
                 "job_description_through-TOTAL_FORMS": "0",
@@ -190,10 +190,10 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url, fetch_redirect_response=False)
         response = admin_client.get(change_url)
 
-        assert_set_admin_role_creation(employer, company, mailoutbox)
+        assert_set_admin_role_creation(professional, company, mailoutbox)
         assert (
             f"Creating companies.CompanyMembership of organization_id={company.pk} "
-            f"for user_id={employer.pk} is_admin=True."
+            f"for user_id={professional.pk} is_admin=True."
         ) in caplog.messages
 
     def test_reactivate_member(self, admin_client, caplog):
@@ -239,7 +239,7 @@ class TestCompanyAdmin:
 
     def test_add_membership_invalid_user(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory()
-        employer = EmployerFactory()
+        professional = ProfessionalFactory()
 
         payload = {
             "id": company.id,
@@ -263,7 +263,7 @@ class TestCompanyAdmin:
             "_continue": "Enregistrer+et+continuer+les+modifications",
         }
 
-        for bad_value in ["", employer.pk + 1]:
+        for bad_value in ["", professional.pk + 1]:
             payload["memberships-0-user"] = bad_value
             response = admin_client.post(
                 reverse("admin:companies_company_change", args=[company.pk]),
@@ -279,7 +279,7 @@ class TestCompanyAdmin:
             assert company.members.count() == 0
 
         # Assert the same payload with a valid user works so that we know the previous loop is useful
-        payload["memberships-0-user"] = employer.pk
+        payload["memberships-0-user"] = professional.pk
         response = admin_client.post(
             reverse("admin:companies_company_change", args=[company.pk]),
             data=payload,
@@ -490,7 +490,7 @@ class TestTransferCompanyData:
     def test_transfer_data_memberships(
         self, admin_client, field, value_in_from_company, value_in_to_company, expected
     ):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         default_args = {"user": user, "is_active": False, "is_admin": False}
         from_company = CompanyFactory(with_membership=False)
         if value_in_from_company is not None:

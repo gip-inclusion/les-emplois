@@ -42,7 +42,7 @@ def test_collect_analytics_with_data():
     users_factories.LaborInspectorFactory.create_batch(5, membership=True)
     users_factories.ItouStaffFactory.create_batch(6)
     users_factories.JobSeekerFactory(is_active=False)
-    users_factories.PrescriberFactory()  # no membership we don't count it
+    users_factories.ProfessionalFactory()  # no membership we don't count it
     # FIXME: Test with a professionnal with all 3 memberships
     assert users.collect_analytics_data(timezone.now()) == {
         models.DatumCode.USER_COUNT: 20,

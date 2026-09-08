@@ -19,7 +19,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
 
 
@@ -715,7 +715,7 @@ class TestJobSeekerSignup:
     def test_job_seeker_signup_cannot_conflict_with_other_user_type(self, client):
         # If a user exists with the requested email, but they are not a candidate,
         # I'm not given the option to login with the existing account.
-        existing_user = EmployerFactory()
+        existing_user = ProfessionalFactory()
         geispolsheim = create_city_geispolsheim()
         birthdate = "1990-01-01"
 

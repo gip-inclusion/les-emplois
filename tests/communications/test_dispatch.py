@@ -14,7 +14,13 @@ from itou.communications.dispatch.utils import (
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 class TestBaseNotification:
@@ -182,7 +188,7 @@ class TestBaseNotification:
         }
 
     def test_method_get_context_employer(self):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         company = CompanyMembershipFactory(user=user).company
         assert BaseNotification(user, company).get_context() == {
             "user": user,
@@ -242,17 +248,17 @@ class TestEmailNotification:
         self.user.prescribermembership_set.update(is_active=False)
 
         admin_1 = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user
         admin_2 = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user
         PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=False,
         )
@@ -280,17 +286,17 @@ class TestEmailNotification:
         user.companymembership_set.update(is_active=False)
 
         admin_1 = CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=True,
         ).user
         admin_2 = CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=True,
         ).user
         CompanyMembershipFactory(
-            user=EmployerFactory(),
+            user=ProfessionalFactory(),
             company=company,
             is_admin=False,
         )
@@ -319,7 +325,7 @@ class TestEmailNotification:
 
         # But we still forward it if the user left his organozation
         admin = PrescriberMembershipFactory(
-            user=PrescriberFactory(),
+            user=ProfessionalFactory(),
             organization=self.organization,
             is_admin=True,
         ).user

@@ -5,7 +5,7 @@ from tests.companies.factories import (
     CompanyFactory,
     SiaeConventionFactory,
 )
-from tests.users.factories import EmployerFactory
+from tests.users.factories import ProfessionalFactory
 
 
 class TestShowAndSelectFinancialAnnex:
@@ -86,7 +86,7 @@ class TestShowAndSelectFinancialAnnex:
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         company.members.add(user)
         assert not company.has_admin(user)
         assert company.should_have_convention

@@ -32,7 +32,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 class TestCommonApprovalQuerySet:
@@ -1254,7 +1254,7 @@ class TestProlongationModel:
         prolongation = ProlongationFactory()
         prolongation.clean()
 
-        employer = EmployerFactory()
+        employer = ProfessionalFactory()
         prolongation.declared_by = employer
         with pytest.raises(ValidationError) as error:
             prolongation.clean()

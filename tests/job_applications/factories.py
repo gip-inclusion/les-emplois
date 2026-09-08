@@ -31,10 +31,10 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
-    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -266,6 +266,6 @@ class JobApplicationCommentFactory(factory.django.DjangoModelFactory):
 
     job_application = factory.SubFactory(JobApplicationFactory)
     created_at = factory.LazyFunction(datetime.now)
-    created_by = factory.SubFactory(EmployerFactory)  # Usually a member of the company, but he might have left
+    created_by = factory.SubFactory(ProfessionalFactory)  # Usually a member of the company, but he might have left
     message = factory.Faker("sentence", nb_words=40)
     company = factory.SelfAttribute(".job_application.to_company")

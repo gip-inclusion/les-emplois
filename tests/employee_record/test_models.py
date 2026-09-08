@@ -38,7 +38,7 @@ from tests.employee_record.factories import (
     EmployeeRecordWithProfileFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import EmployerFactory
+from tests.users.factories import ProfessionalFactory
 
 
 class TestEmployeeRecordModel:
@@ -849,7 +849,7 @@ def test_transition_log(faker):
 
     lifecycle_specs = [
         {
-            EmployeeRecordTransition.READY: {"user": EmployerFactory()},
+            EmployeeRecordTransition.READY: {"user": ProfessionalFactory()},
             EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE: {
                 "file": faker.asp_batch_filename(),
                 "line_number": faker.pyint(),
@@ -861,12 +861,12 @@ def test_transition_log(faker):
                 "archive": faker.pydict(value_types=[int, str]),
             },
             EmployeeRecordTransition.DISABLE: {},
-            EmployeeRecordTransition.ENABLE: {"user": EmployerFactory()},
+            EmployeeRecordTransition.ENABLE: {"user": ProfessionalFactory()},
             EmployeeRecordTransition.ARCHIVE: {},
             EmployeeRecordTransition.UNARCHIVE_PROCESSED: {},
         },
         {
-            EmployeeRecordTransition.READY: {"user": EmployerFactory()},
+            EmployeeRecordTransition.READY: {"user": ProfessionalFactory()},
             EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE: {
                 "file": faker.asp_batch_filename(),
                 "line_number": faker.pyint(),

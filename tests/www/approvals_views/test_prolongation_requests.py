@@ -20,7 +20,7 @@ from tests.approvals import factories as approvals_factories
 from tests.files.factories import FileFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
-from tests.users.factories import EmployerFactory
+from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
     assert_previous_step,
@@ -79,7 +79,7 @@ def test_pagination(client):
 
 def test_list_view_no_siae(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(
-        for_snapshot=True, declared_by_siae=None, declared_by=EmployerFactory()
+        for_snapshot=True, declared_by_siae=None, declared_by=ProfessionalFactory()
     )
     client.force_login(prolongation_request.assigned_to)
 
@@ -150,7 +150,7 @@ def test_show_view(snapshot, client):
 
 def test_show_view_no_siae(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(
-        declared_by_siae=None, declared_by=EmployerFactory()
+        declared_by_siae=None, declared_by=ProfessionalFactory()
     )
     client.force_login(prolongation_request.assigned_to)
 
