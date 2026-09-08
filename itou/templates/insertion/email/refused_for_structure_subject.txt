@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Vous venez de refuser une demande
+
+{% endblock %}

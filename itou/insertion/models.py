@@ -848,6 +848,13 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             return True
         return self.sender_prescriber_organization.is_authorized
 
+    @property
+    def new_service_search_url(self):
+        query = {"job_seeker_public_id": self.beneficiary.public_id}
+        if (city_slug := self.beneficiary.city_slug) and self.sender_can_view_personal_information:
+            query["city"] = city_slug
+        return get_absolute_url(reverse("search:services_results", query=query))
+
     # Transitions
     @xwf_models.transition()
     def process(self):
@@ -864,6 +871,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             self.email_accepted_orientation_for_referent.send()
         self.notification_accepted_for_beneficiary.send()
         self.notification_accepted_for_sender.send()
+
+    @xwf_models.transition()
+    def refuse(self):
+        process_link = OrientationProcessLink.objects.create(orientation=self)
+        process_link.email_refused_orientation_for_structure.send()
+        if not self.sender_is_referent:
+            self.email_refused_orientation_for_referent.send()
+        self.notification_refused_for_beneficiary.send()
+        self.notification_refused_for_sender.send()
 
     # Notifications
     @property
@@ -891,6 +907,14 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def notification_accepted_for_sender(self):
         return orientation_notifications.AcceptedOrientationForSender(self.sender, orientation=self)
+
+    @property
+    def notification_refused_for_beneficiary(self):
+        return orientation_notifications.RefusedOrientationForBeneficiary(self.beneficiary, orientation=self)
+
+    @property
+    def notification_refused_for_sender(self):
+        return orientation_notifications.RefusedOrientationForSender(self.sender, orientation=self)
 
     # Emails (to users that do not have an account)
     @property
@@ -923,6 +947,17 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         }
         subject = "insertion/email/accepted_for_referent_subject.txt"
         body = "insertion/email/accepted_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_refused_orientation_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+            "reasons": [OrientationRefusalReason(reason).label for reason in self.refusal_reasons],
+        }
+        subject = "insertion/email/refused_for_referent_subject.txt"
+        body = "insertion/email/refused_for_referent_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -991,4 +1026,16 @@ class OrientationProcessLink(models.Model):
         }
         subject = "insertion/email/accepted_for_structure_subject.txt"
         body = "insertion/email/accepted_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_refused_orientation_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+            "reasons": [OrientationRefusalReason(reason).label for reason in self.orientation.refusal_reasons],
+        }
+        subject = "insertion/email/refused_for_structure_subject.txt"
+        body = "insertion/email/refused_for_structure_body.txt"
         return get_email_message(to, context, subject, body)
