@@ -3266,11 +3266,11 @@ unidecode==1.4.0 \
     --hash=sha256:c3c7606c27503ad8d501270406e345ddb480a7b5f38827eafe4fa82a137f0021 \
     --hash=sha256:ce35985008338b676573023acc382d62c264f307c8f7963733405add37ea2b23
     # via -r test.txt
-unipatch==1.0.0 \
-    --hash=sha256:195ac3110766c744e029239aba82b287041fc9fd703b062e6574cc9681f1b6c9 \
-    --hash=sha256:195ac3110766c744e029239aba82b287041fc9fd703b062e6574cc9681f1b6c9 \
-    --hash=sha256:993df2fe49f8114a95eaaf088ecf498c0dd20a8387caa17d63e8d1c29ea50af1 \
-    --hash=sha256:993df2fe49f8114a95eaaf088ecf498c0dd20a8387caa17d63e8d1c29ea50af1
+unipatch==1.0.1 \
+    --hash=sha256:1994cec00483584ba13290a0745b6c81cf6bb0e557a77ffdfaed668c59ed4218 \
+    --hash=sha256:1994cec00483584ba13290a0745b6c81cf6bb0e557a77ffdfaed668c59ed4218 \
+    --hash=sha256:876199e2ca3e74fb45afa6fb15caf8a5f076556dbecc3fc4864488bfe3b2b07f \
+    --hash=sha256:876199e2ca3e74fb45afa6fb15caf8a5f076556dbecc3fc4864488bfe3b2b07f
     # via
     #   -r test.txt
     #   patchy
