@@ -1590,7 +1590,7 @@ class TestOrientationRefuseForServiceProvider:
         response = client.get(reverse("insertion_views:refuse_orientation", query=query))
         assert response.status_code == 404
 
-    def test_refuse(self, client):
+    def test_refuse(self, client, mailoutbox):
         link = OrientationProcessLinkFactory(
             orientation__status=OrientationStatus.PENDING,
             orientation__service__name="Accompagnement aux devoirs",
@@ -1633,6 +1633,8 @@ class TestOrientationRefuseForServiceProvider:
             OrientationRefusalReason.SESSION_FULL,
         ]
         assert orientation.updated_at == refused_at
+
+        assert len(mailoutbox) == 4  # email sent to structure, sender, beneficiary and referent
 
     def test_refuse_incorrect_data(self, client):
         with freeze_time(timezone.now()):  # ensure created_at == updated_at
