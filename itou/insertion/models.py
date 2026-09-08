@@ -894,6 +894,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         self.notification_expired_for_beneficiary.send()
         self.notification_expired_for_sender.send()
 
+    def send_reminder_email(self):
+        process_link = OrientationProcessLink.objects.create(orientation=self)
+        process_link.email_reminder_for_structure.send()
+
     # Notifications
     @property
     def notification_new_for_beneficiary(self):
@@ -1091,4 +1095,16 @@ class OrientationProcessLink(models.Model):
         }
         subject = "insertion/email/new_link_for_structure_subject.txt"
         body = "insertion/email/new_link_for_structure_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_reminder_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+            "days_count": (timezone.now() - self.orientation.created_at).days,
+        }
+        subject = "insertion/email/reminder_for_structure_subject.txt"
+        body = "insertion/email/reminder_for_structure_body.txt"
         return get_email_message(to, context, subject, body)

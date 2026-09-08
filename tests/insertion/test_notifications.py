@@ -1,11 +1,14 @@
+from datetime import timedelta
 from functools import partial
 
 import pytest
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.models import CompanyMembership
 from itou.insertion import notifications
 from itou.insertion.enums import OrientationRefusalReason, OrientationStatus
+from itou.insertion.models import Orientation
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from tests.companies.factories import CompanyMembershipFactory
@@ -302,6 +305,22 @@ def test_expired_orientation_for_beneficiary(snapshot):
 def test_orientation_new_link_for_structure(snapshot):
     link = OrientationProcessLinkFactory(orientation__for_snapshot=True)
     email = link.email_new_link_for_structure
+
+    assert email.to == [link.orientation.service.contact_email]
+    assert email.subject == snapshot(name="subject")
+    body = email.body.replace(str(link.pk), "[PK of OrientationProcessLink]")
+    assert body == snapshot(name="body")
+
+
+@freeze_time("2026-08-13")
+@pytest.mark.parametrize("reminder_days_multiplicator", [1, 2])
+def test_orientation_reminder_for_structure(snapshot, reminder_days_multiplicator):
+    with freeze_time(
+        timezone.now() - timedelta(days=Orientation.REMINDER_EMAIL_DELAY_DAYS * reminder_days_multiplicator)
+    ):
+        orientation = OrientationFactory(for_snapshot=True)
+    link = OrientationProcessLinkFactory(orientation=orientation)
+    email = link.email_reminder_for_structure
 
     assert email.to == [link.orientation.service.contact_email]
     assert email.subject == snapshot(name="subject")
