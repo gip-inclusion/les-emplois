@@ -4,16 +4,31 @@
 {% if contract_ending_soon_date %}
     {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id=fiche_banner_extra_id extra_classes="mb-3 mb-md-4" %}
         {% fragment as title %}
-            Le contrat arrive bientôt à échéance
+            {% if request.from_employer %}
+                Le contrat arrive bientôt à échéance
+            {% else %}
+                Ce bénéficiaire arrive en fin de contrat de travail
+            {% endif %}
         {% endfragment %}
         {% fragment as content %}
             <p class="mb-0">
-                Le contrat de ce salarié arrive à échéance le {{ contract_ending_soon_date|date:"d/m/Y" }}. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+                {% if request.from_employer %}
+                    Le contrat de ce salarié arrive à échéance le {{ contract_ending_soon_date|date:"d/m/Y" }}. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+                {% else %}
+                    Son contrat de travail se termine le {{ contract_ending_soon_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                {% endif %}
             </p>
         {% endfragment %}
         {% if suggest_next_step_url %}
             {% fragment as call_to_action %}
                 <a class="btn btn-sm btn-primary has-external-link" href="{{ suggest_next_step_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
+            {% endfragment %}
+        {% elif pro_support_request_mailto %}
+            {% fragment as call_to_action %}
+                <a class="btn btn-sm btn-primary" href="{{ pro_support_request_mailto }}" {% matomo_event "candidat" "clic" "demande-bilan-accompagnement-fiche" %}>Demander un bilan d’accompagnement</a>
+            {% endfragment %}
+        {% else %}
+            {% fragment as call_to_action %}
             {% endfragment %}
         {% endif %}
     {% endcomponent_alert %}

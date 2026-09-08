@@ -9810,7 +9810,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -10488,6 +10488,21 @@
           FROM "approvals_suspension"
           WHERE "approvals_suspension"."approval_id" IN (%s)
           ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_contract"."end_date" AS "end_date"
+          FROM "companies_contract"
+          WHERE ("companies_contract"."end_date" IS NOT NULL
+                 AND "companies_contract"."job_seeker_id" = %s)
+          ORDER BY 1 DESC
+          LIMIT 1
         ''',
       }),
       dict({
@@ -11193,7 +11208,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -11894,6 +11909,21 @@
           FROM "approvals_suspension"
           WHERE "approvals_suspension"."approval_id" IN (%s)
           ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_contract"."end_date" AS "end_date"
+          FROM "companies_contract"
+          WHERE ("companies_contract"."end_date" IS NOT NULL
+                 AND "companies_contract"."job_seeker_id" = %s)
+          ORDER BY 1 DESC
+          LIMIT 1
         ''',
       }),
       dict({
