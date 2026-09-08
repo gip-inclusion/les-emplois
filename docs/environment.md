@@ -11,7 +11,7 @@ utilisées sont recensées dans ce document.
 ## Définir les variables d’environnement
 
 Dans votre environnement de développement, l’utilisation de
-[direnv](./direnv.md) est recommandée.
+[direnv](./developing.md#direnv) est recommandée.
 
 En production, un fichier `.env` est généré au déploiement et chargé avec
 l’utilitaire [`dotenv`](https://pypi.org/project/python-dotenv/). Cette
