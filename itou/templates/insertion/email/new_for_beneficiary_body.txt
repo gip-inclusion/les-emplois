@@ -1,4 +1,4 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_for_beneficiary_text_body.txt" %}
 {% block body %}
 
 Bonjour,
