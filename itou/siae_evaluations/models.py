@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
+from django.db.models import Case, Count, Exists, F, OuterRef, Prefetch, Q, When
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -724,6 +724,19 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
     def viewable(self):
         viewable_campaigns = EvaluationCampaign.objects.viewable()
         return self.filter(evaluated_siae__evaluation_campaign__in=viewable_campaigns)
+
+    def with_job_seeker_last_name_for_display(self):
+        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
+        return self.annotate(
+            job_seeker_last_name_for_display=Case(
+                When(
+                    job_application__job_seeker__last_name="",
+                    then=F("job_application__job_seeker__jobseeker_profile__birth_name"),
+                ),
+                default=F("job_application__job_seeker__last_name"),
+                output_field=models.CharField(),
+            )
+        )
 
 
 class EvaluatedJobApplication(models.Model):

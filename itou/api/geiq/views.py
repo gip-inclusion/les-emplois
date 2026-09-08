@@ -74,6 +74,7 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
                 to_company__kind=CompanyKind.GEIQ,
                 **extra_filters,
             )
+            .with_job_seeker_last_name_for_display()
             .select_related(
                 "to_company",
                 "sender_prescriber_organization",
@@ -96,7 +97,7 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
             )
             .order_by(
                 "to_company__siret",
-                "job_seeker__last_name",
+                "job_seeker_last_name_for_display",
                 "job_seeker__first_name",
                 "pk",
             )
