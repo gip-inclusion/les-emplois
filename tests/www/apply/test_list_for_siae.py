@@ -2363,7 +2363,7 @@ class TestAutocomplete:
     ]
 
     def test_invalid_access(self, client):
-        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+        for user in [JobSeekerFactory(), LaborInspectorFactory()]:
             client.force_login(user)
             for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
                 response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))

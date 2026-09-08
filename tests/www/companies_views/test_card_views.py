@@ -325,7 +325,7 @@ class TestCardView:
         assertContains(response, EXIT_URL_PRESCRIBER)
 
         # If any employer, show the alert
-        employer = EmployerFactory(membership=True)
+        employer = EmployerFactory()
         client.force_login(employer)
         response = client.get(url)
         assertContains(response, BANNER_TXT_NAME)
@@ -527,14 +527,14 @@ class TestJobDescriptionCardView:
         assertNotContains(response, BANNER_TXT)
 
         # If prescriber but not authorized, show the alert with masked name
-        unauthorized_prescriber = PrescriberFactory(membership=True)
+        unauthorized_prescriber = PrescriberFactory()
         client.force_login(unauthorized_prescriber)
         response = client.get(url)
         assertContains(response, BANNER_TXT_MASK)
         assertContains(response, EXIT_URL_PRESCRIBER)
 
         # If any employer, show the alert
-        employer = EmployerFactory(membership=True)
+        employer = EmployerFactory()
         client.force_login(employer)
         response = client.get(url)
         assertContains(response, BANNER_TXT_NAME)

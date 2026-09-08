@@ -770,9 +770,9 @@ class TestProcessViews:
 
         for user in [
             JobSeekerFactory(),
-            EmployerFactory(membership=True),
-            PrescriberFactory(membership=True),
-            LaborInspectorFactory(membership=True),
+            EmployerFactory(),
+            PrescriberFactory(),
+            LaborInspectorFactory(),
         ]:
             with subtests.test(user_kind=user.kind.label):
                 client.force_login(user)

@@ -48,7 +48,14 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
     SanctionsFactory,
 )
-from tests.users.factories import JobSeekerFactory, ProfessionalFactory, UserFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+    UserFactory,
+)
 
 
 def get_all_subclasses(cls):
@@ -159,7 +166,11 @@ def test_all_admin(admin_client, mocker, subtests):
             NexusRessourceSyncStatusFactory,  # Already used above
             SanctionsFactory,  # Called by EvaluatedJobApplicationSanctionFactory
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
-            UserFactory,  # A lot of subfactories, no need to use it
+            UserFactory,  # A user was created with JobSeekerFactory
+            ProfessionalFactory,  # A user was created with JobSeekerFactory
+            PrescriberFactory,  # A user was created with JobSeekerFactory
+            EmployerFactory,  # A user was created with JobSeekerFactory
+            LaborInspectorFactory,  # A user was created with JobSeekerFactory
         ):
             continue
         factory_class()

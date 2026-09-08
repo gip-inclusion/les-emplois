@@ -28,7 +28,7 @@ class TestNewsRender:
     def test_all_news_rendered_html(self, client, snapshot):
         campaign = AnnouncementCampaignFactory(for_snapshot=True, with_items_for_every_user_kind=True)
 
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         client.force_login(user)
         response = client.get(reverse("announcements:news"))
 
@@ -111,7 +111,7 @@ class TestNewsRender:
             content = parse_response_to_soup(response, ".s-section__container")
             assert pretty_indented(content) == snapshot(name="none_exists")
 
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         url = reverse("announcements:news")
 
         assert_content_matches_snapshot(client.get(url))

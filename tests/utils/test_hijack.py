@@ -44,7 +44,7 @@ class TestUserHijack:
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/accounts/login/?next=/hijack/acquire/", fetch_redirect_response=False)
 
-        hijacker = PrescriberFactory(membership=True)  # active but not staff or superuser
+        hijacker = PrescriberFactory()  # active but not staff or superuser
         client.force_login(hijacker)
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403
@@ -90,7 +90,7 @@ class TestUserHijack:
     def test_circumvent_2fa_on_hijacked_user(self, client, settings):
         # If hijacked (target) user must use 2FA, circumvent it for hijacker.
         settings.REQUIRE_MFA_FOR_PROS = True
-        hijacked = EmployerFactory(membership=True)
+        hijacked = EmployerFactory()
         settings.REQUIRE_MFA_ON_COMPANY_IDS = {hijacked.company_set.get().id}
 
         # 2FA is required for hijacked user.

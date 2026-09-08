@@ -17,7 +17,7 @@ def test_home_anonymous(client):
 
 
 def test_home_logged_in(client):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory())
     url = reverse("home:hp")
     response = client.get(url, follow=True)
     assertRedirects(response, reverse("dashboard:index"))

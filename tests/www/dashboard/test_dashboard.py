@@ -1106,8 +1106,8 @@ class TestDashboardView:
     "factory,assertion",
     [
         pytest.param(partial(JobSeekerFactory, with_address=True), assertNotContains, id="JobSeeker"),
-        pytest.param(partial(EmployerFactory, membership=True), assertNotContains, id="Employer"),
-        pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
+        pytest.param(EmployerFactory, assertNotContains, id="Employer"),
+        pytest.param(LaborInspectorFactory, assertNotContains, id="LaborInspector"),
         pytest.param(
             partial(PrescriberFactory, membership__organization__authorized=False),
             assertNotContains,

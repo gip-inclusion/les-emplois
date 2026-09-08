@@ -19,7 +19,6 @@ from tests.www.stats.test_views import has_activated_pilotage_in_nexus
 )
 def test_index_stats_for_employer(snapshot, client, kind):
     employer = EmployerFactory(
-        membership=True,
         membership__company__kind=kind,
     )
     client.force_login(employer)

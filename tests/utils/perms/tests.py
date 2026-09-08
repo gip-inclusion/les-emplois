@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -29,11 +27,11 @@ from tests.utils.testing import get_request
         (JobSeekerFactory, IdentityProvider.DJANGO, False),
         (JobSeekerFactory, IdentityProvider.FT_CONNECT, False),
         (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
-        (partial(PrescriberFactory, membership=True), IdentityProvider.DJANGO, True),
-        (partial(PrescriberFactory, membership=True), IdentityProvider.PRO_CONNECT, False),
-        (partial(EmployerFactory, membership=True), IdentityProvider.DJANGO, True),
-        (partial(EmployerFactory, membership=True), IdentityProvider.PRO_CONNECT, False),
-        (partial(LaborInspectorFactory, membership=True), IdentityProvider.DJANGO, False),
+        (PrescriberFactory, IdentityProvider.DJANGO, True),
+        (PrescriberFactory, IdentityProvider.PRO_CONNECT, False),
+        (EmployerFactory, IdentityProvider.DJANGO, True),
+        (EmployerFactory, IdentityProvider.PRO_CONNECT, False),
+        (LaborInspectorFactory, IdentityProvider.DJANGO, False),
     ],
 )
 def test_redirect_to_pc_activation_view(client, user_factory, identity_provider, is_redirected):

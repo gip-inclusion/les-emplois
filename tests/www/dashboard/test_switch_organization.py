@@ -142,10 +142,7 @@ class TestSwitchOrganization:
     def test_not_allowed_user(self, client):
         organization = prescribers_factories.PrescriberOrganizationFactory()
 
-        for user in (
-            JobSeekerFactory(),
-            random_pro_user_factory(membership=True),
-        ):
+        for user in (JobSeekerFactory(), random_pro_user_factory()):
             client.force_login(user)
             url = reverse("dashboard:switch_organization")
             response = client.post(url, data={"organization_key": organization.organization_switch_key})

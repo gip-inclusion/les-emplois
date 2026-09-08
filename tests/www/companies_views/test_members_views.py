@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -27,9 +25,9 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), True],
-            [partial(PrescriberFactory, membership=True), False],
-            [partial(LaborInspectorFactory, membership=True), False],
+            [EmployerFactory, True],
+            [PrescriberFactory, False],
+            [LaborInspectorFactory, False],
         ],
         ids=[
             "job_seeker",
@@ -516,7 +514,7 @@ class TestRequestAdminRole:
         assert response.status_code == 403
 
     def test_post_requires_employer(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         client.force_login(user)
         response = client.post(self.URL)
         assert response.status_code == 403

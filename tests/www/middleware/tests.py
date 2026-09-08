@@ -36,7 +36,7 @@ class TestRedirectToNewDomainMiddleware:
         response = client.get("/search/employers", HTTP_HOST="old.domain", follow=False)
         assert response.status_code == 200
 
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         client.force_login(user)
         response = client.get("/dashboard/", HTTP_HOST="old.domain", follow=False)
         assert response.status_code == 200

@@ -95,7 +95,7 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = PrescriberMembership
 
-    user = factory.SubFactory(PrescriberFactory)
+    user = factory.SubFactory(PrescriberFactory, membership=False)  # FIXME
     organization = factory.SubFactory(PrescriberOrganizationFactory)
     is_admin = True
     is_active = True

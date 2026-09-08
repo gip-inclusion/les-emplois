@@ -1,4 +1,3 @@
-from functools import partial
 from urllib.parse import urlencode
 
 import pytest
@@ -15,7 +14,6 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
     user = PrescriberFactory(
         identity_provider=IdentityProvider.DJANGO,
         email=pro_connect.oidc_userinfo["email"],
-        membership=True,
     )
     client.force_login(user)
     url = reverse("dashboard:index")
@@ -37,9 +35,7 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
 
 
 def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
-    user = EmployerFactory(
-        membership=True, identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"]
-    )
+    user = EmployerFactory(identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"])
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
@@ -64,9 +60,9 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     [
         (ItouStaffFactory, True),
         (JobSeekerFactory, True),
-        (partial(PrescriberFactory, membership=True), False),
-        (partial(EmployerFactory, membership=True), False),
-        (partial(LaborInspectorFactory, membership=True), False),
+        (PrescriberFactory, False),
+        (EmployerFactory, False),
+        (LaborInspectorFactory, False),
     ],
     ids=["staff", "jobseeker", "prescriber", "employer", "labor_inspector"],
 )

@@ -243,9 +243,9 @@ class TestStructures:
         [
             (None, assertContains),
             (JobSeekerFactory, assertNotContains),
-            (partial(PrescriberFactory, membership=True), assertContains),
-            (partial(EmployerFactory, membership=True), assertContains),
-            (partial(LaborInspectorFactory, membership=True), assertNotContains),
+            (PrescriberFactory, assertContains),
+            (EmployerFactory, assertContains),
+            (LaborInspectorFactory, assertNotContains),
             (ItouStaffFactory, assertNotContains),
         ],
     )
@@ -324,7 +324,7 @@ class TestServices:
         assertContains(response, "Fermé du 25 décembre au 1er janvier.")
 
     def test_detail_basic_dora(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-service-uid",
             name="Mon service de test",
@@ -347,7 +347,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
     def test_detail_basic_not_dora(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-service-uid",
             name="Mon service de test",
@@ -370,7 +370,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
     def test_detail_with_all_optional_fields(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="dora", label="Dora")
         fee = GenericReferenceItemFactory(kind=GenericReferenceItemKind.FEE, value="gratuit", label="Gratuit")
         public = GenericReferenceItemFactory(kind=GenericReferenceItemKind.PUBLIC, value="adultes", label="Adultes")
@@ -425,7 +425,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
     def test_detail_with_external_orientation_link(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         test_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-external-uid",
@@ -444,7 +444,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_with_external_orientation_link_without_text(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         external_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-external-no-text-uid",
@@ -462,7 +462,7 @@ class TestServices:
         assertContains(response, f'href="{external_link}"')
 
     def test_di_service_orientable_with_external_link_prefers_link(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         external_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-orientable-ext-uid",
@@ -482,7 +482,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_dora_service_orientable_with_form_and_external_link_prefers_wizard(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         external_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-orientable-ext-uid",
@@ -501,7 +501,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_dora_service_not_orientable_with_form_prefers_external_link(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         external_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-orientable-ext-uid",
@@ -521,7 +521,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_orientable_and_user_authenticated(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-orientable-uid",
             name="Service orientable",
@@ -569,7 +569,7 @@ class TestServices:
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
 
     def test_detail_not_orientable(self, client, snapshot):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-not-orientable-uid",
             name="Service non orientable",
@@ -584,7 +584,7 @@ class TestServices:
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_not_orientable_because_of_missing_email(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             is_orientable_with_form=True, contact_email="", contact_full_name="Ludwig B.", contact_phone="3949"
         )
@@ -593,7 +593,7 @@ class TestServices:
         assertNotContains(response, self.ORIENT_BTN_LABEL)
 
     def test_detail_non_orientable_di_sources(self, client, settings):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         blacklisted_source = "blacklisted-source"
         settings.NON_ORIENTABLE_DI_SOURCES = [blacklisted_source]
         service = ServiceFactory(
@@ -608,7 +608,7 @@ class TestServices:
         assertNotContains(response, self.ORIENT_BTN_LABEL)
 
     def test_detail_non_orientable_di_sources_with_external_link(self, client, settings):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         blacklisted_source = "blacklisted-source"
         settings.NON_ORIENTABLE_DI_SOURCES = [blacklisted_source]
         external_link = "https://test.example.com"
@@ -627,7 +627,7 @@ class TestServices:
         assertContains(response, f'href="{external_link}"')
 
     def test_detail_contact_section_hidden_without_contact_info(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-no-contact-uid",
             updated_on="2025-01-15",
@@ -644,7 +644,7 @@ class TestServices:
         assertContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-contact-auth-uid",
             updated_on="2025-01-15",
@@ -690,7 +690,7 @@ class TestServices:
         assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service_with_link = ServiceFactory(
             uid="test-with-link-uid",
             source__value="dora",
@@ -704,7 +704,7 @@ class TestServices:
         assertContains(response, '<link rel="canonical" href="https://dora.inclusion.gouv.fr/services/test">')
 
     def test_detail_without_source_link(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service_no_link = ServiceFactory(
             uid="test-no-link-uid",
             source_link="",
@@ -717,7 +717,7 @@ class TestServices:
         assertNotContains(response, 'rel="canonical"')
 
     def test_detail_orientation_url_points_to_wizard_start(self, client):
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-wizard-uid",
             updated_on="2025-01-15",
@@ -1032,9 +1032,9 @@ class TestServices:
         [
             (None, assertContains),
             (JobSeekerFactory, assertNotContains),
-            (partial(PrescriberFactory, membership=True), assertContains),
-            (partial(EmployerFactory, membership=True), assertContains),
-            (partial(LaborInspectorFactory, membership=True), assertNotContains),
+            (PrescriberFactory, assertContains),
+            (EmployerFactory, assertContains),
+            (LaborInspectorFactory, assertNotContains),
             (ItouStaffFactory, assertNotContains),
         ],
     )
@@ -1214,9 +1214,9 @@ class TestOrientationDetails:
         [
             (ItouStaffFactory, 403),
             (JobSeekerFactory, 403),
-            (partial(LaborInspectorFactory, membership=True), 403),
-            (partial(PrescriberFactory, membership=True), 404),  # authorized but not in the the sender org
-            (partial(EmployerFactory, membership=True), 404),  # authorized but not in the sender org
+            (LaborInspectorFactory, 403),
+            (PrescriberFactory, 404),  # authorized but not in the the sender org
+            (EmployerFactory, 404),  # authorized but not in the sender org
         ],
     )
     def test_no_access(self, client, user_factory, status_code):
@@ -1519,7 +1519,7 @@ class TestOrientationsList:
         assert set(displayed_statuses) == set(OrientationStatus.values)
 
     def test_no_results(self, client):
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
 
         response = client.get(self.LIST_URL)
         assertContains(response, "Aucune demande d’orientation pour le moment")
@@ -1730,7 +1730,7 @@ class TestOrientationsList:
 
 
 class TestRegisterMobilizationEvent:
-    @pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
+    @pytest.mark.parametrize("user_factory", [None, PrescriberFactory])
     @pytest.mark.parametrize(
         "kind, with_service, service_external_link",
         [
@@ -1770,7 +1770,7 @@ class TestRegisterMobilizationEvent:
 
     @pytest.mark.parametrize(
         "user_factory",
-        [ItouStaffFactory, JobSeekerFactory, partial(LaborInspectorFactory, membership=True)],
+        [ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory],
     )
     def test_register_mobilization_event_bad_user(self, client, user_factory):
         structure = StructureFactory()
@@ -1795,7 +1795,7 @@ class TestRegisterMobilizationEvent:
     )
     def test_register_mobilization_event_kind(self, client, kind, message, status_code, expected_exists):
         structure = StructureFactory()
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         client.force_login(user)
 
         data = {"kind": kind, "structure_uid": structure.uid, "service_uid": ""}
@@ -1825,7 +1825,7 @@ class TestRegisterMobilizationEvent:
     ):
         structure = StructureFactory(uid="structure-uid")
         ServiceFactory(uid="service-uid", structure=structure)
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         client.force_login(user)
 
         kind = MobilizationEventKind.SERVICE_CONTACT if service_uid else MobilizationEventKind.STRUCTURE_CONTACT

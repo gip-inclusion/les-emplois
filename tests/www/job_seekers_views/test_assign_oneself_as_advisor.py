@@ -1,5 +1,4 @@
 import uuid
-from functools import partial
 
 import pytest
 from django.contrib import messages
@@ -54,14 +53,7 @@ def test_view(client):
     assertMessages(response, [SUCCESS_MESSAGE, INFO_MESSAGE])
 
 
-@pytest.mark.parametrize(
-    "professional_factory",
-    [
-        partial(PrescriberFactory, membership=True),
-        partial(EmployerFactory, membership=True),
-    ],
-    ids=["prescriber", "employer"],
-)
+@pytest.mark.parametrize("professional_factory", [PrescriberFactory, EmployerFactory], ids=["prescriber", "employer"])
 def test_invalid(client, professional_factory):
     # Needs to be logged in
     response = client.get(reverse("job_seekers_views:assign_oneself_as_advisor", kwargs={"public_id": uuid.uuid4()}))
