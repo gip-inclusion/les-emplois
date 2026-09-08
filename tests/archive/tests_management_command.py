@@ -1,5 +1,4 @@
 import datetime
-import random
 import re
 from unittest.mock import patch
 from uuid import uuid4
@@ -67,14 +66,7 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedJobApplicationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerAssignmentFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -149,14 +141,8 @@ class TestNotifyInactiveJobseekersManagementCommand:
             job_application__approval__end_at=timezone.localdate() - INACTIVITY_PERIOD,
         )
 
-        # prescriber_without_recent_activity
-        PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
-
-        # employer_without_recent_activity
-        EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
-
-        # labor_inspector_without_recent_activity
-        LaborInspectorFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        # professional_without_recent_activity
+        ProfessionalFactory(joined_days_ago=DAYS_OF_INACTIVITY)
 
         # itou_staff_without_recent_activity
         ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY)
@@ -476,13 +462,7 @@ class TestAnonymizeJobseekersManagementCommand:
         itoustaff_with_recent_login = ItouStaffFactory(
             joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
         )
-        labor_inspector_with_recent_login = LaborInspectorFactory(
-            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-        )
-        employer_with_recent_login = EmployerFactory(
-            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-        )
-        prescriber_with_recent_login = PrescriberFactory(
+        professional_with_recent_login = ProfessionalFactory(
             joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
         )
 
@@ -536,9 +516,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 notified_jobseeker,
                 expired_approval_of_notified_jobseeker.user,
                 itoustaff_with_recent_login,
-                labor_inspector_with_recent_login,
-                employer_with_recent_login,
-                prescriber_with_recent_login,
+                professional_with_recent_login,
             ],
             ordered=False,
         )
@@ -561,10 +539,9 @@ class TestAnonymizeJobseekersManagementCommand:
     def test_exclude_users_when_archiving(self, respx_mock):
         jobseeker_notified_still_in_grace_period = JobSeekerFactory(notified_days_ago=29)
         jobseeker_never_notified = JobSeekerFactory(upcoming_deletion_notified_at=None)
-        employer = EmployerFactory(is_active=False, notified_days_ago=30)
-        prescriber = PrescriberFactory(notified_days_ago=30)
+        professional = ProfessionalFactory(notified_days_ago=30)
+        inactive_professional = ProfessionalFactory(is_active=False, notified_days_ago=30)
         itou_staff = ItouStaffFactory(notified_days_ago=30)
-        labor_inspector = LaborInspectorFactory(notified_days_ago=30)
 
         call_command("anonymize_jobseekers", wet_run=True)
 
@@ -574,10 +551,9 @@ class TestAnonymizeJobseekersManagementCommand:
             [
                 jobseeker_notified_still_in_grace_period,
                 jobseeker_never_notified,
-                employer,
-                prescriber,
+                professional,
+                inactive_professional,
                 itou_staff,
-                labor_inspector,
             ],
             ordered=False,
         )
@@ -695,7 +671,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 "date_joined": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
                 "first_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
                 "last_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
-                "created_by": PrescriberFactory(),
+                "created_by": ProfessionalFactory(),
                 "jobseeker_profile__pole_emploi_id": "12345678",
                 "jobseeker_profile__nir": "855456789012345",
                 "jobseeker_profile__lack_of_nir_reason": "",
@@ -1187,9 +1163,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
 class TestNotifyInactiveProfessionalsManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
-        EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
-        PrescriberFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
-        LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+        ProfessionalFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_inactive_professionals")
@@ -1198,8 +1172,7 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False)
 
     def test_notify_batch_size(self):
-        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-        factory.create_batch(3, last_login_days_ago=DAYS_OF_INACTIVITY)
+        ProfessionalFactory.create_batch(3, last_login_days_ago=DAYS_OF_INACTIVITY)
 
         call_command("notify_inactive_professionals", batch_size=2, wet_run=True)
 
@@ -1208,11 +1181,11 @@ class TestNotifyInactiveProfessionalsManagementCommand:
 
     def test_professionals_not_to_be_notified(self, django_capture_on_commit_callbacks, caplog, mailoutbox):
         # professional_soon_without_recent_activity
-        EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY - 1)
+        ProfessionalFactory(last_login_days_ago=DAYS_OF_INACTIVITY - 1)
         # professional_never_logged_in
-        PrescriberFactory()
+        ProfessionalFactory()
         # professional_without_recent_activity_already_notified
-        notified_professional = LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
+        notified_professional = ProfessionalFactory(last_login_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_inactive_professionals", wet_run=True)
@@ -1243,8 +1216,7 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         mailoutbox,
         snapshot,
     ):
-        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-        user = factory(
+        user = ProfessionalFactory(
             for_snapshot=True,
             first_name="Micheline",
             last_name="Dubois",
@@ -1293,7 +1265,7 @@ class TestAnonymizeProfessionalManagementCommand:
         ],
     )
     def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
-        EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        ProfessionalFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
 
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
@@ -1302,8 +1274,7 @@ class TestAnonymizeProfessionalManagementCommand:
         assert expected_message in caplog.messages
 
     def test_reset_notified_professional_dry_run(self):
-        for factory in [EmployerFactory, PrescriberFactory, LaborInspectorFactory]:
-            factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+        ProfessionalFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
 
         call_command("anonymize_professionals")
 
@@ -1311,57 +1282,44 @@ class TestAnonymizeProfessionalManagementCommand:
 
     def test_reset_notified_professional(self):
         # professionals who never logged in
-        never_logged_kwargs = {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": None}
-        employer_never_logged = EmployerFactory(**never_logged_kwargs)
-        prescriber_never_logged = PrescriberFactory(**never_logged_kwargs)
-        labor_inspector_never_logged = LaborInspectorFactory(**never_logged_kwargs)
+        professional_never_logged = ProfessionalFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=None
+        )
 
         # professionals who logged before being notified
-        logged_the_day_before_notification_kwargs = {
-            "joined_days_ago": DAYS_OF_INACTIVITY,
-            "notified_days_ago": 1,
-            "last_login": timezone.now() - relativedelta(days=1),
-        }
-        employer_logged_before_notification = EmployerFactory(**logged_the_day_before_notification_kwargs)
-        prescriber_logged_before_notification = PrescriberFactory(**logged_the_day_before_notification_kwargs)
-        labor_inspector_logged_before_notification = LaborInspectorFactory(**logged_the_day_before_notification_kwargs)
+        professional_logged_before_notification = ProfessionalFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=1,
+            last_login=timezone.now() - relativedelta(days=1),
+        )
 
         # professionals who logged after being notified
-        logged_after_notification_kwargs = {
-            "joined_days_ago": DAYS_OF_INACTIVITY,
-            "notified_days_ago": 1,
-            "last_login": timezone.now(),
-        }
-        employer_logged_after_notification = EmployerFactory(**logged_after_notification_kwargs)
-        prescriber_logged_after_notification = PrescriberFactory(**logged_after_notification_kwargs)
-        labor_inspector_logged_after_notification = LaborInspectorFactory(**logged_after_notification_kwargs)
+        professional_logged_after_notification = ProfessionalFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=1,
+            last_login=timezone.now(),
+        )
 
         call_command("anonymize_professionals", wet_run=True)
 
         assertQuerySetEqual(
             User.objects.filter(upcoming_deletion_notified_at__isnull=True),
             [
-                employer_logged_after_notification,
-                prescriber_logged_after_notification,
-                labor_inspector_logged_after_notification,
+                professional_logged_after_notification,
             ],
             ordered=False,
         )
         assertQuerySetEqual(
             User.objects.filter(upcoming_deletion_notified_at__isnull=False),
             [
-                employer_never_logged,
-                prescriber_never_logged,
-                labor_inspector_never_logged,
-                employer_logged_before_notification,
-                prescriber_logged_before_notification,
-                labor_inspector_logged_before_notification,
+                professional_never_logged,
+                professional_logged_before_notification,
             ],
             ordered=False,
         )
 
     def test_anonymize_professionals_dry_run(self, respx_mock):
-        user = EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        user = ProfessionalFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
         call_command("anonymize_professionals")
 
         unmodified_user = User.objects.get()
@@ -1370,7 +1328,7 @@ class TestAnonymizeProfessionalManagementCommand:
         assert not respx_mock.calls.called
 
     def test_anonymize_professionals_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
-        EmployerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        ProfessionalFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", batch_size=2, wet_run=True)
@@ -1380,13 +1338,13 @@ class TestAnonymizeProfessionalManagementCommand:
         assert respx_mock.calls.call_count == 2
 
     def test_excluded_users_when_anonymizing_professionals(self):
-        employer_notified_still_in_grace_period = EmployerFactory(
+        professional_notified_still_in_grace_period = ProfessionalFactory(
             joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29
         )
-        labor_inspector_with_recent_login = LaborInspectorFactory(
+        professional_with_recent_login = ProfessionalFactory(
             joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
         )
-        prescriber_never_notified = PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        professional_never_notified = ProfessionalFactory(joined_days_ago=DAYS_OF_INACTIVITY)
         jobseeker_notified = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
         itou_staff_notified = ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
 
@@ -1395,9 +1353,9 @@ class TestAnonymizeProfessionalManagementCommand:
         assertQuerySetEqual(
             User.objects.all(),
             [
-                employer_notified_still_in_grace_period,
-                labor_inspector_with_recent_login,
-                prescriber_never_notified,
+                professional_notified_still_in_grace_period,
+                professional_with_recent_login,
+                professional_never_notified,
                 jobseeker_notified,
                 itou_staff_notified,
             ],
@@ -1575,8 +1533,7 @@ class TestAnonymizeProfessionalManagementCommand:
     def test_anonymize_professionals_notification(
         self, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot, respx_mock
     ):
-        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-        factory(
+        ProfessionalFactory(
             date_joined=timezone.make_aware(datetime.datetime(2023, 5, 17)),
             upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 6, 17)),
             is_active=is_active,
@@ -1676,7 +1633,7 @@ class TestAnonymizeProfessionalManagementCommand:
             call_command("anonymize_professionals", wet_run=True)
 
     def test_anonymized_at_is_the_first_day_of_the_month(self):
-        EmployerFactory(
+        ProfessionalFactory(
             joined_days_ago=DAYS_OF_INACTIVITY,
             notified_days_ago=31,
         )
@@ -1825,7 +1782,7 @@ class TestRemoveUnknownEmailsFromBrevoCommand:
     def test_remove_unknown_emails_from_brevo(
         self, verbosity, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
     ):
-        known_users = EmployerFactory.create_batch(2)
+        known_users = ProfessionalFactory.create_batch(2)
         two_years_ago = timezone.now() - relativedelta(years=2) - datetime.timedelta(minutes=1)
         almost_two_years_ago = two_years_ago + datetime.timedelta(days=1)
         two_years_ago_fmt = two_years_ago.strftime("%Y-%m-%dT%H:%M:%S") + "Z"

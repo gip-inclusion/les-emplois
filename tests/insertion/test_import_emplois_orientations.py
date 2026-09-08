@@ -9,7 +9,7 @@ from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
 from tests.insertion.factories import ServiceFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 def _dora_entry(*, beneficiary, sender, organization, service, **overrides):
@@ -51,7 +51,7 @@ def _write_export(tmp_path, entries):
 
 def test_import_prescriber_orientation(tmp_path):
     beneficiary = JobSeekerFactory()
-    sender = PrescriberFactory()
+    sender = ProfessionalFactory()
     organization = PrescriberOrganizationFactory()
     service = ServiceFactory()
     entry = _dora_entry(beneficiary=beneficiary, sender=sender, organization=organization, service=service)
@@ -76,7 +76,7 @@ def test_import_prescriber_orientation(tmp_path):
 
 def test_import_employer_orientation(tmp_path):
     beneficiary = JobSeekerFactory()
-    sender = PrescriberFactory()
+    sender = ProfessionalFactory()
     company = CompanyFactory()
     service = ServiceFactory()
     entry = _dora_entry(beneficiary=beneficiary, sender=sender, organization=company, service=service)
@@ -93,7 +93,7 @@ def test_import_employer_orientation(tmp_path):
 def test_dry_run_creates_nothing(tmp_path):
     entry = _dora_entry(
         beneficiary=JobSeekerFactory(),
-        sender=PrescriberFactory(),
+        sender=ProfessionalFactory(),
         organization=PrescriberOrganizationFactory(),
         service=ServiceFactory(),
     )
@@ -106,7 +106,7 @@ def test_dry_run_creates_nothing(tmp_path):
 
 def test_existing_orientation_is_left_untouched(tmp_path):
     beneficiary = JobSeekerFactory()
-    sender = PrescriberFactory()
+    sender = ProfessionalFactory()
     organization = PrescriberOrganizationFactory()
     service = ServiceFactory()
     entry = _dora_entry(beneficiary=beneficiary, sender=sender, organization=organization, service=service)
@@ -133,14 +133,14 @@ def test_existing_orientation_is_left_untouched(tmp_path):
 def test_missing_references_are_skipped(tmp_path, caplog):
     valid = _dora_entry(
         beneficiary=JobSeekerFactory(),
-        sender=PrescriberFactory(),
+        sender=ProfessionalFactory(),
         organization=PrescriberOrganizationFactory(),
         service=ServiceFactory(),
     )
     # An unknown service: the entry must be skipped without aborting the import.
     unknown_service = _dora_entry(
         beneficiary=JobSeekerFactory(),
-        sender=PrescriberFactory(),
+        sender=ProfessionalFactory(),
         organization=PrescriberOrganizationFactory(),
         service=ServiceFactory(),
     )

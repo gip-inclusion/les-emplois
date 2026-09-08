@@ -9,7 +9,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 class TestApplicantsAPI:
@@ -38,7 +38,7 @@ class TestApplicantsAPI:
 
     def test_api_user_has_non_memberships(self, api_client):
         # Connected user must have a membership
-        user = EmployerFactory()
+        user = ProfessionalFactory()
 
         api_client.force_authenticate(user)
         response = api_client.get(self.URL, format="json")

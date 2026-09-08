@@ -65,7 +65,7 @@ from tests.eligibility.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_process import ARCHIVED_MARKUP, UNARCHIVE_BUTTON_MARKUP
@@ -997,7 +997,7 @@ class TestProcessAcceptViewsInWizard:
         assertNotContains(response, NIR_FIELD_ID)
 
         job_application.job_seeker.last_login = None
-        job_application.job_seeker.created_by = PrescriberFactory()
+        job_application.job_seeker.created_by = ProfessionalFactory()
         job_application.job_seeker.save()
         response = client.get(jobseeker_info_url)
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)

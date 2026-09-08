@@ -11,6 +11,7 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 
 
@@ -36,9 +37,9 @@ class TestUserHijack:
         assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
     def test_disallowed_hijackers(self, client):
-        hijacked = PrescriberFactory()
+        hijacked = ProfessionalFactory()
 
-        hijacker = PrescriberFactory(is_active=False)  # Not staff nor active
+        hijacker = ProfessionalFactory(is_active=False)  # Not staff nor active
         client.force_login(hijacker)
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/accounts/login/?next=/hijack/acquire/", fetch_redirect_response=False)
@@ -58,7 +59,7 @@ class TestUserHijack:
         assert response.status_code == 403
 
     def test_permission_staff_hijacker(self, client, caplog):
-        hijacked = PrescriberFactory()
+        hijacked = ProfessionalFactory()
         hijacker = ItouStaffFactory(is_staff=True)
         hijacker.user_permissions.add(Permission.objects.get(codename="hijack"))
         client.force_login(hijacker)
@@ -73,7 +74,7 @@ class TestUserHijack:
         assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
     def test_allowed_django_prescriber(self, client, caplog, settings):
-        hijacked = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        hijacked = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
@@ -111,7 +112,7 @@ class TestUserHijack:
     @pytest.mark.parametrize("hijacked_must_accept_terms", [True, False])
     def test_release_redirects_to_admin(self, client, hijacked_must_accept_terms):
         kwargs = {"terms_accepted_at": None} if hijacked_must_accept_terms else {}
-        hijacked = PrescriberFactory(**kwargs)
+        hijacked = ProfessionalFactory(**kwargs)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 

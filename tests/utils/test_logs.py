@@ -4,9 +4,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from tests.companies.factories import CompanyMembershipFactory
-from tests.users.factories import (
-    ItouStaffFactory,
-)
+from tests.users.factories import ItouStaffFactory
 
 
 def test_log_current_organization(capture_stream_handler_log, client):

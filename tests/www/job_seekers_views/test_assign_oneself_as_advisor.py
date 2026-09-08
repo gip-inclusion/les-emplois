@@ -8,12 +8,7 @@ from pytest_django.asserts import assertMessages, assertRedirects
 
 from itou.users.enums import ActionKind
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    JobSeekerAssignmentFactory,
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
 
 
 def test_view(client):

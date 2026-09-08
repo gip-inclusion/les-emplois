@@ -1,9 +1,5 @@
 from itou.www.job_seekers_views import forms as job_seekers_forms
-from tests.users.factories import (
-    JobSeekerFactory,
-    JobSeekerProfileFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, ProfessionalFactory
 
 
 class TestCheckJobSeekerNirForm:
@@ -44,7 +40,7 @@ class TestCheckJobSeekerNirForm:
         assert existing_account.email not in error_msg
         assert "u*******@r*****.t**" in error_msg
 
-        existing_account = PrescriberFactory()
+        existing_account = ProfessionalFactory()
         profile = JobSeekerProfileFactory(user=existing_account)  # This should not be possible
         form_data = {"nir": profile.nir}
         form = job_seekers_forms.CheckJobSeekerNirForm(data=form_data)

@@ -24,13 +24,11 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import parse_response_to_soup
 
@@ -341,7 +339,7 @@ def test_app_model_change_url(admin_client):
 
 
 def test_num_queries(admin_client, snapshot):
-    prescriber = PrescriberFactory()
+    prescriber = ProfessionalFactory()
     sent_job_application1 = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
@@ -465,8 +463,7 @@ def test_profile_check_inconsistency_check(admin_client):
     )
     assertContains(response, "Aucune incohérence trouvée")
 
-    prescriber = PrescriberFactory()
-    inconsistent_profile = JobSeekerProfileFactory(user=prescriber)
+    inconsistent_profile = JobSeekerProfileFactory(user=ProfessionalFactory())
 
     response = admin_client.post(
         reverse("admin:users_jobseekerprofile_changelist"),
@@ -607,7 +604,7 @@ class TestJobSeekerAssignments:
         assert admin_client.get(expected_url).status_code == 200
 
     def test_professional_assignments_link_in_user_admin(self, admin_client):
-        professional = PrescriberFactory()
+        professional = ProfessionalFactory()
         expected_url = reverse("admin:users_jobseekerassignment_changelist", query={"professional": professional.pk})
         response = admin_client.get(reverse("admin:users_user_change", args=(professional.pk,)))
         assertNotContains(response, self.ASSIGNMENT_LIST_LINK)
@@ -623,7 +620,7 @@ class TestJobSeekerAssignments:
 
 class TestDeactivateView:
     def test_deactivate_button(self, client):
-        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+        user = random.choice([ProfessionalFactory, JobSeekerFactory])()
         deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
 
         # Basic staff users without write access don't see the button
@@ -647,7 +644,7 @@ class TestDeactivateView:
         assertNotContains(response, deactivate_url)
 
     def test_deactivate_without_change_permission(self, client):
-        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+        user = random.choice([ProfessionalFactory, JobSeekerFactory])()
         deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
         admin_user = ItouStaffFactory()
         perms = Permission.objects.filter(codename="view_user")
@@ -657,16 +654,14 @@ class TestDeactivateView:
         assert response.status_code == 403
 
     def test_deactivate_inactive_user(self, admin_client):
-        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])(
-            is_active=False
-        )
+        user = random.choice([ProfessionalFactory, JobSeekerFactory])(is_active=False)
         deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
         response = admin_client.post(deactivate_url)
         assert response.status_code == 404
 
     @freeze_time("2023-08-31 12:34:56")
     def test_deactivate_user(self, admin_client, caplog):
-        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])(
+        user = random.choice([ProfessionalFactory, JobSeekerFactory])(
             username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
             email="user@example.com",
         )
@@ -708,7 +703,7 @@ class TestDeactivateView:
 
 class TestReactivateView:
     def test_reactivate_button(self, client):
-        user = random.choice([EmployerFactory, PrescriberFactory])(
+        user = ProfessionalFactory(
             is_active=False,
             notified_days_ago=40,
             email=None,
@@ -730,7 +725,7 @@ class TestReactivateView:
         assertContains(response, reactivate_url)
 
     def test_reactivate_without_change_permission(self, client):
-        user = random.choice([EmployerFactory, PrescriberFactory])(
+        user = ProfessionalFactory(
             is_active=False,
             notified_days_ago=40,
             email=None,
@@ -744,14 +739,14 @@ class TestReactivateView:
         assert response.status_code == 403
 
     def test_reactivate_non_reactivable_user(self, admin_client):
-        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+        user = random.choice([ProfessionalFactory, JobSeekerFactory])()
 
         assert user.can_be_reactivated() is False
         response = admin_client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
         assert response.status_code == 404
 
     def test_reactivate_user(self, admin_client, caplog):
-        user = random.choice([EmployerFactory, PrescriberFactory])(
+        user = ProfessionalFactory(
             username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
             is_active=False,
             notified_days_ago=40,

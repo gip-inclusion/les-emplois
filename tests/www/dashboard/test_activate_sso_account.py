@@ -8,12 +8,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.users.enums import IdentityProvider
 from tests.institutions.factories import LaborInspectorFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 
 
 def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect):

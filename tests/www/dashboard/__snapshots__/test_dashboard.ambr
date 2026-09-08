@@ -1338,7 +1338,7 @@
     ]),
   })
 # ---
-# name: TestDashboardView.test_jobseeker_eligibility_diagnoses[GEIQ eligibility block on job seeker dashboard]
+# name: TestDashboardView.test_jobseeker_geiq_eligibility_diagnoses
   '''
   <div class="col-12 col-md-12 col-xxl-12 col-xxxl-12 mb-3 mb-md-5" id="geiq-eligibility-diagnosis">
       <div class="c-box p-0 h-100">
@@ -1354,7 +1354,7 @@
           </div>
           <div class="px-3 px-lg-4">
               <p class="fs-sm text-success">
-                  Éligibilité GEIQ confirmée par Jean MICHEL (ACME Inc.).
+                  Éligibilité GEIQ confirmée par James BOND (ACME Inc.).
               </p>
               <ul class="list-data mb-3">
                   <li>
@@ -1388,7 +1388,7 @@
   
   '''
 # ---
-# name: TestDashboardView.test_jobseeker_eligibility_diagnoses[IAE eligibility block on job seeker dashboard]
+# name: TestDashboardView.test_jobseeker_iae_eligibility_diagnoses
   '''
   <div class="col-12 col-md-12 col-xxl-12 col-xxxl-6 mb-3 mb-md-5" id="iae-eligibility-diagnosis">
       <div class="c-box p-0 h-100">
@@ -1407,7 +1407,7 @@
                   <p class="fs-sm text-success">
                       Critères validés
                               le 19/05/2025 par
-                              Pierre DUPONT
+                              James BOND
                               
                               
                                   (Pres. Org.).

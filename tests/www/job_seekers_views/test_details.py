@@ -31,6 +31,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.htmx.testing import update_page_with_htmx
 from tests.utils.testing import get_request, load_template, parse_response_to_soup, pretty_indented
@@ -54,9 +55,7 @@ def test_refused_access(client):
 
 
 def test_not_a_job_seeker(client):
-    not_a_job_seeker = random.choice(
-        [PrescriberFactory(), EmployerFactory(), ItouStaffFactory(), LaborInspectorFactory()]
-    )
+    not_a_job_seeker = random.choice([ProfessionalFactory, ItouStaffFactory])()
     client.force_login(PrescriberFactory(membership=True))
     url = reverse("job_seekers_views:details", kwargs={"public_id": not_a_job_seeker.public_id})
     response = client.get(url)
@@ -859,7 +858,7 @@ class TestCanSeeExternalJobApplication(TestCase):
         )
 
     def test_only_authorized_prescriber_can_see_external_job_applications(self):
-        request = get_request(EmployerFactory())
+        request = get_request(ProfessionalFactory())
         assert not can_see_external_job_applications(self.job_seeker, request)
 
     def test_authorized_prescriber_can_see_external_job_applications_if_approval_exists(self):
@@ -1041,8 +1040,7 @@ class TestAdvisorsTab:
         response = client.get(advisors_tab_url)
         assert response.status_code == 403
 
-        factory = random.choice([PrescriberFactory, EmployerFactory])
-        user = factory(membership=True)
+        user = random.choice([PrescriberFactory, EmployerFactory])(membership=True)
         JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=user)
         client.force_login(user)
         response = client.get(url)
@@ -1129,7 +1127,7 @@ class TestAdvisorsTab:
             professional__for_snapshot=True,
             last_action_kind=ActionKind.APPLY,
         )
-        request = get_request(PrescriberFactory())
+        request = get_request(ProfessionalFactory())
 
         template = load_template("job_seekers_views/includes/advisor.html")
         rendered = template.render(Context({"assignment": assignment, "request": request}))

@@ -60,7 +60,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 @freeze_time("2023-03-10")
@@ -208,7 +208,7 @@ def test_populate_job_seekers(snapshot):
     #  - logged_in recently
     #  - in QPV
     user_1 = JobSeekerFactory(
-        created_by=PrescriberFactory(),
+        created_by=ProfessionalFactory(),
         identity_provider=IdentityProvider.FT_CONNECT,
         jobseeker_profile__pole_emploi_id="",
         last_login=timezone.now(),
@@ -224,7 +224,7 @@ def test_populate_job_seekers(snapshot):
     #  - outside QPV
     #  - expired eligibility diagnosis
     user_2 = JobSeekerFactory(
-        created_by=EmployerFactory(),
+        created_by=ProfessionalFactory(),
         jobseeker_profile__nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
@@ -875,7 +875,7 @@ def test_populate_users_exclude_job_seekers():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 def test_populate_users(snapshot):
-    pro_user = EmployerFactory()
+    pro_user = ProfessionalFactory()
 
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="users")
@@ -1373,7 +1373,7 @@ def test_populate_geiq_assessments(snapshot):
         granted_amount=decimal.Decimal("42000.00"),
         advance_amount=decimal.Decimal("20000.00"),
         submitted_at=datetime.datetime(2023, 2, 3, tzinfo=datetime.UTC),
-        submitted_by=EmployerFactory(),
+        submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=datetime.datetime(2023, 2, 4, tzinfo=datetime.UTC),
         decision_validated_at=datetime.datetime(2023, 2, 5, tzinfo=datetime.UTC),
         reviewed_at=datetime.datetime(2023, 2, 6, tzinfo=datetime.UTC),

@@ -13,7 +13,7 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
-    PrescriberFactory,
+    ProfessionalFactory,
     random_pro_user_factory,
 )
 
@@ -48,7 +48,7 @@ class TestAutoLoginMiddleware:
         ]
 
     def test_middleware_with_no_existing_user(self, client, caplog):
-        jwt = generate_auto_login_token(EmployerFactory.build())
+        jwt = generate_auto_login_token(ProfessionalFactory.build())
         response = client.get(reverse("home:hp", query={"auto_login": jwt}))
         assertRedirects(
             response,
@@ -91,7 +91,7 @@ class TestAutoLoginMiddleware:
 
 class TestDropDownMiddleware:
     def test_context(self, client):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
@@ -101,7 +101,7 @@ class TestDropDownMiddleware:
         }
 
     def test_nexus_page(self, client):
-        user = EmployerFactory()
+        user = ProfessionalFactory()
         CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("nexus:homepage"))
@@ -117,7 +117,7 @@ class TestDropDownMiddleware:
         assert response.wsgi_request.nexus_dropdown == {}
 
     def test_not_using_pro_connect(self, client):
-        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        user = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
         client.force_login(user)
         response = client.get(reverse("nexus:index"))
         assert response.wsgi_request.nexus_dropdown == {}

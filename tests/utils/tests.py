@@ -84,14 +84,7 @@ from tests.institutions.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-    random_user_kind_factory,
-)
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory, random_user_kind_factory
 from tests.utils.testing import (
     create_fake_postcode,
     get_request,
@@ -147,7 +140,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
-        request = self._get_request(EmployerFactory())
+        request = self._get_request(ProfessionalFactory())
         with assertNumQueries(3):  # Retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -272,7 +265,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
-        request = self._get_request(PrescriberFactory())
+        request = self._get_request(ProfessionalFactory())
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -361,7 +354,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
-        request = self._get_request(PrescriberFactory())
+        request = self._get_request(ProfessionalFactory())
         organization = PrescriberOrganizationFactory()
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.organization_switch_key
         request.session.save()
@@ -376,7 +369,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY not in request.session
 
     def test_prescriber_wrong_org_in_session_with_other_org(self, mocked_get_response_for_middlewaremixin):
-        prescriber = PrescriberFactory()
+        prescriber = ProfessionalFactory()
         request = self._get_request(prescriber)
         bad_organization = PrescriberOrganizationFactory()
         organization = PrescriberMembershipFactory(user=prescriber).organization
@@ -394,7 +387,7 @@ class TestItouCurrentOrganizationMiddleware:
         )
 
     def test_ft_prescriber_with_no_ft_organization(self, mocked_get_response_for_middlewaremixin):
-        request = self._get_request(PrescriberFactory(email="prenom.nom@francetravail.fr"))
+        request = self._get_request(ProfessionalFactory(email="prenom.nom@francetravail.fr"))
         PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.AFPA)
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -453,7 +446,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_labor_inspector_no_member(self, mocked_get_response_for_middlewaremixin):
-        request = self._get_request(LaborInspectorFactory())
+        request = self._get_request(ProfessionalFactory())
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -731,7 +724,7 @@ class TestUtilsTemplateTags:
         [
             (functools.partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
             (
-                functools.partial(PrescriberFactory, identity_provider=IdentityProvider.PRO_CONNECT),
+                functools.partial(ProfessionalFactory, identity_provider=IdentityProvider.PRO_CONNECT),
                 True,
             ),
         ],
@@ -1155,7 +1148,7 @@ def test_add_support_remark_to_suspension(client):
     url = reverse("admin:approvals_suspension_change", args=[suspension.pk])
 
     # Not enough perms.
-    user = PrescriberFactory()
+    user = ProfessionalFactory()
     client.force_login(user)
     response = client.get(url)
     assert response.status_code == 302
@@ -1896,7 +1889,7 @@ def test_invalid_variable_in_template():
 @pytest.mark.parametrize(
     "remark_model,obj_factory",
     [
-        (PkSupportRemark, PrescriberFactory),
+        (PkSupportRemark, ProfessionalFactory),
         (UUIDSupportRemark, functools.partial(JobApplicationFactory, sent_by_prescriber_alone=True)),
     ],
 )
@@ -1919,7 +1912,7 @@ def test_add_support_remark_to_obj(remark_model, obj_factory):
 @pytest.mark.parametrize(
     "remark_model,obj_factory",
     [
-        (PkSupportRemark, PrescriberFactory),
+        (PkSupportRemark, ProfessionalFactory),
         (UUIDSupportRemark, functools.partial(JobApplicationFactory, sent_by_prescriber_alone=True)),
     ],
 )

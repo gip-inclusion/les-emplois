@@ -27,14 +27,7 @@ from tests.invitations.factories import (
     PrescriberWithOrgInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import (
-    DEFAULT_PASSWORD,
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import DEFAULT_PASSWORD, ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
 from tests.utils.testing import accept_legal_terms, assert_previous_step
 
 
@@ -42,7 +35,7 @@ class PrescriberMixin:
     org_factory = staticmethod(partial(PrescriberOrganizationFactory, kind=PrescriberOrganizationKind.CAP_EMPLOI))
     org_name = "organization"
     membership_factory = PrescriberMembershipFactory
-    user_factory = PrescriberFactory
+    user_factory = ProfessionalFactory
     invitation_factory = PrescriberWithOrgInvitationFactory
     invitation_model = PrescriberWithOrgInvitation
     invitation_url = reverse_lazy("invitations_views:invite_prescriber_with_org")
@@ -53,7 +46,7 @@ class CompanyMixin:
     org_factory = CompanyFactory
     membership_factory = CompanyMembershipFactory
     org_name = "company"
-    user_factory = EmployerFactory
+    user_factory = ProfessionalFactory
     invitation_factory = EmployerInvitationFactory
     invitation_model = EmployerInvitation
     invitation_url = reverse_lazy("invitations_views:invite_employer")
@@ -64,7 +57,7 @@ class InstitutionMixin:
     org_factory = InstitutionFactory
     membership_factory = InstitutionMembershipFactory
     org_name = "institution"
-    user_factory = LaborInspectorFactory
+    user_factory = ProfessionalFactory
     invitation_factory = LaborInspectorInvitationFactory
     invitation_model = LaborInspectorInvitation
     invitation_url = reverse_lazy("invitations_views:invite_labor_inspector")
@@ -640,7 +633,7 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
     def test_inactive_siae(self, client):
         company = CompanyFactory(convention__is_active=False, with_membership=True, subject_to_iae_rules=True)
         invitation = EmployerInvitationFactory(company=company)
-        user = EmployerFactory(email=invitation.email)
+        user = ProfessionalFactory(email=invitation.email)
         client.force_login(user)
         join_url = reverse(
             "invitations_views:join", kwargs={"invitation_type": KIND_EMPLOYER, "invitation_id": invitation.id}
