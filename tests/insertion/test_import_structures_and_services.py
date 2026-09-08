@@ -3,10 +3,12 @@ import pathlib
 from operator import attrgetter
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.core.management import call_command
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.cities.models import City
 from itou.insertion.models import GenericReferenceItem, GenericReferenceItemKind, Service, Structure
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiItemsIterator, DataInclusionApiPaginatedResponse
@@ -177,6 +179,29 @@ def test_data_inclusion_iterator_yields_every_item_across_pages():
     items = list(DataInclusionApiItemsIterator(lambda *, page, size: pages[page]))
 
     assert [item["id"] for item in items] == ["a", "b", "c"]
+
+
+def test_import_fills_structure_coordinates_and_insee_city(apis_mocks):
+    paris = City.objects.create(
+        name="Paris",
+        slug="paris-75",
+        department="75",
+        post_codes=["75010"],
+        code_insee="75056",
+        coords=Point(2.347, 48.859),
+    )
+
+    call_command("import_structures_and_services", wet_run=True)
+
+    structure = Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd")
+    assert structure.insee_city == paris
+    assert structure.coordinates.x == pytest.approx(2.35511)
+    assert structure.coordinates.y == pytest.approx(48.869364)
+    assert structure.coordinates.srid == 4326
+
+    structure_without_location = Structure.objects.get(uid="emplois-de-linclusion--null")
+    assert structure_without_location.insee_city is None
+    assert structure_without_location.coordinates is None
 
 
 def test_import_soft_deletes_structures_and_services_absent_from_api(apis_mocks):

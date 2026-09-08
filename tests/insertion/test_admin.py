@@ -1,9 +1,11 @@
 from django.contrib.auth.models import Permission
+from django.contrib.gis.geos import Point
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.insertion.models import OrientationProcessLink
-from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory
+from tests.cities.factories import create_city_vannes
+from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory, StructureFactory
 from tests.users.factories import ItouStaffFactory
 
 
@@ -82,3 +84,42 @@ class TestOrientationProcessLink:
         )
         assert response.status_code == 302
         assert not OrientationProcessLink.objects.exists()
+
+
+def test_structure_admin_shows_geolocation(admin_client):
+    vannes = create_city_vannes()
+    structure = StructureFactory(
+        insee_city=vannes,
+        coordinates=Point(2.35511, 48.869364, srid=4326),
+    )
+
+    response = admin_client.get(reverse("admin:insertion_structure_change", args=(structure.pk,)))
+
+    assertContains(
+        response,
+        f"""
+        <div class="form-row field-insee_city">
+            <div>
+                <div class="flex-container">
+                    <label>Insee city&nbsp;:</label>
+                    <div class="readonly">
+                        <a href="/admin/cities/city/{vannes.pk}/change/">Vannes (56)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
+    assertContains(
+        response,
+        """
+        <div class="flex-container">
+            <label>Coordinates&nbsp;:</label>
+            <div class="readonly">SRID=4326;POINT (2.35511 48.869364)</div>
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
