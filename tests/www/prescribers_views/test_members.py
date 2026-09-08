@@ -24,16 +24,11 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, membership=True), False],
-            [partial(PrescriberFactory, membership=True), True],
-            [partial(LaborInspectorFactory, membership=True), False],
+            [EmployerFactory, False],
+            [PrescriberFactory, True],
+            [LaborInspectorFactory, False],
         ],
-        ids=[
-            "job_seeker",
-            "employer",
-            "prescriber",
-            "labor_inspector",
-        ],
+        ids=["job_seeker", "employer", "prescriber", "labor_inspector"],
     )
     def test_permission(self, client, factory, access):
         user = factory()

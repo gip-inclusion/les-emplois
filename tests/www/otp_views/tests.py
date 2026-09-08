@@ -1,6 +1,5 @@
 import datetime
 import logging
-from functools import partial
 from unittest import mock
 
 import pytest
@@ -71,14 +70,7 @@ class TestPermissions:
 
     @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
     @pytest.mark.parametrize(
-        "factory",
-        [
-            JobSeekerFactory,
-            partial(EmployerFactory, membership=True),
-            partial(PrescriberFactory, membership=True),
-            partial(LaborInspectorFactory, membership=True),
-            ItouStaffFactory,
-        ],
+        "factory", [JobSeekerFactory, EmployerFactory, PrescriberFactory, LaborInspectorFactory, ItouStaffFactory]
     )
     def test_hidden_when_otp_is_not_required(self, client, factory, url_name, settings):
         settings.REQUIRE_OTP_FOR_STAFF = False
@@ -125,7 +117,7 @@ class TestPermissions:
     @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
     def test_hidden_when_mfa_comes_from_identity_provider(self, client, settings, url_name, with_device):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
         if with_device:
             ItouTOTPDeviceFactory(user=user)  # shouldn't happen anyway
@@ -159,7 +151,7 @@ class TestConfigurationOtpMenuLink:
     @pytest.mark.parametrize("is_concerned", [True, False])
     def test_professional_depends_on_allowlist(self, client, settings, is_concerned):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         if is_concerned:
             settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
         response = self._get_dashboard(client, user, verified=is_concerned)
@@ -177,7 +169,7 @@ class TestConfigurationOtpMenuLink:
         # The user is concerned by 2FA but was verified by ProConnect: they never enroll
         # a TOTP device on our side, so there is nothing to configure
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
         client.force_login(user)
         attach_external_device_to_user_session(client, user)
@@ -283,7 +275,7 @@ def test_delete_devices(client, snapshot, settings):
 def test_otp_enforced_before_nexus_whitelist(client, settings):
     """An MFA-required professional must not reach the whitelisted Nexus views (/portal, ...) without OTP."""
     settings.REQUIRE_MFA_FOR_PROS = True
-    user = EmployerFactory(membership=True)
+    user = EmployerFactory()
     company = user.company_set.get()
     settings.REQUIRE_MFA_ON_COMPANY_IDS = {company.id}
     client.force_login(user)

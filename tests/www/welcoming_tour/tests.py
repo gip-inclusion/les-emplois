@@ -88,7 +88,7 @@ class TestWelcomingTour:
         assertTemplateUsed(response, "welcoming_tour/employer.html")
 
     def test_new_labor_inspector_does_not_see_welcoming_tour(self, client):
-        user = LaborInspectorFactory(membership=True)
+        user = LaborInspectorFactory()
         client.force_login(user)
 
         response = client.get(reverse("welcoming_tour:index"))

@@ -1275,6 +1275,7 @@ class TestJobSeekerAssignment:
         job_seeker = JobSeekerFactory()
         professional = random.choice(
             [
+                # FIXME
                 ProfessionalFactory(),
                 ProfessionalFactory(),
                 ProfessionalFactory(),  # irrealistic case but technically possible

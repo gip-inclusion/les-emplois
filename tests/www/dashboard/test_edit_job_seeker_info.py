@@ -587,7 +587,7 @@ class TestEditJobSeekerInfo:
         )
 
         # Lambda prescriber not member of the sender organization
-        client.force_login(PrescriberFactory(membership=True))
+        client.force_login(PrescriberFactory())
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )

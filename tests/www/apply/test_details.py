@@ -23,7 +23,7 @@ def test_missing_job_seeker_info(client):
         message="Motivation est mon deuxième prénom.",
         answer="Réponse au candidat.",
     )
-    user = EmployerFactory(membership=True, membership__company=job_application.to_company)
+    user = EmployerFactory(membership__company=job_application.to_company)
     client.force_login(user)
     url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
@@ -141,7 +141,7 @@ def test_display_edit_jobseeker_info_button(client, factory, assertion):
 
 @pytest.mark.parametrize("created_by_prescriber,assertion", [(True, assertContains), (False, assertNotContains)])
 def test_display_edit_jobseeker_info_button_as_unauthorized_prescriber(client, created_by_prescriber, assertion):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(created_by=prescriber if created_by_prescriber else None)
     job_application = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber)
     client.force_login(prescriber)

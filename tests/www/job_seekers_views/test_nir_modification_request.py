@@ -32,11 +32,11 @@ def test_access_for_job_seeker(client):
     [
         (None, 302),
         (JobSeekerFactory, 404),  # Trying to access another job seeker's form
-        (partial(PrescriberFactory, membership=True), 404),
-        (partial(PrescriberFactory, membership=True, membership__organization__authorized=True), 200),
-        (partial(EmployerFactory, membership=True), 200),
+        (PrescriberFactory, 404),
+        (partial(PrescriberFactory, membership__organization__authorized=True), 200),
+        (EmployerFactory, 200),
         (ItouStaffFactory, 403),
-        (partial(LaborInspectorFactory, membership=True), 403),
+        (LaborInspectorFactory, 403),
     ],
 )
 @pytest.mark.parametrize("method", ["get", "post"])
@@ -67,7 +67,7 @@ def test_nir_modification_form_is_consistent(client, back_url):
 @pytest.mark.parametrize("is_proxy", [False, True])
 def test_nir_modification_request_title_blocks_reflects_actor(client, is_proxy):
     job_seeker = JobSeekerFactory()
-    actor = PrescriberFactory(membership=True, membership__organization__authorized=True) if is_proxy else job_seeker
+    actor = PrescriberFactory(membership__organization__authorized=True) if is_proxy else job_seeker
     client.force_login(actor)
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     response = client.get(url)
@@ -111,7 +111,7 @@ def test_nir_modification_request_title_blocks_reflects_actor(client, is_proxy):
     ],
 )
 def test_create_request_invalid_nir(client, data, error_message):
-    client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+    client.force_login(PrescriberFactory(membership__organization__authorized=True))
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     response = client.post(url, data=data)
@@ -132,7 +132,7 @@ def test_create_request_invalid_nir(client, data, error_message):
     ],
 )
 def test_create_request_without_rationale(client, data):
-    client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+    client.force_login(PrescriberFactory(membership__organization__authorized=True))
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     response = client.post(url, data=data)
@@ -159,7 +159,7 @@ def test_create_request_without_rationale(client, data):
     ],
 )
 def test_create_request_with_invalid_rationale(client, rationale, err_message):
-    client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+    client.force_login(PrescriberFactory(membership__organization__authorized=True))
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     data = {"nir": "1 11 11 11 111 111 20", "rationale": rationale}
@@ -170,7 +170,7 @@ def test_create_request_with_invalid_rationale(client, rationale, err_message):
 
 
 def test_create_with_ongoing_request(client, mailoutbox):
-    client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
+    client.force_login(PrescriberFactory(membership__organization__authorized=True))
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
 
     # Ongoing request
@@ -198,7 +198,7 @@ def test_create_with_ongoing_request(client, mailoutbox):
 
 
 def test_create_request_valid(client, mailoutbox):
-    user = PrescriberFactory(membership=True, membership__organization__authorized=True)
+    user = PrescriberFactory(membership__organization__authorized=True)
     client.force_login(user)
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
     rationale_message = "Le NIR affiché ne correspond pas à ma situation."

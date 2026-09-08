@@ -189,7 +189,7 @@ class CompanyMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.CompanyMembership
 
-    user = factory.SubFactory(EmployerFactory)
+    user = factory.SubFactory(EmployerFactory, membership=False)  # FIXME
     company = factory.SubFactory(CompanyFactory)
     is_admin = True
 

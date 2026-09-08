@@ -27,8 +27,8 @@ class TestUpdateEligibilityView:
             [partial(JobSeekerFactory, for_snapshot=True), 403],
             (partial(PrescriberFactory, membership__organization__authorized=True), 200),
             (partial(PrescriberFactory, membership__organization__authorized=False), 403),
-            (partial(EmployerFactory, membership=True), 403),
-            [partial(LaborInspectorFactory, membership=True), 403],
+            (EmployerFactory, 403),
+            [LaborInspectorFactory, 403],
         ],
         ids=[
             "job_seeker",

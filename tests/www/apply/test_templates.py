@@ -372,7 +372,7 @@ class TestCertifiedBadge:
     @pytest.mark.parametrize(
         "user_factory,displayed",
         [
-            (partial(EmployerFactory, membership=True), True),
+            (EmployerFactory, True),
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=False), False),
         ],

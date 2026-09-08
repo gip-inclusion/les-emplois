@@ -97,7 +97,7 @@ class EmployeeRecordTransitionLogFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecordTransitionLog
 
     employee_record = factory.SubFactory(EmployeeRecordFactory)
-    user = factory.SubFactory(EmployerFactory)
+    user = factory.SubFactory(EmployerFactory, membership=False)  # FIXME
     transition = factory.fuzzy.FuzzyChoice(EmployeeRecordTransition)
     from_state = factory.fuzzy.FuzzyChoice(Status)
     to_state = factory.fuzzy.FuzzyChoice(Status)

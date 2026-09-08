@@ -113,7 +113,7 @@ class TestVerifyTokenForUser:
 class TestRequireOtpForPro:
     def test_require_otp_on_some_organizations(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         org = user.prescriberorganization_set.get()
         PrescriberMembershipFactory(user=user)
         CompanyMembershipFactory(user=user)
@@ -125,7 +125,7 @@ class TestRequireOtpForPro:
 
     def test_require_otp_on_some_companies(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         company = user.company_set.get()
         CompanyMembershipFactory(user=user)
         PrescriberMembershipFactory(user=user)
@@ -137,7 +137,7 @@ class TestRequireOtpForPro:
 
     def test_require_otp_if_user_has_already_enrolled(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         assert not _require_otp_for_pro(user)
         ItouTOTPDeviceFactory(user=user)
         assert _require_otp_for_pro(user)
@@ -155,7 +155,7 @@ class TestUserIsConcernedByOtp:
 
     def test_professional_in_allowlisted_organization(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = PrescriberFactory(membership=True)
+        user = PrescriberFactory()
         org = user.prescriberorganization_set.get()
 
         assert not user_is_concerned_by_otp(user)
@@ -165,7 +165,7 @@ class TestUserIsConcernedByOtp:
 
     def test_professional_in_allowlisted_company(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         company = user.company_set.get()
 
         assert not user_is_concerned_by_otp(user)
