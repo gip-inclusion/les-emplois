@@ -198,6 +198,17 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
+                today = timezone.localdate()
+                contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
+                # Contracts are not scoped to a company: a prescriber follows the whole IAE journey.
+                assigned_job_seekers = User.objects.filter(
+                    pk__in=User.objects.assigned_job_seeker_ids(request.user, current_org)
+                )
+                context["contracts_ending_soon_count"] = (
+                    annotate_last_contract_end_date(assigned_job_seekers)
+                    .filter(last_contract_end_date__range=contract_window)
+                    .count()
+                )
     elif request.from_institution:
         current_org = get_current_institution_or_404(request)
         six_months_ago = timezone.now() - timezone.timedelta(days=182)
