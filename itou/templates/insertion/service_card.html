@@ -129,7 +129,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="col-12">
+                <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Présentation du service</h2>
                         {% if service.description|length > 200 %}
@@ -151,9 +151,6 @@
                             <p class="mb-0">{{ service.description|markdownify }}</p>
                         {% endif %}
                     </div>
-                </div>
-
-                <div class="col-12">
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Type de service</h2>
                         <ul class="list-data">
@@ -181,10 +178,46 @@
                             {% endif %}
                         </ul>
                     </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Eligibilité au service</h2>
+                        <ul class="list-data">
+                            {% if service.publics.exists or service.publics_details %}
+                                <li>
+                                    <small>Public concerné</small>
+                                    <div>
+                                        {% if service.publics.exists %}
+                                            <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                        {% endif %}
+                                        {% if service.publics_details %}
+                                            <p><small class="mb-0">{{ service.publics_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if service.prerequisites %}
+                                <li>
+                                    <small>Conditions d'accès</small>
+                                    <strong>{{ service.prerequisites|join:", " }}</strong>
+                                </li>
+                            {% endif %}
+                            {% if service.fee %}
+                                <hr class="my-4">
+                                <li>
+                                    <small>Frais à charge</small>
+                                    <div>
+                                        <strong>{{ service.fee.label }}</strong>
+                                        {% if service.fee_details %}
+                                            <p><small class="mb-0">{{ service.fee_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
 
                 {# Service information card #}
-                <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                <div class="s-section__col col-12 col-lg-8 order-3">
                     <div class="c-box mb-3 mb-md-4">
                         {% if service.average_orientation_response_delay_days is not None %}
                             <h2 class="h3 mb-2">Informations du service</h2>
@@ -280,7 +313,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-8 order-3">
+                <div class="col-12 col-lg-8 order-4">
                     {# Mobilizations #}
                     {% if show_mobilization_section %}
                         <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">

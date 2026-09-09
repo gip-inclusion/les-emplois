@@ -2744,7 +2744,7 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="col-12">
+                  <div class="s-section__col col-12 col-lg-8">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Présentation du service
@@ -2757,8 +2757,6 @@
                           <p>
                           </p>
                       </div>
-                  </div>
-                  <div class="col-12">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Type de service
@@ -2776,6 +2774,21 @@
                                           : Accéder à un véhicule
                                       </div>
                                   </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <strong>
+                                      Avoir plus de 18 ans, Résider en France, Pièce d'identité en cours de validité
+                                  </strong>
                               </li>
                           </ul>
                       </div>
@@ -2905,7 +2918,7 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="col-12">
+                  <div class="s-section__col col-12 col-lg-8">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Présentation du service
@@ -2918,8 +2931,6 @@
                           <p>
                           </p>
                       </div>
-                  </div>
-                  <div class="col-12">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Type de service
@@ -2937,6 +2948,21 @@
                                           : Accéder à un véhicule
                                       </div>
                                   </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <strong>
+                                      Être orienté par un prescripteur, Avoir 18 ans
+                                  </strong>
                               </li>
                           </ul>
                       </div>
@@ -3164,7 +3190,7 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="col-12">
+                  <div class="s-section__col col-12 col-lg-8">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Présentation du service
@@ -3182,8 +3208,6 @@
                           <p>
                           </p>
                       </div>
-                  </div>
-                  <div class="col-12">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Type de service
@@ -3209,6 +3233,52 @@
                                   <strong>
                                       France Travail, Conseil départemental
                                   </strong>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Public concerné
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Adultes
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Toute personne majeure.
+                                          </small>
+                                      </p>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <strong>
+                                      Être orienté par un prescripteur.
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Frais à charge
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Gratuit
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Sous conditions de ressources.
+                                          </small>
+                                      </p>
+                                  </div>
                               </li>
                           </ul>
                       </div>
