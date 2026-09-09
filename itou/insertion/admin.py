@@ -143,7 +143,17 @@ class ServiceAdmin(InsertionAdmin):
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
         ),
         ("Contact", {"fields": ["contact_full_name", "contact_email", "contact_phone", "contact_is_public"]}),
-        ("Horaires", {"fields": ["opening_hours", "opening_hours_text"]}),
+        (
+            "Horaires",
+            {
+                "fields": [
+                    "opening_hours",
+                    "opening_hours_text",
+                    "volume_horaire_hebdomadaire",
+                    "nombre_semaines",
+                ]
+            },
+        ),
         ("Orientation", {"fields": ["is_orientable_with_form", "average_orientation_response_delay_days"]}),
         ("État", {"fields": ["is_active"]}),
         ("Dates", {"fields": ["dora_synced_at", "updated_on", "created_at", "updated_at"]}),

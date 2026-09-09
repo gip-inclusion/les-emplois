@@ -307,6 +307,22 @@
                                     <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if service.address_on_one_line %} — {{ service.address_on_one_line }}{% endif %}</strong>
                                 </li>
                             {% endif %}
+                            {% if service.volume_horaire_hebdomadaire or service.nombre_semaines %}
+                                <li>
+                                    <small>Durée de la prestation</small>
+                                    <strong>
+                                        {% if service.volume_horaire_hebdomadaire %}
+                                            {{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine
+                                        {% endif %}
+                                        {% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}
+                                            , pendant
+                                        {% endif %}
+                                        {% if service.nombre_semaines %}
+                                            {{ service.nombre_semaines }} semaines
+                                        {% endif %}
+                                    </strong>
+                                </li>
+                            {% endif %}
 
                             {% if service.fee %}
                                 <li>
