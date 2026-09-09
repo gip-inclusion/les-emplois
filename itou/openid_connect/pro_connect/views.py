@@ -74,7 +74,6 @@ def _generate_pro_params_from_session(pc_data, host):
         "response_type": "code",
         "client_id": constants.PRO_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "acr_values": "eidas1",
         "scope": constants.PRO_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
@@ -88,15 +87,11 @@ def _generate_pro_params_from_session(pc_data, host):
                         # tells us which authentication methods have been
                         # used.
                         "amr": {"essential": True},
-                        # Request the use of 2FA _if possible_. Until all
-                        # identity providers implement 2FA, we must NOT
-                        # mention `"essential": True`. If we do, we'll get
-                        # an error in `pro_connect_callback` (missing
-                        # "code" ) that says that the requested ACRs could
-                        # not be satisfied.
                         "acr": {
-                            "essential": False,
+                            "essential": True,
                             "values": [
+                                "eidas0-mfa",
+                                "eidas1-mfa",
                                 "eidas2",
                                 "eidas3",
                             ],
@@ -350,6 +345,14 @@ def pro_connect_callback(request):
 
     amr = ()
     idp_id = None
+
+    # FIXME: DEBUG ONLY
+    # La doc de ProConnect dit de vérifier le retour pour comparer
+    # avec les ACR demandés (et renvoyer une erreur 403 en cas de
+    # mismatch)
+    # https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification#4-validation-c%C3%B4t%C3%A9-serveur-obligatoire
+    logger.info("acr: %s", id_token_data.get("acr"))
+
     try:
         amr = id_token_data.get("amr") or ()
         idp_id = user_data.get("idp_id", "")
