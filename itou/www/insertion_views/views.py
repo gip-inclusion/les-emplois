@@ -168,7 +168,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("search:services_home")),
                 "matomo_custom_title": "Fiche de la service d'insértion",
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
-                "credential_documents": self.object.generate_credential_documents_info(),
+                "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "show_mobilization_section": self.object.has_mobilization_modes(),
                 "professionals_has_autre": any(
                     m.value == "autre" for m in self.object.mobilization_modes_professionals.all()

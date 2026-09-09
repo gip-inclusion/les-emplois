@@ -346,6 +346,23 @@
                         </ul>
                     </div>
 
+                    {% if credential_documents or service.extra.online_form %}
+                        <div id="credentials-documents" class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Documents à compléter</h2>
+                            <ul class="list-data mb-0">
+                                {% for document_name, document_url in credential_documents %}
+                                    <li>
+                                        <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if service.extra.online_form %}
+                                    <li>
+                                        <a href="{{ service.extra.online_form }}" target="_blank" rel="noopener noreferrer">{{ service.extra.online_form }}</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
