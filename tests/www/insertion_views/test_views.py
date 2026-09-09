@@ -337,8 +337,69 @@ class TestServices:
         assert hours["Lundi"] == "7h45 à 18h30"
         assert hours["Samedi"] == "ouvert"
         assert formatted_opening_hours["comments"] == ["Fermé en août", "Fermé du 25 décembre au 1er janvier"]
-        assertContains(response, "Fermé en août.")
-        assertContains(response, "Fermé du 25 décembre au 1er janvier.")
+        assertContains(response, "7h45 à 18h30")
+        assertContains(response, "ouvert")
+        assertContains(response, "Fermé en août")
+        assertContains(response, "Fermé du 25 décembre au 1er janvier")
+
+    @pytest.mark.parametrize(
+        ("volume_horaire_hebdomadaire", "nombre_semaines", "expected_texts", "unexpected_texts"),
+        [
+            pytest.param(
+                21,
+                None,
+                ["Durée de la prestation", "21 heures par semaine"],
+                [", pendant", " semaines"],
+                id="volume_only",
+            ),
+            pytest.param(
+                None,
+                16,
+                ["Durée de la prestation", "16 semaines"],
+                ["heures par semaine", ", pendant"],
+                id="semaines_only",
+            ),
+            pytest.param(
+                21,
+                16,
+                [
+                    "Durée de la prestation",
+                    "21 heures par semaine",
+                    ", pendant",
+                    "16 semaines",
+                ],
+                [],
+                id="both",
+            ),
+            pytest.param(None, None, [], ["Durée de la prestation"], id="neither"),
+        ],
+    )
+    def test_detail_prestation_duration(
+        self,
+        client,
+        volume_horaire_hebdomadaire,
+        nombre_semaines,
+        expected_texts,
+        unexpected_texts,
+    ):
+        service = ServiceFactory(
+            uid="test-prestation-duration-uid",
+            name="Mon service de test",
+            updated_on="2025-01-15",
+            source__value="dora",
+            source__label="Dora",
+            volume_horaire_hebdomadaire=volume_horaire_hebdomadaire,
+            nombre_semaines=nombre_semaines,
+            structure__uid="test-structure-uid",
+            structure__name="Ma structure de test",
+            structure__updated_on="2025-01-15",
+        )
+        response = client.get(self.get_service_url(service))
+        assert response.status_code == 200
+        for text in expected_texts:
+            assertContains(response, text)
+        for text in unexpected_texts:
+            assertNotContains(response, text)
 
     def test_detail_basic_dora(self, client, snapshot):
         user = PrescriberFactory()

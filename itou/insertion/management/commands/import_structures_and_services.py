@@ -560,6 +560,9 @@ class Command(BaseCommand):
 
         service.opening_hours = data["horaires_accueil"] or ""
 
+        service.volume_horaire_hebdomadaire = data.get("volume_horaire_hebdomadaire") or None
+        service.nombre_semaines = data.get("nombre_semaines") or None
+
         service.contact_full_name = data["contact_nom_prenom"] or ""
         service.contact_email = data["courriel"] or ""
         self._void_if_max_len(service, "contact_email")

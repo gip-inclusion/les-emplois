@@ -428,6 +428,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
     opening_hours_text = models.CharField(verbose_name="horaires d'accueil (texte libre)", blank=True)
+    volume_horaire_hebdomadaire = models.FloatField(verbose_name="volume horaire hebdomadaire", null=True, blank=True)
+    nombre_semaines = models.PositiveIntegerField(verbose_name="nombre de semaines", null=True, blank=True)
 
     contact_full_name = models.CharField(verbose_name="contact", blank=True)
     contact_email = models.EmailField(verbose_name="e-mail du contact", blank=True)
