@@ -35,6 +35,8 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectState,
     ProConnectUserData,
 )
+from itou.openid_connect.pro_connect.utils import get_acr_configuration
+from itou.otp.utils import require_otp_for_pro
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
@@ -45,7 +47,13 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory, ProfessionalFactory, UserFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+    UserFactory,
+)
 from tests.utils.testing import accept_legal_terms
 
 
@@ -961,3 +969,46 @@ class TestProConnectNexusChannel:
         )
         assert get_user(client).is_authenticated is False
         assert not User.objects.exists()
+
+
+class TestGetAcrConfiguration:
+    @staticmethod
+    def assert_not_enforced(acr):
+        assert acr == {
+            "essential": False,
+            "values": ["eidas2", "eidas3"],
+        }
+
+    @staticmethod
+    def assert_enforced(acr):
+        assert acr == {
+            "essential": True,
+            "values": ["eidas0-mfa", "eidas1-mfa", "eidas2", "eidas3"],
+        }
+
+    def test_no_user(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        acr = get_acr_configuration(user=None)
+        self.assert_not_enforced(acr)
+
+    def test_otp_not_required(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = ProfessionalFactory()
+        acr = get_acr_configuration(user)
+        self.assert_not_enforced(acr)
+
+    def test_otp_required(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        settings.REQUIRE_MFA_FOR_PROS_BATCH = 10  # everyone
+        user = EmployerFactory()
+        acr = get_acr_configuration(user)
+        self.assert_enforced(acr)
+
+    def test_otp_required_but_already_enrolled_with_us(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = EmployerFactory()
+        ItouTOTPDeviceFactory(user=user)
+        assert require_otp_for_pro(user)
+
+        acr = get_acr_configuration(user)
+        self.assert_not_enforced(acr)
