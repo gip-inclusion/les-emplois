@@ -13,7 +13,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from itoutils.django.decoupage_administratif.models import Department, Region
+from itoutils.django.decoupage_administratif.models import City, Department, Region
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
@@ -402,6 +402,22 @@ class TestServices:
         mobilization = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.MOBILIZATION, value="telephonique", label="Par téléphone"
         )
+        mobilization_public = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION_PUBLIC,
+            value="professionnels",
+            label="Professionnels",
+        )
+
+        Region.objects.create(code="53", name="Bretagne")
+        Department.objects.create(code="56", name="Morbihan", region="53")
+        eligibility_zones = [
+            City.objects.create(
+                code=f"56{i:03}",
+                name=f"Commune numéro {i} en Bretagne",
+                department="56",
+            ).code
+            for i in range(1, 16)
+        ]
 
         service = ServiceFactory(
             uid="test-service-full-uid",
@@ -425,6 +441,7 @@ class TestServices:
             address_line_2="Bâtiment B",
             post_code="75001",
             city="Paris",
+            eligibility_zones=eligibility_zones,
             structure__uid="test-structure-full-uid",
             structure__name="Structure complète",
             structure__updated_on="2025-06-01",
@@ -436,6 +453,7 @@ class TestServices:
         service.receptions.add(reception)
         service.thematics.add(thematic)
         service.mobilizations.add(mobilization)
+        service.mobilization_publics.add(mobilization_public)
 
         client.force_login(user)
         response = client.get(self.get_service_url(service))
