@@ -27,7 +27,7 @@
     <ul class="list-unstyled mb-0">
         {% for old_evaluated_siae in evaluation_history %}
             <li>
-                Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
+                Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
                 {% if old_evaluated_siae.state == "ACCEPTED" %}
                     <b class="text-success">Positif</b>
                 {% else %}

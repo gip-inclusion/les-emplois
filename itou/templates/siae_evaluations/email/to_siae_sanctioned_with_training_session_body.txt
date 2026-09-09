@@ -6,7 +6,7 @@ Suite aux manquements constatés lors du dernier contrôle a posteriori des auto
 
 Une convocation vous sera adressée ultérieurement par courrier électronique.
 
-Vous trouverez ci-dessous, les précisions apportées par votre DDETS :
+Vous trouverez ci-dessous, les précisions apportées par votre DDETS :
 {{ sanctions.training_session }}
 
 Cordialement,

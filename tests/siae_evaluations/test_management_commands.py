@@ -104,7 +104,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_company_1.siae_id} "
-            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -120,7 +120,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI Bazar antique ID-{evaluated_company_2.siae_id} "
-            "(SIRET : 12345678900012) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 12345678900012) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -136,7 +136,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI Trucs muche ID-{evaluated_siae3.siae_id} "
-            "(SIRET : 12345678900024) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 12345678900024) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -176,7 +176,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_siae.siae_id} "
-            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -316,7 +316,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_siae_no_proof.siae_id} "
-            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -333,7 +333,7 @@ class TestManagementCommand:
         )
         assert (
             "Nous vous rappelons que votre structure EI trier pour la planète ID-"
-            f"{evaluated_siae_not_submitted.siae_id} (SIRET : 12345678900012) est soumise à la procédure de contrôle "
+            f"{evaluated_siae_not_submitted.siae_id} (SIRET : 12345678900012) est soumise à la procédure de contrôle "
             "a posteriori sur les embauches réalisées en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -419,7 +419,7 @@ class TestManagementCommand:
         )
         assert (
             f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_siae_no_answer.siae_id} "
-            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
@@ -436,7 +436,7 @@ class TestManagementCommand:
         )
         assert (
             "Nous vous rappelons que votre structure EI trier pour la planète ID-"
-            f"{evaluated_siae_reviewed_quickly.siae_id} (SIRET : 12345678900012) est soumise à la procédure de "
+            f"{evaluated_siae_reviewed_quickly.siae_id} (SIRET : 12345678900012) est soumise à la procédure de "
             "contrôle a posteriori sur les embauches réalisées en auto-prescription "
             "du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "

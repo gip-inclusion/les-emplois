@@ -842,7 +842,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "job_seekers_views",
     "prescribers",
     "releases/list.html",
-    "siae_evaluations",
     "users/emails",
 )
 

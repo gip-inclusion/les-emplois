@@ -41,14 +41,14 @@
                         <div class="card-body">
                             <h2 class="mt-2">Bilan</h2>
                             <p class="mb-1">
-                                <b>Résultat de cette campagne de contrôle :</b> <b class="text-danger">Négatif</b>
+                                <b>Résultat de cette campagne de contrôle :</b> <b class="text-danger">Négatif</b>
                             </p>
                             <p class="mb-1">
-                                <b>Raison principale :</b> <b class="text-info">{{ evaluated_siae.get_notification_reason_display }}</b>
+                                <b>Raison principale :</b> <b class="text-info">{{ evaluated_siae.get_notification_reason_display }}</b>
                             </p>
                             <div id="decision-summary">
                                 <p class="mb-1">
-                                    <b>Décision{{ sanctions.count_active|pluralizefr }} :</b>
+                                    <b>Décision{{ sanctions.count_active|pluralizefr }} :</b>
                                 </p>
                                 <ul class="inline ps-5 mb-1">
                                     {% if sanctions.training_session %}
@@ -66,7 +66,7 @@
                                 </ul>
                             </div>
                             <p class="mb-1">
-                                <b>Mode de notification :</b>
+                                <b>Mode de notification :</b>
                                 {% if sanctions.has_significant_sanction %}
                                     <b class="text-danger">Lettre recommandée avec accusé de réception envoyée par la DDETS</b>
                                 {% else %}
@@ -81,8 +81,8 @@
                             </blockquote>
                             {% if not is_siae %}
                                 <p class="fs-xs">
-                                    Ce commentaire est transmis à la structure par e-mail uniquement lorsque le mode de notification sélectionné ci-dessus est « Transmis par e-mail ».
-                                    Lorsque la notification de la sanction requiert l’envoi d’une lettre recommandée, ce commentaire n’est pas adressé par e-mail ; il peut toutefois servir de base à la rédaction du courrier.
+                                    Ce commentaire est transmis à la structure par e-mail uniquement lorsque le mode de notification sélectionné ci-dessus est « Transmis par e-mail ».
+                                    Lorsque la notification de la sanction requiert l’envoi d’une lettre recommandée, ce commentaire n’est pas adressé par e-mail ; il peut toutefois servir de base à la rédaction du courrier.
                                 </p>
                             {% endif %}
                         </div>
@@ -90,18 +90,18 @@
                             <div class="card-body">
                                 <h2>Structure concernée</h2>
                                 <p class="mb-1">
-                                    <b>Nom de la SIAE :</b> {{ evaluated_siae.siae.name|capfirst }}
+                                    <b>Nom de la SIAE :</b> {{ evaluated_siae.siae.name|capfirst }}
                                 </p>
                                 {% if evaluated_siae.siae.brand %}
                                     <p class="mb-1">
-                                        <b>Nom personnalisé par la SIAE :</b> {{ evaluated_siae.siae.brand }}
+                                        <b>Nom personnalisé par la SIAE :</b> {{ evaluated_siae.siae.brand }}
                                     </p>
                                 {% endif %}
                                 <p class="mb-1">
-                                    <b>Type :</b> {{ evaluated_siae.siae.get_kind_display }}
+                                    <b>Type :</b> {{ evaluated_siae.siae.get_kind_display }}
                                 </p>
                                 <p>
-                                    <b>Adresse postale :</b> {{ evaluated_siae.siae.address_on_one_line }}
+                                    <b>Adresse postale :</b> {{ evaluated_siae.siae.address_on_one_line }}
                                 </p>
                             </div>
                             <div class="card-body">
@@ -110,7 +110,7 @@
                                 {% if sanctions.training_session %}
                                     <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>
                                     <p class="mb-1">
-                                        <b>Précision :</b>
+                                        <b>Précision :</b>
                                     </p>
                                     <blockquote class="blockquote mb-0">
                                         {{ sanctions.training_session|linebreaks }}
@@ -120,11 +120,11 @@
                                 {% if sanctions.suspension_dates and sanctions.suspension_dates.upper %}
                                     <h3 class="mt-5">Retrait temporaire de la capacité d’auto-prescription</h3>
                                     <p>
-                                        Période concernée : Du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }} au {{ sanctions.suspension_dates.upper|date:"d/m/Y" }}
+                                        Période concernée : Du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }} au {{ sanctions.suspension_dates.upper|date:"d/m/Y" }}
                                     </p>
                                 {% elif sanctions.suspension_dates %}
                                     <h3 class="mt-5">Retrait définitif de la capacité d’auto-prescription</h3>
-                                    <p>Période concernée : À partir du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }}</p>
+                                    <p>Période concernée : À partir du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }}</p>
                                 {% endif %}
 
                                 {% if sanctions.evaluated_job_applications_sanctions.count %}
@@ -140,7 +140,7 @@
                                 {% if sanctions.no_sanction_reason %}
                                     <h3 class="mt-5">Ne pas sanctionner</h3>
                                     <p class="mb-1">
-                                        <b>Précision :</b>
+                                        <b>Précision :</b>
                                     </p>
                                     <blockquote class="blockquote mb-0">
                                         {{ sanctions.no_sanction_reason|linebreaks }}
@@ -160,10 +160,10 @@
                                     {% endcomponent_info %}
                                 {% endif %}
                                 <p class="mb-1">
-                                    <b>Nombre de PASS IAE contrôlés :</b> {{ evaluated_job_application_count }}
+                                    <b>Nombre de PASS IAE contrôlés :</b> {{ evaluated_job_application_count }}
                                 </p>
                                 <p class="mb-4">
-                                    <b>Nombre de PASS IAE irréguliers :</b> {{ evaluated_job_application_with_sanctions_count }}
+                                    <b>Nombre de PASS IAE irréguliers :</b> {{ evaluated_job_application_with_sanctions_count }}
                                 </p>
                                 {% for evaluated_job_application in evaluated_job_applications %}
                                     <p>

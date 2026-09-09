@@ -14,7 +14,7 @@ Les DDETS disposent d’un délai supplémentaire pour contrôler les justificat
 
 Vous trouverez le calendrier de la campagne de contrôle a posteriori dans votre espace {% brand "de" %}.
 
-Comment ça marche ?
+Comment ça marche ?
 
 1- Consultez la liste des SIAE soumises au contrôle et suivez l’avancée du dossier
 Dans votre tableau de bord, à la rubrique “Contrôle a posteriori > Campagne en cours” vous trouverez la liste des SIAE qui doivent justifier certaines de leurs auto-prescriptions.
