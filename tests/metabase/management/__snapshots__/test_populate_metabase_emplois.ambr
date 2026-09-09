@@ -8037,6 +8037,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_structure"."id",
                  "insertion_structure"."address_line_1",
                  "insertion_structure"."address_line_2",

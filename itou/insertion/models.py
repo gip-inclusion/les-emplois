@@ -448,6 +448,8 @@ class Service(GeolocatedAddressMixin, models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
+    extra = models.JSONField(verbose_name="données complémentaires (data·inclusion)", null=True)
+
     @property
     def is_dora(self):
         return self.source.value == "dora"

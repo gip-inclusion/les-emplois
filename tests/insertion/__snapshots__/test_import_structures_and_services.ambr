@@ -1117,8 +1117,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1175,8 +1176,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1233,8 +1235,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1610,8 +1613,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1778,8 +1782,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1836,8 +1841,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1968,8 +1974,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
