@@ -7,19 +7,25 @@ from django.utils import timezone
 from django_otp.oath import TOTP
 
 from itou.otp.utils import (
-    _require_otp_for_pro,
     create_placeholder_for_external_totp_device,
     get_user_devices,
+    require_otp_for_pro,
     user_can_enroll_otp_device,
     user_can_manage_otp_devices,
     user_is_concerned_by_otp,
     user_uses_external_mfa,
     verify_token_for_user,
 )
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 def test_get_user_devices():
@@ -118,10 +124,10 @@ class TestRequireOtpForPro:
         PrescriberMembershipFactory(user=user)
         CompanyMembershipFactory(user=user)
 
-        assert not _require_otp_for_pro(user)
+        assert not require_otp_for_pro(user)
 
         settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {org.id}
-        assert _require_otp_for_pro(user)
+        assert require_otp_for_pro(user)
 
     def test_require_otp_on_some_companies(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
@@ -130,17 +136,28 @@ class TestRequireOtpForPro:
         CompanyMembershipFactory(user=user)
         PrescriberMembershipFactory(user=user)
 
-        assert not _require_otp_for_pro(user)
+        assert not require_otp_for_pro(user)
 
         settings.REQUIRE_MFA_ON_COMPANY_IDS = {company.id}
-        assert _require_otp_for_pro(user)
+        assert require_otp_for_pro(user)
 
     def test_require_otp_if_user_has_already_enrolled(self, settings):
         settings.REQUIRE_MFA_FOR_PROS = True
         user = EmployerFactory()
-        assert not _require_otp_for_pro(user)
+        assert not require_otp_for_pro(user)
         ItouTOTPDeviceFactory(user=user)
-        assert _require_otp_for_pro(user)
+        assert require_otp_for_pro(user)
+
+    def test_require_otp_on_selected_batch(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        settings.REQUIRE_MFA_FOR_PROS_BATCH = 2
+        company = CompanyFactory(pk=2)
+        user = ProfessionalFactory()
+        CompanyMembershipFactory(user=user, company=company)
+        assert not require_otp_for_pro(user)
+
+        settings.REQUIRE_MFA_FOR_PROS_BATCH = 3
+        assert require_otp_for_pro(user)
 
 
 class TestUserIsConcernedByOtp:

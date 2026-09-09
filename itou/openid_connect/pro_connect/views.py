@@ -32,6 +32,7 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectState,
     ProConnectUserData,
 )
+from itou.openid_connect.pro_connect.utils import get_acr_configuration
 from itou.otp.models import ItouTOTPDevice
 from itou.otp.signals import user_logged_in_with_2fa
 from itou.otp.utils import create_placeholder_for_external_totp_device
@@ -75,11 +76,11 @@ def _generate_pro_params_from_session(pc_data, host):
         "response_type": "code",
         "client_id": constants.PRO_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "acr_values": "eidas1",
         "scope": constants.PRO_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
     }
+    user = User.objects.filter(email=pc_data.get("user_email")).first()
     data.update(
         {
             "claims": json.dumps(
@@ -89,19 +90,7 @@ def _generate_pro_params_from_session(pc_data, host):
                         # tells us which authentication methods have been
                         # used.
                         "amr": {"essential": True},
-                        # Request the use of 2FA _if possible_. Until all
-                        # identity providers implement 2FA, we must NOT
-                        # mention `"essential": True`. If we do, we'll get
-                        # an error in `pro_connect_callback` (missing
-                        # "code" ) that says that the requested ACRs could
-                        # not be satisfied.
-                        "acr": {
-                            "essential": False,
-                            "values": [
-                                "eidas2",
-                                "eidas3",
-                            ],
-                        },
+                        "acr": get_acr_configuration(user),
                     },
                 }
             )
