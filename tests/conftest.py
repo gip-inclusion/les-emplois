@@ -833,7 +833,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "admin",
     "apply",
     "common/emails",
-    "eligibility",
     "employee_record",
     "employees",
     "geiq_assessments/email",
