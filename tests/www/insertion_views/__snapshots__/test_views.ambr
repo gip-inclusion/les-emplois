@@ -500,6 +500,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",
@@ -2635,6 +2636,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_structure"."id",
                  "insertion_structure"."address_line_1",
                  "insertion_structure"."address_line_2",
@@ -2742,6 +2744,42 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Présentation du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -2776,31 +2814,6 @@
                       </div>
                   </div>
                   <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Pré-requis et justificatifs
@@ -2892,6 +2905,42 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Présentation du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -2926,31 +2975,6 @@
                       </div>
                   </div>
                   <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Pré-requis et justificatifs
@@ -3140,6 +3164,55 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Présentation du service
+                          </h2>
+                          <p class="mb-0">
+                              Description complète
+                          </p>
+                          <p>
+                              Avec du
+                              <strong>
+                                  markdown
+                              </strong>
+                              .
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Logement et hébergement
+                                          </strong>
+                                          : Louer un logement
+                                      </div>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Service financé par
+                                  </small>
+                                  <strong>
+                                      France Travail, Conseil départemental
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3 mb-2">
@@ -3151,9 +3224,6 @@
                               <strong>
                                   Réponse rapide : sous 3 jours
                               </strong>
-                          </p>
-                          <p>
-                              Résumé court du service.
                           </p>
                           <ul class="list-data">
                               <li>
@@ -3253,36 +3323,6 @@
                       </div>
                   </div>
                   <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                              Description complète
-                          </p>
-                          <p>
-                              Avec du
-                              <strong>
-                                  markdown
-                              </strong>
-                              .
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Logement et hébergement
-                                  </b>
-                                  : Louer un logement
-                              </li>
-                          </ul>
-                      </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
                               Pré-requis et justificatifs
@@ -3561,6 +3601,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",

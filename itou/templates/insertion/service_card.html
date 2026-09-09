@@ -129,30 +129,75 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                {# Service information card #}
-                <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                <div class="col-12">
                     <div class="c-box mb-3 mb-md-4">
-                        {% if service.average_orientation_response_delay_days is not None %}
-                            <h2 class="h3 mb-2">Informations du service</h2>
-                            {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
-
+                        <h2 class="h3">Présentation du service</h2>
+                        {% if service.description|length > 200 %}
+                            <div class="collapse show has-no-transition" id="collapse-description-collapsed">
+                                <p class="mb-0">{{ service.description|truncatechars:200|markdownify }}</p>
+                                <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-description-collapsed, #collapse-description-expanded"
+                                        aria-expanded="true"
+                                        aria-controls="collapse-description-collapsed collapse-description-expanded">
+                                    Lire la suite
+                                </button>
+                            </div>
+                            <div class="collapse has-no-transition" id="collapse-description-expanded">
+                                <div class="mb-0">{{ service.description|markdownify }}</div>
+                            </div>
                         {% else %}
-                            <h2 class="h3">Informations du service</h2>
+                            <p class="mb-0">{{ service.description|markdownify }}</p>
                         {% endif %}
+                    </div>
+                </div>
 
-                        {% if service.description_short %}
-                            <p>{{ service.description_short }}</p>
-                        {% endif %}
+                <div class="col-12">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Type de service</h2>
                         <ul class="list-data">
+                            {% if formatted_categories %}
+                                <li>
+                                    <small>Thématiques et besoins associés</small>
+                                    <div>
+                                        {% for category_label, subcategory_label in formatted_categories %}
+                                            <div><strong>{{ category_label }}</strong> : {{ subcategory_label }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            {% endif %}
                             {% if service.kind %}
                                 <li>
                                     <small>Type de service</small>
                                     <strong>{{ service.kind.label }}</strong>
                                 </li>
                             {% endif %}
+                            {% if service.extra and service.extra.funding_labels %}
+                                <li>
+                                    <small>Service financé par</small>
+                                    <strong>{{ service.extra.funding_labels|join:", " }}</strong>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                {# Service information card #}
+                <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                    <div class="c-box mb-3 mb-md-4">
+                        {% if service.average_orientation_response_delay_days is not None %}
+                            <h2 class="h3 mb-2">Informations du service</h2>
+                            {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
+                        {% else %}
+                            <h2 class="h3">Informations du service</h2>
+                        {% endif %}
+
+                        <ul class="list-data">
                             {% if service.publics.exists %}
                                 <li>
-                                    <small> Public concerné
+                                    <small>
+                                        Public concerné
                                         {% if service.publics_details %}
                                             <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
                                         {% endif %}
@@ -160,7 +205,6 @@
                                     <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
                                 </li>
                             {% endif %}
-
                             {% if service.receptions.exists %}
                                 <li>
                                     <small>Lieu d'accueil</small>
@@ -237,40 +281,6 @@
                 </div>
 
                 <div class="col-12 col-lg-8 order-3">
-                    {# Description #}
-                    {% if service.description %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Description du service</h2>
-                            {% if service.description|wordcount > 30 %}
-                                <div class="collapse show has-no-transition" id="collapse-description">
-                                    <div class="mb-0">{{ service.description|markdownify|truncatewords_html:30 }}</div>
-                                    <button class="bs-btn-active-color btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-description" aria-expanded="true" aria-controls="collapse-description">
-                                        Lire la suite
-                                    </button>
-                                </div>
-                                <div class="collapse has-no-transition" id="collapse-description">
-                                    <div class="mb-0">{{ service.description|markdownify }}</div>
-                                </div>
-                            {% else %}
-                                <p class="mb-0">{{ service.description|markdownify }}</p>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-                    {# Thematics #}
-                    {% if service.thematics.exists %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Thématiques et besoins associés</h2>
-                            <ul class="mb-0">
-                                {% for category_label, subcategory_label in formatted_categories %}
-                                    <li>
-                                        <b>{{ category_label }}</b> : {{ subcategory_label }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
                     {# Mobilizations #}
                     {% if show_mobilization_section %}
                         <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
