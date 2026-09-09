@@ -3,13 +3,13 @@
 {% if eligibility_diagnosis %}
     {% if eligibility_diagnosis.author_organization %}
         <div class="mb-5">
-            <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+            <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
             <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
         </div>
     {% endif %}
     {% component_alert title=title content=content variant="info" extra_classes="mb-5" %}
         {% fragment as title %}
-            Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}
+            Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}
         {% endfragment %}
         {% fragment as content %}
             <p class="mb-0">
