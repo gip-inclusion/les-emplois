@@ -2597,7 +2597,7 @@
                                   <p>
                                       <i class="ri-question-line mr-1">
                                       </i>
-                                      Ce fichier n'est pas un PDF ?
+                                      Ce fichier n'est pas un PDF ?
                                       <a aria-label="Découvrez comment le convertir (ouverture dans un nouvel onglet)" class="matomo-event has-external-link" data-matomo-action="clic" data-matomo-category="ajout-fichier-candidature" data-matomo-event="true" data-matomo-option="clic-sur-lien-aide-pdf" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16875396981777--Convertir-votre-document-en-format-PDF" rel="noopener" target="_blank">
                                           Découvrez comment le convertir.
                                       </a>
