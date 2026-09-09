@@ -4,19 +4,19 @@ Bonjour,
 
 Sauf erreur de notre part, vous n’avez pas encore transmis vos justificatifs dans le cadre du contrôle a posteriori des auto-prescriptions.
 
-Nous vous rappelons que votre structure {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }} (SIRET : {{ siae.convention.siret_signature }}) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées en auto-prescription du {{ evaluation_campaign.evaluated_period_start_at }} au {{ evaluation_campaign.evaluated_period_end_at }}.
+Nous vous rappelons que votre structure {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }} (SIRET : {{ siae.convention.siret_signature }}) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées en auto-prescription du {{ evaluation_campaign.evaluated_period_start_at }} au {{ evaluation_campaign.evaluated_period_end_at }}.
 
 Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez enregistrés lors de ces embauches.
 Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du {{ evaluation_campaign.evaluations_asked_at|date }}.
 
-Comment ça marche ?
+Comment ça marche ?
 
-1- Visualiser la liste des embauches concernées par la procédure de contrôle :
+1- Visualiser la liste des embauches concernées par la procédure de contrôle :
 
 Depuis le tableau de bord de votre structure à la rubrique “Contrôle a posteriori”, cliquez sur “Campagne en cours”.
 La liste des embauches concernées par la procédure est affichée.
 
-Accès direct à votre liste d’auto-prescriptions : {{ evaluated_job_app_list_url }}
+Accès direct à votre liste d’auto-prescriptions : {{ evaluated_job_app_list_url }}
 
 2- Transmettez vos justificatifs en ligne
 
@@ -25,13 +25,13 @@ les critères que vous avez enregistrés sont affichés.
 Sélectionnez le ou les critères que vous souhaitez justifier (sur cette page, nous vous rappelons le nombre minimum de justificatifs requis en fonction du type de critères et de SIAE).
 Ensuite cliquez sur “Ajouter un justificatif” pour déposer le justificatif demandé.
 
-3- Validez votre dossier de contrôle :
+3- Validez votre dossier de contrôle :
 
 Lorsque tous les justificatifs sont ajoutés, cliquez sur “Soumettre à validation” pour les transmettre à votre DDETS.
 
 Vous serez notifié(e) par e-mail lorsque la DDETS aura vérifié vos justificatifs.
 
-Voir le mode d’emploi : {{ itou_help_center_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE
+Voir le mode d’emploi : {{ itou_help_center_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE
 
 En cas de question sur les critères ou les justificatifs vous devez vous adresser uniquement à votre DDETS.
 

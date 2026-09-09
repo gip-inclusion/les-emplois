@@ -8,9 +8,9 @@ La {{ evaluation_campaign.institution }} ne peut donc pas faire de contrôle, pa
 
 Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }} à la rubrique “Contrôle a posteriori > Campagne en cours”.
 
-Accès direct à votre liste d’auto-prescriptions : {{ auto_prescription_url }}
+Accès direct à votre liste d’auto-prescriptions : {{ auto_prescription_url }}
 
-En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ siae_evaluation_handbook_url }}
+En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ siae_evaluation_handbook_url }}
 
 Cordialement,
 {% endblock %}

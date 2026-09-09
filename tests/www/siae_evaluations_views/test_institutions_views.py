@@ -1071,7 +1071,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_siae.siae.save(update_fields=("phone", "updated_at"))
         response = client.get(url)
         assertContains(
-            response, """<p>Numéro de téléphone à utiliser au besoin :<span>Non renseigné</span>""", html=True
+            response, """<p>Numéro de téléphone à utiliser au besoin :<span>Non renseigné</span>""", html=True
         )
 
         # EvaluatedAdministrativeCriteria uploaded
@@ -2029,7 +2029,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             </h3>
             <ul class="list-unstyled mb-0">
              <li>
-              Période du 01/01/2022 au 31/12/2022 :
+              Période du 01/01/2022 au 31/12/2022 :
               <b class="text-danger">Négatif</b>
              </li>
             </ul>""",
@@ -2178,7 +2178,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             <h3>Historique des campagnes de contrôle</h3>
             <ul class="list-unstyled mb-0">
              <li>
-              Période du 17/05/2023 au 16/07/2023 :
+              Période du 17/05/2023 au 16/07/2023 :
               <b class="text-success">Positif</b>
              </li>
             </ul>
@@ -2505,7 +2505,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "votre structure, EI Les petits jardins, devront participer à une session de présentation des règles "
             "relatives à l’auto-prescription.\n\n"
             "Une convocation vous sera adressée ultérieurement par courrier électronique.\n\n"
-            "Vous trouverez ci-dessous, les précisions apportées par votre DDETS :\n"
+            "Vous trouverez ci-dessous, les précisions apportées par votre DDETS :\n"
             "RDV le lundi 8 à 15h à la DDETS\n\n"
             "Cordialement,\n\n"
             "---\n"
@@ -3396,7 +3396,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
             "dans votre SIAE, nous avons décidé de ne pas appliquer de sanction. Vous trouverez ci-dessous le détail "
-            "de cette décision :\n\n"
+            "de cette décision :\n\n"
             "Chat trop mignon.\n\n"
             "Cordialement,\n\n"
             "---\n"

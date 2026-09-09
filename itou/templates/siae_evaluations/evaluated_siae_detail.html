@@ -58,7 +58,7 @@
                         Liste des auto-prescriptions de {{ evaluated_siae }} ({{ evaluated_siae.siae.kind }} - {{ evaluated_siae.siae.get_kind_display }})
                     </p>
                     <p>
-                        Numéro de téléphone à utiliser au besoin :
+                        Numéro de téléphone à utiliser au besoin :
                         {% if evaluated_siae.siae.phone %}
                             <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
                                 {{ evaluated_siae.siae.phone|format_phone }}

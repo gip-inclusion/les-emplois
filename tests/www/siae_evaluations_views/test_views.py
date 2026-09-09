@@ -92,12 +92,12 @@ class TestEvaluatedSiaeSanctionView:
         )
         assertContains(
             response,
-            '<b>Résultat de cette campagne de contrôle :</b> <b class="text-danger">Négatif</b>',
+            '<b>Résultat de cette campagne de contrôle :</b> <b class="text-danger">Négatif</b>',
             count=1,
         )
         assertContains(
             response,
-            '<b>Raison principale :</b> <b class="text-info">Pièce justificative incorrecte</b>',
+            '<b>Raison principale :</b> <b class="text-info">Pièce justificative incorrecte</b>',
             count=1,
         )
 
@@ -195,7 +195,7 @@ class TestEvaluatedSiaeSanctionView:
         assertContains(
             response,
             """
-            <b>Mode de notification :</b>
+            <b>Mode de notification :</b>
             <b class="text-danger">Lettre recommandée avec accusé de réception envoyée par la DDETS</b>
             """,
             html=True,
@@ -204,7 +204,7 @@ class TestEvaluatedSiaeSanctionView:
         assertContains(
             response,
             f"""
-            <b>Mode de notification :</b>
+            <b>Mode de notification :</b>
             Transmis par e-mail le {timezone.localtime(self.evaluated_siae.notified_at).strftime("%d/%m/%Y")}
             """,
             html=True,

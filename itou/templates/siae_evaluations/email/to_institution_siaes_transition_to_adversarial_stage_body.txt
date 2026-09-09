@@ -3,7 +3,7 @@
 Bonjour,
 
 {% if siaes_forced_to_adversarial_stage %}
-Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du contrôle a posteriori :
+Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du contrôle a posteriori :
 
 {% for evaluated_siae in siaes_forced_to_adversarial_stage %}
 - {{ evaluated_siae.siae.kind }} {{ evaluated_siae.siae.name }} ID-{{ evaluated_siae.siae_id }}
@@ -19,7 +19,7 @@ N’hésitez pas à les contacter afin de comprendre les éventuelles difficult�
 
 {% endif %}
 {% if siaes_accepted_by_default %}
-Les structures suivantes avaient transmis leurs justificatifs mais n’ont pas eu de retour de la DDETS, leur contrôle est considéré positif :
+Les structures suivantes avaient transmis leurs justificatifs mais n’ont pas eu de retour de la DDETS, leur contrôle est considéré positif :
 
 {% for evaluated_siae in siaes_accepted_by_default %}
 - {{ evaluated_siae.siae.kind }} {{ evaluated_siae.siae.name }} ID-{{ evaluated_siae.siae_id }}
