@@ -3,7 +3,6 @@
 {% load format_filters %}
 {% load markdownify %}
 {% load matomo %}
-{% load str_filters %}
 {% load url_add_query %}
 
 
@@ -291,7 +290,17 @@
                             {% if service.volume_horaire_hebdomadaire or service.nombre_semaines %}
                                 <li>
                                     <small>Durée de la prestation</small>
-                                    <strong>{{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine{% if service.nombre_semaines %}, pendant {{ service.nombre_semaines }} semaines{% endif %}</strong>
+                                    <strong>
+                                        {% if service.volume_horaire_hebdomadaire %}
+                                            {{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine
+                                        {% endif %}
+                                        {% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}
+                                            , pendant
+                                        {% endif %}
+                                        {% if service.nombre_semaines %}
+                                            {{ service.nombre_semaines }} semaines
+                                        {% endif %}
+                                    </strong>
                                 </li>
                             {% endif %}
                             {% if service.address_on_one_line or service.opening_hours %}
@@ -336,110 +345,9 @@
                             {% endif %}
                         </ul>
                     </div>
+
                 </div>
 
-                {# Service information card #}
-                <div class="s-section__col col-12 col-lg-8 order-3">
-                    <div class="c-box mb-3 mb-md-4">
-                        {% if service.average_orientation_response_delay_days is not None %}
-                            <h2 class="h3 mb-2">Informations du service</h2>
-                            {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
-                        {% else %}
-                            <h2 class="h3">Informations du service</h2>
-                        {% endif %}
-
-                        <ul class="list-data">
-                            {% if service.publics.exists %}
-                                <li>
-                                    <small>
-                                        Public concerné
-                                        {% if service.publics_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
-                                        {% endif %}
-                                    </small>
-                                    <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
-                                </li>
-                            {% endif %}
-                            {% if service.receptions.exists %}
-                                <li>
-                                    <small>Lieu d'accueil</small>
-                                    <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if service.address_on_one_line %} — {{ service.address_on_one_line }}{% endif %}</strong>
-                                </li>
-                            {% endif %}
-                            {% if service.volume_horaire_hebdomadaire or service.nombre_semaines %}
-                                <li>
-                                    <small>Durée de la prestation</small>
-                                    <strong>
-                                        {% if service.volume_horaire_hebdomadaire %}
-                                            {{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine
-                                        {% endif %}
-                                        {% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}
-                                            , pendant
-                                        {% endif %}
-                                        {% if service.nombre_semaines %}
-                                            {{ service.nombre_semaines }} semaines
-                                        {% endif %}
-                                    </strong>
-                                </li>
-                            {% endif %}
-
-                            {% if service.fee %}
-                                <li>
-                                    <small>
-                                        Frais à charge
-                                        {% if service.fee_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
-                                        {% endif %}
-                                    </small>
-                                    <strong>{{ service.fee.label }}</strong>
-                                </li>
-                            {% endif %}
-
-                            {% if service.opening_hours %}
-                                <li>
-                                    <small>
-                                        Fréquence et horaires
-                                        {% if formatted_opening_hours.has_ph_off %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
-                                        {% endif %}
-                                    </small>
-                                    {% if formatted_opening_hours %}
-                                        <div>
-                                            {% for entry in formatted_opening_hours.entries %}
-                                                <div class="d-flex gap-2">
-                                                    <strong>{{ entry.label }} :</strong>
-                                                    <strong>{{ entry.hours }}
-                                                        {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
-                                                    </strong>
-                                                </div>
-                                            {% endfor %}
-                                            {% if formatted_opening_hours.comments %}
-                                                <div class="mt-2">
-                                                    {% for comment in formatted_opening_hours.comments %}
-                                                        <div class="d-flex"><span class="fst-italic">{{ comment }}.</span></div>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% else %}
-                                        {{ service.opening_hours }}
-                                    {% endif %}
-                                </li>
-                            {% endif %}
-
-                            {% if service.insee_city %}
-                                <li>
-                                    <small>Périmètre géographique</small>
-                                    <strong>{{ geographic_perimeter }}</strong>
-                                </li>
-                            {% endif %}
-                        </ul>
-
-                        <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">Source : {{ service.source.label }}</span>
-                    </div>
-                </div>
-
-                {# Sidebar #}
                 <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Informations de la structure</h2>
@@ -451,99 +359,6 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-8 order-4">
-                    {# Mobilizations #}
-                    {% if show_mobilization_section %}
-                        <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
-                            <h2 class="h3">Les démarches à réaliser</h2>
-                            {% if service.is_dora %}
-                                {% if service.mobilization_modes_professionals.exists or service.mobilization_modes_professionals_external_form_link or service.mobilization_modes_professionals_other %}
-                                    <h3 class="h4">Pour les professionnels de l'accompagnement</h3>
-                                    <ul class="mb-0">
-                                        {% for mode in service.mobilization_modes_professionals.all %}
-                                            {% if mode.value != "autre" %}
-                                                <li>
-                                                    {% if mode.value == "formulaire-dora" %}
-                                                        Via le formulaire (bouton “Orienter votre bénéficiaire”)
-                                                    {% else %}
-                                                        {{ mode.label }}
-                                                    {% endif %}
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% if service.mobilization_modes_professionals_external_form_link %}
-                                            <li>
-                                                <a href="{{ service.mobilization_modes_professionals_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_professionals_external_form_link_text|default:"Orienter un bénéficiaire" }}</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if professionals_has_autre and service.mobilization_modes_professionals_other %}
-                                            <li>{{ service.mobilization_modes_professionals_other|urlize_new_tab }}</li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
-                                {% if service.mobilization_modes_beneficiaries.exists or service.mobilization_modes_beneficiaries_external_form_link or service.mobilization_modes_beneficiaries_other %}
-                                    <hr class="my-4">
-                                    <h3 class="h4">Pour les particuliers</h3>
-                                    <ul class="mb-0">
-                                        {% for mode in service.mobilization_modes_beneficiaries.all %}
-                                            {% if mode.value != "autre" %}<li>{{ mode.label }}</li>{% endif %}
-                                        {% endfor %}
-                                        {% if service.mobilization_modes_beneficiaries_external_form_link %}
-                                            <li>
-                                                <a href="{{ service.mobilization_modes_beneficiaries_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_beneficiaries_external_form_link_text|default:"Faire une demande" }}</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if beneficiaries_has_autre and service.mobilization_modes_beneficiaries_other %}
-                                            <li>{{ service.mobilization_modes_beneficiaries_other|urlize_new_tab }}</li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
-                            {% else %}
-                                <ul class="mb-0">
-                                    {% for mobilization in service.mobilizations.all %}
-                                        <li>{{ mobilization.label }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% if service.mobilizations_details %}<p class="mt-3 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-                    {% if service.has_prerequisites %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Pré-requis et justificatifs</h2>
-                            <ul class="mb-0">
-                                {% for prerequisite in service.prerequisites %}
-                                    {% if service.is_dora %}
-                                        <li>{{ prerequisite|markdownify:"inline" }}</li>
-                                    {% else %}
-                                        {# D·I service may have blocks tags such as lists #}
-                                        <li>{{ prerequisite|markdownify }}</li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
-                    {# Documents à compléter #}
-                    {% if service.credentials_documents or service.credentials_online_form %}
-                        <div id="credentials-documents" class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Documents à compléter</h2>
-                            <ul class="mb-0">
-                                {% for document_name, document_url in credential_documents %}
-                                    <li>
-                                        <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
-                                    </li>
-                                {% endfor %}
-                                {% if service.credentials_online_form %}
-                                    <li>
-                                        <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener noreferrer">{{ service.credentials_online_form }}</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
             </div>
 
         </div>
