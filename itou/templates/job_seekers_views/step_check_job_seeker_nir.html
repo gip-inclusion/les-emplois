@@ -56,14 +56,14 @@
             {% if form.errors %}
                 {% component_alert content=content variant="info" extra_classes="mb-3" %}
                     {% fragment as content %}
-                        <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
+                        <p class="mb-0">{{ request.user.is_job_seeker|yesno:"Vous ne possédez,L’usager ne possède" }} pas de numéro de sécurité sociale ?</p>
                         <a href="{{ invalid_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>Cliquez ici pour accéder à l'étape suivante.</a>
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% else %}
                 {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
                     {% fragment as c_info__summary %}
-                        {{ request.user.is_job_seeker|yesno:"Vous n'avez,Le candidat n'a" }} pas de numéro de sécurité sociale ?
+                        {{ request.user.is_job_seeker|yesno:"Vous n’avez,L’usager n’a" }} pas de numéro de sécurité sociale ?
                     {% endfragment %}
                     {% fragment as c_info__detail %}
                         <p>

@@ -156,6 +156,7 @@ class TestGetOrCreateForJobSeeker:
 
         response = client.get(next_url)
         assertContains(response, company.display_name)
+        assertContains(response, "Vous n’avez pas de numéro de sécurité sociale ?")
         assertContains(
             response,
             f"""
@@ -340,6 +341,7 @@ class TestGetOrCreateForSender:
         )
 
         assertContains(response, company.display_name)
+        assertContains(response, "L’usager n’a pas de numéro de sécurité sociale ?")
 
     @pytest.mark.parametrize(
         "born_in_france", [pytest.param(True, id="born_in_france"), pytest.param(False, id="born_outside_france")]
