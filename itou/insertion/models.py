@@ -498,6 +498,11 @@ class Service(GeolocatedAddressMixin, models.Model):
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
 
+    def generate_extra_credential_documents_info(self) -> list[tuple[str, str]]:
+        if not self.extra:
+            return []
+        return [(form["name"], form["url"]) for form in self.extra.get("forms") or []]
+
     objects = ServiceManager()
     include_inactive = ServiceQuerySet.as_manager()
 

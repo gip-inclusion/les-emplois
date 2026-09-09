@@ -3028,6 +3028,11 @@
                   justificatif.docx
               </a>
           </li>
+          <li>
+              <a href="https://example.com/formulaire-inscription" rel="noopener noreferrer" target="_blank">
+                  https://example.com/formulaire-inscription
+              </a>
+          </li>
       </ul>
   </div>
   
@@ -3398,6 +3403,28 @@
                                           </strong>
                                       </div>
                                   </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4" id="credentials-documents">
+                          <h2 class="h3">
+                              Documents à compléter
+                          </h2>
+                          <ul class="list-data mb-0">
+                              <li>
+                                  <a href="https://s3.example.com/dossier-inscription.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
+                                      dossier-inscription.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb" rel="noopener noreferrer" target="_blank">
+                                      autorisation-traitement-donnees.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/bilan-competences.docx?token=ccc" rel="noopener noreferrer" target="_blank">
+                                      bilan-competences.docx
+                                  </a>
                               </li>
                           </ul>
                       </div>

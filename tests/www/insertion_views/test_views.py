@@ -508,7 +508,23 @@ class TestServices:
             structure__uid="test-structure-full-uid",
             structure__name="Structure complète",
             structure__updated_on="2025-06-01",
-            extra={"funding_labels": ["France Travail", "Conseil départemental"]},
+            extra={
+                "funding_labels": ["France Travail", "Conseil départemental"],
+                "forms": [
+                    {
+                        "name": "dossier-inscription.pdf",
+                        "url": "https://s3.example.com/dossier-inscription.pdf?token=aaa",
+                    },
+                    {
+                        "name": "autorisation-traitement-donnees.pdf",
+                        "url": "https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb",
+                    },
+                    {
+                        "name": "bilan-competences.docx",
+                        "url": "https://s3.example.com/bilan-competences.docx?token=ccc",
+                    },
+                ],
+            },
             thematics=[],
             receptions=[],
         )
@@ -521,6 +537,14 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assert response.status_code == 200
+        assert response.context["credential_documents"] == [
+            ("dossier-inscription.pdf", "https://s3.example.com/dossier-inscription.pdf?token=aaa"),
+            (
+                "autorisation-traitement-donnees.pdf",
+                "https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb",
+            ),
+            ("bilan-competences.docx", "https://s3.example.com/bilan-competences.docx?token=ccc"),
+        ]
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
     def test_detail_with_external_orientation_link(self, client, snapshot):
@@ -838,7 +862,7 @@ class TestServices:
         service = ServiceFactory(
             uid="test-creds-empty-uid",
             updated_on="2025-01-15",
-            credentials_documents=[],
+            extra=None,
             structure__uid="test-structure-creds-empty-uid",
             structure__updated_on="2025-01-15",
         )
@@ -847,29 +871,28 @@ class TestServices:
         assert response.context["credential_documents"] == []
         assertNotContains(response, self.FORMS_TO_FILL)
 
-    def test_detail_credential_documents(self, client):
+    def test_detail_credential_documents(self, client, snapshot):
         service = ServiceFactory(
             uid="test-creds-uid",
             updated_on="2025-01-15",
-            credentials_documents=["folder/sub/my_form.pdf", "other/justificatif.docx"],
+            extra={
+                "forms": [
+                    {"name": "my_form.pdf", "url": "https://s3.example.com/my_form.pdf?token=aaa"},
+                    {"name": "justificatif.docx", "url": "https://s3.example.com/justificatif.docx?token=bbb"},
+                ],
+                "online_form": "https://example.com/formulaire-inscription",
+            },
             structure__uid="test-structure-creds-uid",
             structure__updated_on="2025-01-15",
         )
-        s3_urls = [
-            "https://s3.example.com/my_form.pdf?token=aaa",
-            "https://s3.example.com/justificatif.docx?token=bbb",
-        ]
-        with patch(
-            "itou.insertion.models.generate_dora_storage_url",
-            side_effect=s3_urls,
-        ):
-            response = client.get(self.get_service_url(service))
+        response = client.get(self.get_service_url(service))
 
+        assertContains(response, self.FORMS_TO_FILL)
         assert response.context["credential_documents"] == [
             ("my_form.pdf", "https://s3.example.com/my_form.pdf?token=aaa"),
             ("justificatif.docx", "https://s3.example.com/justificatif.docx?token=bbb"),
         ]
-        assertNotContains(response, self.FORMS_TO_FILL)
+        assert pretty_indented(parse_response_to_soup(response, "#credentials-documents")) == snapshot
 
     def test_format_categories_no_thematics(self):
         service = ServiceFactory(
