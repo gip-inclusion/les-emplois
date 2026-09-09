@@ -569,6 +569,8 @@ class Command(BaseCommand):
         self._fill_geolocation_from_api_data(service, data)
         self._fill_service_from_dora_api_data(service, dora_services)
 
+        service.extra = data.get("extra")
+
         service.updated_on = data["date_maj"]
 
         service.save()  # Save to have a PK for ManyToManyField fields
