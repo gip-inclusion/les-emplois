@@ -98,7 +98,7 @@ class ItouFileField(forms.FileField):
                 """
                 <p>
                     <i class="ri-question-line mr-1"></i>
-                    Ce fichier n'est pas un PDF ?
+                    Ce fichier n'est pas un PDF ?
                     <a href="{}"
                        target="_blank"
                        rel="noopener"
