@@ -42,6 +42,7 @@
   "45 5 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run --max-runtime-minutes=50",
   "30 6 * * * $ROOT/clevercloud/run_management_command.sh check_inconsistencies",
   "0 7 * * * $ROOT/clevercloud/run_management_command.sh archive_accepted_evaluated_siae --wet-run",
+  "30 7 * * * $ROOT/clevercloud/run_management_command.sh archive_old_assignments",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
   "30 9 * * * $ROOT/clevercloud/run_management_command.sh auto_attribute_company_admins",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
