@@ -1,10 +1,10 @@
-# Envoi des fiches salarié (FS) des emplois de l'inclusion vers les logiciels
+# Envoi des fiches salarié (FS) de La plateforme de l’inclusion vers les logiciels
 
-Ceci est une documentation publique à destination des logiciels SSII pour la récupération de fiches salarié depuis les emplois de l'inclusion via une API dédiée.
+Ceci est une documentation publique à destination des logiciels SSII pour la récupération de fiches salarié depuis La plateforme de l'inclusion via une API dédiée.
 
 ## Principe
 
-- Le logiciel commence par appeler l'endpoint API `api/v1/token-auth` des emplois de l'inclusion en fournissant le login/mdp de l'utilisateur employeur des emplois de l'inclusion et obtient ainsi un token qu'il pourra utiliser pour les autres endpoints.
+- Le logiciel commence par appeler l'endpoint API `api/v1/token-auth` de La plateforme de l'inclusion en fournissant le login/mdp de l'utilisateur employeur de La plateforme de l'inclusion et obtient ainsi un token qu'il pourra utiliser pour les autres endpoints.
 
 - Le logiciel appelle ensuite l'endpoint `api/v1/employee-records` avec ce token et récupère ainsi la totalité des FS de toutes les structures de cet utilisateur et les dédoublonne si besoin en se basant sur l'unicité du couple (SIRET, PASS IAE).
 
@@ -114,7 +114,7 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont [disponi
         "passIae": "999992006615",
         # Toujours vide.
         "sufPassIae": null,
-        # Identifiant quasi-unique du candidat sur les emplois de l'inclusion.
+        # Identifiant quasi-unique du candidat sur La plateforme de l'inclusion.
         # 30 caractères.
         "idItou": "70a6d71e4265a5768ad3b3f293ffd7",
         "civilite": "M",
