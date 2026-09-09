@@ -659,7 +659,8 @@
                  "insertion_service"."updated_on",
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
-                 "insertion_service"."updated_at"
+                 "insertion_service"."updated_at",
+                 "insertion_service"."extra"
           FROM "insertion_orientation"
           INNER JOIN "users_user" T3 ON ("insertion_orientation"."beneficiary_id" = T3."id")
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
