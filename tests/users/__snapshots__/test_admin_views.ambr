@@ -649,6 +649,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
