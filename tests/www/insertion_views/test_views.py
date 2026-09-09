@@ -497,6 +497,8 @@ class TestServices:
             contact_phone="01 23 45 67 89",
             is_orientable_with_form=True,
             average_orientation_response_delay_days=3,
+            volume_horaire_hebdomadaire=21,
+            nombre_semaines=16,
             opening_hours="Mo-Fr 09:00-17:00; PH off",
             address_line_1="12 rue de la Paix",
             address_line_2="Bâtiment B",
