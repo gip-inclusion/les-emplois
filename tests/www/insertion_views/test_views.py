@@ -33,6 +33,7 @@ from itou.insertion.models import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
+from itou.www.insertion_views.views import ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
@@ -297,6 +298,12 @@ class TestServices:
     def get_nexus_auto_login_url(self, service_url):
         return reverse("nexus:auto_login", query={"next_url": service_url})
 
+    @staticmethod
+    def format_categories(service):
+        view = ServiceDetailView()
+        view.object = service
+        return view.format_categories()
+
     def test_detail_accessible_without_login(self, client):
         service = ServiceFactory(
             uid="test-service-uid",
@@ -421,6 +428,7 @@ class TestServices:
             structure__uid="test-structure-full-uid",
             structure__name="Structure complète",
             structure__updated_on="2025-06-01",
+            extra={"funding_labels": ["France Travail", "Conseil départemental"]},
             thematics=[],
             receptions=[],
         )
@@ -783,7 +791,7 @@ class TestServices:
         ]
         assert pretty_indented(parse_response_to_soup(response, "#credentials-documents")) == snapshot
 
-    def test_format_categories_no_thematics(self, client):
+    def test_format_categories_no_thematics(self):
         service = ServiceFactory(
             uid="test-categories-uid",
             updated_on="2025-01-15",
@@ -791,10 +799,9 @@ class TestServices:
             structure__updated_on="2025-01-15",
             thematics=[],
         )
-        response = client.get(self.get_service_url(service))
-        assert response.context["formatted_categories"] == []
+        assert self.format_categories(service) == []
 
-    def test_format_categories_single_thematic(self, client):
+    def test_format_categories_single_thematic(self):
         thematic = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -805,13 +812,11 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
-            thematics=[],
+            thematics=[thematic],
         )
-        service.thematics.add(thematic)
-        response = client.get(self.get_service_url(service))
-        assert response.context["formatted_categories"] == [("Choisir un métier", "Explorer des métiers")]
+        assert self.format_categories(service) == [("Choisir un métier", "Explorer des métiers")]
 
-    def test_format_categories_multiple_categories(self, client):
+    def test_format_categories_multiple_categories(self):
         thematic_a = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -827,13 +832,33 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
-            thematics=[],
+            thematics=[thematic_a, thematic_b],
         )
-        service.thematics.add(thematic_a, thematic_b)
-        response = client.get(self.get_service_url(service))
-        assert sorted(response.context["formatted_categories"]) == [
+        assert self.format_categories(service) == [
             ("Choisir un métier", "Explorer des métiers"),
             ("Créer une entreprise", "Définir son projet"),
+        ]
+
+    def test_format_categories_groups_thematics_by_category(self):
+        thematic_a = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="creer-une-entreprise--developper-son-entreprise",
+            label="Développer son entreprise",
+        )
+        thematic_b = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="creer-une-entreprise--definir-son-projet",
+            label="Définir son projet",
+        )
+        service = ServiceFactory(
+            uid="test-categories-grouped-uid",
+            updated_on="2025-01-15",
+            structure__uid="test-structure-categories-grouped-uid",
+            structure__updated_on="2025-01-15",
+            thematics=[thematic_a, thematic_b],
+        )
+        assert self.format_categories(service) == [
+            ("Créer une entreprise", "Définir son projet, Développer son entreprise"),
         ]
 
     # --- Mobilization modes: 'autre' handling ---

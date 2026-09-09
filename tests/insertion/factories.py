@@ -22,7 +22,9 @@ from itou.job_applications.enums import SenderKind
 IN_PERSON_RECEPTION_VALUE = "en-presentiel"
 REMOTE_RECEPTION_VALUE = "a-distance"
 THEMATIC_VALUE = "mobilite--acceder-a-un-vehicule"
+THEMATIC_LABEL = "Accéder à un véhicule"
 OTHER_THEMATIC_VALUE = "sante--acces-aux-soins"
+OTHER_THEMATIC_LABEL = "Accès aux soins"
 
 
 class GenericReferenceItemFactory(factory.django.DjangoModelFactory):
@@ -59,7 +61,7 @@ class DefaultThematicFactory(GenericReferenceItemFactory):
 
     kind = GenericReferenceItemKind.THEMATIC
     value = THEMATIC_VALUE
-    label = THEMATIC_VALUE
+    label = THEMATIC_LABEL
 
 
 class OtherThematicFactory(GenericReferenceItemFactory):
@@ -68,7 +70,7 @@ class OtherThematicFactory(GenericReferenceItemFactory):
 
     kind = GenericReferenceItemKind.THEMATIC
     value = OTHER_THEMATIC_VALUE
-    label = OTHER_THEMATIC_VALUE
+    label = OTHER_THEMATIC_LABEL
 
 
 class StructureFactory(factory.django.DjangoModelFactory):

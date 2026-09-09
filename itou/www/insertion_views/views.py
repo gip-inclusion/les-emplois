@@ -1,6 +1,7 @@
 import enum
 import functools
 import logging
+from collections import defaultdict
 
 from data_inclusion.schema.v1.thematiques import Categorie
 from django.conf import settings
@@ -142,13 +143,14 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     context_object_name = "service"
 
     def format_categories(self) -> list[tuple[str, str]]:
-        formatted_categories = []
+        categories = defaultdict(list)
         for thematic in self.object.thematics.all():
             category = thematic.value.split("--")[0]
-            category_label = Categorie(category).label
-            subcategory_label = thematic.label
-            formatted_categories.append((category_label, subcategory_label))
-        return formatted_categories
+            categories[Categorie(category).label].append(thematic.label)
+        return [
+            (category_label, ", ".join(sorted(categories[category_label])))
+            for category_label in sorted(categories.keys())
+        ]
 
     def get_context_data(self, **kwargs):
         has_contact_to_display = (
