@@ -54,6 +54,7 @@ from itou.metabase.tables import (
     institutions,
     job_applications,
     job_descriptions,
+    job_seeker_assignments,
     job_seekers,
     memberships,
     mobilization_events,
@@ -74,7 +75,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
 )
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerAssignment, User
 from itou.utils.command import BaseCommand
 from itou.utils.slack import send_slack_message
 
@@ -119,6 +120,7 @@ class Command(BaseCommand):
             "evaluated_criteria": self.populate_evaluated_criteria,
             "users": self.populate_users,
             "memberships": self.populate_memberships,
+            "job_seeker_assignments": self.populate_job_seeker_assignments,
             "mobilization_events": self.populate_mobilization_events,
             "geiq_assessments": self.populate_geiq_assessments,
             "geiq_contracts": self.populate_geiq_contracts,
@@ -606,6 +608,12 @@ class Command(BaseCommand):
 
         metabase_db.populate_table(
             memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
+        )
+
+    def populate_job_seeker_assignments(self):
+        queryset = JobSeekerAssignment.objects.all()
+        metabase_db.populate_table(
+            job_seeker_assignments.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
         )
 
     def populate_references(self):
