@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name="jobseekerassignment",
-            name="created_at",
-            field=models.DateTimeField(auto_now_add=True, verbose_name="date de création"),
-        ),
-        migrations.AlterField(
-            model_name="jobseekerassignment",
             name="updated_at",
             field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
