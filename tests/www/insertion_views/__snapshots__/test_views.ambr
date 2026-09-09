@@ -3404,6 +3404,78 @@
                                       </strong>
                                   </div>
                               </li>
+                              <li>
+                                  <small>
+                                      Durée de la prestation
+                                  </small>
+                                  <strong>
+                                      21 heures par semaine
+                                          
+                                          
+                                              , pendant
+                                          
+                                          
+                                              16 semaines
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Lieu d'accueil
+                                  </small>
+                                  <strong>
+                                      12 rue de la Paix, Bâtiment B, 75001 Paris
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Horaires d'ouverture
+                                      <i aria-label="Hors jours fériés" class="ri-information-line ri-xl text-info" data-bs-title="Hors jours fériés" data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Lundi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Mardi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Mercredi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Jeudi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Vendredi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                  </div>
+                              </li>
                           </ul>
                       </div>
                   </div>

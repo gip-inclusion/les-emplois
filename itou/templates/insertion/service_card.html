@@ -277,6 +277,65 @@
                             {% endif %}
                         </ul>
                     </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Conditions d'accueil</h2>
+                        <ul class="list-data">
+                            {% if service.receptions.exists %}
+                                <li>
+                                    <small>Mode d'accueil</small>
+                                    <div>
+                                        <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if service.volume_horaire_hebdomadaire or service.nombre_semaines %}
+                                <li>
+                                    <small>Durée de la prestation</small>
+                                    <strong>{{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine{% if service.nombre_semaines %}, pendant {{ service.nombre_semaines }} semaines{% endif %}</strong>
+                                </li>
+                            {% endif %}
+                            {% if service.address_on_one_line or service.opening_hours %}
+                                <hr class="my-4">
+                            {% endif %}
+                            {% if service.address_on_one_line %}
+                                <li>
+                                    <small>Lieu d'accueil</small>
+                                    <strong>{{ service.address_on_one_line }}</strong>
+                                </li>
+                            {% endif %}
+                            {% if service.opening_hours %}
+                                <li>
+                                    <small>
+                                        Horaires d'ouverture
+                                        {% if formatted_opening_hours.has_ph_off %}
+                                            <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
+                                        {% endif %}
+                                    </small>
+                                    {% if formatted_opening_hours %}
+                                        <div>
+                                            {% for entry in formatted_opening_hours.entries %}
+                                                <div class="d-flex gap-2">
+                                                    <strong>{{ entry.label }} :</strong>
+                                                    <strong>{{ entry.hours }}
+                                                        {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
+                                                    </strong>
+                                                </div>
+                                            {% endfor %}
+                                            {% if formatted_opening_hours.comments %}
+                                                <div class="mt-2">
+                                                    {% for comment in formatted_opening_hours.comments %}
+                                                        <div class="d-flex"><span class="fst-italic">{{ comment }}.</span></div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        {{ service.opening_hours }}
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
 
                 {# Service information card #}
