@@ -197,7 +197,26 @@
                             {% if service.prerequisites %}
                                 <li>
                                     <small>Conditions d'accès</small>
-                                    <strong>{{ service.prerequisites|join:", " }}</strong>
+                                    {% with prerequisites_text=service.prerequisites|join:", " %}
+                                        {% if prerequisites_text|length > 100 %}
+                                            <div class="collapse show has-no-transition" id="collapse-prerequisites-collapsed">
+                                                <strong>{{ prerequisites_text|truncatechars:100 }}</strong>
+                                                <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse-prerequisites-collapsed, #collapse-prerequisites-expanded"
+                                                        aria-expanded="true"
+                                                        aria-controls="collapse-prerequisites-collapsed collapse-prerequisites-expanded">
+                                                    Lire la suite
+                                                </button>
+                                            </div>
+                                            <div class="collapse has-no-transition" id="collapse-prerequisites-expanded">
+                                                <strong>{{ prerequisites_text|markdownify }}</strong>
+                                            </div>
+                                        {% else %}
+                                            <strong>{{ prerequisites_text|markdownify }}</strong>
+                                        {% endif %}
+                                    {% endwith %}
                                 </li>
                             {% endif %}
                             {% if service.fee %}
@@ -210,6 +229,50 @@
                                             <p><small class="mb-0">{{ service.fee_details }}</small></p>
                                         {% endif %}
                                     </div>
+                                </li>
+                            {% endif %}
+                            {% if service.mobilizations.exists or service.mobilization_publics.exists %}
+                                <hr class="my-4">
+                            {% endif %}
+                            {% if service.mobilization_publics.exists %}
+                                <li>
+                                    <small>Service mobilisable par</small>
+                                    <strong>{% for public in service.mobilization_publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                </li>
+                            {% endif %}
+                            {% if service.mobilizations.exists %}
+                                <li>
+                                    <small>Modes de mobilisation</small>
+                                    <div>
+                                        <strong>{% for mobilization in service.mobilizations.all %}{{ mobilization.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                        {% if service.mobilizations_details %}
+                                            <p><small class="mb-0">{{ service.mobilizations_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if geographic_perimeter %}
+                                <hr class="my-4">
+                                <li>
+                                    <small>Zones d'éligibilité</small>
+                                    {% if geographic_perimeter|length > 100 %}
+                                        <div class="collapse show has-no-transition" id="collapse-eligibility-collapsed">
+                                            <strong>{{ geographic_perimeter|truncatechars:100 }}</strong>
+                                            <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-eligibility-collapsed, #collapse-eligibility-expanded"
+                                                    aria-expanded="true"
+                                                    aria-controls="collapse-eligibility-collapsed collapse-eligibility-expanded">
+                                                Lire la suite
+                                            </button>
+                                        </div>
+                                        <div class="collapse has-no-transition" id="collapse-eligibility-expanded">
+                                            <strong>{{ geographic_perimeter }}</strong>
+                                        </div>
+                                    {% else %}
+                                        <strong>{{ geographic_perimeter }}</strong>
+                                    {% endif %}
                                 </li>
                             {% endif %}
                         </ul>

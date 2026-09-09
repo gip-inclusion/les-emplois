@@ -458,7 +458,7 @@ class Service(GeolocatedAddressMixin, models.Model):
     def prerequisites(self) -> list[str]:
         if self.is_dora:
             return [*self.access_conditions_dora, *self.credentials]
-        return [line for line in self.access_conditions_di.split("\\n") if line]
+        return [line.strip(". ") for line in self.access_conditions_di.split("\\n") if line]
 
     @property
     def has_prerequisites(self) -> bool:
