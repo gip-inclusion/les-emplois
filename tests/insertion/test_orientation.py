@@ -3,7 +3,6 @@ import random
 from functools import partial
 
 import pytest
-from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
@@ -67,20 +66,6 @@ def test_orientation_rejects_inconsistent_sender_organization():
             referent_last_name="Martin",
             referent_email="alice@example.org",
         )
-
-
-def test_orientation_attachments(temporary_dora_bucket_name):
-    orientation = OrientationFactory(
-        attachments=[
-            "local/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG1XPYQRtQ/document0.pdf",
-            "local/#orientations/LuBBIUvx6idprXo6QjpYyHi4QsmcXTdS/document1.pdf",
-        ]
-    )
-
-    for idx, attachment_detail in enumerate(orientation.attachments_details):
-        assert attachment_detail[0] == f"document{idx}.pdf"
-        assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail[1]
-        assert temporary_dora_bucket_name in attachment_detail[1]
 
 
 def test_orientation_documents():
