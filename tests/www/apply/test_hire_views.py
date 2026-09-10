@@ -1146,7 +1146,7 @@ class TestFindJobSeekerForHireView:
                 data-matomo-category="nir-temporaire"
                 data-matomo-action="etape-suivante"
                 data-matomo-option="candidature">
-               Cliquez ici pour accéder à l'étape suivante.
+               Cliquez ici pour accéder à l’étape suivante.
             </a>
             """,
             html=True,

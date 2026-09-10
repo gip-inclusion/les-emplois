@@ -103,14 +103,14 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
                 {mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}.</b>
             </p>
             <p>
-                Si cette candidature n'est pas pour
+                Si cette candidature n’est pas pour
                 <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
-                cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                cliquez sur « Ce n’est pas mon candidat » afin de modifier le numéro de sécurité sociale.
             </p>
         </div>
         <div class="modal-footer">
             <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
-            Ce n'est pas mon candidat</button>
+            Ce n’est pas mon candidat</button>
             <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
         </div>
         """,
@@ -739,7 +739,7 @@ class TestApplyAsJobSeeker:
                 data-matomo-category="nir-temporaire"
                 data-matomo-action="etape-suivante"
                 data-matomo-option="candidature">
-               Cliquez ici pour accéder à l'étape suivante.
+               Cliquez ici pour accéder à l’étape suivante.
             </a>
             """,
             html=True,
@@ -1710,7 +1710,7 @@ class TestApplyAsAuthorizedPrescriber:
                 data-matomo-category="nir-temporaire"
                 data-matomo-action="etape-suivante"
                 data-matomo-option="candidature">
-               Cliquez ici pour accéder à l'étape suivante.
+               Cliquez ici pour accéder à l’étape suivante.
             </a>
             """,
             html=True,
