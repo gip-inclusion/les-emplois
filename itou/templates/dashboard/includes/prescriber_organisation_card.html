@@ -12,7 +12,7 @@
             <span class="badge rounded-pill badge-sm bg-primary">ID {{ request.current_organization.id }}</span>
         {% endfragment %}
         {% fragment as list %}
-            {% with card_url=request.current_organization.get_card_url %}
+            {% with has_public_card=request.current_organization.get_card_url %}
                 {% if request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:edit_organization' %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
@@ -21,7 +21,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if card_url %}
+                {% if has_public_card %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:overview' %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
                             <i class="ri-eye-line ri-lg ri-lg fw-normal" aria-hidden="true"></i>
