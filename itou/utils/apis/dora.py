@@ -1,5 +1,4 @@
 import dataclasses
-import json
 import logging
 
 import httpx
@@ -74,36 +73,8 @@ class DoraAPIClient:
     def emplois_services(self, **params):
         return DoraApiPaginatedResponse(**self._request("/services/", params).json())
 
-    def orientation_statuses(self, **params):
-        return DoraApiPaginatedResponse(**self._request("/orientations/status/", params).json())
-
     def disabled_dora_form_di_structures(self, **params):
         return {
             r["source"] + "--" + r["structure_id"]
             for r in self._request("/disabled-dora-form-di-structures/", params).json()
         }
-
-    def create_orientation(self, payload: dict, attachments=()) -> dict:
-        files = [("attachments", (file_name, file_obj)) for file_name, file_obj in attachments]
-        form_data = {"data": json.dumps(payload)}
-        try:
-            response = self.client.post(
-                "/orientations/",
-                data=form_data,
-                files=files or None,
-                timeout=httpx.Timeout(5, read=60),
-            ).raise_for_status()
-        except httpx.HTTPError as exc:
-            logger.info(
-                "DORA create-orientation error di_service_id=%r error=%s",
-                payload.get("di_service_id"),
-                exc,
-            )
-            raise DoraAPIException()
-        orientation_response = response.json()
-        logger.info(
-            "DORA create-orientation success di_service_id=%r emplois_sync_uid=%s",
-            payload.get("di_service_id"),
-            orientation_response.get("emplois_sync_uid"),
-        )
-        return orientation_response
