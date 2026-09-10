@@ -57,7 +57,7 @@
                 {% component_alert content=content variant="info" extra_classes="mb-3" %}
                     {% fragment as content %}
                         <p class="mb-0">{{ request.user.is_job_seeker|yesno:"Vous ne possédez,L’usager ne possède" }} pas de numéro de sécurité sociale ?</p>
-                        <a href="{{ invalid_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>Cliquez ici pour accéder à l'étape suivante.</a>
+                        <a href="{{ invalid_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>Cliquez ici pour accéder à l’étape suivante.</a>
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% else %}
@@ -71,7 +71,7 @@
                                aria-label="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
                                rel="noopener"
                                class="has-external-link"
-                               target="_blank">ameli.fr</a>, le site de l'assurance maladie, vous explique comment l'obtenir.
+                               target="_blank">ameli.fr</a>, le site de l’assurance maladie, vous explique comment l’obtenir.
                         </p>
                     {% endfragment %}
                 {% endcomponent_info %}
@@ -103,9 +103,9 @@
                                 {% if standalone_creation %}
                                     {% if active_assignment %}
                                         {% if active_assignment.advisor == request.user and active_assignment.organization == request.current_organization %}
-                                            Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez préciser les détails de votre intervention.
+                                            Cet usager figure déjà dans votre liste d’accompagnements. Vous pouvez préciser les détails de votre intervention.
                                         {% elif active_assignment.organization == request.current_organization %}
-                                            Cet usager figure déjà dans la liste d'accompagnements de votre structure.
+                                            Cet usager figure déjà dans la liste d’accompagnements de votre structure.
                                             <br>
                                             Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                         {% endif %}
@@ -113,7 +113,7 @@
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
                                 {% else %}
-                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                    Si cette candidature n’est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n’est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                                 {% endif %}
                             </p>
                         </div>
@@ -127,7 +127,7 @@
                                 {% endif %}
                             {% else %}
                                 {# Reload this page with a new form. #}
-                                {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% bootstrap_button "Ce n’est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                                 {# Go to the next step. #}
                                 {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% endif %}
