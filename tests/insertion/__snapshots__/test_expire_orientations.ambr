@@ -56,11 +56,9 @@
                  "insertion_orientation"."duration_weekly_hours",
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
-                 "insertion_orientation"."attachments",
                  "insertion_orientation"."last_reminder_email_sent_at",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
-                 "insertion_orientation"."dora_status_updated_at",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -493,11 +491,9 @@
               "duration_weekly_hours" = NULL,
               "duration_weeks" = NULL,
               "data_protection_commitment" = %s,
-              "attachments" = %s::varchar(1024)[],
               "last_reminder_email_sent_at" = NULL,
               "created_at" = %s,
-              "updated_at" = %s,
-              "dora_status_updated_at" = NULL
+              "updated_at" = %s
           WHERE "insertion_orientation"."id" = %s
         ''',
       }),
@@ -732,11 +728,9 @@
               "duration_weekly_hours" = NULL,
               "duration_weeks" = NULL,
               "data_protection_commitment" = %s,
-              "attachments" = %s::varchar(1024)[],
               "last_reminder_email_sent_at" = NULL,
               "created_at" = %s,
-              "updated_at" = %s,
-              "dora_status_updated_at" = NULL
+              "updated_at" = %s
           WHERE "insertion_orientation"."id" = %s
         ''',
       }),

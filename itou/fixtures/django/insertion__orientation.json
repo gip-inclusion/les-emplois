@@ -1,7 +1,6 @@
 [
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 2,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[\"TELEPHONE\"]",
@@ -9,7 +8,6 @@
       "created_at": "2026-09-13T09:12:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -36,7 +34,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 47,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[\"TELEPHONE\"]",
@@ -44,7 +41,6 @@
       "created_at": "2026-09-12T10:25:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -71,7 +67,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 98,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -79,7 +74,6 @@
       "created_at": "2026-09-10T15:55:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -106,7 +100,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 47,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -114,7 +107,6 @@
       "created_at": "2026-09-03T16:40:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -141,7 +133,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 19,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -149,7 +140,6 @@
       "created_at": "2026-09-05T14:30:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -176,7 +166,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 19,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -184,7 +173,6 @@
       "created_at": "2026-09-01T10:10:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": 6,
       "duration_weeks": 10,
       "last_reminder_email_sent_at": null,
@@ -211,7 +199,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 98,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[\"EMAIL\", \"REFERENT\"]",
@@ -219,7 +206,6 @@
       "created_at": "2026-08-26T08:45:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": 9,
       "duration_weeks": 12,
       "last_reminder_email_sent_at": null,
@@ -246,7 +232,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 19,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -254,7 +239,6 @@
       "created_at": "2026-08-21T11:20:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -281,7 +265,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 47,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[\"EMAIL\"]",
@@ -289,7 +272,6 @@
       "created_at": "2026-08-16T09:00:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": 4,
       "duration_weeks": 8,
       "last_reminder_email_sent_at": null,
@@ -316,7 +298,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 2,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -324,7 +305,6 @@
       "created_at": "2026-08-01T13:40:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
@@ -351,7 +331,6 @@
   },
   {
     "fields": {
-      "attachments": "[]",
       "beneficiary": 120,
       "beneficiary_availability": null,
       "beneficiary_contact_preferences": "[]",
@@ -359,7 +338,6 @@
       "created_at": "2026-07-27T08:30:00Z",
       "data_protection_commitment": true,
       "documents": [],
-      "dora_status_updated_at": null,
       "duration_weekly_hours": null,
       "duration_weeks": null,
       "last_reminder_email_sent_at": null,
