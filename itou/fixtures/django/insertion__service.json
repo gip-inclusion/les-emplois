@@ -303,16 +303,16 @@
   },
   {
     "fields": {
-      "access_conditions_di": "",
-      "access_conditions_dora": "[]",
+      "access_conditions_di": "Être âgé de 16 à 25 ans révolus, ou avoir moins de 30 ans en cas de reconnaissance de la qualité de travailleur handicapé.\\nNe pas être étudiant et ne pas suivre une formation.\\nPièce d'identité en cours de validité.\\nCurriculum vitae.\\nJustificatif de domicile de moins de 3 mois.\\n* Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte), * Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00, Vous êtes travailleur social, professionnels et structures d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)",
+      "access_conditions_dora": "[\"* Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte), * Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00, Vous êtes travailleur social, professionnels et structures d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)\"]",
       "address_line_1": "Place de l'Europe",
-      "address_line_2": "",
+      "address_line_2": "Locaux de la MIFE Belfort",
       "average_orientation_response_delay_days": null,
       "city": "Belfort",
-      "contact_email": "",
-      "contact_full_name": "",
+      "contact_email": "cej@mission-locale.fake",
+      "contact_full_name": "Camille Martin",
       "contact_is_public": true,
-      "contact_phone": "",
+      "contact_phone": "+33123456789",
       "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
       "created_at": "2026-06-15T09:16:29.343Z",
       "credentials": "[\"Pièce d'identité en cours de validité\", \"Curriculum vitae\", \"Justificatif de domicile de moins de 3 mois\"]",
@@ -322,8 +322,21 @@
       "description_short": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi. Il s'agit d'un programme intensif d’accompagnement dans le projet professionnel et l'emploi.",
       "dora_synced_at": "2026-06-15T09:16:29.343Z",
       "eligibility_zones": "[\"90\"]",
+      "extra": {
+        "forms": [
+          {
+            "name": "Dossier d'inscription au CEJ",
+            "url": "https://example.com/dossier-inscription-cej.pdf"
+          }
+        ],
+        "funding_labels": [
+          "France Travail",
+          "Conseil départemental"
+        ],
+        "online_form": "https://example.com/formulaire-inscription-cej"
+      },
       "fee": 1,
-      "fee_details": "",
+      "fee_details": "Service entièrement pris en charge, sans avance de frais.",
       "funding_labels": [],
       "insee_city": 34249,
       "is_active": true,
@@ -357,16 +370,18 @@
         5,
         6
       ],
-      "mobilizations_details": "",
+      "mobilizations_details": "Orientation en ligne, par courriel, téléphone ou accueil physique.",
       "name": "CEJ - Contrat d'Engagement Jeune",
-      "opening_hours": "",
-      "opening_hours_text": "",
+      "nombre_semaines": 52,
+      "opening_hours": "Mo-Fr 09:00-12:00,14:00-17:00; PH off",
+      "opening_hours_text": "Du lundi au vendredi de 9 h à 12 h et de 14 h à 17 h.",
       "post_code": "90000",
       "publics": [
         123
       ],
       "publics_details": "Public moins de 26 ans, Jeunes (16-26 ans)",
       "receptions": [
+        131,
         132
       ],
       "source": 231,
@@ -376,7 +391,8 @@
         186
       ],
       "uid": "dora--869e04c8-4be3-43cf-923b-f59e0300fafe",
-      "updated_on": "2026-02-09"
+      "updated_on": "2026-02-09",
+      "volume_horaire_hebdomadaire": 20
     },
     "model": "insertion.service",
     "pk": 5
