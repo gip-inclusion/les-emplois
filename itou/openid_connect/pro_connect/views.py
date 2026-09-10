@@ -88,7 +88,7 @@ def _generate_pro_params_from_session(pc_data, host):
                         # used.
                         "amr": {"essential": True},
                         "acr": {
-                            "essential": True,
+                            "essential": settings.PRO_CONNECT_ACR_ESSENTIAL,
                             "values": [
                                 "eidas0-mfa",
                                 "eidas1-mfa",

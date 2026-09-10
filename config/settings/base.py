@@ -517,6 +517,7 @@ PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
 PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
     _idp_id.strip() for _idp_id in os.getenv("PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST", "").split(",")
 ]
+PRO_CONNECT_ACR_ESSENTIAL = os.getenv("PRO_CONNECT_ACR_ESSENTIAL", "False") == "True"
 
 TALLY_URL = os.getenv("TALLY_URL")
 
