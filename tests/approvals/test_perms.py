@@ -3,7 +3,7 @@ from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerAssignmentFactory, JobSeekerFactory
 from tests.utils.testing import get_request
 
 
@@ -31,9 +31,16 @@ def test_can_view_approval_details():
         request = get_request(user)
         assert can_view_approval_details(request, approval) == PERMS_READ
 
+    unrelated_membership = PrescriberMembershipFactory(organization__authorized=True)
+    JobSeekerAssignmentFactory(
+        professional=unrelated_membership.user,
+        prescriber_organization=unrelated_membership.organization,
+    )
+
     for bad_user in [
         JobSeekerFactory(),  # another job seeker
         PrescriberMembershipFactory(organization__authorized=True).user,  # a random authorized prescriber
+        unrelated_membership.user,  # authorized, but for another job seeker
         JobApplicationFactory(
             sent_by_prescriber_alone=True, job_seeker=approval.user, with_job_seeker_assignment=True
         ).sender,  # a non authorized prescriber linked to the job seeker
