@@ -17,21 +17,22 @@ from itou.emails.models import Email
 
 logger = logging.getLogger("itou.emails")
 
-# Mailjet max number of recipients (CC, BCC, TO)
-_MAILJET_MAX_RECIPIENTS = 50
+# Brevo max total number of recipients (TO, CC, BCC) per API call.
+# https://developers.brevo.com/reference/send-transac-email
+_BREVO_MAX_RECIPIENTS = 2000
 _EMAIL_KEYS = ("from_email", "cc", "bcc", "subject", "body")
 
 
-def sanitize_mailjet_recipients(email_message):
+def sanitize_recipients(email_message):
     """
-    Mailjet API has a **50** number limit for anytype of email recipient:
+    Brevo API has a **2000** number limit for anytype of email recipient:
     * TO
     * CC
     * BCC
 
     This function:
-    * partitions email recipients with more than 50 elements
-    * creates new emails with a number of recipients in the Mailjet limit
+    * partitions email recipients with more than 2000 elements
+    * creates new emails with a number of recipients in the Brevo limit
     * **only** checks for `TO` recipients owerflows
 
     `email_message` is an EmailMessage object (not serialized)
@@ -39,12 +40,12 @@ def sanitize_mailjet_recipients(email_message):
     Returns a **list** of "sanitized" emails.
     """
 
-    if len(email_message.to) <= _MAILJET_MAX_RECIPIENTS:
+    if len(email_message.to) <= _BREVO_MAX_RECIPIENTS:
         # We're ok, return a list containing the original message
         return [email_message]
 
     sanitized_emails = []
-    to_chunks = batched(email_message.to, _MAILJET_MAX_RECIPIENTS)
+    to_chunks = batched(email_message.to, _BREVO_MAX_RECIPIENTS)
     # We could also combine to, cc and bcc, but it's useless for now
 
     for to_chunk in to_chunks:
@@ -92,7 +93,7 @@ def _async_send_message(email_id, *, task=None):
                     email.esp_response = e.response.json()
                 except InvalidJSONError:
                     logger.exception(
-                        "Received invalid response from Mailjet, email_id=%d. Payload: %s",
+                        "Received invalid response from Brevo, email_id=%d. Payload: %s",
                         email_id,
                         e.response.text,
                     )
@@ -112,8 +113,9 @@ def _async_send_message(email_id, *, task=None):
                 else:
                     raise
             else:
-                [result] = email.esp_response["Messages"]
-                success = result["Status"] == "success"
+                # Brevo returns a "messageId" (or "messageIds" for batch sends) on success,
+                # and doesn't raise AnymailError on failure until the HTTP response is not 2xx.
+                success = True
         email.save(update_fields=["esp_response"])
         # Commit the email status to the DB.
     if not success:
@@ -146,12 +148,12 @@ class AsyncEmailBackend(BaseEmailBackend):
             raise ProgrammingError("Sending email requires an active database transaction.")
         emails_count = 0
         for message in email_messages:
-            for mjemail in sanitize_mailjet_recipients(message):
+            for sanitized_email in sanitize_recipients(message):
                 # Send each email in a separate task, so that Huey retry mecanism only
                 # retries the failed email.
-                email = Email.from_email_message(mjemail)
+                email = Email.from_email_message(sanitized_email)
                 email.save()
-                if not [*mjemail.to, *mjemail.cc, *mjemail.bcc]:
+                if not [*sanitized_email.to, *sanitized_email.cc, *sanitized_email.bcc]:
                     logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
                     continue
                 emails_count += 1
