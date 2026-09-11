@@ -21,7 +21,7 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% component_alert content=content variant="info" icon=False %}
                         {% fragment as content %}
-                            <p>Voulez-vous vraiment vous déconnecter ?</p>
+                            <p>Voulez-vous vraiment vous déconnecter ?</p>
                             <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
 

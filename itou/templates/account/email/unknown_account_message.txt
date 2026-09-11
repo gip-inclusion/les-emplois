@@ -6,10 +6,10 @@ Toutefois, nous n’avons trouvé aucun compte utilisateur associé à votre adr
 
 Si vous n’avez fait aucune demande de nouveau mot de passe, vous pouvez ignorer cet e-mail.
 
-Si vous avez fait cette demande de nouveau mot de passe :
+Si vous avez fait cette demande de nouveau mot de passe :
 
 - Assurez-vous que vous n’aviez pas créé votre compte sur {% brand %} depuis une autre adresse e-mail.
-- Vous pouvez créer un nouveau compte en utilisant le lien ci-dessous :
+- Vous pouvez créer un nouveau compte en utilisant le lien ci-dessous :
 
 {{ signup_url }}
 

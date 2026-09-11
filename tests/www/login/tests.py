@@ -204,7 +204,7 @@ class TestJobSeekerLoginFailures:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
                     "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "
                     "débloquer la situation en suivant "
                     f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
@@ -234,7 +234,7 @@ class TestJobSeekerLoginFailures:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
                     "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "
                     "débloquer la situation en suivant "
                     f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
