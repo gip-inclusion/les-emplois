@@ -123,7 +123,7 @@
                             {% partialdef create-assignment-link inline %}
                                 <hr class="mt-4 mb-3">
                                 <p class="mb-0">
-                                    Vous intervenez {% if last_assignment %}de nouveau {% endif %}sur le parcours de cet usager ?
+                                    Vous intervenez {% if last_assignment %}de nouveau {% endif %}sur le parcours de cet usager ?
                                     <a href="{% url 'job_seekers_views:create_assignment' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                        class="btn-link"
                                        {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>

@@ -39,11 +39,11 @@ from tests.utils.testing import (
 INVALID_VALUE_MESSAGE = "Sélectionnez un choix valide."
 
 _SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP = (
-    "Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction."
+    "Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction."
 )
 _SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP = (
     "Vous pouvez embaucher ce candidat. "
-    "Le PASS IAE se réactivera automatiquement à la déclaration d'une nouvelle embauche."
+    "Le PASS IAE se réactivera automatiquement à la déclaration d'une nouvelle embauche."
 )
 
 
