@@ -246,7 +246,7 @@ class ItouModelMixin:
         try:
             object_id = field.to_python(object_id)
             return queryset.get(**{field.attname: object_id})
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except model.DoesNotExist, ValidationError, ValueError:
             return None
 
     def get_list_display(self, request):
