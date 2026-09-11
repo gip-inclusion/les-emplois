@@ -16,7 +16,7 @@ from itou.asp.models import Commune
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import ActionKind, AssignmentEndReason
+from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -1942,19 +1942,10 @@ def test_advisors_count(client):
     assert response.context["page_obj"].object_list[0].active_advisors_nb == 4
 
     # Archived assignment
-    JobSeekerAssignmentFactory(
-        job_seeker=job_seeker,
-        professional=user,
-        ended_at=timezone.now(),
-        end_reason=AssignmentEndReason.MANUAL,
-    )
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=user, ended=True)
 
     # Archived assignment with other professional
-    JobSeekerAssignmentFactory(
-        job_seeker=job_seeker,
-        ended_at=timezone.now(),
-        end_reason=AssignmentEndReason.MANUAL,
-    )
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, ended=True)
 
     response = client.get(url)
     assert response.context["page_obj"].object_list[0].active_advisors_nb == 4

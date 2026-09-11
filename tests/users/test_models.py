@@ -1290,7 +1290,7 @@ class TestJobSeekerAssignment:
             JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None, random.choice(ActionKind.values))
 
     def test_upsert_new_assignment(self):
-        old_assignment = JobSeekerAssignmentFactory(ended_at=timezone.now(), end_reason=AssignmentEndReason.MANUAL)
+        old_assignment = JobSeekerAssignmentFactory(ended=True)
         JobSeekerAssignment.objects.upsert_assignment(
             old_assignment.job_seeker,
             old_assignment.professional,

@@ -13,7 +13,14 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
-from itou.users.enums import ActionKind, IdentityProvider, JobSeekerAssignmentDisplayMode, Title, UserKind
+from itou.users.enums import (
+    ActionKind,
+    AssignmentEndReason,
+    IdentityProvider,
+    JobSeekerAssignmentDisplayMode,
+    Title,
+    UserKind,
+)
 from itou.utils import triggers
 from itou.utils.mocks.address_format import (
     BAN_GEOCODING_API_RESULTS_MOCK,
@@ -502,6 +509,10 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
             professional__for_snapshot=True,
             created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
             updated_at=datetime.datetime(2024, 6, 24, 0, 0, 0, tzinfo=datetime.UTC),
+        )
+        ended = factory.Trait(
+            ended_at=timezone.now(),
+            end_reason=AssignmentEndReason.AUTOMATIC,
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
