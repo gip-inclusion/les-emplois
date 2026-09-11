@@ -228,12 +228,7 @@ class TestCreateOrEditAssignment:
 
         # Check the is_ongoing field is disabled if an active assignment
         # exists and we try to make an archived assignment active again
-        archived_assignment = JobSeekerAssignmentFactory(
-            job_seeker=job_seeker,
-            professional=professional,
-            ended_at=timezone.now(),
-            end_reason=AssignmentEndReason.AUTOMATIC,
-        )
+        archived_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional, ended=True)
         form = JobSeekerAssignmentForm(instance=archived_assignment, active_assignment_exists=True)
         assert form.fields.get("is_ongoing") is not None
         assert form.fields.get("is_ongoing").disabled
