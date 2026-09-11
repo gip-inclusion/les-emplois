@@ -165,7 +165,7 @@ def ft_connect_callback(request):
         if "email" in e.args:
             return HttpResponseRedirect(reverse("ft_connect:no_email"))
         messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec France Travail.")
-        return HttpResponseRedirect(reverse("search:employers_home"))
+        return HttpResponseRedirect(reverse("search:home"))
 
     try:
         # At this step, we can update the user's fields in DB and create a session if required
@@ -230,7 +230,7 @@ def ft_connect_logout(request):
 
     params = {
         "id_token_hint": id_token,
-        "redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
+        "redirect_uri": get_absolute_url(reverse("search:home"), host=request.get_host()),
     }
     url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
