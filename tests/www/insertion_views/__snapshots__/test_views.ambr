@@ -3618,7 +3618,7 @@
 # ---
 # name: TestStructures.test_card_view_anonymous_renders_description_tab
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
@@ -3733,6 +3733,27 @@
       }),
       dict({
         'origin': list([
+          'StructureCardView.setup[www/insertion_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT ("insertion_structure_reseaux_porteurs"."structure_id") AS "_prefetch_related_val_structure_id",
+                 "insertion_genericreferenceitem"."id",
+                 "insertion_genericreferenceitem"."source",
+                 "insertion_genericreferenceitem"."kind",
+                 "insertion_genericreferenceitem"."value",
+                 "insertion_genericreferenceitem"."label",
+                 "insertion_genericreferenceitem"."description",
+                 "insertion_genericreferenceitem"."created_at",
+                 "insertion_genericreferenceitem"."updated_at"
+          FROM "insertion_genericreferenceitem"
+          INNER JOIN "insertion_structure_reseaux_porteurs" ON ("insertion_genericreferenceitem"."id" = "insertion_structure_reseaux_porteurs"."genericreferenceitem_id")
+          WHERE "insertion_structure_reseaux_porteurs"."structure_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
@@ -3786,8 +3807,15 @@
                   <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                   </button>
               </div>
-              <div class="modal-body">
-                  <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+              <div class="modal-body d-flex flex-column gap-3">
+                  <div class="d-flex align-items-start">
+                      <i aria-hidden="true" class="ri-map-pin-2-line me-2">
+                      </i>
+                      <address class="m-0">
+                          10 rue de la Paix, 75002 Paris
+                      </address>
+                  </div>
+                  <div class="d-flex align-items-start justify-content-between">
                       <div class="d-flex align-items-start overflow-hidden me-2">
                           <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
                           </i>
@@ -3803,7 +3831,7 @@
                           </span>
                       </button>
                   </div>
-                  <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                  <div class="d-flex align-items-start justify-content-between">
                       <div class="d-flex align-items-start overflow-hidden me-2">
                           <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                           </i>
@@ -3817,19 +3845,7 @@
                           </span>
                       </button>
                   </div>
-                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                      <i aria-hidden="true" class="ri-map-pin-2-line me-2">
-                      </i>
-                      <address class="m-0">
-                          10 rue de la Paix, 75002 Paris
-                      </address>
-                  </div>
-                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                      <i aria-hidden="true" class="ri-time-line fw-normal me-2">
-                      </i>
-                      Lun: 8h30 à 12h30 • Mar: 8h30 à 12h30 • Mer: 8h30 à 12h30 • Jeu: 8h30 à 12h30 • Ven: 8h30 à 12h30 (Hors jours fériés)
-                  </div>
-                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                  <div class="d-flex align-items-start">
                       <i aria-hidden="true" class="ri-global-line fw-normal me-2">
                       </i>
                       <a aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)" class="btn-link fw-medium has-external-link" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="lien-site-web" href="https://structure.test" rel="noopener noreferrer" target="_blank">
@@ -3878,7 +3894,7 @@
                       <ul aria-labelledby="structure-tabs-title" class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="structure-description" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="onglet-structure" href="#structure-description" id="structure-description-tab" role="tab">
-                                  Description de la structure
+                                  Présentation de la structure
                               </a>
                           </li>
                           <li class="nav-item" role="presentation">
@@ -3903,16 +3919,10 @@
                       <div id="structure-tabs">
                           <div class="tab-content">
                               <div aria-labelledby="structure-description-tab" class="tab-pane active show" id="structure-description" role="tabpanel">
-                                  <h2>
-                                      Description de la structure
-                                  </h2>
                                   <div class="row">
                                       <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                           <div class="c-box">
                                               <article>
-                                                  <h3>
-                                                      Présentation de la structure
-                                                  </h3>
                                                   <p>
                                                       Description of test structure
                                                   </p>
@@ -3921,11 +3931,11 @@
                                       </div>
                                       <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                                           <div class="c-box mb-3 mb-md-4">
-                                              <h3>
-                                                  Informations pratiques
-                                              </h3>
+                                              <h4 class="mb-3">
+                                                  Informations de contact
+                                              </h4>
                                               <button class="btn btn-secondary btn-block listen-for-mobilization-event" data-bs-target="#structure-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="structure_contact" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-coordonnees-structure" type="button">
-                                                  Voir les coordonnées de la structure
+                                                  Voir les coordonnées
                                               </button>
                                           </div>
                                       </div>

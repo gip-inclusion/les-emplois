@@ -73,30 +73,10 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
                     .select_related("kind")
                     .prefetch_related("receptions"),
                 ),
+                "reseaux_porteurs",
             ),
             uid=structure_uid,
         )
-
-    def format_opening_hours(self):
-        opening_hours = []
-
-        osm_hours = format_osm_hours(self.structure.opening_hours)
-
-        if not osm_hours:
-            return None
-
-        for entry in osm_hours["entries"]:
-            label = entry["label"][:3]
-            hours = entry["hours"]
-            comment = f"({entry['comment']}) " if entry["comment"] else ""
-
-            opening_hours.append(f"{label}: {hours} {comment}")
-
-        formatted_opening_hours = "• ".join(opening_hours).rstrip()
-
-        public_holidays_notice = "(Hors jours fériés)" if osm_hours["has_ph_off"] else ""
-
-        return f"{formatted_opening_hours} {public_holidays_notice}"
 
     def get_context_data(self, **kwargs):
         services = list(self.structure.services.all())
@@ -114,7 +94,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
                 fallback_url=reverse("search:services_home"),
             ),
             "services": services,
-            "formatted_opening_hours": self.format_opening_hours(),
+            "formatted_opening_hours": format_osm_hours(self.structure.opening_hours),
             "can_register_mobilization_event": can_register_mobilization_event(self.request),
         }
 

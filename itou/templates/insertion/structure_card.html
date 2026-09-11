@@ -36,7 +36,7 @@
                data-bs-toggle="tab"
                aria-selected="true"
                aria-controls="structure-description"
-               {% matomo_event "fiche-structure" "clic" "onglet-structure" %}>Description de la structure</a>
+               {% matomo_event "fiche-structure" "clic" "onglet-structure" %}>Présentation de la structure</a>
         </li>
         <li class="nav-item" role="presentation">
             <a id="structure-services-tab"
@@ -60,7 +60,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
-                    {% include "insertion/includes/structure_card_tabs.html" with structure=structure services=services request=request only %}
+                    {% include "insertion/includes/structure_card_tabs.html" with structure=structure services=services request=request formatted_opening_hours=formatted_opening_hours only %}
                 </div>
             </div>
         </div>
@@ -76,9 +76,15 @@
                     <h3 class="modal-title" id="structure-contact-modal-label">Coordonnées de contact</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body d-flex flex-column gap-3">
+                    {% if structure.address_on_one_line %}
+                        <div class="d-flex align-items-start">
+                            <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
+                            <address class="m-0">{{ structure.address_on_one_line }}</address>
+                        </div>
+                    {% endif %}
                     {% if structure.email %}
-                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                        <div class="d-flex align-items-start justify-content-between">
                             <div class="d-flex align-items-start overflow-hidden me-2">
                                 <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
                                 <a href="mailto:{{ structure.email }}" aria-label="Contact par mail" class="text-break">{{ structure.email }}</a>
@@ -88,7 +94,7 @@
                         </div>
                     {% endif %}
                     {% if structure.phone %}
-                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                        <div class="d-flex align-items-start justify-content-between">
                             <div class="d-flex align-items-start overflow-hidden me-2">
                                 <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
                                 {{ structure.phone|format_phone }}
@@ -96,24 +102,8 @@
                             {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True in_modal=True only %}
                         </div>
                     {% endif %}
-                    {% if structure.address_on_one_line %}
-                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                            <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
-                            <address class="m-0">{{ structure.address_on_one_line }}</address>
-                        </div>
-                    {% endif %}
-                    {% if structure.opening_hours %}
-                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                            <i class="ri-time-line fw-normal me-2" aria-hidden="true"></i>
-                            {% if formatted_opening_hours %}
-                                {{ formatted_opening_hours }}
-                            {% else %}
-                                {{ structure.opening_hours }}
-                            {% endif %}
-                        </div>
-                    {% endif %}
                     {% if structure.website %}
-                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                        <div class="d-flex align-items-start">
                             <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
                             <a href="{{ structure.website }}"
                                rel="noopener noreferrer"

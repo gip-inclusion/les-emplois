@@ -4,26 +4,67 @@
 
 {% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
 
-<h2>Description de la structure</h2>
 <div class="row">
     <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
         <div class="c-box">
-            <article>
-                <h3>Présentation de la structure</h3>
-                {{ structure.description|markdownify }}
-            </article>
+            <article>{{ structure.description|markdownify }}</article>
+
+            {% if structure.reseaux_porteurs.exists %}
+                <h4 class="mt-4 mb-0">Réseaux porteurs</h4>
+                <p>
+                    {% for reseau in structure.reseaux_porteurs.all %}
+                        {{ reseau }}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            {% endif %}
+
+            {% if structure.opening_hours %}
+                <h4 class="mt-4 mb-0">Horaires d'ouverture</h4>
+                {% if formatted_opening_hours %}
+                    {% for entry in formatted_opening_hours.entries %}
+                        <p>
+                            {{ entry.label }} : {{ entry.hours }}
+                            {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
+                        </p>
+                    {% endfor %}
+                    {% if formatted_opening_hours.comments %}
+                        {% for comment in formatted_opening_hours.comments %}
+                            <p class="fst-italic">{{ comment }}.</p>
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    {{ structure.opening_hours }}
+                {% endif %}
+            {% endif %}
+
+            {% if structure.accessibilite_lieu or structure.website %}
+                <h4 class="mt-4 mb-0">En savoir plus</h4>
+                {% if structure.accessibilite_lieu %}
+                    <p>
+                        Retrouvez les informations liées à l'accessibilité de notre structure sur <a href="{{ structure.accessibilite_lieu }}" target="_blank">{{ structure.accessibilite_lieu }}</a>
+                    </p>
+                {% endif %}
+                {% if structure.website %}
+                    <p>
+                        Plus d'informations sur <a href="{{ structure.website }}" target="_blank">{{ structure.website }}</a>
+                    </p>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
     <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
         <div class="c-box mb-3 mb-md-4">
-            <h3>Informations pratiques</h3>
+            <h4 class="mb-3">Informations de contact</h4>
             <button class="btn btn-secondary btn-block listen-for-mobilization-event"
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#structure-contact-modal"
                     data-emplois-mobilization-kind="{{ MobilizationEventKind.STRUCTURE_CONTACT }}"
                     {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
-                Voir les coordonnées de la structure
+                Voir les coordonnées
             </button>
         </div>
     </div>
