@@ -334,7 +334,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
         elif missing_actions := assessment.missing_actions_to_submit():
             messages.warning(
                 request,
-                f"Ce bilan ne peut pas encore être soumis. Ces actions sont manquantes : {','.join(missing_actions)}",
+                f"Ce bilan ne peut pas encore être soumis. Ces actions sont manquantes : {','.join(missing_actions)}",
             )
         else:
             assessment.submit(user=request.user)
