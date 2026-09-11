@@ -49,7 +49,7 @@
                                 {% csrf_token %}
                                 {% bootstrap_form_errors form alert_error_type="all" %}
                                 <fieldset>
-                                    <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                    <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                     {% bootstrap_field form.convention_with_ddets %}
                                     {% bootstrap_field form.ddets wrapper_class=form.ddets.field.form_group_class %}
                                     {% bootstrap_field form.convention_with_dreets %}
@@ -58,8 +58,8 @@
 
                                 <hr class="my-4">
                                 <fieldset>
-                                    <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
-                                    <strong class="d-block">GEIQ principal:</strong>
+                                    <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                    <strong class="d-block">GEIQ principal :</strong>
                                     {% if form.main_geiq.field.disabled %}
                                         <div class="form-group">
                                             <div class="form-check">
@@ -74,7 +74,7 @@
                                     {% else %}
                                         {% bootstrap_field form.main_geiq %}
                                     {% endif %}
-                                    <strong class="d-block">Antennes:</strong>
+                                    <strong class="d-block">Antennes :</strong>
                                     {% for field in form.iter_antenna_field %}
                                         {% if field.field.disabled %}
                                             <div class="form-group">

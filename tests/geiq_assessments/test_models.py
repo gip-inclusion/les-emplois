@@ -102,13 +102,13 @@ def test_assessment_date_order_constraints():
             assessment.summary_document_file = FileFactory()
             assessment.action_financial_assessment_file = FileFactory()
             assessment.structure_financial_assessment_file = FileFactory()
-            assessment.geiq_comment = "Bonjour, merci, au revoir !"
+            assessment.geiq_comment = "Bonjour, merci, au revoir !"
             assessment.state = AssessmentState.SUBMITTED
         elif date_field == "reviewed_at":
             ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
             assessment.reviewed_by = ddets_membership.user
             assessment.reviewed_by_institution = ddets_membership.institution
-            assessment.review_comment = "Bravo !"
+            assessment.review_comment = "Bravo !"
             assessment.state = AssessmentState.REVIEWED
         elif date_field == "final_reviewed_at":
             dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
@@ -140,7 +140,7 @@ def test_assessment_full_submission_or_no_submission_constraint():
     assessment.summary_document_file = FileFactory()
     assessment.structure_financial_assessment_file = FileFactory()
     assessment.action_financial_assessment_file = FileFactory()
-    assessment.geiq_comment = "Bonjour, merci, au revoir !"
+    assessment.geiq_comment = "Bonjour, merci, au revoir !"
     assessment.save()
 
 
@@ -160,7 +160,7 @@ def test_assessment_state_submitted_at_constraint():
     assessment.summary_document_file = FileFactory()
     assessment.structure_financial_assessment_file = FileFactory()
     assessment.action_financial_assessment_file = FileFactory()
-    assessment.geiq_comment = "Bonjour, merci, au revoir !"
+    assessment.geiq_comment = "Bonjour, merci, au revoir !"
     with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_submitted_at.*"):
         with transaction.atomic():
             assessment.state = AssessmentState.NEW
@@ -215,7 +215,7 @@ def test_assessment_full_or_no_review_constraint():
     ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     assessment.reviewed_by = ddets_membership.user
     assessment.reviewed_by_institution = ddets_membership.institution
-    assessment.review_comment = "Bravo !"
+    assessment.review_comment = "Bravo !"
     assessment.save()
 
 
@@ -237,7 +237,7 @@ def test_assessment_state_reviewed_at_constraint():
     ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     assessment.reviewed_by = ddets_membership.user
     assessment.reviewed_by_institution = ddets_membership.institution
-    assessment.review_comment = "Bravo !"
+    assessment.review_comment = "Bravo !"
     with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_reviewed_at.*"):
         with transaction.atomic():
             assessment.state = random.choice([AssessmentState.NEW, AssessmentState.SUBMITTED])
@@ -259,7 +259,7 @@ def test_assessment_full_or_no_final_review_constraint():
         reviewed_at=timezone.now() + datetime.timedelta(hours=1),
         reviewed_by=ddets_membership.user,
         reviewed_by_institution=ddets_membership.institution,
-        review_comment="Bravo !",
+        review_comment="Bravo !",
     )
     with pytest.raises(IntegrityError, match=r".*geiq_assessment_full_or_no_final_review.*"):
         with transaction.atomic():
@@ -286,7 +286,7 @@ def test_assessment_state_final_reviewed_at_constraint():
         reviewed_at=timezone.now() + datetime.timedelta(hours=1),
         reviewed_by=ddets_membership.user,
         reviewed_by_institution=ddets_membership.institution,
-        review_comment="Bravo !",
+        review_comment="Bravo !",
     )
     with pytest.raises(IntegrityError, match=r"geiq_assessment_state_final_reviewed_at.*"):
         with transaction.atomic():
@@ -551,7 +551,7 @@ def test_transition_review():
             submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
-            review_comment="Bravo !",
+            review_comment="Bravo !",
         )
     assert assessment.state == AssessmentState.SUBMITTED
 
@@ -576,7 +576,7 @@ def test_transition_ask_for_institution_fix():
             submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             reviewed_at=timezone.now() + datetime.timedelta(hours=1),
             reviewed_by=ddets_membership.user,
             reviewed_by_institution=ddets_membership.institution,
@@ -639,7 +639,7 @@ def test_transition_ask_for_geiq_fix():
         submitted_by=ProfessionalFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
-        review_comment="Bravo !",
+        review_comment="Bravo !",
         reviewed_at=timezone.now() + datetime.timedelta(hours=1),
         reviewed_by=ddets_membership.user,
         reviewed_by_institution=ddets_membership.institution,
@@ -677,7 +677,7 @@ def test_transition_ask_for_institution_or_geiq_fix_with_errors(transition, from
 
     assessment_kwargs = (
         {
-            "review_comment": "Bravo !",
+            "review_comment": "Bravo !",
             "reviewed_at": timezone.now() + datetime.timedelta(hours=1.5),
             "reviewed_by": dreets_membership.user,
             "reviewed_by_institution": dreets_membership.institution,
@@ -731,7 +731,7 @@ def test_transition_final_review(is_reviewed):
             submitted_by=ProfessionalFactory(),
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             reviewed_at=(timezone.now() + datetime.timedelta(hours=1)) if is_reviewed else None,
             reviewed_by=ddets_membership.user if is_reviewed else None,
             reviewed_by_institution=ddets_membership.institution if is_reviewed else None,

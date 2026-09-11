@@ -834,8 +834,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "apply",
     "employee_record",
     "employees",
-    "geiq_assessments/email",
-    "geiq_assessments_views",
     "insertion",
     "releases/list.html",
 )

@@ -1302,7 +1302,7 @@
   
   La structure `Un Joli GEIQ` a transmis son bilan d’exécution sur le site des Emplois de l’inclusion.
   
-  Références du dossier :
+  Références du dossier :
   
   Structures concernées par la convention :
   Une antenne (12); Une autre antenne (23)
@@ -1809,7 +1809,7 @@
                                       <li class="d-flex flex-column gap-2">
                                           <span class="flex-grow-1">Commentaire</span>
                                           <blockquote class="blockquote mb-0">
-                                              Bravo !
+                                              Bravo !
                                           </blockquote>
                                       </li>
                                   </ul>
@@ -1947,7 +1947,7 @@
                                       <li class="d-flex flex-column gap-2">
                                           <span class="flex-grow-1">Commentaire</span>
                                           <blockquote class="blockquote mb-0">
-                                              Bravo !
+                                              Bravo !
                                           </blockquote>
                                       </li>
                                   </ul>
@@ -2690,7 +2690,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -2709,8 +2709,8 @@
   
                                   <hr class="my-4"/>
                                   <fieldset>
-                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <strong class="d-block">GEIQ principal:</strong>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal :</strong>
                                       
                                           <div class="form-group">
                                               <div class="form-check">
@@ -2720,7 +2720,7 @@
                                               </div>
                                           </div>
                                       
-                                      <strong class="d-block">Antennes:</strong>
+                                      <strong class="d-block">Antennes :</strong>
                                       
                                           
                                               <div class="form-group">
@@ -2808,7 +2808,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -2827,12 +2827,12 @@
   
                                   <hr class="my-4"/>
                                   <fieldset>
-                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <strong class="d-block">GEIQ principal:</strong>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal :</strong>
                                       
                                           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ (SIRET : 123 456 789 01234)</label></div></div>
                                       
-                                      <strong class="d-block">Antennes:</strong>
+                                      <strong class="d-block">Antennes :</strong>
                                       
                                           
                                               <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_2345" name="antenna_2345" type="checkbox"/><label class="form-check-label" for="id_antenna_2345">Une antenne (SIRET : 123 456 789 02345)</label></div></div>
@@ -2947,7 +2947,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -2966,12 +2966,12 @@
   
                                   <hr class="my-4"/>
                                   <fieldset>
-                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <strong class="d-block">GEIQ principal:</strong>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal :</strong>
                                       
                                           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ (SIRET : 123 456 789 01234)</label></div></div>
                                       
-                                      <strong class="d-block">Antennes:</strong>
+                                      <strong class="d-block">Antennes :</strong>
                                       
                                           Aucune
                                       

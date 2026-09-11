@@ -143,7 +143,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=ddets_membership.user,
             reviewed_by_institution=ddets_membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             convention_amount=decimal.Decimal(100_000),
             advance_amount=decimal.Decimal(50_000),
             granted_amount=decimal.Decimal(100_000),
@@ -161,7 +161,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=membership.user,
             reviewed_by_institution=membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             final_reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             final_reviewed_by=membership.user,
             final_reviewed_by_institution=membership.institution,
@@ -293,7 +293,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=ddets_membership.user,
             reviewed_by_institution=ddets_membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=100_000,
@@ -316,7 +316,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=membership.user,
             reviewed_by_institution=membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             final_reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             final_reviewed_by=membership.user,
             final_reviewed_by_institution=membership.institution,
@@ -342,7 +342,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=membership.user,
             reviewed_by_institution=membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             final_reviewed_at=timezone.now() + datetime.timedelta(hours=8),
             final_reviewed_by=membership.user,
             final_reviewed_by_institution=membership.institution,
@@ -404,7 +404,7 @@ class TestListAssessmentsView:
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=ddets_membership.user,
             reviewed_by_institution=ddets_membership.institution,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=100_000,
@@ -597,7 +597,7 @@ class TestListAssessmentsView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_by=membership.user,
@@ -614,7 +614,7 @@ class TestListAssessmentsView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_by=membership.user,
@@ -765,7 +765,7 @@ class TestListAssessmentsView:
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=100_000,
@@ -956,7 +956,7 @@ class TestAssessmentDetailsForInstitutionView:
             label_geiq_name="Un Joli GEIQ",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             with_submission_requirements=True,
-            geiq_comment="Bonjour, merci, au revoir !",
+            geiq_comment="Bonjour, merci, au revoir !",
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -1021,7 +1021,7 @@ class TestAssessmentDetailsForInstitutionView:
             name="assessment details section ready for review"
         )
 
-        assessment.review_comment = "Bravo !"
+        assessment.review_comment = "Bravo !"
         with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
             assessment.review(user=ddets_membership.user, institution=ddets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
@@ -1084,7 +1084,7 @@ class TestAssessmentDetailsForInstitutionView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
         )
         AssessmentInstitutionLink.objects.create(
@@ -1178,7 +1178,7 @@ class TestAssessmentDetailsForInstitutionView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
         )
         AssessmentInstitutionLink.objects.create(
@@ -1316,7 +1316,7 @@ class TestAssessmentDetailsForInstitutionView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_at=(timezone.now() + datetime.timedelta(hours=5)) if is_reviewed else None,
             reviewed_by=ddets_membership.user if is_reviewed else None,
@@ -1401,7 +1401,7 @@ class TestAssessmentDetailsForInstitutionView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_at=(timezone.now() + datetime.timedelta(hours=5)) if is_reviewed else None,
             reviewed_by=ddets_membership.user if is_reviewed else None,
@@ -1665,7 +1665,7 @@ class TestAssessmentReviewView:
             data.update(
                 {
                     "convention_amount": "100000.23",
-                    "review_comment": "Bravo !",
+                    "review_comment": "Bravo !",
                     "geiq_responsible_person": "M. GEIQ",
                     "institution_responsible_person": "Mme. DREETS",
                     "legal_commitment_number": "L3G4L",
@@ -1680,7 +1680,7 @@ class TestAssessmentReviewView:
         assert assessment.convention_amount == decimal.Decimal("100_000.23")
         assert assessment.advance_amount == decimal.Decimal("50_000.18")
         assert assessment.granted_amount == decimal.Decimal("80_000.16")
-        assert assessment.review_comment == "Bravo !"
+        assert assessment.review_comment == "Bravo !"
 
         # The printable version must not be accessible at this stage as the assessment has not been finally reviewed.
         url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
@@ -1709,7 +1709,7 @@ class TestAssessmentReviewView:
             label_geiq_post_code="29000",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
-            review_comment="Bravo !",
+            review_comment="Bravo !",
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
@@ -1751,7 +1751,7 @@ class TestAssessmentReviewView:
         assert assessment.convention_amount == 100_000
         assert assessment.advance_amount == 50_000
         assert assessment.granted_amount == 80_000
-        assert assessment.review_comment == "Bravo !"
+        assert assessment.review_comment == "Bravo !"
         assert assessment.geiq_responsible_person == "M. GEIQ"
         assert assessment.institution_responsible_person == "Mme. DDETS"
         assert assessment.legal_commitment_number == "L3G4L"
