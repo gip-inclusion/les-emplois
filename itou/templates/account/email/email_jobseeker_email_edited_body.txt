@@ -14,7 +14,7 @@ Votre adresse e-mail a été mise à jour sur {% brand %} par la structure {{ or
 - Ancienne adresse e-mail: {{ old_email_address|default_if_none:"Non renseignée" }}
 - Nouvelle adresse e-mail: {{ user.email }}
 
-Si vous n'êtes pas à l'origine de cette demande ou si vous souhaitez modifier votre adresse e-mail, vous pouvez vous connecter à votre espace candidat ici : {{ edit_user_info_url }}. Votre mot de passe est inchangé.
+Si vous n'êtes pas à l'origine de cette demande ou si vous souhaitez modifier votre adresse e-mail, vous pouvez vous connecter à votre espace candidat ici : {{ edit_user_info_url }}. Votre mot de passe est inchangé.
 
 Cet e-mail a été généré et envoyé automatiquement, merci de ne pas y répondre.
 {% endblock body %}

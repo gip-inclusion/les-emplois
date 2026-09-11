@@ -829,7 +829,7 @@ def do_not_bypass_terms_acceptance(settings):
 
 
 TEMPLATE_TYPO_IGNORE_LIST = (
-    "account",
+    "account/password_change.html",  # allauth.account.forms.ChangePasswordForm.oldpassword help_text issue
     "admin",
     "apply",
     "employee_record",
