@@ -353,6 +353,11 @@ class TestApprovalAdmin:
         response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
         assert response.status_code == 404
 
+    def test_terminate_approval_wrong_method(self, admin_client):
+        approval = ApprovalFactory(start_at=timezone.localdate() - timedelta(days=10))
+        response = admin_client.get(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assert response.status_code == 405
+
     @freeze_time("2025-08-21")
     def test_terminate_approval(self, admin_client, caplog):
         start_at = timezone.localdate() - timedelta(days=10)
