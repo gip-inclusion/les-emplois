@@ -185,7 +185,8 @@
                                             {% for contract in contracts_page %}
                                                 <tr>
                                                     <td>
-                                                        <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
+                                                        <a class="btn-link"
+                                                           href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}?back_url={{ request.get_full_path|urlencode }}">{{ contract.employee.get_full_name }}</a>
                                                         {% if contract.employee.allowance_granted_previous_year %}
                                                             <i class="ri-file-warning-line ri-lg text-warning"
                                                                aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière."
@@ -210,7 +211,7 @@
                                                         {% else %}
                                                             Non
                                                             {% if request.from_institution and contract.allowance_request_justification_reason %}
-                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.CONTRACT %}"
+                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.CONTRACT %}?back_url={{ request.get_full_path|urlencode }}"
                                                                    class="text-info text-decoration-none lh-1"
                                                                    data-bs-toggle="tooltip"
                                                                    data-bs-title="Le GEIQ a motivé cette demande d’aide">
@@ -223,9 +224,9 @@
                                                     <td class="text-end">{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                                     <td>
                                                         {% if request.from_employer %}
-                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token editable=can_validate request=request disable_stats_oob=True only %}
+                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token editable=can_validate request=request current_url=request.get_full_path disable_stats_oob=True only %}
                                                         {% elif request.from_institution %}
-                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token editable=can_validate request=request disable_stats_oob=True only %}
+                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token editable=can_validate request=request current_url=request.get_full_path disable_stats_oob=True only %}
                                                         {% endif %}
                                                     </td>
                                                 </tr>

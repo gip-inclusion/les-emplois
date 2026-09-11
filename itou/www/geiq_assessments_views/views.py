@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
+from itoutils.urls import add_url_params
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
@@ -45,6 +46,7 @@ from itou.utils.auth import check_request
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
 from itou.utils.readonly import http_methods, readonly_view
+from itou.utils.urls import get_safe_url
 from itou.www.geiq_assessments_views.export import get_export_format, serialize_employee_contract
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
@@ -700,6 +702,13 @@ def assessment_contracts_details(
     if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
         contract_qs = contract_qs.prefetch_related("employee__prequalifications")
     contract = get_object_or_404(contract_qs, pk=contract_pk)
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse(
+            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
+        ),
+    )
 
     editable = False
     context = {}
@@ -742,12 +751,15 @@ def assessment_contracts_details(
                             )
                         )
                     return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={
-                                "contract_pk": str(contract.pk),
-                                "tab": AssessmentContractDetailsTab.CONTRACT.value,
-                            },
+                        add_url_params(
+                            reverse(
+                                "geiq_assessments_views:assessment_contracts_details",
+                                kwargs={
+                                    "contract_pk": str(contract.pk),
+                                    "tab": AssessmentContractDetailsTab.CONTRACT.value,
+                                },
+                            ),
+                            {"back_url": back_url},
                         )
                     )
     elif request.from_institution:
@@ -803,9 +815,12 @@ def assessment_contracts_details(
                         redirect_to_tab = AssessmentContractDetailsTab.EMPLOYEE.value
                 if redirect_to_tab:
                     return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
+                        add_url_params(
+                            reverse(
+                                "geiq_assessments_views:assessment_contracts_details",
+                                kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
+                            ),
+                            {"back_url": back_url},
                         )
                     )
 
@@ -829,9 +844,7 @@ def assessment_contracts_details(
                         contract.save(update_fields=("allowance_refusal_reason", "allowance_refusal_details"))
 
     context |= {
-        "back_url": reverse(
-            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
-        ),
+        "back_url": back_url,
         "assessment": contract.employee.assessment,
         "editable": editable,
         "contract": contract,
@@ -898,9 +911,12 @@ def assessment_contracts_toggle(
                 "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
             )
         return HttpResponseRedirect(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_details",
-                kwargs={"contract_pk": contract.pk, "tab": tab.value},
+            add_url_params(
+                reverse(
+                    "geiq_assessments_views:assessment_contracts_details",
+                    kwargs={"contract_pk": contract.pk, "tab": tab.value},
+                ),
+                {"back_url": get_safe_url(request, "back_url")},
             )
         )
 
@@ -915,6 +931,10 @@ def assessment_contracts_toggle(
     context = {
         "assessment": assessment,
         "contract": contract,
+        # HTMX gives us the URL of the page the switch was toggled from: we pass it (with the active filters of the
+        # contracts list) to the links to the contract details.
+        "current_url": request.htmx.current_url_abs_path
+        or reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk}),
         "editable": True,
         "value": new_value,
         "stats": stats,

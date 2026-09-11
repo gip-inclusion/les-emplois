@@ -35,12 +35,14 @@
             {% if tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and tab != AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <li class="nav-item">
                     {# FIXME(ewen): use span as below #}
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}?back_url={{ back_url|urlencode }}">{{ tab.label }}
                     </a>
                 </li>
             {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and contract.requires_justification %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}?back_url={{ back_url|urlencode }}">
                         <span>{{ tab.label }}</span>
                         {% if not contract.allowance_request_justification_reason %}
                             <i class="ri-error-warning-line text-warning ms-2"></i>
@@ -49,7 +51,8 @@
                 </li>
             {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and request.from_institution and not contract.allowance_granted %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}?back_url={{ back_url|urlencode }}">{{ tab.label }}
                         {% if not contract.allowance_refusal_reason %}<i class="ri-error-warning-line ri-xl text-warning ms-2"></i>{% endif %}
                     </a>
                 </li>
@@ -65,9 +68,9 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                     {% if request.from_employer %}
-                        {% include "geiq_assessments_views/includes/contracts_request_allowance_box_for_geiq.html" with contract=contract csrf_token=csrf_token active_tab=active_tab disabled=contract.employee.assessment.contracts_selection_validated_at MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE only %}
+                        {% include "geiq_assessments_views/includes/contracts_request_allowance_box_for_geiq.html" with contract=contract csrf_token=csrf_token active_tab=active_tab back_url=back_url disabled=contract.employee.assessment.contracts_selection_validated_at MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE only %}
                     {% elif request.from_institution %}
-                        {% include "geiq_assessments_views/includes/contracts_grant_allowance_box_for_institution.html" with contract=contract csrf_token=csrf_token active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
+                        {% include "geiq_assessments_views/includes/contracts_grant_allowance_box_for_institution.html" with contract=contract csrf_token=csrf_token active_tab=active_tab back_url=back_url disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     {% endif %}
                 </div>
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
