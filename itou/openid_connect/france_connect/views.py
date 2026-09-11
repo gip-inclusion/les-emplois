@@ -219,10 +219,11 @@ def france_connect_callback(request):
 
     init_user_nir_from_session(request, user)
 
-    login(request, user)
     # Keep token_data["id_token"] to logout from FC
     request.session[constants.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session.modified = True
+
+    login(request, user)
 
     next_url = reverse("dashboard:index")
     return HttpResponseRedirect(next_url)
