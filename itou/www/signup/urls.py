@@ -1,5 +1,6 @@
 from django.urls import path, re_path
 
+from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.www.signup import views
 
 
@@ -7,7 +8,11 @@ from itou.www.signup import views
 app_name = "signup"
 
 urlpatterns = [
-    path("", views.ChooseUserKindSignupView.as_view(), name="choose_user_kind"),
+    path(
+        "",
+        views.ChooseUserKindSignupView.as_view(extra_context={"contact_form_url": ITOU_CONTACT_FORM_URL}),
+        name="choose_user_kind",
+    ),
     # Job seeker.
     path(
         "job_seeker/start",
