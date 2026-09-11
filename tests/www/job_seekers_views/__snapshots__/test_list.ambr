@@ -4695,7 +4695,7 @@
                       <a class="dropdown-item" href="/eligibility/update/iae/77777777-7777-7777-7777-777777777777?back_url=/job-seekers/list">
                           Valider son éligibilité IAE
                       </a>
-                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777&back_url=%2Fjob-seekers%2Flist" id="introjs-orienter-vers-service-insertion">
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777&back_url=%2Fjob-seekers%2Flist">
                           Orienter vers un service d’insertion
                       </a>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/77777777-7777-7777-7777-777777777777/assignments/create?back_url=/job-seekers/list">
@@ -5832,7 +5832,7 @@
                   <a class="dropdown-item" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">
                       Valider son éligibilité IAE
                   </a>
-                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29" id="introjs-orienter-vers-service-insertion">
+                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                       Orienter vers un service d’insertion
                   </a>
                   <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/22222222-2222-2222-2222-222222222222/assignments/create?back_url=/job-seekers/list-organization">
