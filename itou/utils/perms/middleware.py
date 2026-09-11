@@ -200,7 +200,12 @@ class ItouCurrentOrganizationMiddleware:
                     "/dashboard/activate-pro-connect-account"
                 )  # Allow to access ProConnect activation view
                 and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
-                and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
+                and (
+                    settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
+                    # FT users should really use their own SSO
+                    or user.email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)  # Temp enforcement
+                    or user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX)  # Temp enforcement
+                )
             ):
                 # Add request.path as next param ?
                 return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
