@@ -5,8 +5,8 @@
 
 Détails
 -------------------
-- Prénom : {{ first_name|title }}
-- Nom : {{ last_name|upper }}
-- Adresse e-mail : {{ email }}
+- Prénom : {{ first_name|title }}
+- Nom : {{ last_name|upper }}
+- Adresse e-mail : {{ email }}
 
 {% endblock %}
