@@ -840,7 +840,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "insertion",
     "invitations_views",
     "job_seekers_views",
-    "prescribers",
     "releases/list.html",
     "users/emails",
 )
