@@ -35,6 +35,21 @@ def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_
     assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 
+@pytest.mark.parametrize("email_suffix", ["@pole-emploi.fr", "@francetravail.fr"])
+def test_force_FT_users_to_activate_sso_account(client, pro_connect, settings, email_suffix):
+    settings.FORCE_PRO_CONNECT_LOGIN = False
+    user = PrescriberFactory(
+        identity_provider=IdentityProvider.DJANGO,
+        email="jean.dupond" + email_suffix,
+        membership__organization__france_travail=True,
+    )
+    client.force_login(user)
+    url = reverse("dashboard:index")
+    response = client.get(url, follow=True)
+    activate_pro_connect_account_url = reverse("dashboard:activate_pro_connect_account")
+    assertRedirects(response, activate_pro_connect_account_url)
+
+
 @pytest.mark.parametrize(
     "user_factory,is_redirected",
     [
