@@ -207,8 +207,6 @@ class EmployerFactory(ProfessionalFactory):
 
 
 class LaborInspectorFactory(ProfessionalFactory):
-    identity_provider = IdentityProvider.DJANGO
-
     class Params:
         for_snapshot = factory.Trait(
             first_name="Jeanne",

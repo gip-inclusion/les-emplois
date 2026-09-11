@@ -1050,16 +1050,6 @@
                               Modifier mon profil
                           </a>
                       </li>
-                      <li>
-                          <a class="dropdown-item" href="/accounts/password/change/">
-                              Modifier mon mot de passe
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item" href="/dashboard/edit_user_email">
-                              Modifier mon adresse e-mail
-                          </a>
-                      </li>
                       <li class="dropdown-divider">
                       </li>
                       <li class="dropdown-item position-relative">
@@ -1184,16 +1174,6 @@
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">
                               Modifier mon profil
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item" href="/accounts/password/change/">
-                              Modifier mon mot de passe
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item" href="/dashboard/edit_user_email">
-                              Modifier mon adresse e-mail
                           </a>
                       </li>
                       <li class="dropdown-divider">

@@ -31,7 +31,8 @@ from tests.utils.testing import get_request
         (PrescriberFactory, IdentityProvider.PRO_CONNECT, False),
         (EmployerFactory, IdentityProvider.DJANGO, True),
         (EmployerFactory, IdentityProvider.PRO_CONNECT, False),
-        (LaborInspectorFactory, IdentityProvider.DJANGO, False),
+        (LaborInspectorFactory, IdentityProvider.DJANGO, True),
+        (LaborInspectorFactory, IdentityProvider.PRO_CONNECT, False),
     ],
 )
 def test_redirect_to_pc_activation_view(client, user_factory, identity_provider, is_redirected):

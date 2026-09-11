@@ -109,7 +109,10 @@ def mock_oauth_dance(
     response = client.get(url, data={"code": "123", "state": state})
     # If a expected_redirect_url was provided, check it redirects there
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
-    expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")
+    default_redirect_url = (
+        reverse("dashboard:index") if response.wsgi_request.from_institution else reverse("welcoming_tour:index")
+    )
+    expected = expected_redirect_url or next_url or default_redirect_url
     if expected_failure:
         assert expected_redirect_url is None, "No expected_redirect_url when expecting a failure"
         expected = reverse(

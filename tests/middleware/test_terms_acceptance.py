@@ -6,7 +6,7 @@ from pytest_django.asserts import assertContains, assertRedirects, assertTemplat
 
 from itou.users.enums import IdentityProvider
 from itou.utils.legal_terms import get_latest_terms_datetime
-from tests.users.factories import EmployerFactory, LaborInspectorFactory
+from tests.users.factories import EmployerFactory
 
 
 @pytest.mark.parametrize("never_accepted", [True, False])  # never accepted or outdated acceptance
@@ -59,9 +59,9 @@ def test_middleware_allows_static_public_pages(client, url_name, expected_conten
         "dashboard:edit_user_email",
     ],
 )
-def test_account_pages_are_still_accessible(client, url_name):
-    UserFactory = LaborInspectorFactory if "email" in url_name else EmployerFactory
-    user = UserFactory(terms_accepted_at=None)
+def test_account_pages_are_still_accessible(client, url_name, settings):
+    settings.FORCE_PROCONNECT_LOGIN = False
+    user = EmployerFactory(identity_provider="DJANGO" if "email" in url_name else "PC", terms_accepted_at=None)
     client.force_login(user)
     response = client.get(reverse(url_name))
     assert response.status_code == 200
