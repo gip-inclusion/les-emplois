@@ -16,7 +16,7 @@ from tests.users.factories import (
 )
 
 
-NO_INFO_MARKUP = "<strong>Oups ! Aucune information en vue !</strong>"
+NO_INFO_MARKUP = "<strong>Oups ! Aucune information en vue !</strong>"
 YOUR_ORGA_EMPTY_MARKUP = """<i>Vous n’avez pas encore renseigné d’informations
            <br class="d-none d-lg-inline">
            à propos de votre organisation.</i>"""

@@ -5,9 +5,9 @@ Merci de votre inscription. L'habilitation de votre organisation est maintenant 
 
 *Organisation* :
 
-- Nom : {{ organization.display_name }}
-- SIRET : {{ organization.siret }}
-- Type : {{ organization.kind }}
+- Nom : {{ organization.display_name }}
+- SIRET : {{ organization.siret }}
+- Type : {{ organization.kind }}
 
 Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus.
 
