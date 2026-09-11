@@ -23,10 +23,10 @@ from itou.insertion.enums import MobilizationEventKind
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.jobs.models import Rome
-from itou.metabase.tables import geiq_assessments, mobilization_events
+from itou.metabase.tables import geiq_assessments, job_seeker_assignments, mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, ActionKind, AssignmentEndReason, IdentityProvider
 from itou.utils.db import dictfetchall
 from itou.utils.types import InclusiveDateRange
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -60,7 +60,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 @freeze_time("2023-03-10")
@@ -943,6 +943,81 @@ def test_populate_memberships(snapshot):
                 datetime.date(2023, 2, 2),
             ),
         ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_job_seeker_assignments(snapshot):
+    advisor_assignment = JobSeekerAssignmentFactory(
+        company=CompanyFactory(),
+        last_action_kind=ActionKind.ACCEPT,
+        last_action_at=datetime.datetime(2023, 1, 10, tzinfo=datetime.UTC),
+    )
+    unknown_advisor_assignment = JobSeekerAssignmentFactory(
+        company=CompanyFactory(),
+        assigned_to_unknown_advisor=True,
+        last_action_kind=ActionKind.HIRE,
+        last_action_at=datetime.datetime(2023, 1, 20, tzinfo=datetime.UTC),
+    )
+    ended_assignment = JobSeekerAssignmentFactory(
+        prescriber_organization=PrescriberOrganizationFactory(),
+        last_action_kind=ActionKind.SELF_ASSIGN,
+        last_action_at=datetime.datetime(2023, 1, 30, tzinfo=datetime.UTC),
+        ended_at=datetime.datetime(2023, 2, 1, tzinfo=datetime.UTC),
+        end_reason=AssignmentEndReason.MANUAL,
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="job_seeker_assignments")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {job_seeker_assignments.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": advisor_assignment.pk,
+            "id_candidat": advisor_assignment.job_seeker_id,
+            "id_accompagnateur": advisor_assignment.professional_id,
+            "id_structure": advisor_assignment.company_id,
+            "id_organisation": None,
+            "accompagnateur_non_référencé": False,
+            "dernière_action": ActionKind.ACCEPT.value,
+            "date_dernière_action": datetime.datetime(2023, 1, 10, tzinfo=datetime.UTC),
+            "date_de_création": advisor_assignment.created_at,
+            "date_de_fin": None,
+            "motif_de_fin": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": unknown_advisor_assignment.pk,
+            "id_candidat": unknown_advisor_assignment.job_seeker_id,
+            "id_accompagnateur": unknown_advisor_assignment.professional_id,
+            "id_structure": unknown_advisor_assignment.company_id,
+            "id_organisation": None,
+            "accompagnateur_non_référencé": True,
+            "dernière_action": ActionKind.HIRE.value,
+            "date_dernière_action": datetime.datetime(2023, 1, 20, tzinfo=datetime.UTC),
+            "date_de_création": unknown_advisor_assignment.created_at,
+            "date_de_fin": None,
+            "motif_de_fin": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": ended_assignment.pk,
+            "id_candidat": ended_assignment.job_seeker_id,
+            "id_accompagnateur": ended_assignment.professional_id,
+            "id_structure": None,
+            "id_organisation": ended_assignment.prescriber_organization_id,
+            "accompagnateur_non_référencé": False,
+            "dernière_action": ActionKind.SELF_ASSIGN.value,
+            "date_dernière_action": datetime.datetime(2023, 1, 30, tzinfo=datetime.UTC),
+            "date_de_création": ended_assignment.created_at,
+            "date_de_fin": datetime.datetime(2023, 2, 1, tzinfo=datetime.UTC),
+            "motif_de_fin": AssignmentEndReason.MANUAL.value,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
 
 
 @freeze_time("2023-02-02")

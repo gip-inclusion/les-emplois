@@ -6243,6 +6243,310 @@
     ]),
   })
 # ---
+# name: test_populate_job_seeker_assignments
+  dict({
+    'num_queries': 21,
+    'queries': list([
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "users_jobseekerassignment"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_affectations_candidats_v0"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          CREATE TABLE IF NOT EXISTS "z_new_affectations_candidats_v0" ("id" integer,"id_candidat" integer,"id_accompagnateur" integer,"id_structure" integer,"id_organisation" integer,"accompagnateur_non_référencé" integer,"dernière_action" varchar,"date_dernière_action" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                    "date_de_création" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                                                           "date_de_fin" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                                                                                             "motif_de_fin" varchar,"date_mise_à_jour_metabase" date)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."id" IS \'ID\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."id_candidat" IS \'candidat\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."id_accompagnateur" IS \'accompagnateur\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."id_structure" IS \'entreprise\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."id_organisation" IS \'organisation prescriptrice\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."accompagnateur_non_référencé" IS \'accompagnateur désigné inconnu\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."dernière_action" IS \'dernière action effectuée\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."date_dernière_action" IS \'date de la dernière action\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."date_de_création" IS \'date de création\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."date_de_fin" IS \'date de fin d\'\'accompagnement\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."motif_de_fin" IS \'motif de fin\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_affectations_candidats_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."last_action_at",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason"
+          FROM "users_jobseekerassignment"
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_affectations_candidats_v0" ("id",
+                                                  "id_candidat",
+                                                  "id_accompagnateur",
+                                                  "id_structure",
+                                                  "id_organisation",
+                                                  "accompagnateur_non_référencé",
+                                                  "dernière_action",
+                                                  "date_dernière_action",
+                                                  "date_de_création",
+                                                  "date_de_fin",
+                                                  "motif_de_fin",
+                                                  "date_mise_à_jour_metabase")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_affectations_candidats_v0" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "affectations_candidats_v0" RENAME TO "z_old_affectations_candidats_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_affectations_candidats_v0" RENAME TO "affectations_candidats_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_seeker_assignments[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_affectations_candidats_v0" CASCADE',
+      }),
+    ]),
+  })
+# ---
 # name: test_populate_job_seekers
   dict({
     'num_queries': 75,
