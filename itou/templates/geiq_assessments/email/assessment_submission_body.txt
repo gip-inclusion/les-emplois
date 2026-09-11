@@ -5,7 +5,7 @@ Bonjour,
 
 La structure `{{ assessment.label_geiq_name }}` a transmis son bilan d’exécution sur le site {% brand "de" %}.
 
-Références du dossier :
+Références du dossier :
 
 {{ assessment.label_antenna_names|pluralizefr:"Structure concernée,Structures concernées" }} par la convention :
 {% for antenna_name in assessment.label_antenna_names %}{{ antenna_name }}{% if not forloop.last %}; {% endif %}{% endfor %}

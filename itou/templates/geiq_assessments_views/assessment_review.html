@@ -161,7 +161,7 @@
         function computeBalance() {
             const advanceAmount = cleanAmount(advanceAmountInput.value)
             const grantedAmount = cleanAmount(grantedAmountInput.value)
-            if (!isNaN(advanceAmount) && !isNaN(grantedAmount)) {
+            if (!isNaN(advanceAmount) && !isNaN(grantedAmount)) { // no-typography-rule-check
                 const balance = grantedAmount - advanceAmount
                 const formatter = new Intl.NumberFormat("fr-FR", {
                     style: "currency",

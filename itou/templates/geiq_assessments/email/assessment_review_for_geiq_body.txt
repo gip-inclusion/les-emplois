@@ -17,7 +17,7 @@ Références du dossier :
 
 Vous trouverez ci-dessous le récapitulatif de la décision enregistrée par la {{ assessment.reviewed_by_institution.name }}.
 
-IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
+IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
 Seule la décision officielle émise par la {{ assessment.reviewed_by_institution.name }} pourra confirmer de manière définitive le montant accordé.
 
 Montant total accordé : {{ assessment.granted_amount|format_decimal_euros }}

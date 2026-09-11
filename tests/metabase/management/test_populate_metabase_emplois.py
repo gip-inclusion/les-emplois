@@ -1479,7 +1479,7 @@ def test_populate_geiq_assessments(snapshot):
         reviewed_at=datetime.datetime(2023, 2, 6, tzinfo=datetime.UTC),
         reviewed_by=ddets_membership.user,
         reviewed_by_institution=ddets,
-        review_comment="Bravo !",
+        review_comment="Bravo !",
         final_reviewed_at=datetime.datetime(2023, 2, 7, tzinfo=datetime.UTC),
         final_reviewed_by=dreets_membership.user,
         final_reviewed_by_institution=dreets,
