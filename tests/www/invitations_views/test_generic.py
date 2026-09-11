@@ -368,10 +368,7 @@ class BaseTestAcceptInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
-        if self.org_name == "institution":
-            assertRedirects(response, reverse("dashboard:index"))
-        else:
-            assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
+        assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     def test_auto_accept_invitation__django_login(self, client, mailoutbox):
@@ -392,10 +389,7 @@ class BaseTestAcceptInvitation:
             "password": DEFAULT_PASSWORD,
         }
         response = client.post(login_url, data=form_data, follow=True)
-        if self.org_name == "institution":
-            assertRedirects(response, reverse("dashboard:index"))
-        else:
-            assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
+        assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     def test_existing_user_has_bad_kind(self, client):

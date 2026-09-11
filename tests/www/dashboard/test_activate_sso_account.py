@@ -10,7 +10,7 @@ from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 
 
-@pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory])
+@pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory])
 def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_factory):
     user = user_factory(
         identity_provider=IdentityProvider.DJANGO,

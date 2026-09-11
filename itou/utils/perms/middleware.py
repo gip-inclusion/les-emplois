@@ -195,7 +195,7 @@ class ItouCurrentOrganizationMiddleware:
             # Force ProConnect
             if (
                 user.identity_provider != IdentityProvider.PRO_CONNECT
-                and (request.from_employer or request.from_prescriber)
+                and (request.from_employer or request.from_prescriber or request.from_institution)
                 and not request.path.startswith(
                     "/dashboard/activate-pro-connect-account"
                 )  # Allow to access ProConnect activation view
