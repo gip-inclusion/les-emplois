@@ -838,7 +838,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "geiq_assessments/email",
     "geiq_assessments_views",
     "insertion",
-    "invitations_views",
     "releases/list.html",
     "users/emails",
 )
