@@ -62,7 +62,7 @@ class ItouLoginForm(LoginForm):
         super().__init__(*args, **kwargs)
         self.fields["password"].widget.attrs["placeholder"] = "**********"
         self.fields["password"].help_text = format_html(
-            '<a href="{}" class="btn-link fs-sm">Mot de passe oublié ?</a>',
+            '<a href="{}" class="btn-link fs-sm">Mot de passe oublié ?</a>',
             reverse("account_reset_password"),
         )
         self.fields["login"].label = "Adresse e-mail"

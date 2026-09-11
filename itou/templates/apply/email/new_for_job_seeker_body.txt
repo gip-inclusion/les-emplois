@@ -13,7 +13,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 
 {% endif %}
 
-*Nom de la structure* : {{ job_application.to_company.display_name }}
+*Nom de la structure* : {{ job_application.to_company.display_name }}
 
 {% if job_application.message %}
 
@@ -42,13 +42,13 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate %}
 - Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}{% endif %}
 {% if job_application.resume_id %}
-- CV en ligne : {{ job_application.resume_link }}
+- CV en ligne : {{ job_application.resume_link }}
 {% endif %}
 
 {% if job_application.is_sent_by_proxy %}
 --------
 
-*Candidature envoyée par* :
+*Candidature envoyée par* :
 
 - {{ job_application.sender.get_inverted_full_name }}{% if job_application.sender_prescriber_organization %}
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
@@ -56,7 +56,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 {% endif %}
 
 ---
-Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}
-Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
+Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}
+Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
 
 {% endblock body %}

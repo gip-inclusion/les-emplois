@@ -47,7 +47,7 @@
                       </div>
                       <div class="form-text" id="id_password_helptext">
                           <a class="btn-link fs-sm" href="/accounts/password/reset/">
-                              Mot de passe oublié ?
+                              Mot de passe oublié ?
                           </a>
                       </div>
                   </div>
@@ -117,7 +117,7 @@
                   </div>
                   <div class="form-text" id="id_password_helptext">
                       <a class="btn-link fs-sm" href="/accounts/password/reset/">
-                          Mot de passe oublié ?
+                          Mot de passe oublié ?
                       </a>
                   </div>
               </div>
@@ -271,7 +271,7 @@
                       </div>
                       <div class="form-text" id="id_password_helptext">
                           <a class="btn-link fs-sm" href="/accounts/password/reset/">
-                              Mot de passe oublié ?
+                              Mot de passe oublié ?
                           </a>
                       </div>
                   </div>
@@ -341,7 +341,7 @@
                   </div>
                   <div class="form-text" id="id_password_helptext">
                       <a class="btn-link fs-sm" href="/accounts/password/reset/">
-                          Mot de passe oublié ?
+                          Mot de passe oublié ?
                       </a>
                   </div>
               </div>
