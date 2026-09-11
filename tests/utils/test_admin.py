@@ -13,7 +13,7 @@ from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from itou.antivirus.models import Scan
-from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
+from itou.api.models import CompanyToken, DepartmentToken, DoraToken, ServiceToken
 from itou.asp.models import Department
 from itou.companies.models import SiaeACIConvergencePHC
 from itou.emails.models import Email
@@ -90,6 +90,7 @@ def test_all_admin(admin_client, mocker, subtests):
     SiaeACIConvergencePHC.objects.create(siret="12345678900012")
     ServiceToken.objects.create(service="dora")
     DepartmentToken.objects.create(department="01", label="Token tests département 01")
+    DoraToken.objects.create(label="Test")
     Scan.objects.create(file=FileFactory(), clamav_signature="toto")
     Department.objects.create(code="33", name="Gironde", start_date=timezone.localdate())
     Token.objects.create(user=admin_user)
