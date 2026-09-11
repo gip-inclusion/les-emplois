@@ -19,6 +19,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 from itoutils.urls import add_url_params
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm, ProlongationDerogationForm
@@ -182,6 +183,7 @@ def manually_refuse_approval(
     return render(request, template_name, context)
 
 
+@require_POST
 def terminate_approval(request, model_admin, approval_id):
     opts = model_admin.model._meta
     app_label = opts.app_label
