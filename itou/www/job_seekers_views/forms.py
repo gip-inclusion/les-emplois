@@ -114,7 +114,7 @@ class FilterForm(forms.Form):
         )
         if request.from_authorized_prescriber or self.company:
             self.fields["approval_ending_soon"] = forms.BooleanField(
-                label="PASS IAE bientôt expiré",
+                label="PASS IAE bientôt expiré",
                 required=False,
                 help_text=f"Dans les {APPROVAL_ENDING_SOON_DAYS} prochains jours",
             )

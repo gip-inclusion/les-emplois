@@ -134,7 +134,7 @@ class TestProcessViews:
     IAE_ELIGIBILITY_NO_CRITERIA_MENTION = "Le prescripteur habilité n’a pas renseigné de critères."
     IAE_ELIGIBILITY_WITH_CRITERIA_MENTION = (
         "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic "
-        "ayant permis la délivrance d’un PASS IAE"
+        "ayant permis la délivrance d’un PASS IAE"
     )
     IAE_VALID_ELIGIBILITY_BADGE = """
         <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
