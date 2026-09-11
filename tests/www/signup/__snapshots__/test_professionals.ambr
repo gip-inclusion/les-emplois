@@ -220,11 +220,14 @@
                               </button>
                               <div class="c-info__detail collapse" id="collapseInstitution">
                                   <p class="mb-0">
-                                      DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour rejoindre une institution, un membre existant doit vous ajouter directement. Il n'est pas possible de s'inscrire en autonomie via ce formulaire.
+                                      DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour accéder à votre espace de travail, demandez à un membre de l’organisme concerné de vous ajouter.
                                   </p>
-                                  <a aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)" class="has-external-link" href="" rel="noopener" target="_blank">
-                                      En savoir plus sur les institutions partenaires
-                                  </a>
+                                  <p>
+                                      Si vous avez besoin d'aide,
+                                      <a aria-label="contactez-nous (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                                          contactez-nous
+                                      </a>
+                                  </p>
                               </div>
                           </div>
                           <div class="row">
