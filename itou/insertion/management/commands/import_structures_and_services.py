@@ -338,6 +338,9 @@ class Command(BaseCommand):
 
         structure.opening_hours = data["horaires_accueil"] or ""
 
+        structure.accessibilite_lieu = data["accessibilite_lieu"] or ""
+        self._void_if_max_len(structure, "accessibilite_lieu")
+
         self._fill_geolocation_from_api_data(structure, data)
 
         structure.updated_on = data["date_maj"]
