@@ -18,8 +18,7 @@ def details_markup(expected_url):
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
-                  data-matomo-option="services-search-from-details-general"
-                  id="introjs-orienter-vers-service-insertion">
+                  data-matomo-option="services-search-from-details-general">
                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
                    <span>Orienter vers un service d’insertion</span>
                </a>"""
@@ -35,8 +34,7 @@ def job_applications_markup(expected_url):
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
-                  data-matomo-option="services-search-from-details-job-applications"
-                  id="introjs-orienter-vers-service-insertion">
+                  data-matomo-option="services-search-from-details-job-applications">
                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
                    <span>Orienter vers un service d’insertion</span>
                </a>"""
@@ -52,8 +50,7 @@ def list_markup(expected_url):
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
-                  data-matomo-option="services-search-from-list"
-                  id="introjs-orienter-vers-service-insertion">
+                  data-matomo-option="services-search-from-list">
                 Orienter vers un service d’insertion
             </a>"""
 

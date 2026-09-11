@@ -34,7 +34,7 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-assignment-edit" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2F7614fc4b-aef9-4694-ab17-12324300180a%2Fassignments%2F[PK of Assignment]%2Fedit&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-assignment-edit" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2F7614fc4b-aef9-4694-ab17-12324300180a%2Fassignments%2F[PK of Assignment]%2Fedit&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
                                   <span>
