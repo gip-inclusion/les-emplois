@@ -452,27 +452,6 @@ class BaseTestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         assertContains(response, "Lien d'activation déjà accepté", html=True)
 
-
-class DjangoSignupTestAcceptInvitation:
-    def test_new_user__django_signup(self, client, mailoutbox):
-        invitation = self.invitation_factory()
-        form_data = {
-            "first_name": "Joe",
-            "last_name": "Dalton",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        terms_page_response = client.post(invitation.acceptance_link, data=form_data, follow=True)
-        response = accept_legal_terms(client, terms_page_response)
-        assertRedirects(response, reverse("dashboard:index"))
-
-        user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(
-            response, user, invitation, mailoutbox, messages_response=terms_page_response
-        )
-
-
-class ProConnectSignupTestAcceptInvitation:
     def test_new_user__ProConnect_signup(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
@@ -499,7 +478,10 @@ class ProConnectSignupTestAcceptInvitation:
         )
         terms_page_response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, terms_page_response)
-        assertRedirects(response, reverse("welcoming_tour:index"))
+        redirect_url = (
+            reverse("dashboard:index") if self.org_name == "institution" else reverse("welcoming_tour:index")
+        )
+        assertRedirects(response, redirect_url)
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(
@@ -607,15 +589,15 @@ class ProConnectSignupTestAcceptInvitation:
         assert not User.objects.filter(email=invitation.email).exists()
 
 
-class TestAcceptInstitutionInvitation(InstitutionMixin, BaseTestAcceptInvitation, DjangoSignupTestAcceptInvitation):
+class TestAcceptInstitutionInvitation(InstitutionMixin, BaseTestAcceptInvitation):
     pass
 
 
-class TestAcceptPrescriberInvitation(PrescriberMixin, BaseTestAcceptInvitation, ProConnectSignupTestAcceptInvitation):
+class TestAcceptPrescriberInvitation(PrescriberMixin, BaseTestAcceptInvitation):
     pass
 
 
-class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProConnectSignupTestAcceptInvitation):
+class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation):
     def test_existing_user__already_belongs_to_another_inactive_company(self, client, mailoutbox):
         """
         An inactive SIAE user (i.e. attached to a single inactive SIAE)

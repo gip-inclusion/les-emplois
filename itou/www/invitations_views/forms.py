@@ -1,11 +1,8 @@
-from allauth.account.adapter import get_adapter
-from allauth.account.forms import SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import UserKind
 from itou.users.forms import validate_francetravail_email
 from itou.users.models import User
 
@@ -199,49 +196,3 @@ class BaseLaborInspectorInvitationFormSet(BaseInvitationFormSet):
         # otherwise `self.queryset` will have no effect.
         # https://code.djangoproject.com/ticket/31879
         self.forms[0].empty_permitted = False
-
-
-###############################################################
-######################### Signup forms ########################
-###############################################################
-
-
-class NewLaborInspectorInvitationForm(SignupForm):
-    """
-    Signup form shown when a user accepts an invitation.
-    """
-
-    first_name = forms.CharField(
-        label="Prénom",
-        max_length=User._meta.get_field("first_name").max_length,
-        required=True,
-        strip=True,
-    )
-
-    last_name = forms.CharField(
-        label="Nom",
-        max_length=User._meta.get_field("last_name").max_length,
-        required=True,
-        strip=True,
-    )
-
-    class Meta:
-        fields = ["first_name", "last_name", "password1", "password2"]
-
-    def __init__(self, invitation, *args, **kwargs):
-        # Do not let a guest change his email when signing up.
-        self.email = invitation.email
-        self.invitation = invitation
-        super().__init__(*args, **kwargs)
-        self.fields.pop("email")
-        self.fields["first_name"].initial = invitation.first_name
-        self.fields["last_name"].initial = invitation.last_name
-
-    def save(self, request):
-        self.cleaned_data["email"] = self.email
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        get_adapter().stash_verified_email(request, self.email)
-        self.user_kind = UserKind.PROFESSIONAL  # user.kind is set in allauth UserAdapter override
-        return super().save(request)
