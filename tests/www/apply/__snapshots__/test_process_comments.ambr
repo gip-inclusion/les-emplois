@@ -418,7 +418,7 @@
                                       <h3 class="mb-0">
                                           Dernier accompagnateur
                                       </h3>
-                                      <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                      <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                           Voir tout
                                       </a>
                                   </div>
