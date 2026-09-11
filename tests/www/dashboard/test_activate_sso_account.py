@@ -37,7 +37,8 @@ def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_
 
 @pytest.mark.parametrize("email_suffix", ["@pole-emploi.fr", "@francetravail.fr"])
 def test_force_FT_users_to_activate_sso_account(client, pro_connect, settings, email_suffix):
-    settings.FORCE_PRO_CONNECT_LOGIN = False
+    # even without the settings
+    settings.FORCE_PROCONNECT_LOGIN = False
     user = PrescriberFactory(
         identity_provider=IdentityProvider.DJANGO,
         email="jean.dupond" + email_suffix,
