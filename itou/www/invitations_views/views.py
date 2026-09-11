@@ -29,7 +29,6 @@ from itou.www.invitations_views.forms import (
     BasePrescriberWithOrgInvitationFormSet,
     EmployerInvitationForm,
     LaborInspectorInvitationForm,
-    NewLaborInspectorInvitationForm,
     PrescriberWithOrgInvitationForm,
 )
 from itou.www.invitations_views.helpers import handle_invitation
@@ -38,32 +37,6 @@ from itou.www.signup import forms as signup_forms
 
 
 MAX_PENDING_INVITATION = 50
-
-
-def handle_invited_user_registration_with_django(request, invitation, invitation_type):
-    # This view is now only used for labor inspectors
-    form = NewLaborInspectorInvitationForm(data=request.POST or None, invitation=invitation)
-    if form.is_valid():
-        user = form.save(request)
-        get_adapter().login(request, user)
-        return redirect(invitation.acceptance_url_for_existing_user)
-    context = {"form": form, "invitation": invitation}
-    return render(request, "invitations_views/new_user.html", context=context)
-
-
-def handle_invited_user_registration_with_pro_connect(request, invitation, invitation_type):
-    query = {
-        "user_email": invitation.email,
-        "channel": ProConnectChannel.INVITATION.value,
-        "previous_url": request.get_full_path(),
-        "next_url": invitation.acceptance_url_for_existing_user,
-    }
-    pro_connect_url = reverse("pro_connect:authorize", query=query) if settings.PRO_CONNECT_BASE_URL else None
-    context = {
-        "pro_connect_url": pro_connect_url,
-        "invitation": invitation,
-    }
-    return render(request, "invitations_views/new_pro_connect_user.html", context=context)
 
 
 @login_not_required
@@ -106,13 +79,18 @@ def new_user(request, invitation_type, invitation_id):
             )
         )
 
-    # A new user should be created before joining
-    handle_registration = {
-        KIND_PRESCRIBER: handle_invited_user_registration_with_pro_connect,
-        KIND_EMPLOYER: handle_invited_user_registration_with_pro_connect,
-        KIND_LABOR_INSPECTOR: handle_invited_user_registration_with_django,
-    }[invitation_type]
-    return handle_registration(request, invitation, invitation_type)
+    query = {
+        "user_email": invitation.email,
+        "channel": ProConnectChannel.INVITATION.value,
+        "previous_url": request.get_full_path(),
+        "next_url": invitation.acceptance_url_for_existing_user,
+    }
+    pro_connect_url = reverse("pro_connect:authorize", query=query) if settings.PRO_CONNECT_BASE_URL else None
+    context = {
+        "pro_connect_url": pro_connect_url,
+        "invitation": invitation,
+    }
+    return render(request, "invitations_views/new_pro_connect_user.html", context=context)
 
 
 @bypass_terms_acceptance
