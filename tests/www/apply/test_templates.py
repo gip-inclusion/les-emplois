@@ -32,7 +32,7 @@ CERTIFIED_HELP_TEXT = "En savoir plus sur les badges de certification"
 def situation_tooltip_text(kind):
     return (
         "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic"
-        + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
+        + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
         + ", elle a peut-être changé depuis cette date."
     )
 

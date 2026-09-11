@@ -843,8 +843,8 @@ class TestLastAdvisor:
                 Ajoutez votre intervention
             </a>
         """
-        no_previous_assignment_text = "Vous intervenez sur le parcours de cet usager ?"
-        previous_assignment_text = "Vous intervenez de nouveau sur le parcours de cet usager ?"
+        no_previous_assignment_text = "Vous intervenez sur le parcours de cet usager ?"
+        previous_assignment_text = "Vous intervenez de nouveau sur le parcours de cet usager ?"
         edit_assignment_url = (
             reverse(
                 "job_seekers_views:edit_assignment",

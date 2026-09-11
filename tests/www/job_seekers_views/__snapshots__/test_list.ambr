@@ -89,7 +89,7 @@
                           <div class="form-check">
                               <input class="form-check-input" data-emplois-sync-with="id_approval_ending_soon" id="id_approval_ending_soon-offcanvas" name="approval_ending_soon" type="checkbox"/>
                               <label class="form-check-label" for="id_approval_ending_soon-offcanvas">
-                                  PASS IAE bientôt expiré
+                                  PASS IAE bientôt expiré
                               </label>
                           </div>
                       </div>
@@ -263,7 +263,7 @@
                           <div class="form-check">
                               <input class="form-check-input" data-emplois-sync-with="id_approval_ending_soon" id="id_approval_ending_soon-offcanvas" name="approval_ending_soon" type="checkbox"/>
                               <label class="form-check-label" for="id_approval_ending_soon-offcanvas">
-                                  PASS IAE bientôt expiré
+                                  PASS IAE bientôt expiré
                               </label>
                           </div>
                       </div>
@@ -972,7 +972,7 @@
                       <div class="form-check">
                           <input aria-describedby="id_approval_ending_soon_helptext" class="form-check-input is-valid" id="id_approval_ending_soon" name="approval_ending_soon" type="checkbox"/>
                           <label class="form-check-label" for="id_approval_ending_soon">
-                              PASS IAE bientôt expiré
+                              PASS IAE bientôt expiré
                           </label>
                           <div class="form-text" id="id_approval_ending_soon_helptext">
                               Dans les 90 prochains jours

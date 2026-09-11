@@ -2221,7 +2221,7 @@
           <div class="c-box--accompagnateur__detail">
               <hr class="mt-4 mb-3"/>
               <p class="mb-0">
-                  Vous intervenez sur le parcours de cet usager ?
+                  Vous intervenez sur le parcours de cet usager ?
                   <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/[JobSeeker PublicID]/assignments/create?back_url=/job-seekers/details/[JobSeeker PublicID]">
                       Ajoutez votre intervention
                   </a>
@@ -2286,7 +2286,7 @@
           <div class="c-box--accompagnateur__detail">
               <hr class="mt-4 mb-3"/>
               <p class="mb-0">
-                  Vous intervenez sur le parcours de cet usager ?
+                  Vous intervenez sur le parcours de cet usager ?
                   <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/apply/11111111-1111-1111-1111-111111111111/jobseeker/details">
                       Ajoutez votre intervention
                   </a>
@@ -2394,7 +2394,7 @@
           <div class="c-box--accompagnateur__detail">
               <hr class="mt-4 mb-3"/>
               <p class="mb-0">
-                  Vous intervenez sur le parcours de cet usager ?
+                  Vous intervenez sur le parcours de cet usager ?
                   <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/[JobSeeker PublicID]/assignments/create?back_url=/job-seekers/details/[JobSeeker PublicID]">
                       Ajoutez votre intervention
                   </a>
@@ -3215,7 +3215,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -3481,7 +3481,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -3525,7 +3525,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -3799,7 +3799,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -4079,7 +4079,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -4173,7 +4173,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -4289,7 +4289,7 @@
                                       <div class="col">
                                           <p class="mb-2">
                                               <strong>
-                                                  Périmètre de suivi : Accès à toutes les candidatures
+                                                  Périmètre de suivi : Accès à toutes les candidatures
                                               </strong>
                                           </p>
                                           <p>
@@ -5982,7 +5982,7 @@
                                       <div class="col">
                                           <p class="mb-2">
                                               <strong>
-                                                  Périmètre de suivi : Accès à toutes les candidatures
+                                                  Périmètre de suivi : Accès à toutes les candidatures
                                               </strong>
                                           </p>
                                           <p>
@@ -7052,7 +7052,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -7381,7 +7381,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -7643,7 +7643,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -7911,7 +7911,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -7960,7 +7960,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -8240,7 +8240,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -8289,7 +8289,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -8551,7 +8551,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -8877,7 +8877,7 @@
                                               <div class="c-box--accompagnateur__detail">
                                                   <hr class="mt-4 mb-3"/>
                                                   <p class="mb-0">
-                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      Vous intervenez sur le parcours de cet usager ?
                                                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                           Ajoutez votre intervention
                                                       </a>
@@ -10098,7 +10098,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
