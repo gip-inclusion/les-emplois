@@ -82,6 +82,12 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     )
     assert Structure.objects.get(uid="emplois-de-linclusion--null").opening_hours == ""
 
+    assert (
+        Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd").accessibilite_lieu
+        == "https://acceslibre.beta.gouv.fr/app/paris-75056/a/plateforme-de-linclusion/erp/plateforme-de-linclusion/"
+    )
+    assert Structure.objects.get(uid="emplois-de-linclusion--null").accessibilite_lieu == ""
+
     assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").is_orientable_with_form is False
     assert Service.objects.get(uid="mission-locale--with-mobilization-link").is_orientable_with_form is False
     assert Service.objects.get(uid="dora--blacklisted-service").is_orientable_with_form is False

@@ -145,6 +145,11 @@ class Structure(GeolocatedAddressMixin, models.Model):
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
+    accessibilite_lieu = models.URLField(
+        verbose_name="accessibilité du lieu",
+        blank=True,
+        max_length=2000,
+    )
 
     reseaux_porteurs = models.ManyToManyField(
         verbose_name="réseaux porteurs",
