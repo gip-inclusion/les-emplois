@@ -53,13 +53,13 @@ def pager(queryset, page, items_per_page=settings.PAGE_SIZE_SMALL, pages_num=10)
 
     try:
         page = int(page)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         page = 1
 
     total_pages = paginator.num_pages
 
     try:
         return paginator.page(page)
-    except (EmptyPage, InvalidPage):
+    except EmptyPage, InvalidPage:
         # If page request is out of range, deliver last page of results.
         return paginator.page(total_pages)

@@ -105,7 +105,7 @@ def formatfloat_with_unit(number, unit):
 def format_int_euros(number):
     try:
         number = int(number)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return "-"
     number_str = f"{number:_}".replace("_", " ")
     return f"{number_str} €"

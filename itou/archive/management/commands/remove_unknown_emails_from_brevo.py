@@ -18,7 +18,7 @@ def modified_before(contact, cutoff_date):
 
     try:
         return datetime.fromisoformat(date_str) < cutoff_date
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return False
 
 

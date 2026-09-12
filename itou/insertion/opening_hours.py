@@ -170,5 +170,5 @@ def format_osm_hours(value: str) -> FormattedOpeningHours | None:
             for day_idx in sorted(schedule.keys())
         ]
         return {"entries": entries, "has_ph_off": has_ph_off, "comments": comments}
-    except (KeyError, ValueError):
+    except KeyError, ValueError:
         return None
