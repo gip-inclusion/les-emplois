@@ -176,7 +176,10 @@ class ItouCurrentOrganizationMiddleware:
                 login_verify_otp_url = reverse("otp_views:verify_otp")
                 login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
                 if get_user_devices(user):
-                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
+                    if request.path not in (
+                        login_verify_otp_url,
+                        login_with_backup_code_url,
+                    ) and not request.path.startswith("/otp/reset-request/"):
                         return HttpResponseRedirect(
                             add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
                         )

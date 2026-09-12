@@ -67,6 +67,11 @@
       'model': 'approvals.Suspension',
     }),
     dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'audit_trail.AuditTrail',
+    }),
+    dict({
       'field': 'created_by',
       'hidden': False,
       'model': 'companies.Company',
@@ -182,6 +187,11 @@
       'model': 'job_applications.JobApplicationTransitionLog',
     }),
     dict({
+      'field': 'actor',
+      'hidden': True,
+      'model': 'otp.ResetRequestTransitionLog',
+    }),
+    dict({
       'field': 'updated_by',
       'hidden': False,
       'model': 'prescribers.PrescriberMembership',
@@ -289,6 +299,11 @@
       'field': 'user',
       'hidden': False,
       'model': 'otp.ItouTOTPDevice',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'otp.ResetRequest',
     }),
     dict({
       'field': 'user',

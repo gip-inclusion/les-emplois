@@ -4,7 +4,6 @@ from django.db import transaction
 from itou.companies.models import CompanyMembership
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.prescribers.models import PrescriberMembership
-from itou.utils.emails import get_email_message
 
 
 FAKE_DEVICE_MODEL = "fake-for-external-totp-device"
@@ -58,16 +57,6 @@ def create_otp_backup_code(user) -> str:
     return clear_code
 
 
-def notify_backup_code_has_been_used(user):
-    email = get_email_message(
-        to=[user.email],
-        context={"user": user},
-        subject="common/emails/used_otp_backup_code_subject.txt",
-        body="common/emails/used_otp_backup_code_body.txt",
-    )
-    email.send()
-
-
 def user_is_concerned_by_otp(user):
     """Whether 2FA applies to this user, regardless of whether they have already
     verified in the current session (unlike `require_otp`, which short-circuits on
@@ -109,7 +98,8 @@ def require_otp(user):
     if not user.is_authenticated:
         return False
 
-    if user.is_verified():  # user has already authenticated with MFA
+    # openid_connect can connect users from models but is_verified is set by otp middleware
+    if hasattr(user, "is_verified") and user.is_verified():  # user has already authenticated with MFA
         return False
 
     if getattr(user, "is_hijacked", False):

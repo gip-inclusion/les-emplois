@@ -1,0 +1,78 @@
+import datetime
+
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
+
+class AuditTrailEventType(models.TextChoices):
+    PARTIAL_LOG_IN = "PARTIAL_LOG_IN", "L’utilisateur s’identifie (via un mot de passe ou un IDP)"
+    LOG_IN = "LOG_IN", "L’utilisateur est connecté (2FA validé le cas échéant)"
+    SECOND_FACTOR_RESET_REQUEST = "2FA_RESET_REQUEST", "Demande de réinitialisation du 2FA"
+
+
+class AuditTrailManager(models.Manager):
+    def cleanup(self):
+        return self.filter(timestamp__lt=timezone.now() - settings.AUDIT_TRAIL_STORAGE_DURATION).delete()
+
+    def create(self, event_type: AuditTrailEventType, request, user=None, data: dict = None) -> None:
+        """If user is not explicitly given, it's taken from request.user."""
+        return super().create(
+            event_type=event_type,
+            user=user or request.user,
+            ip=request.META.get("REMOTE_ADDR"),  # May not exist in request mocks
+            browser_id=getattr(request, "browser_id", None),  # May not exist in request mocks
+            data=data,
+        )
+
+
+class AuditTrail(models.Model):
+    class Meta:
+        indexes = (models.Index(fields=("timestamp",)),)
+
+    timestamp = models.DateTimeField("horodatage de l’évènement", auto_now_add=True)
+    event_type = models.CharField("type de l’évènement", choices=AuditTrailEventType.choices)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="utilisateur",
+        related_name="+",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    ip = models.GenericIPAddressField("adresse IP", null=True)
+    browser_id = models.CharField("browser ID", null=True)
+    data = models.JSONField("métadonnées", null=True)
+
+    objects = AuditTrailManager()
+
+    def credibility(self) -> float:
+        """Measure the credibility of this event according to the past events.
+
+        Gives a value between 0 (the event does not looks legit
+        according to past events), and 1 (the event looks legit).
+
+        Consider > 0.5 to be OK, < 0.5 to be suspicious.
+        """
+        trail = AuditTrail.objects.filter(
+            event_type=AuditTrailEventType.LOG_IN,
+            user=self.user,
+            timestamp__lt=self.timestamp - datetime.timedelta(days=1),
+        )
+        known_browser_ids = {event.browser_id for event in trail}
+        known_ips = {event.ip for event in trail}
+
+        browser_is_known = self.browser_id in known_browser_ids
+        ip_is_known = self.ip in known_ips
+        match browser_is_known, ip_is_known:
+            case True, True:
+                return 1
+            case True, False:
+                return 0.9
+            case False, True:
+                return 0.6
+            case _:
+                return 0
+
+    @property
+    def is_suspicious(self) -> bool:
+        return self.credibility() < 0.5
