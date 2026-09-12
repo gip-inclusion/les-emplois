@@ -15,7 +15,7 @@ from django.utils.html import format_html
 from django.utils.http import urlencode
 from itoutils.urls import add_url_params
 
-from itou.external_data.tasks import huey_import_user_pe_data
+from itou.external_data.tasks import huey_import_user_ft_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.ft_connect import constants
 from itou.openid_connect.ft_connect.models import FranceTravailConnectState, FranceTravailConnectUserData
@@ -85,8 +85,8 @@ def ft_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
-    pe_state = FranceTravailConnectState.get_from_state(state)
-    if not pe_state or not pe_state.is_valid():
+    ft_state = FranceTravailConnectState.get_from_state(state)
+    if not ft_state or not ft_state.is_valid():
         error_msg = (
             f"Le paramètre « state » fourni par {IdentityProvider.FT_CONNECT.label} et nécessaire à votre "
             "authentification n’est pas valide."
@@ -134,7 +134,7 @@ def ft_connect_callback(request):
         error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
         logger.error("FT Connect id_token decode error: %s", e)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
-    if id_token_content.get("nonce") != pe_state.nonce:
+    if id_token_content.get("nonce") != ft_state.nonce:
         error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
         logger.error("FT Connect id_token nonce mismatch")
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
@@ -188,7 +188,7 @@ def ft_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
-        pe_user_data = FranceTravailConnectUserData.from_user_info(user_data)
+        ft_user_data = FranceTravailConnectUserData.from_user_info(user_data)
     except KeyError as e:
         if "email" in e.args:
             return HttpResponseRedirect(reverse("ft_connect:no_email"))
@@ -197,7 +197,7 @@ def ft_connect_callback(request):
 
     try:
         # At this step, we can update the user's fields in DB and create a session if required
-        user, _ = pe_user_data.create_or_update_user()
+        user, _ = ft_user_data.create_or_update_user()
     except InactiveUserException as e:
         logger.info("FT Connect login attempt with inactive user: %s", e.user)
         return _redirect_to_job_seeker_login_on_error(
@@ -233,7 +233,7 @@ def ft_connect_callback(request):
     # Fetch external data if birthdate or address is missing
     if not user.jobseeker_profile.birthdate or not user.address_on_one_line:
         triggers_context = triggers.get_current_context() or {}
-        huey_import_user_pe_data(user, access_token, triggers_context=triggers_context)
+        huey_import_user_ft_data(user, access_token, triggers_context=triggers_context)
 
     login(request, user)
     # Keep token_data["id_token"] to logout from France Travail Connect

@@ -120,7 +120,7 @@ def mock_oauth_dance(
     state = FranceTravailConnectState.save_state(
         nonce=id_token_nonce if matching_nonces else crypto.get_random_string(length=12)
     )
-    url = reverse("pe_connect:callback")
+    url = reverse("ft_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
@@ -321,7 +321,7 @@ class TestPoleEmploiConnect:
         with triggers.fake_context():
             user.jobseeker_profile.save()
 
-        # Don't call import_user_pe_data on second login (and don't update user data)
+        # Don't call import_user_ft_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == datetime.date(2001, 1, 1)

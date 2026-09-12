@@ -85,7 +85,7 @@ def _get_address(token):
 #  Public
 
 
-def import_user_pe_data(
+def import_user_ft_data(
     user,
     token,
     triggers_context=None,
