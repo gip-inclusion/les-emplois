@@ -3,7 +3,6 @@
 {% load format_filters %}
 {% load markdownify %}
 {% load matomo %}
-{% load str_filters %}
 {% load url_add_query %}
 
 
@@ -129,61 +128,194 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                {# Service information card #}
                 <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box mb-3 mb-md-4">
-                        {% if service.average_orientation_response_delay_days is not None %}
-                            <h2 class="h3 mb-2">Informations du service</h2>
-                            {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
-
+                        <h2 class="h3">Présentation du service</h2>
+                        {% if service.description|length > 200 %}
+                            <div class="collapse show has-no-transition" id="collapse-description-collapsed">
+                                <p class="mb-0">{{ service.description|truncatechars:200|markdownify }}</p>
+                                <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-description-collapsed, #collapse-description-expanded"
+                                        aria-expanded="true"
+                                        aria-controls="collapse-description-collapsed collapse-description-expanded">
+                                    Lire la suite
+                                </button>
+                            </div>
+                            <div class="collapse has-no-transition" id="collapse-description-expanded">
+                                <div class="mb-0">{{ service.description|markdownify }}</div>
+                            </div>
                         {% else %}
-                            <h2 class="h3">Informations du service</h2>
+                            <p class="mb-0">{{ service.description|markdownify }}</p>
                         {% endif %}
-
-                        {% if service.description_short %}
-                            <p>{{ service.description_short }}</p>
-                        {% endif %}
+                    </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Type de service</h2>
                         <ul class="list-data">
+                            {% if formatted_categories %}
+                                <li>
+                                    <small>Thématiques et besoins associés</small>
+                                    <div>
+                                        {% for category_label, subcategory_label in formatted_categories %}
+                                            <div><strong>{{ category_label }}</strong> : {{ subcategory_label }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            {% endif %}
                             {% if service.kind %}
                                 <li>
                                     <small>Type de service</small>
                                     <strong>{{ service.kind.label }}</strong>
                                 </li>
                             {% endif %}
-                            {% if service.publics.exists %}
+                            {% if service.extra and service.extra.funding_labels %}
                                 <li>
-                                    <small> Public concerné
-                                        {% if service.publics_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
-                                        {% endif %}
-                                    </small>
-                                    <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                    <small>Service financé par</small>
+                                    <strong>{{ service.extra.funding_labels|join:", " }}</strong>
                                 </li>
                             {% endif %}
-
+                        </ul>
+                    </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Eligibilité au service</h2>
+                        <ul class="list-data">
+                            {% if service.publics.exists or service.publics_details %}
+                                <li>
+                                    <small>Public concerné</small>
+                                    <div>
+                                        {% if service.publics.exists %}
+                                            <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                        {% endif %}
+                                        {% if service.publics_details %}
+                                            <p><small class="mb-0">{{ service.publics_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if service.prerequisites %}
+                                <li>
+                                    <small>Conditions d'accès</small>
+                                    {% with prerequisites_text=service.prerequisites|join:", " %}
+                                        {% if prerequisites_text|length > 100 %}
+                                            <div class="collapse show has-no-transition" id="collapse-prerequisites-collapsed">
+                                                <strong>{{ prerequisites_text|truncatechars:100 }}</strong>
+                                                <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse-prerequisites-collapsed, #collapse-prerequisites-expanded"
+                                                        aria-expanded="true"
+                                                        aria-controls="collapse-prerequisites-collapsed collapse-prerequisites-expanded">
+                                                    Lire la suite
+                                                </button>
+                                            </div>
+                                            <div class="collapse has-no-transition" id="collapse-prerequisites-expanded">
+                                                <strong>{{ prerequisites_text|markdownify }}</strong>
+                                            </div>
+                                        {% else %}
+                                            <strong>{{ prerequisites_text|markdownify }}</strong>
+                                        {% endif %}
+                                    {% endwith %}
+                                </li>
+                            {% endif %}
+                            {% if service.fee %}
+                                <hr class="my-4">
+                                <li>
+                                    <small>Frais à charge</small>
+                                    <div>
+                                        <strong>{{ service.fee.label }}</strong>
+                                        {% if service.fee_details %}
+                                            <p><small class="mb-0">{{ service.fee_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if service.mobilizations.exists or service.mobilization_publics.exists %}
+                                <hr class="my-4">
+                            {% endif %}
+                            {% if service.mobilization_publics.exists %}
+                                <li>
+                                    <small>Service mobilisable par</small>
+                                    <strong>{% for public in service.mobilization_publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                </li>
+                            {% endif %}
+                            {% if service.mobilizations.exists %}
+                                <li>
+                                    <small>Modes de mobilisation</small>
+                                    <div>
+                                        <strong>{% for mobilization in service.mobilizations.all %}{{ mobilization.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                        {% if service.mobilizations_details %}
+                                            <p><small class="mb-0">{{ service.mobilizations_details }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            {% if geographic_perimeter %}
+                                <hr class="my-4">
+                                <li>
+                                    <small>Zones d'éligibilité</small>
+                                    {% if geographic_perimeter|length > 100 %}
+                                        <div class="collapse show has-no-transition" id="collapse-eligibility-collapsed">
+                                            <strong>{{ geographic_perimeter|truncatechars:100 }}</strong>
+                                            <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-eligibility-collapsed, #collapse-eligibility-expanded"
+                                                    aria-expanded="true"
+                                                    aria-controls="collapse-eligibility-collapsed collapse-eligibility-expanded">
+                                                Lire la suite
+                                            </button>
+                                        </div>
+                                        <div class="collapse has-no-transition" id="collapse-eligibility-expanded">
+                                            <strong>{{ geographic_perimeter }}</strong>
+                                        </div>
+                                    {% else %}
+                                        <strong>{{ geographic_perimeter }}</strong>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Conditions d'accueil</h2>
+                        <ul class="list-data">
                             {% if service.receptions.exists %}
                                 <li>
-                                    <small>Lieu d'accueil</small>
-                                    <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if service.address_on_one_line %} — {{ service.address_on_one_line }}{% endif %}</strong>
+                                    <small>Mode d'accueil</small>
+                                    <div>
+                                        <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                    </div>
                                 </li>
                             {% endif %}
-
-                            {% if service.fee %}
+                            {% if service.volume_horaire_hebdomadaire or service.nombre_semaines %}
                                 <li>
-                                    <small>
-                                        Frais à charge
-                                        {% if service.fee_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
+                                    <small>Durée de la prestation</small>
+                                    <strong>
+                                        {% if service.volume_horaire_hebdomadaire %}
+                                            {{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine
                                         {% endif %}
-                                    </small>
-                                    <strong>{{ service.fee.label }}</strong>
+                                        {% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}
+                                            , pendant
+                                        {% endif %}
+                                        {% if service.nombre_semaines %}
+                                            {{ service.nombre_semaines }} semaines
+                                        {% endif %}
+                                    </strong>
                                 </li>
                             {% endif %}
-
+                            {% if service.address_on_one_line or service.opening_hours %}
+                                <hr class="my-4">
+                            {% endif %}
+                            {% if service.address_on_one_line %}
+                                <li>
+                                    <small>Lieu d'accueil</small>
+                                    <strong>{{ service.address_on_one_line }}</strong>
+                                </li>
+                            {% endif %}
                             {% if service.opening_hours %}
                                 <li>
                                     <small>
-                                        Fréquence et horaires
+                                        Horaires d'ouverture
                                         {% if formatted_opening_hours.has_ph_off %}
                                             <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
                                         {% endif %}
@@ -211,20 +343,28 @@
                                     {% endif %}
                                 </li>
                             {% endif %}
-
-                            {% if service.insee_city %}
-                                <li>
-                                    <small>Périmètre géographique</small>
-                                    <strong>{{ geographic_perimeter }}</strong>
-                                </li>
-                            {% endif %}
                         </ul>
-
-                        <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">Source : {{ service.source.label }}</span>
                     </div>
+
+                    {% if credential_documents or service.extra.online_form %}
+                        <div id="credentials-documents" class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Documents à compléter</h2>
+                            <ul class="list-data mb-0">
+                                {% for document_name, document_url in credential_documents %}
+                                    <li>
+                                        <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if service.extra.online_form %}
+                                    <li>
+                                        <a href="{{ service.extra.online_form }}" target="_blank" rel="noopener noreferrer">{{ service.extra.online_form }}</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
 
-                {# Sidebar #}
                 <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Informations de la structure</h2>
@@ -236,133 +376,6 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-8 order-3">
-                    {# Description #}
-                    {% if service.description %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Description du service</h2>
-                            {% if service.description|wordcount > 30 %}
-                                <div class="collapse show has-no-transition" id="collapse-description">
-                                    <div class="mb-0">{{ service.description|markdownify|truncatewords_html:30 }}</div>
-                                    <button class="bs-btn-active-color btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-description" aria-expanded="true" aria-controls="collapse-description">
-                                        Lire la suite
-                                    </button>
-                                </div>
-                                <div class="collapse has-no-transition" id="collapse-description">
-                                    <div class="mb-0">{{ service.description|markdownify }}</div>
-                                </div>
-                            {% else %}
-                                <p class="mb-0">{{ service.description|markdownify }}</p>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-                    {# Thematics #}
-                    {% if service.thematics.exists %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Thématiques et besoins associés</h2>
-                            <ul class="mb-0">
-                                {% for category_label, subcategory_label in formatted_categories %}
-                                    <li>
-                                        <b>{{ category_label }}</b> : {{ subcategory_label }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
-                    {# Mobilizations #}
-                    {% if show_mobilization_section %}
-                        <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
-                            <h2 class="h3">Les démarches à réaliser</h2>
-                            {% if service.is_dora %}
-                                {% if service.mobilization_modes_professionals.exists or service.mobilization_modes_professionals_external_form_link or service.mobilization_modes_professionals_other %}
-                                    <h3 class="h4">Pour les professionnels de l'accompagnement</h3>
-                                    <ul class="mb-0">
-                                        {% for mode in service.mobilization_modes_professionals.all %}
-                                            {% if mode.value != "autre" %}
-                                                <li>
-                                                    {% if mode.value == "formulaire-dora" %}
-                                                        Via le formulaire (bouton “Orienter votre bénéficiaire”)
-                                                    {% else %}
-                                                        {{ mode.label }}
-                                                    {% endif %}
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% if service.mobilization_modes_professionals_external_form_link %}
-                                            <li>
-                                                <a href="{{ service.mobilization_modes_professionals_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_professionals_external_form_link_text|default:"Orienter un bénéficiaire" }}</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if professionals_has_autre and service.mobilization_modes_professionals_other %}
-                                            <li>{{ service.mobilization_modes_professionals_other|urlize_new_tab }}</li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
-                                {% if service.mobilization_modes_beneficiaries.exists or service.mobilization_modes_beneficiaries_external_form_link or service.mobilization_modes_beneficiaries_other %}
-                                    <hr class="my-4">
-                                    <h3 class="h4">Pour les particuliers</h3>
-                                    <ul class="mb-0">
-                                        {% for mode in service.mobilization_modes_beneficiaries.all %}
-                                            {% if mode.value != "autre" %}<li>{{ mode.label }}</li>{% endif %}
-                                        {% endfor %}
-                                        {% if service.mobilization_modes_beneficiaries_external_form_link %}
-                                            <li>
-                                                <a href="{{ service.mobilization_modes_beneficiaries_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_beneficiaries_external_form_link_text|default:"Faire une demande" }}</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if beneficiaries_has_autre and service.mobilization_modes_beneficiaries_other %}
-                                            <li>{{ service.mobilization_modes_beneficiaries_other|urlize_new_tab }}</li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
-                            {% else %}
-                                <ul class="mb-0">
-                                    {% for mobilization in service.mobilizations.all %}
-                                        <li>{{ mobilization.label }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% if service.mobilizations_details %}<p class="mt-3 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-                    {% if service.has_prerequisites %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Pré-requis et justificatifs</h2>
-                            <ul class="mb-0">
-                                {% for prerequisite in service.prerequisites %}
-                                    {% if service.is_dora %}
-                                        <li>{{ prerequisite|markdownify:"inline" }}</li>
-                                    {% else %}
-                                        {# D·I service may have blocks tags such as lists #}
-                                        <li>{{ prerequisite|markdownify }}</li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
-                    {# Documents à compléter #}
-                    {% if service.credentials_documents or service.credentials_online_form %}
-                        <div id="credentials-documents" class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Documents à compléter</h2>
-                            <ul class="mb-0">
-                                {% for document_name, document_url in credential_documents %}
-                                    <li>
-                                        <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
-                                    </li>
-                                {% endfor %}
-                                {% if service.credentials_online_form %}
-                                    <li>
-                                        <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener noreferrer">{{ service.credentials_online_form }}</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
             </div>
 
         </div>

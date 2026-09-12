@@ -126,7 +126,10 @@
       "mobilisation_precisions": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/ S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
       "volume_horaire_hebdomadaire": null,
       "nombre_semaines": null,
-      "horaires_accueil": null
+      "horaires_accueil": null,
+      "extra": {
+        "funding_labels": ["France Travail", "Conseil départemental"]
+      }
     },
     {
       "source": "dora",

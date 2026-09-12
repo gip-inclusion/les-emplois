@@ -489,6 +489,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
@@ -500,6 +502,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",
@@ -1254,6 +1257,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
@@ -1265,6 +1270,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",
@@ -2623,6 +2629,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
@@ -2634,6 +2642,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_structure"."id",
                  "insertion_structure"."address_line_1",
                  "insertion_structure"."address_line_2",
@@ -2744,21 +2753,78 @@
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
-                              Informations du service
+                              Présentation du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
                           </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
-                                      Lieu d'accueil
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
                                   </small>
                                   <strong>
-                                      en-presentiel
+                                      <p>
+                                          Avoir plus de 18 ans, Résider en France, Pièce d'identité en cours de validité
+                                      </p>
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
+                                  </small>
+                                  <strong>
+                                      France entière
                                   </strong>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          en-presentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -2772,49 +2838,6 @@
                           <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/?back_url=/insertion/services/test-service-uid/" type="button">
                               Voir la fiche structure
                           </a>
-                      </div>
-                  </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  Avoir plus de 18 ans
-                              </li>
-                              <li>
-                                  Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
                       </div>
                   </div>
               </div>
@@ -2894,21 +2917,78 @@
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
-                              Informations du service
+                              Présentation du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
                           </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
-                                      Lieu d'accueil
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
                                   </small>
                                   <strong>
-                                      en-presentiel
+                                      <p>
+                                          Être orienté par un prescripteur, Avoir 18 ans
+                                      </p>
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
+                                  </small>
+                                  <strong>
+                                      France entière
                                   </strong>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Other
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          en-presentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -2924,50 +3004,6 @@
                           </a>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <p>
-                                      Être orienté par un prescripteur
-                                  </p>
-                              </li>
-                              <li>
-                                  <p>
-                                      Avoir 18 ans
-                                  </p>
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
               </div>
           </div>
       </section>
@@ -2981,7 +3017,7 @@
       <h2 class="h3">
           Documents à compléter
       </h2>
-      <ul class="mb-0">
+      <ul class="list-data mb-0">
           <li>
               <a href="https://s3.example.com/my_form.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
                   my_form.pdf
@@ -2990,6 +3026,11 @@
           <li>
               <a href="https://s3.example.com/justificatif.docx?token=bbb" rel="noopener noreferrer" target="_blank">
                   justificatif.docx
+              </a>
+          </li>
+          <li>
+              <a href="https://example.com/formulaire-inscription" rel="noopener noreferrer" target="_blank">
+                  https://example.com/formulaire-inscription
               </a>
           </li>
       </ul>
@@ -3141,51 +3182,182 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3 mb-2">
-                              Informations du service
+                          <h2 class="h3">
+                              Présentation du service
                           </h2>
-                          <p class="fs-sm text-success">
-                              <i aria-hidden="true" class="ri-time-line">
-                              </i>
-                              <strong>
-                                  Réponse rapide : sous 3 jours
-                              </strong>
+                          <p class="mb-0">
+                              Description complète
                           </p>
                           <p>
-                              Résumé court du service.
+                              Avec du
+                              <strong>
+                                  markdown
+                              </strong>
+                              .
                           </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Logement et hébergement
+                                          </strong>
+                                          : Louer un logement
+                                      </div>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Service financé par
+                                  </small>
+                                  <strong>
+                                      France Travail, Conseil départemental
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Eligibilité au service
+                          </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
                                       Public concerné
-                                      <i aria-label="Toute personne majeure." class="ri-information-line ri-xl text-info" data-bs-title="Toute personne majeure." data-bs-toggle="tooltip" role="button" tabindex="0">
-                                      </i>
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Adultes
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Toute personne majeure.
+                                          </small>
+                                      </p>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Conditions d'accès
                                   </small>
                                   <strong>
-                                      Adultes
+                                      <p>
+                                          Être orienté par un prescripteur.
+                                      </p>
                                   </strong>
                               </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Frais à charge
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Gratuit
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Sous conditions de ressources.
+                                          </small>
+                                      </p>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Service mobilisable par
+                                  </small>
+                                  <strong>
+                                      Professionnels
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Modes de mobilisation
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Par téléphone
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Contacter le service par téléphone.
+                                          </small>
+                                      </p>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
+                                  </small>
+                                  <div class="collapse show has-no-transition" id="collapse-eligibility-collapsed">
+                                      <strong>
+                                          Commune numéro 1 en Bretagne (56), Commune numéro 2 en Bretagne (56), Commune numéro 3 en Bretagne …
+                                      </strong>
+                                      <button aria-controls="collapse-eligibility-collapsed collapse-eligibility-expanded" aria-expanded="true" class="bs-btn-active-color btn-link d-inline-block mt-2" data-bs-target="#collapse-eligibility-collapsed, #collapse-eligibility-expanded" data-bs-toggle="collapse" type="button">
+                                          Lire la suite
+                                      </button>
+                                  </div>
+                                  <div class="collapse has-no-transition" id="collapse-eligibility-expanded">
+                                      <strong>
+                                          Commune numéro 1 en Bretagne (56), Commune numéro 2 en Bretagne (56), Commune numéro 3 en Bretagne (56), Commune numéro 4 en Bretagne (56), Commune numéro 5 en Bretagne (56), Commune numéro 6 en Bretagne (56), Commune numéro 7 en Bretagne (56), Commune numéro 8 en Bretagne (56), Commune numéro 9 en Bretagne (56), Commune numéro 10 en Bretagne (56), Commune numéro 11 en Bretagne (56), Commune numéro 12 en Bretagne (56), Commune numéro 13 en Bretagne (56), Commune numéro 14 en Bretagne (56), Commune numéro 15 en Bretagne (56)
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          En présentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Durée de la prestation
+                                  </small>
+                                  <strong>
+                                      21 heures par semaine
+                                          
+                                          
+                                              , pendant
+                                          
+                                          
+                                              16 semaines
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
                               <li>
                                   <small>
                                       Lieu d'accueil
                                   </small>
                                   <strong>
-                                      En présentiel — 12 rue de la Paix, Bâtiment B, 75001 Paris
+                                      12 rue de la Paix, Bâtiment B, 75001 Paris
                                   </strong>
                               </li>
                               <li>
                                   <small>
-                                      Frais à charge
-                                      <i aria-label="Sous conditions de ressources." class="ri-information-line ri-xl text-info" data-bs-title="Sous conditions de ressources." data-bs-toggle="tooltip" role="button" tabindex="0">
-                                      </i>
-                                  </small>
-                                  <strong>
-                                      Gratuit
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Fréquence et horaires
+                                      Horaires d'ouverture
                                       <i aria-label="Hors jours fériés" class="ri-information-line ri-xl text-info" data-bs-title="Hors jours fériés" data-bs-toggle="tooltip" role="button" tabindex="0">
                                       </i>
                                   </small>
@@ -3233,9 +3405,28 @@
                                   </div>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4" id="credentials-documents">
+                          <h2 class="h3">
+                              Documents à compléter
+                          </h2>
+                          <ul class="list-data mb-0">
+                              <li>
+                                  <a href="https://s3.example.com/dossier-inscription.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
+                                      dossier-inscription.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb" rel="noopener noreferrer" target="_blank">
+                                      autorisation-traitement-donnees.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/bilan-competences.docx?token=ccc" rel="noopener noreferrer" target="_blank">
+                                      bilan-competences.docx
+                                  </a>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -3249,48 +3440,6 @@
                           <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-full-uid/?back_url=/insertion/services/test-service-full-uid/" type="button">
                               Voir la fiche structure
                           </a>
-                      </div>
-                  </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                              Description complète
-                          </p>
-                          <p>
-                              Avec du
-                              <strong>
-                                  markdown
-                              </strong>
-                              .
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Logement et hébergement
-                                  </b>
-                                  : Louer un logement
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  Être orienté par un prescripteur.
-                              </li>
-                          </ul>
                       </div>
                   </div>
               </div>
@@ -3549,6 +3698,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
@@ -3560,6 +3711,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."extra",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",

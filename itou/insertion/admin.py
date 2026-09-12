@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from django.contrib import admin, messages
@@ -6,6 +7,7 @@ from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, reverse
 from django.urls import path
+from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 
 from itou.insertion.models import (
@@ -96,7 +98,7 @@ class ServiceAdmin(InsertionAdmin):
     date_hierarchy = "updated_on"
     ordering = ["-updated_at", "-created_at"]
     search_fields = ["uid", "name", "structure__name", "city"]
-    extra_readonly_fields = ["structure_link"]
+    extra_readonly_fields = ["structure_link", "extra_formatted"]
     fieldsets = [
         ("Identification", {"fields": ["uid", "name", "structure_link", "source", "source_link"]}),
         ("Présentation", {"fields": ["description_short", "description", "kind", "thematics"]}),
@@ -141,10 +143,21 @@ class ServiceAdmin(InsertionAdmin):
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
         ),
         ("Contact", {"fields": ["contact_full_name", "contact_email", "contact_phone", "contact_is_public"]}),
-        ("Horaires", {"fields": ["opening_hours", "opening_hours_text"]}),
+        (
+            "Horaires",
+            {
+                "fields": [
+                    "opening_hours",
+                    "opening_hours_text",
+                    "volume_horaire_hebdomadaire",
+                    "nombre_semaines",
+                ]
+            },
+        ),
         ("Orientation", {"fields": ["is_orientable_with_form", "average_orientation_response_delay_days"]}),
         ("État", {"fields": ["is_active"]}),
         ("Dates", {"fields": ["dora_synced_at", "updated_on", "created_at", "updated_at"]}),
+        ("Données complémentaires", {"fields": ["extra_formatted"]}),
     ]
 
     def get_queryset(self, request):
@@ -153,6 +166,15 @@ class ServiceAdmin(InsertionAdmin):
     @admin.display(description="structure")
     def structure_link(self, obj):
         return get_admin_view_link(obj.structure, content=obj.structure.name)
+
+    @admin.display(description="données complémentaires (data·inclusion)")
+    def extra_formatted(self, obj):
+        if obj.extra is None:
+            return "—"
+        return format_html(
+            "<pre>{}</pre>",
+            json.dumps(obj.extra, indent=2, ensure_ascii=False, sort_keys=True),
+        )
 
 
 @admin.register(MobilizationEvent)
