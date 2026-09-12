@@ -366,6 +366,36 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
         }
 
 
+class OverviewTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/overview.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        approval = self.object.latest_approval
+        suspension = (
+            approval.suspension_set.order_by("-start_at").first() if approval and approval.is_suspended else None
+        )
+        prolongation = approval.prolongation_set.order_by("-end_at").first() if approval else None
+        contract = get_contracts(approval).first() if approval else None
+        job_app = (
+            self.object.job_applications.filter(sender_prescriber_organization=self.request.current_organization)
+            .with_accepted_at()
+            .order_by("-updated_at")
+            .first()
+        )
+        assignment = self.object.last_assignment
+
+        return context | {
+            "approval": approval,
+            "suspension": suspension,
+            "prolongation": prolongation,
+            "contract": contract,
+            "job_app": job_app,
+            "assignment": assignment,
+        }
+
+
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def create_or_edit_assignment(

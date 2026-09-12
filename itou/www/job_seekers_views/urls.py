@@ -42,6 +42,11 @@ urlpatterns = [
         name="archive_assignment",
     ),
     path(
+        "overview/<uuid:public_id>",
+        views.OverviewTabView.as_view(),
+        name="overview",
+    ),
+    path(
         "switch_stalled_status/<uuid:public_id>",
         views.switch_stalled_status,
         name="switch_stalled_status",

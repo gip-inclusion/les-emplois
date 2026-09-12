@@ -22,5 +22,13 @@
                href="{% url 'job_seekers_views:contracts' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
                {% matomo_event "candidat" "clic-onglet" "suivi contrats iae" %}>Suivi des contrats IAE</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link{% if active_nav_tab == "overview" %} active{% endif %}"
+               href="{% url 'job_seekers_views:overview' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
+               {% matomo_event "candidat" "clic-onglet" "synthese" %}>
+                Synthèse
+                <span class="badge badge-sm rounded-pill bg-important text-white mx-2">Nouveau</span>
+            </a>
+        </li>
     {% endif %}
 </ul>

@@ -1,0 +1,122 @@
+{% load enums %}
+{% enums "job_applications" "JobApplicationState" as JobApplicationState %}
+
+<div id="overview-jobapp" class="row gx-3 align-items-start">
+    {% if job_app %}
+        {% if job_app.transferred_at and job_app.state == JobApplicationState.NEW %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-corner-up-right-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">Candidature transférée le {{ job_app.transferred_at|date:"d/m/Y" }} de la structure {{ job_app.transferred_from.display_name }} vers la structure {{ job_app.to_company.display_name }}.</span>
+                        Le nouvel employeur reprend l'instruction.
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">transférée par {{ job_app.transferred_by.get_inverted_full_name }} ({{ job_app.transferred_from.display_name }}).</span>
+                        <br>
+                        <a href="{% url "apply:details_for_prescriber" job_application_id=job_app.id %}">Suivre la candidature</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">transférée</span>
+                    </div>
+                </div>
+            </div>
+
+        {% elif job_app.state == JobApplicationState.NEW or job_app.state == JobApplicationState.PROCESSING %}
+            <div class="col-auto">
+                <i class="ri-xl ri-file-list-3-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} déposée le {{ job_app.created_at|date:"d/m/Y" }}, </span>
+                        {{ job_app.get_jobs_display }}.
+                        {% if job_app.state == JobApplicationState.PROCESSING %}
+                            Sans réponse depuis le {{ job_app.updated_at|date:"d/m/Y" }}.
+                        {% endif %}
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">envoyée le {{ job_app.created_at|date:"d/m/Y" }} par {{ job_app.sender.get_inverted_full_name }} ({{ job_app.sender_prescriber_organization.display_name }})</span>
+                        <br>
+                        <a href="{% url "apply:details_for_prescriber" job_application_id=job_app.id %}">Ouvrir la candidature</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                            {% if job_app.state == JobApplicationState.PROCESSING %}
+                                à l'étude
+                            {% else %}
+                                nouvelle
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        {% elif job_app.state == JobApplicationState.REFUSED %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-file-list-3-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} refusée le {{ job_app.processed_at|date:"d/m/Y" }} </span>
+                        - motif de refus : {{ job_app.get_refusal_reason_display|lower }}.
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">refus saisi le {{ job_app.processed_at|date:"d/m/Y" }} par {{ job_app.to_company.display_name }}</span>
+                        <br>
+                        <a href="#">Voir le motif de refus</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">refusée</span>
+                    </div>
+                </div>
+            </div>
+
+        {% elif job_app.state == JobApplicationState.ACCEPTED %}
+
+            <div class="col-auto">
+                <i class="ri-xl ri-user-follow-line"></i>
+            </div>
+            <div class="col">
+                <div class="row gx-4 align-items-start justify-content-between">
+                    <div class="col-6">
+                        <span class="fw-semibold">Embauche déclarée à {{ job_app.to_company.display_name }} le {{ job_app.hiring_start_at|date:"d/m/Y" }}, </span>
+                        à la suite de la candidature du {{ job_app.created_at|date:"d/m/Y" }}.
+                        <br>
+                        <span class="fs-sm text-muted fw-normal">acceptation saisie le {{ job_app.accepted_at|date:"d/m/Y" }}</span>
+                        <br>
+                        <a href="{% url "apply:details_for_prescriber" job_application_id=job_app.id %}">Ouvrir la candidature</a>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">acceptée</span>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="col-auto">
+            <i class="ri-xl ri-corner-up-right-line"></i>
+        </div>
+        <div class="col">
+            <div class="row gx-4 align-items-start justify-content-between">
+                <div class="col-6">
+                    <span class="fw-semibold">Aucune candidature récupérée.</span>
+                    Il est possible que le candidat est déposé une candidature en autonomie ou qu'il soit suivi par une autre structure.
+                    <br>
+                    <span class="fs-sm text-muted fw-normal">vérifié le {% now "d/m/Y" %}</span>
+                    <br>
+                </div>
+                <div class="col-auto">
+                    <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">aucune candidature</span>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>

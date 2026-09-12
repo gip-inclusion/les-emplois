@@ -1,0 +1,47 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% load str_filters %}
+
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-advisors" only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker active_nav_tab="overview" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Synthèse</h2>
+            <div class="c-box c-box--overview">
+                {#-------------------------- PASS IAE --------------------------#}
+                {% include "job_seekers_views/includes/overview_approval.html" with job_seeker=job_seeker approval=approval suspension=suspension prolongation=prolongation only %}
+
+                <hr class="mt-4">
+
+                {#-------------------------- Contract --------------------------#}
+                {% include "job_seekers_views/includes/overview_contract.html" with job_seeker=job_seeker contract=contract only %}
+
+                <hr class="mt-4">
+
+                {#-------------------------- Job application --------------------------#}
+                {% include "job_seekers_views/includes/overview_jobapp.html" with job_seeker=job_seeker job_app=job_app only %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}

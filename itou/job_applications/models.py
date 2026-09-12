@@ -1068,6 +1068,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         else:
             return SenderKind(self.sender_kind).label
 
+    def get_jobs_display(self):
+        jobs = list(self.selected_jobs.all())
+        if jobs:
+
+            def name_with_prefix(job_name):
+                job_name = job_name.lower()
+                elision_letters = ("a", "e", "i", "o", "u", "h")
+                return f"d'{job_name}" if job_name.startswith(elision_letters) else f"de {job_name}"
+
+            if len(jobs) == 1:
+                return f"poste {name_with_prefix(jobs[0].display_name)}"
+
+            jobs_display = "postes "
+            jobs_display += ", ".join([name_with_prefix(job.display_name) for job in jobs[:-1]])
+            return f"{jobs_display} et {name_with_prefix(jobs[-1].display_name)}"
+        return "candidature spontanée"
+
     def can_be_transferred(self, user, target_company):
         # Can't transfer to same structure
         if target_company == self.to_company:
