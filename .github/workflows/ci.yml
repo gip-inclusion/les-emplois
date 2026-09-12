@@ -19,6 +19,8 @@ jobs:
       CELLAR_ADDON_KEY_ID_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_KEY_ID_FOR_TESTS }}
       CELLAR_ADDON_SECRET_KEY_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_SECRET_KEY_FOR_TESTS }}
       DJANGO_SETTINGS_MODULE: config.settings.test
+      # Shorten tracebacks to one line per failure to keep the CI logs readable.
+      PYTEST_ADDOPTS: --tb=line
       REDIS_URL: redis://127.0.0.1:6379
       REQUIREMENTS_PATH: requirements/test.txt
     concurrency:
