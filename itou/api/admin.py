@@ -1,7 +1,7 @@
 from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
-from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
+from itou.api.models import CompanyToken, DepartmentToken, DoraToken, ServiceToken
 from itou.utils.admin import ItouModelAdmin
 
 
@@ -86,5 +86,18 @@ class ServiceTokenAdmin(ItouModelAdmin):
                     },
                 ),
             )
+        else:
+            return super().get_fieldsets(request, obj=obj)
+
+
+@admin.register(DoraToken)
+class DoraTokenAdmin(ItouModelAdmin):
+    list_display = ["label", "created_at"]
+    ordering = ["-created_at"]
+    readonly_fields = ["key", "created_at"]
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return ((None, {"classes": ("wide",), "fields": ("label",)}),)
         else:
             return super().get_fieldsets(request, obj=obj)

@@ -32,3 +32,15 @@ class ServiceTokenAuthentication(authentication.TokenAuthentication):
         except self.model.DoesNotExist:
             # Do not raise AuthenticationFailed to allow other authentication to succeed
             return None
+
+
+class DoraTokenAuthentication(authentication.TokenAuthentication):
+    model = models.DoraToken
+
+    def authenticate_credentials(self, key):
+        try:
+            api_token = self.model.objects.get(key=key)
+            return (ServiceAccount(), api_token)
+        except self.model.DoesNotExist:
+            # Do not raise AuthenticationFailed to allow other authentication to succeed
+            return None

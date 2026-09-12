@@ -68,3 +68,20 @@ class ServiceToken(models.Model):
     def datadog_info(self):
         """Method returning the token representation in our Datadog logs (no secret here!)"""
         return f"ServiceToken-{self.pk}-for-{self.service}"
+
+
+class DoraToken(models.Model):
+    key = models.CharField(default=_generate_key, unique=True)
+    label = models.CharField(verbose_name="mémo permettant d'identifier l'usage du jeton", max_length=60, unique=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "jeton d'API utilisé par DORA"
+        verbose_name_plural = "jetons d'API utilisés par DORA"
+
+    def __str__(self):
+        return self.label
+
+    def datadog_info(self):
+        """Method returning the token representation in our Datadog logs (no secret here!)"""
+        return f"DoraToken-{self.pk}"
