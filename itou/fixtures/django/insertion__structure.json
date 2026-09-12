@@ -53,20 +53,23 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "https://acceslibre.beta.gouv.fr/app/belfort-90000/a/mission-locale-du-territoire-de-belfort/",
       "address_line_1": "Place de l'Europe",
-      "address_line_2": "",
+      "address_line_2": "Locaux de la MIFE Belfort",
       "city": "Belfort",
       "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
       "created_at": "2026-06-15T09:13:08.613Z",
-      "description": "La Mission Locale accompagne les publics dans la construction de leur parcours d'insertion socio-professionnelle.",
+      "description": "La Mission Locale accompagne les publics dans la construction de leur parcours d'insertion socio-professionnelle.\n\n**Notre mission**\n\nNous accompagnons les jeunes de 16 à 25 ans (jusqu'à 30 ans en situation de handicap) dans leur parcours vers l'emploi ou la formation.\n\n- **Information** sur les dispositifs d'insertion et de formation\n- **Orientation** vers les services adaptés au profil du jeune\n- **Accompagnement** individualisé tout au long du parcours\n\nNos conseillers vous reçoivent **sans rendez-vous** le mardi et jeudi matin, ou sur rendez-vous les autres jours.",
       "email": "miloterritoire@email.fake",
       "insee_city": 34249,
       "is_active": true,
       "name": "MISSION LOCALE DU TERRITOIRE DE BELFORT",
-      "opening_hours": "",
-      "phone": "",
+      "opening_hours": "Mo 09:00-12:00,14:00-17:30\"Sans rendez-vous\";Tu 09:00-12:00,14:00-17:30\"Sur rendez-vous\";We 09:00-12:00,14:00-17:30;Th 09:00-12:00,14:00-17:30\"Sans rendez-vous\";Fr 09:00-12:00,14:00-17:30; Sa off; Aug closed; PH off",
+      "phone": "+33384123456",
       "post_code": "90000",
-      "reseaux_porteurs": [],
+      "reseaux_porteurs": [
+        86
+      ],
       "siret": "33333314000035",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/mission-locale",

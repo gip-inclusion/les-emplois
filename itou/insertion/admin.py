@@ -61,7 +61,7 @@ class StructureAdmin(InsertionAdmin):
     inlines = [ServicesInline]
     fieldsets = [
         ("Identification", {"fields": ["uid", "name", "siret", "source", "source_link"]}),
-        ("Présentation", {"fields": ["description", "website"]}),
+        ("Présentation", {"fields": ["description", "website", "accessibilite_lieu"]}),
         ("Contact", {"fields": ["email", "phone"]}),
         (
             "Adresse",
