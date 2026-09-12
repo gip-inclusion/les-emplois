@@ -2,6 +2,7 @@ import json
 import logging
 
 import httpx
+import jwt
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -39,6 +40,14 @@ logger = logging.getLogger(__name__)
 def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("account_login"))
+
+
+def get_rsa_key():
+    jwks = httpx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_JWKS, timeout=5)
+    rsa256_keys = [key for key in jwks.json()["keys"] if key["kty"] == "RSA"]
+    if not rsa256_keys:
+        raise ValueError("No RSA key found in FranceConnect JWKS")
+    return rsa256_keys[0]
 
 
 @login_not_required
@@ -109,7 +118,26 @@ def ft_connect_callback(request):
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
+    # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
+
+    rsa_key = get_rsa_key()
+    try:
+        id_token_content = jwt.decode(
+            token_data["id_token"],
+            key=jwt.api_jwk.PyJWK(rsa_key).key,
+            algorithms=["RS256"],
+            audience=settings.API_ESD["KEY"],
+            options={"verify_iat": False},
+        )
+    except jwt.PyJWTError as e:
+        error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
+        logger.error("FT Connect id_token decode error: %s", e)
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
+    if id_token_content.get("nonce") != pe_state.nonce:
+        error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
+        logger.error("FT Connect id_token nonce mismatch")
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if not token_data or "access_token" not in token_data:
         error_msg = (

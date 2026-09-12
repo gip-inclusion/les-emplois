@@ -1,16 +1,22 @@
+import base64
 import datetime
+import hashlib
+import time
 import urllib.parse
 
 import httpx
+import jwt
 import pytest
 import respx
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
 from django.http import QueryDict
 from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import crypto, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
@@ -43,8 +49,52 @@ def mock_oauth_dance(
     expected_route="dashboard:index",
     user_info=None,
     userinfo_timeout=False,
+    matching_nonces=True,
 ):
-    token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    id_token_nonce = crypto.get_random_string(length=12)
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    public_key_numbers = private_key.public_key().public_numbers()
+    jwk_json = {
+        "keys": [
+            {
+                "kty": "RSA",
+                "kid": "a_random_string",
+                "use": "sig",
+                "e": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.e)).decode().rstrip("="),
+                "n": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.n)).decode().rstrip("="),
+            }
+        ]
+    }
+    respx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_JWKS).mock(return_value=httpx.Response(200, json=jwk_json))
+
+    now = int(time.time())
+    access_token = "aw9EMEBXYME57xmj-ZZYPPC9yxSRfK-A3MPCL56zysd"
+    access_token_hash = hashlib.sha256(access_token.encode()).digest()
+
+    common_jwt_content = {
+        "sub": FT_CONNECT_USERINFO["sub"],
+        "aud": settings.API_ESD["KEY"],
+        "exp": now + 60,
+        "iat": now,
+        "iss": "https://fcp-low.sbx.dev-franceconnect.fr/api/v2",  # FIXME
+    }
+
+    id_token_content = {
+        "auth_time": now,
+        "acr": "eidas1",
+        "nonce": id_token_nonce,
+        "at_hash": base64.urlsafe_b64encode(access_token_hash[:16]).decode().rstrip("="),
+        **common_jwt_content,
+    }
+    id_token = jwt.encode(id_token_content, private_key, algorithm="RS256", headers={"kid": "a_random_string"})
+
+    token_json = {
+        "access_token": access_token,
+        "token_type": "Bearer",
+        "expires_in": 60,
+        "id_token": id_token,
+        "nonce": id_token_nonce,
+    }
     respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     if userinfo_timeout:
@@ -67,8 +117,10 @@ def mock_oauth_dance(
     ]:
         respx.get(f"{settings.API_ESD['BASE_URL']}/{api}").mock(return_value=httpx.Response(200, json=fake_api_data))
 
-    state = FranceTravailConnectState.save_state()
-    url = reverse("ft_connect:callback")
+    state = FranceTravailConnectState.save_state(
+        nonce=id_token_nonce if matching_nonces else crypto.get_random_string(length=12)
+    )
+    url = reverse("pe_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
@@ -273,6 +325,21 @@ class TestPoleEmploiConnect:
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == datetime.date(2001, 1, 1)
+
+    @respx.mock
+    def test_callback_mismatched_nonce(self, client):
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance(client, expected_route="account_login", matching_nonces=False)
+        assert User.objects.count() == 0
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Le jeton d’authentification de France Travail Connect est invalide.",
+                )
+            ],
+        )
 
     @respx.mock
     def test_callback_no_email(self, client):
