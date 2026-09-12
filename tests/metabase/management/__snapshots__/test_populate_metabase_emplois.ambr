@@ -8190,11 +8190,9 @@
                  "insertion_orientation"."duration_weekly_hours",
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
-                 "insertion_orientation"."attachments",
                  "insertion_orientation"."last_reminder_email_sent_at",
                  "insertion_orientation"."created_at",
-                 "insertion_orientation"."updated_at",
-                 "insertion_orientation"."dora_status_updated_at"
+                 "insertion_orientation"."updated_at"
           FROM "insertion_mobilizationevent"
           LEFT OUTER JOIN "insertion_service" ON ("insertion_mobilizationevent"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_structure" ON ("insertion_mobilizationevent"."structure_id" = "insertion_structure"."id")

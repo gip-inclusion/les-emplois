@@ -43,6 +43,11 @@ urlpatterns = [
         name="orientation_details_for_sender",
     ),
     path(
+        "orientations/document/<uuid:document_id>/",
+        views.document_download,
+        name="document_download",
+    ),
+    path(
         "orientations/process/",
         views.orientation_details_for_service_provider,
         name="orientation_details_for_service_provider",
