@@ -6,7 +6,7 @@ import respx
 from django.conf import settings
 
 import itou.external_data.apis.ft_connect as pec
-from itou.external_data.apis.ft_connect import import_user_pe_data
+from itou.external_data.apis.ft_connect import import_user_ft_data
 from itou.utils import triggers
 from tests.users.factories import JobSeekerFactory
 
@@ -88,7 +88,7 @@ class TestExternalDataImport:
         _mock_status_ok()
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
 
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == old_birthdate
@@ -101,7 +101,7 @@ class TestExternalDataImport:
         _mock_status_partial()
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
 
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == old_birthdate
@@ -113,7 +113,7 @@ class TestExternalDataImport:
 
         _mock_status_failed()
 
-        import_user_pe_data(user, FOO_TOKEN)
+        import_user_ft_data(user, FOO_TOKEN)
 
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == old_birthdate
@@ -128,7 +128,7 @@ class TestJobSeekerExternalData:
         user = JobSeekerFactory(jobseeker_profile__birthdate=None)
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
         assert user.address_line_1 == "4, Privet Drive"
@@ -140,7 +140,7 @@ class TestJobSeekerExternalData:
         birthdate = user.jobseeker_profile.birthdate
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
         assert birthdate == user.jobseeker_profile.birthdate
@@ -151,7 +151,7 @@ class TestJobSeekerExternalData:
 
         user = JobSeekerFactory()
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
         assert user.address_line_1 == "4, Privet Drive"
@@ -168,7 +168,7 @@ class TestJobSeekerExternalData:
         old_address_one_line = user.address_on_one_line
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
         assert user.address_on_one_line == old_address_one_line
@@ -180,7 +180,7 @@ class TestJobSeekerExternalData:
         birthdate = user.jobseeker_profile.birthdate
 
         with triggers.connection_wrapper():
-            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_ft_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
         assert birthdate == user.jobseeker_profile.birthdate
