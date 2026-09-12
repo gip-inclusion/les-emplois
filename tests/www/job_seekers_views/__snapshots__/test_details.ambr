@@ -1697,7 +1697,7 @@
                           <p>
                               Choisissez un créneau qui vous convient pour un échange de 30 minutes.
                           </p>
-                          <a class="btn btn-ico btn-block btn-outline-primary" href="">
+                          <a class="btn btn-ico btn-block btn-outline-primary" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="prendre-rendez-vous" href="">
                               <i class="ri-calendar-line">
                               </i>
                               <span>
@@ -1923,7 +1923,7 @@
                           <p>
                               Choisissez un créneau qui vous convient pour un échange de 30 minutes.
                           </p>
-                          <a class="btn btn-ico btn-block btn-outline-primary" href="">
+                          <a class="btn btn-ico btn-block btn-outline-primary" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="prendre-rendez-vous" href="">
                               <i class="ri-calendar-line">
                               </i>
                               <span>
@@ -2171,7 +2171,7 @@
           <h3 class="mb-0">
               Dernier accompagnateur
           </h3>
-          <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/[JobSeeker PublicID]">
+          <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/[JobSeeker PublicID]">
               Voir tout
           </a>
       </div>
@@ -2327,7 +2327,7 @@
           <h3 class="mb-0">
               Dernier accompagnateur
           </h3>
-          <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/[JobSeeker PublicID]">
+          <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/[JobSeeker PublicID]">
               Voir tout
           </a>
       </div>
@@ -2416,7 +2416,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -2493,7 +2493,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -2570,7 +2570,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -2604,7 +2604,7 @@
                               <p class="mb-2">
                                   Pierre DUPONT ne fait plus partie de [Org display name].
                               </p>
-                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
+                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="advisors" data-matomo-event="true" data-matomo-option="displayed_last_advisor_email" hx-include="#display-contact-info-form" hx-post="/job-seekers/display/[JobSeekerAssignment PK]/email" hx-swap="outerHTML" id="email-[JobSeekerAssignment PK]">
                                   <div class="stable-text">
                                       <i aria-hidden="true" class="ri-mail-send-line">
                                       </i>
@@ -2680,7 +2680,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -2725,7 +2725,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -2819,7 +2819,7 @@
                   <h3 class="mb-0">
                       Dernier accompagnateur
                   </h3>
-                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                       Voir tout
                   </a>
               </div>
@@ -3195,7 +3195,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -3505,7 +3505,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -3779,7 +3779,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -4153,7 +4153,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -7032,7 +7032,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -7361,7 +7361,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -7623,7 +7623,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -7940,7 +7940,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -8269,7 +8269,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -8531,7 +8531,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -8857,7 +8857,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
@@ -10188,7 +10188,7 @@
                                               <h3 class="mb-0">
                                                   Dernier accompagnateur
                                               </h3>
-                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   Voir tout
                                               </a>
                                           </div>
