@@ -4,6 +4,7 @@ import textwrap
 from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
+from django.urls import reverse
 
 from itou.utils import constants as global_constants
 from itou.utils.enums import ItouEnvironment
@@ -26,6 +27,7 @@ def get_email_text_template(template, context):
             "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
             "itou_environment": settings.ITOU_ENVIRONMENT,
             "base_url": get_absolute_url(),
+            "legal_privacy_url": get_absolute_url(reverse("legal-privacy")),
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())

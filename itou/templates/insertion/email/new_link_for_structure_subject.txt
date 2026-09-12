@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Nouveau lien de traitement d’orientation
+
+{% endblock %}
