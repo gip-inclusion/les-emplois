@@ -39,12 +39,28 @@ class BeneficiaryContactPreference(models.TextChoices):
 
 class OrientationStatus(models.TextChoices):
     PENDING = "OUVERTE", "En cours de traitement"
+    PROCESSING = "ÉTUDE", "À l’étude"
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
-    REJECTED = "REFUSÉE", "Refusée"
+    REFUSED = "REFUSÉE", "Déclinée"
 
 
 class OrientationTransition(enum.StrEnum):
+    PROCESS = "process"
     ACCEPT = "accept"
-    REJECT = "reject"
+    REFUSE = "refuse"
     EXPIRE = "expire"
+
+
+class OrientationRefusalReason(models.TextChoices):
+    NOT_REACHABLE = "not_reachable", "Bénéficiaire non joignable"
+    DID_NOT_COME_TO_INTERVIEW = "did_not_come_to_interview", "Bénéficiaire ne s’étant pas présenté à l’entretien"
+    HIRED_ELSEWHERE = "hired_elsewhere", "Bénéficiaire indisponible : en emploi"
+    TRAINING = "training", "Bénéficiaire indisponible : en formation"
+    NOT_ELIGIBLE = "not_eligible", "Bénéficiaire non éligible (ne répond pas aux pré-requis)"
+    NOT_MOBILE = "not_mobile", "Bénéficiaire non mobile"
+    NOT_INTERESTED = "not_interested", "Bénéficiaire non intéressé"
+    INCOMPATIBLE = "incompatible", "Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre"
+    SESSION_FULL = "session_full", "Session complète"
+    DUPLICATE = "duplicate", "Orientation en doublon"
+    OTHER = "other", "Autre (détails dans le message ci-dessous)"
