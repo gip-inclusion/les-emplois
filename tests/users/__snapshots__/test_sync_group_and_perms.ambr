@@ -1,4 +1,14 @@
 # serializer version: 1
+# name: test_command[annuaire-pro]
+  list([
+    'view_city',
+    'add_directoryactivecity',
+    'change_directoryactivecity',
+    'delete_directoryactivecity',
+    'view_directoryactivecity',
+    'view_city',
+  ])
+# ---
 # name: test_command[disable-user-password-auth]
   list([
     'disable_password_auth',
@@ -27,6 +37,7 @@
     'view_country',
     'view_department',
     'view_city',
+    'view_directoryactivecity',
     'view_announcementcampaign',
     'view_announcementitem',
     'view_company',
@@ -120,6 +131,10 @@
     'view_country',
     'view_department',
     'view_city',
+    'add_directoryactivecity',
+    'change_directoryactivecity',
+    'delete_directoryactivecity',
+    'view_directoryactivecity',
     'add_announcementcampaign',
     'change_announcementcampaign',
     'delete_announcementcampaign',
@@ -289,6 +304,13 @@
 # ---
 # name: test_command[logs]
   list([
+    'group name=annuaire-pro created',
+    'group name=annuaire-pro, permission add_directoryactivecity added',
+    'group name=annuaire-pro, permission change_directoryactivecity added',
+    'group name=annuaire-pro, permission delete_directoryactivecity added',
+    'group name=annuaire-pro, permission view_city added',
+    'group name=annuaire-pro, permission view_city added',
+    'group name=annuaire-pro, permission view_directoryactivecity added',
     'group name=disable-user-password-auth created',
     'group name=disable-user-password-auth, permission disable_password_auth added',
     'group name=disable-user-password-auth, permission view_user added',
@@ -303,6 +325,7 @@
     'group name=itou-admin, permission add_announcementitem added',
     'group name=itou-admin, permission add_company added',
     'group name=itou-admin, permission add_companymembership added',
+    'group name=itou-admin, permission add_directoryactivecity added',
     'group name=itou-admin, permission add_eligibilitydiagnosis added',
     'group name=itou-admin, permission add_emailaddress added',
     'group name=itou-admin, permission add_geiqeligibilitydiagnosis added',
@@ -326,6 +349,7 @@
     'group name=itou-admin, permission change_cancelledapproval added',
     'group name=itou-admin, permission change_company added',
     'group name=itou-admin, permission change_companymembership added',
+    'group name=itou-admin, permission change_directoryactivecity added',
     'group name=itou-admin, permission change_eligibilitydiagnosis added',
     'group name=itou-admin, permission change_emailaddress added',
     'group name=itou-admin, permission change_employeerecord added',
@@ -356,6 +380,7 @@
     'group name=itou-admin, permission delete_announcementitem added',
     'group name=itou-admin, permission delete_approval added',
     'group name=itou-admin, permission delete_company added',
+    'group name=itou-admin, permission delete_directoryactivecity added',
     'group name=itou-admin, permission delete_eligibilitydiagnosis added',
     'group name=itou-admin, permission delete_emailaddress added',
     'group name=itou-admin, permission delete_employeerecord added',
@@ -406,6 +431,7 @@
     'group name=itou-admin, permission view_datum added',
     'group name=itou-admin, permission view_department added',
     'group name=itou-admin, permission view_department added',
+    'group name=itou-admin, permission view_directoryactivecity added',
     'group name=itou-admin, permission view_eligibilitydiagnosis added',
     'group name=itou-admin, permission view_email added',
     'group name=itou-admin, permission view_emailaddress added',
@@ -481,6 +507,7 @@
     'group name=itou-admin-readonly, permission view_datum added',
     'group name=itou-admin-readonly, permission view_department added',
     'group name=itou-admin-readonly, permission view_department added',
+    'group name=itou-admin-readonly, permission view_directoryactivecity added',
     'group name=itou-admin-readonly, permission view_eligibilitydiagnosis added',
     'group name=itou-admin-readonly, permission view_email added',
     'group name=itou-admin-readonly, permission view_emailaddress added',
