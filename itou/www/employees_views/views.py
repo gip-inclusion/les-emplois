@@ -121,7 +121,7 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
         context["immersion_convention_url"] = immersion_convention_url()
         context["approval_valid"] = approval and approval.is_valid()
         context["approval_expires_soon"] = approval and approval.remainder.days < 90
-        context["last_assignment"] = get_last_assignment(self.request, self.object)
+        context["last_user_assignment"] = get_last_assignment(self.request, self.object)
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(

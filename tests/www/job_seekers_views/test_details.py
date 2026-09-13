@@ -735,7 +735,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
-                    "last_assignment": assignment,
+                    "last_user_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -793,7 +793,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
-                    "last_assignment": assignment,
+                    "last_user_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
@@ -810,7 +810,7 @@ class TestLastAdvisor:
             Context(
                 {
                     "job_seeker": assignment.job_seeker,
-                    "last_assignment": assignment,
+                    "last_user_assignment": assignment,
                     "request": request,
                     "csrf_token": "CSRF_TOKEN",
                 }
