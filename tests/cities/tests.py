@@ -1,11 +1,15 @@
+from django.contrib import admin
 from django.contrib.gis.geos import Point
 from django.core import management
 from django.core.management import call_command
+from django.urls import reverse
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.cities.admin import CityAdmin
+from itou.cities.cache import get_directory_active_city_ids
 from itou.cities.management.commands.sync_cities import get_next_insee_code
-from itou.cities.models import City, EditionModeChoices
-from tests.cities.factories import create_city_guerande, create_test_cities
+from itou.cities.models import City, DirectoryActiveCity, EditionModeChoices
+from tests.cities.factories import create_city_guerande, create_city_vannes, create_test_cities
 from tests.companies.factories import JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory
@@ -455,6 +459,45 @@ def test_resolve_insee_cities(caplog, snapshot):
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
     )
+
+
+def test_city_admin_search_ranks_exact_match_first(rf):
+    vannes = create_city_vannes()
+    City.objects.create(
+        name="Fontvannes",
+        slug="fontvannes-10",
+        department="10",
+        coords=Point(4.0805, 48.2536),
+        post_codes=["10190"],
+        code_insee="10154",
+    )
+
+    queryset, _ = CityAdmin(City, admin.site).get_search_results(rf.get("/"), City.objects.all(), "Vannes")
+
+    assert list(queryset)[0] == vannes
+
+
+def test_directory_active_city_ids_cache(django_assert_num_queries):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+
+    with django_assert_num_queries(1):
+        assert get_directory_active_city_ids() == frozenset({vannes.pk})
+
+    # Cached: no query needed until the cache entry expires.
+    with django_assert_num_queries(0):
+        assert get_directory_active_city_ids() == frozenset({vannes.pk})
+
+
+def test_directory_active_city_admin(admin_client):
+    vannes = create_city_vannes()
+
+    response = admin_client.get(reverse("admin:cities_directoryactivecity_add"))
+    assert response.status_code == 200
+
+    response = admin_client.post(reverse("admin:cities_directoryactivecity_add"), {"city": vannes.pk})
+    assert response.status_code == 302
+    assert DirectoryActiveCity.objects.get().city == vannes
 
 
 def test_get_next_insee_code(settings, respx_mock):
