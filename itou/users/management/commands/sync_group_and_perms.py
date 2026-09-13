@@ -68,6 +68,7 @@ def get_permissions_dict():
         asp_models.Country: PERMS_READ,
         asp_models.Department: PERMS_READ,
         cities_models.City: PERMS_READ,
+        cities_models.DirectoryActiveCity: PERMS_ALL,
         communications_models.AnnouncementCampaign: PERMS_ALL,
         communications_models.AnnouncementItem: PERMS_ALL,
         companies_models.SiaeFinancialAnnex: PERMS_READ,
@@ -154,6 +155,10 @@ def get_permissions_dict():
     }
 
     return {
+        "annuaire-pro": {
+            cities_models.City: PERMS_READ,
+            cities_models.DirectoryActiveCity: PERMS_ALL,
+        },
         "itou-admin": {**group_itou_admin_permissions},
         "itou-admin-readonly": {
             **{model: perms & PERMS_READONLY for model, perms in group_itou_admin_permissions.items()}

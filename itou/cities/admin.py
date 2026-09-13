@@ -35,3 +35,10 @@ class CityAdmin(ReadonlyMixin, ItouGISMixin, ItouModelAdmin):
             return "Impossible de déterminer la classification en ZRR"
         else:
             return zrr.get_status_display()
+
+
+@admin.register(models.DirectoryActiveCity)
+class DirectoryActiveCityAdmin(ItouModelAdmin):
+    list_display = ("city",)
+    autocomplete_fields = ("city",)
+    search_fields = ("city__name__istartswith", "city__code_insee__istartswith")
