@@ -973,7 +973,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "certified_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="profil demandeur d'emploi"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de certification"),
                 ),
                 (
                     "jobseeker_profile",
