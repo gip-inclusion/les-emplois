@@ -3718,7 +3718,7 @@
 # ---
 # name: test_filtered_by_end_of_journey_for_siae
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -4146,30 +4146,6 @@
                               FROM "users_jobseekerassignment" U0
                               WHERE U0."company_id" = %s))))
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN
-                   (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
-                    FROM "users_jobseekerassignment" U0
-                    WHERE U0."company_id" = %s)
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
-                           AND U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."company_id" = %s)
-                    ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s)
         ''',
       }),
       dict({

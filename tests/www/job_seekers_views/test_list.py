@@ -1370,38 +1370,60 @@ def test_end_of_journey_filter_not_for_prescriber(client):
 
 
 @freeze_time("2026-01-15")
-def test_end_of_contracts_banners_for_siae(client):
-    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
-    company = membership.company
-    employer = membership.user
+def test_end_of_journey_banners_for_siae(client):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+    employer = company.members.first()
     client.force_login(employer)
     url = reverse("job_seekers_views:list_organization")
-    today = datetime.date(2026, 1, 15)
+    today = timezone.localdate()
 
-    # No contract ending soon: neither banner.
+    def add_employee(*, contract_ended):
+        job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=job_seeker,
+            company=company,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=today + datetime.timedelta(days=-10 if contract_ended else 20),
+        )
+        if contract_ended:
+            ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today)
+
     response = client.get(url)
-    assertNotContains(response, "Afficher ce salarié")
-    assertNotContains(response, "Afficher ces salariés")
+    assertNotContains(response, "en fin de parcours d’accompagnement")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
-    # A job seeker with a contract ending soon: discovery banner on the unfiltered list.
-    job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    ContractFactory(
-        job_seeker=job_seeker,
-        company=company,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
-    )
+    add_employee(contract_ended=False)
     response = client.get(url)
-    assertContains(response, "Vous avez 1 salarié en fin de contrat")
+    assertContains(response, "Vous avez 1 salarié en fin de parcours d’accompagnement")
+    assertContains(response, "<li>1 salarié termine son contrat dans les 30 prochains jours.</li>", html=True)
+    assertNotContains(response, "plus en contrat")
     assertContains(response, "Afficher ce salarié")
-    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
-    # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
+    add_employee(contract_ended=True)
+    response = client.get(url)
+    assertContains(response, "Vous avez 2 salariés en fin de parcours d’accompagnement")
+    assertContains(response, "<li>1 salarié termine son contrat dans les 30 prochains jours.</li>", html=True)
+    assertContains(
+        response, "<li>1 salarié n’est plus en contrat mais a encore un PASS\xa0IAE valide.</li>", html=True
+    )
+
+    add_employee(contract_ended=False)
+    add_employee(contract_ended=True)
+    response = client.get(url)
+    assertContains(response, "Vous avez 4 salariés en fin de parcours d’accompagnement")
+    assertContains(response, "<li>2 salariés terminent leurs contrats dans les 30 prochains jours.</li>", html=True)
+    assertContains(
+        response,
+        "<li>2 salariés ne sont plus en contrat mais ont encore un PASS\xa0IAE valide.</li>",
+        html=True,
+    )
+    assertContains(response, "Afficher ces salariés")
+    assertContains(response, f'href="{url}?end_of_journey=on&amp;assignments=all"')
+
+    # The discovery banner replaces it once the list is filtered.
+    response = client.get(url, {"end_of_journey": "on", "assignments": "all"})
     assertContains(response, "Suggérer une suite de parcours aux salariés")
-    assertNotContains(response, "Afficher ce salariés")
-    assertNotContains(response, "Afficher ces salariés")
+    assertNotContains(response, "en fin de parcours d’accompagnement")
 
 
 @freeze_time("2026-01-15")

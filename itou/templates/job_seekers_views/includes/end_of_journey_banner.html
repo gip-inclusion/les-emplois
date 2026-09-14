@@ -1,0 +1,47 @@
+{% load components %}
+{% load matomo %}
+{% load str_filters %}
+{% load url_add_query %}
+
+{% if show_end_of_contracts_banner %}
+    <div id="end-of-journey-banner"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+        {% if end_of_journey_filter_active %}
+            {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-contract-info-suggest" extra_classes="mb-3 mb-md-4" %}
+                {% fragment as title %}
+                    Suggérer une suite de parcours aux salariés
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Vous pouvez suggérer une suite de parcours directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
+        {% elif last_contract_ends_soon_count or last_contract_ended_count %}
+            {% with end_of_journey_count=last_contract_ends_soon_count|add:last_contract_ended_count %}
+                {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-journey-counts-banner" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Vous avez {{ end_of_journey_count }} salarié{{ end_of_journey_count|pluralizefr }} en fin de parcours d’accompagnement
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <ul class="mb-0">
+                            {% if last_contract_ends_soon_count == 1 %}
+                                <li>1 salarié termine son contrat dans les 30 prochains jours.</li>
+                            {% elif last_contract_ends_soon_count %}
+                                <li>{{ last_contract_ends_soon_count }} salariés terminent leurs contrats dans les 30 prochains jours.</li>
+                            {% endif %}
+                            {% if last_contract_ended_count == 1 %}
+                                <li>1 salarié n’est plus en contrat mais a encore un PASS IAE valide.</li>
+                            {% elif last_contract_ended_count %}
+                                <li>{{ last_contract_ended_count }} salariés ne sont plus en contrat mais ont encore un PASS IAE valide.</li>
+                            {% endif %}
+                        </ul>
+                    {% endfragment %}
+                    {% fragment as call_to_action %}
+                        {% url 'job_seekers_views:list_organization' as list_organization_url %}
+                        <a class="btn btn-sm btn-primary" href="{% url_add_query list_organization_url end_of_journey="on" assignments="all" %}" {% matomo_event "employeurs" "clic" "afficher-fins-de-parcours" %}>Afficher ce{{ end_of_journey_count|pluralizefr }} salarié{{ end_of_journey_count|pluralizefr }}</a>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endwith %}
+        {% endif %}
+    </div>
+{% endif %}

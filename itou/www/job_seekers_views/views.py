@@ -61,6 +61,7 @@ from itou.www.job_seekers_views.forms import (
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
+    annotate_end_of_journey,
     annotate_last_contract_end_date,
 )
 
@@ -607,7 +608,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
         end_of_journey_filter_active = bool(
-            form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
+            form.cleaned_data.get("approval_ending_soon")
+            or form.cleaned_data.get("contract_ending_soon")
+            or form.cleaned_data.get("end_of_journey")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
             # Contracts are the most precise, but they are delayed.
@@ -655,15 +658,16 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     today = timezone.localdate()
     contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
 
-    # Discovery banner: count over the SIAE assigned job seekers (unfiltered), only shown when the
+    # Discovery banner: counts over the SIAE assigned job seekers (unfiltered), only shown when the
     # end-of-journey filter is not active.
-    contracts_ending_soon_count = None
+    last_contract_ends_soon_count = last_contract_ended_count = None
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
-        contracts_ending_soon_count = (
-            annotate_last_contract_end_date(base_queryset, company=request.current_organization)
-            .filter(last_contract_end_date__range=contract_window)
-            .count()
+        end_of_journey_counts = annotate_end_of_journey(base_queryset, company=request.current_organization).aggregate(
+            ends_soon=Count("pk", filter=Q(last_contract_ends_soon=True)),
+            ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True)),
         )
+        last_contract_ends_soon_count = end_of_journey_counts["ends_soon"]
+        last_contract_ended_count = end_of_journey_counts["ended"]
 
     # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
     # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
@@ -722,7 +726,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "page_obj": page_obj,
         "show_end_of_contracts_banner": show_end_of_contracts_banner,
         "end_of_journey_filter_active": end_of_journey_filter_active,
-        "contracts_ending_soon_count": contracts_ending_soon_count,
+        "last_contract_ends_soon_count": last_contract_ends_soon_count,
+        "last_contract_ended_count": last_contract_ended_count,
         "suggest_next_step_url": suggest_next_step_url,
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(request.current_organization).filter(status=Status.REJECTED).count()

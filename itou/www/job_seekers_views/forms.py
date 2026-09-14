@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Exists, OuterRef, Q, Subquery, TextChoices, Value
+from django.db.models import BooleanField, Exists, ExpressionWrapper, OuterRef, Q, Subquery, TextChoices, Value
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
@@ -80,6 +80,15 @@ def last_contract_ended_with_valid_approval_q(company):
 
 def end_of_journey_q(company):
     return last_contract_ends_soon_q(company) | last_contract_ended_with_valid_approval_q(company)
+
+
+def annotate_end_of_journey(queryset, *, company):
+    return annotate_last_known_contract(queryset).annotate(
+        last_contract_ends_soon=ExpressionWrapper(last_contract_ends_soon_q(company), output_field=BooleanField()),
+        last_contract_ended_with_valid_approval=ExpressionWrapper(
+            last_contract_ended_with_valid_approval_q(company), output_field=BooleanField()
+        ),
+    )
 
 
 class AssignmentsChoices(TextChoices):
