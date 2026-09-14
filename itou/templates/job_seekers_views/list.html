@@ -33,7 +33,25 @@
 {% endblock %}
 
 {% block title_extra %}
-    {% if request.from_prescriber and request.current_organization.memberships.count > 1 %}
+    {% if request.from_authorized_prescriber %}
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+            <li class="nav-item">
+                <a class="nav-link{% if not list_organization %} active{% endif %}"
+                   href="{% url 'job_seekers_views:list' %}">Usagers accompagnés</a>
+            </li>
+            {% if request.current_organization.memberships.count > 1 %}
+                <li class="nav-item">
+                    <a class="nav-link{% if list_organization %} active{% endif %}"
+                       href="{% url 'job_seekers_views:list_organization' %}">Usagers accompagnés de la structure</a>
+                </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on">
+                    Prolongations de PASS IAE
+                </a>
+            </li>
+        </ul>
+    {% elif request.from_prescriber and request.current_organization.memberships.count > 1 %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item">
                 <a class="nav-link{% if not list_organization %} active{% endif %}"
