@@ -3,12 +3,12 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
-{% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
+{% block title %}Candidatures vers des emplois {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur les candidatures" %}
         {% fragment as c_title__main %}
-            {% include "apply/includes/list_job_applications_title.html" %}
+            <h1>Demandes envoyées</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% include "apply/includes/job_applications_export_button.html" %}
@@ -23,11 +23,18 @@
     {% endif %}
 {% endblock %}
 
+{% block title_extra %}
+    {% include "includes/applications_orientations_tabs.html" with active_tab="applications" only %}
+{% endblock title_extra %}
+
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">
         <div class="s-section__container container">
             {% include "apply/includes/job_applications_filters/top_filters.html" %}
+            <div class="s-section__row row">
+                <div class="col-12">{% include "apply/includes/list_job_applications_title.html" %}</div>
+            </div>
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
