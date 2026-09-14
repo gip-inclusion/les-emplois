@@ -566,6 +566,65 @@ class TestServices:
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
+    def test_detail_mobilization_link_in_modes(self, client):
+        user = PrescriberFactory()
+        mobilization = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION,
+            value="utiliser-lien-mobilisation",
+            label="Utiliser le lien de mobilisation",
+        )
+        external_link = "https://example.com/mobilisation"
+        service = ServiceFactory(
+            uid="test-mobilization-link-uid",
+            updated_on="2025-01-15",
+            mobilization_modes_professionals_external_form_link=external_link,
+            contact_is_public=True,
+            structure__updated_on="2025-01-15",
+        )
+        service.mobilizations.add(mobilization)
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, f'href="{external_link}"')
+        assertContains(response, "Utiliser le lien de mobilisation")
+        assertContains(response, "ri-external-link-line")
+
+    def test_detail_mobilization_link_not_clickable_without_authorization(self, client):
+        mobilization = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION,
+            value="utiliser-lien-mobilisation",
+            label="Utiliser le lien de mobilisation",
+        )
+        external_link = "https://example.com/mobilisation"
+        service = ServiceFactory(
+            uid="test-mobilization-link-private-uid",
+            updated_on="2025-01-15",
+            mobilization_modes_professionals_external_form_link=external_link,
+            contact_is_public=False,
+            structure__updated_on="2025-01-15",
+        )
+        service.mobilizations.add(mobilization)
+        response = client.get(self.get_service_url(service))
+        mobilization_modes = (
+            parse_response_to_soup(response, "main").find("small", string="Modes de mobilisation").find_next("strong")
+        )
+        assert "Utiliser le lien de mobilisation" in mobilization_modes.get_text()
+        assert mobilization_modes.find("a") is None
+
+    def test_detail_contact_modal_has_phone_copy_button(self, client):
+        user = PrescriberFactory()
+        service = ServiceFactory(
+            uid="test-contact-phone-copy-uid",
+            updated_on="2025-01-15",
+            contact_phone="01 23 45 67 89",
+            contact_is_public=True,
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        modal = parse_response_to_soup(response, "#service-contact-modal")
+        assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
+        assertNotContains(response, 'class="modal-footer"')
+
     def test_detail_with_external_orientation_link_without_text(self, client):
         user = PrescriberFactory()
         external_link = "https://test.example.com"

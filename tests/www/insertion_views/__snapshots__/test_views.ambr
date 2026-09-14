@@ -3839,11 +3839,6 @@
                       </a>
                   </div>
               </div>
-              <div class="modal-footer">
-                  <button class="btn btn-primary" data-bs-dismiss="modal" type="button">
-                      Terminer
-                  </button>
-              </div>
           </div>
       </div>
   </div>

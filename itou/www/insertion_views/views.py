@@ -160,7 +160,8 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         user_is_authorized = (
             self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
         )
-        can_view_modal = has_contact_to_display and user_is_authorized
+        can_view_contact = user_is_authorized
+        can_view_modal = has_contact_to_display and can_view_contact
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)
@@ -178,6 +179,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                     m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
                 ),
                 "formatted_categories": self.format_categories(),
+                "can_view_contact": can_view_contact,
                 "can_view_modal": can_view_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
             }

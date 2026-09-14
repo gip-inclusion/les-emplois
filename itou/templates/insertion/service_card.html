@@ -241,7 +241,15 @@
                                 <li>
                                     <small>Modes de mobilisation</small>
                                     <div>
-                                        <strong>{% for mobilization in service.mobilizations.all %}{{ mobilization.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                        <strong>
+                                            {% for mobilization in service.mobilizations.all %}
+                                                {% if mobilization.value == "utiliser-lien-mobilisation" and service.mobilization_modes_professionals_external_form_link and can_view_contact %}
+                                                    <a href="{{ service.mobilization_modes_professionals_external_form_link }}" class="has-external-link" rel="noopener noreferrer" target="_blank">{{ mobilization.label }}<i class="ri-external-link-line fw-normal ms-1" aria-hidden="true"></i></a>
+                                                {% else %}
+                                                    {{ mobilization.label }}
+                                                {% endif %}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </strong>
                                         {% if service.mobilizations_details %}
                                             <p><small class="mb-0">{{ service.mobilizations_details }}</small></p>
                                         {% endif %}
@@ -407,14 +415,14 @@
                             </div>
                         {% endif %}
                         {% if service.contact_phone %}
-                            <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                                <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
-                                {{ service.contact_phone|format_phone }}
+                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                                <div class="d-flex align-items-start overflow-hidden me-2">
+                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                    {{ service.contact_phone|format_phone }}
+                                </div>
+                                {% include "includes/copy_to_clipboard.html" with content=service.contact_phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier le numéro de téléphone" in_modal=True only %}
                             </div>
                         {% endif %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
                     </div>
                 </div>
             </div>
