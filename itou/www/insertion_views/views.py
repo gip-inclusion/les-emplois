@@ -45,6 +45,7 @@ from itou.utils.perms.utils import can_edit_personal_information, can_view_perso
 from itou.utils.phone import normalize_phone_number
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.session import SessionNamespace, SessionNamespaceException
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
 from itou.www.insertion_views.forms import (
     OrientationConformityForm,
@@ -321,32 +322,6 @@ class OrientationSelectJobSeekerView(FormView):
         }
 
 
-class OrientationResultBaseView(TemplateView):
-    matomo_custom_title = None
-
-    def get_context_data(self, **kwargs):
-        service = get_object_or_404(
-            insertion_models.Service.objects.select_related("kind", "structure"),
-            uid=self.kwargs["service_uid"],
-        )
-        job_seeker = get_object_or_404(
-            User.objects.select_related("jobseeker_profile"),
-            public_id=self.request.GET.get("job_seeker_public_id"),
-            kind=UserKind.JOB_SEEKER,
-        )
-        return super().get_context_data(**kwargs) | {
-            "service": service,
-            "job_seeker": job_seeker,
-            "can_view_personal_information": can_view_personal_information(self.request, job_seeker),
-            "matomo_custom_title": self.matomo_custom_title,
-        }
-
-
-class OrientationConfirmationView(OrientationResultBaseView):
-    template_name = "insertion/orientation_confirmation.html"
-    matomo_custom_title = "Demande d'orientation transmise"
-
-
 class OrientationWizardView(WizardView):
     url_name = "insertion_views:orientation_steps"
     expected_session_kind = "orientation"
@@ -370,6 +345,7 @@ class OrientationWizardView(WizardView):
             public_id=self.wizard_session.get("job_seeker_public_id"),
             kind=UserKind.JOB_SEEKER,
         )
+        self.can_view_personal_information = can_view_personal_information(self.request, self.job_seeker)
 
     def get_form(self, step, data):
         files = self.request.FILES if self.request.method == "POST" else None
@@ -536,13 +512,20 @@ class OrientationWizardView(WizardView):
                 self.job_seeker, request.user, request.current_organization, ActionKind.ORIENT
             )
 
-            confirmation_url = reverse(
-                "insertion_views:orientation_confirmation",
-                kwargs={"service_uid": self.service.uid},
-                query={"job_seeker_public_id": self.job_seeker.public_id},
+            # A non-authorized prescriber may orient a job seeker whose account they did not create
+            # (e.g. a first visit), but must not see their personal information
+            messages.success(
+                request,
+                "Votre demande a bien été transmise !||"
+                "Le récapitulatif de la demande vous a été envoyé, ainsi qu’à l’adresse e-mail de "
+                f"{mask_unless(self.job_seeker.get_full_name(), predicate=self.can_view_personal_information)} : "
+                f"{mask_unless(self.job_seeker.email, predicate=self.can_view_personal_information)}",
+                extra_tags="toast",
             )
             self.wizard_session.delete()
-            return HttpResponseRedirect(confirmation_url)
+            return HttpResponseRedirect(
+                reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
+            )
 
         if self.form.is_valid():
             logger.info(
@@ -563,7 +546,7 @@ class OrientationWizardView(WizardView):
         return super().get_context_data(**kwargs) | {
             "service": self.service,
             "job_seeker": self.job_seeker,
-            "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
+            "can_view_personal_information": self.can_view_personal_information,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "missing_beneficiary_fields": get_missing_orientation_beneficiary_field_labels(self.job_seeker),
             "credential_documents": self.service.generate_credential_documents_info(),

@@ -178,54 +178,6 @@
   
   '''
 # ---
-# name: test_orientation_wizard_happy_path[confirmation]
-  '''
-  <section class="s-section">
-      <div class="s-section__container container">
-          <div class="s-section__row row">
-              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
-                  <div class="c-form">
-                      <h2 class="h3">
-                          Votre demande a bien été transmise !
-                      </h2>
-                      <p>
-                          Le récapitulatif de la demande vous a été envoyé, ainsi qu'à l'adresse e-mail de
-                              Jane DOE :
-                              usager@example.org.
-                      </p>
-                      <a class="btn btn-primary" href="/dashboard/">
-                          Retour à l'accueil
-                      </a>
-                  </div>
-              </div>
-              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
-                  <div class="c-box c-box--organization mb-3 mb-md-4">
-                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-hand-heart-line">
-                          </i>
-                          <div>
-                              <span class="d-block h3">
-                                  Service orientation wizard
-                              </span>
-                          </div>
-                      </button>
-                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
-                          <hr class="my-4"/>
-                          <p class="mb-0">
-                              Structure orientation wizard
-                          </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a" rel="noopener noreferrer" target="_blank">
-                              Voir la fiche structure
-                          </a>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
-  
-  '''
-# ---
 # name: test_orientation_wizard_happy_path[conformity]
   '''
   <section class="s-section">
@@ -784,6 +736,30 @@
           </div>
       </div>
   </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[toast]
+  '''
+  <div aria-atomic="true" aria-live="polite" class="toast-container">
+      <div aria-atomic="true" aria-live="assertive" class="toast toast--success" data-delay="6000" role="status">
+          <div class="toast-header">
+              <i aria-hidden="true" class="ri-check-line ri-lg me-1">
+              </i>
+              <strong class="me-auto">
+                  Votre demande a bien été transmise !
+              </strong>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="toast" type="button">
+                  <span class="visually-hidden">
+                      J'ai compris
+                  </span>
+              </button>
+          </div>
+          <div class="toast-body">
+              Le récapitulatif de la demande vous a été envoyé, ainsi qu’à l’adresse e-mail de Jane DOE : usager@example.org
+          </div>
+      </div>
+  </div>
   
   '''
 # ---

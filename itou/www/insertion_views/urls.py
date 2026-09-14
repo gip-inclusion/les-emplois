@@ -33,11 +33,6 @@ urlpatterns = [
         name="orientation_dismiss_disclaimer",
     ),
     path(
-        "orientations/<encoded_uid:service_uid>/confirmation/",
-        views.OrientationConfirmationView.as_view(),
-        name="orientation_confirmation",
-    ),
-    path(
         "orientations/<uuid:orientation_id>/",
         views.orientation_details_for_sender,
         name="orientation_details_for_sender",

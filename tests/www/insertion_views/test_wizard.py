@@ -139,12 +139,11 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
             "gdpr_consent": "on",
         },
     )
-    confirmation_url = reverse(
-        "insertion_views:orientation_confirmation",
-        kwargs={"service_uid": service.uid},
-        query={"job_seeker_public_id": job_seeker.public_id},
+    details_url = reverse(
+        "insertion_views:orientation_details_for_sender",
+        kwargs={"orientation_id": emplois_sync_uid},
     )
-    assertRedirects(response, confirmation_url, fetch_redirect_response=False)
+    assertRedirects(response, details_url, fetch_redirect_response=False)
     mock_dora.return_value.create_orientation.assert_called_once()
 
     orientation = Orientation.objects.get()
@@ -208,8 +207,8 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         },
     }
 
-    response = client.get(confirmation_url)
-    assert pretty_indented(parse_response_to_soup(response, "#main .s-section")) == snapshot(name="confirmation")
+    response = client.get(details_url)
+    assert pretty_indented(parse_response_to_soup(response, ".toast-container")) == snapshot(name="toast")
 
 
 def test_documents_step_credential_documents(client):
@@ -570,6 +569,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     view = OrientationWizardView()
     view.step = OrientationStep.DOCUMENTS
     view.job_seeker = job_seeker
+    view.can_view_personal_information = True
     view.service = mocker.Mock(
         uid="service-uid",
         name="Service",
@@ -594,7 +594,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     request = mocker.Mock()
     request.user.pk = 1
     request.current_organization = None
-    mocker.patch("itou.www.insertion_views.views.reverse", return_value="/confirmation")
+    mocker.patch("itou.www.insertion_views.views.reverse", return_value="/orientation-details")
 
     view.post(request)
 
@@ -646,7 +646,7 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
     emplois_sync_uid = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
     mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
     mock_dora.return_value.create_orientation.return_value = {"emplois_sync_uid": emplois_sync_uid}
-    client.post(documents_url, {"gdpr_consent": "on"})
+    response = client.post(documents_url, {"gdpr_consent": "on"})
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload["beneficiary_phone"] == ""
@@ -654,6 +654,9 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
 
     orientation = Orientation.objects.get()
     assert str(orientation.id) == emplois_sync_uid
+    assertRedirects(
+        response, reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
+    )
     assert orientation.sender == user
     assert orientation.sender_kind == SenderKind.EMPLOYER
     assert orientation.sender_company == organization
@@ -666,6 +669,72 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
         company=organization,
         last_action_kind=ActionKind.ORIENT,
     ).exists()
+
+
+@pytest.mark.parametrize(
+    "authorized,created_by,expected",
+    [
+        pytest.param(True, False, "Jean DUPONT : usager@example.org", id="authorized"),
+        # Expected: a job seeker may turn to a non-authorized prescriber for the first time,
+        # who can orient them without being allowed to see their personal information
+        pytest.param(False, False, "J… D… : u…", id="not_authorized"),
+        pytest.param(False, True, "Jean DUPONT : usager@example.org", id="not_authorized_creator"),
+    ],
+)
+def test_orientation_wizard_success_toast_personal_information(client, mocker, authorized, created_by, expected):
+    prescriber = PrescriberMembershipFactory(organization__authorized=authorized).user
+    job_seeker = JobSeekerFactory(
+        first_name="Jean",
+        last_name="Dupont",
+        email="usager@example.org",
+        created_by=prescriber if created_by else None,
+    )
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url, {"job_seeker_public_id": job_seeker.public_id})
+
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    client.post(
+        reverse(
+            "insertion_views:orientation_steps",
+            kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+        ),
+        {"confirms_conditions": "on"},
+    )
+    client.post(
+        reverse(
+            "insertion_views:orientation_steps",
+            kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+        ),
+        {
+            "referent_last_name": "Dupont",
+            "referent_first_name": "Jean",
+            "referent_phone": "0612345678",
+            "referent_email": "jean@example.com",
+        },
+    )
+
+    mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {
+        "emplois_sync_uid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    }
+    response = client.post(
+        reverse(
+            "insertion_views:orientation_steps",
+            kwargs={"session_uuid": session_uuid, "step": OrientationStep.DOCUMENTS},
+        ),
+        {"gdpr_consent": "on"},
+        follow=True,
+    )
+
+    toast_body = (
+        '<div class="toast-body">Le récapitulatif de la demande vous a été envoyé, '
+        f"ainsi qu’à l’adresse e-mail de {expected}</div>"
+    )
+    assertContains(response, toast_body, html=True)
 
 
 def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, mocker):
