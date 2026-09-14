@@ -3,6 +3,7 @@ import logging
 import secrets
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
@@ -455,6 +456,10 @@ class Service(GeolocatedAddressMixin, models.Model):
     @property
     def is_dora(self):
         return self.source.value == "dora"
+
+    @property
+    def update_needed(self):
+        return self.updated_on < timezone.localdate() - relativedelta(months=6)
 
     @property
     def prerequisites(self) -> list[str]:
