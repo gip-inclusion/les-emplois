@@ -1390,7 +1390,7 @@ def test_end_of_journey_banners_for_siae(client):
 
     response = client.get(url)
     assertNotContains(response, "en fin de parcours d’accompagnement")
-    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+    assertNotContains(response, "grâce au bilan d’accompagnement")
 
     add_employee(contract_ended=False)
     response = client.get(url)
@@ -1422,61 +1422,79 @@ def test_end_of_journey_banners_for_siae(client):
 
     # The discovery banner replaces it once the list is filtered.
     response = client.get(url, {"end_of_journey": "on", "assignments": "all"})
-    assertContains(response, "Suggérer une suite de parcours aux salariés")
+    assertContains(response, "grâce au bilan d’accompagnement")
     assertNotContains(response, "en fin de parcours d’accompagnement")
 
 
 @freeze_time("2026-01-15")
-@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
-def test_suggest_next_step_action_in_list(client):
-    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
-    company = membership.company
-    employer = membership.user
+@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wREPORT")
+def test_pro_support_report_action_in_list_for_siae(client):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+    employer = company.members.first()
     client.force_login(employer)
     url = reverse("job_seekers_views:list_organization")
-    today = datetime.date(2026, 1, 15)
-    ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    today = timezone.localdate()
+    contract_ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
-        job_seeker=ending_soon,
+        job_seeker=contract_ending_soon,
         company=company,
         start_date=today - datetime.timedelta(days=200),
         end_date=today + datetime.timedelta(days=20),
     )
-    # A job seeker with no contract ending soon: no action on their row.
+    contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=contract_ended,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today - datetime.timedelta(days=10),
+    )
+    ApprovalFactory(user=contract_ended, start_at=today - datetime.timedelta(days=300), end_at=today)
     JobSeekerAssignmentFactory(professional=employer, company=company)
 
-    # Unfiltered: the action is offered on the row of the job seeker ending soon (mirroring the card banner),
-    # exactly once, and it links to the Tally form pre-filled with the responding employer's identifiers.
-    tally_url = f"https://tally.example/r/wSUGGEST?iduser={employer.pk}&kindcompany={company.kind}"
-    response = client.get(url)
-    assertContains(response, "Suggérer une suite de parcours")
-    assertContains(response, tally_url, count=1)
-
-    # With the end-of-journey filter active, only the job seeker ending soon remains, still with the action.
-    response = client.get(url, {"contract_ending_soon": "on"})
-    assertContains(response, tally_url, count=1)
+    tally_url = f"https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}"
+    for params in [{}, {"end_of_journey": "on", "assignments": "all"}]:
+        response = client.get(url, params)
+        assertContains(response, "Faire le bilan d’accompagnement", count=2)
+        assertContains(response, tally_url, count=2)
 
 
 @freeze_time("2026-01-15")
-@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
-def test_suggest_next_step_banner_on_job_seeker_card(client):
-    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
-    company = membership.company
-    employer = membership.user
+@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wREPORT")
+def test_pro_support_report_banner_on_job_seeker_card_for_siae(client):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+    employer = company.members.first()
     client.force_login(employer)
-    today = datetime.date(2026, 1, 15)
+    today = timezone.localdate()
     job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    ContractFactory(
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+    tally_url = f"https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}"
+
+    response = client.get(url)
+    assertNotContains(response, "Remplir le bilan")
+
+    contract = ContractFactory(
         job_seeker=job_seeker,
         company=company,
         start_date=today - datetime.timedelta(days=200),
         end_date=today + datetime.timedelta(days=20),
     )
-
-    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    response = client.get(url)
     assertContains(response, "Le contrat arrive bientôt à échéance")
-    assertContains(response, "04/02/2026")
-    assertContains(response, f"https://tally.example/r/wSUGGEST?iduser={employer.pk}&kindcompany={company.kind}")
+    assertContains(response, "Le contrat de ce salarié arrive à échéance le 04/02/2026.")
+    assertContains(response, tally_url)
+
+    contract.end_date = today - datetime.timedelta(days=10)
+    contract.save()
+    response = client.get(url)
+    assertNotContains(response, "Remplir le bilan")
+
+    ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today)
+    response = client.get(url)
+    assertContains(response, "Le contrat de travail a pris fin")
+    assertContains(
+        response, "Le contrat de ce salarié a pris fin le 05/01/2026, mais son PASS\xa0IAE est encore valide."
+    )
+    assertContains(response, tally_url)
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

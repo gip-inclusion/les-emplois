@@ -112,7 +112,7 @@
                             {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                     </div>
-                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request csrf_token=csrf_token order=order can_orient_towards_insertion_service=can_orient_towards_insertion_service show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active last_contract_ends_soon_count=last_contract_ends_soon_count last_contract_ended_count=last_contract_ended_count suggest_next_step_url=suggest_next_step_url list_organization=list_organization only %}
+                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request csrf_token=csrf_token order=order can_orient_towards_insertion_service=can_orient_towards_insertion_service show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active last_contract_ends_soon_count=last_contract_ends_soon_count last_contract_ended_count=last_contract_ended_count pro_support_report_url=pro_support_report_url list_organization=list_organization only %}
                 </div>
             </div>
         </div>

@@ -525,7 +525,7 @@ PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
 
 TALLY_URL = os.getenv("TALLY_URL")
 
-# Tally form id for the SIAE "suggest a next step" action (end of IAE contract). Empty until provided:
+# Tally form id of the SIAE pro support report, at the end of the IAE journey. Empty until provided:
 # the action and the job seeker card banner stay hidden while it is not set.
 TALLY_SUGGEST_NEXT_STEP_FORM_ID = os.getenv("TALLY_SUGGEST_NEXT_STEP_FORM_ID")
 

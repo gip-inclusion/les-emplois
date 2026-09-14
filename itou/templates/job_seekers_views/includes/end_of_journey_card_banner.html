@@ -1,0 +1,27 @@
+{% load components %}
+{% load matomo %}
+
+{% if pro_support_report_url %}
+    {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id=card_banner_extra_id extra_classes="mb-3 mb-md-4" %}
+        {% fragment as title %}
+            {% if last_contract_ended %}
+                Le contrat de travail a pris fin
+            {% else %}
+                Le contrat arrive bientôt à échéance
+            {% endif %}
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                {% if last_contract_ended %}
+                    Le contrat de ce salarié a pris fin le {{ last_contract_end_date|date:"d/m/Y" }}, mais son PASS IAE est encore valide.
+                {% else %}
+                    Le contrat de ce salarié arrive à échéance le {{ last_contract_end_date|date:"d/m/Y" }}.
+                {% endif %}
+                Vous pouvez communiquer la suite du parcours envisagée au prescripteur en remplissant un bilan d’accompagnement.
+            </p>
+        {% endfragment %}
+        {% fragment as call_to_action %}
+            <a class="btn btn-sm btn-primary has-external-link" href="{{ pro_support_report_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "remplir-bilan-fiche" %}>Remplir le bilan</a>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endif %}

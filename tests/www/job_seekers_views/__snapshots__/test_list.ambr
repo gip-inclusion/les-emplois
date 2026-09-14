@@ -4237,14 +4237,44 @@
                                     WHERE (U0."ended_at" IS NULL
                                            AND U0."job_seeker_id" = ("users_user"."id"))
                                     GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
-          
-               (SELECT U0."end_date" AS "end_date"
-                FROM "companies_contract" U0
-                WHERE (U0."end_date" IS NOT NULL
-                       AND U0."job_seeker_id" = ("users_user"."id")
-                       AND U0."company_id" = %s)
-                ORDER BY 1 DESC
-                LIMIT 1) AS "last_contract_end_date"
+                        (
+                           (SELECT U0."company_id" AS "company"
+                            FROM "companies_contract" U0
+                            WHERE (U0."company_id" IS NOT NULL
+                                   AND U0."job_seeker_id" = ("users_user"."id"))
+                            ORDER BY U0."start_date" DESC,
+                                     U0."id" DESC
+                            LIMIT 1) = %s
+                         AND
+                           (SELECT U0."end_date" AS "end_date"
+                            FROM "companies_contract" U0
+                            WHERE (U0."company_id" IS NOT NULL
+                                   AND U0."job_seeker_id" = ("users_user"."id"))
+                            ORDER BY U0."start_date" DESC,
+                                     U0."id" DESC
+                            LIMIT 1) BETWEEN %s AND %s) AS "last_contract_ends_soon",
+                        (EXISTS
+                           (SELECT %s AS "a"
+                            FROM "approvals_approval" U0
+                            WHERE (U0."end_at" >= %s
+                                   AND U0."user_id" = ("users_user"."id"))
+                            LIMIT 1)
+                         AND
+                           (SELECT U0."company_id" AS "company"
+                            FROM "companies_contract" U0
+                            WHERE (U0."company_id" IS NOT NULL
+                                   AND U0."job_seeker_id" = ("users_user"."id"))
+                            ORDER BY U0."start_date" DESC,
+                                     U0."id" DESC
+                            LIMIT 1) = %s
+                         AND
+                           (SELECT U0."end_date" AS "end_date"
+                            FROM "companies_contract" U0
+                            WHERE (U0."company_id" IS NOT NULL
+                                   AND U0."job_seeker_id" = ("users_user"."id"))
+                            ORDER BY U0."start_date" DESC,
+                                     U0."id" DESC
+                            LIMIT 1) < %s) AS "last_contract_ended_with_valid_approval"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4305,7 +4335,9 @@
                       5,
                       7,
                       8,
-                      9) subquery
+                      9,
+                      10,
+                      11) subquery
         ''',
       }),
       dict({
@@ -4431,14 +4463,44 @@
                                  WHERE (U0."ended_at" IS NULL
                                         AND U0."job_seeker_id" = ("users_user"."id"))
                                  GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
-          
-            (SELECT U0."end_date" AS "end_date"
-             FROM "companies_contract" U0
-             WHERE (U0."end_date" IS NOT NULL
-                    AND U0."job_seeker_id" = ("users_user"."id")
-                    AND U0."company_id" = %s)
-             ORDER BY 1 DESC
-             LIMIT 1) AS "last_contract_end_date",
+                     (
+                        (SELECT U0."company_id" AS "company"
+                         FROM "companies_contract" U0
+                         WHERE (U0."company_id" IS NOT NULL
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         ORDER BY U0."start_date" DESC,
+                                  U0."id" DESC
+                         LIMIT 1) = %s
+                      AND
+                        (SELECT U0."end_date" AS "end_date"
+                         FROM "companies_contract" U0
+                         WHERE (U0."company_id" IS NOT NULL
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         ORDER BY U0."start_date" DESC,
+                                  U0."id" DESC
+                         LIMIT 1) BETWEEN %s AND %s) AS "last_contract_ends_soon",
+                     (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "approvals_approval" U0
+                         WHERE (U0."end_at" >= %s
+                                AND U0."user_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      AND
+                        (SELECT U0."company_id" AS "company"
+                         FROM "companies_contract" U0
+                         WHERE (U0."company_id" IS NOT NULL
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         ORDER BY U0."start_date" DESC,
+                                  U0."id" DESC
+                         LIMIT 1) = %s
+                      AND
+                        (SELECT U0."end_date" AS "end_date"
+                         FROM "companies_contract" U0
+                         WHERE (U0."company_id" IS NOT NULL
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         ORDER BY U0."start_date" DESC,
+                                  U0."id" DESC
+                         LIMIT 1) < %s) AS "last_contract_ended_with_valid_approval",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -4547,6 +4609,8 @@
                    45,
                    46,
                    47,
+                   48,
+                   49,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 44 DESC,
                    "users_user"."id" DESC

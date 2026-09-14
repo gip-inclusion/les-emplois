@@ -6,13 +6,13 @@
 {% if show_end_of_contracts_banner %}
     <div id="end-of-journey-banner"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
         {% if end_of_journey_filter_active %}
-            {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-contract-info-suggest" extra_classes="mb-3 mb-md-4" %}
+            {% component_alert title=title content=content variant="info" dismissible_once=True extra_id="end-of-journey-pro-support-report-banner" extra_classes="mb-3 mb-md-4" %}
                 {% fragment as title %}
-                    Suggérer une suite de parcours aux salariés
+                    NOUVEAU : Assurez une suite de parcours à votre salarié grâce au bilan d’accompagnement
                 {% endfragment %}
                 {% fragment as content %}
                     <p class="mb-0">
-                        Vous pouvez suggérer une suite de parcours directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
+                        Vous pouvez faire un bilan d’accompagnement, directement depuis la fiche du salarié ou en cliquant sur « ⋮ » à droite de sa ligne.
                     </p>
                 {% endfragment %}
             {% endcomponent_alert %}

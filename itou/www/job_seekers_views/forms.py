@@ -36,13 +36,6 @@ IAE_CONTRACT_ENDING_SOON_DAYS = 30
 
 def annotate_last_contract_end_date(queryset, *, company=None):
     # Latest known IAE contract end date of the job seeker, optionally scoped to a single SIAE.
-    # Scoping to the current SIAE avoids counting a contract signed with another structure, and keeps
-    # a renewed employee out of the cohort (their latest contract with the SIAE ends later).
-    # Shared business definition reused by the dashboard counter, the filter, the discovery banner and
-    # the per-row end-of-contract flag. Idempotent so the list view can annotate for the row flag while
-    # the filter also annotates for the same SIAE, without raising on a duplicate annotation.
-    if "last_contract_end_date" in queryset.query.annotations:
-        return queryset
     contracts = Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
     if company is not None:
         contracts = contracts.filter(company=company)

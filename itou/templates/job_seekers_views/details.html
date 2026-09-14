@@ -44,9 +44,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% if contract_ending_soon_date %}
+                                {% if pro_support_report_url %}
                                     <div class="col-12 order-1 order-xxl-1">
-                                        {% include "job_seekers_views/includes/end_of_contract_card_banner.html" with contract_ending_soon_date=contract_ending_soon_date suggest_next_step_url=suggest_next_step_url fiche_banner_extra_id=fiche_banner_extra_id request=request only %}
+                                        {% include "job_seekers_views/includes/end_of_journey_card_banner.html" with last_contract_end_date=last_contract_end_date last_contract_ended=last_contract_ended pro_support_report_url=pro_support_report_url card_banner_extra_id=card_banner_extra_id request=request only %}
                                     </div>
                                 {% endif %}
                                 <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
