@@ -452,12 +452,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         ]:
             transition = getattr(self, transition_name)
             if transition.is_available():
-                if EmployeeRecord.objects.missed_notifications().filter(pk=self.pk).exists():
-                    EmployeeRecordUpdateNotification.objects.update_or_create(
-                        employee_record=self,
-                        status=NotificationStatus.NEW,
-                        defaults={"updated_at": timezone.now},
-                    )
                 return transition()
 
         if self.status != Status.ARCHIVED:
