@@ -833,7 +833,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "admin",
     "apply",
     "employee_record",
-    "employees",
     "insertion",
     "releases/list.html",
 )

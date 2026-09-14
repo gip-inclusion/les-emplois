@@ -354,7 +354,7 @@ class BaseConfirmationView(JobSeekerAndContractInfosNeededMixin, TemplateView):
         if job_application.to_company.is_subject_to_iae_rules:
             # Automatic approval delivery mode.
             if job_application.approval:
-                messages.success(request, "Candidature acceptée !", extra_tags="toast")
+                messages.success(request, "Candidature acceptée !", extra_tags="toast")
             # Manual approval delivery mode.
             else:
                 external_link = get_external_link_markup(
