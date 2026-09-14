@@ -617,7 +617,7 @@ class Command(BaseCommand):
     def populate_job_seeker_assignments(self):
         queryset = JobSeekerAssignment.objects.all()
         metabase_db.populate_table(
-            job_seeker_assignments.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
+            job_seeker_assignments.TABLE, batch_size=20_000, querysets=[queryset], schema="raw_emplois"
         )
 
     def populate_references(self):
