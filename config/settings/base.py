@@ -949,3 +949,8 @@ NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 
 OVERVIEW_TAB_TEST_DEPARTMENT = "13" if SHOW_DEMO_ACCOUNTS_BANNER else "93"
 OVERVIEW_TAB_CONTROL_DEPARTMENT = "13"
+
+# This API seems to be rarely used (which is understandable) and will soon have to be dropped
+API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT = (
+    os.getenv("API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT", "False") == "True"
+)
