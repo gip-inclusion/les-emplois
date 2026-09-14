@@ -143,7 +143,7 @@ class TestDashboardView:
 
         response = client.get(reverse("dashboard:index"))
         assertContains(response, format_siret(prescriber_organization.siret))
-        assertContains(response, "Mes accompagnements")
+        assertContains(response, "Usagers accompagnés")
 
     def test_dashboard_displays_asp_badge(self, client):
         WARNING_CLASS = "bg-warning"
