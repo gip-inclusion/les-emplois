@@ -1,0 +1,113 @@
+# serializer version: 1
+# name: test_delete_orientations_documents[sql]
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.handle[insertion/management/commands/delete_orientations_documents.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[insertion/management/commands/delete_orientations_documents.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_orientation"."id",
+                 "insertion_orientation"."beneficiary_id",
+                 "insertion_orientation"."sender_id",
+                 "insertion_orientation"."sender_kind",
+                 "insertion_orientation"."sender_prescriber_organization_id",
+                 "insertion_orientation"."sender_company_id",
+                 "insertion_orientation"."service_id",
+                 "insertion_orientation"."beneficiary_contact_preferences",
+                 "insertion_orientation"."beneficiary_other_contact_method",
+                 "insertion_orientation"."beneficiary_availability",
+                 "insertion_orientation"."requirements",
+                 "insertion_orientation"."situation",
+                 "insertion_orientation"."situation_other",
+                 "insertion_orientation"."referent_last_name",
+                 "insertion_orientation"."referent_first_name",
+                 "insertion_orientation"."referent_phone",
+                 "insertion_orientation"."referent_email",
+                 "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."refusal_reasons",
+                 "insertion_orientation"."refusal_details",
+                 "insertion_orientation"."status",
+                 "insertion_orientation"."processing_date",
+                 "insertion_orientation"."duration_weekly_hours",
+                 "insertion_orientation"."duration_weeks",
+                 "insertion_orientation"."data_protection_commitment",
+                 "insertion_orientation"."attachments",
+                 "insertion_orientation"."last_reminder_email_sent_at",
+                 "insertion_orientation"."created_at",
+                 "insertion_orientation"."updated_at",
+                 "insertion_orientation"."dora_status_updated_at"
+          FROM "insertion_orientation"
+          INNER JOIN "insertion_orientation_documents" ON ("insertion_orientation"."id" = "insertion_orientation_documents"."orientation_id")
+          WHERE ("insertion_orientation"."created_at" <= %s
+                 AND "insertion_orientation_documents"."file_id" IS NOT NULL)
+          ORDER BY "insertion_orientation"."created_at" ASC,
+                   "insertion_orientation"."id" ASC
+          LIMIT 100
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Command.handle[insertion/management/commands/delete_orientations_documents.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Command.handle[insertion/management/commands/delete_orientations_documents.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
