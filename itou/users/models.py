@@ -1572,7 +1572,7 @@ class IdentityCertification(models.Model):
     )
     certified_at = models.DateTimeField(
         default=timezone.now,
-        verbose_name=JobSeekerProfile._meta.verbose_name,
+        verbose_name="date de certification",
     )
 
     objects = IdentityCertificationManager()
