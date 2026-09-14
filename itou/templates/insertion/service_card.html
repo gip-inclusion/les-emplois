@@ -17,9 +17,7 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>
-        {{ service.name }} <span class="badge badge-base rounded-pill text-bg-success">Mise à jour {{ service.updated_on|date:"d/m/Y" }}</span>
-    </h1>
+    <h1>{{ service.name }} {% include "insertion/includes/updated_on_badge.html" with service=service only %}</h1>
 {% endblock %}
 
 {% block global_messages %}

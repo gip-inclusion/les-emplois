@@ -2703,8 +2703,10 @@
                       </div>
                       <h1>
                           Mon service de test
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 15/01/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 15/01/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
@@ -2867,8 +2869,10 @@
                       </div>
                       <h1>
                           Mon service de test
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 15/01/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 15/01/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
@@ -3133,8 +3137,10 @@
                       </div>
                       <h1>
                           Service complet
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 01/06/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 01/06/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
