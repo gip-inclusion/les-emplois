@@ -26,7 +26,7 @@
         {% if employee_record.status == "REJECTED" %}
             {% component_alert title=title content=content variant="warning" %}
                 {% fragment as title %}
-                    Informations sur l'erreur de traitement :
+                    Informations sur l'erreur de traitement :
                 {% endfragment %}
                 {% fragment as content %}
                     {% if employee_record.asp_processing_code == "3308" %}
@@ -88,7 +88,7 @@
                         <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                     {% else %}
                         <p class="mb-0">
-                            Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
+                            Erreur {{ employee_record.asp_processing_code }} :<small>{{ employee_record.asp_processing_label }}</small>
                         </p>
                     {% endif %}
                 {% endfragment %}

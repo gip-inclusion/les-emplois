@@ -477,7 +477,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
                 # If anything goes wrong during employee record creation, catch it and show error to the user
                 messages.error(
                     request,
-                    f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
+                    f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
                 )
                 employee_record = None
 
@@ -686,7 +686,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
         except ValidationError as ex:
             messages.error(
                 request,
-                f"Il est impossible de réactiver cette fiche salarié pour la raison suivante : {ex.message}.",
+                f"Il est impossible de réactiver cette fiche salarié pour la raison suivante : {ex.message}.",
             )
 
     context = {

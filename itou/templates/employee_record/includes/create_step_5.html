@@ -33,7 +33,7 @@
                     {% endfragment %}
                     {% fragment as content %}
                         <p>
-                            La validation de la fiche salarié sera possible à compter de la date d’embauche : {{ job_application.hiring_start_at|date:"d/m/Y" }}.
+                            La validation de la fiche salarié sera possible à compter de la date d’embauche : {{ job_application.hiring_start_at|date:"d/m/Y" }}.
                             <br>
                             Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
                         </p>
@@ -74,7 +74,7 @@
                    href="{% url 'approvals:display_printable_approval' public_id=job_application.approval.public_id %}"
                    target="_blank">
                     <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
-                    <span>Afficher le PASS&nbsp;IAE</span>
+                    <span>Afficher le PASS IAE</span>
                 </a>
             {% endwith %}
         </div>
