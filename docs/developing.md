@@ -71,3 +71,7 @@ Il est possible de définir celles-ci via le fichier `.envrc` si vous utilisez d
 export GDAL_LIBRARY_PATH="$(brew --prefix gdal)/lib/libgdal.dylib"
 export GEOS_LIBRARY_PATH="$(brew --prefix geos)/lib/libgeos_c.dylib"
 ```
+
+## SSO
+
+La méthode pour brancher un environnement de dev ou une recette jetable à un SSI est disponible dans notre documentation privée.
