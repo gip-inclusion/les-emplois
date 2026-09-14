@@ -639,6 +639,7 @@ class OrientationWorkflow(xwf_models.Workflow):
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
     PENDING_EXPIRATION_PERIOD_DAYS = 30  # as in DORA
     REMINDER_EMAIL_DELAY_DAYS = 10  # as in DORA
+    DOCUMENTS_EXPIRATION_MONTHS = 6  # as in DORA
 
     id = models.UUIDField(primary_key=True, editable=False)
 
@@ -805,6 +806,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     def from_data(cls, service, beneficiary, sender, **kwargs):
         return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
 
+    def delete_documents(self):
+        # Delete the relation, delete_unused_files management command handles the actual deletion from S3
+        self.documents.clear()
+
     @property
     def sender_organization(self):
         return self.sender_prescriber_organization or self.sender_company
@@ -857,6 +862,8 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def refuse(self):
+        self.delete_documents()
+
         process_link = OrientationProcessLink.objects.create(orientation=self)
         process_link.email_refused_orientation_for_structure.send()
         if not self.sender_is_referent:
@@ -866,6 +873,8 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def expire(self):
+        self.delete_documents()
+
         process_link = OrientationProcessLink.objects.create(orientation=self)
         process_link.email_expired_orientation_for_structure.send()
         if not self.sender_is_referent:
