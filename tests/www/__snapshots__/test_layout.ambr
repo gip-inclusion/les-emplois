@@ -202,10 +202,10 @@
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/siae/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                          <i aria-hidden="true" class="ri-mail-download-line fw-medium">
                           </i>
                           <span>
-                              Candidatures reçues
+                              Demandes reçues
                           </span>
                       </a>
                   </li>
