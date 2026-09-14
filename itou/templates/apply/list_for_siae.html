@@ -4,11 +4,13 @@
 {% load matomo %}
 {% load static %}
 
-{% block title %}Candidatures reçues {{ block.super }}{% endblock %}
+{% block title %}Demandes reçues {{ block.super }}{% endblock %}
 
 {% block title_content %}
     <div class="c-title">
-        <div class="c-title__main">{% include "apply/includes/list_job_applications_title.html" %}</div>
+        <div class="c-title__main">
+            <h1>{% include "apply/includes/list_job_applications_title.html" %}</h1>
+        </div>
         <div class="c-title__cta" data-emplois-elements-visibility-on-selection="hidden" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             {% if can_apply %}

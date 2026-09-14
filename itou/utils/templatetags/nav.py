@@ -190,8 +190,8 @@ NAV_ENTRIES = {
     ),
     # Employers.
     "employer-job-apps": NavItem(
-        label="Candidatures reçues",
-        icon="ri-draft-line",
+        label="Demandes reçues",
+        icon="ri-mail-download-line",
         target=reverse("apply:list_for_siae"),
         active_view_names=["apply:list_for_siae", "apply:list_for_siae_exports"],
         matomo_event_category="offcanvasNav",
