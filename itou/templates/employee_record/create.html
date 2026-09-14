@@ -8,7 +8,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Fiches salarié ASP : {{ job_application.job_seeker.get_inverted_full_name }}</h1>
+            <h1>Fiches salarié ASP : {{ job_application.job_seeker.get_inverted_full_name }}</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -32,7 +32,7 @@
                                              aria-labelledby="currentProgressState"></div>
                                     </div>
                                     <p id="currentProgressState">
-                                        <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
+                                        <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
                                     </p>
                                 </div>
                             {% endif %}

@@ -25,7 +25,7 @@
                                     L'adresse du salarié n'a pu être vérifiée automatiquement.
                                 {% endfragment %}
                                 {% fragment as content %}
-                                    <p class="mb-0">Ceci peut être dû à :</p>
+                                    <p class="mb-0">Ceci peut être dû à :</p>
                                     <ul>
                                         <li>une erreur temporaire de géolocalisation,</li>
                                         <li>une adresse introuvable (code postal ou voie erronée).</li>
@@ -49,7 +49,7 @@
                                     <li>{{ job_seeker.post_code }} {{ job_seeker.city }}</li>
                                 </ul>
                             {% else %}
-                                <p class="mb-0">Aucune adresse n'a été saisie sur {% brand %} !</p>
+                                <p class="mb-0">Aucune adresse n'a été saisie sur {% brand %} !</p>
                             {% endif %}
                         {% endfragment %}
                     {% endcomponent_info %}

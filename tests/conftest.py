@@ -832,7 +832,6 @@ TEMPLATE_TYPO_IGNORE_LIST = (
     "account/password_change.html",  # allauth.account.forms.ChangePasswordForm.oldpassword help_text issue
     "admin",
     "apply",
-    "employee_record",
     "insertion",
     "releases/list.html",
 )

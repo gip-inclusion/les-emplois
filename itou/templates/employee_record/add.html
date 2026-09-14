@@ -26,7 +26,7 @@
                         {% if wizard_steps.current == "choose-employee" %}
                             <h2 class="h3">Rechercher un salarié</h2>
                         {% else %}
-                            <h2 class="h3">Rechercher un PASS IAE</h2>
+                            <h2 class="h3">Rechercher un PASS IAE</h2>
                         {% endif %}
                         <form method="post">
                             {% csrf_token %}
@@ -37,7 +37,7 @@
                                 </p>
                             {% else %}
                                 <p>
-                                    Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
+                                    Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
                                     <br>
                                     Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
                                 </p>
@@ -47,9 +47,9 @@
                             {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
                                 {% fragment as c_info__summary %}
                                     {% if wizard_steps.current == "choose-employee" %}
-                                        Vous ne trouvez pas votre salarié ?
+                                        Vous ne trouvez pas votre salarié ?
                                     {% else %}
-                                        Vous ne trouvez pas le PASS souhaité ?
+                                        Vous ne trouvez pas le PASS souhaité ?
                                     {% endif %}
                                 {% endfragment %}
                                 {% fragment as c_info__detail %}

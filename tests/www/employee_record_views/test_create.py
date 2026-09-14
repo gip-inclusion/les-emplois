@@ -596,7 +596,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
 
 class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
-    NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur Les emplois de l’inclusion !"
+    NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur Les emplois de l’inclusion !"
     ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
     ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR = (
         "Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié."
@@ -831,7 +831,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         data = test_data.copy()
 
         # No special characters
-        data["hexa_lane_name"] = "des colons !"
+        data["hexa_lane_name"] = "des colons !"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
         assert response.context["form"].errors == {
@@ -851,7 +851,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         }
 
         data = test_data.copy()
-        data["hexa_additional_address"] = "Bat a !"
+        data["hexa_additional_address"] = "Bat a !"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
         assert response.context["form"].errors == {
@@ -1206,9 +1206,9 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     ACTIVITY_BONUS_LABEL = escape("Bénéficiaire de la prime d'activité depuis")
     CAPE_FREELANCE_LABEL = "Bénéficiaire CAPE"
     CESA_FREELANCE_LABEL = "Bénéficiaire CESA"
-    ACTOR_MET_LABEL = "Acteur rencontré : "
-    MONTHLY_INCOME_LABEL = "Revenu brut mensuel moyen : "
-    EITI_CONTRIBUTIONS_LABEL = "Taux de cotisation : "
+    ACTOR_MET_LABEL = "Acteur rencontré : "
+    MONTHLY_INCOME_LABEL = "Revenu brut mensuel moyen : "
+    EITI_CONTRIBUTIONS_LABEL = "Taux de cotisation : "
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):

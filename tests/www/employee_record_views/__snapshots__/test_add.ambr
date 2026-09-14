@@ -689,12 +689,12 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Rechercher un PASS IAE
+                          Rechercher un PASS IAE
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <p>
-                              Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
+                              Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
                               <br/>
                               Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
                           </p>
@@ -713,7 +713,7 @@
                           </div>
                           <div class="c-info mb-3">
                               <span class="c-info__summary">
-                                  Vous ne trouvez pas le PASS souhaité ?
+                                  Vous ne trouvez pas le PASS souhaité ?
                               </span>
                               <div class="c-info__detail">
                                   <p>
@@ -1320,7 +1320,7 @@
                           </div>
                           <div class="c-info mb-3">
                               <span class="c-info__summary">
-                                  Vous ne trouvez pas votre salarié ?
+                                  Vous ne trouvez pas votre salarié ?
                               </span>
                               <div class="c-info__detail">
                                   <p>

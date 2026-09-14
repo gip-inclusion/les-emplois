@@ -114,13 +114,13 @@
                     <li>{{ profile|profile_field_display:'cesa_freelance' }}</li>
                 {% endif %}
                 {% if profile.actor_met_for_business_creation %}
-                    <li>Acteur rencontré : {{ profile.actor_met_for_business_creation }}</li>
+                    <li>Acteur rencontré : {{ profile.actor_met_for_business_creation }}</li>
                 {% endif %}
                 {% if profile.mean_monthly_income_before_process %}
-                    <li>Revenu brut mensuel moyen : {{ profile.mean_monthly_income_before_process }}</li>
+                    <li>Revenu brut mensuel moyen : {{ profile.mean_monthly_income_before_process }}</li>
                 {% endif %}
                 {% if profile.eiti_contributions %}
-                    <li>Taux de cotisation : {{ profile.get_eiti_contributions_display|lower }}</li>
+                    <li>Taux de cotisation : {{ profile.get_eiti_contributions_display|lower }}</li>
                 {% endif %}
             {% endif %}
             {% if profile.housing_issue %}

@@ -30,13 +30,13 @@
                                         <h5 class="h4 card-title">Vous êtes sur le point de réactiver cette fiche salarié.</h5>
                                         {% with job_application=employee_record.job_application %}
                                             <div>
-                                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
+                                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
                                             </div>
                                             <div>
-                                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
+                                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
                                             </div>
                                             <div>
-                                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
+                                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
                                             </div>
                                         {% endwith %}
                                         <div>
