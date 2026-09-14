@@ -8,7 +8,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
-            <h1>Orientations</h1>
+            <h1>Demandes envoyées</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             <a href="{% url "search:services_results" %}" class="btn btn-lg btn-ico btn-primary">
@@ -19,10 +19,26 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'apply:list_prescriptions' %}">Candidatures vers les emplois</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'insertion_views:orientations_list' %}">Orientations vers des services</a>
+        </li>
+    </ul>
+{% endblock title_extra %}
+
 {% block content %}
     {% include "insertion/includes/orientations/filters/offcanvas.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
     <section class="s-section">
         <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <h2 class="mb-3 mb-md-4">Orientations vers des services</h2>
+                </div>
+            </div>
             {% include "insertion/includes/orientations/filters/top_filters.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
             <div class="s-section__row row">
                 <div class="col-12">

@@ -140,7 +140,7 @@ NAV_ENTRIES = {
         active_view_names=["approvals:prolongation_requests_list"],
     ),
     "prescriber-job-apps": NavItem(
-        label="Candidatures",
+        label="Candidatures vers les emplois",
         icon="ri-draft-line",
         target=reverse("apply:list_prescriptions"),
         active_view_names=["apply:list_prescriptions", "apply:list_prescriptions_exports"],
@@ -149,8 +149,7 @@ NAV_ENTRIES = {
         matomo_event_option="candidatures",
     ),
     "prescriber-orientations": NavItem(
-        label="Orientations",
-        icon="ri-service-line",
+        label="Orientations vers des services",
         target=reverse("insertion_views:orientations_list"),
         active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details_for_sender"],
         matomo_event_category="offcanvasNav",
@@ -200,8 +199,7 @@ NAV_ENTRIES = {
         matomo_event_option="candidatures",
     ),
     "employer-job-apps-sent": NavItem(
-        label="Candidatures envoyées",
-        icon="ri-folder-shared-line",
+        label="Candidatures vers les emplois",
         target=reverse("apply:list_prescriptions"),
         active_view_names=["apply:list_prescriptions", "apply:list_prescriptions_exports"],
         matomo_event_category="offcanvasNav",
@@ -209,8 +207,7 @@ NAV_ENTRIES = {
         matomo_event_option="candidatures-envoyees",
     ),
     "employer-orientations": NavItem(
-        label="Orientations",
-        icon="ri-service-line",
+        label="Orientations vers des services",
         target=reverse("insertion_views:orientations_list"),
         active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details_for_sender"],
         matomo_event_category="offcanvasNav",
@@ -327,8 +324,16 @@ def nav(request):
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:
-            menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
-            menu_items.append(NAV_ENTRIES["prescriber-orientations"])
+            menu_items.append(
+                NavGroup(
+                    label="Demandes envoyées",
+                    icon="ri-mail-send-line",
+                    items=[
+                        NAV_ENTRIES["prescriber-job-apps"],
+                        NAV_ENTRIES["prescriber-orientations"],
+                    ],
+                )
+            )
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
@@ -357,8 +362,16 @@ def nav(request):
             )
         elif request.from_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
-            menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
-            menu_items.append(NAV_ENTRIES["employer-orientations"])
+            menu_items.append(
+                NavGroup(
+                    label="Demandes envoyées",
+                    icon="ri-mail-send-line",
+                    items=[
+                        NAV_ENTRIES["employer-job-apps-sent"],
+                        NAV_ENTRIES["employer-orientations"],
+                    ],
+                )
+            )
             if request.current_organization.is_subject_to_iae_rules:
                 employee_group_items = [
                     NAV_ENTRIES["employer-approvals"],

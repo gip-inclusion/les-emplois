@@ -3,15 +3,21 @@
 <div class="col mb-3 mb-md-4">
     {% component_box_dashboard title=title cta=cta list=list %}
         {% fragment as title %}
-            Candidatures
+            Demandes envoyées
         {% endfragment %}
         {% fragment as cta %}
             <a href="{% url 'apply:list_prescriptions' %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
                 <i class="ri-file-user-line ri-lg fw-normal" aria-hidden="true"></i>
-                <span>Voir toutes les candidatures</span>
+                <span>Candidatures vers les emplois</span>
             </a>
         {% endfragment %}
         {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'insertion_views:orientations_list' %}" class="btn-link btn-ico">
+                    <i class="ri-service-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Orientations vers des services</span>
+                </a>
+            </li>
             <li class="d-flex justify-content-between align-items-center mb-3">
                 <a href="{% url 'search:employers_results' %}" class="btn-link btn-ico">
                     <i class="ri-draft-line ri-lg fw-normal" aria-hidden="true"></i>

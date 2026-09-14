@@ -220,7 +220,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         criteria=filters_form.data.getlist("criteria", [])
     ).with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True)
 
-    title = "Candidatures envoyées"
+    title = "Candidatures vers les emplois"
     filters_counter = 0
     if filters_form.is_valid():
         job_applications = filters_form.filter(job_applications)

@@ -1553,7 +1553,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Orientations
+                                  Demandes envoyées
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -1566,6 +1566,18 @@
                               </a>
                           </div>
                       </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" href="/apply/prescriptions/list">
+                                  Candidatures vers les emplois
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" href="/insertion/orientations/">
+                                  Orientations vers des services
+                              </a>
+                          </li>
+                      </ul>
                   </div>
               </div>
           </div>
@@ -1637,6 +1649,13 @@
       </form>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <h2 class="mb-3 mb-md-4">
+                          Orientations vers des services
+                      </h2>
+                  </div>
+              </div>
               <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
                   <div class="col-12">
                       <div>
@@ -1748,7 +1767,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Orientations
+                                  Demandes envoyées
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -1761,6 +1780,18 @@
                               </a>
                           </div>
                       </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" href="/apply/prescriptions/list">
+                                  Candidatures vers les emplois
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" href="/insertion/orientations/">
+                                  Orientations vers des services
+                              </a>
+                          </li>
+                      </ul>
                   </div>
               </div>
           </div>
@@ -1881,6 +1912,13 @@
       </form>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <h2 class="mb-3 mb-md-4">
+                          Orientations vers des services
+                      </h2>
+                  </div>
+              </div>
               <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
                   <div class="col-12">
                       <div>
