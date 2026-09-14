@@ -1,71 +1,15 @@
 import pytest
-from django.contrib import messages
-from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.models import Approval
-from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.users.factories import ItouStaffFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
-
-
-def test_schedule_approval_update_notification_when_notification_do_not_exists(admin_client):
-    employee_record = factories.BareEmployeeRecordFactory()
-
-    response = admin_client.post(
-        reverse("admin:employee_record_employeerecord_changelist"),
-        {
-            "action": "schedule_approval_update_notification",
-            helpers.ACTION_CHECKBOX_NAME: [employee_record.pk],
-        },
-    )
-    notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
-    assert notification.employee_record == employee_record
-    assert notification.status == models.NotificationStatus.NEW
-    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
-
-
-def test_schedule_approval_update_notification_when_new_notification_already_exists(admin_client):
-    notification = factories.BareEmployeeRecordUpdateNotificationFactory(status=models.NotificationStatus.NEW)
-    save_updated_at = notification.updated_at
-
-    response = admin_client.post(
-        reverse("admin:employee_record_employeerecord_changelist"),
-        {
-            "action": "schedule_approval_update_notification",
-            helpers.ACTION_CHECKBOX_NAME: [notification.employee_record.pk],
-        },
-    )
-    notification.refresh_from_db()
-    assert notification.updated_at > save_updated_at
-    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification mise à jour")])
-
-
-@pytest.mark.parametrize("status", set(models.NotificationStatus) - {models.NotificationStatus.NEW})
-def test_schedule_approval_update_notification_when_other_than_new_notification_already_exists(admin_client, status):
-    notification = factories.BareEmployeeRecordUpdateNotificationFactory(status=status)
-    save_updated_at = notification.updated_at
-
-    response = admin_client.post(
-        reverse("admin:employee_record_employeerecord_changelist"),
-        {
-            "action": "schedule_approval_update_notification",
-            helpers.ACTION_CHECKBOX_NAME: [notification.employee_record.pk],
-        },
-    )
-    notification.refresh_from_db()
-    assert notification.updated_at == save_updated_at
-    created_notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
-    assert created_notification != notification
-    assert created_notification.employee_record == notification.employee_record
-    assert created_notification.status == models.NotificationStatus.NEW
-    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
 
 
 def test_job_seeker_profile_from_employee_record(admin_client):

@@ -469,12 +469,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         ]:
             transition = getattr(self, transition_name)
             if transition.is_available():
-                if self.has_watched_data_updated_at_set():
-                    EmployeeRecordUpdateNotification.objects.update_or_create(
-                        employee_record=self,
-                        status=NotificationStatus.NEW,
-                        defaults={"updated_at": timezone.now},
-                    )
+                # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
+                # we might want to automatically go to PENDING_UPDATE
                 return transition()
 
         if self.status != Status.ARCHIVED:

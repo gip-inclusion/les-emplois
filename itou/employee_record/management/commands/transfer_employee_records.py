@@ -5,12 +5,11 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from sentry_sdk.crons import monitor
 
-from itou.approvals.models import Approval
 from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
-from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
@@ -118,23 +117,12 @@ class Command(EmployeeRecordTransferCommand):
                             archive=raw_employee_record,
                             as_duplicate=True,
                         )
-
-                        # If the ASP mark the employee record as duplicate,
-                        # and there is a suspension or a prolongation for the associated approval,
-                        # then we create a notification to be sure the ASP has the correct end date.
-                        try:
-                            approval = Approval.objects.get(number=employee_record.approval_number)
-                        except Approval.DoesNotExist:
-                            pass  # No point to send a notification about an approval if it doesn't exist
-                        else:
-                            if approval.suspension_set.exists() or approval.prolongation_set.exists():
-                                # Mimic the SQL trigger function "create_employee_record_notification()"
-                                EmployeeRecordUpdateNotification.objects.update_or_create(
-                                    status=NotificationStatus.NEW,
-                                    employee_record=employee_record,
-                                    defaults={"updated_at": timezone.now},
-                                )
-
+                        if not employee_record.has_watched_data_updated_at_set():
+                            # XXX: make sure an update will be sent
+                            now = timezone.now()
+                            EmployeeRecord.objects.filter(pk=employee_record.pk).update(
+                                watched_data_updated_at=now, updated_at=now
+                            )
                         continue
 
                     employee_record.reject(code=processing_code, label=processing_label, archive=raw_employee_record)

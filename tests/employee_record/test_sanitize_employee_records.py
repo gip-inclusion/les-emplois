@@ -75,7 +75,7 @@ def test_missed_notifications(command, faker, caplog, snapshot):
 
     # Various cases are now set up, finally check the behavior
     command.handle(wet_run=True)
-    assert employee_record_with_watched_data_updated_at.update_notifications.count() == 1
+    assert employee_record_with_watched_data_updated_at.update_notifications.count() == 0  # No notification created
     employee_record_with_watched_data_updated_at.refresh_from_db()
     assert employee_record_with_watched_data_updated_at.status != Status.ARCHIVED
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
@@ -91,7 +91,7 @@ def test_missed_notifications_limit(mocker, snapshot, command, caplog):
 
     command.handle(wet_run=True)
 
-    assert models.EmployeeRecordUpdateNotification.objects.count() == 2
+    assert models.EmployeeRecordUpdateNotification.objects.count() == 0  # No notification created
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
