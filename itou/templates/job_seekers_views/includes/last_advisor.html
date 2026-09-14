@@ -69,7 +69,7 @@
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR %}
                     {% component_alert content=content variant="info" extra_classes="mt-3" %}
                         {% fragment as content %}
-                            <p class="mb-0">Cet accompagnement a été renseigné par une personne ne suivant plus cet usager : aucune personne n'y est associée.</p>
+                            <p class="mb-0">Cet accompagnement a été renseigné par une personne ne suivant plus cet usager : aucune personne n'y est associée.</p>
                         {% endfragment %}
                     {% endcomponent_alert %}
                 {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
