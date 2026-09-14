@@ -6,7 +6,7 @@
             hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk mode %}"
             hx-swap="outerHTML"
             hx-include="#display-contact-info-form"
-            {% matomo_event "advisors" "clic" "displayed_advisor_"|add:mode %}>
+            {% matomo_event "accompagnateur" "clic" "displayed_advisor_"|add:mode %}>
         <div class="stable-text">
             {% if "email" in mode %}
                 <i class="ri-mail-send-line" aria-hidden="true"></i>
