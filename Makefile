@@ -76,7 +76,7 @@ update_snapshots: $(VIRTUAL_ENV)
 			printf '⚠ orphaned snapshot, no test module: %s\n' "$$ambr" >&2; \
 		fi; \
 	done | sort -u | xargs --no-run-if-empty \
-		pytest --snapshot-update --numprocesses=logical
+		pytest --snapshot-update --snapshot-file-lock --numprocesses=logical
 
 # Django.
 # =============================================================================
