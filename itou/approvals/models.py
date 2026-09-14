@@ -24,7 +24,6 @@ from itou.approvals.utils import get_user_last_accepted_siae_job_application, la
 from itou.archive.constants import EXPIRATION_DAYS
 from itou.companies import enums as companies_enums
 from itou.companies.models import CompanyMembership
-from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
@@ -484,43 +483,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             ("handle_manual_approval_requests", "Can handle manual PASS IAE requests"),
         ]
         triggers = [
-            pgtrigger.Trigger(
-                name="create_employee_record_notification",
-                when=pgtrigger.After,
-                operation=pgtrigger.UpdateOf("start_at", "end_at"),
-                condition=pgtrigger.Q(old__end_at__df=pgtrigger.F("new__end_at"))
-                | pgtrigger.Q(old__start_at__df=pgtrigger.F("new__start_at")),
-                func=f"""
-                    -- If there is an "UPDATE" action on 'approvals_approval' table (Approval model object):
-                    -- create an `EmployeeRecordUpdateNotification` object for each PROCESSED `EmployeeRecord`
-                    -- linked to this approval
-                    IF (TG_OP = 'UPDATE') THEN
-                        -- Only for update operations:
-                        -- iterate through processed employee records linked to this approval
-                        FOR current_employee_record_id IN
-                            SELECT id FROM employee_record_employeerecord
-                            WHERE approval_number = NEW.number
-                            AND status IN (
-                                '{Status.PROCESSED.value}', '{Status.SENT.value}', '{Status.DISABLED.value}'
-                            )
-                            LOOP
-                                -- Create `EmployeeRecordUpdateNotification` object
-                                -- with the correct type and status
-                                INSERT INTO employee_record_employeerecordupdatenotification
-                                    (employee_record_id, created_at, updated_at, status)
-                                SELECT current_employee_record_id, NOW(), NOW(), '{Status.NEW.value}'
-                                -- Update it if already created (UPSERT)
-                                -- On partial indexes conflict, the where clause of the index must be added here
-                                ON conflict(employee_record_id) WHERE status = '{Status.NEW.value}'
-                                DO
-                                -- Not exactly the same syntax as a standard update op
-                                UPDATE SET updated_at = NOW();
-                            END LOOP;
-                    END IF;
-                    RETURN NULL;
-                """,
-                declare=[("current_employee_record_id", "INT")],
-            ),
             pgtrigger.Trigger(
                 name="update_employee_record_watched_data_updated_at",
                 when=pgtrigger.After,
