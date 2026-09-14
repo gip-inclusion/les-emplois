@@ -7,7 +7,6 @@ from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import path, reverse
-from django.utils import timezone
 from django.utils.html import format_html
 from itoutils.urls import add_url_params
 
@@ -24,7 +23,6 @@ from itou.utils.admin import (
 )
 from itou.utils.db import statement_timeout
 from itou.utils.pagination import FuzzyCountPaginator
-from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class EmployeeRecordUpdateNotificationInline(ReadonlyMixin, ItouTabularInline):
@@ -220,30 +218,6 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
 class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     form = EmployeeRecordAdminForm
     list_select_related = ["job_application__job_seeker"]
-
-    @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
-    def schedule_approval_update_notification(self, request, queryset):
-        total_created = 0
-        for employee_record in queryset:
-            _, created = models.EmployeeRecordUpdateNotification.objects.update_or_create(
-                employee_record=employee_record,
-                status=models.NotificationStatus.NEW,
-                defaults={"updated_at": timezone.now},
-            )
-            total_created += int(created)
-
-        if total_created:
-            s = pluralizefr(total_created)
-            messages.success(request, f"{total_created} notification{s} planifiée{s}")
-
-        total_updated = len(queryset) - total_created
-        if total_updated:
-            s = pluralizefr(total_updated)
-            messages.success(request, f"{total_updated} notification{s} mise{s} à jour")
-
-    actions = [
-        schedule_approval_update_notification,
-    ]
 
     inlines = (EmployeeRecordUpdateNotificationInline, EmployeeRecordTransitionLogInline)
 
