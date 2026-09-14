@@ -1,0 +1,10 @@
+<ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+    <li class="nav-item">
+        <a class="nav-link{% if active_tab == "applications" %} active{% endif %}"
+           href="{% url 'apply:list_prescriptions' %}">Candidatures vers des emplois</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active_tab == "orientations" %} active{% endif %}"
+           href="{% url 'insertion_views:orientations_list' %}">Orientations vers des services</a>
+    </li>
+</ul>
