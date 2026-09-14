@@ -10,7 +10,8 @@
             <article>{{ structure.description|markdownify }}</article>
 
             {% if structure.reseaux_porteurs.exists %}
-                <h4 class="mt-4 mb-0">Réseaux porteurs</h4>
+                <hr class="my-4">
+                <h4 class="mb-0">Réseaux porteurs</h4>
                 <p>
                     {% for reseau in structure.reseaux_porteurs.all %}
                         {{ reseau }}
@@ -22,7 +23,8 @@
             {% endif %}
 
             {% if structure.opening_hours %}
-                <h4 class="mt-4 mb-0">Horaires d'ouverture</h4>
+                <hr class="my-4">
+                <h4 class="mb-0">Horaires d'ouverture</h4>
                 {% if formatted_opening_hours %}
                     {% for entry in formatted_opening_hours.entries %}
                         <p>
@@ -41,7 +43,8 @@
             {% endif %}
 
             {% if structure.accessibilite_lieu or structure.website %}
-                <h4 class="mt-4 mb-0">En savoir plus</h4>
+                <hr class="my-4">
+                <h4 class="mb-0">En savoir plus</h4>
                 {% if structure.accessibilite_lieu %}
                     <p>
                         Retrouvez les informations liées à l'accessibilité de notre structure sur <a href="{{ structure.accessibilite_lieu }}" target="_blank">{{ structure.accessibilite_lieu }}</a>
