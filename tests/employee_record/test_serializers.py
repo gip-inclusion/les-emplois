@@ -7,7 +7,7 @@ from django.utils import timezone
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, SiaeMeasure
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
-from itou.employee_record.enums import NotificationStatus, Status
+from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
     EmployeeRecordSerializer,
@@ -200,7 +200,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         assert data is not None
         assert data.get("siret") == employee_record.siret
         assert data.get("mesure") == employee_record.asp_measure
-        assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
+        assert data.get("typeMouvement") == MovementType.UPDATE
 
         personal_data = data.get("personnePhysique")
 
@@ -252,7 +252,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
             with subtests.test(idx):
                 assert element.get("numLigne") == idx
                 assert element.get("siret") is not None
-                assert element.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
+                assert element.get("typeMouvement") == MovementType.UPDATE
 
 
 @pytest.mark.parametrize(
@@ -336,6 +336,7 @@ def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
     data = EmployeeRecordSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.CREATION
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record")
 
@@ -364,6 +365,7 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
     data = EmployeeRecordSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.CREATION
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record")
 
@@ -392,6 +394,7 @@ def test_situation_salarie_serializer_with_most_fields_filled(snapshot, kind):
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
     data = EmployeeRecordSerializer(employee_record).data
+    assert data["typeMouvement"] == MovementType.CREATION
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record")
 
