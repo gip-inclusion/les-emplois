@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2026-09-14
+
+### Ajouté
+
+- [Accompagnateurs : Ajout d'un filtre sur le statut des accompagnements](https://github.com/gip-inclusion/les-emplois/pull/8688)
+- [Accompagnateurs : Évolution de l'affichage des accompagnateurs](https://github.com/gip-inclusion/les-emplois/pull/8677)
+- [Accompagnements : Mettre à jour les accompagnements lors de l’orientation d’un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/8711)
+- [Insertion : Page de pilotage d’une orientation (1/2 : lien magique)](https://github.com/gip-inclusion/les-emplois/pull/8554)
+- [Recherche : Mise à jour du moteur de recherche de prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/8643)
+
+### Modifié
+
+- [Accompagnements : Correction d'un message d'erreur quand un prescripteur ajoute un usager](https://github.com/gip-inclusion/les-emplois/pull/8749)
+- [Connexion : Forcer les agents France Travail à se connecter avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/8760)
+- [Connexion : Les institutionnels ont les même règles d'utilisation de ProConnect que les autres pros](https://github.com/gip-inclusion/les-emplois/pull/8765)
+- [Contrôle a posteriori : Crrection du filtre d'organisation de la consultation des justificatif](https://github.com/gip-inclusion/les-emplois/pull/8727)
+- [Insertion : Ne pas proposer le formulaire d’orientation si le service n’a pas d’email de contact](https://github.com/gip-inclusion/les-emplois/pull/8726)
+- [Interface : Renommage de "Présentation" et de "Voir la liste des organisations conventionnées" dans le menu Organisation](https://github.com/gip-inclusion/les-emplois/pull/8704)
+- [Interface : Renommage et réorganisation des items du menu "Accompagnements"](https://github.com/gip-inclusion/les-emplois/pull/8731)
+- [Pass IAE : Permettre aux SIAE de clôturer un PASS IAE sans intervention du support](https://github.com/gip-inclusion/les-emplois/pull/8517)
+
+### Supprimé
+
+- [Insertion : Suppression de la bannière mentionnant un récent problème technique autour des orientations](https://github.com/gip-inclusion/les-emplois/pull/8716)
+- [Tech : Suppression de l’app `recommendations`, sauf de sa couche API](https://github.com/gip-inclusion/les-emplois/pull/8708)
+
 ## 2026-09-07
 
 ### Ajouté
