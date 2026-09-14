@@ -141,6 +141,7 @@ def _employer_dashboard_context(request):
             .select_related("evaluation_campaign")
         ),
         "job_applications_categories": job_applications_categories,
+        "list_exports_url": reverse("apply:list_prescriptions_exports"),
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
         ),
