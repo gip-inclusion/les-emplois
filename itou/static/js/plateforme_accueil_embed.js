@@ -18,7 +18,7 @@
 (function () {
   window._paq = window._paq || [];
 
-  const frame = document.querySelector("iframe[data-plateforme-accueil]");
+  const frame = document.getElementById("plateforme-accueil-iframe");
   // https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#error_and_load_event_behavior
   let frameLoaded = false;
   let frameHeight = null;

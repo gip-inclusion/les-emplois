@@ -34,7 +34,10 @@
         </div>
     </section>
     {# src is set by plateforme_accueil_embed.js, once it can catch the first resize message. #}
-    <iframe data-plateforme-accueil="{{ iframe_url }}" sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"></iframe>
+    <iframe id="plateforme-accueil-iframe"
+            data-plateforme-accueil="{{ iframe_url }}"
+            sandbox="allow-forms allow-scripts allow-top-navigation-by-user-activation"
+            title="Formulaires de recherche d’employeur, d’accompagnateur et de services. Présentation {% brand "de" %}."></iframe>
 {% endblock %}
 
 {% block extra_script_files %}
