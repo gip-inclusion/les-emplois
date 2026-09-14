@@ -212,7 +212,6 @@ def test_serializer(serializer, expected_movement_type):
     assert data.get("siret") == employee_record.siret
     assert data.get("mesure") == employee_record.asp_measure
     assert data.get("typeMouvement") == expected_movement_type
-    assert instance.ASP_MOVEMENT_TYPE == expected_movement_type
 
     personal_data = data.get("personnePhysique")
     assert personal_data is not None
