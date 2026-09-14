@@ -1304,6 +1304,72 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
+def test_filtered_by_end_of_journey_for_siae(client, snapshot):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = timezone.localdate()
+
+    def add_employee(contract_end_date, *, contract_company=company, approval_end_at=None):
+        job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=job_seeker,
+            company=contract_company,
+            start_date=(contract_end_date or today) - datetime.timedelta(days=50),
+            end_date=contract_end_date,
+        )
+        if approval_end_at:
+            ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=600), end_at=approval_end_at)
+        return job_seeker
+
+    contract_ending_soon = add_employee(today + datetime.timedelta(days=30))
+    contract_ended = add_employee(today - datetime.timedelta(days=1), approval_end_at=today)
+    contract_ended_long_ago = add_employee(
+        today - datetime.timedelta(days=540), approval_end_at=today + datetime.timedelta(days=30)
+    )
+
+    add_employee(today + datetime.timedelta(days=31))
+    add_employee(None)
+    add_employee(today - datetime.timedelta(days=10), approval_end_at=today - datetime.timedelta(days=1))
+    add_employee(today - datetime.timedelta(days=10))
+    add_employee(today + datetime.timedelta(days=20), contract_company=CompanyFactory())
+    hired_elsewhere = add_employee(
+        today - datetime.timedelta(days=10), approval_end_at=today + datetime.timedelta(days=100)
+    )
+    ContractFactory(
+        job_seeker=hired_elsewhere,
+        start_date=today - datetime.timedelta(days=5),
+        end_date=today + datetime.timedelta(days=100),
+    )
+
+    response = client.get(url, {"end_of_journey": "on"})
+    assert set(response.context["page_obj"].object_list) == {
+        contract_ending_soon,
+        contract_ended,
+        contract_ended_long_ago,
+    }
+    # Kept when another filter is changed.
+    assertContains(
+        response, '<input type="hidden" name="end_of_journey" value="on" id="id_end_of_journey">', html=True
+    )
+
+    with assertSnapshotQueries(snapshot):
+        client.get(url, {"end_of_journey": "on"})
+
+
+def test_end_of_journey_filter_not_for_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    job_seeker = JobSeekerAssignmentFactory(professional=prescriber).job_seeker
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
+    assertNotContains(response, 'name="end_of_journey"')
+
+
+@freeze_time("2026-01-15")
 def test_end_of_contracts_banners_for_siae(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
