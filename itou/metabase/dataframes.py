@@ -37,7 +37,7 @@ def infer_columns_from_df(df):
     ]
 
 
-def store_df(df, table_name, batch_size=10_000):
+def store_df(df, table_name, batch_size=10_000, schema=None):
     """
     Store dataframe in database.
 
@@ -53,9 +53,9 @@ def store_df(df, table_name, batch_size=10_000):
     logger.info("Injecting %i rows with %i columns into %r", len(df), len(columns), table_name)
 
     new_table_name = metabase_db.get_new_table_name(table_name)
-    metabase_db.create_table(new_table_name, columns, reset=True)
+    metabase_db.create_table(new_table_name, columns, reset=True, schema=schema)
 
-    with metabase_db.get_connection() as conn, conn.cursor() as cursor:
+    with metabase_db.get_connection(schema=schema) as conn, conn.cursor() as cursor:
         written_rows = 0
         # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
         for df_chunk in [df[i : i + batch_size] for i in range(0, df.shape[0], batch_size)]:
@@ -81,7 +81,7 @@ def store_df(df, table_name, batch_size=10_000):
                 time.perf_counter() - chunk_start_time,
             )
 
-    metabase_db.rename_table_atomically(new_table_name, table_name)
+    metabase_db.rename_table_atomically(new_table_name, table_name, schema=schema)
     logger.info("%r created in %0.2f seconds", table_name, time.perf_counter() - start_time)
 
 

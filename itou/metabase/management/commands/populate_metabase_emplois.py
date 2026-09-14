@@ -162,9 +162,14 @@ class Command(BaseCommand):
         parser.add_argument("--mode", required=True, choices=["all", *sorted(self.MODE_TO_OPERATION)])
 
     def populate_analytics(self):
-        metabase_db.populate_table(analytics.AnalyticsTable, batch_size=100_000, querysets=[Datum.objects.all()])
         metabase_db.populate_table(
-            analytics.DashboardVisitTable, batch_size=100_000, querysets=[StatsDashboardVisit.objects.all()]
+            analytics.AnalyticsTable, batch_size=100_000, querysets=[Datum.objects.all()], schema="raw_emplois"
+        )
+        metabase_db.populate_table(
+            analytics.DashboardVisitTable,
+            batch_size=100_000,
+            querysets=[StatsDashboardVisit.objects.all()],
+            schema="raw_emplois",
         )
 
     def populate_companies(self):
@@ -304,7 +309,7 @@ class Command(BaseCommand):
             )
         )
 
-        metabase_db.populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_job_descriptions(self):
         queryset = (
@@ -397,6 +402,7 @@ class Command(BaseCommand):
             organizations.TABLE,
             batch_size=10_000,
             querysets=[queryset],
+            schema="raw_emplois",
         )
 
     def populate_job_seekers(self):
@@ -491,11 +497,11 @@ class Command(BaseCommand):
         )
         job_seekers_table = job_seekers.get_table()
 
-        metabase_db.populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
-        metabase_db.populate_table(criteria.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(criteria.TABLE, batch_size=10_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_job_applications(self):
         queryset = (
@@ -566,44 +572,52 @@ class Command(BaseCommand):
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()
-        metabase_db.populate_table(prolongations.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(prolongations.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_prolongation_requests(self):
         queryset = ProlongationRequest.objects.select_related(
             "prolongation",
             "deny_information",
         ).all()
-        metabase_db.populate_table(prolongation_requests.TABLE, batch_size=50_000, querysets=[queryset])
+        metabase_db.populate_table(
+            prolongation_requests.TABLE, batch_size=50_000, querysets=[queryset], schema="raw_emplois"
+        )
 
     def populate_suspensions(self):
         queryset = Suspension.objects.all()
-        metabase_db.populate_table(suspensions.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(suspensions.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_institutions(self):
         queryset = Institution.objects.all()
-        metabase_db.populate_table(institutions.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(institutions.TABLE, batch_size=10_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_evaluation_campaigns(self):
         queryset = EvaluationCampaign.objects.all()
-        metabase_db.populate_table(evaluation_campaigns.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(
+            evaluation_campaigns.TABLE, batch_size=10_000, querysets=[queryset], schema="raw_emplois"
+        )
 
     def populate_evaluated_siaes(self):
         queryset = EvaluatedSiae.objects.prefetch_related(
             "evaluated_job_applications__evaluated_administrative_criteria"
         ).all()
-        metabase_db.populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset])
+        metabase_db.populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_evaluated_job_applications(self):
         queryset = EvaluatedJobApplication.objects.prefetch_related("evaluated_administrative_criteria").all()
-        metabase_db.populate_table(evaluated_job_applications.TABLE, batch_size=20_000, querysets=[queryset])
+        metabase_db.populate_table(
+            evaluated_job_applications.TABLE, batch_size=20_000, querysets=[queryset], schema="raw_emplois"
+        )
 
     def populate_evaluated_criteria(self):
         queryset = EvaluatedAdministrativeCriteria.objects.all()
-        metabase_db.populate_table(evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(
+            evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
+        )
 
     def populate_users(self):
         queryset = User.objects.filter(kind=UserKind.PROFESSIONAL, is_active=True)
-        metabase_db.populate_table(users.TABLE, batch_size=30_000, querysets=[queryset])
+        metabase_db.populate_table(users.TABLE, batch_size=30_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_memberships(self):
         siae_queryset = CompanyMembership.objects.all()
@@ -611,7 +625,10 @@ class Command(BaseCommand):
         institution_queryset = InstitutionMembership.objects.all()
 
         metabase_db.populate_table(
-            memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
+            memberships.TABLE,
+            batch_size=100_000,
+            querysets=[siae_queryset, prescriber_queryset, institution_queryset],
+            schema="raw_emplois",
         )
 
     def populate_job_seeker_assignments(self):
@@ -622,8 +639,12 @@ class Command(BaseCommand):
 
     def populate_references(self):
         # DB referential
-        metabase_db.populate_table(rome_codes.TABLE, batch_size=100_000, querysets=[Rome.objects.all()])
-        metabase_db.populate_table(insee_codes.TABLE, batch_size=50_000, querysets=[City.objects.all()])
+        metabase_db.populate_table(
+            rome_codes.TABLE, batch_size=100_000, querysets=[Rome.objects.all()], schema="raw_emplois"
+        )
+        metabase_db.populate_table(
+            insee_codes.TABLE, batch_size=50_000, querysets=[City.objects.all()], schema="raw_emplois"
+        )
         # Code referential
         rows = []
         for dpt_code, dpt_name in DEPARTMENTS.items():
@@ -633,7 +654,7 @@ class Command(BaseCommand):
             row["nom_departement"] = dpt_name
             row["nom_region"] = DEPARTMENT_TO_REGION[dpt_code]
             rows.append(row)
-        store_df(df=get_df_from_rows(rows), table_name="departements")
+        store_df(df=get_df_from_rows(rows), table_name="departements", schema="raw_emplois")
 
     def populate_enums(self):
         # TODO(vperron,dejafait): This works as long as we don't have several table creations in the same call.
@@ -650,7 +671,7 @@ class Command(BaseCommand):
             self.logger.info("Preparing content for %s table...", table_name)
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
-            store_df(df=df, table_name=table_name)
+            store_df(df=df, table_name=table_name, schema="raw_emplois")
 
     def populate_mobilization_events(self):
         queryset = MobilizationEvent.objects.all().select_related(
