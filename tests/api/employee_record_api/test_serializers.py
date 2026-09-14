@@ -12,8 +12,8 @@ from itou.api.employee_record_api.serializers import (
 )
 from itou.asp.models import Commune, Country, SiaeMeasure
 from itou.companies.models import Company
-from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.enums import MovementType, Status
+from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -202,7 +202,7 @@ def test_employee_record_serializer():
     assert data is not None
     assert data.get("siret") == employee_record.siret
     assert data.get("mesure") == employee_record.asp_measure
-    assert data.get("typeMouvement") == EmployeeRecord.ASP_MOVEMENT_TYPE
+    assert data.get("typeMouvement") == MovementType.CREATION
 
     personal_data = data.get("personnePhysique")
     assert personal_data is not None
@@ -228,7 +228,7 @@ def test_notification_serializer():
     assert data is not None
     assert data.get("siret") == employee_record.siret
     assert data.get("mesure") == employee_record.asp_measure
-    assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
+    assert data.get("typeMouvement") == MovementType.UPDATE
 
     personal_data = data.get("personnePhysique")
     assert personal_data is not None
