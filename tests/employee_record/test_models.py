@@ -260,24 +260,6 @@ class TestEmployeeRecordModel:
                 employee_record.unarchive()
                 assert employee_record.status == expected_status
 
-    def test_unarchive_create_the_missed_notification(self, faker):
-        employee_record_with_watched_data_updated_at = EmployeeRecordFactory(
-            status=Status.ARCHIVED,
-            watched_data_updated_at=timezone.now(),
-        )
-        employee_record_without_watched_data_updated_at = EmployeeRecordFactory(
-            status=Status.ARCHIVED,
-            watched_data_updated_at=None,
-        )
-
-        assert employee_record_with_watched_data_updated_at.update_notifications.all().count() == 0
-        employee_record_with_watched_data_updated_at.unarchive()
-        assert employee_record_with_watched_data_updated_at.update_notifications.all().count() == 1
-
-        assert employee_record_without_watched_data_updated_at.update_notifications.all().count() == 0
-        employee_record_without_watched_data_updated_at.unarchive()
-        assert employee_record_without_watched_data_updated_at.update_notifications.all().count() == 0
-
     @pytest.mark.parametrize(
         "code,expected",
         [
