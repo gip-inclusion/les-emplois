@@ -408,14 +408,44 @@
                    (SELECT U0."job_seeker_id" AS "job_seeker"
                     FROM "users_jobseekerassignment" U0
                     WHERE U0."company_id" = %s)
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
-                           AND U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."company_id" = %s)
-                    ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s)
+                 AND ((
+                         (SELECT U0."company_id" AS "company"
+                          FROM "companies_contract" U0
+                          WHERE (U0."company_id" IS NOT NULL
+                                 AND U0."job_seeker_id" = ("users_user"."id"))
+                          ORDER BY U0."start_date" DESC,
+                                   U0."id" DESC
+                          LIMIT 1) = %s
+                       AND
+                         (SELECT U0."end_date" AS "end_date"
+                          FROM "companies_contract" U0
+                          WHERE (U0."company_id" IS NOT NULL
+                                 AND U0."job_seeker_id" = ("users_user"."id"))
+                          ORDER BY U0."start_date" DESC,
+                                   U0."id" DESC
+                          LIMIT 1) BETWEEN %s AND %s)
+                      OR (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "approvals_approval" U0
+                             WHERE (U0."end_at" >= %s
+                                    AND U0."user_id" = ("users_user"."id"))
+                             LIMIT 1)
+                          AND
+                            (SELECT U0."company_id" AS "company"
+                             FROM "companies_contract" U0
+                             WHERE (U0."company_id" IS NOT NULL
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             ORDER BY U0."start_date" DESC,
+                                      U0."id" DESC
+                             LIMIT 1) = %s
+                          AND
+                            (SELECT U0."end_date" AS "end_date"
+                             FROM "companies_contract" U0
+                             WHERE (U0."company_id" IS NOT NULL
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             ORDER BY U0."start_date" DESC,
+                                      U0."id" DESC
+                             LIMIT 1) < %s)))
         ''',
       }),
       dict({
