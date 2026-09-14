@@ -1089,6 +1089,11 @@
                                   Usagers accompagnés de la structure
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/approvals/prolongation/requests?only_pending=on">
+                                  Prolongations de PASS IAE
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -1490,6 +1495,11 @@
                           <li class="nav-item">
                               <a class="nav-link" href="/job-seekers/list-organization">
                                   Usagers accompagnés de la structure
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/approvals/prolongation/requests?only_pending=on">
+                                  Prolongations de PASS IAE
                               </a>
                           </li>
                       </ul>
