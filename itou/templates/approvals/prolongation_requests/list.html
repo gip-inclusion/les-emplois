@@ -14,10 +14,29 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Gérer les prolongations de PASS IAE</h1>
+            <h1>Accompagnements</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
+
+{% block title_extra %}
+    {% if request.from_prescriber and request.current_organization.memberships.count > 1 %}
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'job_seekers_views:list' %}">Usagers accompagnés</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   href="{% url 'job_seekers_views:list_organization' %}">Usagers accompagnés de la structure</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on">
+                    Prolongations de PASS IAE
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock title_extra %}
 
 {% block content %}
     {% enums "approvals" "ProlongationRequestStatus" as ProlongationRequestStatus %}
@@ -26,7 +45,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
-                        <h2 class="mb-0">Prolongations</h2>
+                        <h2 class="mb-0">Prolongations de PASS IAE</h2>
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end"
                              role="group"
                              aria-label="Actions sur les prolongations">

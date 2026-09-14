@@ -105,9 +105,9 @@ NAV_ENTRIES = {
     ),
     # Prescribers.
     "prescriber-jobseekers-user": NavItem(
-        label="Mes accompagnements",
+        label="Usagers accompagnés",
         target=reverse("job_seekers_views:list"),
-        active_view_names=["job_seekers_views:list"],
+        active_view_names=["job_seekers_views:list", "job_seekers_views:list_organization"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="candidats-utilisateur",

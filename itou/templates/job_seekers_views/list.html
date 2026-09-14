@@ -43,6 +43,11 @@
                 <a class="nav-link{% if list_organization %} active{% endif %}"
                    href="{% url 'job_seekers_views:list_organization' %}">Usagers accompagnés de la structure</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on">
+                    Prolongations de PASS IAE
+                </a>
+            </li>
         </ul>
     {% elif request.current_organization.can_use_employee_record %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
