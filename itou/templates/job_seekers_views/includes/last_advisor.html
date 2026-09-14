@@ -82,7 +82,7 @@
                                     hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk "email" %}"
                                     hx-swap="outerHTML"
                                     hx-include="#display-contact-info-form"
-                                    {% matomo_event "advisors" "clic" "displayed_last_advisor_email" %}>
+                                    {% matomo_event "accompagnateur" "clic" "displayed_last_advisor_email" %}>
                                 <div class="stable-text">
                                     <i class="ri-mail-send-line" aria-hidden="true"></i>
                                     <span>Contacter l’accompagnateur</span>
