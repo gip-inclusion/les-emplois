@@ -1304,6 +1304,7 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
+@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wREPORT")
 def test_filtered_by_end_of_journey_for_siae(client, snapshot):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     employer = company.members.first()
@@ -1433,7 +1434,17 @@ def test_pro_support_report_action_in_list_for_siae(client):
     employer = company.members.first()
     client.force_login(employer)
     url = reverse("job_seekers_views:list_organization")
+    now = timezone.now()
     today = timezone.localdate()
+
+    def report_url(job_seeker, advisor, situation):
+        return (
+            f"https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}&idcompany={company.pk}"
+            f"&uidjobseeker={job_seeker.public_id}&idadvisor={advisor.pk if advisor else ''}&situation={situation}"
+        )
+
+    # The most recent assignments, of the SIAE and of an orienteur, are ignored in favor of the last
+    # authorized prescriber: the tab where the report is read is theirs alone.
     contract_ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
         job_seeker=contract_ending_soon,
@@ -1441,6 +1452,22 @@ def test_pro_support_report_action_in_list_for_siae(client):
         start_date=today - datetime.timedelta(days=200),
         end_date=today + datetime.timedelta(days=20),
     )
+    JobSeekerAssignmentFactory(
+        job_seeker=contract_ending_soon,
+        prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+        last_action_at=now - datetime.timedelta(days=30),
+    )
+    prescriber = JobSeekerAssignmentFactory(
+        job_seeker=contract_ending_soon,
+        prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+        last_action_at=now - datetime.timedelta(days=10),
+    ).professional
+    JobSeekerAssignmentFactory(
+        job_seeker=contract_ending_soon,
+        prescriber_organization=PrescriberOrganizationFactory(),
+        last_action_at=now,
+    )
+    # Without any authorized prescriber, the report has no recipient.
     contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
         job_seeker=contract_ended,
@@ -1451,11 +1478,11 @@ def test_pro_support_report_action_in_list_for_siae(client):
     ApprovalFactory(user=contract_ended, start_at=today - datetime.timedelta(days=300), end_at=today)
     JobSeekerAssignmentFactory(professional=employer, company=company)
 
-    tally_url = f"https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}"
     for params in [{}, {"end_of_journey": "on", "assignments": "all"}]:
         response = client.get(url, params)
         assertContains(response, "Faire le bilan d’accompagnement", count=2)
-        assertContains(response, tally_url, count=2)
+        assertContains(response, f'href="{report_url(contract_ending_soon, prescriber, "ending_soon")}"', count=1)
+        assertContains(response, f'href="{report_url(contract_ended, None, "ended")}"', count=1)
 
 
 @freeze_time("2026-01-15")
@@ -1466,8 +1493,20 @@ def test_pro_support_report_banner_on_job_seeker_card_for_siae(client):
     client.force_login(employer)
     today = timezone.localdate()
     job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    prescriber = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+        last_action_at=timezone.now() - datetime.timedelta(days=10),
+    ).professional
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-    tally_url = f"https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}"
+
+    # Nothing but identifiers: the full href proves no personal data is appended.
+    def tally_url(situation):
+        return (
+            f'href="https://tally.example/r/wREPORT?iduser={employer.pk}&kindcompany={company.kind}'
+            f"&idcompany={company.pk}&uidjobseeker={job_seeker.public_id}&idadvisor={prescriber.pk}"
+            f'&situation={situation}"'
+        )
 
     response = client.get(url)
     assertNotContains(response, "Remplir le bilan")
@@ -1481,7 +1520,7 @@ def test_pro_support_report_banner_on_job_seeker_card_for_siae(client):
     response = client.get(url)
     assertContains(response, "Le contrat arrive bientôt à échéance")
     assertContains(response, "Le contrat de ce salarié arrive à échéance le 04/02/2026.")
-    assertContains(response, tally_url)
+    assertContains(response, tally_url("ending_soon"))
 
     contract.end_date = today - datetime.timedelta(days=10)
     contract.save()
@@ -1494,7 +1533,7 @@ def test_pro_support_report_banner_on_job_seeker_card_for_siae(client):
     assertContains(
         response, "Le contrat de ce salarié a pris fin le 05/01/2026, mais son PASS\xa0IAE est encore valide."
     )
-    assertContains(response, tally_url)
+    assertContains(response, tally_url("ended"))
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

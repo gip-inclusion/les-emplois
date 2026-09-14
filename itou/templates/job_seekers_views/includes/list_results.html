@@ -80,8 +80,8 @@
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                        {% if job_seeker.show_pro_support_report %}
-                                            <a href="{{ pro_support_report_url }}" class="dropdown-item has-external-link" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Faire le bilan d’accompagnement</a>
+                                        {% if job_seeker.pro_support_report_url %}
+                                            <a href="{{ job_seeker.pro_support_report_url }}" class="dropdown-item has-external-link" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Faire le bilan d’accompagnement</a>
                                         {% endif %}
                                         {% if request.current_organization.is_authorized %}
                                             {% if not job_seeker.has_valid_approval %}

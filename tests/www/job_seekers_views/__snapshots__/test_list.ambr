@@ -4274,7 +4274,16 @@
                                    AND U0."job_seeker_id" = ("users_user"."id"))
                             ORDER BY U0."start_date" DESC,
                                      U0."id" DESC
-                            LIMIT 1) < %s) AS "last_contract_ended_with_valid_approval"
+                            LIMIT 1) < %s) AS "last_contract_ended_with_valid_approval",
+          
+               (SELECT U0."professional_id" AS "professional"
+                FROM "users_jobseekerassignment" U0
+                INNER JOIN "prescribers_prescriberorganization" U2 ON (U0."prescriber_organization_id" = U2."id")
+                WHERE (U0."job_seeker_id" = ("users_user"."id")
+                       AND U2."authorization_status" = %s)
+                ORDER BY U0."last_action_at" DESC,
+                         U0."id" DESC
+                LIMIT 1) AS "pro_support_report_advisor_id"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4501,6 +4510,15 @@
                          ORDER BY U0."start_date" DESC,
                                   U0."id" DESC
                          LIMIT 1) < %s) AS "last_contract_ended_with_valid_approval",
+          
+            (SELECT U0."professional_id" AS "professional"
+             FROM "users_jobseekerassignment" U0
+             INNER JOIN "prescribers_prescriberorganization" U2 ON (U0."prescriber_organization_id" = U2."id")
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U2."authorization_status" = %s)
+             ORDER BY U0."last_action_at" DESC,
+                      U0."id" DESC
+             LIMIT 1) AS "pro_support_report_advisor_id",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
