@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import itertools
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -1048,10 +1049,12 @@ def test_populate_memberships(snapshot):
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 def test_populate_job_seeker_assignments(snapshot):
+    reason = "Some text that should not be exported"  # may contain personal data
     advisor_assignment = JobSeekerAssignmentFactory(
         company=CompanyFactory(),
         last_action_kind=ActionKind.ACCEPT,
         last_action_at=datetime.datetime(2023, 1, 10, tzinfo=datetime.UTC),
+        reason=reason,
     )
     unknown_advisor_assignment = JobSeekerAssignmentFactory(
         company=CompanyFactory(),
@@ -1118,6 +1121,7 @@ def test_populate_job_seeker_assignments(snapshot):
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
+    assert reason not in itertools.chain.from_iterable(row.values() for row in rows)
 
 
 @freeze_time("2023-02-02")
