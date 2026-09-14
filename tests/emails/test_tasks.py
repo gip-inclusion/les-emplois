@@ -12,8 +12,8 @@ BREVO_SEND_URL = "https://api.brevo.com/v3/smtp/email"
 
 class TestAsyncEmailBackend:
     def test_send_messages_splits_recipients(self, django_capture_on_commit_callbacks, mailoutbox):
-        # 2 emails are needed; one with 2000 the other with 25
-        recipients = [Faker("email", locale="fr_FR") for _ in range(2025)]
+        # 2 emails are needed; one with 99 the other with 25
+        recipients = [Faker("email", locale="fr_FR") for _ in range(99 + 25)]
         message = EmailMessage(
             from_email="unit-test@tests.com",
             to=recipients,
@@ -28,7 +28,7 @@ class TestAsyncEmailBackend:
 
         assert sent == 2
         [email1, email2] = mailoutbox
-        assert len(email1.to) == 2000
+        assert len(email1.to) == 99
         assert len(email2.to) == 25
         for email in [email1, email2]:
             assert email.from_email == "unit-test@tests.com"

@@ -19,19 +19,19 @@ logger = logging.getLogger("itou.emails")
 
 # Brevo max total number of recipients (TO, CC, BCC) per API call.
 # https://developers.brevo.com/reference/send-transac-email
-_BREVO_MAX_RECIPIENTS = 2000
+_BREVO_MAX_RECIPIENTS = 99
 _EMAIL_KEYS = ("from_email", "cc", "bcc", "subject", "body")
 
 
 def sanitize_recipients(email_message):
     """
-    Brevo API has a **2000** number limit for anytype of email recipient:
+    Brevo API has a limit for anytype of email recipient:
     * TO
     * CC
     * BCC
 
     This function:
-    * partitions email recipients with more than 2000 elements
+    * partitions email recipients when there are more items than allowed,
     * creates new emails with a number of recipients in the Brevo limit
     * **only** checks for `TO` recipients owerflows
 
