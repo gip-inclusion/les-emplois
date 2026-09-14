@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_expire_orientations[sql]
   dict({
-    'num_queries': 22,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -282,6 +282,22 @@
       }),
       dict({
         'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
           'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
           'Orientation.expire[insertion/models.py]',
           'Command.handle[insertion/management/commands/expire_orientations.py]',
@@ -501,6 +517,22 @@
                                                             "timestamp",
                                                             "orientation_id")
           VALUES (%s, %s, %s, %s, %s) RETURNING "insertion_orientationtransitionlog"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
         ''',
       }),
       dict({
