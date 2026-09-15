@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django_datadog_logger.formatters.datadog import get_client_ip
 
 
 class AuditTrailEventType(models.TextChoices):
@@ -17,7 +18,7 @@ class AuditTrailManager(models.Manager):
         return super().create(
             event_type=event_type,
             user=user or request.user,
-            ip=request.META.get("REMOTE_ADDR"),  # May not exist in request mocks
+            ip=get_client_ip(request),
             browser_id=getattr(request, "browser_id", None),  # May not exist in request mocks
             data=data,
         )
