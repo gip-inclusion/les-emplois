@@ -9,6 +9,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.models import CompanyMembership
+from itou.files.models import File
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     OrientationRefusalReason,
@@ -19,6 +20,7 @@ from itou.insertion.models import Orientation, OrientationProcessLink, Orientati
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.files.factories import FileFactory
 from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, ProfessionalFactory
@@ -79,6 +81,17 @@ def test_orientation_attachments(temporary_dora_bucket_name):
         assert attachment_detail[0] == f"document{idx}.pdf"
         assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail[1]
         assert temporary_dora_bucket_name in attachment_detail[1]
+
+
+def test_delete_documents():
+    orientation = OrientationFactory()
+    files = [FileFactory(), FileFactory()]
+    orientation.documents.set(files)
+    assert orientation.documents.exists()
+
+    orientation.delete_documents()
+    assert not orientation.documents.exists()
+    assert File.objects.exists()
 
 
 @pytest.mark.parametrize(
@@ -216,6 +229,7 @@ def test_transition_accept(from_state, sender_is_referent, mailoutbox, django_ca
 @pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
 def test_transition_refuse(from_state, sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
     orientation = OrientationFactory(status=from_state, service__contact_email="service.contact@email.fake")
+    orientation.documents.set([FileFactory()])
     if sender_is_referent:
         orientation.referent_email = orientation.sender.email
         orientation.save()
@@ -238,6 +252,8 @@ def test_transition_refuse(from_state, sender_is_referent, mailoutbox, django_ca
 
     assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
 
+    assert not orientation.documents.exists()
+
     # Notifications
     if sender_is_referent:
         [structure_email, beneficiary_email, sender_email] = mailoutbox
@@ -253,6 +269,7 @@ def test_transition_refuse(from_state, sender_is_referent, mailoutbox, django_ca
 @pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
 def test_transition_expire(from_state, sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
     orientation = OrientationFactory(status=from_state, service__contact_email="service.contact@email.fake")
+    orientation.documents.set([FileFactory()])
     if sender_is_referent:
         orientation.referent_email = orientation.sender.email
         orientation.save()
@@ -272,6 +289,8 @@ def test_transition_expire(from_state, sender_is_referent, mailoutbox, django_ca
     assert log.orientation.updated_at == timestamp
 
     assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
+
+    assert not orientation.documents.exists()
 
     # Notifications
     if sender_is_referent:
