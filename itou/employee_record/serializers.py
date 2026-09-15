@@ -13,6 +13,7 @@ from itou.asp.models import (
 )
 from itou.asp.typing import CodeComInsee
 from itou.asp.utils import asp_birth_place
+from itou.employee_record.enums import MovementType
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
@@ -325,7 +326,7 @@ class _StaticSituationForEITISerializer(_SituationForEITISerializer):
 
 class EmployeeRecordSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
+    typeMouvement = serializers.ReadOnlyField(default=MovementType.CREATION)  # Required
     siret = serializers.CharField()  # Required
     mesure = serializers.CharField(source="asp_measure")  # Required
 
@@ -345,7 +346,7 @@ class EmployeeRecordSerializer(serializers.Serializer):
 
 class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
+    typeMouvement = serializers.ReadOnlyField(default=MovementType.UPDATE)  # Required
     mesure = serializers.CharField(source="employee_record.asp_measure")  # Required
     siret = serializers.SerializerMethodField()  # Required
 

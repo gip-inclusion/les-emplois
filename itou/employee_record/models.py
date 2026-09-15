@@ -18,7 +18,7 @@ from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.enums import CompanySource
 from itou.companies.models import Company, SiaeFinancialAnnex
-from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
@@ -43,8 +43,6 @@ class ASPExchangeInformation(models.Model):
     ASP_PROCESSING_SUCCESS_CODE = "0000"
     ASP_DUPLICATE_ERROR_CODE = "3436"
     ASP_UNIQUE_ID_MISMATCH_CODE = "3437"
-
-    ASP_MOVEMENT_TYPE = None  # Must be specified in descendant classes
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="code de traitement ASP", null=True)
@@ -244,8 +242,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     ERROR_EMPLOYEE_RECORD_INVALID_STATE = "La fiche salarié n'est pas dans l'état requis pour cette action"
 
     ERROR_NO_CONVENTION_AVAILABLE = "La structure actuelle ne dispose d'aucune convention"
-
-    ASP_MOVEMENT_TYPE = MovementType.CREATION
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -735,8 +731,6 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     Monitoring of approvals is done via a Postgres trigger (defined in `Approval` app migrations),
     at the moment, only the start and end dates are tracked.
     """
-
-    ASP_MOVEMENT_TYPE = MovementType.UPDATE
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
