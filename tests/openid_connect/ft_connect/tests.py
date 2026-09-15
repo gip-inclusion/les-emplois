@@ -329,7 +329,6 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_mismatched_nonce(self, client):
-        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
         response = mock_oauth_dance(client, expected_route="account_login", matching_nonces=False)
         assert User.objects.count() == 0
         assertMessages(
