@@ -3,6 +3,7 @@ import random
 import uuid
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.template import Context
 from django.test import TestCase
 from django.urls import reverse
@@ -15,11 +16,16 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
-from itou.www.job_seekers_views.views import can_see_external_job_applications
-from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
+from itou.www.job_seekers_views.views import JobApplication, can_see_external_job_applications
+from tests.approvals.factories import (
+    ApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1480,3 +1486,329 @@ class TestAdvisorsTab:
         assertNotContains(response, fill_assignment_reason_btn, html=True)
         assertNotContains(response, switch_organization_btn)
         assertNotContains(response, not_a_member_warning)
+
+
+class TestOverviewTab:
+    @pytest.fixture(autouse=True)
+    def setup(self, settings):
+        self.department = "13"
+        settings.OVERVIEW_TAB_DEPARTMENTS = [self.department]
+
+    def test_forbidden_access(self, client):
+        job_seeker = JobSeekerFactory()
+        url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        for user in [
+            job_seeker,
+            PrescriberFactory(membership__organization__authorized=False),
+            EmployerFactory(),
+            LaborInspectorFactory(),
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == 403
+
+    def test_tab_access(self, client):
+        job_seeker = JobSeekerFactory()
+        overview_tab_url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(job_seeker)
+        response = client.get(overview_tab_url)
+        assert response.status_code == 403
+
+        user = PrescriberFactory(
+            membership__organization__authorized=True, membership__organization__department=self.department
+        )
+        client.force_login(user)
+        response = client.get(overview_tab_url)
+        assert response.status_code == 403
+
+        approval = ApprovalFactory(
+            user=job_seeker,
+            start_at=timezone.localdate() - relativedelta(years=1, months=6),
+            end_at=timezone.localdate() + relativedelta(months=6),
+        )
+        ContractFactory(
+            job_seeker=job_seeker, start_date=approval.start_at, end_date=timezone.localdate() - relativedelta(days=7)
+        )
+        JobApplicationFactory(
+            sent_by_prescriber=True, job_seeker=job_seeker, created_at=timezone.now() - relativedelta(days=30)
+        )
+        response = client.get(overview_tab_url)
+        assert response.status_code == 200
+
+    @freeze_time("2026-09-15")
+    def test_tab(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        user = PrescriberFactory(
+            membership__organization__authorized=True, membership__organization__department=self.department
+        )
+        approval = ApprovalFactory(
+            public_id="11111111-1111-1111-1111-111111111111",
+            user=job_seeker,
+            start_at="2025-01-01",
+            end_at="2026-12-31",
+        )
+        ContractFactory(
+            job_seeker=job_seeker,
+            company__name="SIAE",
+            start_date=approval.start_at,
+            end_date="2026-07-01",
+        )
+        JobApplicationFactory(
+            for_snapshot=True,
+            sent_by_prescriber=True,
+            job_seeker=job_seeker,
+            created_at=timezone.now() - relativedelta(days=31),
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional__first_name="Gordon",
+            professional__last_name="Freeman",
+            company=CompanyFactory(name="Black Mesa"),
+            created_at=timezone.now() - relativedelta(months=7),
+        )
+        overview_tab_url = reverse("job_seekers_views:overview", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(user)
+
+        response = client.get(overview_tab_url)
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#job-seeker-overview")) == snapshot
+
+    @freeze_time("2026-09-11")
+    def test_overview_approval(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_approval.html")
+
+        # No approval ever delivered
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": None,
+                    "suspension": None,
+                    "prolongation": None,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="no approval")
+
+        # Approval is valid with over 90 days left
+        approval = ApprovalFactory(user=job_seeker, public_id="11111111-1111-1111-1111-111111111111")
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": approval,
+                    "suspension": None,
+                    "prolongation": None,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="valid approval")
+
+        # Approval is valid with less than or 90 days left
+        TWO_YEARS = relativedelta(years=2)
+        NINETY_DAYS = relativedelta(days=90)
+        approval.start_at = timezone.localdate() - relativedelta(years=1, months=10)
+        approval.end_at = timezone.localdate() + relativedelta(months=2)
+        del approval.remainder  #  it's a cached property so we need to clear it manually
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": approval,
+                    "suspension": None,
+                    "prolongation": None,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="soon expired approval")
+
+        # Approval is suspended
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=timezone.localdate(),
+            end_at=timezone.localdate() + NINETY_DAYS,
+            siae__name="SIAE 1",
+        )
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": approval,
+                    "suspension": suspension,
+                    "prolongation": None,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="suspended approval")
+
+        # Approval is expired
+        approval.start_at = timezone.localdate() - TWO_YEARS - NINETY_DAYS
+        approval.end_at = approval.start_at + NINETY_DAYS
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": approval,
+                    "suspension": None,
+                    "prolongation": None,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="expired approval")
+
+        # Approval is prolonged
+        prolongation = ProlongationFactory(
+            approval=approval, end_at=timezone.localdate() + NINETY_DAYS, declared_by_siae__name="SIAE 2"
+        )
+        rendered = template.render(
+            Context(
+                {
+                    "job_seeker": job_seeker,
+                    "approval": approval,
+                    "suspension": None,
+                    "prolongation": prolongation,
+                    "request": request,
+                }
+            )
+        )
+        assert pretty_indented(rendered) == snapshot(name="prolonged approval")
+
+    @freeze_time("2026-09-11")
+    def test_overview_contract(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_contract.html")
+
+        # No contract found
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": None, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no contract")
+
+        # Contract is ongoing with no end date
+        contract = ContractFactory(
+            job_seeker=job_seeker,
+            company__name="SIAE",
+            start_date=timezone.localdate() - relativedelta(months=6),
+            end_date=None,
+        )
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="contract without end date")
+
+        # Contract is ongoing and has an end date
+        contract.end_date = timezone.localdate() + relativedelta(days=42)
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="contract with end date")
+
+        # Contract has ended
+        contract.end_date = timezone.localdate() - relativedelta(days=42)
+        rendered = template.render(Context({"job_seeker": job_seeker, "contract": contract, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="ended contract")
+
+    @freeze_time("2026-09-11")
+    def test_overview_jobapp(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_jobapp.html")
+
+        # No job application found
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": None, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no job app")
+
+        # New job application
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
+        org = PrescriberOrganizationFactory(for_snapshot=True)
+        prescriber = PrescriberFactory(first_name="Annie", last_name="Jardin")
+        job_app = JobApplicationFactory(
+            id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            sent_by_prescriber=True,
+            sender_prescriber_organization=org,
+            sender=prescriber,
+            to_company__name="SIAE",
+            job_seeker=job_seeker,
+            state=JobApplicationState.NEW,
+        )
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="new job app")
+
+        # Job application being processed
+        job_app.process()
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="processing job app")
+
+        # Refused job application
+        employer = EmployerFactory(first_name="Pierre", last_name="Clément", membership__company=job_app.to_company)
+        job_app.refusal_reason = RefusalReason.INCOMPATIBLE
+        job_app.answer = "refusé"
+        job_app.refuse(user=employer)
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="refused job app")
+
+        # Transferred job application
+        company = CompanyFactory(name="SIAE 2", subject_to_iae_rules=True)
+        CompanyMembershipFactory(user=employer, company=company)
+        job_app.transfer(user=employer, target_company=company)
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="transferred job app")
+
+        # Accepted job application
+        job_app.accept(user=employer)
+        job_app = JobApplication.objects.with_accepted_at().get()
+
+        rendered = template.render(Context({"job_seeker": job_seeker, "job_app": job_app, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="accepted job app")
+
+    @freeze_time("2026-09-11")
+    def test_overview_assignment(self, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        prescriber = PrescriberFactory(for_snapshot=True)
+        request = get_request(PrescriberFactory())
+        template = load_template("job_seekers_views/includes/overview_assignment.html")
+
+        # No assignment
+        job_seeker.active_advisors_nb = 0
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no assignment")
+
+        # 1 active assignment
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=prescriber,
+            last_action_kind=ActionKind.APPLY,
+            created_at=timezone.now() - relativedelta(months=3),
+        )
+        job_seeker.active_advisors_nb = 1
+        del job_seeker.last_assignment
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="one active assignment")
+
+        # Several active assignments
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=EmployerFactory(for_snapshot=True),
+            last_action_kind=ActionKind.ACCEPT,
+            last_action_at=timezone.now() - relativedelta(months=6),
+        )
+        job_seeker.active_advisors_nb = 2
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="several active assignments")
+
+        # No active assignment
+        assignment.ended_at = timezone.now() - relativedelta(months=1)
+        assignment.end_reason = AssignmentEndReason.AUTOMATIC
+        assignment.save()
+        job_seeker.active_advisors_nb = 0
+        del job_seeker.last_assignment
+        rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
+        assert pretty_indented(rendered) == snapshot(name="no active assignment")

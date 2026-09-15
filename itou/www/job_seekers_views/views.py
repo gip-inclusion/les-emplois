@@ -3,12 +3,13 @@ import logging
 import urllib.parse
 from functools import cached_property
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -31,6 +32,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
@@ -151,6 +153,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
+            "show_overview_tab": get_jobseeker_overview_data(self.request, self.object),
         }
 
 
@@ -364,6 +367,75 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
             "ended_assignments": ended_assignments,
             "calendar_url": settings.ADVISORS_CALENDAR_URL,
         }
+
+
+def get_jobseeker_overview_data(request, job_seeker):
+    """
+    Several conditions need to be cleared to display/access the overview tab:
+    - the user must be an authorized prescriber from one of the selected departments for the experiment
+    - the user must have logged in in the past 3 months
+    - the job seeker must have a valid approval with more than 90 days left, not suspended
+    - the job seeker must not be employed
+    - the job seeker hasn't applied for a job in over 30 days
+    - the job seeker made at least one job application in the past 6 months
+    """
+    now = timezone.now()
+    MIN_LAST_LOGIN = now - relativedelta(months=3)
+    THIRTY_DAYS_AGO = now - relativedelta(days=30)
+    SIX_MONTHS_AGO = now - relativedelta(months=6)
+    if (
+        request.from_authorized_prescriber
+        and request.user.last_login >= MIN_LAST_LOGIN
+        and request.current_organization.department in settings.OVERVIEW_TAB_DEPARTMENTS
+    ):
+        approval = job_seeker.latest_approval
+        if approval and approval.is_valid() and approval.remainder.days > 90 and not approval.is_suspended:
+            contract = get_contracts(approval).first()
+            if contract and contract.has_ended:
+                job_apps = (
+                    job_seeker.job_applications.filter(created_at__gte=SIX_MONTHS_AGO)
+                    .filter(~Exists(JobApplication.objects.filter(pk=OuterRef("pk"), created_at__gte=THIRTY_DAYS_AGO)))
+                    .order_by("-created_at")
+                )
+                if job_apps.exists():
+                    state_order = {
+                        JobApplicationState.NEW: 0,
+                        JobApplicationState.PROCESSING: 1,
+                        JobApplicationState.REFUSED: 2,
+                    }
+
+                    job_app = sorted(list(job_apps), key=lambda jobapp: state_order[jobapp.state])[0]
+                    return {
+                        "approval": approval,
+                        "contract": contract,
+                        "job_app": job_app,
+                    }
+
+    return None
+
+
+@check_request(lambda request: request.from_authorized_prescriber)
+def job_seeker_overview(request, public_id, template_name="job_seekers_views/overview.html"):
+    job_seeker = get_object_or_404(User.objects.with_advisors_count(), kind=UserKind.JOB_SEEKER, public_id=public_id)
+    overview_data = get_jobseeker_overview_data(request, job_seeker)
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
+
+    if not overview_data:
+        raise PermissionDenied
+
+    context = {
+        "job_seeker": job_seeker,
+        "back_url": back_url,
+        "can_view_personal_information": can_view_personal_information(request, job_seeker),
+        "services_search_url": build_services_search_url(request, job_seeker),
+        "matomo_custom_title": "Synthèse usager",
+        "show_overview_tab": True,
+        "suspension": None,  # Not handled yet
+        "prolongation": None,  # Not handled yet
+        **overview_data,
+    }
+
+    return render(request, template_name, context)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
@@ -580,18 +652,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .values("id")[:1],
         output_field=IntegerField(),
     )
-    subquery_advisors_count = Subquery(
-        JobSeekerAssignment.objects.filter(job_seeker=OuterRef("pk"), ended_at=None)
-        .values("job_seeker")
-        .annotate(
-            known_advisors_count=Count("professional", distinct=True, filter=Q(assigned_to_unknown_advisor=False)),
-            unknown_advisors_count=Count("assigned_to_unknown_advisor", filter=Q(assigned_to_unknown_advisor=True)),
-            advisors_count=F("known_advisors_count") + F("unknown_advisors_count"),
-        )
-        .values("advisors_count"),
-        output_field=IntegerField(),
-    )
-    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
+    queryset = User.objects.with_advisors_count().filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
 
     form = FilterForm(
         queryset,
@@ -637,7 +698,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
             active_assignment=subquery_active_assignment,
-            active_advisors_nb=Coalesce(subquery_advisors_count, 0),
         )
         .select_related("jobseeker_profile")
         .prefetch_related(

@@ -940,3 +940,7 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 
 REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
 NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
+
+OVERVIEW_TAB_DEPARTMENTS = ["69", "75", "93"]
+if SHOW_DEMO_ACCOUNTS_BANNER:
+    OVERVIEW_TAB_DEPARTMENTS.append("13")

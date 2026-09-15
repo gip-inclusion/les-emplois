@@ -2902,6 +2902,825 @@
   
   '''
 # ---
+# name: TestOverviewTab.test_overview_approval[expired approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-pass-expired-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              PASS IAE expiré le 11/09/2024.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/">
+                              Voir le PASS IAE
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">
+                              expiré
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_approval[no approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-shield-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Aucun PASS IAE au dossier.
+                          </span>
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="valider-eligibilite-iae" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Valider son éligibilité IAE
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              jamais délivré
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_approval[prolonged approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-add-circle-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              PASS IAE prolongé jusqu'au 10/12/2026 - motif : fin d'une formation.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/">
+                              Voir le PASS IAE
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                              prolongé
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_approval[soon expired approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-pass-valid-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              PASS IAE expire dans 62 jours, le 11/11/2026.
+                          </span>
+                          A renouveler avant toute nouvelle embauche.
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/">
+                              Voir le PASS IAE
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              bientôt expiré
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_approval[suspended approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-pass-pending-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              PASS IAE suspendu depuis le 11/09/2026 - motif déclaré : contrat de travail suspendu depuis plus de 15 jours.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-suspension-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/">
+                              Voir la suspension
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              suspendu
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_approval[valid approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-approval">
+              <div class="col-auto">
+                  <i class="ri-xl ri-pass-valid-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              PASS IAE valide jusqu'au 09/09/2028.
+                          </span>
+                          Aucune démarche à prévoir pour une embauche en SIAE.
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/">
+                              Voir le PASS IAE
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                              en cours
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[no active assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-unfollow-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Accompagné de juin 2026 à août 2026 par 
+      
+          DUPONT Pierre (Aucune structure associée)
+      
+  .
+                          </span>
+                          Accompagnement clos automatiquement le 11/08/2026.
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="accompagnements" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir les anciens accompagnements
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                              ancien
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[no assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-shield-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Aucun accompagnateur actuel.
+                          </span>
+                          Cet usager n'a encore jamais été accompagné.
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="creer-accompagnement" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Se positionner comme accompagnateur
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              jamais accompagné
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[one active assignment]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Accompagné depuis juin 2026 par 
+      
+          DUPONT Pierre (Aucune structure associée)
+      
+  .
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="info-contact-accompagnateur" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir ses coordonnées
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              accompagnateur
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_assignment[several active assignments]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-assignment">
+              <div class="col-auto">
+                  <i class="ri-xl ri-group-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Actuellement suivi par plusieurs accompagnateurs.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="accompagnements" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir les accompagnements
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                              2 accompagnements
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_contract[contract with end date]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-contract">
+              <div class="col-auto">
+                  <i class="ri-xl ri-briefcase-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Contrat IAE avec SIAE du 11/03/2026 au 23/10/2026.
+                          </span>
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" href="#">
+                              Préparer la suite du parcours
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              fin prévue
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_contract[contract without end date]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-contract">
+              <div class="col-auto">
+                  <i class="ri-xl ri-briefcase-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              En poste: contrat IAE avec SIAE depuis le 11/03/2026.
+                          </span>
+                          Aucune date de fin déclarée à ce jour.
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" href="#">
+                              Préparer la suite du parcours
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              en cours
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_contract[ended contract]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-contract">
+              <div class="col-auto">
+                  <i class="ri-xl ri-briefcase-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Dernier contrat IAE : SIAE, du 11/03/2026 au 31/07/2026.
+                          </span>
+                          <br/>
+                          <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="suivi-contrat" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/">
+                              Voir le suivi des contrats
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                              terminé
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_contract[no contract]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-contract">
+              <div class="col-auto">
+                  <i class="ri-xl ri-briefcase-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Aucun contrat IAE trouvé.
+                          </span>
+                          Absence d'enregistrement dans l'extranet, ou récupération impossible, ce n'est pas la preuve d'une absence d'emploi.
+                          <br/>
+                          <a class="btn btn-outline-primary mt-2" href="#">
+                              Vérifier auprès de l'employeur
+                          </a>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              non trouvé
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[accepted job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-user-follow-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Embauche déclarée à SIAE 2 le 11/09/2026,
+                          </span>
+                          à la suite de la candidature du 11/09/2026.
+                          <br/>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                              acceptée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[new job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Candidature à SIAE déposée le 11/09/2026,
+                          </span>
+                          candidature spontanée.
+                          <br/>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              nouvelle
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[no job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-corner-up-right-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Aucune candidature récupérée.
+                          </span>
+                          Il est possible que le candidat est déposé une candidature en autonomie ou qu'il soit suivi par une autre structure.
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                              aucune candidature
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[processing job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Candidature à SIAE déposée le 11/09/2026,
+                          </span>
+                          candidature spontanée.
+                          
+                              Sans réponse depuis le 11/09/2026.
+                          <br/>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                              à l'étude
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[refused job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-file-list-3-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Candidature à SIAE refusée le 11/09/2026
+                          </span>
+                          - motif de refus : un des freins à l'emploi du candidat est incompatible avec le poste proposé.
+                          <br/>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">
+                              refusée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_overview_jobapp[transferred job app]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="row gx-3 align-items-start" id="overview-jobapp">
+              <div class="col-auto">
+                  <i class="ri-xl ri-corner-up-right-line">
+                  </i>
+              </div>
+              <div class="col">
+                  <div class="row gx-4 align-items-start justify-content-between">
+                      <div class="col-6">
+                          <span class="fw-semibold">
+                              Candidature transférée le 11/09/2026 de la structure SIAE vers la structure SIAE 2.
+                          </span>
+                          Le nouvel employeur reprend l'instruction.
+                          <br/>
+                      </div>
+                      <div class="col-auto">
+                          <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">
+                              transférée
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: TestOverviewTab.test_tab
+  '''
+  <section class="s-section" id="job-seeker-overview">
+      <div class="s-section__container container">
+          <h2>
+              Ce qu'il faut savoir aujourd'hui
+          </h2>
+          <div class="c-box c-box--overview">
+              <div class="row gx-3 align-items-start" id="overview-contract">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-briefcase-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <span class="fw-semibold">
+                                  Dernier contrat IAE : SIAE, du 01/01/2025 au 01/07/2026.
+                              </span>
+                              <br/>
+                              <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="suivi-contrat" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/overview/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  Voir le suivi des contrats
+                              </a>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">
+                                  terminé
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-4"/>
+              <div class="row gx-3 align-items-start" id="overview-approval">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-pass-valid-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <span class="fw-semibold">
+                                  PASS IAE valide jusqu'au 31/12/2026.
+                              </span>
+                              Aucune démarche à prévoir pour une embauche en SIAE.
+                              <br/>
+                              <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="voir-pass-iae" href="/approvals/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/overview/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  Voir le PASS IAE
+                              </a>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">
+                                  en cours
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-4"/>
+              <div class="row gx-3 align-items-start" id="overview-jobapp">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-file-list-3-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <span class="fw-semibold">
+                                  Candidature à ACME Inc. déposée le 15/08/2026,
+                              </span>
+                              candidature spontanée.
+                              <br/>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-info-lighter text-info flex-shrink-0">
+                                  nouvelle
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-4"/>
+              <div class="row gx-3 align-items-start" id="overview-assignment">
+                  <div class="col-auto">
+                      <i class="ri-xl ri-user-line">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <div class="row gx-4 align-items-start justify-content-between">
+                          <div class="col-6">
+                              <span class="fw-semibold">
+                                  Accompagné depuis février 2026 par 
+      
+          FREEMAN Gordon (Black Mesa)
+      
+  .
+                              </span>
+                              <br/>
+                              <a data-matomo-action="clic" data-matomo-category="test-synthese" data-matomo-event="true" data-matomo-option="info-contact-accompagnateur" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/overview/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  Voir ses coordonnées
+                              </a>
+                          </div>
+                          <div class="col-auto">
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">
+                                  accompagnateur
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
 # name: test_both_diag_from_company[snapshot with GEIQ diag]
   '''
   <main class="s-main" id="main" role="main">

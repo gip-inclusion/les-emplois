@@ -2100,8 +2100,14 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -2111,6 +2117,7 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s))))
+          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -2176,7 +2183,9 @@
                                       AND U0."prescriber_organization_id" IS NULL
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
-                                         AND U0."prescriber_organization_id" = %s))))))
+                                         AND U0."prescriber_organization_id" = %s))))
+                    GROUP BY V0."id",
+                             1))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2275,15 +2284,7 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment",
-                        COALESCE(
-                                   (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                         WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                         WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                    FROM "users_jobseekerassignment" U0
-                                    WHERE (U0."ended_at" IS NULL
-                                           AND U0."job_seeker_id" = ("users_user"."id"))
-                                    GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb"
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -2323,8 +2324,7 @@
                       5,
                       6,
                       8,
-                      9,
-                      10) subquery
+                      9) subquery
         ''',
       }),
       dict({
@@ -2371,6 +2371,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
           
             (SELECT U0."end_at" AS "end_at"
              FROM "approvals_approval" U0
@@ -2457,14 +2462,6 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
-                     COALESCE(
-                                (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                      WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                      WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                 FROM "users_jobseekerassignment" U0
-                                 WHERE (U0."ended_at" IS NULL
-                                        AND U0."job_seeker_id" = ("users_user"."id"))
-                                 GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -2546,15 +2543,14 @@
                     ORDER BY 1 DESC
                     LIMIT 1) BETWEEN %s AND %s)
           GROUP BY "users_user"."id",
-                   41,
                    42,
                    43,
                    44,
-                   46,
+                   45,
                    47,
                    48,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "users_user"."id" DESC
           LIMIT 1
         ''',
@@ -3039,8 +3035,14 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -3051,6 +3053,7 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s))))
+          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -3117,7 +3120,9 @@
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s
-                                         AND U0."professional_id" = %s))))))
+                                         AND U0."professional_id" = %s))))
+                    GROUP BY V0."id",
+                             1))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3219,15 +3224,7 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment",
-                        COALESCE(
-                                   (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                         WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                         WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                    FROM "users_jobseekerassignment" U0
-                                    WHERE (U0."ended_at" IS NULL
-                                           AND U0."job_seeker_id" = ("users_user"."id"))
-                                    GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb"
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -3269,8 +3266,7 @@
                       5,
                       6,
                       8,
-                      9,
-                      10) subquery
+                      9) subquery
         ''',
       }),
       dict({
@@ -3317,6 +3313,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
           
             (SELECT U0."end_at" AS "end_at"
              FROM "approvals_approval" U0
@@ -3406,14 +3407,6 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
-                     COALESCE(
-                                (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                      WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                      WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                 FROM "users_jobseekerassignment" U0
-                                 WHERE (U0."ended_at" IS NULL
-                                        AND U0."job_seeker_id" = ("users_user"."id"))
-                                 GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -3497,15 +3490,14 @@
                     ORDER BY 1 DESC
                     LIMIT 1) BETWEEN %s AND %s)
           GROUP BY "users_user"."id",
-                   41,
                    42,
                    43,
                    44,
-                   46,
+                   45,
                    47,
                    48,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "users_user"."id" DESC
           LIMIT 1
         ''',
@@ -3990,8 +3982,14 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -4002,6 +4000,7 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s))))
+          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -4068,7 +4067,9 @@
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s
-                                         AND U0."professional_id" = %s))))))
+                                         AND U0."professional_id" = %s))))
+                    GROUP BY V0."id",
+                             1))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -4140,15 +4141,7 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment",
-                        COALESCE(
-                                   (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                         WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                         WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                    FROM "users_jobseekerassignment" U0
-                                    WHERE (U0."ended_at" IS NULL
-                                           AND U0."job_seeker_id" = ("users_user"."id"))
-                                    GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb"
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4176,8 +4169,7 @@
                       2,
                       3,
                       5,
-                      6,
-                      7) subquery
+                      6) subquery
         ''',
       }),
       dict({
@@ -4224,6 +4216,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -4283,14 +4280,6 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
-                     COALESCE(
-                                (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                      WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                      WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                 FROM "users_jobseekerassignment" U0
-                                 WHERE (U0."ended_at" IS NULL
-                                        AND U0."job_seeker_id" = ("users_user"."id"))
-                                 GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -4361,14 +4350,13 @@
                                 AND U0."professional_id" = %s))
                            AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
-                   39,
                    40,
                    41,
-                   43,
+                   42,
                    44,
                    45,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 42 DESC,
+          ORDER BY 43 DESC,
                    "users_user"."id" DESC
           LIMIT 5
         ''',
@@ -5205,8 +5193,14 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN
                    (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
@@ -5216,6 +5210,7 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s))))
+          GROUP BY "users_user"."id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -5281,7 +5276,9 @@
                                       AND U0."prescriber_organization_id" IS NULL
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
-                                         AND U0."prescriber_organization_id" = %s))))))
+                                         AND U0."prescriber_organization_id" = %s))))
+                    GROUP BY V0."id",
+                             1))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -5350,15 +5347,7 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment",
-                        COALESCE(
-                                   (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                         WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                         WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                    FROM "users_jobseekerassignment" U0
-                                    WHERE (U0."ended_at" IS NULL
-                                           AND U0."job_seeker_id" = ("users_user"."id"))
-                                    GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb"
+                LIMIT 1) AS "active_assignment"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -5384,8 +5373,7 @@
                       2,
                       3,
                       5,
-                      6,
-                      7) subquery
+                      6) subquery
         ''',
       }),
       dict({
@@ -5432,6 +5420,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 (COUNT(DISTINCT "users_jobseekerassignment"."professional_id") FILTER (
+                                                                                        WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                               AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
+                                                                                                                                                                                                                               WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -5488,14 +5481,6 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
-                     COALESCE(
-                                (SELECT (COUNT(DISTINCT U0."professional_id") FILTER (
-                                                                                      WHERE (NOT U0."assigned_to_unknown_advisor")) + COUNT(U0."assigned_to_unknown_advisor") FILTER (
-                                                                                                                                                                                      WHERE (U0."assigned_to_unknown_advisor"))) AS "advisors_count"
-                                 FROM "users_jobseekerassignment" U0
-                                 WHERE (U0."ended_at" IS NULL
-                                        AND U0."job_seeker_id" = ("users_user"."id"))
-                                 GROUP BY U0."job_seeker_id"), %s) AS "active_advisors_nb",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -5564,14 +5549,13 @@
                                 AND U0."prescriber_organization_id" = %s))
                            AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
-                   39,
                    40,
                    41,
-                   43,
+                   42,
                    44,
                    45,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 42 DESC,
+          ORDER BY 43 DESC,
                    "users_user"."id" DESC
           LIMIT 3
         ''',
