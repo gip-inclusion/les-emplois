@@ -202,30 +202,35 @@
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/siae/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                          <i aria-hidden="true" class="ri-mail-download-line fw-medium">
                           </i>
                           <span>
-                              Candidatures reçues
+                              Demandes reçues
                           </span>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures-envoyees" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-folder-shared-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures envoyées
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-employeurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures-envoyees" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-employeurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -1230,22 +1235,27 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -1259,7 +1269,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes accompagnements
+                                      Usagers accompagnés
                                   </a>
                               </li>
                               <li>
@@ -1612,22 +1622,27 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -1641,7 +1656,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes accompagnements
+                                      Usagers accompagnés
                                   </a>
                               </li>
                           </ul>
@@ -2304,22 +2319,27 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -2333,7 +2353,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes accompagnements
+                                      Usagers accompagnés
                                   </a>
                               </li>
                           </ul>
@@ -2626,22 +2646,27 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -2655,7 +2680,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes accompagnements
+                                      Usagers accompagnés
                                   </a>
                               </li>
                           </ul>
@@ -2933,22 +2958,27 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
+                      <button aria-controls="collapse-nav-demandes-envoyees" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-demandes-envoyees" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Demandes envoyées
                           </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
-                          <i aria-hidden="true" class="ri-service-line fw-medium">
-                          </i>
-                          <span>
-                              Orientations
-                          </span>
-                      </a>
+                      </button>
+                      <div class="collapse" id="collapse-nav-demandes-envoyees">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                                      Candidatures vers les emplois
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
+                                      Orientations vers des services
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
@@ -2962,7 +2992,7 @@
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes accompagnements
+                                      Usagers accompagnés
                                   </a>
                               </li>
                           </ul>
