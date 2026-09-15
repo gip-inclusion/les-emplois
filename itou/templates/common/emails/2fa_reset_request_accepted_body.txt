@@ -1,0 +1,18 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load datetime_filters %}
+{% block body %}
+
+Bonjour {{ reset_request.user.get_full_name }},
+
+Votre demande de réinitialisation de vos paramètres de double authentification a été acceptée.
+Pour configurer une nouvelle double authentification, cliquez sur le lien suivant (valable {{ OTP_RESET_LINK_VALIDITY|duration }}, à usage unique) :
+
+{{ reset_request.reset_link }}
+
+Si vous n’êtes pas à l’origine de cette demande, vous pouvez l’annuler directement via ce lien :
+
+{{ self_cancel_url }}
+
+et contactez sans attendre security@inclusion.gouv.fr.
+
+{% endblock body %}

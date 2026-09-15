@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+{{ user.get_truncated_full_name }} demande une réinitialisation de ses paramètres de 2FA
+{% endblock %}

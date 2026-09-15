@@ -1,20 +1,46 @@
+import logging
 import secrets
 import uuid
+from statistics import median
 
+import xworkflows
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import make_password
 from django.db import models
-from django_otp.models import Device, ThrottlingMixin, TimestampMixin
+from django.urls import reverse
+from django.utils import timezone
+from django_otp.models import Device, DeviceManager, ThrottlingMixin, TimestampMixin
 from django_otp.plugins.otp_totp.models import (
     TOTPDevice as BaseTOTPDevice,
     default_key as generate_totp_key,
     key_validator,
 )
+from django_xworkflows import models as xwf_models
 from encrypted_fields import EncryptedCharField
 
+from itou.audit_trail.models import AuditTrail, AuditTrailEventType
+from itou.otp.emails import (
+    notify_2fa_reset_request_accepted,
+    notify_2fa_reset_request_denied,
+    notify_2fa_reset_request_done,
+)
+from itou.otp.enums import ResetRequestState, ResetRequestTransition
 from itou.utils.models import CopyModelFieldsMeta
+from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
+
+
+class ItouDeviceManager(DeviceManager):
+    def disable_for_user(self, user) -> int:
+        now = timezone.now()
+        devices = self.filter(user=user)
+        for device in devices:
+            device.disabled_at = now
+        return self.bulk_update(devices, ["disabled_at"])
 
 
 # `django_otp.TOTPDevice` needs a few adjustments, but it's not an
@@ -45,6 +71,8 @@ class ItouTOTPDevice(
         on_delete=models.CASCADE,
     )
     disabled_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
+
+    objects = ItouDeviceManager()
 
     class Meta:
         verbose_name = "appareil d’authentification (TOTP)"
@@ -152,3 +180,168 @@ class ItouStaticToken(models.Model):
             self.save(update_fields=["hashed_code"])
 
         return check_password(clear_code, self.hashed_code, setter)
+
+
+class ResetRequestWorkflow(xwf_models.Workflow):
+    log_model = "otp.ResetRequestTransitionLog"
+
+    states = ResetRequestState.choices
+    transitions = (
+        (ResetRequestTransition.ACCEPT, ResetRequestState.PENDING, ResetRequestState.ACCEPTED),
+        (ResetRequestTransition.RESEND, ResetRequestState.ACCEPTED, ResetRequestState.ACCEPTED),
+        (
+            ResetRequestTransition.DENY,
+            [ResetRequestState.ACCEPTED, ResetRequestState.PENDING],
+            ResetRequestState.DENIED,
+        ),
+        (ResetRequestTransition.RESET_DEVICES, ResetRequestState.ACCEPTED, ResetRequestState.DONE),
+    )
+    initial_state = ResetRequestState.PENDING
+
+
+class ResetRequestQuerySet(models.QuerySet):
+    def deny(self, *, actor=None, msg=None):
+        """Deny all Reset Request of this QuerySet."""
+        for request in self:
+            request.deny(actor=actor, msg=msg)
+
+    def expired_pending_requests(self):
+        return self.filter(
+            state=ResetRequestState.PENDING, created_at__lt=timezone.now() - settings.OTP_RESET_REQUEST_VALIDITY
+        )
+
+    def expired_accepted_requests(self):
+        """An expired request that has its link just resent is only invalidated once the link is expired."""
+        return self.filter(
+            state=ResetRequestState.ACCEPTED,
+            created_at__lt=timezone.now() - settings.OTP_RESET_REQUEST_VALIDITY,
+            updated_at__lt=timezone.now() - settings.OTP_RESET_LINK_VALIDITY,
+        )
+
+    def expired_requests(self):
+        return self.expired_pending_requests().union(self.expired_accepted_requests())
+
+    def close_expired_requests(self):
+        expired_requests = self.expired_requests()
+        for request in expired_requests:
+            request.deny(msg="Request expired.")
+        return len(expired_requests)
+
+
+class ResetRequest(xwf_models.WorkflowEnabled, models.Model):
+    objects = ResetRequestQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = "demande de réinitialisation 2FA"
+        verbose_name_plural = "demandes de réinitialisation 2FA"
+        indexes = (models.Index(fields=("created_at",)),)
+
+    user = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"),
+        verbose_name="utilisateur",
+        help_text="L’utilisateur demandant la réinitialisation de ses 2FA.",
+        related_name="+",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField("date de création", auto_now_add=True)
+    updated_at = models.DateTimeField("date de modification", auto_now=True)
+    state = xwf_models.StateField(ResetRequestWorkflow, verbose_name="état")
+    nonce = models.CharField(default=secrets.token_hex, editable=False)
+
+    def mark_used(self):
+        self.used_at = timezone.now()
+        self.save(update_fields=("used_at",))
+
+    def __str__(self):
+        return f"Demande de réinitialisation 2FA de {self.user.get_full_name()}"
+
+    @xwf_models.transition()
+    def accept(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_accepted(self)
+
+    @xwf_models.transition()
+    def deny(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_denied(self)
+
+    @xwf_models.transition()
+    def resend(self, *, actor=None, msg=None):
+        notify_2fa_reset_request_accepted(self)
+
+    @xwf_models.transition()
+    def reset_devices(self, *, actor=None, msg=None) -> int:
+        """Invalidates or deletes all 2FA user devices."""
+        disabled = ItouTOTPDevice.objects.disable_for_user(self.user)
+        deleted, _ = ItouStaticDevice.objects.filter(user=self.user).delete()
+        notify_2fa_reset_request_done(self)
+        return disabled + deleted
+
+    @xworkflows.transition_check(ResetRequestTransition.RESET_DEVICES)
+    def check_reset_devices(self):
+        """Enforce reset link validity."""
+        return self.updated_at + settings.OTP_RESET_LINK_VALIDITY > timezone.now()
+
+    @xworkflows.transition_check(ResetRequestTransition.RESEND)
+    def check_resend(self):
+        """Enforce reset request validity."""
+        return self.created_at + settings.OTP_RESET_REQUEST_VALIDITY > timezone.now()
+
+    @property
+    def reset_link(self):
+        return get_absolute_url(reverse("otp_views:reset_request_do_reset", args=(self.nonce,)))
+
+    def _credibility_according_to_last_connections(self) -> float | None:
+        """Tell if we’ve already seen the machine doing the request."""
+        try:
+            event = AuditTrail.objects.get(
+                event_type=AuditTrailEventType.SECOND_FACTOR_RESET_REQUEST,
+                user=self.user,
+                data__itou_2fa_reset_request_pk=self.pk,
+            )
+        except AuditTrail.DoesNotExist:  # Too old, had been removed
+            return None
+        return event.credibility()
+
+    def _credibility_according_to_hour(self) -> float:
+        return float(8 < self.created_at.hour < 20)
+
+    def _credibility_according_to_weekday(self) -> float:
+        return float(self.created_at.weekday() < 5)
+
+    def credibility(self) -> float:
+        """Measure the credibility of this request.
+
+        Gives a value between 0 (the request does not looks legit) and
+        1 (it looks legit).
+
+        Consider > 0.5 to be OK, < 0.5 to be suspicious.
+        """
+        values = [
+            self._credibility_according_to_last_connections(),
+            self._credibility_according_to_weekday(),
+            self._credibility_according_to_hour(),
+        ]
+        return median([v for v in values if v is not None])
+
+    @property
+    def is_suspicious(self) -> bool:
+        return self.credibility() < 0.5
+
+
+class ResetRequestTransitionLog(xwf_models.BaseTransitionLog):
+    MODIFIED_OBJECT_FIELD = "reset_request"
+    EXTRA_LOG_ATTRIBUTES = (("actor", "actor", None), ("msg", "msg", None))
+
+    reset_request = models.ForeignKey(ResetRequest, related_name="logs", on_delete=models.CASCADE)
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="user initiating this transition",
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+    msg = models.CharField("message", null=True)
+
+    class Meta:
+        verbose_name = "log de demande de réinitialisation de 2FA"
+        verbose_name_plural = "log des demandes de réinitialisation de 2FA"

@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     # ITOU apps.
+    "itou.audit_trail",
     "itou.utils",
     "itou.tasks",
     "itou.cities",
@@ -431,6 +432,8 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
+
+AUDIT_TRAIL_STORAGE_DURATION = datetime.timedelta(days=365)
 
 BOOTSTRAP5 = {
     "required_css_class": "form-group-required",
@@ -883,6 +886,8 @@ SERIALIZATION_MODULES = {
 # OTP
 # ------------------------------------------------------------------------------
 OTP_TOTP_ISSUER = f"{product_name()} ({ITOU_ENVIRONMENT})"
+OTP_RESET_REQUEST_VALIDITY = datetime.timedelta(days=15)
+OTP_RESET_LINK_VALIDITY = datetime.timedelta(hours=24)
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 REQUIRE_MFA_FOR_PROS = os.getenv("REQUIRE_MFA_FOR_PROS", "False") == "True"
 SHOW_UPCOMING_MFA_FOR_PROS_BANNER = os.getenv("SHOW_UPCOMING_MFA_FOR_PROS_BANNER", "False") == "True"
