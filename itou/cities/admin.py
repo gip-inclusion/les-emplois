@@ -11,7 +11,13 @@ class CityAdmin(ReadonlyMixin, ItouGISMixin, ItouModelAdmin):
 
     list_filter = ("department",)
 
-    search_fields = ("name", "department", "post_codes", "code_insee", "siren_epci")
+    search_fields = (
+        "name__istartswith",
+        "department__exact",
+        "post_codes",
+        "code_insee__istartswith",
+        "siren_epci__istartswith",
+    )
 
     readonly_fields = ("zrr", "edition_mode")
 
