@@ -59,7 +59,7 @@
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 4,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -113,6 +113,23 @@
           WHERE ("employee_record_employeerecordupdatenotification"."asp_batch_file" = %s
                  AND "employee_record_employeerecordupdatenotification"."asp_batch_line_number" = %s)
           ORDER BY "employee_record_employeerecordupdatenotification"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EmployeeRecord.has_watched_data_updated_at_set[employee_record/models.py]',
+          'EmployeeRecordUpdateNotification.process[employee_record/models.py]',
+          'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.download_json_file[employee_record/common_management.py]',
+          'Command.download[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          WHERE ("employee_record_employeerecord"."id" = %s
+                 AND "employee_record_employeerecord"."watched_data_updated_at" IS NOT NULL)
           LIMIT 1
         ''',
       }),
