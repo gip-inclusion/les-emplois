@@ -4,6 +4,7 @@ import re
 
 import pytest
 from django.core.management import call_command
+from django.utils import timezone
 
 from itou.employee_record import models
 from itou.employee_record.enums import Status
@@ -52,55 +53,40 @@ def test_missing_approvals(command, caplog):
 
 
 def test_missed_notifications(command, faker, caplog, snapshot):
-    # Approval() updated after the last employee record snapshot are what we want
-    employee_record_before_approval = factories.EmployeeRecordFactory(
+    # Approval() with watched_data_updated_at are what we want
+    employee_record_with_watched_data_updated_at = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
-        updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
-        job_application__approval__updated_at=faker.date_time_between(
-            start_date="-1y", end_date="-1d", tzinfo=datetime.UTC
-        ),
+        watched_data_updated_at=timezone.now(),
     )
 
-    # But not the Approval() updated before the last employee record snapshot
+    # But not Approval() without watched_data_updated_at
     factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
-        updated_at=faker.date_time_between(start_date="-1y", end_date="-1d", tzinfo=datetime.UTC),
-        job_application__approval__updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
+        watched_data_updated_at=None,
     )
 
-    # Approval() that can no longer be prolonged are ignored
+    # Approval() that can no longer be prolonged are ignored, even with watched_data_updated_at
     factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
+        watched_data_updated_at=timezone.now(),
         job_application__approval__expired=True,
         job_application__approval__created_at=faker.future_datetime(tzinfo=datetime.UTC),
     )
 
-    # EmployeeRecordUpdateNotification() should be taken into account
-    factories.EmployeeRecordUpdateNotificationFactory(
-        employee_record__status=models.Status.ARCHIVED,
-        employee_record__job_application__approval__created_at=faker.future_datetime(
-            end_date="+1d", tzinfo=datetime.UTC
-        ),
-        created_at=faker.date_time_between(start_date="+1d", end_date="+30d", tzinfo=datetime.UTC),
-    )
-
     # Various cases are now set up, finally check the behavior
     command.handle(wet_run=True)
-    assert employee_record_before_approval.update_notifications.count() == 1
-    employee_record_before_approval.refresh_from_db()
-    assert employee_record_before_approval.status != Status.ARCHIVED
+    assert employee_record_with_watched_data_updated_at.update_notifications.count() == 1
+    employee_record_with_watched_data_updated_at.refresh_from_db()
+    assert employee_record_with_watched_data_updated_at.status != Status.ARCHIVED
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
-def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
+def test_missed_notifications_limit(mocker, snapshot, command, caplog):
     mocker.patch.object(command, "MAX_MISSED_NOTIFICATIONS_CREATED", 2)
     factories.EmployeeRecordFactory.create_batch(
         3,
         status=models.Status.ARCHIVED,
-        updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
-        job_application__approval__updated_at=faker.date_time_between(
-            start_date="-1y", end_date="-1d", tzinfo=datetime.UTC
-        ),
+        watched_data_updated_at=timezone.now(),
     )
 
     command.handle(wet_run=True)

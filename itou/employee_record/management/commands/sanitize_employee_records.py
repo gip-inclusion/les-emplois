@@ -43,17 +43,14 @@ class Command(BaseCommand):
 
     def _check_missed_notifications(self):
         self.stdout.write("* Checking missing employee records notifications:")
-        employee_record_with_missing_notification = (
-            EmployeeRecord.objects.missed_notifications()
-            .filter(
-                status=Status.ARCHIVED,
-                job_application__approval__end_at__gte=timezone.now(),  # Take approvals that can still be used
-            )
-            .order_by(
-                "-job_application__approval__updated_at",
-                "job_application__approval__number",
-                "job_application__to_company__siret",
-            )
+        employee_record_with_missing_notification = EmployeeRecord.objects.filter(
+            watched_data_updated_at__isnull=False,
+            status=Status.ARCHIVED,
+            job_application__approval__end_at__gte=timezone.now(),  # Take approvals that can still be used
+        ).order_by(
+            "-job_application__approval__updated_at",
+            "job_application__approval__number",
+            "job_application__to_company__siret",
         )
 
         self.logger.info(
