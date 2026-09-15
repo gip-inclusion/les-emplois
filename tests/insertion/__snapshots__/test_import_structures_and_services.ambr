@@ -1107,6 +1107,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1117,8 +1119,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1165,6 +1168,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1175,8 +1180,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1223,6 +1229,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1233,8 +1241,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1600,6 +1609,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1610,8 +1621,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1768,6 +1780,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1778,8 +1792,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1826,6 +1841,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1836,8 +1853,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1958,6 +1976,8 @@
                                            "credentials_online_form",
                                            "opening_hours",
                                            "opening_hours_text",
+                                           "volume_horaire_hebdomadaire",
+                                           "nombre_semaines",
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
@@ -1968,8 +1988,9 @@
                                            "updated_on",
                                            "is_active",
                                            "created_at",
-                                           "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+                                           "updated_at",
+                                           "extra")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({

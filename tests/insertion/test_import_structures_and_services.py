@@ -71,6 +71,11 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").dora_synced_at is not None
     assert Service.objects.get(uid="emplois-de-linclusion--null").dora_synced_at is None
 
+    assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").extra == {
+        "funding_labels": ["France Travail", "Conseil départemental"],
+    }
+    assert Service.objects.get(uid="emplois-de-linclusion--null").extra is None
+
     assert (
         Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd").opening_hours
         == "Mo-Fr 09:00-12:00,14:00-17:00"
@@ -85,7 +90,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
 
     assert Service.objects.get(uid="mission-locale--with-mobilization-link").has_orientation_action is True
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").has_orientation_action is True
-    assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").has_orientation_action is False
+    assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").has_orientation_action is True
 
     assert (
         Service.objects.get(
@@ -97,7 +102,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         Service.objects.get(
             uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927"
         ).mobilization_modes_professionals_external_form_link
-        == "https://dora-link.precendence.test.com"
+        == "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-les-emplois-de-lincl/orienter"
     )
     assert (
         Service.objects.get(uid="emplois-de-linclusion--null").mobilization_modes_professionals_external_form_link

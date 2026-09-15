@@ -3,6 +3,7 @@ import logging
 import secrets
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
@@ -428,6 +429,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
     opening_hours_text = models.CharField(verbose_name="horaires d'accueil (texte libre)", blank=True)
+    volume_horaire_hebdomadaire = models.FloatField(verbose_name="volume horaire hebdomadaire", null=True, blank=True)
+    nombre_semaines = models.PositiveIntegerField(verbose_name="nombre de semaines", null=True, blank=True)
 
     contact_full_name = models.CharField(verbose_name="contact", blank=True)
     contact_email = models.EmailField(verbose_name="e-mail du contact", blank=True)
@@ -448,15 +451,21 @@ class Service(GeolocatedAddressMixin, models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
+    extra = models.JSONField(verbose_name="données complémentaires (data·inclusion)", null=True)
+
     @property
     def is_dora(self):
         return self.source.value == "dora"
 
     @property
+    def update_needed(self):
+        return self.updated_on < timezone.localdate() - relativedelta(months=6)
+
+    @property
     def prerequisites(self) -> list[str]:
         if self.is_dora:
             return [*self.access_conditions_dora, *self.credentials]
-        return [line for line in self.access_conditions_di.split("\\n") if line]
+        return [line.strip(". ") for line in self.access_conditions_di.split("\\n") if line]
 
     @property
     def has_prerequisites(self) -> bool:
@@ -493,6 +502,11 @@ class Service(GeolocatedAddressMixin, models.Model):
         return [
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
+
+    def generate_extra_credential_documents_info(self) -> list[tuple[str, str]]:
+        if not self.extra:
+            return []
+        return [(form["name"], form["url"]) for form in self.extra.get("forms") or []]
 
     objects = ServiceManager()
     include_inactive = ServiceQuerySet.as_manager()
