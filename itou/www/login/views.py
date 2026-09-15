@@ -89,7 +89,7 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
         context = super().get_context_data(**kwargs)
         return context | {
             "redirect_field_value": self.next_url,
-            "redirected_from_old_domain": REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM in (self.next_url or ""),
+            "redirected_from_old_domain": REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM in self.request.GET,
         }
 
 
