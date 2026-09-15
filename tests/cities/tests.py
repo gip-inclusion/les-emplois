@@ -461,7 +461,7 @@ def test_resolve_insee_cities(caplog, snapshot):
     )
 
 
-def test_city_admin_search_ranks_exact_match_first(rf):
+def test_city_admin_search_by_name_prefix(rf):
     vannes = create_city_vannes()
     City.objects.create(
         name="Fontvannes",
@@ -474,7 +474,7 @@ def test_city_admin_search_ranks_exact_match_first(rf):
 
     queryset, _ = CityAdmin(City, admin.site).get_search_results(rf.get("/"), City.objects.all(), "Vannes")
 
-    assert list(queryset)[0] == vannes
+    assert list(queryset) == [vannes]
 
 
 def test_directory_active_city_ids_cache(django_assert_num_queries):
