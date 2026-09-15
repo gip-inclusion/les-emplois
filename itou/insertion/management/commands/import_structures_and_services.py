@@ -551,9 +551,6 @@ class Command(BaseCommand):
 
         service.eligibility_zones = data["zone_eligibilite"] or []
 
-        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
-        self._void_if_max_len(service, "mobilization_modes_professionals_external_form_link")
-
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""
         )  # service.mobilizations is a ManyToManyField
@@ -571,6 +568,9 @@ class Command(BaseCommand):
 
         self._fill_geolocation_from_api_data(service, data)
         self._fill_service_from_dora_api_data(service, dora_services)
+
+        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
+        self._void_if_max_len(service, "mobilization_modes_professionals_external_form_link")
 
         service.extra = data.get("extra")
 
