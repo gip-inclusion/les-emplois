@@ -1,0 +1,40 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+    Décliner la demande d’orientation : {{ orientation.beneficiary.get_inverted_full_name }} {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Décliner la demande</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <form method="post" class="c-form mb-3 mb-md-4">
+                        {% csrf_token %}
+                        <h2 class="h3">Donnez plus de détails</h2>
+                        <p>
+                            Vous êtes sur le point de décliner une demande de prescription de service qui vous a été adressée par {{ orientation.sender.get_inverted_full_name }} de la structure {{ orientation.sender_organization.name }} pour le service {{ orientation.service.name }}.
+                            L’usager {{ orientation.beneficiary.get_inverted_full_name }} recevra la décision par e-mail.
+                            Pour des raisons de confidentialité, le motif et le détail du refus ne lui seront pas transmis.
+                        </p>
+                        <hr>
+                        {% bootstrap_field form.refusal_reasons %}
+                        {% bootstrap_field form.refusal_details %}
+                        {% itou_buttons_form primary_label="Décliner la demande" reset_url=reset_url %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
