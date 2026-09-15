@@ -477,6 +477,30 @@ def test_city_admin_search_by_name_prefix(rf):
     assert list(queryset) == [vannes]
 
 
+def test_city_admin_search_by_post_code(rf):
+    paris = City.objects.create(
+        name="Paris",
+        slug="paris-75",
+        department="75",
+        post_codes=["75001"],
+        code_insee="75056",
+    )
+    crottet = City.objects.create(
+        name="Crottet",
+        slug="crottet-01",
+        department="01",
+        post_codes=["01750"],
+        code_insee="01134",
+    )
+    city_admin = CityAdmin(City, admin.site)
+
+    queryset, _ = city_admin.get_search_results(rf.get("/"), City.objects.all(), "75")
+    assert list(queryset) == [paris]
+
+    queryset, _ = city_admin.get_search_results(rf.get("/"), City.objects.all(), "01750")
+    assert list(queryset) == [crottet]
+
+
 def test_directory_active_city_ids_cache(django_assert_num_queries):
     vannes = create_city_vannes()
     DirectoryActiveCity.objects.create(city=vannes)
