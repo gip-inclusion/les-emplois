@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
+from pytest_django.asserts import assertContains
 
 from tests.companies.factories import CompanyFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -24,7 +25,7 @@ class TestRedirectToNewDomainMiddleware:
             follow=False,
         )
         assert response.status_code == 302
-        assert response.url == "https://new.domain/admin/?foo=bar&redirected-from-old-domain=1"
+        assert response.url == "https://new.domain/admin/?foo=bar"
 
         response = client.get("/admin/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
@@ -68,6 +69,18 @@ class TestRedirectToNewDomainMiddleware:
             follow=False,
         )
         assert response.status_code == 200  # no rediect
+
+    def test_show_redirected_from_old_domain_banner(self, settings, client):
+        settings.NEW_DOMAIN = "new.domain"
+        settings.ALLOWED_HOSTS = ["old.domain", settings.NEW_DOMAIN]
+        settings.REDIRECT_TO_NEW_DOMAIN = True
+        response = client.get(
+            "/job-seekers/list",  # restricted page, needs login
+            HTTP_HOST="old.domain",
+            HTTP_REFERER="old.domain",
+            follow=True,
+        )
+        assertContains(response, "Vous arrivez de l’ancienne adresse")
 
 
 def test_browser_id_cookie_not_set_for_viewers(client):
