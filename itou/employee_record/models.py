@@ -7,10 +7,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, Max, OuterRef, Subquery
+from django.db.models import Exists, F, Max, OuterRef, Q, Subquery
 from django.db.models.functions import Greatest
-from django.db.models.manager import Manager
-from django.db.models.query import Q, QuerySet
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -221,6 +220,15 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
 
+class EmployeeRecordManager(models.Manager.from_queryset(EmployeeRecordQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return (
+            super().get_queryset().defer("watched_data_updated_at")  # Deferred to prevent accidental UPDATE
+        )
+
+
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
     # also block any approval date updates on linked approvals since a trigger would
@@ -232,12 +240,10 @@ def _check_and_remove_watched_data_updated_at(employee_record, archive):
     sent_start_at = datetime.datetime.strptime(archive["personnePhysique"]["passDateDeb"], "%d/%m/%Y").date()
     sent_end_at = datetime.datetime.strptime(archive["personnePhysique"]["passDateFin"], "%d/%m/%Y").date()
     if approval.end_at == sent_end_at and approval.start_at == sent_start_at:
-        logger.info(
-            "Removed watched_data_updated_at=%s flag from employee_record=%s",
-            employee_record.watched_data_updated_at,
-            employee_record.pk,
-        )
-        employee_record.watched_data_updated_at = None
+        if EmployeeRecord.objects.filter(pk=employee_record.pk, watched_data_updated_at__isnull=False).update(
+            watched_data_updated_at=None, updated_at=timezone.now()
+        ):
+            logger.info("Removed watched_data_updated_at flag from employee_record=%s", employee_record.pk)
 
 
 class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
@@ -260,6 +266,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
+    # This field is only set by update_employee_record_watched_data_updated_at trigger
+    # when a linked approval date is changed and only reset (set to None) by
+    # _check_and_remove_watched_data_updated_at function which is supposed to operate on locked
+    # EmployeeRecord.
     watched_data_updated_at = models.DateTimeField(
         verbose_name="date de dernière modification des éléments liés",
         help_text="Typiquement les dates du PASS IAE lié",
@@ -313,8 +323,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     # Forcing a 'PROCESSED' status enables communication for employee record update notifications.
     processed_as_duplicate = models.BooleanField(verbose_name="déjà intégrée par l'ASP", default=False)
 
-    # Added typing helper: improved type checking for `objects` methods
-    objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
+    objects = EmployeeRecordManager()
 
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "fiche salarié"
@@ -335,6 +344,22 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application_id} "
             f"JOBSEEKER:{self.job_application.job_seeker_id} STATUS:{self.status}"
         )
+
+    def save(self, *args, force_insert=False, **kwargs):
+        if not force_insert and self._is_pk_set():
+            # Someone is trying to update the employee record
+            if "watched_data_updated_at" not in self.get_deferred_fields():
+                # We do NOT want watched_data_updated_at to be modified via the save method
+                # to avoid accidental UPDATE.
+                raise RuntimeError("watched_data_updated_at field was loaded despite being deferred")
+        super().save(*args, force_insert=force_insert, **kwargs)
+        if "watched_data_updated_at" not in self.get_deferred_fields():
+            # Mark field as deferred (typically after an insertion)
+            # Cf https://github.com/django/django/blob/6.0.8/django/db/models/base.py#L695-L703
+            del self.__dict__["watched_data_updated_at"]
+
+    def has_watched_data_updated_at_set(self):
+        return EmployeeRecord.objects.filter(pk=self.pk, watched_data_updated_at__isnull=False).exists()
 
     def _clean_job_application(self):
         """
@@ -423,7 +448,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_processing_information(
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
-        if self.watched_data_updated_at and archive:
+        if self.has_watched_data_updated_at_set() and archive:
             _check_and_remove_watched_data_updated_at(self, archive)
 
     @xwf_models.transition()
@@ -784,17 +809,10 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     @xwf_models.transition()
     def process(self, *, code, label, archive):
         self.set_asp_processing_information(code, label, archive)
-        if self.employee_record.watched_data_updated_at and archive:
+        if self.employee_record.has_watched_data_updated_at_set() and archive:
             employee_record = (
                 EmployeeRecord.objects.select_for_update(of=("self",), no_key=True)
                 .select_related("job_application__approval")
                 .get(pk=self.employee_record.pk)
             )
             _check_and_remove_watched_data_updated_at(employee_record, archive)
-            if employee_record.watched_data_updated_at is None:
-                employee_record.save(
-                    update_fields=(
-                        "updated_at",
-                        "watched_data_updated_at",
-                    )
-                )

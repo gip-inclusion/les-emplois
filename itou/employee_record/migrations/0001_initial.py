@@ -130,6 +130,9 @@ class Migration(migrations.Migration):
                     ),
                 ],
             },
+            managers=[
+                ("objects", itou.employee_record.models.EmployeeRecordManager()),
+            ],
         ),
         migrations.CreateModel(
             name="EmployeeRecordUpdateNotification",
