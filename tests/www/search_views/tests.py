@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
 from django.utils.http import urlencode
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, JobSource, JobSourceTag
@@ -55,16 +55,19 @@ class TestSearchCompany:
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
     applications_open_str = "Cette structure vous intéresse ?"
 
-    def test_home_anonymous(self, client):
+    def test_home_anonymous(self, client, settings):
+        settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
         response = client.get(reverse("search:employers_home"))
-        assertContains(response, "Rechercher un emploi inclusif")
+        assertContains(
+            response,
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
+        )
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
-        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
-            response = client.get(reverse("search:employers_home"))
-        assertRedirects(response, reverse("search:employers_results"))
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
+            client.get(reverse("search:employers_home"))
 
     def test_not_existing(self, client):
         response = client.get(self.URL, {"city": "foo-44"})
@@ -605,21 +608,19 @@ class TestSearchCompany:
 
 
 class TestSearchPrescriber:
-    def test_home_anonymous(self, client):
+    def test_home_anonymous(self, client, settings):
+        settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
         response = client.get(reverse("search:prescribers_home"))
-        assertContains(response, "Rechercher un accompagnement")
         assertContains(
             response,
-            "Pour obtenir un emploi inclusif, accéder à une aide et effectuer des démarches, "
-            "le renfort d’un accompagnateur est souvent essentiel.",
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;type=accompagnateur"',
         )
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
 
-        with pytest.warns(RuntimeWarning, match="Access to 'search_prescribers_home' while authenticated"):
-            response = client.get(reverse("search:prescribers_home"))
-        assertRedirects(response, reverse("search:prescribers_results"))
+        with pytest.warns(RuntimeWarning, match="Access to 'search_home' while authenticated"):
+            client.get(reverse("search:prescribers_home"))
 
     def test_invalid(self, client):
         response = client.get(reverse("search:prescribers_results"), {"city": "foo-44"})
