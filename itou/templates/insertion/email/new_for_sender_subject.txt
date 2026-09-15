@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    Votre demande a bien été transmise !
+
+{% endblock %}
