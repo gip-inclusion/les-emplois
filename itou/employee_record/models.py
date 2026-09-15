@@ -260,6 +260,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
+    # This field is only set by update_employee_record_watched_data_updated_at trigger
+    # when a linked approval date is changed and only reset (set to None) by
+    # _check_and_remove_watched_data_updated_at function which is supposed to operate on locked
+    # EmployeeRecord.
     watched_data_updated_at = models.DateTimeField(
         verbose_name="date de dernière modification des éléments liés",
         help_text="Typiquement les dates du PASS IAE lié",
@@ -329,6 +333,28 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
                 name="employee_record_ntt_regex",
             ),
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_watched_data_updated_at_value = self.watched_data_updated_at
+
+    def save(self, *args, force_insert=False, update_fields=None, **kwargs):
+        if (
+            not force_insert
+            and self._is_pk_set()
+            and update_fields is None
+            and self.watched_data_updated_at == self._initial_watched_data_updated_at_value
+        ):
+            # The watched_data_updated_at has apparently not been modified
+            # then we DO NOT want to UPDATE this field to reduce the probability of a race condition with
+            # the trigger responsible for setting it.
+            update_fields = set()
+            pk_fields = self._meta.pk_fields
+            for field in self._meta.concrete_fields:
+                if field not in pk_fields and not hasattr(field, "through"):
+                    update_fields.add(field.attname)
+            update_fields.remove("watched_data_updated_at")
+        return super().save(*args, force_insert=force_insert, update_fields=update_fields, **kwargs)
 
     def __str__(self):
         return (
