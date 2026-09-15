@@ -380,6 +380,7 @@
       dict({
         'origin': list([
           'EmployeeRecord.save[<site-packages>/django/db/models/base.py]',
+          'EmployeeRecord.save[employee_record/models.py]',
           'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records.py]',
           'Command.download_json_file[employee_record/common_management.py]',
           'Command.download[employee_record/management/commands/transfer_employee_records.py]',
@@ -772,6 +773,7 @@
       dict({
         'origin': list([
           'EmployeeRecord.save[<site-packages>/django/db/models/base.py]',
+          'EmployeeRecord.save[employee_record/models.py]',
           'Command._upload_batch_file[employee_record/management/commands/transfer_employee_records.py]',
           'Command.upload[employee_record/management/commands/transfer_employee_records.py]',
           'Command.handle[employee_record/management/commands/transfer_employee_records.py]',

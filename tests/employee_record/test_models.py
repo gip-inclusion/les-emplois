@@ -2,6 +2,7 @@ import datetime
 import functools
 import itertools
 import random
+import threading
 from contextlib import nullcontext
 from datetime import timedelta
 from unittest import mock
@@ -11,7 +12,7 @@ import pytest
 import xworkflows
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
-from django.db import DataError, IntegrityError, transaction
+from django.db import DataError, IntegrityError, connection, transaction
 from django.utils import timezone
 
 from itou.approvals.models import Approval
@@ -28,6 +29,7 @@ from itou.employee_record.models import (
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import Title
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -955,3 +957,49 @@ def test_has_valid_data_filled():
     # OK with a NTT
     employee_record.ntt = "11234567890"
     assert employee_record.has_valid_data_filled() is True
+
+
+@pytest.mark.django_db(transaction=True)
+def test_watched_data_updated_at_race_condition(faker):
+    with transaction.atomic(), triggers.fake_context():
+        employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    approval = employee_record.job_application.approval
+    assert employee_record.watched_data_updated_at is None
+
+    record_loaded = threading.Event()
+    ready = threading.Event()
+
+    def approval_update():
+        try:
+            with transaction.atomic():
+                updated_approval = Approval.objects.get(pk=approval.pk)
+                updated_approval.end_at += datetime.timedelta(days=1)
+                ready.set()
+                record_loaded.wait(timeout=1)
+                # This sets employee_record.watched_data_updated_at via a trigger
+                updated_approval.save(update_fields={"end_at", "updated_at"})
+        finally:
+            connection.close()
+
+    def employee_record_state_change():
+        try:
+            with transaction.atomic():
+                employee_record_to_update = EmployeeRecord.objects.get(pk=employee_record.pk)
+                ready.wait(timeout=1)
+                record_loaded.set()
+                # This shouldn't touch employee_record.watched_data_updated_at
+                employee_record_to_update.wait_for_asp_response(
+                    file=faker.asp_batch_filename(), line_number=1, archive=None
+                )
+        finally:
+            connection.close()
+
+    t1 = threading.Thread(target=approval_update)
+    t1.start()
+    t2 = threading.Thread(target=employee_record_state_change)
+    t2.start()
+
+    t1.join(timeout=1)
+    t2.join(timeout=1)
+
+    assert EmployeeRecord.objects.get(pk=employee_record.pk).watched_data_updated_at is not None

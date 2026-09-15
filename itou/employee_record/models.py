@@ -305,6 +305,26 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             ),
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_watched_data_updated_at_value = self.watched_data_updated_at
+
+    def save(self, *args, force_insert=False, update_fields=None, **kwargs):
+        if (
+            not force_insert
+            and self._is_pk_set()
+            and update_fields is None
+            and self.watched_data_updated_at == self._initial_watched_data_updated_at_value
+        ):
+            # Then we DO NOT want to UPDATE this field to avoid race conditions
+            update_fields = set()
+            pk_fields = self._meta.pk_fields
+            for field in self._meta.concrete_fields:
+                if field not in pk_fields and not hasattr(field, "through"):
+                    update_fields.add(field.attname)
+            update_fields.remove("watched_data_updated_at")
+        return super().save(*args, force_insert=force_insert, update_fields=update_fields, **kwargs)
+
     def __str__(self):
         return (
             f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application_id} "
