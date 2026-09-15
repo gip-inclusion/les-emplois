@@ -15,6 +15,7 @@ from rest_framework.authtoken.models import Token
 from itou.antivirus.models import Scan
 from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
 from itou.asp.models import Department
+from itou.cities.models import DirectoryActiveCity
 from itou.companies.models import SiaeACIConvergencePHC
 from itou.emails.models import Email
 from itou.geiq_assessments.models import LabelInfos
@@ -83,7 +84,7 @@ def test_all_admin(admin_client, mocker, subtests):
 
     # Create some data for models without factories
     admin_user = get_user(admin_client)
-    create_city_guerande()
+    DirectoryActiveCity.objects.create(city=create_city_guerande())
     create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
     auth_models.Group.objects.create(name="Groupe de test")
     CompanyToken.objects.create(label="Test")

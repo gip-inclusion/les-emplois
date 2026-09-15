@@ -94,3 +94,21 @@ class City(models.Model):
                 if self.department in departments:
                     return region
         return None
+
+
+class DirectoryActiveCity(models.Model):
+    """Cities where the "Annuaire Pro" feature is enabled (feature flag by city)."""
+
+    city = models.OneToOneField(
+        City,
+        on_delete=models.CASCADE,
+        related_name="+",
+        verbose_name="ville",
+    )
+
+    class Meta:
+        verbose_name = "ville de l'annuaire pro"
+        verbose_name_plural = "villes de l'annuaire pro"
+
+    def __str__(self):
+        return str(self.city)
