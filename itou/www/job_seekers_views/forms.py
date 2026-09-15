@@ -246,7 +246,7 @@ class FilterForm(forms.Form):
             archived=(
                 Value(True)
                 if assignments_filter == AssignmentsChoices.ARCHIVED
-                else ~Exists(Subquery(assignments.filter(job_seeker=OuterRef("pk")).filter(ended_at=None)))
+                else ~Exists(assignments.filter(job_seeker=OuterRef("pk")).filter(ended_at=None))
             ),
         )
 
