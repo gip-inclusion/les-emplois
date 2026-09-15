@@ -745,11 +745,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -779,11 +780,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -813,11 +815,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -847,11 +850,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -923,11 +927,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -957,11 +962,12 @@
                                              "email",
                                              "phone",
                                              "opening_hours",
+                                             "accessibilite_lieu",
                                              "updated_on",
                                              "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({

@@ -101,7 +101,7 @@ class TestStructures:
                     data-emplois-mobilization-kind="structure_contact"
                     data-matomo-event="true" data-matomo-category="fiche-structure" data-matomo-action="clic"
                     data-matomo-option="voir-coordonnees-structure">
-                Voir les coordonnées de la structure
+                Voir les coordonnées
             </button>
            """,
             html=True,
@@ -141,7 +141,7 @@ class TestStructures:
         modal = parse_response_to_soup(response, selector="#structure-contact-modal")
         assert pretty_indented(modal) == snapshot
 
-    def test_card_view_contact_modal_with_opening_hours(self, client):
+    def test_card_view_description_tab_opening_hours(self, client):
         opening_hours = """Mo 09:00-12:00,14:00-17:30"Sans rendez-vous";Tu 09:00-12:00,14:00-17:30;
         We 09:00-12:00,14:00-17:30;Th 09:00-12:00,14:00-17:30;Fr 09:00-12:00,14:00-17:30; PH off"""
         structure = StructureFactory(
@@ -149,14 +149,26 @@ class TestStructures:
         )
         response = client.get(self.get_structure_url(structure))
 
-        assertContains(
-            response,
-            (
-                "Lun: 9h00 à 12h00 - 14h00 à 17h30 (Sans rendez-vous) "
-                "• Mar: 9h00 à 12h00 - 14h00 à 17h30 • Mer: 9h00 à 12h00 - 14h00 à 17h30 "
-                "• Jeu: 9h00 à 12h00 - 14h00 à 17h30 • Ven: 9h00 à 12h00 - 14h00 à 17h30 (Hors jours fériés)"
-            ),
+        assertContains(response, "Lundi : 9h00 à 12h00 - 14h00 à 17h30")
+        assertContains(response, "sans rendez-vous")
+        assert response.context["formatted_opening_hours"]["has_ph_off"] is True
+
+    def test_card_view_description_tab_opening_hours_with_comments(self, client):
+        structure = StructureFactory(
+            opening_hours="Mo-Fr 07:45-18:30 open; Sa open; Aug closed; Dec 25-Jan 1 closed",
         )
+        response = client.get(self.get_structure_url(structure))
+
+        assert response.status_code == 200
+        formatted_opening_hours = response.context["formatted_opening_hours"]
+        hours = {e["label"]: e["hours"] for e in formatted_opening_hours["entries"]}
+        assert hours["Lundi"] == "7h45 à 18h30"
+        assert hours["Samedi"] == "ouvert"
+        assert formatted_opening_hours["comments"] == ["Fermé en août", "Fermé du 25 décembre au 1er janvier"]
+        assertContains(response, "7h45 à 18h30")
+        assertContains(response, "ouvert")
+        assertContains(response, "Fermé en août")
+        assertContains(response, "Fermé du 25 décembre au 1er janvier")
 
     def test_card_view_renders_bootstrap_tabs_with_full_payload(self, client, snapshot):
         structure = StructureFactory(
@@ -201,6 +213,7 @@ class TestStructures:
             1  # structure + source
             + 1  # services prefetch
             + 1  # service receptions prefetch
+            + 1  # reseaux porteurs prefetch
             + 1  # departments bulk (eligibility_zones)
             + 1  # cities bulk (eligibility_zones)
             + 1  # epcis bulk (eligibility_zones)
