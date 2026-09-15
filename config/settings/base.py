@@ -937,3 +937,8 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 
 REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
 NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
+
+# This API seems to be rarely used (which is understandable) and will soon have to be dropped
+API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT = (
+    os.getenv("API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT", "False") == "True"
+)
