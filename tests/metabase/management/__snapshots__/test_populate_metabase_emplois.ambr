@@ -8191,6 +8191,7 @@
                  "insertion_orientation"."duration_weeks",
                  "insertion_orientation"."data_protection_commitment",
                  "insertion_orientation"."attachments",
+                 "insertion_orientation"."last_reminder_email_sent_at",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
                  "insertion_orientation"."dora_status_updated_at"

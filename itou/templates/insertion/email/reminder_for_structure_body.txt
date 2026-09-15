@@ -1,0 +1,13 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+Nous nous permettons de vous contacter aujourd’hui afin de faire suite à une demande d’orientation que nous vous avons transmise il y a {{ days_count }} jours et qui n’a, semble-t-il, pas encore été traitée.
+
+Cette demande concerne {{ orientation.beneficiary.get_full_name }}, qui vous a été adressé par {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }}. Le service concerné : {{ orientation.service.name }}.
+
+Afin de faciliter le traitement de cette demande, je vous invite à cliquer sur le lien ci-dessous pour accéder directement à la plateforme où vous pourrez visualiser et traiter la demande en question :
+{{ process_link }}
+
+{% endblock body %}
