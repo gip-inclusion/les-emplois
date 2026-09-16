@@ -11,7 +11,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
         {% fragment as c_title__main %}
-            <h1>{{ page_title }} !</h1>
+            <h1>{{ page_title }} !</h1>
         {% endfragment %}
         {% fragment as c_title__secondary %}
             <p>
@@ -35,7 +35,7 @@
                         <p>
                             <b>
                                 {% if can_edit_personal_information %}
-                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
+                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
                                 {% else %}
                                     Le candidat a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
                                 {% endif %}

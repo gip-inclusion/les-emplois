@@ -6777,7 +6777,7 @@
       <div class="c-info mb-3 mb-md-4">
           <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
               <span>
-                  Besoin d'un chiffre ?
+                  Besoin d'un chiffre ?
               </span>
           </button>
           <div class="c-info__detail collapse" id="collapseBesoinChiffre">
@@ -7999,9 +7999,7 @@
                   <p>
                       Êtes-vous sûr de vouloir archiver
                                   
-                                      la candidature sélectionnée
-                                  
-                                  ?
+                                      la candidature sélectionnée ?
                   </p>
               </div>
               <div class="modal-footer">
@@ -8038,9 +8036,7 @@
                   <p>
                       Êtes-vous sûr de vouloir archiver
                                   
-                                      les 2 candidatures sélectionnées
-                                  
-                                  ?
+                                      les 2 candidatures sélectionnées ?
                   </p>
               </div>
               <div class="modal-footer">
@@ -8221,9 +8217,7 @@
                   <p>
                       Êtes-vous sûr de vouloir mettre à l’étude
                                   
-                                      la candidature sélectionnée
-                                  
-                                  ?
+                                      la candidature sélectionnée ?
                   </p>
               </div>
               <form action="/apply/company/batch/process?next_url=/apply/siae/list%3Fstart_date%3D2015-01-01" method="post">
@@ -8260,9 +8254,7 @@
                   <p>
                       Êtes-vous sûr de vouloir mettre à l’étude
                                   
-                                      les 2 candidatures sélectionnées
-                                  
-                                  ?
+                                      les 2 candidatures sélectionnées ?
                   </p>
               </div>
               <form action="/apply/company/batch/process?next_url=/apply/siae/list%3Fstart_date%3D2015-01-01" method="post">
@@ -8601,9 +8593,7 @@
                   <p>
                       Êtes-vous sûr de vouloir désarchiver
                                   
-                                      la candidature sélectionnée
-                                  
-                                  ?
+                                      la candidature sélectionnée ?
                   </p>
               </div>
               <div class="modal-footer">
@@ -8640,9 +8630,7 @@
                   <p>
                       Êtes-vous sûr de vouloir désarchiver
                                   
-                                      les 2 candidatures sélectionnées
-                                  
-                                  ?
+                                      les 2 candidatures sélectionnées ?
                   </p>
               </div>
               <div class="modal-footer">

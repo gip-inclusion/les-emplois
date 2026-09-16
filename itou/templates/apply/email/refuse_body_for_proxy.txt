@@ -26,5 +26,5 @@ Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
 
 -----
 
-Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
+Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
 {% endblock body %}

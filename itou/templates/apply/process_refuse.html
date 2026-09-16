@@ -46,11 +46,11 @@
                         </div>
                         <p id="currentProgressState">
                             {% if wizard_steps.current == RefuseViewStep.REASON %}
-                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Choix du motif de refus
+                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Choix du motif de refus
                             {% elif wizard_steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}
+                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}
                             {% elif wizard_steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
-                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ to_prescriber }}
+                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ to_prescriber }}
                             {% endif %}
                         </p>
                     </div>
@@ -77,7 +77,7 @@
                                     Merci de bien vouloir adapter ce message en fonction de la situation.
                                 </p>
                                 <p class="mb-3 mb-md-4">
-                                    <strong>Motif de refus :</strong>
+                                    <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
                                     {% if not refusal_reason_shared_with_job_seeker %}
                                         <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
@@ -89,7 +89,7 @@
                                     Vous pouvez partager un message {{ to_prescriber }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
                                 <p class="mb-3 mb-md-4">
-                                    <strong>Motif de refus :</strong>
+                                    <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
                                     {% if not refusal_reason_shared_with_job_seeker %}
                                         <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
@@ -100,7 +100,7 @@
                             {% if wizard_steps.current == RefuseViewStep.REASON %}
                                 <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
                                     <legend class="fs-base fw-bold">
-                                        {{ form.refusal_reason.label }} :
+                                        {{ form.refusal_reason.label }} :
                                         {% if form.refusal_reason.field.required %}*{% endif %}
                                     </legend>
                                     <ul class="list-unstyled">
@@ -149,7 +149,7 @@
                                 <fieldset>
                                     <div class="form-group">
                                         <legend class="fs-base fw-bold">
-                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?
+                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?
                                         </legend>
                                         {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>

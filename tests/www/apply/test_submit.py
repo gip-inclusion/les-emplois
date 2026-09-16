@@ -2938,9 +2938,9 @@ class TestApplyAsOther:
 
 
 class TestApplicationView:
-    DIAGORIENTE_JOB_SEEKER_TITLE = "Vous n’avez pas de CV ?"
+    DIAGORIENTE_JOB_SEEKER_TITLE = "Vous n’avez pas de CV ?"
     DIAGORIENTE_JOB_SEEKER_DESCRIPTION = "Créez-en un grâce à notre partenaire Diagoriente."
-    DIAGORIENTE_PRESCRIBER_TITLE = "Ce candidat n’a pas encore de CV ?"
+    DIAGORIENTE_PRESCRIBER_TITLE = "Ce candidat n’a pas encore de CV ?"
     DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
         "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
     )

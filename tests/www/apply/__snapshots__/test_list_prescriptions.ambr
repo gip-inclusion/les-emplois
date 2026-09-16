@@ -3755,11 +3755,11 @@
       <div class="c-info mb-3 mb-md-4">
           <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
               <span>
-                  Besoin d'un chiffre ?
+                  Besoin d'un chiffre ?
               </span>
           </button>
           <div class="c-info__detail collapse" id="collapseBesoinChiffre">
-              Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+              Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
               <ul class="mb-0">
                   <li>
                       <a href="/stats/pe/state/main" rel="noopener" target="_blank">

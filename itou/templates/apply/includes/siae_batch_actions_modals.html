@@ -18,11 +18,10 @@
                             <p>
                                 Êtes-vous sûr de vouloir mettre à l’étude
                                 {% if selected_nb > 1 %}
-                                    les {{ selected_nb }} candidatures sélectionnées
+                                    les {{ selected_nb }} candidatures sélectionnées ?
                                 {% else %}
-                                    la candidature sélectionnée
+                                    la candidature sélectionnée ?
                                 {% endif %}
-                                ?
                             </p>
                         </div>
                         <form method="post" action="{% url 'apply:batch_process' %}?next_url={{ list_url|urlencode }}">
@@ -121,11 +120,10 @@
                             <p>
                                 Êtes-vous sûr de vouloir archiver
                                 {% if selected_nb > 1 %}
-                                    les {{ selected_nb }} candidatures sélectionnées
+                                    les {{ selected_nb }} candidatures sélectionnées ?
                                 {% else %}
-                                    la candidature sélectionnée
+                                    la candidature sélectionnée ?
                                 {% endif %}
-                                ?
                             </p>
                         </div>
                         <div class="modal-footer">
@@ -158,11 +156,10 @@
                             <p>
                                 Êtes-vous sûr de vouloir désarchiver
                                 {% if selected_nb > 1 %}
-                                    les {{ selected_nb }} candidatures sélectionnées
+                                    les {{ selected_nb }} candidatures sélectionnées ?
                                 {% else %}
-                                    la candidature sélectionnée
+                                    la candidature sélectionnée ?
                                 {% endif %}
-                                ?
                             </p>
                         </div>
                         <div class="modal-footer">

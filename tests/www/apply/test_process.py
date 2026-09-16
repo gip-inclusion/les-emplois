@@ -105,7 +105,7 @@ class TestProcessViews:
         Pour plus de détails, consultez <a href="{global_constants.ITOU_HELP_CENTER_URL}/articles/44240682937745"
         rel="noopener" target="_blank">notre documentation</a>.
         """
-    DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
+    DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_BUTTON_TITLE = "Inviter à créer un CV avec Diagoriente"
@@ -113,17 +113,17 @@ class TestProcessViews:
     DIAGORIENTE_INVITE_EMAIL_SUBJECT = "Créer un CV avec Diagoriente"
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1 = (
         "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser "
-        "les expériences de votre candidat : {job_seeker_name}."
+        "les expériences de votre candidat : {job_seeker_name}."
     )
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 = (
-        "Vous pourrez lui créer un compte en cliquant sur ce lien : "
+        "Vous pourrez lui créer un compte en cliquant sur ce lien : "
         "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1 = (
         "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser vos expériences."
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 = (
-        "Vous pourrez créer votre compte en cliquant sur ce lien : "
+        "Vous pourrez créer votre compte en cliquant sur ce lien : "
         "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     REFUSAL_REASON_JOB_SEEKER_MENTION = "<small>Motif de refus</small><strong>Autre</strong>"
@@ -1203,7 +1203,7 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
         assertRedirects(response, refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-reason-submit"
 
@@ -1216,9 +1216,9 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
         )
         assertRedirects(response, job_seeker_answer_url)
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-job-seeker-answer-submit"
 
@@ -1230,9 +1230,9 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
         )
         assertRedirects(response, prescriber_answer_url)
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         assertContains(response, "Réponse au prescripteur")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-prescriber-answer-submit"
 
@@ -1267,7 +1267,7 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
         assertRedirects(response, refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-reason-submit"
 
@@ -1280,11 +1280,11 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
         )
         assertRedirects(response, job_seeker_answer_url)
-        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
         assertContains(
             response,
-            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
             html=True,
         )
         assert response.context["matomo_custom_title"] == "Candidature refusée"
@@ -1346,7 +1346,7 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
         )
         assertRedirects(response, prescriber_answer_url)
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         assertContains(response, "Réponse au prescripteur")
         assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
         assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
@@ -1367,7 +1367,7 @@ class TestProcessViews:
         assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
 
         response = client.get(prescriber_answer_url)
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
         assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
         assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
@@ -1389,7 +1389,7 @@ class TestProcessViews:
         assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
 
         response = client.get(prescriber_answer_url)
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
         assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
         assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")

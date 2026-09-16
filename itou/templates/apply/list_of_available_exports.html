@@ -48,13 +48,13 @@
                         <div id="besoin-dun-chiffre">
                             {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseBesoinChiffre" extra_classes="mb-3 mb-md-4" %}
                                 {% fragment as c_info__summary %}
-                                    Besoin d'un chiffre ?
+                                    Besoin d'un chiffre ?
                                 {% endfragment %}
                                 {% fragment as c_info__detail %}
                                     {% if export_for == "siae" %}
                                         Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}" target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
                                     {% elif export_for == "prescriptions" and can_view_stats_ft %}
-                                        Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                        Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
                                         <ul class="mb-0">
                                             <li>
                                                 <a href="{% url 'stats:stats_ft_state_main' %}" target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
