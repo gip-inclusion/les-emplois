@@ -6,7 +6,6 @@ from django.urls import include, path, re_path, register_converter, reverse_lazy
 from django.views.generic import RedirectView, TemplateView
 
 from itou.utils import redirect_legacy_views
-from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.urls import SiretConverter
 from itou.utils.views import with_triggers_context
 from itou.www.dashboard import views as dashboard_views
@@ -125,12 +124,7 @@ urlpatterns = [
     # Static pages.
     path(
         "accessibility/",
-        login_not_required(
-            TemplateView.as_view(
-                template_name="static/accessibility.html",
-                extra_context={"contact_form_url": ITOU_CONTACT_FORM_URL},
-            )
-        ),
+        login_not_required(TemplateView.as_view(template_name="static/accessibility.html")),
         name="accessibility",
     ),
     path(
