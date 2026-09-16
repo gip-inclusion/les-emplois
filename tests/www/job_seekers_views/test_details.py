@@ -32,6 +32,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
     ProfessionalFactory,
+    ProSupportReportFactory,
 )
 from tests.utils.htmx.testing import update_page_with_htmx
 from tests.utils.testing import get_request, load_template, parse_response_to_soup, pretty_indented
@@ -1118,6 +1119,44 @@ class TestContracts:
             )
             == snapshot
         )
+
+    @freeze_time("2026-01-15")
+    def test_pro_support_report_banner(self, client, settings):
+        settings.PRO_SUPPORT_REPORT_URL = "https://n8n.example/webhook/voir-bilan"
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        today = timezone.localdate()
+        company = CompanyFactory(name="ETTI Une nouvelle chance", subject_to_iae_rules=True)
+        job_seeker = JobSeekerFactory()
+        ApprovalFactory(
+            user=job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today + datetime.timedelta(days=100)
+        )
+        contract = ContractFactory(
+            job_seeker=job_seeker,
+            company=company,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=today + datetime.timedelta(days=20),
+        )
+        url = reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id})
+
+        assertNotContains(client.get(url), "Nouveau bilan disponible")
+
+        ProSupportReportFactory(job_seeker=job_seeker, company=company)
+        response = client.get(url)
+        assertContains(response, "Nouveau bilan disponible")
+        assertContains(response, "Le contrat de ce salarié se termine le 04/02/2026.")
+        assertContains(response, "rempli par ETTI Une nouvelle chance")
+        assertContains(response, f'href="https://n8n.example/webhook/voir-bilan?uidjobseeker={job_seeker.public_id}"')
+
+        contract.end_date = today - datetime.timedelta(days=10)
+        contract.save()
+        response = client.get(url)
+        assertContains(
+            response, "Le contrat de ce salarié a pris fin le 05/01/2026, mais son PASS\xa0IAE est encore valide."
+        )
+
+        # Without the address of the page displaying it, the report stays hidden.
+        settings.PRO_SUPPORT_REPORT_URL = None
+        assertNotContains(client.get(url), "Nouveau bilan disponible")
 
     def test_forbidden(self, client):
         job_seeker = JobSeekerFactory()

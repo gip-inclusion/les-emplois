@@ -1311,3 +1311,21 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
 
 admin.site.unregister(EmailAddress)
 admin.site.register(EmailAddress, EmailAddressWithRemarkAdmin)
+
+
+@admin.register(models.ProSupportReport)
+class ProSupportReportAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = ["job_seeker_display", "company", "submitted_at"]
+    search_fields = (
+        "job_seeker__first_name",
+        "job_seeker__last_name",
+        "job_seeker__email",
+        "company__name",
+        "company__brand",
+    )
+    raw_id_fields = ("job_seeker", "company")
+    ordering = ("-submitted_at",)
+
+    @admin.display(description="candidat")
+    def job_seeker_display(self, obj):
+        return obj.job_seeker.get_inverted_full_name()

@@ -331,6 +331,11 @@
       'model': 'users.JobSeekerProfile',
     }),
     dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'users.ProSupportReport',
+    }),
+    dict({
       'field': 'user',
       'hidden': True,
       'model': 'users.User_groups',

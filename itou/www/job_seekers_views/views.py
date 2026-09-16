@@ -34,7 +34,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
-from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
+from itou.users.models import JobSeekerAssignment, JobSeekerProfile, ProSupportReport, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
@@ -61,6 +61,7 @@ from itou.www.job_seekers_views.forms import (
     NirModificationRequestForm,
     SwitchStalledStatusForm,
     annotate_end_of_journey,
+    annotate_last_contract_end_date,
 )
 
 
@@ -134,6 +135,11 @@ def annotate_pro_support_report_advisor(queryset):
             .values("professional")[:1]
         )
     )
+
+
+def get_pro_support_report_view_url(job_seeker):
+    query = urllib.parse.urlencode({"uidjobseeker": job_seeker.public_id})
+    return f"{settings.PRO_SUPPORT_REPORT_URL}?{query}"
 
 
 def get_pro_support_report_url(request, job_seeker, advisor_id, *, contract_ended):
@@ -320,9 +326,29 @@ class ContractsTabView(BaseJobSeekerDetailView):
         return get_contracts(approval)
 
     def get_context_data(self, **kwargs):
+        pro_support_report = None
+        contract_end_date = None
+        if settings.PRO_SUPPORT_REPORT_URL:
+            pro_support_report = (
+                ProSupportReport.objects.filter(job_seeker=self.object).select_related("company").first()
+            )
+        if pro_support_report:
+            # The report describes the journey in that company: show the end of its contract, not of a later one.
+            contract_end_date = (
+                annotate_last_contract_end_date(
+                    User.objects.filter(pk=self.object.pk), company=pro_support_report.company
+                )
+                .values_list("last_contract_end_date", flat=True)
+                .get()
+            )
+
         return super().get_context_data(**kwargs) | {
             "approval": self.approval,
             "contracts": self.get_contracts(self.request, self.approval),
+            "pro_support_report": pro_support_report,
+            "pro_support_report_url": (get_pro_support_report_view_url(self.object) if pro_support_report else None),
+            "contract_end_date": contract_end_date,
+            "contract_ended": bool(contract_end_date and contract_end_date < timezone.localdate()),
         }
 
 

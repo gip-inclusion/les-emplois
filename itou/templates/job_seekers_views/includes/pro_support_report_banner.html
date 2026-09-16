@@ -1,0 +1,23 @@
+{% load components %}
+{% load matomo %}
+
+{% if pro_support_report_url %}
+    {% component_alert title=title content=content call_to_action=call_to_action variant="info" extra_classes="mb-3 mb-md-4" %}
+        {% fragment as title %}
+            Nouveau bilan disponible
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                {% if contract_ended %}
+                    Le contrat de ce salarié a pris fin le {{ contract_end_date|date:"d/m/Y" }}{% if approval %}, mais son PASS IAE est encore valide{% endif %}.
+                {% elif contract_end_date %}
+                    Le contrat de ce salarié se termine le {{ contract_end_date|date:"d/m/Y" }}.
+                {% endif %}
+                Vous pouvez consulter le bilan d’accompagnement rempli par {{ pro_support_report.company.display_name }}.
+            </p>
+        {% endfragment %}
+        {% fragment as call_to_action %}
+            <a class="btn btn-sm btn-primary has-external-link" href="{{ pro_support_report_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "candidat" "clic" "consulter-bilan" %}>Consulter le bilan</a>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endif %}

@@ -24,6 +24,8 @@
         <div class="s-section__container container">
             <h2>Suivi des contrats IAE</h2>
 
+            {% include "job_seekers_views/includes/pro_support_report_banner.html" with pro_support_report=pro_support_report pro_support_report_url=pro_support_report_url contract_end_date=contract_end_date contract_ended=contract_ended approval=approval only %}
+
             {% if approval %}
                 {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
                     {% fragment as title %}

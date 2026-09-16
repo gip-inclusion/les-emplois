@@ -529,6 +529,14 @@ TALLY_URL = os.getenv("TALLY_URL")
 # the action and the job seeker card banner stay hidden while it is not set.
 TALLY_SUGGEST_NEXT_STEP_FORM_ID = os.getenv("TALLY_SUGGEST_NEXT_STEP_FORM_ID")
 
+# Signing secret of the Tally webhook announcing a new pro support report. Empty until provided:
+# submissions are then refused.
+TALLY_PRO_SUPPORT_REPORT_WEBHOOK_SECRET = os.getenv("TALLY_PRO_SUPPORT_REPORT_WEBHOOK_SECRET")
+
+# Page displaying a pro support report, hosted outside of Les emplois. Empty until provided:
+# the link to a report stays hidden.
+PRO_SUPPORT_REPORT_URL = os.getenv("PRO_SUPPORT_REPORT_URL")
+
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")

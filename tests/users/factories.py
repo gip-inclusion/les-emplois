@@ -556,3 +556,12 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
                 case _:
                     raise ValueError(f"Invalid display_mode={extracted}")
             obj.save()
+
+
+class ProSupportReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.ProSupportReport
+
+    job_seeker = factory.SubFactory(JobSeekerFactory)
+    company = factory.SubFactory("tests.companies.factories.CompanyFactory")
+    submitted_at = factory.LazyFunction(timezone.now)
