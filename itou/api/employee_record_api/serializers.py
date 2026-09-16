@@ -6,6 +6,7 @@ from unidecode import unidecode
 
 from itou.asp.typing import CodeComInsee
 from itou.asp.utils import asp_birth_place
+from itou.employee_record.enums import MovementType
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
@@ -226,7 +227,7 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
     """
 
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
+    typeMouvement = serializers.CharField(default=MovementType.CREATION)  # Required
     siret = serializers.CharField()
     mesure = serializers.CharField(source="asp_measure")
 
@@ -244,7 +245,7 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
 
 class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
+    typeMouvement = serializers.CharField(default=MovementType.UPDATE)  # Required
     siret = serializers.CharField(source="employee_record.siret")
     mesure = serializers.CharField(source="employee_record.asp_measure")
 

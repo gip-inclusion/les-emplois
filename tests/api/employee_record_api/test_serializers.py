@@ -12,7 +12,7 @@ from itou.api.employee_record_api.serializers import (
 )
 from itou.asp.models import Commune, Country, SiaeMeasure
 from itou.companies.models import Company
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
@@ -185,6 +185,32 @@ def test_oeth_employee(kind):
     assert data["situationSalarie"]["salarieOETH"] is True
 
 
+def test_employee_record_serializer():
+    # High-level: check basic information
+    start_at = timezone.localdate()
+    end_at = timezone.localdate() + timedelta(weeks=52)
+    employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+    approval = employee_record.job_application.approval
+    approval.start_at = start_at
+    approval.end_at = end_at
+    employee_record.save()
+
+    data = EmployeeRecordAPISerializer(
+        employee_record,
+        context={"request": make_dummy_request()},
+    ).data
+    assert data is not None
+    assert data.get("siret") == employee_record.siret
+    assert data.get("mesure") == employee_record.asp_measure
+    assert data.get("typeMouvement") == MovementType.CREATION
+
+    personal_data = data.get("personnePhysique")
+    assert personal_data is not None
+    assert personal_data.get("passIae") == employee_record.approval_number
+    assert personal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
+    assert personal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
+
+
 def test_notification_serializer():
     # High-level: check basic information
     start_at = timezone.localdate()
@@ -202,7 +228,7 @@ def test_notification_serializer():
     assert data is not None
     assert data.get("siret") == employee_record.siret
     assert data.get("mesure") == employee_record.asp_measure
-    assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
+    assert data.get("typeMouvement") == MovementType.UPDATE
 
     personal_data = data.get("personnePhysique")
     assert personal_data is not None
