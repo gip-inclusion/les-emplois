@@ -4,12 +4,13 @@ from itertools import batched
 import sentry_sdk
 from anymail.exceptions import AnymailError
 from django.conf import settings
-from django.core.mail import get_connection
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.db import ProgrammingError, connection, transaction
 from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import CancelExecution
+from markdownify.templatetags.markdownify import markdownify
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
@@ -75,7 +76,7 @@ def _async_send_message(email_id, *, task=None):
             # Email deleted from django admin, stop trying to send it.
             logger.warning("Not sending email_id=%d, it does not exist in the database.", email_id)
             return
-        message = EmailMessage(
+        message = EmailMultiAlternatives(
             from_email=email.from_email,
             reply_to=email.reply_to,
             to=email.to,
@@ -84,6 +85,18 @@ def _async_send_message(email_id, *, task=None):
             subject=email.subject,
             body=email.body_text,
         )
+        # Brevo MUST have a text/html alternative, otherwise it converts the
+        # plain text body to an HTML body, while retaining the text/plain
+        # content type. Email clients display the HTML markup, which starts
+        # with a tracking pixel.
+        #
+        # To provide that text/html alternative, interpret the plain text
+        # message as markdown (the semantics of our plain text are compatible
+        # with markdown) and convert it to HTML.
+        #
+        # Markdownify transforms the markdown to HTML and **sanitizes** it.
+        # TODO: Header and footer.
+        message.attach_alternative(markdownify(email.body_text), mimetype="text/html")
         try:
             with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
                 connection.send_messages([message])
