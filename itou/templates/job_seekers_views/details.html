@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load approvals %}
+{% load components %}
 {% load static %}
 {% load str_filters %}
 
@@ -43,6 +44,21 @@
                                             {% endif %}
                                         </div>
                                     </div>
+                                    {% if show_overview_tab %}
+                                        {% component_alert title=title content=content call_to_action=call_to_action variant="important" dismissible_once=True extra_id="overview-banner" %}
+                                            {% fragment as title %}
+                                                Synthèse
+                                            {% endfragment %}
+                                            {% fragment as content %}
+                                                <p class="mb-0">
+                                                    Découvrez le nouvel onglet “Synthèse”, repérez en un coup d’oeil les événements importants du parcours de cet usager.
+                                                </p>
+                                            {% endfragment %}
+                                            {% fragment as call_to_action %}
+                                                <a class="btn btn-sm btn-primary" href="{% url "job_seekers_views:overview" public_id=job_seeker.public_id %}">Découvrir la synthèse</a>
+                                            {% endfragment %}
+                                        {% endcomponent_alert %}
+                                    {% endif %}
                                 </div>
                                 {% if contract_ending_soon_date %}
                                     <div class="col-12 order-1 order-xxl-1">
