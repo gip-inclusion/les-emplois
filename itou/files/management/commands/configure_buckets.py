@@ -27,18 +27,12 @@ class Command(BaseCommand):
                 "client": s3_client(),
                 "url": settings.AWS_S3_ENDPOINT_URL,
                 "policy_statements": [
-                    # `resume/` is publicly readable during the sunset window so that URLs baked into already-sent
-                    # emails and already-returned API responses continue to resolve. New uploads are written to
-                    # `resume-private/` (see itou/www/apply/views/submit_views.py), which is never listed here.
-                    # Remove `resume/` from this list once `migrate_resume_to_private` has copied every legacy
-                    # object into `resume-private/` and the sunset date has passed.
                     {
                         "Sid": "AllowPublicRead",
                         "Effect": "Allow",
                         "Principal": {"AWS": "*"},
                         "Action": "s3:GetObject",
                         "Resource": [
-                            f"arn:aws:s3:::{settings.AWS_STORAGE_BUCKET_NAME}/resume/*",
                             f"arn:aws:s3:::{settings.AWS_STORAGE_BUCKET_NAME}/news-images/*",
                         ],
                     }
