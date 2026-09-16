@@ -378,9 +378,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             # Format job seeker address
             profile.update_hexa_address()
 
-        self.job_application.job_seeker.last_checked_at = timezone.now()
-        self.job_application.job_seeker.save(update_fields=["last_checked_at"])
-
         self.clean()
         # There could be a delay between the moment the object is created
         # and the moment it is completed to be sent to the ASP.
