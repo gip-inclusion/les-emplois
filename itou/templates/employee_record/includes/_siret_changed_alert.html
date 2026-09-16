@@ -1,0 +1,18 @@
+{% load components %}
+{% component_alert title=title content=content variant="warning" dismissible=dismissible %}
+    {% fragment as title %}
+        Actualisation du numéro SIRET
+    {% endfragment %}
+    {% fragment as content %}
+        <p>Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.</p>
+        <p class="mb-0"><b><a href="https://iae2.asp-public.fr/riae/" rel="noopener" target="_blank" aria-label="Vérifiez d'abord dans l’Extranet IAE 2.0 de l’ASP (ouverture dans un nouvel onglet)" class="has-external-link">Vérifiez d’abord dans l’Extranet IAE 2.0 de l’ASP</a> que les informations sont présentes et correctes.</b></p>
+        <ul class="mb-0">
+            <li>
+                Si ce salarié est toujours dans vos effectifs mais que ses informations sont absentes, cliquez sur <b>« Renvoyer cette fiche salarié »</b>.
+            </li>
+            <li>
+                S’il ne fait plus partie de votre entreprise, cliquez sur <b>« Désactiver la fiche salarié »</b>.
+            </li>
+        </ul>
+    {% endfragment %}
+{% endcomponent_alert %}

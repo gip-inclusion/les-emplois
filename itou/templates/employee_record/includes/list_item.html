@@ -96,20 +96,7 @@
         {% endif %}
         {# SIRET has changed #}
         {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-            {% component_alert title=title content=content variant="warning" %}
-                {% fragment as title %}
-                    Actualisation du numéro SIRET
-                {% endfragment %}
-                {% fragment as content %}
-                    <p class="mb-0">Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.</p>
-                    <ul class="mb-0">
-                        <li>
-                            Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
-                        </li>
-                        <li>Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.</li>
-                    </ul>
-                {% endfragment %}
-            {% endcomponent_alert %}
+            {% include 'employee_record/includes/_siret_changed_alert.html' with dismissible=False only %}
         {% endif %}
         {# Actions #}
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
@@ -149,7 +136,7 @@
                 {% if employee_record.disable.is_available %}
                     <a href="{% url "employee_record_views:disable" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                       aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Désactiver</a>
+                       aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Désactiver la fiche salariée</a>
                 {% elif employee_record.status == "DISABLED" %}
                     <a href="{% url "employee_record_views:reactivate" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"

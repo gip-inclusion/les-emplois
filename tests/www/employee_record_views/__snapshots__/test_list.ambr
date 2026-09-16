@@ -4,7 +4,7 @@
   <div class="c-box--results__footer">
       <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
           <a aria-label="Désactiver la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
-              Désactiver
+              Désactiver la fiche salariée
           </a>
           <a aria-label="Voir la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">
               Voir la fiche salarié
@@ -880,7 +880,7 @@
   <div class="c-box--results__footer">
       <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
           <a aria-label="Désactiver la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
-              Désactiver
+              Désactiver la fiche salariée
           </a>
           <a aria-label="Voir la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DPROCESSED">
               Voir la fiche salarié

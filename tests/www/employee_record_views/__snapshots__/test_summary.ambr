@@ -105,7 +105,7 @@
                       <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
                       </i>
                       <span>
-                          Désactiver
+                          Désactiver la fiche salariée
                       </span>
                   </a>
               </div>
@@ -161,7 +161,7 @@
                       <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
                       </i>
                       <span>
-                          Désactiver
+                          Désactiver la fiche salariée
                       </span>
                   </a>
               </div>
@@ -237,7 +237,7 @@
                       <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
                       </i>
                       <span>
-                          Désactiver
+                          Désactiver la fiche salariée
                       </span>
                   </a>
               </div>
@@ -308,18 +308,34 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Incohérence de numéro SIRET détectée
+                          Actualisation du numéro SIRET
                       </strong>
                   </p>
-                  <p class="mb-0">
+                  <p>
                       Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
+                  </p>
+                  <p class="mb-0">
+                      <b>
+                          <a aria-label="Vérifiez d'abord dans l’Extranet IAE 2.0 de l’ASP (ouverture dans un nouvel onglet)" class="has-external-link" href="https://iae2.asp-public.fr/riae/" rel="noopener" target="_blank">
+                              Vérifiez d’abord dans l’Extranet IAE 2.0 de l’ASP
+                          </a>
+                          que les informations sont présentes et correctes.
+                      </b>
                   </p>
                   <ul class="mb-0">
                       <li>
-                          Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
+                          Si ce salarié est toujours dans vos effectifs mais que ses informations sont absentes, cliquez sur
+                          <b>
+                              « Renvoyer cette fiche salarié »
+                          </b>
+                          .
                       </li>
                       <li>
-                          Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
+                          S’il ne fait plus partie de votre entreprise, cliquez sur
+                          <b>
+                              « Désactiver la fiche salarié »
+                          </b>
+                          .
                       </li>
                   </ul>
               </div>
@@ -348,7 +364,7 @@
                       <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
                       </i>
                       <span>
-                          Désactiver
+                          Désactiver la fiche salariée
                       </span>
                   </a>
               </div>
