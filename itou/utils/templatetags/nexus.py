@@ -33,12 +33,12 @@ def get_template_context(context, service):
             ],
             "items_long": [
                 "Publiez vos fiches de poste",
-                "Recevez des candidatures de la part des accompagnateurs et des candidats",
+                "Recevez des candidatures de la part des accompagnateurs et des usagers",
                 format_html(
                     """
                     Obtenez un
                     <a href="{}" class="btn-link has-external-link" target="_blank">PASS IAE</a>
-                    en ligne dès l’embauche d’un candidat",
+                    en ligne dès l’embauche d’un usager",
                     """,
                     "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche",
                 ),

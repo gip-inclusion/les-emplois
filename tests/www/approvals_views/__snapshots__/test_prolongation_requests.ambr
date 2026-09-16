@@ -19,7 +19,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -44,13 +44,13 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
-                                          La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
+                                          La durée de prolongation demandée n’est pas adaptée à la situation de l’usager.
                                       </label>
                                   </div>
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
-                                          Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
+                                          Le motif de prolongation demandé n’est pas adapté à la situation de l’usager.
                                       </label>
                                   </div>
                               </div>
@@ -111,7 +111,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -183,14 +183,14 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="proposed_actions"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Quelle(s) action(s) envisagez-vous de proposer au candidat ?
+                                  Quelle(s) action(s) envisagez-vous de proposer à l’usager ?
                               </label>
                               <div id="id_proposed_actions-proposed_actions">
                                   <div class="form-check">
@@ -260,7 +260,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -285,13 +285,13 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
-                                          La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
+                                          La durée de prolongation demandée n’est pas adaptée à la situation de l’usager.
                                       </label>
                                   </div>
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
-                                          Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
+                                          Le motif de prolongation demandé n’est pas adapté à la situation de l’usager.
                                       </label>
                                   </div>
                               </div>
@@ -352,7 +352,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -424,7 +424,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -449,13 +449,13 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
-                                          La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
+                                          La durée de prolongation demandée n’est pas adaptée à la situation de l’usager.
                                       </label>
                                   </div>
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
-                                          Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
+                                          Le motif de prolongation demandé n’est pas adapté à la situation de l’usager.
                                       </label>
                                   </div>
                               </div>
@@ -516,7 +516,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -588,7 +588,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -613,13 +613,13 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" type="radio" value="DURATION"/>
                                       <label class="form-check-label" for="id_reason-reason_2">
-                                          La durée de prolongation demandée n’est pas adaptée à la situation du candidat.
+                                          La durée de prolongation demandée n’est pas adaptée à la situation de l’usager.
                                       </label>
                                   </div>
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" required="" type="radio" value="REASON"/>
                                       <label class="form-check-label" for="id_reason-reason_3">
-                                          Le motif de prolongation demandé n’est pas adapté à la situation du candidat.
+                                          Le motif de prolongation demandé n’est pas adapté à la situation de l’usager.
                                       </label>
                                   </div>
                               </div>
@@ -680,7 +680,7 @@
                   </div>
                   <div class="c-form mb-3 mb-md-4">
                       <h2 class="h3">
-                          Réponse envoyée à l'employeur et au candidat
+                          Réponse envoyée à l'employeur et à l’usager
                       </h2>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>

@@ -3,15 +3,15 @@
 {% load theme_inclusion %}
 
 {% block progress_title %}
-    État civil du candidat
+    État civil de l’usager
 {% endblock %}
 {% block step_title %}
-    Quel est l’état civil du candidat ?
+    Quel est l’état civil de l’usager ?
 {% endblock %}
 
 {% block form_content %}
     <fieldset>
-        <legend class="visually-hidden">État civil du candidat</legend>
+        <legend class="visually-hidden">État civil de l’usager</legend>
         {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
         {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form.first_name %}
@@ -44,8 +44,8 @@
                     <div class="modal-body">
                         <p>
                             <strong>
-                                D'après les informations renseignées, il semblerait que ce
-                                candidat soit déjà rattaché à un autre email : {{ redacted_existing_email }}.
+                                D'après les informations renseignées, il semblerait que cet
+                                usager soit déjà rattaché à un autre email : {{ redacted_existing_email }}.
                             </strong>
                         </p>
                         <p>
@@ -60,7 +60,7 @@
                                 value="1"
                                 class="btn btn-sm btn-outline-primary">Poursuivre la création du compte</button>
                         {# Reload this page with a new form. #}
-                        <a href="{{ back_url }}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
+                        <a href="{{ back_url }}" class="btn btn-sm btn-primary">Modifier l'email de l’usager</a>
                     </div>
                 </div>
             </div>

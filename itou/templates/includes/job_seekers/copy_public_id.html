@@ -1,7 +1,7 @@
 {% load matomo %}
 
 {% matomo_event "candidature" "clic" "copied_jobseeker_public_id" as matomo_event_attrs %}
-{% with user_type=as_job_seeker|default:False|yesno:"du candidat,de l'usager" %}
+{% with user_type=as_job_seeker|default:False|yesno:"de l’usager,de l'usager" %}
     {% with text="Copier l'ID "|add:user_type %}
         {% if small|default:False %}
             {{ text }}

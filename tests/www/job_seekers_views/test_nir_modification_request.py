@@ -182,7 +182,7 @@ def test_create_with_ongoing_request(client, mailoutbox):
     data = {"nir": "111111111111120", "rationale": "Explication"}
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     response = client.post(url, data=data)
-    assertContains(response, "Une demande est déjà en cours de traitement pour ce candidat.")
+    assertContains(response, "Une demande est déjà en cours de traitement pour cet usager.")
     assert NirModificationRequest.objects.count() == 1
     assert len(mailoutbox) == 0
 

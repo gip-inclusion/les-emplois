@@ -22,7 +22,7 @@ _doc_link = get_external_link_markup(
 )
 
 ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = mark_safe(
-    "Le candidat a terminé un parcours il y a moins de deux ans.<br>"
+    "L’usager a terminé un parcours il y a moins de deux ans.<br>"
     "Pour prétendre à nouveau à un parcours en structure d'insertion "
     "par l'activité économique il doit rencontrer un prescripteur "
     "habilité : France Travail, Mission Locale, Cap emploi, etc."

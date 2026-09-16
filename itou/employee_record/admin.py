@@ -77,7 +77,7 @@ class ASPExchangeInformationAdminMixin:
         measure = obj.archived_json["mesure"]
         return f"{siret} ({measure})"
 
-    @admin.display(description="données candidat envoyées")
+    @admin.display(description="données usager envoyées")
     def user_data_sent(self, obj):
         if not obj.archived_json:
             return self.get_empty_value_display()

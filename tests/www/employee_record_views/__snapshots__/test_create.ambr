@@ -4,7 +4,7 @@
   <div class="c-info">
       <button aria-controls="collapseInfoNir78" aria-expanded="true" class="c-info__summary" data-bs-target="#collapseInfoNir78" data-bs-toggle="collapse" type="button">
           <span>
-              Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?
+              L’usager a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?
           </span>
       </button>
       <div class="c-info__detail collapse show" id="collapseInfoNir78">
@@ -28,7 +28,7 @@
   <div class="c-info">
       <button aria-controls="collapseInfoNoNir" aria-expanded="true" class="c-info__summary" data-bs-target="#collapseInfoNoNir" data-bs-toggle="collapse" type="button">
           <span>
-              Le candidat n’a pas de numéro de sécurité sociale (NIR) ?
+              L’usager n’a pas de numéro de sécurité sociale (NIR) ?
           </span>
       </button>
       <div class="c-info__detail collapse show" id="collapseInfoNoNir">

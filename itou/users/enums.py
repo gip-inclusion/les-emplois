@@ -12,7 +12,7 @@ KIND_ITOU_STAFF = "itou_staff"
 
 
 class UserKind(models.TextChoices):
-    JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
+    JOB_SEEKER = KIND_JOB_SEEKER, "usager"
     PROFESSIONAL = KIND_PROFESSIONAL, "professionnel"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
@@ -60,7 +60,7 @@ class LackOfPoleEmploiId(models.TextChoices):
 
 
 class ActionKind(models.TextChoices):
-    CREATE = "CREATE", "création du compte candidat"
+    CREATE = "CREATE", "création du compte usager"
     APPLY = "APPLY", "envoi de candidature"
     HIRE = "HIRE", "déclaration d'embauche"
     ACCEPT = "ACCEPT", "acceptation de candidature"

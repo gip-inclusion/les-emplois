@@ -715,7 +715,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text=(
                             "Identifiant France Travail chiffré, utilisé dans la communication à France Travail. "
-                            "Son existence implique que le nom, prénom, date de naissance et NIR de ce candidat "
+                            "Son existence implique que le nom, prénom, date de naissance et NIR de cet usager "
                             "sont connus et valides du point de vue de France Travail."
                         ),
                         max_length=48,
@@ -726,7 +726,7 @@ class Migration(migrations.Migration):
                 (
                     "pe_last_certification_attempt_at",
                     models.DateTimeField(
-                        help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
+                        help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier cet usager",
                         null=True,
                         verbose_name="date de la dernière tentative de certification",
                     ),
@@ -761,10 +761,12 @@ class Migration(migrations.Migration):
                             ("FORGOTTEN", "Identifiant France Travail oublié"),
                             ("NOT_REGISTERED", "Non inscrit auprès de France Travail"),
                         ],
-                        help_text="Indiquez la raison de l'absence d'identifiant France Travail.<br>Renseigner "
-                        "l'identifiant France Travail des candidats inscrits permet d'instruire instantanément "
-                        "votre demande.<br>Dans le cas contraire un délai de deux jours est nécessaire pour effectuer "
-                        "manuellement les vérifications d’usage.",
+                        help_text=(
+                            "Indiquez la raison de l'absence d'identifiant France Travail.<br>Renseigner "
+                            "l'identifiant France Travail des usagers inscrits permet d'instruire instantanément "
+                            "votre demande.<br>Dans le cas contraire un délai de deux jours est nécessaire pour "
+                            "effectuer manuellement les vérifications d’usage."
+                        ),
                         verbose_name="pas d'identifiant France Travail\xa0?",
                     ),
                 ),
@@ -906,10 +908,12 @@ class Migration(migrations.Migration):
                     models.BooleanField(
                         default=False,
                         editable=False,
-                        help_text="Un candidat est dans la file active de l'IAE depuis plus de 30 jours s'il a émis "
-                        "une candidature dans les 6 derniers mois, n'a pas de candidature acceptée, et a émis sa "
-                        "première candidature il y a plus de 30 jours.",
-                        verbose_name="candidat sans solution",
+                        help_text=(
+                            "Un usager est dans la file active de l'IAE depuis plus de 30 jours s'il a émis une "
+                            "candidature dans les 6 derniers mois, n'a pas de candidature acceptée, et a émis sa "
+                            "première candidature il y a plus de 30 jours."
+                        ),
+                        verbose_name="usager sans solution",
                     ),
                 ),
                 (

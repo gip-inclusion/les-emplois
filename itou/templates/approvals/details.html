@@ -34,7 +34,7 @@
                                                 disabled
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                {% if approval.is_suspended %}data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}data-bs-title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}data-bs-title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}data-bs-title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
+                                                {% if approval.is_suspended %}data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}data-bs-title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}data-bs-title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}data-bs-title="La suspension n’est pas possible car un autre employeur a embauché l’usager."{% endif %}>
                                             <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
                                             <span>Suspendre</span>
                                         </button>

@@ -91,21 +91,21 @@ class AnonymizedJobSeeker(AbstractAnonymizedModel):
     )
 
     class Meta:
-        verbose_name = "candidat anonymisé"
-        verbose_name_plural = "candidats anonymisés"
+        verbose_name = "usager anonymisé"
+        verbose_name_plural = "usagers anonymisés"
         ordering = ["-anonymized_at", "-date_joined"]
 
     def __str__(self):
-        return f"candidat {self.id} anonymisé en {self.anonymized_at.strftime('%Y-%m')}"
+        return f"usager {self.id} anonymisé en {self.anonymized_at.strftime('%Y-%m')}"
 
 
 class AnonymizedApplication(AbstractAnonymizedModel):
     # job_seeker
     job_seeker_birth_year = models.PositiveSmallIntegerField(
-        verbose_name="année de naissance du candidat", blank=True, null=True
+        verbose_name="année de naissance de l’usager", blank=True, null=True
     )
     job_seeker_department_same_as_company_department = models.BooleanField(
-        verbose_name="le candidat a le même département que celui l'entreprise", default=False
+        verbose_name="l’usager a le même département que celui l'entreprise", default=False
     )
 
     # sender
@@ -136,7 +136,7 @@ class AnonymizedApplication(AbstractAnonymizedModel):
     refusal_reason = models.CharField(verbose_name="raison du refus", blank=True, null=True)
     had_been_transferred = models.BooleanField(verbose_name="avait été transférée", default=False)
     number_of_jobs_applied_for = models.PositiveIntegerField(
-        verbose_name="nombre d'offres d'emploi pour lesquelles le candidat a postulé", default=0
+        verbose_name="nombre d'offres d'emploi pour lesquelles l’usager a postulé", default=0
     )
     had_diagoriente_invitation = models.BooleanField(
         verbose_name="avait reçu une invitation à un diagnostic d'orientation", default=False
@@ -198,10 +198,10 @@ class AbstractAnonymizedEligibilityDiagnosis(AbstractAnonymizedModel):
     expired_at = models.DateField(verbose_name="année et mois d'expiration du diagnostic", blank=True, null=True)
     # job seeker
     job_seeker_birth_year = models.PositiveSmallIntegerField(
-        verbose_name="année de naissance du candidat", blank=True, null=True
+        verbose_name="année de naissance de l’usager", blank=True, null=True
     )
     job_seeker_department = models.CharField(
-        verbose_name="département du candidat", max_length=3, blank=True, null=True
+        verbose_name="département de l’usager", max_length=3, blank=True, null=True
     )
     # author
     author_kind = models.CharField(verbose_name="type de l'auteur du diagnostic")

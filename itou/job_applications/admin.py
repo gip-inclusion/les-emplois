@@ -233,15 +233,15 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
     INCONSISTENCY_CHECKS = [
         (
-            "Candidature liée au PASS IAE d'un autre candidat",
+            "Candidature liée au PASS IAE d'un autre usager",
             lambda q: q.inconsistent_approval_user(),
         ),
         (
-            "Candidature liée au diagnostic d'un autre candidat",
+            "Candidature liée au diagnostic d'un autre usager",
             lambda q: q.inconsistent_eligibility_diagnosis_job_seeker(),
         ),
         (
-            "Candidature liée au diagnostic GEIQ d'un autre candidat",
+            "Candidature liée au diagnostic GEIQ d'un autre usager",
             lambda q: q.inconsistent_geiq_eligibility_diagnosis_job_seeker(),
         ),
     ]
@@ -346,13 +346,13 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         message = None
         if error.args[0] == models.JobApplicationWorkflow.error_missing_eligibility_diagnostic:
             message = (
-                "Un diagnostic d'éligibilité valide pour ce candidat "
+                "Un diagnostic d'éligibilité valide pour cet usager "
                 "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE."
             )
         elif error.args[0] == models.JobApplicationWorkflow.error_missing_hiring_start_at:
             message = "Le champ 'Date de début du contrat' est obligatoire pour accepter une candidature"
         elif error.args[0] == models.JobApplicationWorkflow.error_wrong_eligibility_diagnosis:
-            message = "Le diagnostic d'éligibilité n'est pas valide pour ce candidat et cette entreprise"
+            message = "Le diagnostic d'éligibilité n'est pas valide pour cet usager et cette entreprise"
         self.message_user(request, message or error, messages.ERROR)
         return HttpResponseRedirect(request.get_full_path())
 

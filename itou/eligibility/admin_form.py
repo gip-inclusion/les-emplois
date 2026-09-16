@@ -15,7 +15,7 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
     def clean_job_seeker(self):
         job_seeker = self.cleaned_data["job_seeker"]
         if job_seeker.kind != UserKind.JOB_SEEKER:
-            raise forms.ValidationError("L'utilisateur doit être un candidat")
+            raise forms.ValidationError("L'utilisateur doit être un usager")
         return job_seeker
 
     def clean_author_kind(self):

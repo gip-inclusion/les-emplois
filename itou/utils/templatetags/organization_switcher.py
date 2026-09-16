@@ -29,7 +29,7 @@ def organization_switcher(context, mode):
         if request.user.is_job_seeker:
             userkind_context = {
                 "icon": "ri-user-line",
-                "kind_display": "Candidat",
+                "kind_display": "Usager",
                 "no_org_display": request.user.get_full_name(),
             }
         elif request.from_employer:

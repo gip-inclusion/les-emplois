@@ -117,7 +117,7 @@
                               </div>
                           </div>
                           <h2 class="h3">
-                              Préciser la situation administrative du candidat (facultatif)
+                              Préciser la situation administrative de l’usager (facultatif)
                           </h2>
                           <hr class="mt-5"/>
                           <div id="form_errors">
@@ -126,14 +126,14 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
                                   <span class="c-info__summary">
-                                      Pour valider l'éligibilité IAE du candidat
+                                      Pour valider l'éligibilité IAE de l’usager
                                   </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
                                               Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
                   Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
+                                              <a aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
                                                   diagnostic socio-professionnel de référence
                                               </a>
                                               .
