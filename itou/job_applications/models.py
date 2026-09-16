@@ -693,7 +693,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
     )
     refusal_reason_shared_with_job_seeker = models.BooleanField(
-        verbose_name="partage du motif de refus avec le candidat", default=False
+        verbose_name="partage du motif de refus avec l’usager", default=False
     )
 
     # Set on accepted job applications, except when they were imported from
@@ -882,7 +882,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ),
             models.CheckConstraint(
                 name="job_seeker_sender_coherence",
-                violation_error_message="Le candidat doit être l'émetteur de la candidature",
+                violation_error_message="l’usager doit être l'émetteur de la candidature",
                 condition=(~models.Q(sender_kind="job_seeker") | models.Q(job_seeker=F("sender"))),
             ),
             models.CheckConstraint(
@@ -923,9 +923,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         super().clean()
 
         if self.job_seeker_id and self.job_seeker.kind != UserKind.JOB_SEEKER:
-            raise ValidationError(
-                "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"
-            )
+            raise ValidationError("Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte usager")
 
         # `to_company` is not guaranteed to exist if a `full_clean` is performed in some occasions
         # (f.i. in an admin form) checking existence of `to_company_id` keeps us safe here

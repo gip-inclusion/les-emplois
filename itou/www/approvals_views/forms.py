@@ -330,7 +330,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
             report_file_field = ItouFileField(
                 content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 max_upload_size=MB,
-                label="Fichier bilan du candidat",
+                label="Fichier bilan de l’usager",
             )
             self.fields["report_file"] = report_file_field
 
@@ -444,7 +444,7 @@ class ProlongationRequestDenyInformationReasonExplanationForm(forms.ModelForm):
 
 class ProlongationRequestDenyInformationProposedActionsForm(forms.ModelForm):
     proposed_actions = forms.MultipleChoiceField(
-        label="Quelle(s) action(s) envisagez-vous de proposer au candidat ?",
+        label="Quelle(s) action(s) envisagez-vous de proposer à l’usager ?",
         choices=ProlongationRequestDenyProposedAction.choices,
         widget=forms.CheckboxSelectMultiple(),
     )
@@ -576,7 +576,7 @@ class SuspensionEndDateForm(forms.Form):
         label="A quelle date le salarié va-t-il réintégrer votre entreprise ?",
         help_text=(
             "La date de fin de suspension sera mise à jour, le PASS sera de nouveau actif "
-            "à la date de réintégration du candidat."
+            "à la date de réintégration de l’usager."
         ),
     )
 
@@ -609,11 +609,11 @@ class SuspensionEndDateForm(forms.Form):
 class CloseApprovalForm(forms.Form):
     situation_reviewed = forms.BooleanField(
         required=True,
-        label="J’atteste avoir réalisé un examen de la situation du candidat, "
+        label="J’atteste avoir réalisé un examen de la situation de l’usager, "
         "préalablement à cette demande de clôture de son PASS IAE.",
     )
     candidate_informed = forms.BooleanField(
         required=True,
-        label="J’atteste avoir informé le candidat de ma demande de clôture de son PASS IAE.",
+        label="J’atteste avoir informé l’usager de ma demande de clôture de son PASS IAE.",
         help_text="Une notification sera automatiquement envoyée à son adresse e-mail.",
     )

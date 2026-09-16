@@ -1279,7 +1279,7 @@
           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
           </i>
           <span>
-              Copier l'ID du candidat
+              Copier l'ID de l’usager
           </span>
       </button>
   </div>
@@ -5889,7 +5889,7 @@
           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
           </i>
           <span>
-              Copier l'ID du candidat
+              Copier l'ID de l’usager
           </span>
       </button>
   </div>

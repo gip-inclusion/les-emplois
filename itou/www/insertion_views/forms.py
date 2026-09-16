@@ -23,10 +23,10 @@ ORIENTATION_FILE_MAX_SIZE_MB = 5
 class OrientationSelectJobSeekerForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=True,
-        label="Nom de l'usager",
+        label="Nom de l’usager",
         widget=Select2Widget(
             attrs={
-                "data-placeholder": "Nom de l'usager",
+                "data-placeholder": "Nom de l’usager",
             }
         ),
     )
@@ -78,7 +78,7 @@ class OrientationConformityForm(forms.Form):
     confirms_conditions = forms.BooleanField(
         required=True,
         label=(
-            "Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. "
+            "Je confirme que l’usager fait partie des publics concernés et que les pré-requis sont respectés. "
             "Je dispose des justificatifs qui me seront demandés à l'étape 3."
         ),
     )
@@ -91,7 +91,7 @@ class OrientationConformityForm(forms.Form):
         cleaned_data = super().clean()
         if missing_fields := get_missing_orientation_beneficiary_field_labels(self.job_seeker):
             raise ValidationError(
-                "Les informations du candidat sont incomplètes : %(fields)s.",
+                "Les informations de l’usager sont incomplètes : %(fields)s.",
                 params={"fields": ", ".join(missing_fields)},
                 code="incomplete_beneficiary",
             )

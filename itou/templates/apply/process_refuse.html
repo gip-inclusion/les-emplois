@@ -48,7 +48,7 @@
                             {% if wizard_steps.current == RefuseViewStep.REASON %}
                                 <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Choix du motif de refus
                             {% elif wizard_steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}
+                                <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ job_seeker_nb|pluralizefr:"à l’usager,aux usagers" }}
                             {% elif wizard_steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <strong>Étape {{ wizard_steps.step1 }}</strong>/{{ wizard_steps.count }} : Message {{ to_prescriber }}
                             {% endif %}
@@ -62,13 +62,13 @@
                                 <h2 class="h3">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"le candidat,les candidats" }} comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"l’usager,les usagers" }} comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
                                     {% else %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"le candidat,les candidats" }}.
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"l’usager,les usagers" }}.
                                     {% endif %}
                                 </p>
                             {% elif wizard_steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <h2 class="h3">Réponse {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}</h2>
+                                <h2 class="h3">Réponse {{ job_seeker_nb|pluralizefr:"à l’usager,aux usagers" }}</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
                                         Une copie de ce message sera adressée {{ to_prescriber }}.
@@ -80,7 +80,7 @@
                                     <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
                                     {% if not refusal_reason_shared_with_job_seeker %}
-                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
+                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"à l’usager,aux usagers" }})</em>
                                     {% endif %}
                                 </p>
                             {% elif wizard_steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
@@ -92,7 +92,7 @@
                                     <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
                                     {% if not refusal_reason_shared_with_job_seeker %}
-                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
+                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"à l’usager,aux usagers" }})</em>
                                     {% endif %}
                                 </p>
                             {% endif %}
@@ -149,7 +149,7 @@
                                 <fieldset>
                                     <div class="form-group">
                                         <legend class="fs-base fw-bold">
-                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?
+                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"à l’usager,aux usagers" }} ?
                                         </legend>
                                         {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>

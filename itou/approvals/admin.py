@@ -97,7 +97,7 @@ class JobApplicationInline(ReadonlyMixin, ItouStackedInline):
             )
 
         if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
-            return "Une fiche salarié existe déjà pour ce candidat"
+            return "Une fiche salarié existe déjà pour cet usager"
 
         if not obj.to_company.can_use_employee_record:
             return "La SIAE ne peut pas utiliser la gestion des fiches salarié"
@@ -276,7 +276,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
 
     INCONSISTENCY_CHECKS = [
         (
-            "PASS IAE lié au diagnostic d'un autre candidat",
+            "PASS IAE lié au diagnostic d'un autre usager",
             lambda q: q.inconsistent_eligibility_diagnosis_job_seeker(),
         ),
     ]

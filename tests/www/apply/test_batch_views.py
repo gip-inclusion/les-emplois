@@ -1262,8 +1262,8 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
-        assertContains(response, "Réponse au candidat")
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message à l’usager", html=True)
+        assertContains(response, "Réponse à l’usager")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
@@ -1360,8 +1360,8 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message aux candidats", html=True)
-        assertContains(response, "Réponse aux candidats")
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message aux usagers", html=True)
+        assertContains(response, "Réponse aux usagers")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
@@ -1452,11 +1452,11 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
-        assertContains(response, "Réponse au candidat")
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message à l’usager", html=True)
+        assertContains(response, "Réponse à l’usager")
         assertContains(
             response,
-            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué à l’usager)</em>",
             html=True,
         )
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
@@ -1667,8 +1667,8 @@ class TestBatchRefuse:
         )
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
-        assertContains(response, "Réponse au candidat")
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message à l’usager", html=True)
+        assertContains(response, "Réponse à l’usager")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)

@@ -161,7 +161,7 @@ class GEIQAdministrativeCriteriaForGEIQForm(GEIQAdministrativeCriteriaForm):
             {"hx-trigger": "change", "hx-post": form_url, "hx-indicator": "closest .form-check"}
         )
         proof_of_eligibility.label = (
-            "Si le candidat est éligible à l’aide à l’accompagnement GEIQ, "
+            "Si l’usager est éligible à l’aide à l’accompagnement GEIQ, "
             "je m'engage à conserver les justificatifs correspondants aux critères "
             "d'éligibilité sélectionnés pour 24 mois, en cas de contrôle."
         )

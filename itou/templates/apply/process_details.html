@@ -104,7 +104,7 @@
                             {% block sidebar %}
                                 {% if request.from_prescriber %}
                                     <div class="c-box mb-4">
-                                        <h3>Suivi du candidat</h3>
+                                        <h3>Suivi de l’usager</h3>
                                         <p>Retrouvez l’ensemble de ses candidatures en un seul endroit.</p>
                                         <a href="{% url "job_seekers_views:job_applications" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-primary btn-block"

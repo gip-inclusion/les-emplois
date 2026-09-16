@@ -19,11 +19,11 @@
   '''
   La candidature de D… J… envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
-  *Motif de refus non transmis au candidat* :
+  *Motif de refus non transmis à l’usager* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
-  *Réponse de l'entreprise transmise au candidat* :
+  *Réponse de l'entreprise transmise à l’usager* :
   
   Pas venu
   
@@ -57,17 +57,17 @@
   '''
   La candidature de DOE Jane envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
-  *Motif de refus non transmis au candidat* :
+  *Motif de refus non transmis à l’usager* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
-  *Réponse de l'entreprise transmise au candidat* :
+  *Réponse de l'entreprise transmise à l’usager* :
   
   Pas venu
   
-  *Message privé de l'entreprise (non transmis au candidat)* :
+  *Message privé de l'entreprise (non transmis à l’usager)* :
   
-  Le candidat n'est pas venu.
+  L’usager n'est pas venu.
   
   -----
   
@@ -87,7 +87,7 @@
   
   *Motif de refus* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
   *Message de l'entreprise* :
   
@@ -103,11 +103,11 @@
   '''
   La candidature de D… J… envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
-  *Motif de refus transmis au candidat* :
+  *Motif de refus transmis à l’usager* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
-  *Réponse de l'entreprise transmise au candidat* :
+  *Réponse de l'entreprise transmise à l’usager* :
   
   Pas venu
   
@@ -129,7 +129,7 @@
   
   *Motif de refus* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
   *Message de l'entreprise* :
   
@@ -145,17 +145,17 @@
   '''
   La candidature de DOE Jane envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
-  *Motif de refus transmis au candidat* :
+  *Motif de refus transmis à l’usager* :
   
-  Candidat ne s’étant pas présenté à l’entretien
+  Usager ne s’étant pas présenté à l’entretien
   
-  *Réponse de l'entreprise transmise au candidat* :
+  *Réponse de l'entreprise transmise à l’usager* :
   
   Pas venu
   
-  *Message privé de l'entreprise (non transmis au candidat)* :
+  *Message privé de l'entreprise (non transmis à l’usager)* :
   
-  Le candidat n'est pas venu.
+  L’usager n'est pas venu.
   
   -----
   

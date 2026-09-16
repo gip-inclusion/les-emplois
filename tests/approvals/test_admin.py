@@ -209,7 +209,7 @@ class TestApprovalAdmin:
                         '1 objet incohérent: <ul><li class="warning">'
                         f'<a href="/admin/approvals/approval/{inconsistent_approval.pk}/change/">'
                         f"PASS IAE - {inconsistent_approval.pk}"
-                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat"
+                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre usager"
                         "</li></ul>"
                     ),
                 )
@@ -1115,7 +1115,7 @@ class TestCustomApprovalAdminViews:
             approval=employee_record.job_application.approval,
         )
         msg = inline.employee_record_status(job_application)
-        assert msg == "Une fiche salarié existe déjà pour ce candidat"
+        assert msg == "Une fiche salarié existe déjà pour cet usager"
 
 
 class TestProlongationDerogation:
@@ -1258,7 +1258,7 @@ class TestProlongationDerogation:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Ce PASS IAE n’est pas le PASS IAE le plus récent du candidat, il ne peut donc pas être prolongé.",
+                    "Ce PASS IAE n’est pas le PASS IAE le plus récent de l’usager, il ne peut donc pas être prolongé.",
                 )
             ],
         )

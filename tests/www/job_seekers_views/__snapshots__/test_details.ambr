@@ -924,7 +924,7 @@
                           </small>
                           <span>
                               <strong>
-                                  Création du compte candidat
+                                  Création du compte usager
                               </strong>
                               - 08/08/2026
                           </span>
@@ -1500,7 +1500,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-advisors" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fadvisors%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -1600,7 +1600,7 @@
                               </ul>
                               <div class="c-info mb-0 mt-3">
                                   <span class="c-info__summary">
-                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l’usager.
                                   </span>
                                   <div class="c-info__detail">
                                       <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -1766,7 +1766,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-advisors" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fadvisors%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -1874,7 +1874,7 @@
                               </ul>
                               <div class="c-info mb-0 mt-3">
                                   <span class="c-info__summary">
-                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                                      Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l’usager.
                                   </span>
                                   <div class="c-info__detail">
                                       <a data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="renseigner-motif-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -1992,7 +1992,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-contracts" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fcontracts%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -2937,7 +2937,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -3147,7 +3147,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -3270,7 +3270,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -3481,7 +3481,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -3580,7 +3580,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -3854,7 +3854,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -4079,7 +4079,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -4129,7 +4129,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">
@@ -4228,7 +4228,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -4293,7 +4293,7 @@
                                               </strong>
                                           </p>
                                           <p>
-                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures de l'usager, y compris celles déposées par d’autres organisations ou par l'usager lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures de l’usager, y compris celles déposées par d’autres organisations ou par l’usager lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
                                           </p>
                                           <p class="mb-0">
                                               <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297" rel="noopener noreferrer" target="_blank">
@@ -5023,7 +5023,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -5921,7 +5921,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -5986,7 +5986,7 @@
                                               </strong>
                                           </p>
                                           <p>
-                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures de l'usager, y compris celles déposées par d’autres organisations ou par l'usager lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures de l’usager, y compris celles déposées par d’autres organisations ou par l’usager lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
                                           </p>
                                           <p class="mb-0">
                                               <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297" rel="noopener noreferrer" target="_blank">
@@ -6766,7 +6766,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -6979,7 +6979,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -7107,7 +7107,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -7332,7 +7332,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -7436,7 +7436,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -7698,7 +7698,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -7911,7 +7911,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -8015,7 +8015,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -8240,7 +8240,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <ul>
@@ -8344,7 +8344,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -8606,7 +8606,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -9880,7 +9880,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -10098,7 +10098,7 @@
                                               <li>
                                                   <small>
                                                       Critères administratifs
-                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <i class="text-disabled">

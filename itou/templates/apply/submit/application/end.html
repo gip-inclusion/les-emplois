@@ -35,9 +35,9 @@
                         <p>
                             <b>
                                 {% if can_edit_personal_information %}
-                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
+                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre usager" }} sont bien à jour :
                                 {% else %}
-                                    Le candidat a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
+                                    L’usager a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
                                 {% endif %}
                             </b>
                         </p>
@@ -82,8 +82,8 @@
                                                     N&deg; de téléphone
                                                     <i class="ri-information-line text-info"
                                                        data-bs-toggle="tooltip"
-                                                       data-bs-title="L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
-                                                       aria-label="L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
+                                                       data-bs-title="L’ajout du numéro de téléphone facilitera la prise de contact avec l’usager."
+                                                       aria-label="L’ajout du numéro de téléphone facilitera la prise de contact avec l’usager."
                                                        role="button"
                                                        tabindex="0"></i>
                                                 </small>
@@ -97,11 +97,11 @@
                                         {% partialdef btn-group inline %}
                                             {% if search_url %}
                                                 {% if request.from_prescriber %}
-                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "job_seekers_views:details" job_application.job_seeker.public_id %}">Voir le profil candidat</a>
+                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "job_seekers_views:details" job_application.job_seeker.public_id %}">Voir le profil usager</a>
                                                 {% elif request.from_employer %}
                                                     <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
                                                 {% endif %}
-                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href={{ search_url }}>Revenir à la recherche pour ce candidat</a>
+                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href={{ search_url }}>Revenir à la recherche pour cet usager</a>
                                             {% elif auto_prescription_process %}
                                                 <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
                                                 <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href={% url "apply:details_for_company" job_application_id=job_application.id %}>Voir la candidature</a>

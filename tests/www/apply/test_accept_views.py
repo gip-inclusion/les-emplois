@@ -310,7 +310,7 @@ class TestProcessAcceptViewsInWizard:
             response,
             (
                 '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
-                "<span>Valider l’éligibilité du candidat</span>"
+                "<span>Valider l’éligibilité de l’usager</span>"
                 "</button>"
             ),
             html=True,

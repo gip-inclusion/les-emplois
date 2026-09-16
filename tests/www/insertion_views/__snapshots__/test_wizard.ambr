@@ -59,7 +59,7 @@
                               </p>
                               <ul class="mb-0">
                                   <li>
-                                      Les informations du candidat sont incomplètes : Prénom.
+                                      Les informations de l’usager sont incomplètes : Prénom.
                                   </li>
                               </ul>
                           </div>
@@ -78,7 +78,7 @@
                           </div>
                           <div class="c-box mb-3 mb-md-4 position-relative">
                               <div class="position-absolute top-0 end-0 m-3">
-                                  <span class="btn btn-outline-primary w-100 w-md-auto disabled" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" tabindex="0">
+                                  <span class="btn btn-outline-primary w-100 w-md-auto disabled" data-bs-placement="top" data-bs-title="Cet usager a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" tabindex="0">
                                       Modifier
                                   </span>
                               </div>
@@ -117,7 +117,7 @@
                               <div class="form-check">
                                   <input checked="" class="form-check-input is-valid" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
+                                      Je confirme que l’usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
                                   </label>
                               </div>
                           </div>
@@ -263,7 +263,7 @@
                                   </div>
                                   <div class="col">
                                       <p class="mb-0 h-100 d-flex align-items-center">
-                                          Frais à la charge de l'usager : Payant. Adhésion annuelle de 10€ à la MJC Champ Libre + frais de location
+                                          Frais à la charge de l’usager : Payant. Adhésion annuelle de 10€ à la MJC Champ Libre + frais de location
                                       </p>
                                   </div>
                               </div>
@@ -294,7 +294,7 @@
                               <div class="form-check">
                                   <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
+                                      Je confirme que l’usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
                                   </label>
                               </div>
                           </div>
@@ -401,7 +401,7 @@
                               Pré-requis et justificatifs
                           </h3>
                           <p>
-                              (A récupérer auprès de l'usager)
+                              (A récupérer auprès de l’usager)
                           </p>
                           <ul class="mb-3 mb-md-4">
                               <li>
@@ -535,7 +535,7 @@
                               </legend>
                               <p class="fs-sm">
                                   Personne en charge de l'accompagnement et du suivi professionnel de la situation
-                                          de l'usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
+                                          de l’usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
                               </p>
                               <div class="form-group form-group-input-w-lg-66 form-group-required">
                                   <label class="form-label" for="id_referent_last_name">
@@ -664,9 +664,9 @@
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <div class="form-group form-group-input-w-lg-66 form-group-required">
                               <label class="form-label" for="id_job_seeker">
-                                  Nom de l'usager
+                                  Nom de l’usager
                               </label>
-                              <select class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Nom de l'usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker" required="">
+                              <select class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Nom de l’usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker" required="">
                                   <option selected="" value="">
                                       ---------
                                   </option>

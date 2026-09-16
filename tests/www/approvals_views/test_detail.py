@@ -467,7 +467,7 @@ class TestApprovalDetailView:
         settings.BYPASS_TERMS_ACCEPTANCE = True
         ALREADY_SUSPENDED = "La suspension n’est pas possible car une suspension est déjà en cours."
         NOT_STARTED = "La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."
-        HANDLED_BY_OTHER_SIAE = "La suspension n’est pas possible car un autre employeur a embauché le candidat."
+        HANDLED_BY_OTHER_SIAE = "La suspension n’est pas possible car un autre employeur a embauché l’usager."
         EXPIRED = "Il est impossible de faire une suspension de PASS IAE expiré."
 
         job_application = JobApplicationFactory(

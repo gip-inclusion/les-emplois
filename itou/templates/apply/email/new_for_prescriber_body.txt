@@ -5,7 +5,7 @@
 
 La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_company.display_name }} ({{ job_application.to_company.kind }}) localisée à {{ job_application.to_company.city }} !
 
-*Candidat* :
+*Usager* :
 
 - Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
 - Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information %}

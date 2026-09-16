@@ -37,7 +37,7 @@ class JobApplicationAdminForm(forms.ModelForm):
 
         if sender_kind == SenderKind.JOB_SEEKER:
             if sender is None:
-                raise ValidationError("Émetteur candidat manquant.")
+                raise ValidationError("Émetteur usager manquant.")
             if not sender.is_job_seeker:
                 raise ValidationError("Émetteur du mauvais type.")
 
@@ -73,7 +73,7 @@ class JobApplicationAdminForm(forms.ModelForm):
         if eligibility_diagnosis:
             job_seeker = self.cleaned_data.get("job_seeker")
             if job_seeker.pk != eligibility_diagnosis.job_seeker_id:
-                raise ValidationError("Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature.")
+                raise ValidationError("Le diagnostic d'éligibilité n'appartient pas à l’usager de la candidature.")
 
         return
 

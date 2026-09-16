@@ -50,7 +50,7 @@
                                                   Prescripteur / Orienteur
                                               </strong>
                                               <br/>
-                                              Vous accompagnez des candidats dans leur recherche d’emploi inclusif
+                                              Vous accompagnez des usagers dans leur recherche d’emploi inclusif
                                           </label>
                                       </div>
                                   </div>
@@ -64,7 +64,7 @@
                                                   Employeur inclusif
                                               </strong>
                                               <br/>
-                                              Vous travaillez dans une structure inclusive qui recrute et accompagne des candidats (SIAE, GEIQ, OPCS)
+                                              Vous travaillez dans une structure inclusive qui recrute et accompagne des usagers (SIAE, GEIQ, OPCS)
                                           </label>
                                       </div>
                                   </div>
@@ -164,7 +164,7 @@
                                   <div class="d-flex">
                                       <div>
                                           <p>
-                                              Vous accompagnez des candidats vers l’emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, …).
+                                              Vous accompagnez des usagers vers l’emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, …).
                                           </p>
                                           <div class="tag-group">
                                               <span class="tag bg-info-lighter text-info">
@@ -192,7 +192,7 @@
                                       <input class="form-check-input" id="kind_job_seeker" name="kind" required="" type="radio" value="job_seeker"/>
                                       <label class="form-check-label stretched-link" for="kind_job_seeker">
                                           <strong>
-                                              Candidat
+                                              Usager
                                           </strong>
                                       </label>
                                   </div>

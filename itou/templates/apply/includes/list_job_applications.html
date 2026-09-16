@@ -22,7 +22,7 @@
                     {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
                         Vous trouverez ici les candidatures émises par votre organisation
                         <br class="d-none d-lg-inline">
-                        pour les candidats.
+                        pour les usagers.
                     {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                         Pour recevoir des candidatures, vérifiez que les postes ouverts
                         <br class="d-none d-lg-inline">
@@ -37,7 +37,7 @@
             {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
                 <a href="{% url 'search:employers_results' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
                     <i class="ri-user-follow-line ri-lg fw-normal" aria-hidden="true"></i>
-                    <span>Postuler pour un candidat</span>
+                    <span>Postuler pour un usager</span>
                 </a>
             {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                 <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">

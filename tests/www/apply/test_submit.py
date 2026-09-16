@@ -105,12 +105,12 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
             <p>
                 Si cette candidature n’est pas pour
                 <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
-                cliquez sur « Ce n’est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                cliquez sur « Ce n’est pas mon usager » afin de modifier le numéro de sécurité sociale.
             </p>
         </div>
         <div class="modal-footer">
             <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
-            Ce n’est pas mon candidat</button>
+            Ce n’est pas mon usager</button>
             <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
         </div>
         """,
@@ -123,7 +123,7 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
         f"""
         <p>
             En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale
-            {format_nir(nir_to_add)} soit associé à ce candidat.</b>
+            {format_nir(nir_to_add)} soit associé à cet usager.</b>
         </p>
         """
         if nir_to_add is not None
@@ -138,16 +138,16 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
                 {mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}.</b>
             </p>
             <p>
-                L'identité du candidat est une information clé pour la structure.
+                L'identité de l’usager est une information clé pour la structure.
                 Si cette candidature n'est pas pour
                 <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
-                cliquez sur « Ce n'est pas mon candidat » afin d'enregistrer ses informations personnelles.
+                cliquez sur « Ce n'est pas mon usager » afin d'enregistrer ses informations personnelles.
             </p>
             {add_nir_text}
         </div>
         <div class="modal-footer">
             <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
-            Ce n'est pas mon candidat</button>
+            Ce n'est pas mon usager</button>
             <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
         </div>
         """,
@@ -1164,7 +1164,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertRedirects(response, next_url)
 
         response = client.get(next_url)
-        assertContains(response, "Créer le compte candidat")
+        assertContains(response, "Créer le compte usager")
 
         response = client.post(next_url)
 
@@ -1480,7 +1480,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertRedirects(response, next_url)
 
         response = client.get(next_url)
-        assertContains(response, "Créer le compte candidat")
+        assertContains(response, "Créer le compte usager")
 
         response = client.post(next_url)
 
@@ -1648,10 +1648,10 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         response = client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
-        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
-        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
 
     def test_apply_step_eligibility_does_not_show_employer_diagnosis(self, client):
         company = CompanyFactory(name="Les petits pains", with_membership=True, subject_to_iae_rules=True)
@@ -1988,7 +1988,7 @@ class TestApplyAsPrescriber:
         assertRedirects(response, next_url)
 
         response = client.get(next_url)
-        assertContains(response, "Créer le compte candidat")
+        assertContains(response, "Créer le compte usager")
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
@@ -2251,7 +2251,7 @@ class TestApplyAsPrescriber:
             assert job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason == ""
             assertContains(
                 response,
-                "Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat",
+                "Votre utilisateur n'est pas autorisé à modifier les informations de cet usager",
                 status_code=403,
                 html=True,
             )
@@ -2343,7 +2343,7 @@ class TestApplyAsPrescriberNirExceptions:
         assert response.status_code == 200
         assert (
             "Le<b> numéro de sécurité sociale</b> renseigné (141068078200557) "
-            "est déjà utilisé par un autre candidat sur la Plateforme." in str(list(response.context["messages"])[0])
+            "est déjà utilisé par un autre usager sur la Plateforme." in str(list(response.context["messages"])[0])
         )
 
         # Remove that extra job seeker and proceed with "normal" flow
@@ -2719,7 +2719,7 @@ class TestApplyAsCompany:
         assertRedirects(response, next_url)
 
         response = client.get(next_url)
-        assertContains(response, "Créer le compte candidat")
+        assertContains(response, "Créer le compte usager")
 
         response = client.post(next_url)
 
@@ -2904,10 +2904,10 @@ class TestApplyAsCompany:
         assert response.status_code == 200
 
         response = client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
-        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
-        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
 
 
 class TestApplyAsOther:
@@ -2940,7 +2940,7 @@ class TestApplyAsOther:
 class TestApplicationView:
     DIAGORIENTE_JOB_SEEKER_TITLE = "Vous n’avez pas de CV ?"
     DIAGORIENTE_JOB_SEEKER_DESCRIPTION = "Créez-en un grâce à notre partenaire Diagoriente."
-    DIAGORIENTE_PRESCRIBER_TITLE = "Ce candidat n’a pas encore de CV ?"
+    DIAGORIENTE_PRESCRIBER_TITLE = "Cet usager n’a pas encore de CV ?"
     DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
         "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
     )
@@ -3368,9 +3368,9 @@ class TestApplicationView:
                 response,
                 f"""
                     <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_seeker_profile_url}">
-                    Voir le profil candidat</a>
+                    Voir le profil usager</a>
                     <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
-                    Revenir à la recherche pour ce candidat</a>
+                    Revenir à la recherche pour cet usager</a>
                 """,
                 html=True,
             )
@@ -3397,7 +3397,7 @@ class TestApplicationView:
                         <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
                         Tableau de bord</a>
                         <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
-                        Revenir à la recherche pour ce candidat</a>
+                        Revenir à la recherche pour cet usager</a>
                     """,
                     html=True,
                 )
@@ -3462,14 +3462,14 @@ class TestApplicationEndView:
 
     def test_wo_phone_number_as_employer(self, client):
         application = JobApplicationFactory(sent_by_another_employer=True, job_seeker__phone="")
-        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
+        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec l’usager."
         client.force_login(application.sender)
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assertContains(response, expected_text)
 
     def test_wo_phone_number_as_prescriber(self, client):
         application = JobApplicationFactory(sent_by_authorized_prescriber=True, job_seeker__phone="")
-        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
+        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec l’usager."
         client.force_login(application.sender)
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assertContains(response, expected_text)
@@ -3553,7 +3553,7 @@ class UpdateJobSeekerTestMixin:
 
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
-        self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
+        self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT = "Informations modifiables par l’usager uniquement"
         self.job_seeker_session_key = f"job_seeker-{self.job_seeker.public_id}"
 
         settings.API_GEOPF_BASE_URL = "http://ban-api"
@@ -3599,7 +3599,7 @@ class UpdateJobSeekerTestMixin:
         with assertSnapshotQueries(snapshot(name="queries - step 1")):
             response = client.get(self.get_step_url("1", client))
         assertContains(response, self.job_seeker.first_name)
-        assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+        assertNotContains(response, self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT)
 
         # Let's check for consistency between the NIR, the birthdate and the title.
         # (but do not check when there is no NIR)
@@ -3632,7 +3632,7 @@ class UpdateJobSeekerTestMixin:
         # ----------------------------------------------------------------------
 
         NEW_FIRST_NAME = "New first name"
-        PROCESS_TITLE = "Modification du compte candidat"
+        PROCESS_TITLE = "Modification du compte usager"
 
         post_data = {
             "title": "M",
@@ -3678,7 +3678,7 @@ class UpdateJobSeekerTestMixin:
             response = client.get(self.get_step_url("2", client))
         assertContains(response, PROCESS_TITLE, html=True)
         assertContains(response, self.job_seeker.phone)
-        assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+        assertNotContains(response, self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT)
 
         NEW_ADDRESS_LINE = "382 ROUTE DE JOLLIVET"
 
@@ -3797,7 +3797,7 @@ class UpdateJobSeekerTestMixin:
         # STEP 1
         response = client.get(self.get_step_url("1", client))
         assertContains(response, self.job_seeker.first_name)
-        assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+        assertContains(response, self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT)
 
         response = client.post(self.get_step_url("1", client))
         assertRedirects(response, self.get_step_url("2", client), fetch_redirect_response=False)
@@ -3807,7 +3807,7 @@ class UpdateJobSeekerTestMixin:
         # STEP 2
         response = client.get(self.get_step_url("2", client))
         assertContains(response, self.job_seeker.phone)
-        assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+        assertContains(response, self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT)
 
         response = client.post(self.get_step_url("2", client))
         assertRedirects(response, self.get_step_url("3", client), fetch_redirect_response=False)
@@ -4141,7 +4141,7 @@ def test_detect_existing_job_seeker(client):
     assertContains(
         response,
         (
-            "D'après les informations renseignées, il semblerait que ce candidat soit "
+            "D'après les informations renseignées, il semblerait que cet usager soit "
             "déjà rattaché à un autre email : j*****@e******.c**."
         ),
         html=True,
@@ -4158,7 +4158,7 @@ def test_detect_existing_job_seeker(client):
     )
     assertContains(
         response,
-        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>""",
+        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Modifier l'email de l’usager</a>""",
         html=True,
     )
     # Use the modal button to send confirmation
@@ -4577,7 +4577,7 @@ class TestCheckPreviousApplicationsView:
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
         assertContains(
-            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response, "Cet usager a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404
@@ -4636,7 +4636,7 @@ class TestCheckPreviousApplicationsView:
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
         assertContains(
-            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response, "Cet usager a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404
@@ -4706,7 +4706,7 @@ class TestCheckPreviousApplicationsView:
         self._login_and_setup_session(client, self.company.members.first())
 
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assertContains(response, "Cet usager a déjà postulé pour cette entreprise")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4751,7 +4751,7 @@ class TestCheckPreviousApplicationsView:
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
         assertContains(
-            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response, "Cet usager a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404

@@ -10,11 +10,11 @@
                 <li>
                     <strong>Résident QPV</strong> : l'adresse
                     {% if request.from_employer %}
-                        déclarée pour le
+                        déclarée pour l’
                     {% else %}
-                        du
+                        de l’
                     {% endif %}
-                    candidat "{{ job_seeker.address_in_qpv }}" est en QPV.
+                    usager "{{ job_seeker.address_in_qpv }}" est en QPV.
                 </li>
             {% endif %}
             {% if job_seeker.zrr_city_name %}

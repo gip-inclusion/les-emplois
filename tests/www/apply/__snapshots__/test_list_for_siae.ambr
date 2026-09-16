@@ -7878,13 +7878,13 @@
                   <div class="modal-body">
                       <p>
                           En ajoutant cette candidature au vivier, elle ne sera pas automatiquement refusée après deux mois.
-                                          Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer le candidat de l’avancement de sa candidature.
+                                          Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer l’usager de l’avancement de sa candidature.
                                       
                                       Les candidatures placées en vivier seront automatiquement masquées après 2 ans.
                       </p>
                       <div class="form-group">
                           <label class="form-label" for="id_answer">
-                              Commentaire envoyé au candidat
+                              Commentaire envoyé à l’usager
                           </label>
                           <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" rows="10">Votre candidature a retenu toute notre attention. Malheureusement, nous n’avons plus de poste disponible pour le moment. Toutefois, nous l’avons conservée dans notre base de candidatures. Ainsi, si une opportunité se présente, elle pourra être réexaminée et, le cas échéant, retenue.
   Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapidement une opportunité qui vous correspond.</textarea>
@@ -7926,13 +7926,13 @@
                   <div class="modal-body">
                       <p>
                           En ajoutant ces candidatures au vivier, elles ne seront pas automatiquement refusées après deux mois.
-                                          Toutefois, nous vous invitons à les traiter dans un délai raisonnable afin d’informer les candidats de l’avancement de leurs candidatures.
+                                          Toutefois, nous vous invitons à les traiter dans un délai raisonnable afin d’informer les usagers de l’avancement de leurs candidatures.
                                       
                                       Les candidatures placées en vivier seront automatiquement masquées après 2 ans.
                       </p>
                       <div class="form-group">
                           <label class="form-label" for="id_answer">
-                              Commentaire envoyé aux 2 candidats
+                              Commentaire envoyé aux 2 usagers
                           </label>
                           <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" rows="10">Votre candidature a retenu toute notre attention. Malheureusement, nous n’avons plus de poste disponible pour le moment. Toutefois, nous l’avons conservée dans notre base de candidatures. Ainsi, si une opportunité se présente, elle pourra être réexaminée et, le cas échéant, retenue.
   Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapidement une opportunité qui vous correspond.</textarea>
@@ -8114,11 +8114,11 @@
                   <div class="modal-body">
                       <div class="form-group form-group-required">
                           <label class="form-label" for="id_answer">
-                              Commentaire à envoyer au candidat
+                              Commentaire à envoyer à l’usager
                           </label>
-                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les usagers et les prescripteurs/orienteurs" required="" rows="10"></textarea>
                           <div class="form-text" id="id_answer_helptext">
-                              Votre réponse sera visible par le candidat et le prescripteur
+                              Votre réponse sera visible par l’usager et le prescripteur
                           </div>
                       </div>
                   </div>
@@ -8155,11 +8155,11 @@
                   <div class="modal-body">
                       <div class="form-group form-group-required">
                           <label class="form-label" for="id_answer">
-                              Commentaire à envoyer aux 2 candidats
+                              Commentaire à envoyer aux 2 usagers
                           </label>
-                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les usagers et les prescripteurs/orienteurs" required="" rows="10"></textarea>
                           <div class="form-text" id="id_answer_helptext">
-                              Votre réponse sera visible par le candidat et le prescripteur
+                              Votre réponse sera visible par l’usager et le prescripteur
                           </div>
                       </div>
                   </div>
@@ -8841,7 +8841,7 @@
                           <td>
                               <i aria-hidden="true" class="ri-user-line me-1">
                               </i>
-                              Le candidat lui-même
+                              L’usager lui-même
                           </td>
                           <td>
                               Le prescripteur habilité n'a pas renseigné de critères.

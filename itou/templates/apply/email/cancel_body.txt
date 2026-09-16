@@ -10,7 +10,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 
 ----------------------------------------------------------
 
-*Candidat* :
+*Usager* :
 
 - Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
 - Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information%}
@@ -20,7 +20,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 
 {% if job_application.message %}
 
-*Message du candidat* :
+*Message de l’usager* :
 
 {{ job_application.message }}
 
@@ -40,7 +40,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 *Candidature envoyée par :*
 
 {% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
-Le candidat lui même.
+L’usager lui même.
 {% endif %}
 
 {% if job_application.sender_kind == SenderKind.PRESCRIBER %}

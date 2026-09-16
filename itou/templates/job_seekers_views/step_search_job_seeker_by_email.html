@@ -8,10 +8,10 @@
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="c-form">
-            <h2 class="h3">Créer un compte pour votre candidat</h2>
+            <h2 class="h3">Créer un compte pour votre usager</h2>
             {% if nir %}
                 <div class="form-group form-group-required form-group-input-w-lg-66">
-                    <label for="id_nir">Numéro de sécurité sociale du candidat</label>
+                    <label for="id_nir">Numéro de sécurité sociale de l’usager</label>
                     <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
                 </div>
             {% endif %}
@@ -21,7 +21,7 @@
                     <p class="mb-0">
                         Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
                         <br>
-                        Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                        Merci de renseigner l'adresse e-mail de votre usager pour l'inscrire.
                     </p>
                 {% endfragment %}
             {% endcomponent_alert %}
@@ -31,7 +31,7 @@
             {% bootstrap_form form alert_error_type="all" %}
 
             <div class="mb-3">
-                {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" only %}
+                {% include "signup/includes/no_email_link.html" with link_text="L’usager n'a pas d'e-mail ?" only %}
             </div>
 
             {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" reset_url=reset_url %}
@@ -63,15 +63,15 @@
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
                                 {% else %}
-                                    L'identité du candidat est une information clé pour la structure.
+                                    L'identité de l’usager est une information clé pour la structure.
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
-                                    « Ce n'est pas mon candidat » afin d'enregistrer ses informations
+                                    « Ce n'est pas mon usager » afin d'enregistrer ses informations
                                     personnelles.
                                 {% endif %}
                             </p>
                             {% if can_add_nir %}
                                 <p>
-                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce candidat.</b>
+                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à cet usager.</b>
                                 </p>
                             {% endif %}
                         </div>
@@ -85,7 +85,7 @@
                                 {% endif %}
                             {% else %}
                                 {# Reload this page with a new form. #}
-                                {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% bootstrap_button "Ce n'est pas mon usager" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                                 {# Go to the next step. #}
                                 {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% endif %}

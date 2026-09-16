@@ -26,7 +26,7 @@ class TestJobApplicationGEIQEligibilityDetails:
         <i class="ri-error-warning-line" aria-hidden="true"></i>
         Éligibilité GEIQ non confirmée
       </span>"""
-    EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic du candidat a expiré"
+    EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic de l’usager a expiré"
 
     def get_response(self, client, job_application, viewer_kind, *, diagnosis=None):
         user = {
@@ -309,5 +309,5 @@ def test_geiq_eligibility(client):
     )
     client.force_login(job_application.to_company.members.first())
     response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))
-    assertContains(response, "Souhaitez-vous préciser la situation administrative du candidat ?")
+    assertContains(response, "Souhaitez-vous préciser la situation administrative de l’usager ?")
     assertContains(response, reverse("companies_views:card", kwargs={"company_pk": job_application.to_company.pk}))

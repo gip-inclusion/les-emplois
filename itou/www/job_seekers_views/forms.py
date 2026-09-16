@@ -58,10 +58,10 @@ class AssignmentsChoices(TextChoices):
 class FilterForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=False,
-        label="Nom de l'usager",
+        label="Nom de l’usager",
         widget=Select2Widget(
             attrs={
-                "data-placeholder": "Nom de l'usager",
+                "data-placeholder": "Nom de l’usager",
             }
         ),
     )
@@ -281,7 +281,7 @@ class CheckJobSeekerNirForm(forms.Form):
         if self.job_seeker:
             self.fields["nir"].label = "Votre numéro de sécurité sociale"
         else:
-            self.fields["nir"].label = "Numéro de sécurité sociale du candidat"
+            self.fields["nir"].label = "Numéro de sécurité sociale de l’usager"
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"].upper()
@@ -316,7 +316,7 @@ class CheckJobSeekerNirForm(forms.Form):
         if self.job_seeker and self.job_seeker.kind != UserKind.JOB_SEEKER:
             error_message = (
                 "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
-                "n'est pas associé à un compte candidat."
+                "n'est pas associé à un compte usager."
             )
             raise forms.ValidationError(error_message)
 
@@ -330,7 +330,7 @@ class JobSeekerExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label="Adresse e-mail personnelle du candidat",
+        label="Adresse e-mail personnelle de l’usager",
         help_text="Par exemple : julie@example.com",
         widget=forms.EmailInput(attrs={"autocomplete": "off"}),
     )
@@ -338,9 +338,9 @@ class JobSeekerExistsForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data["email"]
         if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
@@ -586,7 +586,7 @@ class NirModificationRequestForm(forms.ModelForm):
         if ongoing_requests.exists():
             message = (
                 "Une demande est déjà en cours de traitement"
-                f"{' pour ce candidat' if self.job_seeker != self.requested_by else ''}."
+                f"{' pour cet usager' if self.job_seeker != self.requested_by else ''}."
             )
             error = forms.ValidationError(message)
             self.add_error(None, error)
@@ -604,7 +604,7 @@ class JobSeekerAssignmentForm(forms.ModelForm):
     reason = forms.CharField(
         required=False,
         label="Motif de l'accompagnement",
-        help_text="Raison de l’accompagnement et/ou actions menées avec l'usager.",
+        help_text="Raison de l’accompagnement et/ou actions menées avec l’usager.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

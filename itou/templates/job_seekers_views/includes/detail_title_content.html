@@ -3,7 +3,7 @@
 {% load str_filters %}
 {% load url_add_query %}
 
-{% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur le candidat" %}
+{% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur l’usager" %}
     {% fragment as c_title__main %}
         <h1>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
         <p id="copy_public_id">

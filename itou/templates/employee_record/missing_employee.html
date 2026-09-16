@@ -30,9 +30,9 @@
 
                             {% if case == MissingEmployeeCase.NO_HIRING %}
                                 <p>
-                                    Vous n’avez pas déclaré d’embauche pour ce candidat. Pour créer une fiche salarié vous devez accepter la candidature.
+                                    Vous n’avez pas déclaré d’embauche pour cet usager. Pour créer une fiche salarié vous devez accepter la candidature.
                                     <br>
-                                    Vous pouvez trouver la liste des candidatures de ce candidat en <a href="{% url 'apply:list_for_siae' %}?job_seeker={{ employee_or_job_seeker.pk }}&archived=all">cliquant ici</a>.
+                                    Vous pouvez trouver la liste des candidatures de cet usager en <a href="{% url 'apply:list_for_siae' %}?job_seeker={{ employee_or_job_seeker.pk }}&archived=all">cliquant ici</a>.
                                 </p>
                             {% elif case == MissingEmployeeCase.NO_APPROVAL %}
                                 <p>

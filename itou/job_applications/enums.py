@@ -58,18 +58,18 @@ def sender_kind_to_pe_origine_candidature(sender_kind):
 
 
 class RefusalReason(models.TextChoices):
-    DID_NOT_COME = "did_not_come", "Candidat non joignable"
-    DID_NOT_COME_TO_INTERVIEW = "did_not_come_to_interview", "Candidat ne s’étant pas présenté à l’entretien"
-    HIRED_ELSEWHERE = "hired_elsewhere", "Candidat indisponible : en emploi"
-    TRAINING = "training", "Candidat indisponible : en formation"
-    NON_ELIGIBLE = "non_eligible", "Candidat non éligible"
-    NOT_MOBILE = "not_mobile", "Candidat non mobile"
-    NOT_INTERESTED = "not_interested", "Candidat non intéressé"
-    LACKING_SKILLS = "lacking_skills", "Le candidat n’a pas les compétences requises pour le poste"
-    INCOMPATIBLE = "incompatible", "Un des freins à l'emploi du candidat est incompatible avec le poste proposé"
+    DID_NOT_COME = "did_not_come", "Usager non joignable"
+    DID_NOT_COME_TO_INTERVIEW = "did_not_come_to_interview", "Usager ne s’étant pas présenté à l’entretien"
+    HIRED_ELSEWHERE = "hired_elsewhere", "Usager indisponible : en emploi"
+    TRAINING = "training", "Usager indisponible : en formation"
+    NON_ELIGIBLE = "non_eligible", "Usager non éligible"
+    NOT_MOBILE = "not_mobile", "Usager non mobile"
+    NOT_INTERESTED = "not_interested", "Usager non intéressé"
+    LACKING_SKILLS = "lacking_skills", "l’usager n’a pas les compétences requises pour le poste"
+    INCOMPATIBLE = "incompatible", "Un des freins à l'emploi de l’usager est incompatible avec le poste proposé"
     PREVENT_OBJECTIVES = (
         "prevent_objectives",
-        "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
+        "L'embauche de l’usager empêche la réalisation des objectifs du dialogue de gestion",
     )
     NO_POSITION = "no_position", "Pas de recrutement en cours"
     DUPLICATE = "duplicate", "Candidature en doublon"
@@ -81,10 +81,10 @@ class RefusalReason(models.TextChoices):
         "approval_expiration_too_close",
         "La date de fin du PASS IAE / agrément est trop proche",
     )
-    UNAVAILABLE = "unavailable", "Candidat indisponible ou non intéressé par le poste"
+    UNAVAILABLE = "unavailable", "Usager indisponible ou non intéressé par le poste"
     ELIGIBILITY_DOUBT = (
         "eligibility_doubt",
-        "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
+        "Doute sur l'éligibilité de l’usager (penser à renvoyer la personne vers un prescripteur)",
     )
     DEACTIVATION = "deactivation", "La structure n'est plus conventionnée"
     POORLY_INFORMED = "poorly_informed", "Candidature pas assez renseignée"

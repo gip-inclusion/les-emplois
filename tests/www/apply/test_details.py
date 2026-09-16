@@ -21,7 +21,7 @@ def test_missing_job_seeker_info(client):
         job_seeker__jobseeker_profile__nir="",
         job_seeker__jobseeker_profile__pole_emploi_id="",
         message="Motivation est mon deuxième prénom.",
-        answer="Réponse au candidat.",
+        answer="Réponse à l’usager.",
     )
     user = EmployerFactory(membership__company=job_application.to_company)
     client.force_login(user)
@@ -44,7 +44,7 @@ def test_prescriber_see_history_box(client, factory, assertion):
     client.force_login(job_application.sender)
     url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
-    assertion(response, "<h3>Suivi du candidat</h3>", html=True)
+    assertion(response, "<h3>Suivi de l’usager</h3>", html=True)
 
 
 def test_hide_old_applications_to_employers(client, subtests):

@@ -53,7 +53,7 @@
                                     </ul>
                                     {% if can_edit_personal_information %}
                                         <p class="mb-0 mt-3">
-                                            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-sm">Compléter les informations du candidat</a>
+                                            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-sm">Compléter les informations de l’usager</a>
                                         </p>
                                     {% endif %}
                                 {% endfragment %}
@@ -75,7 +75,7 @@
                                     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
                                         {% fragment as fee_alert_content %}
                                             <p class="mb-0 h-100 d-flex align-items-center">
-                                                Frais à la charge de l'usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
+                                                Frais à la charge de l’usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
                                             </p>
                                         {% endfragment %}
                                     {% endcomponent_alert %}
@@ -103,7 +103,7 @@
                                     <legend class="mb-0">Conseiller ou conseillère référent(e)</legend>
                                     <p class="fs-sm">
                                         Personne en charge de l'accompagnement et du suivi professionnel de la situation
-                                        de l'usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
+                                        de l’usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
                                     </p>
                                     {% bootstrap_field form.referent_last_name wrapper_class="form-group form-group-input-w-lg-66" %}
                                     {% bootstrap_field form.referent_first_name wrapper_class="form-group form-group-input-w-lg-66" %}

@@ -368,7 +368,7 @@ def test_nir_modification_request_changelist(admin_client):
 
 def test_nir_modification_request_display_requested_by_kind(admin_client):
     job_seeker = JobSeekerFactory()
-    (requested_by, display_kind) = random.choice([(job_seeker, "candidat"), (ProfessionalFactory(), "professionnel")])
+    (requested_by, display_kind) = random.choice([(job_seeker, "usager"), (ProfessionalFactory(), "professionnel")])
     nir_modification_request = NirModificationRequest.objects.create(
         jobseeker_profile=job_seeker.jobseeker_profile, requested_by=requested_by
     )
@@ -591,7 +591,7 @@ def test_disable_password_auth_permission(client, with_permission):
                     messages.SUCCESS,
                     (
                         "Désactivation de l’authentification par mot de passe pour 1 utilisateur :<br>- "
-                        f"{job_seeker.email} (PK : {job_seeker.pk}, candidat, dernière connexion : jamais connecté)"
+                        f"{job_seeker.email} (PK : {job_seeker.pk}, usager, dernière connexion : jamais connecté)"
                     ),
                 ),
             ],

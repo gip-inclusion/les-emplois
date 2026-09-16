@@ -113,7 +113,7 @@
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
                                 {% else %}
-                                    Si cette candidature n’est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n’est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                    Si cette candidature n’est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n’est pas mon usager » afin de modifier le numéro de sécurité sociale.
                                 {% endif %}
                             </p>
                         </div>
@@ -127,7 +127,7 @@
                                 {% endif %}
                             {% else %}
                                 {# Reload this page with a new form. #}
-                                {% bootstrap_button "Ce n’est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% bootstrap_button "Ce n’est pas mon usager" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                                 {# Go to the next step. #}
                                 {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% endif %}
