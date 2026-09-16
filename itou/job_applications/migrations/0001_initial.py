@@ -113,8 +113,8 @@ class Migration(migrations.Migration):
                         choices=[
                             ("did_not_come", "Candidat non joignable"),
                             ("did_not_come_to_interview", "Candidat ne s’étant pas présenté à l’entretien"),
-                            ("hired_elsewhere", "Candidat indisponible : en emploi"),
-                            ("training", "Candidat indisponible : en formation"),
+                            ("hired_elsewhere", "Candidat indisponible : en emploi"),
+                            ("training", "Candidat indisponible : en formation"),
                             ("non_eligible", "Candidat non éligible"),
                             ("not_mobile", "Candidat non mobile"),
                             ("not_interested", "Candidat non intéressé"),

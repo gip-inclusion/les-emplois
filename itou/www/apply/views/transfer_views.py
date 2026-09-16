@@ -52,7 +52,7 @@ def transfer(request, job_application_id):
     except Exception as ex:
         messages.error(
             request,
-            "Une erreur est survenue lors du transfert de la candidature : "
+            "Une erreur est survenue lors du transfert de la candidature : "
             f"{ job_application= }, { target_company= }, { ex= }",
             extra_tags="toast",
         )
@@ -218,7 +218,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
         elif self.job_application.sender_prescriber_organization:
             sender_display += f" - {self.job_application.sender_prescriber_organization.name}"
         initial_message = (
-            f"Le {self.job_application.created_at.strftime('%d/%m/%Y à %Hh%M')}, {sender_display} a écrit :\n\n"
+            f"Le {self.job_application.created_at.strftime('%d/%m/%Y à %Hh%M')}, {sender_display} a écrit :\n\n"
             + self.job_application.message
         )
         return {"message": initial_message}

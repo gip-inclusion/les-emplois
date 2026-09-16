@@ -39,7 +39,7 @@ INTERNAL_TRANSFER_CONFIRM_BUTTON = """
     <span>Confirmer</span>
 </button>"""
 
-PREVIOUS_RESUME_TEXT = "Souhaitez-vous conserver le CV présent dans la candidature d’origine ?"
+PREVIOUS_RESUME_TEXT = "Souhaitez-vous conserver le CV présent dans la candidature d’origine ?"
 
 
 class TestProcessTransferJobApplication:
@@ -627,7 +627,7 @@ def test_step_3(client, snapshot, pdf_file):
 
     assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     expected_message = (
-        f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, DUPONT Pierre a écrit :\n\n{job_application.message}"
+        f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, DUPONT Pierre a écrit :\n\n{job_application.message}"
     )
     assert response.context["form"].initial["message"] == expected_message
 

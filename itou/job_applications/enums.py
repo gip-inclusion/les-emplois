@@ -60,8 +60,8 @@ def sender_kind_to_pe_origine_candidature(sender_kind):
 class RefusalReason(models.TextChoices):
     DID_NOT_COME = "did_not_come", "Candidat non joignable"
     DID_NOT_COME_TO_INTERVIEW = "did_not_come_to_interview", "Candidat ne s’étant pas présenté à l’entretien"
-    HIRED_ELSEWHERE = "hired_elsewhere", "Candidat indisponible : en emploi"
-    TRAINING = "training", "Candidat indisponible : en formation"
+    HIRED_ELSEWHERE = "hired_elsewhere", "Candidat indisponible : en emploi"
+    TRAINING = "training", "Candidat indisponible : en formation"
     NON_ELIGIBLE = "non_eligible", "Candidat non éligible"
     NOT_MOBILE = "not_mobile", "Candidat non mobile"
     NOT_INTERESTED = "not_interested", "Candidat non intéressé"

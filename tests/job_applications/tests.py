@@ -1366,7 +1366,7 @@ class TestJobApplicationNotifications:
     def test_accept_for_proxy_without_hiring_end_at(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, hiring_end_at=None)
         email = job_application.notifications_accept_for_proxy.build()
-        assert "Date de fin du contrat : Non renseigné" in email.body
+        assert "Date de fin du contrat : Non renseigné" in email.body
 
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationFactory(

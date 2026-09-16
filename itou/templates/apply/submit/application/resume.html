@@ -10,7 +10,7 @@
     {% if is_subject_to_iae_rules %}
         {% if not request.user.is_job_seeker and eligibility_diagnosis.author_organization %}
             <div class="mb-5">
-                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
                 <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
@@ -20,7 +20,7 @@
                 {% fragment as content %}
                     {% if job_seeker.has_valid_approval %}
                         <p class="mb-2">
-                            <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_approval.end_at|date:"d/m/Y" }}</strong>
+                            <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_approval.end_at|date:"d/m/Y" }}</strong>
                         </p>
                         <p class="mb-0">
                             {% if request.from_authorized_prescriber or auto_prescription_process %}
@@ -33,7 +33,7 @@
                         </p>
                     {% elif eligibility_diagnosis %}
                         <p class="mb-2">
-                            <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                            <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
                         </p>
                         <p class="mb-0">
                             {% if prescription_process %}
@@ -63,7 +63,7 @@
     {% elif is_subject_to_geiq_rules %}
         {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
             <div class="mb-5">
-                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
+                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
                 <p class="text-tertiary fw-bold">{{ geiq_eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
@@ -73,7 +73,7 @@
                 {% fragment as content %}
                     {% if geiq_eligibility_diagnosis %}
                         <p class="mb-2">
-                            <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                            <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
                         </p>
                         <p class="mb-0">
                             {% if prescription_process %}
@@ -116,7 +116,7 @@
         {% endfragment %}
         {% fragment as c_info__detail %}
             {% if auto_prescription_process %}
-                <p class="mb-0">Précisez dans le message :</p>
+                <p class="mb-0">Précisez dans le message :</p>
                 <ul class="mb-0">
                     <li>les motivations du candidat,</li>
                     <li>ses compétences,</li>
@@ -165,7 +165,7 @@
                 {% endif %}
                 <p class="mb-0">Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.</p>
             {% else %}
-                <p class="mb-0">Précisez dans le message :</p>
+                <p class="mb-0">Précisez dans le message :</p>
                 <ul class="mb-0">
                     <li>les motivations du candidat,</li>
                     <li>ses compétences,</li>
@@ -181,10 +181,10 @@
     {% if prescription_process or request.user.is_job_seeker %}
         <div class="c-info p-3 mb-4">
             {% if prescription_process %}
-                <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
+                <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
                 <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
             {% else %}
-                <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
+                <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
                 <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
             {% endif %}
             <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_job_seeker|yesno:"candidat,prescripteur" }}"

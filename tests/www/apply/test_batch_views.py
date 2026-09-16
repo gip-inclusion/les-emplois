@@ -712,7 +712,7 @@ class TestBatchPostpone:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Les candidatures n’ont pas pu être mises en attente : le commentaire est obligatoire.",
+                    "Les candidatures n’ont pas pu être mises en attente : le commentaire est obligatoire.",
                     extra_tags="toast",
                 )
             ],
@@ -1245,7 +1245,7 @@ class TestBatchRefuse:
 
         # Reason step
         response = client.get(refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
@@ -1262,9 +1262,9 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
@@ -1277,9 +1277,9 @@ class TestBatchRefuse:
         assertRedirects(response, prescriber_answer_url)
 
         # Prescriber answer step
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-prescriber-answer-submit"
         post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
@@ -1343,7 +1343,7 @@ class TestBatchRefuse:
 
         # Reason step
         response = client.get(refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
@@ -1360,9 +1360,9 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message aux candidats", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message aux candidats", html=True)
         assertContains(response, "Réponse aux candidats")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
@@ -1375,9 +1375,9 @@ class TestBatchRefuse:
         assertRedirects(response, prescriber_answer_url)
 
         # Prescriber answer step
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message aux prescripteurs", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message aux prescripteurs", html=True)
         assertContains(response, "Réponse aux prescripteurs")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-prescriber-answer-submit"
         post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
@@ -1435,7 +1435,7 @@ class TestBatchRefuse:
 
         # Reason step
         response = client.get(refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
         assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
@@ -1452,11 +1452,11 @@ class TestBatchRefuse:
         assertRedirects(response, job_seeker_answer_url)
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
         assertContains(
             response,
-            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
             html=True,
         )
         assert response.context["matomo_custom_title"] == "Candidatures refusées"
@@ -1571,7 +1571,7 @@ class TestBatchRefuse:
 
         # Reason step
         response = client.get(refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
         refusable_app.to_company = CompanyFactory()
         refusable_app.save(update_fields=("to_company", "updated_at"))
@@ -1638,7 +1638,7 @@ class TestBatchRefuse:
 
         # Reason step
         response = client.get(refusal_reason_url)
-        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
         # One of the application is removed (or transferred)
         refusable_apps[0].delete()
@@ -1667,9 +1667,9 @@ class TestBatchRefuse:
         )
 
         # Job seeker answer step
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         expected_session["job-seeker-answer"] = post_data
@@ -1680,9 +1680,9 @@ class TestBatchRefuse:
         assertRedirects(response, prescriber_answer_url)
 
         # Prescriber answer step
-        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         assertContains(response, "Réponse au prescripteur")
-        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
         response = client.post(prescriber_answer_url, data=post_data, follow=True)
         assertRedirects(response, next_url)

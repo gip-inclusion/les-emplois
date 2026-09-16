@@ -154,7 +154,7 @@ def postpone(request):
         # This is unlikely since the form is quite simple and the answer field is required
         messages.error(
             request,
-            "Les candidatures n’ont pas pu être mises en attente : le commentaire est obligatoire.",
+            "Les candidatures n’ont pas pu être mises en attente : le commentaire est obligatoire.",
             extra_tags="toast",
         )
         logger.error(

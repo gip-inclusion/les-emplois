@@ -9,7 +9,7 @@
 Vous et {{ job_application.sender.get_inverted_full_name }} serez tous les deux informés de l'avancement de cette candidature.
 
 {% else %}
-Candidature chez {{ job_application.to_company.display_name }} envoyée avec succès !
+Candidature chez {{ job_application.to_company.display_name }} envoyée avec succès !
 
 {% endif %}
 

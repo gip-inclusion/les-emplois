@@ -181,7 +181,7 @@ def test_workflow_transitions(subtests):
 
 
 def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callbacks, mailoutbox):
-    # Send email notification of transfer to :
+    # Send email notification of transfer to:
     # - origin SIAE
     # - job seeker
     # - Prescriber (if any linked eligibility diagnosis was not sent by a SIAE)
@@ -207,7 +207,7 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     assert len(mailoutbox[0].to) == 1
     assert origin_user.email in mailoutbox[0].to
     assert f"[TEST] La candidature de {job_seeker.get_inverted_full_name()} a été transférée" == mailoutbox[0].subject
-    assert "a transféré la candidature de :" in mailoutbox[0].body
+    assert "a transféré la candidature de :" in mailoutbox[0].body
 
     assert len(mailoutbox[1].to) == 1
     assert job_application.job_seeker.email in mailoutbox[1].to
@@ -253,7 +253,7 @@ def test_transfer_must_notify_unauthorized_prescriber(
     assert len(mailoutbox[2].to) == 1
     assert job_application.sender.email in mailoutbox[2].to
     assert f"[TEST] La candidature de {expected_jobseeker_name} a été transférée" == mailoutbox[2].subject
-    assert f"a transféré la candidature de : {expected_jobseeker_name}" in mailoutbox[2].body
+    assert f"a transféré la candidature de : {expected_jobseeker_name}" in mailoutbox[2].body
 
 
 def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbacks, mailoutbox):
@@ -281,7 +281,7 @@ def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbac
     # Focusing on sender email content
     assert mailoutbox[2].to == [job_application.sender.email]
     assert f"[TEST] La candidature de {job_seeker.get_inverted_full_name()} a été transférée" == mailoutbox[2].subject
-    assert "a transféré la candidature de :" in mailoutbox[2].body
+    assert "a transféré la candidature de :" in mailoutbox[2].body
 
 
 def test_transfer_notifications_to_many_employers(django_capture_on_commit_callbacks, mailoutbox):
@@ -312,8 +312,8 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     assert second_mail_to in [origin_user_1.email, origin_user_2.email]
     assert f"[TEST] La candidature de {job_seeker.get_inverted_full_name()} a été transférée" == mailoutbox[0].subject
     assert f"[TEST] La candidature de {job_seeker.get_inverted_full_name()} a été transférée" == mailoutbox[1].subject
-    assert "a transféré la candidature de :" in mailoutbox[0].body
-    assert "a transféré la candidature de :" in mailoutbox[1].body
+    assert "a transféré la candidature de :" in mailoutbox[0].body
+    assert "a transféré la candidature de :" in mailoutbox[1].body
     assert "[TEST] Votre candidature a été transférée à une autre structure" == mailoutbox[2].subject
 
 

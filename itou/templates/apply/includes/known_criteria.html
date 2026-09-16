@@ -2,13 +2,13 @@
 
 {% component_alert title=title content=content variant="info" extra_classes="mb-5" %}
     {% fragment as title %}
-        Critère(s) détecté(s) :
+        Critère(s) détecté(s) :
     {% endfragment %}
     {% fragment as content %}
         <ul>
             {% if job_seeker.address_in_qpv %}
                 <li>
-                    <strong>Résident QPV</strong> : l'adresse
+                    <strong>Résident QPV</strong> : l'adresse
                     {% if request.from_employer %}
                         déclarée pour le
                     {% else %}
@@ -21,9 +21,9 @@
                 {% with city_name=job_seeker.zrr_city_name.0 partially_in_zrr=job_seeker.zrr_city_name.1 %}
                     <li>
                         {% if partially_in_zrr %}
-                            <strong>Commune partiellement en ZRR</strong> : la commune de "{{ city_name }}" est partiellement classée en ZRR.
+                            <strong>Commune partiellement en ZRR</strong> : la commune de "{{ city_name }}" est partiellement classée en ZRR.
                         {% else %}
-                            <strong>Résident en ZRR</strong> : la commune de "{{ city_name }}" est classée en ZRR.
+                            <strong>Résident en ZRR</strong> : la commune de "{{ city_name }}" est classée en ZRR.
                         {% endif %}
                     </li>
                 {% endwith %}
@@ -32,7 +32,7 @@
         <p class="mb-0">Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.</p>
         {% if request.from_employer %}
             <p class="mb-0 mt-3">
-                <strong>Important :</strong> ce message d'information ne permet pas de certifier ces critères en cas de contrôle.
+                <strong>Important :</strong> ce message d'information ne permet pas de certifier ces critères en cas de contrôle.
                 Vous devez conserver les justificatifs mentionnés ci-dessous.
             </p>
         {% endif %}
