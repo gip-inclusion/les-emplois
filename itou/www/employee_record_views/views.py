@@ -1,5 +1,4 @@
 import enum
-from operator import itemgetter
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -252,6 +251,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.SENT, 0), "bg-emploi-lightest text-info"),
         (employee_record_badges.get(Status.REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.PROCESSED, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_PENDING, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_SENT, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-info"),
     ]
 
@@ -612,19 +614,25 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     )
     job_application = employee_record.job_application
 
-    creations = [
-        ("Mouvement de création", asp_batch_file, EmployeeRecordBatch.datetime_from_asp_batch_file(asp_batch_file))
-        for asp_batch_file in employee_record.logs.filter(
-            transition=EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE
-        ).values_list("asp_batch_file", flat=True)
-    ]
-    changes = [
-        ("Mouvement de modification", asp_batch_file, EmployeeRecordBatch.datetime_from_asp_batch_file(asp_batch_file))
-        for asp_batch_file in employee_record.update_notifications.exclude(status=Status.NEW).values_list(
-            "asp_batch_file", flat=True
+    transition_label = {
+        EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE: "Mouvement de création",
+        EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE: "Mouvement de modification",
+    }
+    updates = [
+        (
+            transition_label[transition],
+            asp_batch_file,
+            EmployeeRecordBatch.datetime_from_asp_batch_file(asp_batch_file),
         )
+        for transition, asp_batch_file in employee_record.logs.filter(
+            transition__in=(
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE_FOR_UPDATE,
+            )
+        )
+        .order_by("-asp_batch_file")
+        .values_list("transition", "asp_batch_file")
     ]
-    updates = sorted(creations + changes, key=itemgetter(1), reverse=True)
 
     display_ntt = is_ntt_required(job_application.job_seeker.jobseeker_profile.nir)
     if not display_ntt and employee_record.ntt and employee_record.archived_json is not None:
