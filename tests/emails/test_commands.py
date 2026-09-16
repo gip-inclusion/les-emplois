@@ -5,15 +5,16 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.emails.management.commands.delete_old_emails import CUTOFF_DAYS
 from itou.emails.models import Email
 
 
 class TestExpireOldEmails:
     def test_dry_run(self, caplog):
         now = timezone.now()
-        with freeze_time(now - timedelta(days=62)):
+        with freeze_time(now - timedelta(days=CUTOFF_DAYS)):
             old = Email.objects.create(to=["old@test.local"], subject="Old stuff", body_text="Old")
-        with freeze_time(now - timedelta(days=61)):
+        with freeze_time(now - timedelta(days=CUTOFF_DAYS - 1)):
             after_cutoff = Email.objects.create(to=["recent@test.local"], subject="Recent stuff", body_text="Recent")
         call_command("delete_old_emails")
         assert caplog.messages[1] == "Deleted 1 email"
@@ -21,9 +22,9 @@ class TestExpireOldEmails:
 
     def test_wet_run(self, caplog):
         now = timezone.now()
-        with freeze_time(now - timedelta(days=62)):
+        with freeze_time(now - timedelta(days=CUTOFF_DAYS)):
             Email.objects.create(to=["old@test.local"], subject="Old stuff", body_text="Old")
-        with freeze_time(now - timedelta(days=61)):
+        with freeze_time(now - timedelta(days=CUTOFF_DAYS - 1)):
             after_cutoff = Email.objects.create(to=["recent@test.local"], subject="Recent stuff", body_text="Recent")
         call_command("delete_old_emails", wet_run=True)
         assert caplog.messages[0] == "Deleted 1 email"
