@@ -19,20 +19,7 @@
     {% endcomponent_title %}
 
     {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-        {% component_alert title=title content=content variant="warning" dismissible=True %}
-            {% fragment as title %}
-                Incohérence de numéro SIRET détectée
-            {% endfragment %}
-            {% fragment as content %}
-                <p class="mb-0">Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.</p>
-                <ul class="mb-0">
-                    <li>
-                        Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
-                    </li>
-                    <li>Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.</li>
-                </ul>
-            {% endfragment %}
-        {% endcomponent_alert %}
+        {% include 'employee_record/includes/_siret_changed_alert.html' with dismissible=True only %}
     {% endif %}
 {% endblock %}
 
@@ -70,7 +57,7 @@
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
                             <i class="ri-file-close-line font-weight-medium" aria-hidden="true"></i>
-                            <span>Désactiver</span>
+                            <span>Désactiver la fiche salariée</span>
                         </a>
                     </div>
                 {% endif %}
