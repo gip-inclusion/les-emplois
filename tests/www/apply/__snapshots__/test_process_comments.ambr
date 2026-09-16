@@ -153,7 +153,7 @@
                                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                           </i>
                                           <span>
-                                              Copier l'ID du candidat
+                                              Copier l'ID de l’usager
                                           </span>
                                       </button>
                                   </div>
@@ -295,7 +295,7 @@
                                   <div class="c-info d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 p-3 fs-sm d-print-none">
                                       <div class="w-100 w-md-50 text-center text-md-start">
                                           <p class="fw-bold mb-2">
-                                              Ce candidat n’a pas de CV ?
+                                              Cet usager n’a pas de CV ?
                                           </p>
                                           <p class="m-0">
                                               Invitez le prescripteur à en créer un via notre partenaire Diagoriente.
@@ -401,7 +401,7 @@
                                   <ul class="list-data mb-3">
                                       <li class="has-forced-line-break">
                                           <small>
-                                              Message envoyé au candidat
+                                              Message envoyé à l’usager
                                           </small>
                                           <blockquote class="blockquote mt-2 mb-0">
                                               <p>

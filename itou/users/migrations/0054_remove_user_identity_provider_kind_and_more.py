@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             name="kind",
             field=models.CharField(
                 choices=[
-                    ("job_seeker", "candidat"),
+                    ("job_seeker", "usager"),
                     ("professional", "professionnel"),
                     ("itou_staff", "administrateur"),
                 ],

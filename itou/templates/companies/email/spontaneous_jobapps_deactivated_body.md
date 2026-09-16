@@ -10,7 +10,7 @@ Structure > Métiers et recrutements sur {% brand %}
 
 Si vous ne recrutez plus actuellement, aucune action de votre part n’est nécessaire.
 
-Cette mesure vise à garantir que les candidats adressent leurs candidatures spontanées à des structures dont les recrutements sont toujours d’actualité et à maintenir des opportunités de recrutement à jour.
+Cette mesure vise à garantir que les usagers adressent leurs candidatures spontanées à des structures dont les recrutements sont toujours d’actualité et à maintenir des opportunités de recrutement à jour.
 
 Cordialement,
 {% endblock body%}

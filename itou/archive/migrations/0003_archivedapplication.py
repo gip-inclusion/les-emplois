@@ -28,14 +28,14 @@ class Migration(migrations.Migration):
                     models.PositiveSmallIntegerField(
                         blank=True,
                         null=True,
-                        verbose_name="année de naissance du candidat",
+                        verbose_name="année de naissance de l’usager",
                     ),
                 ),
                 (
                     "job_seeker_department_same_as_company_department",
                     models.BooleanField(
                         default=False,
-                        verbose_name="le candidat a le même département que celui l'entreprise",
+                        verbose_name="l’usager a le même département que celui l'entreprise",
                     ),
                 ),
                 ("sender_kind", models.CharField(verbose_name="type de l'émetteur")),
@@ -118,7 +118,7 @@ class Migration(migrations.Migration):
                     "number_of_jobs_applied_for",
                     models.PositiveIntegerField(
                         default=0,
-                        verbose_name="nombre d'offres d'emploi pour lesquelles le candidat a postulé",
+                        verbose_name="nombre d'offres d'emploi pour lesquelles l’usager a postulé",
                     ),
                 ),
                 (

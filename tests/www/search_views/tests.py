@@ -534,7 +534,7 @@ class TestSearchCompany:
 
     def test_results_links_from_job_seeker_list(self, client):
         """
-        When applying from "Mes candidats"
+        When applying from "Mes usagers"
         """
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -1603,7 +1603,7 @@ class TestJobDescriptionSearchView:
 
     def test_results_links_from_job_seeker_list(self, client):
         """
-        When applying from "Mes candidats"
+        When applying from "Mes usagers"
         """
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,

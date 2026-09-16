@@ -181,7 +181,7 @@ class Migration(migrations.Migration):
                     django.contrib.postgres.fields.ArrayField(
                         base_field=models.CharField(
                             choices=[
-                                ("job_seeker", "candidat"),
+                                ("job_seeker", "usager"),
                                 ("prescriber", "prescripteur"),
                                 ("employer", "employeur"),
                             ]

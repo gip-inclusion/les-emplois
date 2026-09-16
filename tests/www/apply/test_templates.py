@@ -31,7 +31,7 @@ CERTIFIED_HELP_TEXT = "En savoir plus sur les badges de certification"
 
 def situation_tooltip_text(kind):
     return (
-        "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic"
+        "Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic"
         + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
         + ", elle a peut-être changé depuis cette date."
     )
@@ -165,7 +165,7 @@ class TestIAEEligibilityDetail:
         )
         assert self.ELIGIBILITY_TITLE not in rendered
         assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
-        assert "Le diagnostic d'éligibilité IAE de ce candidat a expiré" in rendered
+        assert "Le diagnostic d'éligibilité IAE de cet usager a expiré" in rendered
 
     @pytest.mark.usefixtures("api_particulier_settings")
     def test_info_box(self, mocker):

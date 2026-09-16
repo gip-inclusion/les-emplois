@@ -37,8 +37,8 @@ class Migration(migrations.Migration):
             name="anonymizedjobseeker",
             options={
                 "ordering": ["-anonymized_at", "-date_joined"],
-                "verbose_name": "candidat anonymisé",
-                "verbose_name_plural": "candidats anonymisés",
+                "verbose_name": "usager anonymisé",
+                "verbose_name_plural": "usagers anonymisés",
             },
         ),
         migrations.AlterModelOptions(

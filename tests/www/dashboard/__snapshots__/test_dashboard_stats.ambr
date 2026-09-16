@@ -1277,7 +1277,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                               </i>
                                               <span>
-                                                  Analyse des parcours des candidats diagnostiqués
+                                                  Analyse des parcours des usagers diagnostiqués
                                               </span>
                                           </a>
                                       </li>
@@ -2740,7 +2740,7 @@
                                       </span>
                                   </p>
                                   <p>
-                                      C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.
+                                      C’est le nombre d’usagers dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.
                                   </p>
                               </div>
                               <div>
@@ -2983,7 +2983,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Analyse des parcours des candidats diagnostiqués
+                                                  Analyse des parcours des usagers diagnostiqués
                                               </span>
                                           </a>
                                       </li>

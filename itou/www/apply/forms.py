@@ -88,7 +88,7 @@ class ApplicationJobsForm(forms.ModelForm):
 def get_advisor_choice_field(user, job_seeker_name, queryset):
     field = forms.ModelChoiceField(
         label=f"Accompagnateur de {job_seeker_name} au sein de votre structure",
-        help_text="Sélectionnez le professionnel qui accompagne le candidat",
+        help_text="Sélectionnez le professionnel qui accompagne l’usager",
         queryset=queryset,
         empty_label="Non référencé sur le service",
         initial=user,
@@ -125,9 +125,9 @@ class SubmitJobApplicationForm(forms.Form):
             help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
         elif auto_prescription_process:
             message.label = "Message d’information"
-            help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
+            help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise à l’usager."
         else:
-            message.label = "Message à l’employeur (avec copie transmise au candidat)"
+            message.label = "Message à l’employeur (avec copie transmise à l’usager)"
             help_text = "Message obligatoire et non modifiable après l’envoi."
         message.help_text = help_text
 
@@ -199,7 +199,7 @@ class JobApplicationRefusalReasonForm(forms.Form):
         job_seeker_nb = len(set(job_application.job_seeker_id for job_application in job_applications))
         self.fields[
             "refusal_reason_shared_with_job_seeker"
-        ].label = f"J’accepte d’envoyer le motif de refus {pluralizefr(job_seeker_nb, 'au candidat,aux candidats')}"
+        ].label = f"J’accepte d’envoyer le motif de refus {pluralizefr(job_seeker_nb, 'à l’usager,aux usagers')}"
 
         orienter_nb, prescriber_nb = _get_orienter_and_prescriber_nb(job_applications)
         if orienter_nb and not prescriber_nb:
@@ -222,7 +222,7 @@ class JobApplicationRefusalReasonForm(forms.Form):
 
 class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
     job_seeker_answer = forms.CharField(
-        label="Commentaire envoyé au candidat",
+        label="Commentaire envoyé à l’usager",
         widget=forms.Textarea(),
         strip=True,
     )
@@ -230,7 +230,7 @@ class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
     def __init__(self, job_applications, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if len(set(job_application.job_seeker_id for job_application in job_applications)) > 1:
-            self.fields["job_seeker_answer"].label = "Commentaire envoyé aux candidats"
+            self.fields["job_seeker_answer"].label = "Commentaire envoyé aux usagers"
 
 
 class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
@@ -249,14 +249,14 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
             label = f"Commentaire envoyé {pluralizefr(prescriber_nb, 'au prescripteur,aux prescripteurs')}"
         else:
             label = "Commentaire envoyé aux orienteurs/prescripteurs"
-        label += f" (n’est pas communiqué {pluralizefr(jobseeker_nb, 'au candidat,aux candidats')})"
+        label += f" (n’est pas communiqué {pluralizefr(jobseeker_nb, 'à l’usager,aux usagers')})"
 
         self.fields["prescriber_answer"].label = label
 
 
 class AddToPoolForm(forms.Form):
     answer = forms.CharField(
-        label="Commentaire envoyé au candidat",
+        label="Commentaire envoyé à l’usager",
         widget=forms.Textarea(),
         help_text="Une copie sera envoyée au prescripteur ou à l’orienteur s’il y en a un.",
         strip=True,
@@ -272,7 +272,7 @@ class AnswerForm(forms.Form):
     answer = forms.CharField(
         label="Réponse",
         widget=forms.Textarea(),
-        help_text="Votre réponse sera visible par le candidat et le prescripteur",
+        help_text="Votre réponse sera visible par l’usager et le prescripteur",
         strip=True,
     )
 
@@ -309,9 +309,9 @@ class HiringStartAtErrorCode(enum.Enum):
                 message = """\
                     <p>
                         La date de début de contrat prévue n’est pas couverte par la période de validité du
-                        PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation du candidat le
+                        PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation de l’usager le
                         nécessite vous pouvez faire appel à un prescripteur habilité afin qu’il valide
-                        l’éligibilité du candidat.
+                        l’éligibilité de l’usager.
                         <br>
                         La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
                         fin de validité du PASS IAE ({max_date_str}).
@@ -332,7 +332,7 @@ class HiringStartAtErrorCode(enum.Enum):
                 )
             case self.OUTSIDE_APPROVAL_BOUNDS:
                 message = (
-                    "Le candidat disposant d’un PASS IAE en court de validité se terminant le {max_date_str}, "
+                    "L’usager disposant d’un PASS IAE en court de validité se terminant le {max_date_str}, "
                     "la date doit être comprise dans cette période et être inférieure au {max_date_str}."
                 )
         return format_html(message, **context)
@@ -1014,7 +1014,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     )
     job_seeker = forms.ModelChoiceField(
         queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
-        label="Nom du candidat",
+        label="Nom de l’usager",
         required=False,
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
@@ -1022,7 +1022,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 "data-ajax--delay": 250,
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 1,
-                "data-placeholder": "Nom du candidat",
+                "data-placeholder": "Nom de l’usager",
             }
         ),
     )
@@ -1256,7 +1256,7 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
 
 class BatchAddToPoolForm(forms.Form):
     answer = forms.CharField(
-        label="Commentaire envoyé aux candidats",
+        label="Commentaire envoyé aux usagers",
         widget=forms.Textarea(),
         help_text="Une copie sera envoyée aux prescripteurs/orienteurs.",
         required=False,
@@ -1267,9 +1267,9 @@ class BatchAddToPoolForm(forms.Form):
         super().__init__(*args, **kwargs)
         if job_seeker_nb is not None:
             self.fields["answer"].label = (
-                f"Commentaire envoyé aux {job_seeker_nb} candidats"
+                f"Commentaire envoyé aux {job_seeker_nb} usagers"
                 if job_seeker_nb > 1
-                else "Commentaire envoyé au candidat"
+                else "Commentaire envoyé à l’usager"
             )
         if prescriber_nb == 0:
             self.fields["answer"].help_text = ""
@@ -1281,13 +1281,13 @@ class BatchPostponeForm(AnswerForm):
     def __init__(self, *args, job_seeker_nb, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["answer"].widget.attrs["placeholder"] = (
-            "Votre réponse sera visible par les candidats et les prescripteurs/orienteurs"
+            "Votre réponse sera visible par les usagers et les prescripteurs/orienteurs"
         )
         if job_seeker_nb is not None:
             self.fields["answer"].label = (
-                f"Commentaire à envoyer aux {job_seeker_nb} candidats"
+                f"Commentaire à envoyer aux {job_seeker_nb} usagers"
                 if job_seeker_nb > 1
-                else "Commentaire à envoyer au candidat"
+                else "Commentaire à envoyer à l’usager"
             )
 
 

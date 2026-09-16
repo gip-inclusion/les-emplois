@@ -896,7 +896,7 @@
           <span>
               Émise le 27 septembre 2025 à 02h00 par
               <b>
-                  le candidat
+                  l’usager
               </b>
           </span>
           <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/[PK of JobSeeker JobApplication]/siae/start-accept">
@@ -6191,9 +6191,9 @@
       <div class="invalid-feedback d-block">
           <p>
               La date de début de contrat prévue n’est pas couverte par la période de validité du
-                          PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation du candidat le
+                          PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation de l’usager le
                           nécessite vous pouvez faire appel à un prescripteur habilité afin qu’il valide
-                          l’éligibilité du candidat.
+                          l’éligibilité de l’usager.
               <br/>
               La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
                           fin de validité du PASS IAE (08/08/2026).

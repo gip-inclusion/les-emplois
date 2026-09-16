@@ -272,7 +272,7 @@ class TestModel:
         # An email is sent to the new user
         assert len(sent_emails) == 1
         assert sent_emails[0].to == [user.email]
-        assert sent_emails[0].subject == "[TEST] Création de votre compte candidat"
+        assert sent_emails[0].subject == "[TEST] Création de votre compte usager"
 
         # Get the token from the email for testing
         reset_url = get_absolute_url(
@@ -612,7 +612,7 @@ class TestModel:
 
     def test_get_kind_display(self):
         job_seeker = JobSeekerFactory()
-        assert "candidat" == job_seeker.get_kind_display()
+        assert "usager" == job_seeker.get_kind_display()
 
         professional = ProfessionalFactory()
         assert "professionnel" == professional.get_kind_display()

@@ -114,9 +114,9 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
     def clean_email(self):
         email = super().clean_email()
         if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
         if User.objects.filter(email=email).exists():
             self._email_submitted = email
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")

@@ -7,7 +7,7 @@
     {% if geiq_eligibility_diagnosis %}
         {% if eligibility_diagnosis.author_organization %}
             <div class="mb-5">
-                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
+                <p>L’éligibilité GEIQ de l’usager a été validée par :</p>
                 <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
@@ -25,7 +25,7 @@
 
 {% block form_content %}
     <div {% if geiq_eligibility_diagnosis and not form.is_bound %}class="js-shroud"{% endif %}>
-        <h2>Préciser la situation administrative du candidat (facultatif)</h2>
+        <h2>Préciser la situation administrative de l’usager (facultatif)</h2>
         {% include "apply/includes/geiq/legislative_text_link.html" %}
         {# Form fragment rendered by HTMX #}
         <div hx-target="this">{% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}</div>

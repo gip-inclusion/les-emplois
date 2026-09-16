@@ -15,7 +15,7 @@ from itou.users.enums import KIND_EMPLOYER, KIND_JOB_SEEKER, KIND_PRESCRIBER, Us
 
 
 class UserKindTag(models.TextChoices):
-    JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
+    JOB_SEEKER = KIND_JOB_SEEKER, "usager"
     PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
     EMPLOYER = KIND_EMPLOYER, "employeur"
 

@@ -130,11 +130,11 @@ def test_check_inconsistency_check(admin_client):
                     '<li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_1.pk}/change/">'
                     f"candidature - {inconsistent_application_1.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre usager</li>"
                     '<li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_2.pk}/change/">'
                     f"candidature - {inconsistent_application_2.pk}"
-                    "</a>: Candidature liée au diagnostic d&#x27;un autre candidat</li>"
+                    "</a>: Candidature liée au diagnostic d&#x27;un autre usager</li>"
                     "</ul>"
                 ),
             )
@@ -245,7 +245,7 @@ def test_create_then_accept_job_application(admin_client, caplog):
         [
             messages.Message(
                 messages.ERROR,
-                "Un diagnostic d'éligibilité valide pour ce candidat "
+                "Un diagnostic d'éligibilité valide pour cet usager "
                 "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE.",
             )
         ],
@@ -306,7 +306,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING
     assert response.context["errors"] == [
-        ["Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature."]
+        ["Le diagnostic d'éligibilité n'appartient pas à l’usager de la candidature."]
     ]
     assertContains(response, 'value="Accepter"')
 
@@ -324,7 +324,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
         [
             messages.Message(
                 messages.ERROR,
-                "Le diagnostic d'éligibilité n'est pas valide pour ce candidat et cette entreprise",
+                "Le diagnostic d'éligibilité n'est pas valide pour cet usager et cette entreprise",
             )
         ],
     )

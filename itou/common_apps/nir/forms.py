@@ -59,7 +59,7 @@ class JobSeekerNIRUpdateMixin:
                 # and not when creating one
                 if not user_instance.is_handled_by_proxy and user_instance != editor:
                     nir_help_text = (
-                        "Ce candidat a pris le contrôle de son compte utilisateur. "
+                        "Cet usager a pris le contrôle de son compte utilisateur. "
                         "Vous ne pouvez pas modifier ses informations."
                     )
                 else:

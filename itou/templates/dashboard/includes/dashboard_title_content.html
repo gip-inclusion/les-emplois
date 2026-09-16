@@ -15,7 +15,7 @@
                 <p>Orienteur seul</p>
             {% elif user.is_job_seeker %}
                 <p>
-                    Copier mon ID candidat
+                    Copier mon ID usager
                     {% include "includes/copy_to_clipboard.html" with content=user.public_id css_classes="btn-link" only_icon=True %}
                 </p>
             {% endif %}

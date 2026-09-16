@@ -214,11 +214,11 @@ class TestTransferUserData:
                         '<li class="warning">'
                         f'<a href="/admin/job_applications/jobapplication/{job_application.pk}/change/">'
                         f"candidature - {job_application.pk}"
-                        "</a>: Candidature liée au diagnostic d&#x27;un autre candidat</li>"
+                        "</a>: Candidature liée au diagnostic d&#x27;un autre usager</li>"
                         '<li class="warning">'
                         f'<a href="/admin/approvals/approval/{job_application.approval.pk}/change/">'
                         f"PASS IAE - {job_application.approval.pk}"
-                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat</li>"
+                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre usager</li>"
                         "</ul>"
                     ),
                 ),
@@ -324,7 +324,7 @@ class TestTransferUserData:
         user_content_type = ContentType.objects.get_for_model(User)
         to_user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=to_user.pk).first()
         remark = to_user_remark.remark
-        assert "- AFFECTATIONS CANDIDATS" in remark
+        assert "- AFFECTATIONS USAGERS" in remark
 
 
 def test_app_model_change_url(admin_client):
@@ -389,7 +389,7 @@ def test_check_inconsistency_check(admin_client):
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_job_app.pk}/change/">'
                     f"candidature - {inconsistent_job_app.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre usager"
                     "</li></ul>"
                 ),
             )
@@ -482,7 +482,7 @@ def test_profile_check_inconsistency_check(admin_client):
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/users/jobseekerprofile/{inconsistent_profile.pk}/change/">'
                     f"profil demandeur d&#x27;emploi - {inconsistent_profile.pk}"
-                    "</a>: Profil lié à un utilisateur non-candidat"
+                    "</a>: Profil lié à un utilisateur non-usager"
                     "</li></ul>"
                 ),
             )
@@ -555,7 +555,7 @@ def test_membership_inline_includes_inactive(admin_client):
 
 
 class TestJobSeekerAssignments:
-    ASSIGNMENT_LIST_LINK = "Liste des affectations candidat"
+    ASSIGNMENT_LIST_LINK = "Liste des affectations usager"
 
     def test_job_seeker_assignments_search(self, admin_client):
         assignment = JobSeekerAssignmentFactory(

@@ -8,7 +8,7 @@
     {% else %}
         Création
     {% endif %}
-    du compte candidat
+    du compte usager
     {{ block.super }}
 {% endblock %}
 
@@ -29,7 +29,7 @@
                 {% else %}
                     Création
                 {% endif %}
-                du compte candidat
+                du compte usager
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
@@ -63,9 +63,9 @@
                                 {% itou_buttons_form primary_label="Valider les informations" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
                             {% else %}
                                 {% if standalone_creation|default:False %}
-                                    {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False matomo_category="compte-candidat" matomo_action="creation" matomo_name="standalone_creation" %}
+                                    {% itou_buttons_form primary_label="Créer le compte usager" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False matomo_category="compte-candidat" matomo_action="creation" matomo_name="standalone_creation" %}
                                 {% else %}
-                                    {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                                    {% itou_buttons_form primary_label="Créer le compte usager" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
                                 {% endif %}
                             {% endif %}
                         </form>

@@ -37,14 +37,14 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
                                   <span class="c-info__summary">
-                                      Pour valider l'éligibilité IAE du candidat
+                                      Pour valider l'éligibilité IAE de l’usager
                                   </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
                                               Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
                   Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
+                                              <a aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
                                                   diagnostic socio-professionnel de référence
                                               </a>
                                               .
@@ -310,14 +310,14 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
                                   <span class="c-info__summary">
-                                      Pour valider l'éligibilité IAE du candidat
+                                      Pour valider l'éligibilité IAE de l’usager
                                   </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
                                               Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
                   Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
+                                              <a aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
                                                   diagnostic socio-professionnel de référence
                                               </a>
                                               .
@@ -338,12 +338,12 @@
                                           <p>
                                               Attention :
               
-                  le critère ci-dessous a été précoché par défaut, car il a été renseigné récemment dans le profil administratif du candidat.
+                  le critère ci-dessous a été précoché par défaut, car il a été renseigné récemment dans le profil administratif de l’usager.
                                               <strong>
                                                   Merci d’en vérifier l’exactitude.
                                               </strong>
                                               <br/>
-                                              Vous pouvez le décocher si vous ne souhaitez pas l’intégrer au diagnostic socio-professionnel du candidat.
+                                              Vous pouvez le décocher si vous ne souhaitez pas l’intégrer au diagnostic socio-professionnel de l’usager.
               
               Vous avez également la possibilité d’ajouter d’autres critères.
                                           </p>
@@ -606,7 +606,7 @@
                           </h2>
                           <div class="mb-5">
                               <p>
-                                  L’éligibilité à l'IAE du candidat a été validée par :
+                                  L’éligibilité à l'IAE de l’usager a été validée par :
                               </p>
                               <p class="text-tertiary fw-bold">
                                   Pres. Org.
@@ -639,14 +639,14 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
                                   <span class="c-info__summary">
-                                      Pour valider l'éligibilité IAE du candidat
+                                      Pour valider l'éligibilité IAE de l’usager
                                   </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
                                               Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
                   Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
+                                              <a aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence" rel="noreferrer noopener" target="_blank">
                                                   diagnostic socio-professionnel de référence
                                               </a>
                                               .

@@ -961,18 +961,21 @@ class Migration(migrations.Migration):
                     "reason",
                     models.CharField(
                         choices=[
-                            ("IAE", "L’IAE ne correspond plus aux besoins / à la situation de la personne."),
+                            (
+                                "IAE",
+                                "L’IAE ne correspond plus aux besoins / à la situation de la personne.",
+                            ),
                             (
                                 "SIAE",
                                 "La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.",
                             ),
                             (
                                 "DURATION",
-                                "La durée de prolongation demandée n’est pas adaptée à la situation du candidat.",
+                                "La durée de prolongation demandée n’est pas adaptée à la situation de l’usager.",
                             ),
                             (
                                 "REASON",
-                                "Le motif de prolongation demandé n’est pas adapté à la situation du candidat.",
+                                "Le motif de prolongation demandé n’est pas adapté à la situation de l’usager.",
                             ),
                         ],
                         verbose_name="motif de refus",
