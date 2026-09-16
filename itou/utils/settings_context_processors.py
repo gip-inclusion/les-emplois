@@ -23,6 +23,7 @@ def expose_settings(request):
         "API_EMAIL_CONTACT": settings.API_EMAIL_CONTACT,
         "DORA_WWW_BASE_URL": settings.DORA_WWW_BASE_URL,
         "ITOU_HELP_CENTER_URL": help_center_url,
+        "ITOU_CONTACT_FORM_URL": global_constants.ITOU_CONTACT_FORM_URL,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
         "ITOU_FQDN": settings.ITOU_FQDN,

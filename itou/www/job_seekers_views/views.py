@@ -38,7 +38,6 @@ from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
-from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -1847,8 +1846,7 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
     if request.method == "POST" and form.is_valid():  # POST requests should be htmx, except in the tests
         nir_modification_request = form.save()
         nir_modification_request.email_nir_modification_request_notification().send()
-        context = {"contact_form_url": ITOU_CONTACT_FORM_URL}
-        return render(request, "job_seekers_views/nir_modification_success.html", context)
+        return render(request, "job_seekers_views/nir_modification_success.html")
     is_proxy = request.user != job_seeker
     context = {
         "job_seeker_public_id": job_seeker.public_id,
