@@ -11,7 +11,7 @@
         {% csrf_token %}
 
         <div class="c-form">
-            <h2 class="h3">Ce candidat a déjà postulé pour votre entreprise</h2>
+            <h2 class="h3">Cet usager a déjà postulé pour votre entreprise</h2>
             <p>Nous vous recommandons d'accepter une candidature existante plutôt que d'en créer une nouvelle avec la déclaration d'embauche.</p>
             {% if prev_applications %}
                 <p>
@@ -28,7 +28,7 @@
                                 Émise le {{ prev_app.created_at|date:"d F Y à H\\hi" }} par
                                 <b>
                                     {% if prev_app.sender == job_seeker %}
-                                        le candidat
+                                        l’usager
                                     {% elif prev_app.sender_kind == SenderKind.EMPLOYER %}
                                         {{ prev_app.sender_company.display_name }}
                                     {% elif prev_app.sender_kind == SenderKind.PRESCRIBER %}

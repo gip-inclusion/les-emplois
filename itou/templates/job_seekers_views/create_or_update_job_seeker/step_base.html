@@ -9,7 +9,7 @@
     {% else %}
         Création
     {% endif %}
-    du compte candidat
+    du compte usager
     {{ block.super }}
 {% endblock %}
 
@@ -22,7 +22,7 @@
                 {% else %}
                     Création
                 {% endif %}
-                du compte candidat
+                du compte usager
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
@@ -54,10 +54,10 @@
                         {% if readonly_form %}
                             {% component_alert title=title content=content variant="warning" dismissible=True extra_classes="mb-3" %}
                                 {% fragment as title %}
-                                    Informations modifiables par le candidat uniquement
+                                    Informations modifiables par l’usager uniquement
                                 {% endfragment %}
                                 {% fragment as content %}
-                                    <p>Le candidat s’étant connecté à son compte utilisateur, vous ne pouvez modifier que sa situation administrative.</p>
+                                    <p>L’usager s’étant connecté à son compte utilisateur, vous ne pouvez modifier que sa situation administrative.</p>
                                     <a class="btn btn-link" href="{{ step_3_url }}">Voir la situation administrative</a>
                                 {% endfragment %}
                             {% endcomponent_alert %}

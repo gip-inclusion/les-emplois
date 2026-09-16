@@ -73,4 +73,4 @@ def prescribers_accounts_tag():
 def job_seekers_accounts_tag():
     user_email = "demo.emplois+de@inclusion.gouv.fr"
     action_url = reverse("login:demo")
-    return [{"title": "Candidat", "email": user_email, "action_url": action_url}]
+    return [{"title": "Usager", "email": user_email, "action_url": action_url}]

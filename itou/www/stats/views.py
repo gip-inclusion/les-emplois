@@ -403,7 +403,7 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
 def stats_ft_conversion_main(request):
     return render_stats_ft(
         request=request,
-        page_title="Analyse des parcours des candidats diagnostiqués",
+        page_title="Analyse des parcours des usagers diagnostiqués",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },

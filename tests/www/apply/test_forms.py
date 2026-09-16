@@ -490,7 +490,7 @@ class TestJobApplicationRefusalReasonForm:
         form = apply_forms.JobApplicationRefusalReasonForm([job_app])
         assert (
             form.fields["refusal_reason_shared_with_job_seeker"].label
-            == "J’accepte d’envoyer le motif de refus au candidat"
+            == "J’accepte d’envoyer le motif de refus à l’usager"
         )
         assert form.fields["refusal_reason"].label == expected_reason_label
 
@@ -501,7 +501,7 @@ class TestJobApplicationRefusalReasonForm:
         form = apply_forms.JobApplicationRefusalReasonForm(orienter_apps)
         assert (
             form.fields["refusal_reason_shared_with_job_seeker"].label
-            == "J’accepte d’envoyer le motif de refus aux candidats"
+            == "J’accepte d’envoyer le motif de refus aux usagers"
         )
         assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux orienteurs"
 
@@ -515,7 +515,7 @@ class TestJobApplicationRefusalReasonForm:
         form = apply_forms.JobApplicationRefusalReasonForm(prescriber_apps_with_same_job_seeker)
         assert (
             form.fields["refusal_reason_shared_with_job_seeker"].label
-            == "J’accepte d’envoyer le motif de refus au candidat"
+            == "J’accepte d’envoyer le motif de refus à l’usager"
         )
         assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux prescripteurs"
 
@@ -523,7 +523,7 @@ class TestJobApplicationRefusalReasonForm:
         form = apply_forms.JobApplicationRefusalReasonForm(orienter_apps + prescriber_apps_with_same_job_seeker)
         assert (
             form.fields["refusal_reason_shared_with_job_seeker"].label
-            == "J’accepte d’envoyer le motif de refus aux candidats"
+            == "J’accepte d’envoyer le motif de refus aux usagers"
         )
         assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux prescripteurs/orienteurs"
 
@@ -535,10 +535,10 @@ class TestJobApplicationRefusalJobSeekerAnswerForm:
         same_job_seeker_app = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_app.job_seeker)
 
         form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app])
-        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé au candidat"
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé à l’usager"
 
         form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app, other_app])
-        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé aux candidats"
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé aux usagers"
 
         form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app, same_job_seeker_app])
-        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé au candidat"
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé à l’usager"

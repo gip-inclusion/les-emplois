@@ -57,7 +57,7 @@ class DisablePasswordAuthNotification(EmailNotification):
 
 @notifications_registry.register
 class EditJobSeekerInfoNotification(EmailNotification):
-    name = "Modification des informations personnelles d'un candidat"
+    name = "Modification des informations personnelles d'un usager"
     category = NotificationCategory.ACCOUNT_MANAGEMENT
     subject_template = "account/email/email_jobseeker_personal_info_edited_subject.txt"
     body_template = "account/email/email_jobseeker_personal_info_edited_body.txt"
@@ -71,7 +71,7 @@ class EditJobSeekerInfoNotification(EmailNotification):
 
 @notifications_registry.register
 class EditJobSeekerEmailNotification(EmailNotification):
-    name = "Modification des informations personnelles d'un candidat"
+    name = "Modification des informations personnelles d'un usager"
     category = NotificationCategory.ACCOUNT_MANAGEMENT
     subject_template = "account/email/email_jobseeker_email_edited_subject.txt"
     body_template = "account/email/email_jobseeker_email_edited_body.txt"

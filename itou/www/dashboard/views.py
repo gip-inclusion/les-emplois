@@ -412,7 +412,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
 
         if form.data.get("confirm"):
             form.save()
-            messages.success(request, "Les informations du candidat ont bien été mises à jour.", extra_tags="toast")
+            messages.success(request, "Les informations de l’usager ont bien été mises à jour.", extra_tags="toast")
             if "email" in form.changed_data:
                 EditJobSeekerEmailNotification(
                     job_seeker,

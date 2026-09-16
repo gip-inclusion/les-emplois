@@ -282,7 +282,7 @@ class TestCardView:
 
     def test_card_with_job_seeker_public_id(self, client):
         """
-        When applying from "Mes candidats"
+        When applying from "Mes usagers"
         """
         company = CompanyFactory(with_membership=True)
         job_description = JobDescriptionFactory(company=company)
@@ -490,7 +490,7 @@ class TestJobDescriptionCardView:
 
     def test_card_with_job_seeker_public_id(self, client):
         """
-        When applying from "Mes candidats"
+        When applying from "Mes usagers"
         """
         company = CompanyFactory()
         job_description = JobDescriptionFactory(company=company)

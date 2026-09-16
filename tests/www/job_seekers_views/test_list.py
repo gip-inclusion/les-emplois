@@ -579,7 +579,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
             )
 
     # The job seekers created by the other member of the organization are not shown in the
-    # "Mes candidats" tab
+    # "Mes usagers" tab
     response = client.get(url_user)
 
     # Job seekers are displayed for the prescriber

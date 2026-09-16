@@ -111,21 +111,27 @@ class Migration(migrations.Migration):
                     models.CharField(
                         blank=True,
                         choices=[
-                            ("did_not_come", "Candidat non joignable"),
-                            ("did_not_come_to_interview", "Candidat ne s’étant pas présenté à l’entretien"),
-                            ("hired_elsewhere", "Candidat indisponible : en emploi"),
-                            ("training", "Candidat indisponible : en formation"),
-                            ("non_eligible", "Candidat non éligible"),
-                            ("not_mobile", "Candidat non mobile"),
-                            ("not_interested", "Candidat non intéressé"),
-                            ("lacking_skills", "Le candidat n’a pas les compétences requises pour le poste"),
+                            ("did_not_come", "Usager non joignable"),
+                            (
+                                "did_not_come_to_interview",
+                                "Usager ne s’étant pas présenté à l’entretien",
+                            ),
+                            ("hired_elsewhere", "Usager indisponible : en emploi"),
+                            ("training", "Usager indisponible : en formation"),
+                            ("non_eligible", "Usager non éligible"),
+                            ("not_mobile", "Usager non mobile"),
+                            ("not_interested", "Usager non intéressé"),
+                            (
+                                "lacking_skills",
+                                "l’usager n’a pas les compétences requises pour le poste",
+                            ),
                             (
                                 "incompatible",
-                                "Un des freins à l'emploi du candidat est incompatible avec le poste proposé",
+                                "Un des freins à l'emploi de l’usager est incompatible avec le poste proposé",
                             ),
                             (
                                 "prevent_objectives",
-                                "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
+                                "L'embauche de l’usager empêche la réalisation des objectifs du dialogue de gestion",
                             ),
                             ("no_position", "Pas de recrutement en cours"),
                             ("duplicate", "Candidature en doublon"),
@@ -135,10 +141,13 @@ class Migration(migrations.Migration):
                                 "approval_expiration_too_close",
                                 "La date de fin du PASS\xa0IAE / agrément est trop proche",
                             ),
-                            ("unavailable", "Candidat indisponible ou non intéressé par le poste"),
+                            (
+                                "unavailable",
+                                "Usager indisponible ou non intéressé par le poste",
+                            ),
                             (
                                 "eligibility_doubt",
-                                "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un "
+                                "Doute sur l'éligibilité de l’usager (penser à renvoyer la personne vers un "
                                 "prescripteur)",
                             ),
                             ("deactivation", "La structure n'est plus conventionnée"),
@@ -394,7 +403,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "refusal_reason_shared_with_job_seeker",
-                    models.BooleanField(default=False, verbose_name="partage du motif de refus avec le candidat"),
+                    models.BooleanField(default=False, verbose_name="partage du motif de refus avec l’usager"),
                 ),
                 ("processed_at", models.DateTimeField(blank=True, null=True, verbose_name="date de traitement")),
                 (
@@ -511,7 +520,7 @@ class Migration(migrations.Migration):
                             _connector="OR",
                         ),
                         name="job_seeker_sender_coherence",
-                        violation_error_message="Le candidat doit être l'émetteur de la candidature",
+                        violation_error_message="l’usager doit être l'émetteur de la candidature",
                     ),
                 ],
             },

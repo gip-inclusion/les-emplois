@@ -132,7 +132,7 @@
             {% if assignment.organization == request.current_organization or not assignment.organization %}
                 {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0 mt-3" %}
                     {% fragment as c_info__summary %}
-                        Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l'usager.
+                        Un motif clair facilite la coordination entre accompagnateurs et garantit un suivi cohérent du parcours d'insertion de l’usager.
                     {% endfragment %}
                     {% fragment as c_info__detail %}
                         <a href="{% url 'job_seekers_views:edit_assignment' public_id=assignment.job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ request.get_full_path|urlencode }}"

@@ -949,7 +949,7 @@ class TestStandaloneCreateAsPrescriber:
         assertRedirects(response, next_url)
 
         response = client.get(next_url)
-        assertContains(response, "Créer le compte candidat")
+        assertContains(response, "Créer le compte usager")
 
         response = client.post(next_url)
         assert job_seeker_session_name not in client.session

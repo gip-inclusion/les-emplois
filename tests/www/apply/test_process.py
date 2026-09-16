@@ -105,7 +105,7 @@ class TestProcessViews:
         Pour plus de détails, consultez <a href="{global_constants.ITOU_HELP_CENTER_URL}/articles/44240682937745"
         rel="noopener" target="_blank">notre documentation</a>.
         """
-    DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
+    DIAGORIENTE_INVITE_TITLE = "Cet usager n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_BUTTON_TITLE = "Inviter à créer un CV avec Diagoriente"
@@ -113,7 +113,7 @@ class TestProcessViews:
     DIAGORIENTE_INVITE_EMAIL_SUBJECT = "Créer un CV avec Diagoriente"
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1 = (
         "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser "
-        "les expériences de votre candidat : {job_seeker_name}."
+        "les expériences de votre usager : {job_seeker_name}."
     )
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 = (
         "Vous pourrez lui créer un compte en cliquant sur ce lien : "
@@ -127,13 +127,11 @@ class TestProcessViews:
         "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     REFUSAL_REASON_JOB_SEEKER_MENTION = "<small>Motif de refus</small><strong>Autre</strong>"
-    REFUSAL_REASON_SHARED_MENTION = "<small>Motif de refus partagé avec le candidat</small><strong>Autre</strong>"
-    REFUSAL_REASON_NOT_SHARED_MENTION = (
-        "<small>Motif de refus non partagé avec le candidat</small><strong>Autre</strong>"
-    )
+    REFUSAL_REASON_SHARED_MENTION = "<small>Motif de refus partagé avec l’usager</small><strong>Autre</strong>"
+    REFUSAL_REASON_NOT_SHARED_MENTION = "<small>Motif de refus non partagé avec l’usager</small><strong>Autre</strong>"
     IAE_ELIGIBILITY_NO_CRITERIA_MENTION = "Le prescripteur habilité n’a pas renseigné de critères."
     IAE_ELIGIBILITY_WITH_CRITERIA_MENTION = (
-        "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic "
+        "Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic "
         "ayant permis la délivrance d’un PASS IAE"
     )
     IAE_VALID_ELIGIBILITY_BADGE = """
@@ -931,7 +929,7 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, "<small>Message envoyé à l’usager</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
         assertNotContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
@@ -959,7 +957,7 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
         assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, "<small>Message envoyé à l’usager</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
         assertContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
@@ -987,7 +985,7 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
         assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, "<small>Message envoyé à l’usager</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
         assertContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
@@ -1216,14 +1214,14 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
         )
         assertRedirects(response, job_seeker_answer_url)
-        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
-        assertContains(response, "Réponse au candidat")
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message à l’usager", html=True)
+        assertContains(response, "Réponse à l’usager")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-job-seeker-answer-submit"
 
         post_data = {
-            "job_seeker_answer": "Message au candidat",
+            "job_seeker_answer": "Message à l’usager",
         }
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         prescriber_answer_url = reverse(
@@ -1246,7 +1244,7 @@ class TestProcessViews:
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_refused
-        assert job_application.answer == "Message au candidat"
+        assert job_application.answer == "Message à l’usager"
         assert job_application.answer_to_prescriber == "Message au prescripteur"
 
     def test_refuse_from_job_seeker(self, client):
@@ -1280,18 +1278,18 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
         )
         assertRedirects(response, job_seeker_answer_url)
-        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
-        assertContains(response, "Réponse au candidat")
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message à l’usager", html=True)
+        assertContains(response, "Réponse à l’usager")
         assertContains(
             response,
-            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué à l’usager)</em>",
             html=True,
         )
         assert response.context["matomo_custom_title"] == "Candidature refusée"
         assert response.context["matomo_event_name"] == "batch-refuse-application-job-seeker-answer-submit"
 
         post_data = {
-            "job_seeker_answer": "Message au candidat",
+            "job_seeker_answer": "Message à l’usager",
         }
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         assertRedirects(
@@ -1300,7 +1298,7 @@ class TestProcessViews:
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_refused
-        assert job_application.answer == "Message au candidat"
+        assert job_application.answer == "Message à l’usager"
 
     def test_refuse_labels_for_prescriber_or_orienteur(self, client):
         """
@@ -1323,7 +1321,7 @@ class TestProcessViews:
         response = client.get(refusal_reason_url)
         assertContains(
             response,
-            "la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur.",
+            "la transparence sur les motifs de refus est importante pour l’usager comme pour le prescripteur.",
         )
         assertContains(response, "Choisir le motif de refus envoyé au prescripteur")
         assertContains(response, "Autre (détails à fournir dans le message au prescripteur)", html=True)
@@ -1339,7 +1337,7 @@ class TestProcessViews:
         assertContains(response, "Une copie de ce message sera adressée au prescripteur.")
 
         post_data = {
-            "job_seeker_answer": "Message au candidat",
+            "job_seeker_answer": "Message à l’usager",
         }
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         prescriber_answer_url = reverse(
@@ -1349,7 +1347,7 @@ class TestProcessViews:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         assertContains(response, "Réponse au prescripteur")
         assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
-        assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
+        assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué à l’usager)")
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
@@ -1358,7 +1356,7 @@ class TestProcessViews:
         response = client.get(refusal_reason_url)
         assertContains(
             response,
-            "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
+            "la transparence sur les motifs de refus est importante pour l’usager comme pour l’orienteur.",
         )
         assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
         assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
@@ -1370,7 +1368,7 @@ class TestProcessViews:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
         assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
+        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué à l’usager)")
 
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
@@ -1380,7 +1378,7 @@ class TestProcessViews:
         response = client.get(refusal_reason_url)
         assertContains(
             response,
-            "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
+            "la transparence sur les motifs de refus est importante pour l’usager comme pour l’orienteur.",
         )
         assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
         assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
@@ -1392,7 +1390,7 @@ class TestProcessViews:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
         assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
+        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué à l’usager)")
 
     def test_refuse_incompatible_state(self, client):
         job_application = JobApplicationFactory(

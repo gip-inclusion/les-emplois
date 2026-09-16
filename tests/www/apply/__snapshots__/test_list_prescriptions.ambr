@@ -3734,14 +3734,14 @@
               <i>
                   Vous trouverez ici les candidatures émises par votre organisation
                   <br class="d-none d-lg-inline"/>
-                  pour les candidats.
+                  pour les usagers.
               </i>
           </p>
           <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers/results">
               <i aria-hidden="true" class="ri-user-follow-line ri-lg fw-normal">
               </i>
               <span>
-                  Postuler pour un candidat
+                  Postuler pour un usager
               </span>
           </a>
       </div>

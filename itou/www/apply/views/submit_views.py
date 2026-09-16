@@ -88,7 +88,7 @@ def _get_job_seeker_to_apply_for(request):
             ValidationError,
             User.DoesNotExist,
         ):
-            raise Http404("Aucun candidat n'a été trouvé.")
+            raise Http404("Aucun usager n'a été trouvé.")
     return job_seeker
 
 
@@ -137,7 +137,7 @@ class ApplicationPermissionMixin:
             if request.user == self.job_seeker:
                 msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             else:
-                msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
+                msg = "Cet usager a déjà postulé chez cet employeur durant les dernières 24 heures."
             self.apply_session.delete()  # Don't allow to re-use the session in another step to skip this check
             raise PermissionDenied(msg)
         return super().dispatch(request, *args, **kwargs)
@@ -753,7 +753,7 @@ class ApplicationEndView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         if not can_edit_personal_information(self.request, self.job_application.job_seeker):
-            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de cet usager")
         if self.form.is_valid():
             self.form.save()
             # Redirect to the same page, so we don't have a POST method

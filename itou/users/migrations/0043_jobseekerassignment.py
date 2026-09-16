@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="job_seeker_assignments",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="candidat",
+                        verbose_name="usager",
                     ),
                 ),
                 (
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                     "last_action_kind",
                     models.CharField(
                         choices=[
-                            ("CREATE", "création du compte candidat"),
+                            ("CREATE", "création du compte usager"),
                             ("APPLY", "envoi de candidature"),
                             ("HIRE", "déclaration d'embauche"),
                             ("ACCEPT", "acceptation de candidature"),
@@ -83,8 +83,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ["-updated_at"],
-                "verbose_name": "affectation candidat",
-                "verbose_name_plural": "affectations candidats",
+                "verbose_name": "affectation usager",
+                "verbose_name_plural": "affectations usagers",
                 "constraints": [
                     models.UniqueConstraint(
                         fields=("job_seeker", "prescriber", "prescriber_organization"),

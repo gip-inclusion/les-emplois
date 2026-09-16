@@ -47,5 +47,5 @@ class TestCheckJobSeekerNirForm:
         assert not form.is_valid()
         assert (
             "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
-            "n'est pas associé à un compte candidat."
+            "n'est pas associé à un compte usager."
         ) == form.errors["__all__"][0]

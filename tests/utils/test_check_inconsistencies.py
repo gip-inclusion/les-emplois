@@ -37,7 +37,7 @@ def test_inconsistencies_with_slack_webhook(caplog, settings, mocker):
             text=(
                 "1 incohérence trouvée:\n"
                 f" - http://localhost:8000/admin/users/jobseekerprofile/{inconsistent_profile.pk}/change/ :"
-                " ['Profil lié à un utilisateur non-candidat']"
+                " ['Profil lié à un utilisateur non-usager']"
             ),
             url=settings.SLACK_INCONSISTENCIES_WEBHOOK_URL,
         )

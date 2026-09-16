@@ -202,7 +202,7 @@ class SentJobApplicationInline(JobApplicationInline):
     verbose_name = "candidature envoyée"
     verbose_name_plural = "candidatures envoyées"
 
-    @admin.display(description="candidat")
+    @admin.display(description="usager")
     def job_seeker_link(self, obj):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
@@ -231,7 +231,7 @@ class SentOrientationInline(OrientationInline):
     verbose_name = "orientation envoyée"
     verbose_name_plural = "orientations envoyées"
 
-    @admin.display(description="candidat")
+    @admin.display(description="usager")
     def job_seeker_link(self, obj):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
@@ -371,21 +371,21 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
     INCONSISTENCY_CHECKS = [
         (
-            "Candidature liée au PASS IAE d'un autre candidat",
+            "Candidature liée au PASS IAE d'un autre usager",
             lambda q: JobApplication.objects.filter(job_seeker__in=q).inconsistent_approval_user(),
         ),
         (
-            "Candidature liée au diagnostic d'un autre candidat",
+            "Candidature liée au diagnostic d'un autre usager",
             lambda q: JobApplication.objects.filter(job_seeker__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
         ),
         (
-            "Candidature liée au diagnostic GEIQ d'un autre candidat",
+            "Candidature liée au diagnostic GEIQ d'un autre usager",
             lambda q: JobApplication.objects.filter(
                 job_seeker__in=q
             ).inconsistent_geiq_eligibility_diagnosis_job_seeker(),
         ),
         (
-            "PASS IAE lié au diagnostic d'un autre candidat",
+            "PASS IAE lié au diagnostic d'un autre usager",
             lambda q: Approval.objects.filter(user__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
         ),
     ]
@@ -481,7 +481,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             )
         return "Aucune"
 
-    @admin.display(description="affectations candidat")
+    @admin.display(description="affectations usager")
     def job_seeker_assignments(self, obj):
         key = None
         if obj.is_job_seeker:
@@ -490,7 +490,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             key = "professional"
         if key and (count := models.JobSeekerAssignment.objects.filter(**{key: obj}).count()):
             url = reverse("admin:users_jobseekerassignment_changelist", query={key: obj.pk})
-            return format_html('<a href="{}">Liste des affectations candidat ({})</a>', url, count)
+            return format_html('<a href="{}">Liste des affectations usager ({})</a>', url, count)
         return self.get_empty_value_display()
 
     @admin.display(description="Historique des valeurs provenant de systèmes externes")
@@ -1162,7 +1162,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
 
     INCONSISTENCY_CHECKS = [
         (
-            "Profil lié à un utilisateur non-candidat",
+            "Profil lié à un utilisateur non-usager",
             lambda q: q.exclude(user__kind=UserKind.JOB_SEEKER),
         ),
     ]
@@ -1292,7 +1292,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
     )
     ordering = ("-updated_at",)
 
-    @admin.display(description="candidat")
+    @admin.display(description="usager")
     def job_seeker_display(self, obj):
         return obj.job_seeker.get_inverted_full_name()
 

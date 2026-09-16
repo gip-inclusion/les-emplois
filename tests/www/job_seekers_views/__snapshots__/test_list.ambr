@@ -1422,9 +1422,9 @@
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
                               <div class="w-lg-400px">
                                   <label class="visually-hidden" for="id_job_seeker">
-                                      Nom de l'usager
+                                      Nom de l’usager
                                   </label>
-                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom de l'usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom de l’usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
                                       </option>
                                   </select>
@@ -1799,9 +1799,9 @@
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
                               <div class="w-lg-400px">
                                   <label class="visually-hidden" for="id_job_seeker">
-                                      Nom de l'usager
+                                      Nom de l’usager
                                   </label>
-                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom de l'usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom de l’usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
                                       </option>
                                   </select>

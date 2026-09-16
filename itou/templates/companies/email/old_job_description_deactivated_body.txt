@@ -9,7 +9,7 @@ Structure > Métiers et recrutements sur {% brand %} {{ base_url}}.
 
 Si cette fiche de poste n’est plus d’actualité, aucune action de votre part n’est nécessaire.
 
-Cette mesure vise à garantir la pertinence des annonces disponibles pour les candidats et à maintenir une base d’opportunités d’emploi à jour.
+Cette mesure vise à garantir la pertinence des annonces disponibles pour les usagers et à maintenir une base d’opportunités d’emploi à jour.
 
 Cordialement,
 {% endblock body%}
