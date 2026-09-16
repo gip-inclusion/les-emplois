@@ -1792,3 +1792,31 @@ class JobSeekerAssignment(models.Model):
     @property
     def is_active(self):
         return self.ended_at is None
+
+
+class ProSupportReport(models.Model):
+    """Report filled by a SIAE in an external form, at the end of a job seeker IAE journey."""
+
+    job_seeker = models.OneToOneField(
+        User,
+        verbose_name="candidat",
+        on_delete=models.CASCADE,  # The report has no meaning without its job seeker
+        related_name="pro_support_report",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="pro_support_reports",
+    )
+    submitted_at = models.DateTimeField(verbose_name="date de transmission")
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    class Meta:
+        verbose_name = "bilan d’accompagnement"
+        verbose_name_plural = "bilans d’accompagnement"
+
+    def __str__(self):
+        return f"Bilan d’accompagnement de {self.job_seeker.get_inverted_full_name()}"
