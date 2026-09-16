@@ -565,6 +565,11 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     if request.method == "POST" and not job_application.hiring_starts_in_future:
         previous_status = employee_record.status
         back_url = reverse("employee_record_views:list", query={"status": previous_status})
+
+        # Mark the profile as checked since all information are displayed for a last check
+        employee_record.job_application.job_seeker.last_checked_at = timezone.now()
+        employee_record.job_application.job_seeker.save(update_fields=["last_checked_at"])
+
         employee_record.ready(user=request.user)
         toast_title = (
             "La fiche salarié a été renvoyée"
