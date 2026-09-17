@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_not_required
+from django.core.cache import cache
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -42,12 +43,20 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     return HttpResponseRedirect(reverse("account_login"))
 
 
+FRANCE_TRAVAIL_CONNECT_KEY = "ft-connect-key"
+
+
 def get_rsa_key():
+    if key := cache.get(FRANCE_TRAVAIL_CONNECT_KEY):
+        return key
+
     jwks = httpx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_JWKS, timeout=5)
     rsa256_keys = [key for key in jwks.json()["keys"] if key["kty"] == "RSA"]
     if not rsa256_keys:
         raise ValueError("No RSA key found in FranceConnect JWKS")
-    return rsa256_keys[0]
+    key = rsa256_keys[0]
+    cache.set(FRANCE_TRAVAIL_CONNECT_KEY, key, 24 * 60 * 60)
+    return key
 
 
 @login_not_required
