@@ -150,7 +150,7 @@ class TestStructures:
         )
         response = client.get(self.get_structure_url(structure))
 
-        assertContains(response, "Lundi : 9h00 à 12h00 - 14h00 à 17h30")
+        assertContains(response, "Lundi : 9h00 à 12h00 - 14h00 à 17h30")
         assertContains(response, "sans rendez-vous")
         assert response.context["formatted_opening_hours"]["has_ph_off"] is True
 
