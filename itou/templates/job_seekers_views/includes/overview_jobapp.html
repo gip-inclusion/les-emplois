@@ -65,9 +65,9 @@
                                     {% if not selected_jobs %}
                                         Candidature spontanée
                                     {% elif selected_jobs|length == 1 %}
-                                        Poste sélectionné : {{ selected_jobs.0.display_name }}
+                                        Poste sélectionné : {{ selected_jobs.0.display_name }}
                                     {% else %}
-                                        Postes sélectionnés :
+                                        Postes sélectionnés :
                                         <ul class="list-unstyled mb-0">
                                             {% for job in selected_jobs %}
                                                 <li>{{ job.display_name }}</li>

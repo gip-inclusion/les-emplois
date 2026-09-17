@@ -192,7 +192,7 @@
                                         <div>
                                             {% for entry in formatted_opening_hours.entries %}
                                                 <div class="d-flex gap-2">
-                                                    <strong>{{ entry.label }} :</strong>
+                                                    <strong>{{ entry.label }} :</strong>
                                                     <strong>{{ entry.hours }}
                                                         {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
                                                     </strong>
@@ -220,7 +220,7 @@
                             {% endif %}
                         </ul>
 
-                        <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">Source : {{ service.source.label }}</span>
+                        <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">Source : {{ service.source.label }}</span>
                     </div>
                 </div>
 
@@ -264,7 +264,7 @@
                             <ul class="mb-0">
                                 {% for category_label, subcategory_label in formatted_categories %}
                                     <li>
-                                        <b>{{ category_label }}</b> : {{ subcategory_label }}
+                                        <b>{{ category_label }}</b> : {{ subcategory_label }}
                                     </li>
                                 {% endfor %}
                             </ul>

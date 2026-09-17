@@ -43,7 +43,7 @@
                                     Informations manquantes
                                 {% endfragment %}
                                 {% fragment as alert_content %}
-                                    <p class="mb-0">Les informations suivantes doivent être renseignées pour poursuivre l'orientation :</p>
+                                    <p class="mb-0">Les informations suivantes doivent être renseignées pour poursuivre l'orientation :</p>
                                     <ul class="mb-0">
                                         {% for field in missing_beneficiary_fields %}
                                             <li>
@@ -75,7 +75,7 @@
                                     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
                                         {% fragment as fee_alert_content %}
                                             <p class="mb-0 h-100 d-flex align-items-center">
-                                                Frais à la charge de l'usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
+                                                Frais à la charge de l'usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
                                             </p>
                                         {% endfragment %}
                                     {% endcomponent_alert %}

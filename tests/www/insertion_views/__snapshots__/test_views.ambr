@@ -2757,7 +2757,7 @@
                               </li>
                           </ul>
                           <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
+                              Source : Dora
                           </span>
                       </div>
                   </div>
@@ -2907,7 +2907,7 @@
                               </li>
                           </ul>
                           <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Other
+                              Source : Other
                           </span>
                       </div>
                   </div>
@@ -3148,7 +3148,7 @@
                               <i aria-hidden="true" class="ri-time-line">
                               </i>
                               <strong>
-                                  Réponse rapide : sous 3 jours
+                                  Réponse rapide : sous 3 jours
                               </strong>
                           </p>
                           <p>
@@ -3192,7 +3192,7 @@
                                   <div>
                                       <div class="d-flex gap-2">
                                           <strong>
-                                              Lundi :
+                                              Lundi :
                                           </strong>
                                           <strong>
                                               9h00 à 17h00
@@ -3200,7 +3200,7 @@
                                       </div>
                                       <div class="d-flex gap-2">
                                           <strong>
-                                              Mardi :
+                                              Mardi :
                                           </strong>
                                           <strong>
                                               9h00 à 17h00
@@ -3208,7 +3208,7 @@
                                       </div>
                                       <div class="d-flex gap-2">
                                           <strong>
-                                              Mercredi :
+                                              Mercredi :
                                           </strong>
                                           <strong>
                                               9h00 à 17h00
@@ -3216,7 +3216,7 @@
                                       </div>
                                       <div class="d-flex gap-2">
                                           <strong>
-                                              Jeudi :
+                                              Jeudi :
                                           </strong>
                                           <strong>
                                               9h00 à 17h00
@@ -3224,7 +3224,7 @@
                                       </div>
                                       <div class="d-flex gap-2">
                                           <strong>
-                                              Vendredi :
+                                              Vendredi :
                                           </strong>
                                           <strong>
                                               9h00 à 17h00
@@ -3234,7 +3234,7 @@
                               </li>
                           </ul>
                           <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
+                              Source : Dora
                           </span>
                       </div>
                   </div>
@@ -3791,7 +3791,7 @@
                                                   <span class="fs-sm mt-1 d-flex align-items-center">
                                                       <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
                                                       </i>
-                                                      Périmètre : Perimeter 1
+                                                      Périmètre : Perimeter 1
                                                   </span>
                                               </div>
                                           </div>
@@ -3807,7 +3807,7 @@
                                                   <span class="fs-sm mt-1 d-flex align-items-center">
                                                       <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
                                                       </i>
-                                                      Périmètre : Perimeter 2
+                                                      Périmètre : Perimeter 2
                                                   </span>
                                               </div>
                                           </div>
@@ -3823,7 +3823,7 @@
                                                   <span class="fs-sm mt-1 d-flex align-items-center">
                                                       <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
                                                       </i>
-                                                      Périmètre : Perimeter 3
+                                                      Périmètre : Perimeter 3
                                                   </span>
                                               </div>
                                           </div>
