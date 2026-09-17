@@ -36,7 +36,7 @@
                                   </strong>
                               </p>
                               <p class="mb-0">
-                                  Les informations suivantes doivent être renseignées pour poursuivre l'orientation :
+                                  Les informations suivantes doivent être renseignées pour poursuivre l'orientation :
                               </p>
                               <ul class="mb-0">
                                   <li>
@@ -59,7 +59,7 @@
                               </p>
                               <ul class="mb-0">
                                   <li>
-                                      Les informations du candidat sont incomplètes : Prénom.
+                                      Les informations du candidat sont incomplètes : Prénom.
                                   </li>
                               </ul>
                           </div>
@@ -263,7 +263,7 @@
                                   </div>
                                   <div class="col">
                                       <p class="mb-0 h-100 d-flex align-items-center">
-                                          Frais à la charge de l'usager : Payant. Adhésion annuelle de 10€ à la MJC Champ Libre + frais de location
+                                          Frais à la charge de l'usager : Payant. Adhésion annuelle de 10€ à la MJC Champ Libre + frais de location
                                       </p>
                                   </div>
                               </div>
@@ -555,7 +555,7 @@
                                   </label>
                                   <input aria-describedby="id_referent_phone_helptext" class="form-control" id="id_referent_phone" name="referent_phone" required="" type="tel" value="0612345678"/>
                                   <div class="form-text" id="id_referent_phone_helptext">
-                                      Ex : 0123456789
+                                      Ex : 0123456789
                                   </div>
                               </div>
                               <div class="form-group form-group-input-w-lg-66 form-group-required">
@@ -564,7 +564,7 @@
                                   </label>
                                   <input aria-describedby="id_referent_email_helptext" class="form-control" id="id_referent_email" maxlength="320" name="referent_email" required="" type="email" value="pierre.dupont@test.local"/>
                                   <div class="form-text" id="id_referent_email_helptext">
-                                      Ex : mail@domaine.fr
+                                      Ex : mail@domaine.fr
                                   </div>
                               </div>
                           </fieldset>
@@ -705,7 +705,7 @@
                   </div>
                   <hr class="my-5" data-it-text="ou"/>
                   <div class="text-center mb-3">
-                      Votre usager n'a pas encore de compte ?
+                      Votre usager n'a pas encore de compte ?
                       <a class="btn-link" data-matomo-action="clic" data-matomo-category="compte-candidat" data-matomo-event="true" data-matomo-option="creer-un-compte-candidat-orientation" href="/job-seekers/start?tunnel=orientation&from_url=%2Finsertion%2Fservices%2Ftest-orientation-wizard-uid%2F&service_uid=test-orientation-wizard-uid">
                           Créer un compte usager
                       </a>
@@ -747,7 +747,7 @@
               <i aria-hidden="true" class="ri-check-line ri-lg me-1">
               </i>
               <strong class="me-auto">
-                  Votre demande a bien été transmise !
+                  Votre demande a bien été transmise !
               </strong>
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="toast" type="button">
                   <span class="visually-hidden">
@@ -756,7 +756,7 @@
               </button>
           </div>
           <div class="toast-body">
-              Le récapitulatif de la demande vous a été envoyé, ainsi qu’à l’adresse e-mail de Jane DOE : usager@example.org
+              Le récapitulatif de la demande vous a été envoyé, ainsi qu’à l’adresse e-mail de Jane DOE : usager@example.org
           </div>
       </div>
   </div>

@@ -516,9 +516,9 @@ class OrientationWizardView(WizardView):
             # (e.g. a first visit), but must not see their personal information
             messages.success(
                 request,
-                "Votre demande a bien été transmise !||"
+                "Votre demande a bien été transmise !||"
                 "Le récapitulatif de la demande vous a été envoyé, ainsi qu’à l’adresse e-mail de "
-                f"{mask_unless(self.job_seeker.get_full_name(), predicate=self.can_view_personal_information)} : "
+                f"{mask_unless(self.job_seeker.get_full_name(), predicate=self.can_view_personal_information)} : "
                 f"{mask_unless(self.job_seeker.email, predicate=self.can_view_personal_information)}",
                 extra_tags="toast",
             )

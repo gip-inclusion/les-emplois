@@ -211,9 +211,9 @@ class TestStructures:
         assert response.status_code == 200
         perimeters = [service.perimeter for service in response.context["services"]]
         assert perimeters == ["Finistère", "Morbihan", "Ille-et-Vilaine"]
-        assertContains(response, "Périmètre : Finistère")
-        assertContains(response, "Périmètre : Morbihan")
-        assertContains(response, "Périmètre : Ille-et-Vilaine")
+        assertContains(response, "Périmètre : Finistère")
+        assertContains(response, "Périmètre : Morbihan")
+        assertContains(response, "Périmètre : Ille-et-Vilaine")
 
     def test_card_view_services_display_reception_location(self, client):
         structure = StructureFactory()
@@ -237,9 +237,9 @@ class TestStructures:
 
         response = client.get(self.get_structure_url(structure))
 
-        assertContains(response, "Lieu d'accueil : Poitiers")
-        assertContains(response, "Lieu d'accueil : Loudun")
-        assertContains(response, "Lieu d'accueil : à distance")
+        assertContains(response, "Lieu d'accueil : Poitiers")
+        assertContains(response, "Lieu d'accueil : Loudun")
+        assertContains(response, "Lieu d'accueil : à distance")
 
     def test_no_error_when_special_chars_in_uid(self, client):
         structure = StructureFactory()

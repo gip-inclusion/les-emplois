@@ -91,7 +91,7 @@ class OrientationConformityForm(forms.Form):
         cleaned_data = super().clean()
         if missing_fields := get_missing_orientation_beneficiary_field_labels(self.job_seeker):
             raise ValidationError(
-                "Les informations du candidat sont incomplètes : %(fields)s.",
+                "Les informations du candidat sont incomplètes : %(fields)s.",
                 params={"fields": ", ".join(missing_fields)},
                 code="incomplete_beneficiary",
             )
@@ -104,10 +104,10 @@ class OrientationReferentForm(forms.Form):
     referent_phone = forms.CharField(
         required=True,
         label="Téléphone",
-        help_text="Ex : 0123456789",
+        help_text="Ex : 0123456789",
         widget=forms.TextInput(attrs={"type": "tel"}),
     )
-    referent_email = forms.EmailField(required=True, label="Adresse e-mail", help_text="Ex : mail@domaine.fr")
+    referent_email = forms.EmailField(required=True, label="Adresse e-mail", help_text="Ex : mail@domaine.fr")
     orientation_reason = forms.CharField(
         required=False,
         label="Si besoin, détaillez ici le motif de l'orientation",

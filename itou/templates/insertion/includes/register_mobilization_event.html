@@ -31,7 +31,7 @@
                 }
 
                 const href = el.getAttribute("href"); // can be null
-                const linkOpensInCurrentTab = href && el.getAttribute("target") !== "_blank";
+                const linkOpensInCurrentTab = href && el.getAttribute("target") !== "_blank"; // no-typography-rule-check
                 if (linkOpensInCurrentTab) {
                     /* If opening a link in the current tab, preventDefault to let the XHR finish */
                     event.preventDefault();

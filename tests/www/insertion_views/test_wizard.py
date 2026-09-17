@@ -674,11 +674,11 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
 @pytest.mark.parametrize(
     "authorized,created_by,expected",
     [
-        pytest.param(True, False, "Jean DUPONT : usager@example.org", id="authorized"),
+        pytest.param(True, False, "Jean DUPONT : usager@example.org", id="authorized"),
         # Expected: a job seeker may turn to a non-authorized prescriber for the first time,
         # who can orient them without being allowed to see their personal information
-        pytest.param(False, False, "J… D… : u…", id="not_authorized"),
-        pytest.param(False, True, "Jean DUPONT : usager@example.org", id="not_authorized_creator"),
+        pytest.param(False, False, "J… D… : u…", id="not_authorized"),
+        pytest.param(False, True, "Jean DUPONT : usager@example.org", id="not_authorized_creator"),
     ],
 )
 def test_orientation_wizard_success_toast_personal_information(client, mocker, authorized, created_by, expected):
