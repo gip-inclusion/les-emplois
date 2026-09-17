@@ -1,5 +1,7 @@
 import datetime
+import logging
 import secrets
+import urllib.parse
 from math import ceil
 
 import sentry_sdk
@@ -8,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import connection
-from django.http import HttpResponseRedirect, JsonResponse, QueryDict
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.urls import reverse
@@ -16,6 +18,9 @@ from django.utils.cache import add_never_cache_headers
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
 from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
+
+
+logger = logging.getLogger(__name__)
 
 
 def never_cache(get_response):
@@ -141,9 +146,15 @@ class RedirectToNewDomainMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        return self.get_response(request)
+        response = self.get_response(request)
+        try:
+            _add_redirected_from_old_domain_param(request, response)
+        except Exception:
+            logger.exception("Got exception in _add_redirected_from_old_domain_param")
+        return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
+        # Potentially redirect user to the new domain.
         url = _get_redirect_url(request)
         if url is None:
             return None
@@ -179,9 +190,32 @@ def _get_redirect_url(request):
         # other users once we're sure that everything is fine.
         return None
 
-    query = QueryDict(request.GET.urlencode(), mutable=True)
-    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
-    return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
+    return f"https://{settings.NEW_DOMAIN}{request.get_full_path()}"
+
+
+def _add_redirected_from_old_domain_param(request, response):
+    """Add a query param when coming from the old domain and
+    redirecting to the login form.
+    """
+    if request.get_host() == settings.NEW_DOMAIN:
+        return
+    referrer = request.META.get("HTTP_REFERER")
+    if not referrer or urllib.parse.urlparse(referrer).netloc == settings.NEW_DOMAIN:
+        return
+    if response.status_code != 302 or urllib.parse.urlparse(response.url).path != "/accounts/login/":
+        return
+
+    parse_res = urllib.parse.urlparse(response["Location"])
+    query = urllib.parse.parse_qs(parse_res.query)
+    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = ["1"]
+    parse_res = parse_res._replace(
+        query=urllib.parse.urlencode(
+            query,
+            doseq=True,
+            quote_via=urllib.parse.quote,
+        )
+    )
+    response["Location"] = urllib.parse.urlunparse(parse_res)
 
 
 def browser_id_cookie(get_response):
