@@ -3,11 +3,13 @@ import io
 import re
 
 import pytest
+from django.core.management import call_command
 
 from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import sanitize_employee_records
 from tests.employee_record import factories
+from tests.users.factories import JobSeekerProfileFactory
 
 
 @pytest.fixture(name="command")
@@ -105,3 +107,81 @@ def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
 
     assert models.EmployeeRecordUpdateNotification.objects.count() == 2
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
+
+
+def test_handle_3437_errors():
+    expected_label = (
+        "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. ({})"
+    )
+    new_asp_uid_OK = "1234567890abcdef1234567890abcd"
+    employee_record_OK = factories.EmployeeRecordFactory(
+        ready_for_transfer=True,  # Make sure all the infos needed for ready transition are here
+        status=models.Status.REJECTED,
+        asp_processing_code=models.EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=expected_label.format(new_asp_uid_OK),
+    )
+    new_asp_uid_OK_but_not_ready = "111111111111111111111111111111"
+    employee_record_OK_but_not_ready = factories.EmployeeRecordFactory(
+        status=models.Status.REJECTED,
+        asp_processing_code=models.EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=expected_label.format(new_asp_uid_OK_but_not_ready),
+    )
+    employee_record_wrong_log = factories.EmployeeRecordFactory(
+        status=models.Status.REJECTED,
+        asp_processing_code=models.EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label="Unexpected label",
+    )
+    invalid_asp_uid = "1234567890abcdef"
+    employee_record_invalid_asp_uid = factories.EmployeeRecordFactory(
+        status=models.Status.REJECTED,
+        asp_processing_code=models.EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=expected_label.format(invalid_asp_uid),
+    )
+    duplicate_asp_uid = JobSeekerProfileFactory().asp_uid
+    employee_record_duplicate_asp_uid = factories.EmployeeRecordFactory(
+        status=models.Status.REJECTED,
+        asp_processing_code=models.EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=expected_label.format(duplicate_asp_uid),
+    )
+    previous_asp_uid = {
+        employee_record.pk: employee_record.job_application.job_seeker.jobseeker_profile.asp_uid
+        for employee_record in [
+            employee_record_OK,
+            employee_record_OK_but_not_ready,
+            employee_record_wrong_log,
+            employee_record_invalid_asp_uid,
+            employee_record_duplicate_asp_uid,
+        ]
+    }
+    call_command("sanitize_employee_records", wet_run=True)
+
+    employee_record_OK.job_application.job_seeker.jobseeker_profile.refresh_from_db()
+    assert (
+        employee_record_OK.job_application.job_seeker.jobseeker_profile.asp_uid
+        != previous_asp_uid[employee_record_OK.pk]
+    )
+    assert employee_record_OK.job_application.job_seeker.jobseeker_profile.asp_uid == new_asp_uid_OK
+    employee_record_OK.refresh_from_db()
+    assert employee_record_OK.status == models.Status.READY
+
+    employee_record_OK_but_not_ready.job_application.job_seeker.jobseeker_profile.refresh_from_db()
+    assert (
+        employee_record_OK_but_not_ready.job_application.job_seeker.jobseeker_profile.asp_uid
+        != previous_asp_uid[employee_record_OK_but_not_ready.pk]
+    )
+    assert (
+        employee_record_OK_but_not_ready.job_application.job_seeker.jobseeker_profile.asp_uid
+        == new_asp_uid_OK_but_not_ready
+    )
+    employee_record_OK_but_not_ready.refresh_from_db()
+    assert employee_record_OK_but_not_ready.status == models.Status.REJECTED
+
+    for untouched_er in [
+        employee_record_wrong_log,
+        employee_record_invalid_asp_uid,
+        employee_record_duplicate_asp_uid,
+    ]:
+        untouched_er.refresh_from_db()
+        assert untouched_er.status == models.Status.REJECTED
+        untouched_er.job_application.job_seeker.jobseeker_profile.refresh_from_db()
+        assert untouched_er.job_application.job_seeker.jobseeker_profile.asp_uid == previous_asp_uid[untouched_er.pk]
