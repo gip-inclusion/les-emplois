@@ -115,7 +115,7 @@
                         <h2 class="h3">Présentation du service</h2>
                         {% if service.description|length > 200 %}
                             <div class="collapse show has-no-transition" id="collapse-description-collapsed">
-                                <p class="mb-0">{{ service.description|truncatechars:200|markdownify }}</p>
+                                <div class="mb-0">{{ service.description|truncatechars:200|markdownify }}</div>
                                 <button class="bs-btn-active-color btn-link d-inline-block mt-2"
                                         type="button"
                                         data-bs-toggle="collapse"
@@ -129,7 +129,7 @@
                                 <div class="mb-0">{{ service.description|markdownify }}</div>
                             </div>
                         {% else %}
-                            <p class="mb-0">{{ service.description|markdownify }}</p>
+                            <div class="mb-0">{{ service.description|markdownify }}</div>
                         {% endif %}
                     </div>
                     <div class="c-box mb-3 mb-md-4">
@@ -170,7 +170,7 @@
                                             <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
                                         {% endif %}
                                         {% if service.publics_details %}
-                                            <p><small class="mb-0">{{ service.publics_details }}</small></p>
+                                            <small class="d-block">{{ service.publics_details }}</small>
                                         {% endif %}
                                     </div>
                                 </li>
@@ -235,7 +235,7 @@
                                             {% endfor %}
                                         </strong>
                                         {% if service.mobilizations_details %}
-                                            <p><small class="mb-0">{{ service.mobilizations_details }}</small></p>
+                                            <small class="d-block">{{ service.mobilizations_details }}</small>
                                         {% endif %}
                                     </div>
                                 </li>
@@ -299,7 +299,7 @@
                             {% if service.address_on_one_line %}
                                 <li>
                                     <small>Lieu d'accueil</small>
-                                    <strong>{{ service.address_on_one_line }}</strong>
+                                    <address>{{ service.address_on_one_line }}</address>
                                 </li>
                             {% endif %}
                             {% if service.opening_hours %}
@@ -307,7 +307,7 @@
                                     <small>
                                         Horaires d'ouverture
                                         {% if formatted_opening_hours.has_ph_off %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
+                                            <i class="ri-information-line text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
                                         {% endif %}
                                     </small>
                                     {% if formatted_opening_hours %}
