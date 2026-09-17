@@ -95,17 +95,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Avoir plus de 18 ans
-                              </li>
-                              <li>
+                                  <br/>
                                   Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -153,7 +149,7 @@
 # ---
 # name: TestOrientationDetailsForSender.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -547,6 +543,21 @@
       }),
       dict({
         'origin': list([
+          'IfNode[insertion/orientations/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[insertion/orientations/details.html]',
+          'orientation_details_for_sender[www/insertion_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -676,18 +687,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <p>
-                                      Être orienté par un prescripteur
-                                  </p>
-                              </li>
-                              <li>
-                                  <p>
-                                      Avoir 18 ans
-                                  </p>
-                              </li>
-                          </ul>
+                          <div class="">
+                              <p>
+                                  Être orienté par un prescripteur
+                                  <br/>
+                                  Avoir 18 ans
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -841,11 +847,11 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Être orienté par un prescripteur.
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -1032,17 +1038,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Avoir plus de 18 ans
-                              </li>
-                              <li>
+                                  <br/>
                                   Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -1108,7 +1110,7 @@
 # ---
 # name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 4,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -1328,6 +1330,20 @@
       }),
       dict({
         'origin': list([
+          'IfNode[insertion/orientations/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[insertion/orientations/details.html]',
+          'orientation_details_for_service_provider[www/insertion_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1436,11 +1452,11 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Être orienté par un prescripteur.
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -2798,11 +2814,11 @@
                                   <small>
                                       Conditions d'accès
                                   </small>
-                                  <strong>
+                                  <div class="fw-bold">
                                       <p>
-                                          Avoir plus de 18 ans, Résider en France, Pièce d'identité en cours de validité
+                                          Ne doit pas apparaître pour dora
                                       </p>
-                                  </strong>
+                                  </div>
                               </li>
                               <hr class="my-4"/>
                               <li>
@@ -2962,11 +2978,13 @@
                                   <small>
                                       Conditions d'accès
                                   </small>
-                                  <strong>
+                                  <div class="fw-bold">
                                       <p>
-                                          Être orienté par un prescripteur, Avoir 18 ans
+                                          Être orienté par un prescripteur
+                                          <br/>
+                                          Avoir 18 ans
                                       </p>
-                                  </strong>
+                                  </div>
                               </li>
                               <hr class="my-4"/>
                               <li>
@@ -3215,16 +3233,6 @@
                                           Toute personne majeure.
                                       </small>
                                   </div>
-                              </li>
-                              <li>
-                                  <small>
-                                      Conditions d'accès
-                                  </small>
-                                  <strong>
-                                      <p>
-                                          Être orienté par un prescripteur.
-                                      </p>
-                                  </strong>
                               </li>
                               <hr class="my-4"/>
                               <li>

@@ -88,7 +88,10 @@
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
-                                {% include "insertion/includes/orientation_credentials_list.html" with service=service show_section_heading=True show_heading=True show_recovery_note=False only %}
+                                {% if service.has_prerequisites %}
+                                    <p class="fw-bold mb-2">Conditions requises</p>
+                                    {% include "insertion/includes/access_conditions_di.html" with service=service extra_classes="mb-3 mb-md-4" only %}
+                                {% endif %}
                                 {% bootstrap_field form.confirms_conditions wrapper_class="form-group form-group-required-check" %}
                                 {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields matomo_category="orientation" matomo_action="submit" matomo_name=matomo_event_name %}
                             </form>
@@ -140,7 +143,7 @@
                                     {% endfragment %}
                                 {% endcomponent_info %}
 
-                                {% if service.credentials_documents %}
+                                {% if credential_documents %}
                                     <h3 class="h4">Documents à compléter</h3>
                                     <ul class="list-unstyled mb-3">
                                         {% for document_name, document_url in credential_documents %}
@@ -156,13 +159,13 @@
                                     <hr class="my-3">
                                 {% endif %}
 
-                                {% if service.credentials_online_form %}
+                                {% if service.extra.online_form %}
                                     <h3 class="h4">Liens</h3>
                                     <p>Informations complémentaires ou formulaires à compléter</p>
                                     <ul>
                                         <li>
-                                            <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener" class="has-external-link">
-                                                {{ service.credentials_online_form }}
+                                            <a href="{{ service.extra.online_form }}" target="_blank" rel="noopener" class="has-external-link">
+                                                {{ service.extra.online_form }}
                                             </a>
                                         </li>
                                     </ul>

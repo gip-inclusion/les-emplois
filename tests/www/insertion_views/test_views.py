@@ -35,6 +35,7 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from itou.www.insertion_views.views import ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
+from tests.files.factories import FileFactory
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
@@ -1110,11 +1111,7 @@ class TestOrientationDetailsForSender:
             source__value="dora",
             source__label="Dora",
             source_link="https://domain.fake/services/test-service-uid",
-            # dora-only fields — should appear
-            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
-            credentials=["Pièce d'identité en cours de validité"],
-            # DI-only field — should NOT appear
-            access_conditions_di="Ne doit pas apparaître pour dora",
+            access_conditions_di="Avoir plus de 18 ans\nRésider en France",
             structure__name="Gonflable",
             structure__uid="structure-uid",
         )
@@ -1150,11 +1147,7 @@ class TestOrientationDetailsForSender:
             updated_on="2025-01-15",
             source__value="other",
             source__label="Other",
-            # DI-only field — should appear
-            access_conditions_di="Être orienté par un prescripteur\\nAvoir 18 ans",
-            # dora-only fields — should NOT appear
-            access_conditions_dora=["Ne doit pas apparaître pour data·inclusion"],
-            credentials=["Ne doit pas apparaître pour data·inclusion"],
+            access_conditions_di="Être orienté par un prescripteur\nAvoir 18 ans",
             structure__name="Gonflable",
             structure__uid="structure-uid",
         )
@@ -1187,7 +1180,7 @@ class TestOrientationDetailsForSender:
             name="Service complet",
             updated_on="2025-06-01",
             source__value="dora",
-            access_conditions_dora=["Être orienté par un prescripteur."],
+            access_conditions_di="Être orienté par un prescripteur.",
             mobilizations_details="Contacter le service par téléphone.",
             contact_email="contact@service.fr",
             contact_phone="01 23 45 67 89",
@@ -1195,6 +1188,7 @@ class TestOrientationDetailsForSender:
             structure__uid="structure-uid",
         )
         beneficiary = JobSeekerFactory(for_snapshot=True)
+        attachment = FileFactory(key="orientations/cv.pdf")
 
         for membership_factory in [
             partial(PrescriberMembershipFactory, organization__authorized=True),
@@ -1234,10 +1228,8 @@ class TestOrientationDetailsForSender:
                 duration_weekly_hours=5,
                 duration_weeks=8,
                 data_protection_commitment=False,  # not displayed
-                attachments=[
-                    "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-                ],
             )
+            orientation.documents.add(attachment)
 
             client.force_login(user)
             response = client.get(self.get_orientation_url(orientation))
@@ -1246,7 +1238,7 @@ class TestOrientationDetailsForSender:
                 parse_response_to_soup(
                     response,
                     selector="#main",
-                    replace_in_attr=[("href", orientation.attachments_details[0][1], "[computed URL of attachment]")],
+                    replace_in_attr=[("href", orientation.documents_details[0][1], "[computed URL of attachment]")],
                 )
             ) == snapshot(name="page")
             assertNotContains(response, "NonAffiché")
@@ -1415,8 +1407,7 @@ class TestOrientationDetailsForServiceProvider:
             source__value="dora",
             source__label="Dora",
             source_link="https://domain.fake/services/test-service-uid",
-            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
-            credentials=["Pièce d'identité en cours de validité"],
+            access_conditions_di="Avoir plus de 18 ans\nRésider en France",
         )
 
         process_link = OrientationProcessLinkFactory(
@@ -1443,13 +1434,14 @@ class TestOrientationDetailsForServiceProvider:
             name="Service complet",
             updated_on="2025-06-01",
             source__value="dora",
-            access_conditions_dora=["Être orienté par un prescripteur."],
+            access_conditions_di="Être orienté par un prescripteur.",
             mobilizations_details="Contacter le service par téléphone.",
             contact_email="contact@service.fr",
             contact_phone="01 23 45 67 89",
             structure__name="Structure complète",
             structure__uid="structure-uid",
         )
+        attachment = FileFactory(key="orientations/cv.pdf")
 
         process_link = OrientationProcessLinkFactory(
             id="1111111111zzzzzzzzzz3333333333_4",
@@ -1476,10 +1468,8 @@ class TestOrientationDetailsForServiceProvider:
             orientation__duration_weekly_hours=5,
             orientation__duration_weeks=8,
             orientation__data_protection_commitment=False,  # not displayed
-            orientation__attachments=[
-                "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
-            ],
         )
+        process_link.orientation.documents.add(attachment)
 
         response = client.get(self.get_process_link_url(process_link))
 
@@ -1488,7 +1478,7 @@ class TestOrientationDetailsForServiceProvider:
                 response,
                 selector="#main",
                 replace_in_attr=[
-                    ("href", process_link.orientation.attachments_details[0][1], "[computed URL of attachment]")
+                    ("href", process_link.orientation.documents_details[0][1], "[computed URL of attachment]")
                 ],
             )
         ) == snapshot(name="page")

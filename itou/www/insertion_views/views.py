@@ -530,12 +530,14 @@ class OrientationWizardView(WizardView):
             "can_view_personal_information": self.can_view_personal_information,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "missing_beneficiary_fields": get_missing_orientation_beneficiary_field_labels(self.job_seeker),
-            "credential_documents": self.service.generate_credential_documents_info(),
+            "credential_documents": self.service.generate_extra_credential_documents_info(),
             "OrientationStep": OrientationStep,
             "matomo_custom_title": matomo_titles[self.step],
             "matomo_custom_url": f"orientations/<uuid:session_uuid>/create/{self.step}/",
             "matomo_event_name": f"orientation-{self.step}-submit",
-            "show_orientation_disclaimer": not self.wizard_session.get("disclaimer_dismissed", False),
+            "show_orientation_disclaimer": (
+                self.step == OrientationStep.CONFORMITY and not self.wizard_session.get("disclaimer_dismissed", False)
+            ),
             "orientation_session_uuid": self.wizard_session.name,
             "exit_url": get_orient_for_job_seeker_context(self.request)["exit_url"],
         }
