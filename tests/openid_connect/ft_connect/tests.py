@@ -8,7 +8,6 @@ import httpx
 import jwt
 import pytest
 import respx
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
@@ -53,7 +52,7 @@ def mock_oauth_dance(
     matching_nonces=True,
 ):
     id_token_nonce = crypto.get_random_string(length=12)
-    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    private_key = settings.FRANCE_TRAVAIL_CONNECT_OIDC_PRIVATE_KEY
     public_key_numbers = private_key.public_key().public_numbers()
     jwk_json = {
         "keys": [

@@ -1,5 +1,7 @@
 import os
 
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
+
 from itou.utils.enums import ItouEnvironment
 
 
@@ -120,3 +122,7 @@ GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
 OVERVIEW_TAB_TEST_DEPARTMENT = None
+
+# Generate a private key for the SSO that need one in our tests
+FRANCE_CONNECT_OIDC_PRIVATE_KEY = ec.generate_private_key(ec.SECP256R1())
+FRANCE_TRAVAIL_CONNECT_OIDC_PRIVATE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)

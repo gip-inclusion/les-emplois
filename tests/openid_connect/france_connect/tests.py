@@ -10,7 +10,6 @@ import httpx
 import jwt
 import pytest
 import respx
-from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
@@ -50,7 +49,7 @@ FC_USERINFO = {
 # @respx.mock
 def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True):
     id_token_nonce = str(uuid.uuid4())
-    private_key = ec.generate_private_key(ec.SECP256R1())
+    private_key = settings.FRANCE_CONNECT_OIDC_PRIVATE_KEY
     public_key_numbers = private_key.public_key().public_numbers()
     jwk_json = {
         "keys": [
