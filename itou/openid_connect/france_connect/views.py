@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_not_required
+from django.core.cache import cache
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
@@ -38,12 +39,20 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     return HttpResponseRedirect(reverse("account_login"))
 
 
+FRANCE_CONNECT_KEY = "france-connect-key"
+
+
 def get_es256_key():
+    if key := cache.get(FRANCE_CONNECT_KEY):
+        return key
+
     jwks = httpx.get(constants.FRANCE_CONNECT_ENDPOINT_JWKS, timeout=5)
     es256_keys = [key for key in jwks.json()["keys"] if key["alg"] == "ES256"]
     if not es256_keys:
         raise ValueError("No ES256 key found in FranceConnect JWKS")
-    return es256_keys[0]
+    key = es256_keys[0]
+    cache.set(FRANCE_CONNECT_KEY, key, 24 * 60 * 60)
+    return key
 
 
 @login_not_required
