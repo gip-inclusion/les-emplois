@@ -269,6 +269,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     }[order_by]
     data = (
         EmployeeRecord.objects.full_fetch()
+        .with_last_transition_timestamp()
         .for_company(siae)
         .with_siret_from_asp_source()
         .order_by(*employee_record_order_by)
@@ -606,7 +607,9 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
+    employee_record = get_object_or_404(
+        EmployeeRecord.objects.for_company(siae).full_fetch().with_last_transition_timestamp(), pk=employee_record_id
+    )
     job_application = employee_record.job_application
 
     creations = [
@@ -648,7 +651,9 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
+    employee_record = get_object_or_404(
+        EmployeeRecord.objects.for_company(siae).full_fetch().with_last_transition_timestamp(), pk=employee_record_id
+    )
 
     back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 
@@ -675,7 +680,9 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
+    employee_record = get_object_or_404(
+        EmployeeRecord.objects.for_company(siae).full_fetch().with_last_transition_timestamp(), pk=employee_record_id
+    )
 
     back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 

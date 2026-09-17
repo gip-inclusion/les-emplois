@@ -301,6 +301,12 @@ class TestSummaryEmployeeRecords:
         ],
     )
     def test_action_bar(self, client, status, snapshot):
+        EmployeeRecordTransitionLogFactory(
+            employee_record=self.employee_record,
+            to_state=status,
+            asp_batch_file="RIAE_FS_20210510130000.json",
+        )
+
         self.employee_record.status = status
         self.employee_record.save()
 
@@ -320,6 +326,11 @@ class TestSummaryEmployeeRecords:
     )
     @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_action_bar_with_changed_siret(self, client, status, snapshot):
+        EmployeeRecordTransitionLogFactory(
+            employee_record=self.employee_record,
+            to_state=status,
+            asp_batch_file="RIAE_FS_20210510130000.json",
+        )
         self.employee_record.status = status
         self.company.siret = "10000000000001"
         self.employee_record.siret = "10000000000002"
