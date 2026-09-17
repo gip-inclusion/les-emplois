@@ -12,6 +12,8 @@ Unidecode  # https://github.com/avian2/unidecode
 
 tenacity  # https://github.com/jd/tenacity
 
+gunicorn  # https://github.com/benoitc/gunicorn/
+
 # Django
 # ------------------------------------------------------------------------------
 
