@@ -95,6 +95,12 @@ def get_active_institution_memberships(user):
     )
 
 
+def otp_verification_exempt(path):
+    return path in (reverse("otp_views:verify_otp"), reverse("otp_views:login_with_backup_code")) or path.startswith(
+        "/otp/reset-request/"
+    )
+
+
 class ItouCurrentOrganizationMiddleware:
     """
     Store the ID of the current prescriber organization or employer structure in session
@@ -173,12 +179,12 @@ class ItouCurrentOrganizationMiddleware:
             # Enforce MFA if needed:
             if require_otp(user):
                 logger.info("Requiring internal OTP for user %d", user.id)
-                login_verify_otp_url = reverse("otp_views:verify_otp")
-                login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
                 if get_user_devices(user):
-                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
+                    if not otp_verification_exempt(request.path):
                         return HttpResponseRedirect(
-                            add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                            add_url_params(
+                                reverse("otp_views:verify_otp"), {REDIRECT_FIELD_NAME: request.get_full_path()}
+                            )
                         )
                 elif not request.path.startswith("/otp/enrollment"):
                     return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
