@@ -303,6 +303,12 @@ class ContractsTabView(BaseJobSeekerDetailView):
 
 
 class AdvisorsTabView(BaseJobSeekerDetailView):
+    queryset = (
+        User.objects.select_related("jobseeker_profile")
+        .filter(kind=UserKind.JOB_SEEKER)
+        .with_advisors_count(active=True)
+        .with_advisors_count(active=False)
+    )
     template_name = "job_seekers_views/advisors.html"
 
     def get_context_data(self, **kwargs):
