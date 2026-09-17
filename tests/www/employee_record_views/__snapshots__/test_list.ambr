@@ -592,6 +592,12 @@
                  "employee_record_employeerecord"."siret",
                  "employee_record_employeerecord"."processed_as_duplicate",
           
+            (SELECT U0."timestamp" AS "timestamp"
+             FROM "employee_record_employeerecordtransitionlog" U0
+             WHERE U0."employee_record_id" = ("employee_record_employeerecord"."id")
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_transition_timestamp",
+          
             (SELECT U0."siret" AS "siret"
              FROM "companies_company" U0
              WHERE (NOT (U0."siret" = %s)

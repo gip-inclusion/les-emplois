@@ -210,6 +210,16 @@ class EmployeeRecordQuerySet(models.QuerySet):
             )
         )
 
+    def with_last_transition_timestamp(self):
+        return self.annotate(
+            last_transition_timestamp=Subquery(
+                EmployeeRecordTransitionLog.objects.filter(employee_record=OuterRef("pk"))
+                .order_by("-timestamp")
+                .values("timestamp")[:1],
+                output_field=models.DateTimeField(),
+            )
+        )
+
 
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
