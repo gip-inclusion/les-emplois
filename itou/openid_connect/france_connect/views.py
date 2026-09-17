@@ -259,7 +259,7 @@ def france_connect_logout_callback(request):
             "Une erreur technique est survenue. "
             f"Merci de vérifier que vous êtes bien déconnecté de {IdentityProvider.FRANCE_CONNECT.label}.",
         )
-    return HttpResponseRedirect(reverse("search:home"))
+    return HttpResponseRedirect(reverse("search:employers_home"))
 
 
 @login_not_required

@@ -1,3 +1,4 @@
+import types
 from unittest.mock import call
 
 import pytest
@@ -35,17 +36,28 @@ def make_employer():
     return company.members.get()
 
 
-def test_error_handling_ignores_nav_error(client, mocker):
-    # Anonymous pages don’t render any navigation, so only authenticated users exercise the nav tag.
+@pytest.mark.parametrize(
+    "user_factory,exc_count",
+    [
+        (
+            types.NoneType,
+            2,  # Anonymous navigation is included twice, for mobile and desktop.
+        ),
+        (make_employer, 1),
+    ],
+)
+def test_error_handling_ignores_nav_error(client, exc_count, mocker, user_factory):
     sentry_mock = mocker.patch("itou.utils.errors.sentry_sdk")
     exc = Exception()
     mocker.patch("itou.utils.templatetags.nav.is_active", side_effect=exc)
 
-    client.force_login(make_employer())
+    user = user_factory()
+    if user:
+        client.force_login(user)
     # Any public page is fine.
     response = client.get(reverse("accessibility"))
     assertContains(response, '<li class="nav-item">')
-    assert sentry_mock.capture_exception.mock_calls == [call(exc)]
+    assert sentry_mock.capture_exception.mock_calls == [call(exc)] * exc_count
 
 
 def test_handler500_view():
