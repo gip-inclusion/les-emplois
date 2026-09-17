@@ -11,30 +11,31 @@
 
             {% if structure.reseaux_porteurs.exists %}
                 <hr class="my-4">
-                <h4 class="mb-0">Réseaux porteurs</h4>
-                <p>
+                <h3 class="mb-0">Réseaux porteurs</h3>
+                <ul>
                     {% for reseau in structure.reseaux_porteurs.all %}
-                        {{ reseau }}
-                        {% if not forloop.last %}
-                            ,
-                        {% endif %}
+                        <li>{{ reseau }}</li>
                     {% endfor %}
-                </p>
+                </ul>
             {% endif %}
 
             {% if structure.opening_hours %}
                 <hr class="my-4">
-                <h4 class="mb-0">Horaires d'ouverture</h4>
+                <h3 class="mb-0">Horaires d'ouverture</h3>
                 {% if formatted_opening_hours %}
-                    {% for entry in formatted_opening_hours.entries %}
-                        <p>
-                            {{ entry.label }} : {{ entry.hours }}
-                            {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
-                        </p>
-                    {% endfor %}
+                    <ul>
+                        {% for entry in formatted_opening_hours.entries %}
+                            <li>
+                                {{ entry.label }} : {{ entry.hours }}
+                                {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
                     {% if formatted_opening_hours.comments %}
                         {% for comment in formatted_opening_hours.comments %}
-                            <p class="fst-italic">{{ comment }}.</p>
+                            <blockquote class="blockquote">
+                                {{ comment }}.
+                            </blockquote>
                         {% endfor %}
                     {% endif %}
                 {% else %}
@@ -44,15 +45,15 @@
 
             {% if structure.accessibilite_lieu or structure.website %}
                 <hr class="my-4">
-                <h4 class="mb-0">En savoir plus</h4>
+                <h3 class="mb-0">En savoir plus</h3>
                 {% if structure.accessibilite_lieu %}
                     <p>
-                        Retrouvez les informations liées à l'accessibilité de notre structure sur <a href="{{ structure.accessibilite_lieu }}" target="_blank">{{ structure.accessibilite_lieu }}</a>
+                        Retrouvez les informations liées à l'accessibilité de notre structure sur <a href="{{ structure.accessibilite_lieu }}" class="has-external-link" target="_blank" rel="noopener noreferrer">{{ structure.accessibilite_lieu }}</a>
                     </p>
                 {% endif %}
                 {% if structure.website %}
                     <p>
-                        Plus d'informations sur <a href="{{ structure.website }}" target="_blank">{{ structure.website }}</a>
+                        Plus d'informations sur <a href="{{ structure.website }}" class="has-external-link" target="_blank" rel="noopener noreferrer">{{ structure.website }}</a>
                     </p>
                 {% endif %}
             {% endif %}
@@ -60,7 +61,7 @@
     </div>
     <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
         <div class="c-box mb-3 mb-md-4">
-            <h4 class="mb-3">Informations de contact</h4>
+            <h3>Informations de contact</h3>
             <button class="btn btn-secondary btn-block listen-for-mobilization-event"
                     type="button"
                     data-bs-toggle="modal"
