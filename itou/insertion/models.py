@@ -356,6 +356,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
     mobilizations_details = models.TextField(verbose_name="modes de mobilisation - précisions", blank=True)
+    lien_mobilisation = models.URLField(verbose_name="lien de mobilisation", blank=True, max_length=2000)
     mobilization_publics = models.ManyToManyField(
         verbose_name="personne mobilisatrices",
         to=GenericReferenceItem,
@@ -477,26 +478,7 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def should_mobilize_via_external_link(self) -> bool:
-        return not self.is_dora and bool(self.mobilization_modes_professionals_external_form_link)
-
-    @property
-    def has_orientation_action(self):
-        return (
-            self.is_orientable_with_form and bool(self.contact_email) and not self.from_non_orientable_di_source
-        ) or bool(self.mobilization_modes_professionals_external_form_link)
-
-    def has_mobilization_modes(self):
-        return (not self.is_dora and bool(self.mobilizations.all())) or (
-            self.is_dora
-            and (
-                bool(self.mobilization_modes_professionals.all())
-                or self.mobilization_modes_professionals_external_form_link
-                or self.mobilization_modes_professionals_other
-                or bool(self.mobilization_modes_beneficiaries.all())
-                or self.mobilization_modes_beneficiaries_external_form_link
-                or self.mobilization_modes_beneficiaries_other
-            )
-        )
+        return bool(self.lien_mobilisation)
 
     def generate_credential_documents_info(self) -> list[tuple[str, str]]:
         return [

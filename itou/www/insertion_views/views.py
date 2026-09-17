@@ -135,8 +135,6 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         Prefetch("receptions", queryset=insertion_models.GenericReferenceItem.objects.order_by("label")),
         "mobilizations",
         "mobilization_publics",
-        "mobilization_modes_beneficiaries",
-        "mobilization_modes_professionals",
     )
     slug_field = "uid"
     slug_url_kwarg = "service_uid"
@@ -153,15 +151,22 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
             for category_label in sorted(categories.keys())
         ]
 
+    def get_contact_button_label(self) -> str:
+        if self.object.contact_phone and self.object.contact_email:
+            return "Contacter le service par téléphone ou email"
+        if self.object.contact_phone:
+            return "Contacter le service par téléphone"
+        if self.object.contact_email:
+            return "Contacter le service par email"
+        return "Contacter le service"
+
     def get_context_data(self, **kwargs):
         has_contact_to_display = (
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
         )
-        user_is_authorized = (
+        can_view_modal = has_contact_to_display and (
             self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
         )
-        can_view_contact = user_is_authorized
-        can_view_modal = has_contact_to_display and can_view_contact
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)
@@ -171,15 +176,8 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "matomo_custom_title": "Fiche de la service d'insértion",
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
                 "credential_documents": self.object.generate_extra_credential_documents_info(),
-                "show_mobilization_section": self.object.has_mobilization_modes(),
-                "professionals_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_professionals.all()
-                ),
-                "beneficiaries_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
-                ),
                 "formatted_categories": self.format_categories(),
-                "can_view_contact": can_view_contact,
+                "contact_button_label": self.get_contact_button_label(),
                 "can_view_modal": can_view_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
             }
@@ -238,15 +236,11 @@ class OrientationStep(enum.StrEnum):
 
 
 def start_orientation(request, service_uid):
-    service = get_object_or_404(
-        insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES).exclude(
-            contact_email=""
-        ),
-        uid=service_uid,
-        is_orientable_with_form=True,
-    )
+    service = get_object_or_404(insertion_models.Service.objects.select_related("source"), uid=service_uid)
     if service.should_mobilize_via_external_link:
         return HttpResponseRedirect(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+    if service.from_non_orientable_di_source:
+        raise Http404
     if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
         logger.info(
             "orientation wizard start_without_job_seeker user=%s service_uid=%s",
@@ -287,14 +281,15 @@ class OrientationSelectJobSeekerView(FormView):
             return HttpResponseRedirect(
                 reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
             )
+        if self.service.from_non_orientable_di_source:
+            raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, service_uid, **kwargs):
         super().setup(request, *args, **kwargs)
         self.service = get_object_or_404(
-            insertion_models.Service.objects.select_related("kind", "structure"),
+            insertion_models.Service.objects.select_related("kind", "source", "structure"),
             uid=service_uid,
-            is_orientable_with_form=True,
         )
 
     def get_form_kwargs(self):
@@ -344,6 +339,8 @@ class OrientationWizardView(WizardView):
             ),
             uid=self.wizard_session.get("service_uid"),
         )
+        if self.service.should_mobilize_via_external_link or self.service.from_non_orientable_di_source:
+            raise Http404
         self.job_seeker = get_object_or_404(
             User.objects.select_related("jobseeker_profile"),
             public_id=self.wizard_session.get("job_seeker_public_id"),

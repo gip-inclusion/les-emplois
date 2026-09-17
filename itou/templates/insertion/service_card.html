@@ -31,40 +31,24 @@
         <div class="c-box c-box--action">
             <h2 class="visually-hidden">Actions rapides</h2>
             <div class="form-row align-items-center gx-3">
-                {% if service.has_orientation_action %}
+                {% if service.lien_mobilisation or not service.from_non_orientable_di_source %}
                     {% if can_orient_towards_insertion_service or not user.is_authenticated %}
                         <div class="form-group col-12 col-lg-auto">
                             {% url 'insertion_views:start_orientation' service_uid=service.uid as start_orientation_url %}
                             {% if request.GET.job_seeker_public_id %}
                                 {% url_add_query start_orientation_url job_seeker_public_id=request.GET.job_seeker_public_id as start_orientation_url %}
                             {% endif %}
-                            {% if service.should_mobilize_via_external_link %}
-                                {% include "insertion/includes/orientation_external_link_button.html" with service=service MobilizationEventKind=MobilizationEventKind request=request only %}
-                            {% elif service.is_orientable_with_form and not service.from_non_orientable_di_source %}
-                                {% if can_orient_towards_insertion_service %}
-                                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                                       data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_ORIENTATION }}"
-                                       href="{{ start_orientation_url }}"
-                                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
-                                        {% if request.GET.job_seeker_public_id %}
-                                            Orienter le bénéficiaire
-                                        {% else %}
-                                            Orienter un bénéficiaire
-                                        {% endif %}
-                                    </span> </a>
-                                {% elif not user.is_authenticated %}
-                                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                                       href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
-                                        {% if request.GET.job_seeker_public_id %}
-                                            Orienter le bénéficiaire
-                                        {% else %}
-                                            Orienter un bénéficiaire
-                                        {% endif %}
-                                    </span> </a>
-                                {% endif %}
+                            {% if service.lien_mobilisation %}
+                                {% include "insertion/includes/orientation_external_link_button.html" with service=service MobilizationEventKind=MobilizationEventKind only %}
+                            {% elif can_orient_towards_insertion_service %}
+                                <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                                   data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_ORIENTATION }}"
+                                   href="{{ start_orientation_url }}"
+                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre bénéficiaire en ligne</span> </a>
                             {% else %}
-                                {% include "insertion/includes/orientation_external_link_button.html" with service=service MobilizationEventKind=MobilizationEventKind request=request only %}
+                                <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                                   href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre bénéficiaire en ligne</span> </a>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -79,18 +63,18 @@
                                     data-bs-target="#service-contact-modal"
                                     data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
                                     {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
-                                Voir les coordonnées de contact du service
+                                {{ contact_button_label }}
                             </button>
                         {% else %}
                             <a class="btn btn-lg btn-outline-white btn-block justify-content-center"
                                type="button"
                                href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}> Voir les coordonnées de contact du service </a>
+                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}> {{ contact_button_label }} </a>
                         {% endif %}
                     </div>
                 {% endif %}
 
-                {% if not service.has_orientation_action and not service.contact_full_name and not service.contact_email and not service.contact_phone %}
+                {% if not service.lien_mobilisation and service.from_non_orientable_di_source and not service.contact_full_name and not service.contact_email and not service.contact_phone %}
                     <div class="form-group col-12 col-lg">
                         <p class="mb-0 fst-italic text-white">
                             <i class="ri-information-line fw-normal me-1" aria-hidden="true"></i>
@@ -243,8 +227,8 @@
                                     <div>
                                         <strong>
                                             {% for mobilization in service.mobilizations.all %}
-                                                {% if mobilization.value == "utiliser-lien-mobilisation" and service.mobilization_modes_professionals_external_form_link and can_view_contact %}
-                                                    <a href="{{ service.mobilization_modes_professionals_external_form_link }}" class="has-external-link" rel="noopener noreferrer" target="_blank">{{ mobilization.label }}<i class="ri-external-link-line fw-normal ms-1" aria-hidden="true"></i></a>
+                                                {% if mobilization.value == "utiliser-lien-mobilisation" and service.lien_mobilisation %}
+                                                    <a href="{{ service.lien_mobilisation }}" class="has-external-link" rel="noopener noreferrer" target="_blank">{{ mobilization.label }}</a>
                                                 {% else %}
                                                     {{ mobilization.label }}
                                                 {% endif %}{% if not forloop.last %}, {% endif %}

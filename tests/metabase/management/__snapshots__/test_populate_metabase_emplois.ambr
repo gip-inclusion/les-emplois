@@ -8114,6 +8114,7 @@
                  "insertion_service"."access_conditions_dora",
                  "insertion_service"."eligibility_zones",
                  "insertion_service"."mobilizations_details",
+                 "insertion_service"."lien_mobilisation",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",
                  "insertion_service"."mobilization_modes_beneficiaries_other",

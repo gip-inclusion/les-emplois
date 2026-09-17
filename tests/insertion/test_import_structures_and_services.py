@@ -88,26 +88,17 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").is_orientable_with_form is True
     assert Service.objects.get(uid="dora--allowed-service-structure-no-email").is_orientable_with_form is True
 
-    assert Service.objects.get(uid="mission-locale--with-mobilization-link").has_orientation_action is True
-    assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").has_orientation_action is True
-    assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").has_orientation_action is False
-
     assert (
-        Service.objects.get(
-            uid="mission-locale--with-mobilization-link"
-        ).mobilization_modes_professionals_external_form_link
+        Service.objects.get(uid="mission-locale--with-mobilization-link").lien_mobilisation
         == "https://example.com/mobilisation"
     )
-    assert (
-        Service.objects.get(
-            uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927"
-        ).mobilization_modes_professionals_external_form_link
-        == "https://dora-link.precendence.test.com"
+    assertQuerySetEqual(
+        Service.objects.get(uid="mission-locale--with-mobilization-link").mobilizations.all(),
+        ["utiliser-lien-mobilisation"],
+        transform=attrgetter("value"),
     )
-    assert (
-        Service.objects.get(uid="emplois-de-linclusion--null").mobilization_modes_professionals_external_form_link
-        == ""
-    )
+    assert not Service.objects.filter(source__value="dora").exclude(lien_mobilisation="").exists()
+    assert Service.objects.get(uid="emplois-de-linclusion--null").lien_mobilisation == ""
 
     assertQuerySetEqual(
         Structure.objects.get(uid="mission-locale--with-mobilization-link").reseaux_porteurs.all(),

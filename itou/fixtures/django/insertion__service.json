@@ -35,12 +35,14 @@
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
+      "lien_mobilisation": "https://form.fillout.com/t/exemple-orientation",
       "mobilization_publics": [
         7
       ],
       "mobilizations": [
         3,
-        5
+        5,
+        6
       ],
       "mobilizations_details": "",
       "name": "Ouvrir l'école aux parents pour la réussite des enfants - OEPRE",
@@ -176,13 +178,13 @@
       "mobilization_modes_professionals_external_form_link": "https://site.fake/demande-rappel/",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
+      "lien_mobilisation": "",
       "mobilization_publics": [
         7,
         8
       ],
       "mobilizations": [
-        5,
-        6
+        5
       ],
       "mobilizations_details": "",
       "name": "Mon conseil en évolution professionnelle (Mon CEP) par Avenir Actifs - Belfort",
@@ -262,9 +264,7 @@
         7,
         8
       ],
-      "mobilizations": [
-        6
-      ],
+      "mobilizations": [],
       "mobilizations_details": "",
       "name": "Mon Conseil en Evolution Professionnelle par Avenir Actifs – Tarascon",
       "opening_hours": "",
@@ -360,6 +360,7 @@
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
+      "lien_mobilisation": "",
       "mobilization_publics": [
         7,
         8
@@ -367,8 +368,7 @@
       "mobilizations": [
         3,
         4,
-        5,
-        6
+        5
       ],
       "mobilizations_details": "Orientation en ligne, par courriel, téléphone ou accueil physique.",
       "name": "CEJ - Contrat d'Engagement Jeune",

@@ -119,7 +119,7 @@ class ServiceAdmin(InsertionAdmin):
         ),
         (
             "Mobilisation (data·inclusion)",
-            {"fields": ["mobilizations", "mobilizations_details", "mobilization_publics"]},
+            {"fields": ["mobilizations", "mobilizations_details", "lien_mobilisation", "mobilization_publics"]},
         ),
         (
             "Mobilisation (DORA)",

@@ -115,10 +115,8 @@
         "france"
       ],
       "contact_nom_prenom": "Z... H...",
-      "lien_mobilisation": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-les-emplois-de-lincl/orienter",
-      "modes_mobilisation": [
-        "utiliser-lien-mobilisation"
-      ],
+      "lien_mobilisation": null,
+      "modes_mobilisation": null,
       "mobilisable_par": [
         "professionnels",
         "usagers"
@@ -169,10 +167,8 @@
         "france"
       ],
       "contact_nom_prenom": null,
-      "lien_mobilisation": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee/orienter",
-      "modes_mobilisation": [
-        "utiliser-lien-mobilisation"
-      ],
+      "lien_mobilisation": null,
+      "modes_mobilisation": null,
       "mobilisable_par": [
         "professionnels",
         "usagers"
@@ -210,7 +206,9 @@
       "zone_eligibilite": null,
       "contact_nom_prenom": null,
       "lien_mobilisation": "https://example.com/mobilisation",
-      "modes_mobilisation": null,
+      "modes_mobilisation": [
+        "utiliser-lien-mobilisation"
+      ],
       "mobilisable_par": null,
       "mobilisation_precisions": null,
       "volume_horaire_hebdomadaire": null,
@@ -255,10 +253,8 @@
         "france"
       ],
       "contact_nom_prenom": null,
-      "lien_mobilisation": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee/orienter",
-      "modes_mobilisation": [
-        "utiliser-lien-mobilisation"
-      ],
+      "lien_mobilisation": null,
+      "modes_mobilisation": null,
       "mobilisable_par": [
         "professionnels",
         "usagers"
@@ -306,10 +302,8 @@
         "france"
       ],
       "contact_nom_prenom": null,
-      "lien_mobilisation": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee/orienter",
-      "modes_mobilisation": [
-        "utiliser-lien-mobilisation"
-      ],
+      "lien_mobilisation": null,
+      "modes_mobilisation": null,
       "mobilisable_par": [
         "professionnels",
         "usagers"
