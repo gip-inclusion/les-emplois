@@ -66,7 +66,7 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
     return HttpResponseRedirect(reverse("search:employers_home"))
 
 
-def _generate_pro_params_from_session(pc_data, host):
+def _generate_pro_params_from_session(pc_data, host, request):
     redirect_uri = get_absolute_url(reverse("pro_connect:callback"), host=host)
     nonce = crypto.get_random_string(length=12)
     state = ProConnectState.save_state(data=pc_data, nonce=nonce)
@@ -78,6 +78,15 @@ def _generate_pro_params_from_session(pc_data, host):
         "state": state,
         "nonce": nonce,
     }
+    if "acr_levels" in request.GET:
+        acr_levels = request.GET["acr_levels"].split(",")
+    else:
+        acr_levels = [
+            "eidas0-mfa",
+            "eidas1-mfa",
+            "eidas2",
+            "eidas3",
+        ]
     data.update(
         {
             "claims": json.dumps(
@@ -89,12 +98,7 @@ def _generate_pro_params_from_session(pc_data, host):
                         "amr": {"essential": True},
                         "acr": {
                             "essential": settings.PRO_CONNECT_ACR_ESSENTIAL,
-                            "values": [
-                                "eidas0-mfa",
-                                "eidas1-mfa",
-                                "eidas2",
-                                "eidas3",
-                            ],
+                            "values": acr_levels,
                         },
                     },
                 }
@@ -139,7 +143,7 @@ def pro_connect_authorize(request):
     if user_email := request.GET.get("user_email"):
         pc_data.user_email = user_email
 
-    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data), request.get_host())
+    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data), request.get_host(), request)
 
     base_url = constants.PRO_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")

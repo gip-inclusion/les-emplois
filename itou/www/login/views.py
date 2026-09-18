@@ -36,6 +36,7 @@ class UserKindLoginMixin:
         params = {
             "previous_url": self.request.get_full_path(),
             "user_email": self.user.email,
+            "acr_levels": self.request.GET.get("acr_levels"),
         }
         if self.next_url:
             params["next_url"] = self.next_url
