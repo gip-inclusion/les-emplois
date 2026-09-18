@@ -1,6 +1,7 @@
 import datetime
 import random
 import uuid
+from urllib.parse import quote
 
 import pytest
 from django.contrib import messages
@@ -260,6 +261,49 @@ class TestAssessmentContractsListAndToggle:
         contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         response = client.get(contracts_list_url)
         assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (contracts_list_url + "?page=1"), html=True)
+
+    def test_filters_are_kept_when_browsing_a_contract(self, client):
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+        )
+        assessment = AssessmentFactory(
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+        )
+        contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            allowance_requested=False,
+            nb_days_in_campaign_year=89,
+        )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+        filtered_contracts_list_url = f"{contracts_list_url}?duration_strictly_shorter_90=on"
+        back_url_param = f"back_url={quote(filtered_contracts_list_url)}"
+        employee_tab_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={"contract_pk": contract.pk, "tab": AssessmentContractDetailsTab.EMPLOYEE},
+        )
+        justification_tab_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={
+                "contract_pk": contract.pk,
+                "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION,
+            },
+        )
+
+        client.force_login(geiq_membership.user)
+        response = client.get(filtered_contracts_list_url)
+        assertContains(response, f'href="{employee_tab_url}?{back_url_param}"')
+
+        # The switch re-rendered by HTMX also links to the filtered list.
+        response = client.post(
+            reverse("geiq_assessments_views:assessment_contracts_include", kwargs={"contract_pk": contract.pk}),
+            headers={"HX-Request": "true", "HX-Current-URL": f"http://testserver{filtered_contracts_list_url}"},
+        )
+        assertContains(response, f'href="{justification_tab_url}?{back_url_param}"')
+
+        # The contract details page goes back to the filtered list.
+        response = client.get(f"{employee_tab_url}?{back_url_param}")
+        assertContains(response, f'href="{filtered_contracts_list_url}"')
 
     def test_access_as_institution(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
@@ -865,15 +909,16 @@ class TestAssessmentContractsDetails:
                 "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value,
             },
         )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         JUSTIFICATION_TAB_LI = f"""
         <li class="nav-item">
-            <a class="nav-link" href="{details_justification_url}">
+            <a class="nav-link" href="{details_justification_url}?back_url={contracts_list_url}">
                 <span>Justification</span>
             </a>
         </li>"""
         JUSTIFICATION_TAB_WITH_ICON_LI = f"""
         <li class="nav-item">
-            <a class="nav-link" href="{details_justification_url}">
+            <a class="nav-link" href="{details_justification_url}?back_url={contracts_list_url}">
                 <span>Justification</span>
                 <i class="ri-error-warning-line text-warning ms-2"></i>
             </a>
@@ -888,7 +933,10 @@ class TestAssessmentContractsDetails:
             parse_response_to_soup(
                 response,
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+                replace_in_attr=[
+                    ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("action", str(assessment.pk), "[PK of Assessment]"),
+                ],
             )
         ) == snapshot(name="allowance request box with allowance not requested")
 
@@ -909,7 +957,10 @@ class TestAssessmentContractsDetails:
                 parse_response_to_soup(
                     response,
                     selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                    replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+                    replace_in_attr=[
+                        ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("action", str(assessment.pk), "[PK of Assessment]"),
+                    ],
                 )
             ) == snapshot(name="allowance request box with allowance requested")
             assertNotContains(response, JUSTIFICATION_TAB_LI, html=True)
@@ -926,7 +977,9 @@ class TestAssessmentContractsDetails:
                     selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
                     replace_in_attr=[
                         ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("action", str(assessment.pk), "[PK of Assessment]"),
                         ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("href", str(assessment.pk), "[PK of Assessment]"),
                     ],
                 )
             ) == snapshot(name="allowance request box with allowance requested, missing reason, common tab")
@@ -960,7 +1013,7 @@ class TestAssessmentContractsDetails:
                     "allowance_request_details": "C’est un cas particulier…",
                 },
             )
-            assertRedirects(response, details_contract_url)
+            assertRedirects(response, f"{details_contract_url}?back_url={contracts_list_url}")
             contract.refresh_from_db()
             assert contract.allowance_requested is True
             assert contract.allowance_request_justification_reason is not None
@@ -972,7 +1025,9 @@ class TestAssessmentContractsDetails:
                     selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
                     replace_in_attr=[
                         ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("action", str(assessment.pk), "[PK of Assessment]"),
                         ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("href", str(assessment.pk), "[PK of Assessment]"),
                     ],
                 )
             ) == snapshot(name="allowance request box with allowance requested, filled reason, common tab")
@@ -1034,6 +1089,7 @@ class TestAssessmentContractsDetails:
                 "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value,
             },
         )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
 
         client.force_login(geiq_membership.user)
         response = client.get(details_url)
@@ -1041,7 +1097,10 @@ class TestAssessmentContractsDetails:
             parse_response_to_soup(
                 response,
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+                replace_in_attr=[
+                    ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("action", str(assessment.pk), "[PK of Assessment]"),
+                ],
             )
         ) == snapshot(name="allowance request box with allowance not requested after contract selection")
 
@@ -1073,6 +1132,7 @@ class TestAssessmentContractsDetails:
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
                 replace_in_attr=[
                     ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("action", str(assessment.pk), "[PK of Assessment]"),
                 ],
             )
         ) == snapshot(name="allowance request box with allowance not requested after contract selection")
@@ -1109,7 +1169,9 @@ class TestAssessmentContractsDetails:
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
                 replace_in_attr=[
                     ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("action", str(assessment.pk), "[PK of Assessment]"),
                     ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("href", str(assessment.pk), "[PK of Assessment]"),
                 ],
             )
         ) == snapshot(name="allowance request box with allowance requested after contract selection")
@@ -1123,7 +1185,7 @@ class TestAssessmentContractsDetails:
                     "allowance_request_details": "Nouveaux détails",
                 },
             )
-            assertRedirects(response, details_contract_url)
+            assertRedirects(response, f"{details_contract_url}?back_url={contracts_list_url}")
             assertMessages(
                 response,
                 [
@@ -1176,15 +1238,16 @@ class TestAssessmentContractsDetails:
                 "tab": AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value,
             },
         )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         JUSTIFICATION_TAB_LI = f"""
         <li class="nav-item">
-            <a class="nav-link" href="{details_justification_url}">
+            <a class="nav-link" href="{details_justification_url}?back_url={contracts_list_url}">
                 Motif de refus
             </a>
         </li>"""
         JUSTIFICATION_TAB_WITH_ICON_LI = f"""
         <li class="nav-item">
-            <a class="nav-link" href="{details_justification_url}">
+            <a class="nav-link" href="{details_justification_url}?back_url={contracts_list_url}">
                 Motif de refus <i class="ri-error-warning-line ri-xl text-warning ms-2"></i>
             </a>
         </li>"""
@@ -1199,7 +1262,7 @@ class TestAssessmentContractsDetails:
 
         # User refuses the allowance and gets redirected to the justification form tab
         response = client.post(details_url, data={"action": InstitutionAction.REFUSE_ALLOWANCE})
-        assertRedirects(response, details_justification_url)
+        assertRedirects(response, f"{details_justification_url}?back_url={contracts_list_url}")
         contract.refresh_from_db()
         assert contract.allowance_granted is False
 
@@ -1210,7 +1273,10 @@ class TestAssessmentContractsDetails:
             parse_response_to_soup(
                 response,
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                replace_in_attr=[("href", str(contract.pk), "[Pk of EmployeeContract]")],
+                replace_in_attr=[
+                    ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("href", str(assessment.pk), "[PK of Assessment]"),
+                ],
             )
         ) == snapshot(name="contract detail side box with refused allowance, missing reason, common tab")
 
@@ -1268,7 +1334,10 @@ class TestAssessmentContractsDetails:
             parse_response_to_soup(
                 response,
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                replace_in_attr=[("href", str(contract.pk), "[Pk of EmployeeContract]")],
+                replace_in_attr=[
+                    ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("href", str(assessment.pk), "[PK of Assessment]"),
+                ],
             )
         ) == snapshot(name="contract detail side box with refused allowance, filled reason, common tab")
 
@@ -1279,7 +1348,8 @@ class TestAssessmentContractsDetails:
             reverse(
                 "geiq_assessments_views:assessment_contracts_details",
                 kwargs={"contract_pk": contract.pk, "tab": AssessmentContractDetailsTab.EMPLOYEE},
-            ),
+            )
+            + f"?back_url={contracts_list_url}",
         )
         contract.refresh_from_db()
         assert contract.allowance_granted is True
@@ -1333,7 +1403,10 @@ class TestAssessmentContractsDetails:
             parse_response_to_soup(
                 response,
                 selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
-                replace_in_attr=[("href", str(contract.pk), "[Pk of EmployeeContract]")],
+                replace_in_attr=[
+                    ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("href", str(assessment.pk), "[PK of Assessment]"),
+                ],
             )
         ) == snapshot(name="contract detail side box with refused allowance and validated selection")
 
