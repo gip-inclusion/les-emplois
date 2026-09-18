@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+import pytest
 from django.urls import reverse
 from django.utils.html import escape
 from httpx import Response
@@ -9,17 +10,17 @@ from itou.emails.models import Email
 
 
 class TestEmailAdmin:
-    def test_view_email_success(self, admin_client, success_response):
+    def test_view_email_success_mailjet(self, admin_client, mailjet_success_response):
         email = Email.objects.create(
             to=["you@test.local"],
             cc=[],
             bcc=[],
             subject="Hi",
             body_text="Hello",
-            esp_response=success_response,
+            esp_response=mailjet_success_response,
         )
         response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
-        [message] = success_response["Messages"]
+        [message] = mailjet_success_response["Messages"]
         [status] = message["To"]
         mailjet_url = reverse("admin:emails_email_mailjet", args=(status["MessageID"],))
         assertContains(
@@ -34,14 +35,32 @@ class TestEmailAdmin:
             count=1,
         )
 
-    def test_view_email_error(self, admin_client, error_response):
+    def test_view_email_success_brevo(self, admin_client, success_response):
         email = Email.objects.create(
             to=["you@test.local"],
             cc=[],
             bcc=[],
             subject="Hi",
             body_text="Hello",
-            esp_response=error_response,
+            esp_response=success_response,
+        )
+        response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
+        message_id = success_response["messageId"]
+        brevo_url = reverse("admin:emails_email_brevo", args=(message_id,))
+        assertContains(
+            response,
+            f'<a href="{escape(brevo_url)}">{escape(message_id)}</a>',
+            count=1,
+        )
+
+    def test_view_email_error_mailjet(self, admin_client, mailjet_error_response):
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            esp_response=mailjet_error_response,
         )
         response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
         assertContains(
@@ -56,7 +75,37 @@ class TestEmailAdmin:
             count=1,
         )
 
-    def test_filter_changelist_on_status(self, admin_client, error_response, success_response):
+    def test_view_email_error_brevo(self, admin_client, error_response):
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            esp_response=error_response,
+        )
+        response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
+        assertContains(
+            response,
+            # JSON is escaped.
+            "<pre><code>{&#x27;code&#x27;: &#x27;invalid_parameter&#x27;, "
+            "&#x27;message&#x27;: &#x27;At least &quot;htmlContent&quot;, &quot;textContent&quot; "
+            "or &quot;templateId&quot; must be provided.&#x27;}</code></pre>",
+            count=1,
+        )
+
+    @pytest.fixture(params=["BREVO", "MAILJET"])
+    def esp_responses(
+        self, request, error_response, success_response, mailjet_error_response, mailjet_success_response
+    ):
+        if request.param == "BREVO":
+            return [error_response, success_response]
+        elif request.param == "MAILJET":
+            return [mailjet_error_response, mailjet_success_response]
+        raise ValueError(request.param)
+
+    def test_filter_changelist_on_status(self, admin_client, esp_responses):
+        error_response, success_response = esp_responses
         waiting_email = Email(
             to=["you@test.local"],
             cc=[],
@@ -122,9 +171,24 @@ class TestEmailAdmin:
         assertNotContains(response, error_email_url)
         assertContains(response, email_th(success_email_url), count=1)
 
+    def test_view_brevo_response(self, admin_client, respx_mock, brevo_events_response, settings, success_response):
+        settings.ANYMAIL["BREVO_API_KEY"] = "key"
+        message_id = success_response["messageId"]
+        respx_mock.get(
+            url="https://api.brevo.com/v3/smtp/statistics/events",
+            params={"messageId": message_id},
+        ).mock(
+            return_value=Response(
+                status_code=200,
+                json=brevo_events_response,
+            )
+        )
+        response = admin_client.get(reverse("admin:emails_email_brevo", args=(message_id,)))
+        assert response.json() == brevo_events_response
+
     def test_view_mailjet_response(self, admin_client, respx_mock, mailjet_messagehistory_response, settings):
-        settings.ANYMAIL["MAILJET_API_KEY"] = "key"
-        settings.ANYMAIL["MAILJET_SECRET_KEY"] = "secret"
+        settings.MAILJET_API_KEY = "key"
+        settings.MAILJET_SECRET_KEY = "secret"
         message_id = 2345
         respx_mock.get(url=f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}").mock(
             return_value=Response(
