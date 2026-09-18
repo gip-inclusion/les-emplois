@@ -313,6 +313,10 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     )
 
     has_completed_welcoming_tour = models.BooleanField(verbose_name="parcours de bienvenue effectué", default=False)
+    is_directory_opted_out = models.BooleanField(
+        verbose_name="ne pas apparaître dans l'annuaire des professionnels",
+        default=False,
+    )
 
     created_by = models.ForeignKey(
         "self",

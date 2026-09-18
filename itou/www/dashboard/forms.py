@@ -119,6 +119,7 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
             "first_name",
             "last_name",
             "phone",
+            "is_directory_opted_out",
         ]
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 

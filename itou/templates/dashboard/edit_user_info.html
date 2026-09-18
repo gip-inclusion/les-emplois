@@ -31,7 +31,7 @@
                                     <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
                                     <ul class="mb-0">
                                         {% for field in form %}
-                                            {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
+                                            {% if field.field.required and not field.value or field.name == "phone" and not field.value %}
                                                 <li>
                                                     <strong>{{ field.label }}</strong>
                                                 </li>
@@ -94,6 +94,12 @@
                                     {% bootstrap_field form.last_name %}
                                 {% endif %}
                                 {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                                <hr class="my-4">
+                                <h2 class="h3">Annuaire des professionnels</h2>
+                                <p>
+                                    Vos coordonnées professionnelles peuvent apparaître dans l’annuaire afin que d’autres professionnels puissent vous contacter.
+                                </p>
+                                {% bootstrap_field form.is_directory_opted_out %}
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                                 {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=prev_url %}
