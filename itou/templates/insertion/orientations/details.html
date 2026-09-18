@@ -32,7 +32,7 @@
                 {{ orientation.service.name }}
                 {% orientation_state_badge orientation extra_classes="badge-base" %}
             </h1>
-            <p>Demande d’orientation</p>
+            <p>Demande d’orientation - Émise le {{ orientation.created_at|date:"d/m/Y" }}</p>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if orientation.service.is_active %}
