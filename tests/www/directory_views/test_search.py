@@ -70,6 +70,8 @@ def test_people_search_restores_query_from_url(client):
     assert response.context["form"]["types"].value() == [NexusStructureKind.ML]
     assert response.context["form"]["contacts"].value() == ["phone"]
     assertContains(response, 'id="q-personnes"')
+    assertContains(response, "Annuaire Pro en accès bêta restreint")
+    assertContains(response, "directory-tally-hidden-fields")
 
 
 def test_people_search_matches_hyphenated_name(client):

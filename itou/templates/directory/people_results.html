@@ -16,6 +16,7 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
+            {% include "directory/includes/beta_notice.html" %}
             <form id="people-search-form"
                   method="get"
                   hx-get="{% url 'directory:people_results' %}"
@@ -33,6 +34,11 @@
 
 {% block script %}
     {{ block.super }}
+    {{ tally_hidden_fields|json_script:"directory-tally-hidden-fields" }}
+    {% if TALLY_URL %}
+        <script src="{{ TALLY_URL }}/widgets/embed.js"></script>
+    {% endif %}
     <script src="{% static 'js/htmx_compat.js' %}"></script>
     <script src="{% static 'js/htmx_dropdown_filter.js' %}"></script>
+    <script src="{% static 'js/directory.js' %}"></script>
 {% endblock %}

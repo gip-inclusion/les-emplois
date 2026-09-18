@@ -18,9 +18,13 @@ def test_person_detail_preserves_back_url_and_hides_contact(client):
     assertNotContains(response, target_organization.phone)
     assertContains(response, "Afficher l'adresse e-mail")
     assertContains(response, "Afficher le téléphone de la structure")
+    assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "https://www.openstreetmap.org/")
     assertContains(response, target_organization.get_card_url())
     assertContains(response, "https://mission-locale.example")
+    assertContains(response, "directory-tally-hidden-fields")
+    assert response.context["tally_hidden_fields"]["mail"]
+    assert response.context["tally_hidden_fields"]["kind"] == "employeur"
 
 
 def test_person_detail_displays_missing_phone(client):

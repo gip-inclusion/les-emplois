@@ -64,6 +64,17 @@ def _filter_people(people, form):
     return people
 
 
+def _tally_hidden_fields(request):
+    organization = request.current_organization
+    return {
+        "id": request.user.get_full_name(),
+        "kind": organization.member_kind_display,
+        "mail": request.user.email,
+        "org": getattr(organization, "display_name", organization.name),
+        "town": organization.city,
+    }
+
+
 @check_request(can_access_directory)
 @readonly_view
 def people_results(request, template_name="directory/people_results.html"):
@@ -75,6 +86,7 @@ def people_results(request, template_name="directory/people_results.html"):
     context = {
         "form": form,
         "results": results,
+        "tally_hidden_fields": _tally_hidden_fields(request),
         "matomo_custom_title": "Annuaire pro - Personnes",
     }
     return render(
@@ -103,6 +115,7 @@ def _person_detail_context(request, person, contact_form=None):
             "back_url",
             fallback_url=reverse("directory:people_results"),
         ),
+        "tally_hidden_fields": _tally_hidden_fields(request),
         "matomo_custom_title": "Annuaire pro - Fiche personne",
     }
 
