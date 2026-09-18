@@ -67,8 +67,17 @@ def anonymize_and_delete_professionals(users):
 
 def anonymize_professionals_without_deletion(users):
     user_ids = [user.id for user in users]
+
+    # `updated_at` is `auto_now`, but `auto_now` is only automatically updated when calling Model.save().
+    # The field isn’t updated when making updates to other fields in other ways such as QuerySet.update()
+    # https://docs.djangoproject.com/en/6.0/ref/models/fields/#django.db.models.DateField.auto_now
+    # `updated_at` and `updated_by` are manually reset otherwise the previous author would appear to be
+    # the one deactivating the membership.
+    now = timezone.now()
     for model in [CompanyMembership, InstitutionMembership, PrescriberMembership]:
-        model.objects.filter(user_id__in=user_ids).update(is_active=False)
+        model.objects.filter(user_id__in=user_ids).update(
+            is_active=False, is_admin=False, updated_by=None, updated_at=now
+        )
 
     EmailAddress.objects.filter(user_id__in=user_ids).delete()
 
@@ -96,5 +105,10 @@ def anonymize_professionals_without_deletion(users):
         coords=None,
         insee_city=None,
     )
+
+    for user in users:
+        user.username = user.deactivated_username
+    User.objects.bulk_update(users, ["username"])
+
     text = f"{timezone.localtime().replace(microsecond=0)} - Désactivation/archivage de l'utilisateur"
     bulk_add_support_remark_to_objs(users, text)

@@ -767,7 +767,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         )
 
         user.email = f"{user.email}_old"
-        user.username = f"old_{user.username}"
+        user.username = user.deactivated_username
         user.is_active = False
         changed_fields = ["email", "username", "is_active"]  # As a list to mimic Django change_message format
         user.save(update_fields=changed_fields)

@@ -541,6 +541,14 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             return department_from_postcode(self.jobseeker_profile.hexa_post_code)
         return ""
 
+    @property
+    def deactivated_username(self):
+        # `username` can hold the SSO `sub`.
+        # When we deactivate a user, we want to free the identifier so the user can create a new account.
+        # The `pk` makes the value unique avoiding conflict
+        # if a new account with the freed `sub` is deactivated in turn.
+        return f"old_{self.pk}_{self.username}"
+
     def can_be_reactivated(self):
         if self.is_active:  # Already active
             return False
