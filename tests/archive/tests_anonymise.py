@@ -27,6 +27,7 @@ def test_anonymize_professional_without_deletion():
         updated_by=ItouStaffFactory(),
     )
     employer = membership.user
+    username_before_anonymization = employer.username
     updated_at_before_anonymization = membership.updated_at
 
     with triggers.fake_context():
@@ -44,6 +45,7 @@ def test_anonymize_professional_without_deletion():
     assert employer.insee_city is None
     assert employer.first_name == "Alice"
     assert employer.last_name == "Cooper"
+    assert employer.username == f"old_{employer.pk}_{username_before_anonymization}"
 
     membership = CompanyMembership.include_inactive.get(user=employer)
     assert not membership.is_active
