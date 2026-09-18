@@ -959,3 +959,27 @@ def test_has_valid_data_filled():
     # OK with a NTT
     employee_record.ntt = "11234567890"
     assert employee_record.has_valid_data_filled() is True
+
+
+def test_watched_data_updated_at_race_condition(faker):
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    approval = employee_record.job_application.approval
+    assert employee_record.watched_data_updated_at is None
+
+    # A query starts to load the approval to update its end date
+    updated_approval = Approval.objects.get(pk=approval.pk)
+    updated_approval.end_at += datetime.timedelta(days=1)
+
+    # An other query loads the employee record without taking a lock
+    employee_record_to_update = EmployeeRecord.objects.get(pk=employee_record.pk)
+
+    # The approval end at date it modified, triggering a trigger
+    # which sets employee_record.watched_data_updated_at via a trigger
+    updated_approval.save(update_fields={"end_at", "updated_at"})
+
+    # The employee record transition is triggered and
+    # this shouldn't touch employee_record.watched_data_updated_at
+    employee_record_to_update.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+
+    # The employee record should have its watched_data_updated_at flag still set
+    assert EmployeeRecord.objects.get(pk=employee_record.pk).watched_data_updated_at is not None

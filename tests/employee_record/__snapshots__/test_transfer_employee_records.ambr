@@ -65,7 +65,7 @@
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 5,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -94,7 +94,6 @@
                  "employee_record_employeerecord"."created_at",
                  "employee_record_employeerecord"."updated_at",
                  "employee_record_employeerecord"."processed_at",
-                 "employee_record_employeerecord"."watched_data_updated_at",
                  "employee_record_employeerecord"."status",
                  "employee_record_employeerecord"."job_application_id",
                  "employee_record_employeerecord"."ntt",
@@ -379,6 +378,22 @@
       }),
       dict({
         'origin': list([
+          'EmployeeRecord.process[employee_record/models.py]',
+          'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records.py]',
+          'Command.download_json_file[employee_record/common_management.py]',
+          'Command.download[employee_record/management/commands/transfer_employee_records.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records.py]',
+        ]),
+        'sql': '''
+          SELECT "employee_record_employeerecord"."id",
+                 "employee_record_employeerecord"."watched_data_updated_at"
+          FROM "employee_record_employeerecord"
+          WHERE "employee_record_employeerecord"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'EmployeeRecord.save[<site-packages>/django/db/models/base.py]',
           'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records.py]',
           'Command.download_json_file[employee_record/common_management.py]',
@@ -488,7 +503,6 @@
                  "employee_record_employeerecord"."created_at",
                  "employee_record_employeerecord"."updated_at",
                  "employee_record_employeerecord"."processed_at",
-                 "employee_record_employeerecord"."watched_data_updated_at",
                  "employee_record_employeerecord"."status",
                  "employee_record_employeerecord"."job_application_id",
                  "employee_record_employeerecord"."ntt",
@@ -786,7 +800,6 @@
               "created_at" = %s,
               "updated_at" = %s,
               "processed_at" = NULL,
-              "watched_data_updated_at" = NULL,
               "status" = %s,
               "job_application_id" = %s,
               "ntt" = NULL,

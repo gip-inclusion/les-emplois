@@ -7,10 +7,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, Max, OuterRef, Subquery
+from django.db.models import Exists, F, Max, OuterRef, Q, Subquery
 from django.db.models.functions import Greatest
-from django.db.models.manager import Manager
-from django.db.models.query import Q, QuerySet
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -221,6 +220,15 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
 
+class EmployeeRecordManager(models.Manager.from_queryset(EmployeeRecordQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return (
+            super().get_queryset().defer("watched_data_updated_at")  # Deferred to prevent accidental UPDATE
+        )
+
+
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
     # also block any approval date updates on linked approvals since a trigger would
@@ -260,6 +268,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
+    # This field is only set by update_employee_record_watched_data_updated_at trigger
+    # when a linked approval date is changed and only reset (set to None) by
+    # _check_and_remove_watched_data_updated_at function which is supposed to operate on locked
+    # EmployeeRecord.
     watched_data_updated_at = models.DateTimeField(
         verbose_name="date de dernière modification des éléments liés",
         help_text="Typiquement les dates du PASS IAE lié",
@@ -313,8 +325,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     # Forcing a 'PROCESSED' status enables communication for employee record update notifications.
     processed_as_duplicate = models.BooleanField(verbose_name="déjà intégrée par l'ASP", default=False)
 
-    # Added typing helper: improved type checking for `objects` methods
-    objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
+    objects = EmployeeRecordManager()
 
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "fiche salarié"
