@@ -32,7 +32,7 @@
                 {{ orientation.service.name }}
                 {% orientation_state_badge orientation extra_classes="badge-base" %}
             </h1>
-            <p>Demande d’orientation</p>
+            <p>Demande d’orientation - Émise le {{ orientation.created_at|date:"d/m/Y" }}</p>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if orientation.service.is_active %}
@@ -44,6 +44,9 @@
             {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
+    {% if can_process and has_actions %}
+        {% include "insertion/includes/orientations/service_provider_actions.html" with link=link csrf_token=csrf_token only %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -123,7 +126,7 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Motifs de l’orientation</h2>
                             <blockquote class="blockquote mb-0">
-                                {{ orientation.orientation_reasons }}
+                                {{ orientation.orientation_reasons|linebreaksbr }}
                             </blockquote>
                         </div>
                     {% endif %}
