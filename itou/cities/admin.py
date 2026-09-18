@@ -14,12 +14,21 @@ class CityAdmin(ReadonlyMixin, ItouGISMixin, ItouModelAdmin):
     search_fields = (
         "name__istartswith",
         "department__exact",
-        "post_codes",
         "code_insee__iexact",
         "siren_epci__istartswith",
     )
 
     readonly_fields = ("zrr", "edition_mode")
+
+    def get_search_results(self, request, queryset, search_term):
+        # The default admin search casts ArrayField to text, so "75" also matches "01750".
+        # This override forces postcodes search to be performed as ArrayField.
+        base_queryset = queryset
+        queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
+        search_term = search_term.strip()
+        if len(search_term) == 5 and search_term.isdecimal():
+            queryset |= base_queryset.filter(post_codes__contains=[search_term])
+        return queryset, may_have_duplicates
 
     fields = (
         "name",
