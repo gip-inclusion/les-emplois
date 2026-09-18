@@ -146,6 +146,11 @@ class Structure(GeolocatedAddressMixin, models.Model):
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
+    accessibilite_lieu = models.URLField(
+        verbose_name="accessibilité du lieu",
+        blank=True,
+        max_length=2000,
+    )
 
     reseaux_porteurs = models.ManyToManyField(
         verbose_name="réseaux porteurs",
@@ -463,14 +468,8 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.updated_on < timezone.localdate() - relativedelta(months=6)
 
     @property
-    def prerequisites(self) -> list[str]:
-        if self.is_dora:
-            return [*self.access_conditions_dora, *self.credentials]
-        return [line.strip(". ") for line in self.access_conditions_di.split("\\n") if line]
-
-    @property
     def has_prerequisites(self) -> bool:
-        return bool(self.prerequisites)
+        return bool(self.access_conditions_di.strip())
 
     @property
     def from_non_orientable_di_source(self) -> bool:
@@ -734,15 +733,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         default=False,
     )
 
-    # `attachments` will be removed in favor of `documents` when we stop posting orientations to DORA
+    # DORA S3 keys from Emplois; drop when we stop posting orientations to DORA.
     attachments = ArrayField(
         models.CharField(max_length=1024),
         verbose_name="documents joints",
         blank=True,
         default=list,
     )
-    # `documents` are saved but not displayed for now; we still display `attachments` until we stop posting to DORA
-    documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="+")  #
+    # Itou-stored wizard uploads; shown in orientation recap via `documents_details`.
+    documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="+")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -787,6 +786,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     @property
     def attachments_details(self):
         return [(form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.attachments]
+
+    @property
+    def documents_details(self):
+        return [(file.key.rsplit("/", 1)[-1], file.url()) for file in self.documents.all()]
 
     @property
     def beneficiary_contact_preferences_display(self):

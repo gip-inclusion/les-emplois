@@ -1,5 +1,4 @@
 from datetime import timedelta
-from unittest.mock import patch
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -61,8 +60,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         structure__updated_on="2025-01-15",
         fee=fee,
         fee_details="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location",
-        access_conditions_dora=["Résident QPV / ZFRR"],
-        credentials=["Pièce d'identité", "Justificatif de domicile"],
+        access_conditions_di="Résident **QPV / ZFRR**",
     )
     service.publics.add(public)
 
@@ -216,10 +214,18 @@ def test_documents_step_credential_documents(client):
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
         is_orientable_with_form=True,
-        credentials_documents=[
-            "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_PACEA_2025.pdf",
-            "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf",
-        ],
+        extra={
+            "forms": [
+                {
+                    "name": "flyer_PACEA_2025.pdf",
+                    "url": "https://s3.example.com/flyer_PACEA_2025.pdf?token=aaa",
+                },
+                {
+                    "name": "flyer_CEJ_2025.pdf",
+                    "url": "https://s3.example.com/flyer_CEJ_2025.pdf?token=bbb",
+                },
+            ]
+        },
         structure__name="Structure orientation wizard",
     )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -251,15 +257,7 @@ def test_documents_step_credential_documents(client):
         },
     )
 
-    s3_urls = [
-        "https://s3.example.com/flyer_PACEA_2025.pdf?token=aaa",
-        "https://s3.example.com/flyer_CEJ_2025.pdf?token=bbb",
-    ]
-    with patch(
-        "itou.insertion.models.generate_dora_storage_url",
-        side_effect=s3_urls,
-    ):
-        response = client.get(documents_url)
+    response = client.get(documents_url)
 
     assert response.status_code == 200
     assert response.context["credential_documents"] == [

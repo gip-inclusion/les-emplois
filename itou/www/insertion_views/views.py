@@ -74,30 +74,10 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
                     .select_related("kind")
                     .prefetch_related("receptions"),
                 ),
+                "reseaux_porteurs",
             ),
             uid=structure_uid,
         )
-
-    def format_opening_hours(self):
-        opening_hours = []
-
-        osm_hours = format_osm_hours(self.structure.opening_hours)
-
-        if not osm_hours:
-            return None
-
-        for entry in osm_hours["entries"]:
-            label = entry["label"][:3]
-            hours = entry["hours"]
-            comment = f"({entry['comment']}) " if entry["comment"] else ""
-
-            opening_hours.append(f"{label}: {hours} {comment}")
-
-        formatted_opening_hours = "• ".join(opening_hours).rstrip()
-
-        public_holidays_notice = "(Hors jours fériés)" if osm_hours["has_ph_off"] else ""
-
-        return f"{formatted_opening_hours} {public_holidays_notice}"
 
     def get_context_data(self, **kwargs):
         services = list(self.structure.services.all())
@@ -115,7 +95,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
                 fallback_url=reverse("search:services_home"),
             ),
             "services": services,
-            "formatted_opening_hours": self.format_opening_hours(),
+            "formatted_opening_hours": format_osm_hours(self.structure.opening_hours),
             "can_register_mobilization_event": can_register_mobilization_event(self.request),
         }
 
@@ -550,12 +530,14 @@ class OrientationWizardView(WizardView):
             "can_view_personal_information": self.can_view_personal_information,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "missing_beneficiary_fields": get_missing_orientation_beneficiary_field_labels(self.job_seeker),
-            "credential_documents": self.service.generate_credential_documents_info(),
+            "credential_documents": self.service.generate_extra_credential_documents_info(),
             "OrientationStep": OrientationStep,
             "matomo_custom_title": matomo_titles[self.step],
             "matomo_custom_url": f"orientations/<uuid:session_uuid>/create/{self.step}/",
             "matomo_event_name": f"orientation-{self.step}-submit",
-            "show_orientation_disclaimer": not self.wizard_session.get("disclaimer_dismissed", False),
+            "show_orientation_disclaimer": (
+                self.step == OrientationStep.CONFORMITY and not self.wizard_session.get("disclaimer_dismissed", False)
+            ),
             "orientation_session_uuid": self.wizard_session.name,
             "exit_url": get_orient_for_job_seeker_context(self.request)["exit_url"],
         }

@@ -3,6 +3,7 @@
 {% load format_filters %}
 {% load markdownify %}
 {% load matomo %}
+{% load str_filters %}
 {% load url_add_query %}
 
 
@@ -175,13 +176,13 @@
                                     </div>
                                 </li>
                             {% endif %}
-                            {% if service.prerequisites %}
+                            {% if service.has_prerequisites %}
                                 <li>
                                     <small>Conditions d'accès</small>
-                                    {% with prerequisites_text=service.prerequisites|join:", " %}
+                                    {% with prerequisites_text=service.access_conditions_di|normalize_di_markdown %}
                                         {% if prerequisites_text|length > 100 %}
                                             <div class="collapse show has-no-transition" id="collapse-prerequisites-collapsed">
-                                                <strong>{{ prerequisites_text|truncatechars:100 }}</strong>
+                                                <strong>{{ prerequisites_text|markdownify|striptags|truncatechars:100 }}</strong>
                                                 <button class="bs-btn-active-color btn-link d-inline-block mt-2"
                                                         type="button"
                                                         data-bs-toggle="collapse"
@@ -192,10 +193,10 @@
                                                 </button>
                                             </div>
                                             <div class="collapse has-no-transition" id="collapse-prerequisites-expanded">
-                                                <strong>{{ prerequisites_text|markdownify }}</strong>
+                                                <div class="fw-bold">{{ prerequisites_text|markdownify }}</div>
                                             </div>
                                         {% else %}
-                                            <strong>{{ prerequisites_text|markdownify }}</strong>
+                                            <div class="fw-bold">{{ prerequisites_text|markdownify }}</div>
                                         {% endif %}
                                     {% endwith %}
                                 </li>
