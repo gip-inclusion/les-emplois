@@ -7,10 +7,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, Max, OuterRef, Subquery
+from django.db.models import Exists, F, Max, OuterRef, Q, Subquery
 from django.db.models.functions import Greatest
-from django.db.models.manager import Manager
-from django.db.models.query import Q, QuerySet
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -221,6 +220,15 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
 
+class EmployeeRecordManager(models.Manager.from_queryset(EmployeeRecordQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return (
+            super().get_queryset().defer("watched_data_updated_at")  # Deferred to prevent accidental UPDATE
+        )
+
+
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
     # also block any approval date updates on linked approvals since a trigger would
@@ -317,8 +325,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     # Forcing a 'PROCESSED' status enables communication for employee record update notifications.
     processed_as_duplicate = models.BooleanField(verbose_name="déjà intégrée par l'ASP", default=False)
 
-    # Added typing helper: improved type checking for `objects` methods
-    objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
+    objects = EmployeeRecordManager()
 
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "fiche salarié"
@@ -333,28 +340,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
                 name="employee_record_ntt_regex",
             ),
         ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._initial_watched_data_updated_at_value = self.watched_data_updated_at
-
-    def save(self, *args, force_insert=False, update_fields=None, **kwargs):
-        if (
-            not force_insert
-            and self._is_pk_set()
-            and update_fields is None
-            and self.watched_data_updated_at == self._initial_watched_data_updated_at_value
-        ):
-            # The watched_data_updated_at has apparently not been modified
-            # then we DO NOT want to UPDATE this field to reduce the probability of a race condition with
-            # the trigger responsible for setting it.
-            update_fields = set()
-            pk_fields = self._meta.pk_fields
-            for field in self._meta.concrete_fields:
-                if field not in pk_fields and not hasattr(field, "through"):
-                    update_fields.add(field.attname)
-            update_fields.remove("watched_data_updated_at")
-        return super().save(*args, force_insert=force_insert, update_fields=update_fields, **kwargs)
 
     def __str__(self):
         return (
