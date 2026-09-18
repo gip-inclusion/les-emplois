@@ -173,8 +173,8 @@ def test_orientation_process_link_expiration():
         process_link = OrientationProcessLinkFactory()
     assert process_link.is_valid
 
-    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDTITY_SECONDS)):
+    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDITY_SECONDS)):
         assert process_link.is_valid
 
-    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDTITY_SECONDS + 1)):
+    with freeze_time(now + datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDITY_SECONDS + 1)):
         assert not process_link.is_valid

@@ -831,7 +831,7 @@ def _generate_key():
 
 
 class OrientationProcessLink(models.Model):
-    MAX_VALIDTITY_SECONDS = 7 * 24 * 3600  # 7 days
+    MAX_VALIDITY_SECONDS = 7 * 24 * 3600  # 7 days
 
     id = models.CharField(primary_key=True, default=_generate_key)
     orientation = models.ForeignKey(Orientation, on_delete=models.CASCADE, related_name="process_links")
@@ -854,4 +854,4 @@ class OrientationProcessLink(models.Model):
 
     @property
     def is_valid(self):
-        return timezone.now() <= self.created_at + datetime.timedelta(seconds=self.MAX_VALIDTITY_SECONDS)
+        return timezone.now() <= self.created_at + datetime.timedelta(seconds=self.MAX_VALIDITY_SECONDS)
