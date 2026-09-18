@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}{{ person.full_name }} {{ block.super }}{% endblock %}
@@ -74,6 +75,14 @@
                         </div>
                     </div>
 
+                    <h2>Envoyer un message</h2>
+                    <p>Votre message sera transmis par e-mail. La personne pourra vous répondre directement.</p>
+                    <form id="contact-form" method="post" action="{% url 'directory:send_message' key=person.key %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="back_url" value="{{ back_url }}">
+                        {% bootstrap_form contact_form alert_error_type="all" %}
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -83,4 +92,5 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/htmx_compat.js' %}"></script>
+    <script src="{% static 'js/directory.js' %}"></script>
 {% endblock %}
