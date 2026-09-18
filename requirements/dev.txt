@@ -24,6 +24,12 @@ asttokens==3.0.2 \
     --hash=sha256:3ecdbd8f2cc195f53ccada3a613538bb5f9ef6f6869129f13e03c30a677b8fe2 \
     --hash=sha256:9da13157f5b28becde0bd374fc677dcd3c290614264eff096f167c469cd9f933
     # via stack-data
+async-lru==2.3.0 \
+    --hash=sha256:89bdb258a0140d7313cf8f4031d816a042202faa61d0ab310a0a538baa1c24b6 \
+    --hash=sha256:eea27b01841909316f2cc739807acea1c623df2be8c5cfad7583286397bb8315
+    # via
+    #   -r test.txt
+    #   py-identity-model
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309 \
     --hash=sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32
@@ -689,6 +695,7 @@ cryptography==50.0.1 \
     #   django-fernet-encrypted-fields
     #   jwcrypto
     #   paramiko
+    #   py-identity-model
 cssbeautifier==2.0.3 \
     --hash=sha256:14650d9c8a47adcb80a7697a866a3921fe0332ef74a92e1039d09086aa0c5001 \
     --hash=sha256:2c2fd129342561029de86b1744efa231c9fafe26023dbc988a1deb0ca0f5c845
@@ -1093,6 +1100,7 @@ httpx==0.28.1 \
     # via
     #   -r test.txt
     #   itoutils
+    #   py-identity-model
     #   respx
 huey==3.4.0 \
     --hash=sha256:ac9b02e741f13da4092ea19bcaafc73669e97d3153914d2fed2868df144f6dfa \
@@ -1142,7 +1150,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django,django-testing]==26.7.9.0 \
+itoutils[django, django-testing]==26.7.9.0 \
     --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
     --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
     # via -r test.txt
@@ -2206,6 +2214,10 @@ pure-eval==0.2.4 \
     --hash=sha256:260c2774686e651b79f8b8e7fc9d80b3599ea6a66334b47d5f4abb69fc2c0ea1 \
     --hash=sha256:96cae060a313cfaad51bb761278bfb0e62dc0248d9315a81173752dc546cd37a
     # via stack-data
+py-identity-model==3.18.2 \
+    --hash=sha256:538a5cf45d38c3486fbc7deecaf0bbf8e3f4fc33d8d1390e488ecbce34c5130b \
+    --hash=sha256:a832c971d15f0458353583357ef35249fe55691db249f90f594397a48abea6e8
+    # via -r test.txt
 pycparser==3.0 \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
@@ -2399,7 +2411,9 @@ pygments==2.21.0 \
 pyjwt==2.13.0 \
     --hash=sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423 \
     --hash=sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728
-    # via -r test.txt
+    # via
+    #   -r test.txt
+    #   py-identity-model
 pynacl==1.6.2 \
     --hash=sha256:018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c \
     --hash=sha256:018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c \

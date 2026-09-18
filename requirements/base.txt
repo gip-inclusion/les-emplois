@@ -16,6 +16,10 @@ asgiref==3.12.1 \
     #   django
     #   django-allauth
     #   django-htmx
+async-lru==2.3.0 \
+    --hash=sha256:89bdb258a0140d7313cf8f4031d816a042202faa61d0ab310a0a538baa1c24b6 \
+    --hash=sha256:eea27b01841909316f2cc739807acea1c623df2be8c5cfad7583286397bb8315
+    # via py-identity-model
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309 \
     --hash=sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32
@@ -657,6 +661,7 @@ cryptography==50.0.1 \
     #   django-fernet-encrypted-fields
     #   jwcrypto
     #   paramiko
+    #   py-identity-model
 data-inclusion-schema==1.0.9 \
     --hash=sha256:b624dda8d28eae29cfd3b28e522baa90b560e1f886ebbb1a9ac4613babef2f29 \
     --hash=sha256:ddc5c84a5807ceeff9c6ca6e5fbfe736d5a7423fc9c0ac98efaf013fcd9fbb4a
@@ -917,6 +922,7 @@ httpx==0.28.1 \
     # via
     #   -r base.in
     #   itoutils
+    #   py-identity-model
 huey==3.4.0 \
     --hash=sha256:ac9b02e741f13da4092ea19bcaafc73669e97d3153914d2fed2868df144f6dfa \
     --hash=sha256:d0580762397744026f83baae5f2b97a62474a62b8565ac75bbafefe72f9c784f
@@ -1868,6 +1874,10 @@ psycopg-binary==3.2.12 \
     --hash=sha256:f8107968a9eadb451cfa6cf86036006fdde32a83cd39c26c9ca46765e653b547 \
     --hash=sha256:f821e0c8a8fdfddfa71acb4f462d7a4c5aae1655f3f5e078970dbe9f19027386
     # via psycopg
+py-identity-model==3.18.2 \
+    --hash=sha256:538a5cf45d38c3486fbc7deecaf0bbf8e3f4fc33d8d1390e488ecbce34c5130b \
+    --hash=sha256:a832c971d15f0458353583357ef35249fe55691db249f90f594397a48abea6e8
+    # via -r base.in
 pycparser==3.0 \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
@@ -2045,7 +2055,9 @@ pydantic-core==2.41.5 \
 pyjwt==2.13.0 \
     --hash=sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423 \
     --hash=sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728
-    # via -r base.in
+    # via
+    #   -r base.in
+    #   py-identity-model
 pynacl==1.6.2 \
     --hash=sha256:018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c \
     --hash=sha256:018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c \

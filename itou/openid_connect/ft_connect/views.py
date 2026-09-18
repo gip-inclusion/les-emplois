@@ -1,20 +1,27 @@
-import json
 import logging
 
-import httpx
-import jwt
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_not_required
-from django.core.cache import cache
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from itoutils.urls import add_url_params
+from py_identity_model import (
+    AuthorizationCodeTokenRequest,
+    DiscoveryDocumentRequest,
+    PyIdentityModelException,
+    TokenValidationConfig,
+    UserInfoRequest,
+    build_authorization_url,
+    get_discovery_document,
+    get_userinfo,
+    request_authorization_code_token,
+    validate_id_token,
+)
 
 from itou.external_data.tasks import huey_import_user_ft_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
@@ -43,40 +50,26 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     return HttpResponseRedirect(reverse("account_login"))
 
 
-FRANCE_TRAVAIL_CONNECT_KEY = "ft-connect-key"
-
-
-def get_rsa_key():
-    if key := cache.get(FRANCE_TRAVAIL_CONNECT_KEY):
-        return key
-
-    jwks = httpx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_JWKS, timeout=5)
-    rsa256_keys = [key for key in jwks.json()["keys"] if key["kty"] == "RSA"]
-    if not rsa256_keys:
-        raise ValueError("No RSA key found in FranceConnect JWKS")
-    key = rsa256_keys[0]
-    cache.set(FRANCE_TRAVAIL_CONNECT_KEY, key, 24 * 60 * 60)
-    return key
-
-
 @login_not_required
 def ft_connect_authorize(request):
+    disco_doc = get_discovery_document(DiscoveryDocumentRequest(address=constants.FRANCETRAVAIL_CONNECT_DISCOVERY))
     # The redirect_uri should be defined in the France Travail Connect settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/ft_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
     state = FranceTravailConnectState.save_state(nonce=nonce)
-    data = {
-        "response_type": "code",
-        "client_id": settings.API_ESD["KEY"],
-        "redirect_uri": redirect_uri,
-        "scope": constants.FRANCETRAVAIL_CONNECT_SCOPES,
-        "state": state,
-        "nonce": nonce,
-        "realm": "/individu",  # France Travail Connect specificity
-    }
-    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_AUTHORIZE
-    return HttpResponseRedirect(f"{url}?{urlencode(data)}")
+    print(constants.FRANCETRAVAIL_CONNECT_DISCOVERY)
+
+    auth_url = build_authorization_url(
+        authorization_endpoint=disco_doc.authorization_endpoint,
+        client_id=settings.API_ESD["KEY"],
+        redirect_uri=redirect_uri,
+        scope=constants.FRANCETRAVAIL_CONNECT_SCOPES,
+        state=state,
+        nonce="nonce",
+        realm="/individu",  # France Travail Connect specificity
+    )
+    return HttpResponseRedirect(auth_url)
 
 
 # This view expects a GET but is not readonly (it is likely to create/update an user):
@@ -104,76 +97,64 @@ def ft_connect_callback(request):
 
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
 
-    data = {
-        "client_id": settings.API_ESD["KEY"],
-        "client_secret": settings.API_ESD["SECRET"],
-        "code": code,
-        "grant_type": "authorization_code",
-        "redirect_uri": redirect_uri,
-    }
+    disco_doc = get_discovery_document(DiscoveryDocumentRequest(address=constants.FRANCETRAVAIL_CONNECT_DISCOVERY))
+    token_request = AuthorizationCodeTokenRequest(
+        address=disco_doc.token_endpoint,
+        client_id=settings.API_ESD["KEY"],
+        client_secret=settings.API_ESD["SECRET"],
+        code=code,
+        redirect_uri=redirect_uri,
+    )
+    token_response = request_authorization_code_token(token_request)
 
-    url = add_url_params(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
-    try:
-        response = httpx.post(url, data=data, timeout=5)
-        response.raise_for_status()
-        if response.status_code not in [200, 201]:
-            raise httpx.HTTPStatusError(
-                f"Unexpected status code: {response.status_code}", request=response._request, response=response
-            )
-    except httpx.HTTPError:
+    if not token_response.is_successful:
+        print(token_response.error)
         logger.error("FT Connect token request failed", exc_info=True)
         error_msg = (
             f"Impossible d'obtenir le jeton de {IdentityProvider.FT_CONNECT.label}. Réessayez dans quelques minutes."
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    # Contains access_token, token_type, expires_in, id_token
-    token_data = response.json()
+    # id_token reçu dans token_response.token["id_token"] (étape précédente)
+    id_token = token_response.token["id_token"]
+    access_token = token_response.token.get("access_token")
 
-    rsa_key = get_rsa_key()
-    try:
-        id_token_content = jwt.decode(
-            token_data["id_token"],
-            key=jwt.api_jwk.PyJWK(rsa_key).key,
-            algorithms=["RS256"],
-            audience=settings.API_ESD["KEY"],
-            options={"verify_iat": False},
-        )
-    except jwt.PyJWTError as e:
-        error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
-        logger.error("FT Connect id_token decode error: %s", e)
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
-    if id_token_content.get("nonce") != ft_state.nonce:
-        error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
-        logger.error("FT Connect id_token nonce mismatch")
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
-
-    if not token_data or "access_token" not in token_data:
+    if not access_token:
         error_msg = (
             f"Aucun champ « access_token » dans la réponse {IdentityProvider.FT_CONNECT.label}, "
             "impossible de vous authentifier"
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    access_token = token_data["access_token"]
+    config = TokenValidationConfig(
+        perform_disco=True,
+        audience=settings.API_ESD["KEY"],
+    )
+
+    try:
+        claims = validate_id_token(
+            id_token=id_token,
+            token_validation_config=config,
+            disco_doc_address=constants.FRANCETRAVAIL_CONNECT_DISCOVERY,
+            nonce=ft_state.nonce,
+            access_token=access_token,  # Verify at_hash if present
+        )
+    except PyIdentityModelException as e:
+        error_msg = f"Le jeton d’authentification de {IdentityProvider.FT_CONNECT.label} est invalide."
+        logger.error("FT Connect id_token decode error: %s", e)
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO
+    userinfo_request = UserInfoRequest(
+        address=disco_doc.userinfo_endpoint,
+        token=access_token,
+        expected_sub=claims["sub"],  # optional : check the sub is the same as in the id_token
+    )
+    userinfo_response = get_userinfo(userinfo_request)
 
-    try:
-        response = httpx.get(
-            url,
-            params={"schema": "openid"},
-            headers={"Authorization": "Bearer " + access_token},
-            timeout=10,
-        )
-        response.raise_for_status()
-        if response.status_code != 200:
-            raise httpx.HTTPStatusError(
-                f"Unexpected status code: {response.status_code}", request=response._request, response=response
-            )
-    except httpx.HTTPError:
+    if not userinfo_response.is_successful:
+        print(userinfo_response.error)
         logger.error("FT Connect user info request failed", exc_info=True)
         error_msg = (
             f"Impossible d'obtenir les informations utilisateur de {IdentityProvider.FT_CONNECT.label}. "
@@ -182,22 +163,7 @@ def ft_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
-        user_data = json.loads(response.content)
-    except json.decoder.JSONDecodeError:
-        error_msg = "Impossible de décoder les informations utilisateur."
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
-
-    if "sub" not in user_data:
-        # 'sub' is the unique identifier from {IdentityProvider.FT_CONNECT}, we need that to match a user later on
-        error_msg = (
-            f"Le paramètre « sub » n'a pas été retourné par {IdentityProvider.FT_CONNECT.label}. "
-            "Il est nécessaire pour identifier un utilisateur."
-        )
-        logger.error(error_msg, exc_info=True)
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
-
-    try:
-        ft_user_data = FranceTravailConnectUserData.from_user_info(user_data)
+        ft_user_data = FranceTravailConnectUserData.from_user_info(userinfo_response.claims)
     except KeyError as e:
         if "email" in e.args:
             return HttpResponseRedirect(reverse("ft_connect:no_email"))
@@ -245,7 +211,7 @@ def ft_connect_callback(request):
         huey_import_user_ft_data(user, access_token, triggers_context=triggers_context)
 
     # Keep token_data["id_token"] to logout from France Travail Connect
-    request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]
+    request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = id_token
     request.session.modified = True
 
     login(request, user)

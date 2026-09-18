@@ -118,6 +118,10 @@ pyzipper  # https://github.com/danifus/pyzipper
 # Stream XLSX files
 xlsx_streaming  # https://github.com/Polyconseil/xlsx_streaming
 
+# OpenID Connect - handle specs
+py-identity-model  # https://github.com/jamescrowley321/identity-model
+
+
 # S3
 # ------------------------------------------------------------------------------
 
