@@ -1,4 +1,3 @@
-import datetime
 import logging
 import urllib.parse
 from functools import cached_property
@@ -34,6 +33,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
@@ -51,7 +51,6 @@ from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireWizardMixin
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
-    IAE_CONTRACT_ENDING_SOON_DAYS,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
     CreateOrUpdateJobSeekerStep1Form,
@@ -62,7 +61,7 @@ from itou.www.job_seekers_views.forms import (
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
-    annotate_last_contract_end_date,
+    annotate_end_of_journey,
 )
 
 
@@ -121,6 +120,32 @@ def get_last_assignment(request, job_seeker, from_all_coworkers=False, archived=
         .filter(job_seeker=job_seeker)
         .order_by("-last_action_at")
         .first()
+    )
+
+
+def annotate_pro_support_report_advisor(queryset):
+    # Only authorized prescribers read the report: the IAE contracts tab, where it is offered, is theirs alone.
+    return queryset.annotate(
+        pro_support_report_advisor_id=Subquery(
+            JobSeekerAssignment.objects.filter(
+                job_seeker=OuterRef("pk"),
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .order_by("-last_action_at", "-pk")
+            .values("professional")[:1]
+        )
+    )
+
+
+def get_pro_support_report_url(request, job_seeker, advisor_id, *, contract_ended):
+    return get_tally_form_url(
+        settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
+        iduser=request.user.pk,
+        kindcompany=request.current_organization.kind,
+        idcompany=request.current_organization.pk,
+        uidjobseeker=job_seeker.public_id,
+        idadvisor=advisor_id or "",
+        situation="ended" if contract_ended else "ending_soon",
     )
 
 
@@ -195,40 +220,47 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
-        # SIAE job seeker card banner: shown when a contract with this SIAE ends within 30 days and the
-        # Tally form is configured. Same business definition (scoped to the current SIAE) as the list.
-        # Lives in the details tab view only, so the query does not run on the other tabs.
-        contract_ending_soon_date = None
-        suggest_next_step_url = None
+        # SIAE job seeker card banner, in the details tab view only so the query does not run on the other tabs.
+        last_contract_end_date = None
+        last_contract_ended = False
+        pro_support_report_url = None
         if (
             self.request.from_employer
             and self.request.current_organization.is_subject_to_iae_rules
             and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID
         ):
-            today = timezone.localdate()
-            last_contract_end_date = (
-                Contract.objects.filter(
-                    job_seeker=self.object, company=self.request.current_organization, end_date__isnull=False
+            end_of_journey = (
+                annotate_pro_support_report_advisor(
+                    annotate_end_of_journey(
+                        User.objects.filter(pk=self.object.pk), company=self.request.current_organization
+                    )
                 )
-                .order_by("-end_date")
-                .values_list("end_date", flat=True)
-                .first()
+                .values(
+                    "last_known_contract_end_date",
+                    "last_contract_ends_soon",
+                    "last_contract_ended_with_valid_approval",
+                    "pro_support_report_advisor_id",
+                )
+                .get()
             )
-            if last_contract_end_date and today <= last_contract_end_date <= today + datetime.timedelta(
-                days=IAE_CONTRACT_ENDING_SOON_DAYS
-            ):
-                contract_ending_soon_date = last_contract_end_date
-                suggest_next_step_url = get_tally_form_url(
-                    settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
-                    iduser=self.request.user.pk,
-                    kindcompany=self.request.current_organization.kind,
+            if end_of_journey["last_contract_ends_soon"] or end_of_journey["last_contract_ended_with_valid_approval"]:
+                last_contract_end_date = end_of_journey["last_known_contract_end_date"]
+                last_contract_ended = end_of_journey["last_contract_ended_with_valid_approval"]
+                pro_support_report_url = get_pro_support_report_url(
+                    self.request,
+                    self.object,
+                    end_of_journey["pro_support_report_advisor_id"],
+                    contract_ended=last_contract_ended,
                 )
 
         return context | {
             "approval": self.approval,
-            "contract_ending_soon_date": contract_ending_soon_date,
-            "suggest_next_step_url": suggest_next_step_url,
-            "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
+            "last_contract_end_date": last_contract_end_date,
+            "last_contract_ended": last_contract_ended,
+            "pro_support_report_url": pro_support_report_url,
+            "card_banner_extra_id": (
+                f"{'ended' if last_contract_ended else 'ending'}-contract-card-banner-{self.object.public_id}"
+            ),
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
@@ -688,7 +720,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
         end_of_journey_filter_active = bool(
-            form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
+            form.cleaned_data.get("approval_ending_soon")
+            or form.cleaned_data.get("contract_ending_soon")
+            or form.cleaned_data.get("end_of_journey")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
             # Contracts are the most precise, but they are delayed.
@@ -732,28 +766,20 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     )
 
     show_end_of_contracts_banner = request.from_employer and request.current_organization.is_subject_to_iae_rules
-    today = timezone.localdate()
-    contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
 
-    # Discovery banner: count over the SIAE assigned job seekers (unfiltered), only shown when the
+    # Discovery banner: counts over the SIAE assigned job seekers (unfiltered), only shown when the
     # end-of-journey filter is not active.
-    contracts_ending_soon_count = None
+    last_contract_ends_soon_count = last_contract_ended_count = None
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
-        contracts_ending_soon_count = (
-            annotate_last_contract_end_date(base_queryset, company=request.current_organization)
-            .filter(last_contract_end_date__range=contract_window)
-            .count()
+        end_of_journey_counts = annotate_end_of_journey(base_queryset, company=request.current_organization).aggregate(
+            ends_soon=Count("pk", filter=Q(last_contract_ends_soon=True)),
+            ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True)),
         )
+        last_contract_ends_soon_count = end_of_journey_counts["ends_soon"]
+        last_contract_ended_count = end_of_journey_counts["ended"]
 
-    # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
-    # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
-    suggest_next_step_url = None
-    if show_end_of_contracts_banner and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
-        suggest_next_step_url = get_tally_form_url(
-            settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
-            iduser=request.user.pk,
-            kindcompany=request.current_organization.kind,
-        )
+    # SIAE pro support report (Tally), offered on the rows of employees at the end of their journey like on their card.
+    can_fill_pro_support_report = show_end_of_contracts_banner and bool(settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID)
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
@@ -761,7 +787,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
     if show_end_of_contracts_banner:
-        queryset = annotate_last_contract_end_date(queryset, company=request.current_organization)
+        queryset = annotate_end_of_journey(queryset, company=request.current_organization)
+    if can_fill_pro_support_report:
+        queryset = annotate_pro_support_report_advisor(queryset)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
@@ -778,17 +806,21 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 job_seeker.pro_support_request_company_email,
                 job_seeker.get_full_name(),
             )
-        job_seeker.contract_ending_soon = bool(
-            show_end_of_contracts_banner
-            and job_seeker.last_contract_end_date
-            and contract_window[0] <= job_seeker.last_contract_end_date <= contract_window[1]
-        )
+        job_seeker.pro_support_report_url = None
+        contract_ended = getattr(job_seeker, "last_contract_ended_with_valid_approval", None)
+        if can_fill_pro_support_report and (getattr(job_seeker, "last_contract_ends_soon", None) or contract_ended):
+            job_seeker.pro_support_report_url = get_pro_support_report_url(
+                request,
+                job_seeker,
+                job_seeker.pro_support_report_advisor_id,
+                contract_ended=bool(contract_ended),
+            )
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
             or job_seeker.jobseeker_profile.is_stalled
             or can_orient_towards_insertion_service(request)
             or bool(job_seeker.pro_support_request_mailto)
-            or bool(suggest_next_step_url and job_seeker.contract_ending_soon)
+            or bool(job_seeker.pro_support_report_url)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
 
@@ -802,8 +834,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "page_obj": page_obj,
         "show_end_of_contracts_banner": show_end_of_contracts_banner,
         "end_of_journey_filter_active": end_of_journey_filter_active,
-        "contracts_ending_soon_count": contracts_ending_soon_count,
-        "suggest_next_step_url": suggest_next_step_url,
+        "last_contract_ends_soon_count": last_contract_ends_soon_count,
+        "last_contract_ended_count": last_contract_ended_count,
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(request.current_organization).filter(status=Status.REJECTED).count()
             if request.from_employer and request.current_organization.can_use_employee_record

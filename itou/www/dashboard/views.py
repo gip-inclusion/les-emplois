@@ -1,4 +1,3 @@
-import datetime
 import enum
 import logging
 
@@ -58,7 +57,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
-from itou.www.job_seekers_views.forms import IAE_CONTRACT_ENDING_SOON_DAYS, annotate_last_contract_end_date
+from itou.www.job_seekers_views.forms import annotate_last_known_contract, end_of_journey_q
 from itou.www.search_views.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
@@ -115,22 +114,18 @@ def _employer_dashboard_context(request):
         category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
         category["url"] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    contracts_ending_soon_count = None
+    end_of_journey_count = None
     if current_org.is_subject_to_iae_rules:
-        today = timezone.localdate()
-        contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
         siae_job_seekers = User.objects.filter(
             kind=UserKind.JOB_SEEKER,
             pk__in=JobSeekerAssignment.objects.filter(company=current_org).values("job_seeker"),
         )
-        contracts_ending_soon_count = (
-            annotate_last_contract_end_date(siae_job_seekers, company=current_org)
-            .filter(last_contract_end_date__range=contract_window)
-            .count()
+        end_of_journey_count = (
+            annotate_last_known_contract(siae_job_seekers).filter(end_of_journey_q(current_org)).count()
         )
 
     return {
-        "contracts_ending_soon_count": contracts_ending_soon_count,
+        "end_of_journey_count": end_of_journey_count,
         "active_campaigns": (
             EvaluatedSiae.objects.for_company(current_org)
             .in_progress()
@@ -169,7 +164,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "active_geiq_campaign": None,
         "active_campaigns": [],
         "closed_campaigns": [],
-        "contracts_ending_soon_count": None,
+        "end_of_journey_count": None,
         "job_applications_categories": [],
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,

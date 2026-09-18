@@ -200,40 +200,49 @@ class TestDashboardView:
         assert response.context["num_rejected_employee_records"] == 0
 
     @freeze_time("2026-01-15")
-    def test_dashboard_contracts_ending_soon_count(self, client):
+    def test_dashboard_end_of_journey_count(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         client.force_login(employer)
         today = date(2026, 1, 15)
         url = reverse("dashboard:index")
 
-        # No contract ending soon yet: the entry is shown without a badge.
+        # No employee at the end of their journey yet: the entry is shown without a badge.
         response = client.get(url)
-        assertContains(response, "Fins de contrats")
-        assert response.context["contracts_ending_soon_count"] == 0
+        assertContains(response, "Fins de parcours")
+        assert response.context["end_of_journey_count"] == 0
 
-        # A job seeker assigned to the SIAE with a contract with this SIAE ending in 20 days is counted.
-        job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        contract_ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
         ContractFactory(
-            job_seeker=job_seeker,
+            job_seeker=contract_ending_soon,
             company=company,
             start_date=today - timedelta(days=200),
             end_date=today + timedelta(days=20),
         )
-        # A contract with another SIAE must not be counted.
-        other_job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        # Its assignment was ended when the employee left, it is still counted.
+        contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company, ended=True).job_seeker
         ContractFactory(
-            job_seeker=other_job_seeker,
+            job_seeker=contract_ended,
+            company=company,
+            start_date=today - timedelta(days=200),
+            end_date=today - timedelta(days=20),
+        )
+        ApprovalFactory(user=contract_ended, start_at=today - timedelta(days=300), end_at=today + timedelta(days=100))
+        other_company_contract = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=other_company_contract,
             start_date=today - timedelta(days=200),
             end_date=today + timedelta(days=20),
         )
 
         response = client.get(url)
-        assert response.context["contracts_ending_soon_count"] == 1
+        assert response.context["end_of_journey_count"] == 2
+        list_url = reverse("job_seekers_views:list_organization")
+        assertContains(response, f'href="{list_url}?end_of_journey=on&amp;assignments=all"')
 
-        # The dashboard counter matches the filtered "Accompagnements" list results.
-        list_response = client.get(reverse("job_seekers_views:list_organization"), {"contract_ending_soon": "on"})
-        assert list(list_response.context["page_obj"].object_list) == [job_seeker]
+        # The counter matches the list it links to.
+        list_response = client.get(list_url, {"end_of_journey": "on", "assignments": "all"})
+        assert set(list_response.context["page_obj"].object_list) == {contract_ending_soon, contract_ended}
 
     def test_dashboard_applications_to_process(self, client):
         non_geiq_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"

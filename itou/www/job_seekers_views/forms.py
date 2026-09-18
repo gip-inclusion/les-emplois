@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Exists, OuterRef, Q, Subquery, TextChoices, Value
+from django.db.models import BooleanField, Exists, ExpressionWrapper, OuterRef, Q, Subquery, TextChoices, Value
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
@@ -36,17 +36,52 @@ IAE_CONTRACT_ENDING_SOON_DAYS = 30
 
 def annotate_last_contract_end_date(queryset, *, company=None):
     # Latest known IAE contract end date of the job seeker, optionally scoped to a single SIAE.
-    # Scoping to the current SIAE avoids counting a contract signed with another structure, and keeps
-    # a renewed employee out of the cohort (their latest contract with the SIAE ends later).
-    # Shared business definition reused by the dashboard counter, the filter, the discovery banner and
-    # the per-row end-of-contract flag. Idempotent so the list view can annotate for the row flag while
-    # the filter also annotates for the same SIAE, without raising on a duplicate annotation.
-    if "last_contract_end_date" in queryset.query.annotations:
-        return queryset
     contracts = Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
     if company is not None:
         contracts = contracts.filter(company=company)
     return queryset.annotate(last_contract_end_date=Subquery(contracts.order_by("-end_date").values("end_date")[:1]))
+
+
+def annotate_last_known_contract(queryset):
+    # Looked up among all companies: an employee hired elsewhere since has found a solution.
+    if "last_known_contract_company_id" in queryset.query.annotations:
+        return queryset
+    last_known_contract = Contract.objects.filter(job_seeker=OuterRef("pk"), company__isnull=False).order_by(
+        "-start_date", "-pk"
+    )
+    return queryset.annotate(
+        last_known_contract_company_id=Subquery(last_known_contract.values("company")[:1]),
+        last_known_contract_end_date=Subquery(last_known_contract.values("end_date")[:1]),
+    )
+
+
+def last_contract_ends_soon_q(company):
+    today = timezone.localdate()
+    return Q(
+        last_known_contract_company_id=company.pk,
+        last_known_contract_end_date__range=(today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS)),
+    )
+
+
+def last_contract_ended_with_valid_approval_q(company):
+    return Q(
+        Exists(Approval.objects.valid().filter(user=OuterRef("pk"))),
+        last_known_contract_company_id=company.pk,
+        last_known_contract_end_date__lt=timezone.localdate(),
+    )
+
+
+def end_of_journey_q(company):
+    return last_contract_ends_soon_q(company) | last_contract_ended_with_valid_approval_q(company)
+
+
+def annotate_end_of_journey(queryset, *, company):
+    return annotate_last_known_contract(queryset).annotate(
+        last_contract_ends_soon=ExpressionWrapper(last_contract_ends_soon_q(company), output_field=BooleanField()),
+        last_contract_ended_with_valid_approval=ExpressionWrapper(
+            last_contract_ended_with_valid_approval_q(company), output_field=BooleanField()
+        ),
+    )
 
 
 class AssignmentsChoices(TextChoices):
@@ -82,6 +117,8 @@ class FilterForm(forms.Form):
     # Fields only for authorized prescribers and IAE employers, set in __init__
     approval_ending_soon = None
     contract_ending_soon = None
+    # Field only for IAE employers, set in __init__
+    end_of_journey = None
 
     assignments = forms.ChoiceField(
         label="Statut des accompagnements",
@@ -123,6 +160,9 @@ class FilterForm(forms.Form):
                 required=False,
                 help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
+        if self.company:
+            # Reached from links only, it has no checkbox.
+            self.fields["end_of_journey"] = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
         if from_all_coworkers:
             self.fields["assignments"].widget.help_texts = {
@@ -219,6 +259,10 @@ class FilterForm(forms.Form):
                 contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
                 end_of_journey_filter &= Q(last_contract_end_date__range=contract_window)
             filters.append(end_of_journey_filter)
+
+        if self.cleaned_data.get("end_of_journey"):
+            queryset = annotate_last_known_contract(queryset)
+            filters.append(end_of_journey_q(self.company))
 
         if self.cleaned_data.get("is_stalled"):
             queryset = queryset.filter(
