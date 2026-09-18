@@ -1,0 +1,11 @@
+{% if service.update_needed %}
+    <span class="badge badge-base rounded-pill text-bg-warning">
+        <i class="ri-error-warning-line me-1" aria-hidden="true"></i>
+        Mise à jour ancienne : {{ service.updated_on|date:"d/m/Y" }}
+    </span>
+{% else %}
+    <span class="badge badge-base rounded-pill text-bg-success">
+        <i class="ri-history-line me-1" aria-hidden="true"></i>
+        Mise à jour récente : {{ service.updated_on|date:"d/m/Y" }}
+    </span>
+{% endif %}
