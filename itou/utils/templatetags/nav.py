@@ -2,6 +2,7 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
+from itou.cities.cache import get_directory_active_city_ids
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import (
@@ -92,6 +93,18 @@ NAV_ENTRIES = {
         label="Un service d'insertion",
         target=reverse("search:services_results"),
         active_view_names=["search:services_home", "search:services_results"],
+        is_beta=True,
+    ),
+    "professional-directory": NavItem(
+        label="Annuaire pro",
+        icon="ri-contacts-book-line",
+        target=reverse("directory:people_results"),
+        active_view_names=[
+            "directory:people_results",
+            "directory:person_detail",
+            "directory:reveal_contact",
+            "directory:send_message",
+        ],
         is_beta=True,
     ),
     # Job seekers.
@@ -367,6 +380,13 @@ def nav(request):
                 and request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST
             ):
                 menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
+        if (
+            request.user.is_professional
+            and request.current_organization
+            and request.current_organization.coords
+            and request.current_organization.insee_city_id in get_directory_active_city_ids()
+        ):
+            menu_items.append(NAV_ENTRIES["professional-directory"])
         menu_items.append(
             NavGroup(
                 label="Rechercher",

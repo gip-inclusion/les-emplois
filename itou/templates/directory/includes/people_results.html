@@ -1,0 +1,34 @@
+{% load str_filters %}
+
+<div id="people-search-results">
+    <h2 class="mb-3">Personne{{ results.paginator.count|pluralizefr }} ({{ results.paginator.count }})</h2>
+    {% for person in results %}
+        <article class="c-box c-box--results has-one-link-inside mb-3">
+            <div class="c-box--results__header">
+                <div class="c-box--results__summary">
+                    <i class="ri-user-line" aria-hidden="true"></i>
+                    <div>
+                        <p class="mb-1">{{ person.kind_label }}</p>
+                        <h3>{{ person.full_name }}</h3>
+                    </div>
+                </div>
+                <a href="{% url 'directory:person_detail' key=person.key %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary stretched-link">Voir ses coordonnées</a>
+            </div>
+            <hr class="m-0">
+            <div class="c-box--results__body">
+                <p class="mb-1 fw-bold">{{ person.main_organization.name }}</p>
+                <address class="mb-1">{{ person.main_organization.address }}</address>
+                {% if person.other_organizations_count %}
+                    <p class="mb-0">et {{ person.other_organizations_count }} autre{{ person.other_organizations_count|pluralizefr }} structure{{ person.other_organizations_count|pluralizefr }}</p>
+                {% endif %}
+            </div>
+        </article>
+    {% empty %}
+        <div id="empty-personnes" class="c-box c-box--results mb-3">
+            <div class="c-box--results__body">
+                <p class="mb-0">Aucune personne ne correspond à votre recherche.</p>
+            </div>
+        </div>
+    {% endfor %}
+    {% include "includes/pagination.html" with page=results boost=True boost_target="#people-search-results" request=request only %}
+</div>

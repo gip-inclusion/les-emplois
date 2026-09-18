@@ -1,0 +1,20 @@
+{% load django_bootstrap5 %}
+
+{% bootstrap_form_errors form type="all" %}
+<div class="input-group input-group-xl input-group-search mb-3">
+    <label class="input-group-text" for="{{ form.q.id_for_label }}">
+        <span class="visually-hidden">{{ form.q.label }}</span>
+        <i class="ri-user-search-line" aria-hidden="true"></i>
+    </label>
+    {{ form.q }}
+</div>
+<div class="btn-dropdown-filter-group">
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.types only %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.contacts only %}
+    {% if form.q.value or form.types.value or form.contacts.value %}
+        <a href="{% url 'directory:people_results' %}" class="btn btn-ico btn-dropdown-filter ms-lg-auto" aria-label="Effacer les filtres actifs">
+            <i class="ri-eraser-line" aria-hidden="true"></i>
+            <span>Effacer</span>
+        </a>
+    {% endif %}
+</div>

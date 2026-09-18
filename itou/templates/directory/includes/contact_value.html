@@ -1,0 +1,9 @@
+<div class="d-flex align-items-center justify-content-between border rounded p-3">
+    <div>
+        <span class="fw-bold">{{ label }}</span>
+        <span class="ms-2">{% if value %}{{ value }}{% else %}<em>Non renseigné</em>{% endif %}</span>
+    </div>
+    {% if value %}
+        {% include "includes/copy_to_clipboard.html" with content=value|cut:" " css_classes="btn-link" only_icon=True only %}
+    {% endif %}
+</div>

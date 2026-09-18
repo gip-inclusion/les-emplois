@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "itou.tasks",
     "itou.cities",
     "itou.companies",
+    "itou.directory",
     "itou.emails",
     "itou.jobs",
     "itou.users",

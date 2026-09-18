@@ -1,0 +1,10 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+    {{ sender.get_full_name }} ({{ sender.email }}) de {{ sender_organization }} vous a envoyé un message via l'Annuaire Pro.
+
+    Objet : {{ subject }}
+
+    {{ body }}
+
+    Vous pouvez répondre directement à cet e-mail.
+{% endblock %}

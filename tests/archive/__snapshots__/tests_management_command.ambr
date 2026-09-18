@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 88,
+    'num_queries': 89,
     'queries': list([
       dict({
         'origin': list([
@@ -1020,6 +1020,7 @@
                  "users_user"."kind",
                  "users_user"."identity_provider",
                  "users_user"."has_completed_welcoming_tour",
+                 "users_user"."is_directory_opted_out",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
                  "users_user"."last_checked_at",
@@ -1033,7 +1034,7 @@
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."upcoming_deletion_notified_at" <= %s)
-          ORDER BY 38 ASC,
+          ORDER BY 39 ASC,
                    "users_user"."upcoming_deletion_notified_at" ASC
           LIMIT 200
           FOR
@@ -1079,6 +1080,7 @@
                  "users_user"."kind",
                  "users_user"."identity_provider",
                  "users_user"."has_completed_welcoming_tour",
+                 "users_user"."is_directory_opted_out",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
                  "users_user"."last_checked_at",
@@ -1714,6 +1716,7 @@
                  "users_user"."kind",
                  "users_user"."identity_provider",
                  "users_user"."has_completed_welcoming_tour",
+                 "users_user"."is_directory_opted_out",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
                  "users_user"."last_checked_at",
@@ -3195,6 +3198,30 @@
                                                             %s,
                                                             %s,
                                                             %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "directory_contactmessage"
+          WHERE "directory_contactmessage"."sender_id" IN (%s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s)
         ''',
       }),
       dict({

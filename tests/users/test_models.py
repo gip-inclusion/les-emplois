@@ -582,6 +582,15 @@ class TestModel:
         professional = ProfessionalFactory()
         assert "professionnel" == professional.get_kind_display()
 
+    def test_directory_opt_out(self):
+        professional = ProfessionalFactory()
+        assert professional.is_directory_opted_out is False
+
+        professional.is_directory_opted_out = True
+        professional.save(update_fields=["is_directory_opted_out"])
+        professional.refresh_from_db()
+        assert professional.is_directory_opted_out is True
+
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
         no_nir_profile = JobSeekerProfileFactory(nir="")
         # This works

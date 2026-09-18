@@ -817,6 +817,30 @@ class TestEditUserInfoView:
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
 
+    def test_professional_can_opt_out_of_directory(self, client):
+        user = PrescriberFactory(is_directory_opted_out=False)
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        response = client.get(url)
+
+        assertContains(response, "Annuaire des professionnels")
+        assertContains(response, "Ne pas apparaître dans l&#x27;annuaire des professionnels")
+
+        response = client.post(
+            url,
+            {
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "phone": user.phone,
+                "is_directory_opted_out": "on",
+            },
+        )
+
+        assert response.status_code == 302
+        user.refresh_from_db()
+        assert user.is_directory_opted_out is True
+
     @pytest.mark.parametrize(
         "user_factory,identity_provider",
         [
