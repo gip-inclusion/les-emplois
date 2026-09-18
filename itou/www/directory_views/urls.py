@@ -7,4 +7,6 @@ app_name = "directory"
 
 urlpatterns = [
     path("", views.people_results, name="people_results"),
+    path("personnes/<str:key>/", views.person_detail, name="person_detail"),
+    path("personnes/<str:key>/contact/<str:field>/", views.reveal_contact, name="reveal_contact"),
 ]
