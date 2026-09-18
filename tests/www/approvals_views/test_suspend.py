@@ -233,7 +233,7 @@ class TestApprovalSuspendView:
 
         client.force_login(employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("search:home")
         redirect_url = reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id})
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})

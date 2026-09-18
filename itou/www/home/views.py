@@ -12,7 +12,7 @@ def home(request):
     if request.user.is_authenticated:
         url = reverse("dashboard:index")
     else:
-        url = reverse("search:employers_home")
+        url = reverse("search:home")
     # Handle REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM (and only that,
     # there is no use case for any other query string parameter).
     if REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM in request.GET:
