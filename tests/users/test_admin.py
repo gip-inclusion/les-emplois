@@ -110,6 +110,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "created_assessments",  # Assessment.created_by
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
+        "directory_profile",  # DirectoryProfile.user: only professionals can have one
         "final_reviewed_assessments",  # Assessment.final_reviewed_by
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
