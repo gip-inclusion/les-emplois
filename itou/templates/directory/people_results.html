@@ -1,0 +1,38 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+{% load theme_inclusion %}
+
+{% block title %}Annuaire des professionnels {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Annuaire des professionnels {% beta_badge extra_classes="badge-base" %}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <form id="people-search-form"
+                  method="get"
+                  hx-get="{% url 'directory:people_results' %}"
+                  hx-trigger="input changed delay:300ms, change"
+                  hx-target="#people-search-results"
+                  hx-swap="outerHTML"
+                  hx-push-url="true"
+                  hx-indicator="#people-search-results">
+                {% include "directory/includes/people_form.html" with form=form only %}
+            </form>
+            <div class="mt-4">{% include "directory/includes/people_results.html" %}</div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/htmx_compat.js' %}"></script>
+    <script src="{% static 'js/htmx_dropdown_filter.js' %}"></script>
+{% endblock %}
