@@ -56,7 +56,7 @@ class SiaeSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, data: MultiValueDict = None, **kwargs):
+    def __init__(self, data: MultiValueDict | None = None, **kwargs):
         initial = kwargs.get("initial", {})
         if data:
             # Use the initial values as default values and extend them with the user data.
@@ -192,7 +192,7 @@ class PrescriberSearchForm(forms.Form):
         ),
     )
 
-    def __init__(self, data: MultiValueDict = None, **kwargs):
+    def __init__(self, data: MultiValueDict | None = None, **kwargs):
         initial = kwargs.get("initial", {})
         if data:
             # Use the initial values as default values and extend them with the user data.

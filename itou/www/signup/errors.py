@@ -29,8 +29,8 @@ class JobSeekerSignupConflictModalResolver:
     JobSeekerSignupConflictModalResolver(*args).evaluate(request)
     """
 
-    existing_user: User = None
-    fields: ConflictFields = None
+    existing_user: User | None = None
+    fields: ConflictFields | None = None
     errors = None
 
     def __init__(self, cleaned_data, errors, nir, email):
