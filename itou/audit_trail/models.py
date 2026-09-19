@@ -13,7 +13,7 @@ class AuditTrailManager(models.Manager):
     def cleanup(self):
         return self.filter(timestamp__lt=timezone.now() - settings.AUDIT_TRAIL_STORAGE_DURATION).delete()
 
-    def log(self, event_type: AuditTrailEventType, request, user=None, data: dict = None) -> None:
+    def log(self, event_type: AuditTrailEventType, request, user=None, data: dict | None = None) -> None:
         """If user is not explicitly given, it's taken from request.user."""
         return super().create(
             event_type=event_type,

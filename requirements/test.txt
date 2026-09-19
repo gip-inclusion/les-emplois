@@ -1084,7 +1084,7 @@ invoke==3.0.3 \
     # via
     #   -r base.txt
     #   paramiko
-itoutils[django,django-testing]==26.7.9.0 \
+itoutils[django, django-testing]==26.7.9.0 \
     --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
     --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
     # via
