@@ -141,7 +141,7 @@ def get_vue_af_df():
 @dataclasses.dataclass
 class Convention:
     has_active_state: bool = False
-    end_at: datetime.date = None
+    end_at: datetime.date | None = None
 
     @property
     def is_active(self):

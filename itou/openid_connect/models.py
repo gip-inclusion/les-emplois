@@ -156,7 +156,7 @@ class OIDConnectUserData:
         return user.allow_next_sso_sub_update or self.allow_sub_update
 
     @property
-    def login_allowed_user_kinds(self) -> tuple[UserKind]:
+    def login_allowed_user_kinds(self) -> tuple[UserKind, ...]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
     def _check_valid_kind(self, user):
