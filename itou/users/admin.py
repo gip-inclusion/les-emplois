@@ -672,9 +672,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         inlines.insert(0, EmailAddressInline)
 
         class ConditionalInline(NamedTuple):
-            has_related_objs: Callable[[models.User], bool]
-            inline_class: InlineModelAdmin
-            strict: bool
+            has_related_objs: Callable[[models.User], bool]  # type: ignore
+            inline_class: InlineModelAdmin  # type: ignore
+            strict: bool  # type: ignore
 
         sent_applications_inline = ConditionalInline(
             lambda user: user.job_applications_sent.all(), SentJobApplicationInline, True

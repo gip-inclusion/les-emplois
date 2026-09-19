@@ -33,10 +33,10 @@ class TransferField(TextChoices):
     PROLONGATIONS = "prolongations", "Prolongations déclarées"
     PROLONGATION_REQUESTS = "demandes de prolongation", "Demandes de prolongation"
     SUSPENSIONS = "suspensions", "Suspensions déclarées"
-    BRAND = "brand", models.Company._meta.get_field("brand").verbose_name.capitalize()
-    DESCRIPTION = "description", models.Company._meta.get_field("description").verbose_name.capitalize()
-    IS_SEARCHABLE = "is_searchable", models.Company._meta.get_field("is_searchable").verbose_name.capitalize()
-    PHONE = "phone", models.Company._meta.get_field("phone").verbose_name.capitalize()
+    BRAND = "brand", models.Company._meta.get_field("brand").verbose_name.capitalize()  # type: ignore
+    DESCRIPTION = "description", models.Company._meta.get_field("description").verbose_name.capitalize()  # type: ignore
+    IS_SEARCHABLE = "is_searchable", models.Company._meta.get_field("is_searchable").verbose_name.capitalize()  # type: ignore
+    PHONE = "phone", models.Company._meta.get_field("phone").verbose_name.capitalize()  # type: ignore
 
 
 class ReportSection(TextChoices):

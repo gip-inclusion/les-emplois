@@ -125,7 +125,7 @@ def update_table_at_date(table_name, column_names, at, rows):
 @dataclass
 class MatomoFetchOptions:
     dashboard_name: str
-    api_options: str
+    api_options: dict[str, str]
     extra_columns: dict
 
 

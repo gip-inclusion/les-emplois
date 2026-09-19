@@ -97,12 +97,12 @@ class EmployeeRecordTransferCommand(BaseCommand):
             )
         except Exception as ex:
             self.logger.error("Could not upload file: %s, reason: %s", remote_path, ex)
-            return
+            return None
         self.logger.info("Successfully uploaded: %s", remote_path)
 
         return remote_path
 
-    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
+    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         raise NotImplementedError()
 
     def download_json_file(self, sftp: paramiko.SFTPClient, dry_run: bool):
