@@ -221,6 +221,34 @@ def test_import_soft_deletes_structures_and_services_absent_from_api(apis_mocks)
     assert service in list(Service.include_inactive.all())
 
 
+def test_import_force_update(apis_mocks):
+    call_command("import_structures_and_services", wet_run=True)
+
+    structure = Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd")
+    service = Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927")
+    assert structure.name == "PLATEFORME DE L'INCLUSION"
+    assert service.name == "Les emplois de l'inclusion"
+
+    Structure.objects.filter(pk=structure.pk).update(name="Nom local structure")
+    Service.objects.filter(pk=service.pk).update(name="Nom local service")
+
+    # date_maj is unchanged, so a normal import leaves the local edits in place.
+    call_command("import_structures_and_services", wet_run=True)
+
+    structure.refresh_from_db()
+    service.refresh_from_db()
+    assert structure.name == "Nom local structure"
+    assert service.name == "Nom local service"
+
+    # --force rewrites rows even when date_maj has not changed.
+    call_command("import_structures_and_services", wet_run=True, force_update=True)
+
+    structure.refresh_from_db()
+    service.refresh_from_db()
+    assert structure.name == "PLATEFORME DE L'INCLUSION"
+    assert service.name == "Les emplois de l'inclusion"
+
+
 def test_import_reactivates_reappearing_structures_and_services(apis_mocks):
     source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="mission-locale")
     structure = StructureFactory(uid="mission-locale--with-mobilization-link", source=source)
