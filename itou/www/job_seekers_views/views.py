@@ -201,11 +201,11 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         contract_ending_soon_date = None
         suggest_next_step_url = None
         pro_support_request_mailto = None
-        show_suggest_next_step = _show_suggest_next_step(self.request)
-        if show_suggest_next_step or self.request.from_authorized_prescriber:
+        request_from_siae = self.request.from_iae_actor and self.request.from_employer
+        if request_from_siae or self.request.from_authorized_prescriber:
             today = timezone.localdate()
             contracts = Contract.objects.filter(job_seeker=self.object, end_date__isnull=False)
-            if show_suggest_next_step:
+            if request_from_siae:
                 # A SIAE only looks at its own contract; a prescriber follows the whole IAE journey.
                 contracts = contracts.filter(company=self.request.current_organization)
             last_contract_end_date = contracts.order_by("-end_date").values_list("end_date", flat=True).first()
@@ -213,7 +213,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                 days=IAE_CONTRACT_ENDING_SOON_DAYS
             ):
                 contract_ending_soon_date = last_contract_end_date
-                if show_suggest_next_step:
+                if request_from_siae:
                     suggest_next_step_url = get_tally_form_url(
                         settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
                         iduser=self.request.user.pk,
@@ -655,14 +655,6 @@ def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
     return f"mailto:{to_email}?{query}"
 
 
-def _show_suggest_next_step(request):
-    return (
-        request.from_employer
-        and request.current_organization.is_subject_to_iae_rules
-        and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID
-    )
-
-
 @readonly_view
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
@@ -748,9 +740,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
     )
 
-    show_suggest_next_step = _show_suggest_next_step(request)
+    request_from_siae = request.from_iae_actor and request.from_employer
     # Authorized prescribers get the same banners, pointing to the support request instead of the Tally form.
-    show_end_of_contracts_banner = show_suggest_next_step or request.from_authorized_prescriber
+    show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
     today = timezone.localdate()
     contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
 
@@ -770,7 +762,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
     # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
     suggest_next_step_url = None
-    if show_suggest_next_step and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
+    if request_from_siae and settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID:
         suggest_next_step_url = get_tally_form_url(
             settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
             iduser=request.user.pk,
@@ -782,7 +774,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     except ValueError:
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
-    if show_suggest_next_step:
+    if request_from_siae:
         queryset = annotate_last_contract_end_date(queryset, company=request.current_organization)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
@@ -801,7 +793,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 job_seeker.get_full_name(),
             )
         job_seeker.contract_ending_soon = bool(
-            show_suggest_next_step
+            request_from_siae
             and job_seeker.last_contract_end_date
             and contract_window[0] <= job_seeker.last_contract_end_date <= contract_window[1]
         )
