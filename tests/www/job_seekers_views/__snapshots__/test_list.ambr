@@ -2206,13 +2206,6 @@
                 WHERE U0."user_id" = ("users_user"."id")
                 ORDER BY 1 DESC
                 LIMIT 1) AS "last_approval_end_at",
-          
-               (SELECT U0."end_date" AS "end_date"
-                FROM "companies_contract" U0
-                WHERE (U0."end_date" IS NOT NULL
-                       AND U0."job_seeker_id" = ("users_user"."id"))
-                ORDER BY 1 DESC
-                LIMIT 1) AS "last_contract_end_date",
                     NOT EXISTS
                (SELECT %s AS "a"
                 FROM "users_jobseekerassignment" U0
@@ -2296,6 +2289,12 @@
                                AND U0."professional_id" = %s)
                               OR (U0."company_id" IS NULL
                                   AND U0."prescriber_organization_id" = %s)))
+                    AND EXISTS
+                      (SELECT %s AS "a"
+                       FROM "companies_contract" U0
+                       WHERE (U0."end_date" BETWEEN %s AND %s
+                              AND U0."job_seeker_id" = ("users_user"."id"))
+                       LIMIT 1)
                     AND "users_user"."id" IN
                       (SELECT U0."job_seeker_id" AS "job_seeker_id"
                        FROM "users_jobseekerassignment" U0
@@ -2310,21 +2309,14 @@
                        FROM "approvals_approval" U0
                        WHERE U0."user_id" = ("users_user"."id")
                        ORDER BY 1 DESC
-                       LIMIT 1) BETWEEN %s AND %s
-                    AND
-                      (SELECT U0."end_date" AS "end_date"
-                       FROM "companies_contract" U0
-                       WHERE (U0."end_date" IS NOT NULL
-                              AND U0."job_seeker_id" = ("users_user"."id"))
-                       ORDER BY 1 DESC
                        LIMIT 1) BETWEEN %s AND %s)
              GROUP BY "users_user"."id",
+                      2,
                       3,
                       4,
                       5,
-                      6,
-                      8,
-                      9) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -2382,13 +2374,6 @@
              WHERE U0."user_id" = ("users_user"."id")
              ORDER BY 1 DESC
              LIMIT 1) AS "last_approval_end_at",
-          
-            (SELECT U0."end_date" AS "end_date"
-             FROM "companies_contract" U0
-             WHERE (U0."end_date" IS NOT NULL
-                    AND U0."job_seeker_id" = ("users_user"."id"))
-             ORDER BY 1 DESC
-             LIMIT 1) AS "last_contract_end_date",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -2520,6 +2505,12 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s)))
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_contract" U0
+                    WHERE (U0."end_date" BETWEEN %s AND %s
+                           AND U0."job_seeker_id" = ("users_user"."id"))
+                    LIMIT 1)
                  AND "users_user"."id" IN
                    (SELECT U0."job_seeker_id" AS "job_seeker_id"
                     FROM "users_jobseekerassignment" U0
@@ -2534,23 +2525,16 @@
                     FROM "approvals_approval" U0
                     WHERE U0."user_id" = ("users_user"."id")
                     ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    ORDER BY 1 DESC
                     LIMIT 1) BETWEEN %s AND %s)
           GROUP BY "users_user"."id",
+                   41,
                    42,
                    43,
                    44,
-                   45,
+                   46,
                    47,
-                   48,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 46 DESC,
+          ORDER BY 45 DESC,
                    "users_user"."id" DESC
           LIMIT 1
         ''',
@@ -3143,13 +3127,6 @@
                 WHERE U0."user_id" = ("users_user"."id")
                 ORDER BY 1 DESC
                 LIMIT 1) AS "last_approval_end_at",
-          
-               (SELECT U0."end_date" AS "end_date"
-                FROM "companies_contract" U0
-                WHERE (U0."end_date" IS NOT NULL
-                       AND U0."job_seeker_id" = ("users_user"."id"))
-                ORDER BY 1 DESC
-                LIMIT 1) AS "last_contract_end_date",
                     NOT EXISTS
                (SELECT %s AS "a"
                 FROM "users_jobseekerassignment" U0
@@ -3237,6 +3214,12 @@
                               OR (U0."company_id" IS NULL
                                   AND U0."prescriber_organization_id" = %s
                                   AND U0."professional_id" = %s)))
+                    AND EXISTS
+                      (SELECT %s AS "a"
+                       FROM "companies_contract" U0
+                       WHERE (U0."end_date" BETWEEN %s AND %s
+                              AND U0."job_seeker_id" = ("users_user"."id"))
+                       LIMIT 1)
                     AND "users_user"."id" IN
                       (SELECT U0."job_seeker_id" AS "job_seeker_id"
                        FROM "users_jobseekerassignment" U0
@@ -3252,21 +3235,14 @@
                        FROM "approvals_approval" U0
                        WHERE U0."user_id" = ("users_user"."id")
                        ORDER BY 1 DESC
-                       LIMIT 1) BETWEEN %s AND %s
-                    AND
-                      (SELECT U0."end_date" AS "end_date"
-                       FROM "companies_contract" U0
-                       WHERE (U0."end_date" IS NOT NULL
-                              AND U0."job_seeker_id" = ("users_user"."id"))
-                       ORDER BY 1 DESC
                        LIMIT 1) BETWEEN %s AND %s)
              GROUP BY "users_user"."id",
+                      2,
                       3,
                       4,
                       5,
-                      6,
-                      8,
-                      9) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -3324,13 +3300,6 @@
              WHERE U0."user_id" = ("users_user"."id")
              ORDER BY 1 DESC
              LIMIT 1) AS "last_approval_end_at",
-          
-            (SELECT U0."end_date" AS "end_date"
-             FROM "companies_contract" U0
-             WHERE (U0."end_date" IS NOT NULL
-                    AND U0."job_seeker_id" = ("users_user"."id"))
-             ORDER BY 1 DESC
-             LIMIT 1) AS "last_contract_end_date",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -3466,6 +3435,12 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s)))
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_contract" U0
+                    WHERE (U0."end_date" BETWEEN %s AND %s
+                           AND U0."job_seeker_id" = ("users_user"."id"))
+                    LIMIT 1)
                  AND "users_user"."id" IN
                    (SELECT U0."job_seeker_id" AS "job_seeker_id"
                     FROM "users_jobseekerassignment" U0
@@ -3481,23 +3456,16 @@
                     FROM "approvals_approval" U0
                     WHERE U0."user_id" = ("users_user"."id")
                     ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    ORDER BY 1 DESC
                     LIMIT 1) BETWEEN %s AND %s)
           GROUP BY "users_user"."id",
+                   41,
                    42,
                    43,
                    44,
-                   45,
+                   46,
                    47,
-                   48,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 46 DESC,
+          ORDER BY 45 DESC,
                    "users_user"."id" DESC
           LIMIT 1
         ''',
@@ -4092,13 +4060,12 @@
                                 AND U0."prescriber_organization_id" = %s
                                 AND U0."professional_id" = %s))
                            AND U0."ended_at" IS NULL))
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
+                 AND EXISTS
+                   (SELECT %s AS "a"
                     FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
+                    WHERE (U0."end_date" BETWEEN %s AND %s
                            AND U0."job_seeker_id" = ("users_user"."id"))
-                    ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s)
+                    LIMIT 1))
         ''',
       }),
       dict({
@@ -5328,13 +5295,12 @@
                             OR (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" = %s))
                            AND U0."ended_at" IS NULL))
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
+                 AND EXISTS
+                   (SELECT %s AS "a"
                     FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
+                    WHERE (U0."end_date" BETWEEN %s AND %s
                            AND U0."job_seeker_id" = ("users_user"."id"))
-                    ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s)
+                    LIMIT 1))
         ''',
       }),
       dict({

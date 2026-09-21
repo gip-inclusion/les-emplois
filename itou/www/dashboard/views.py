@@ -1,4 +1,3 @@
-import datetime
 import enum
 import logging
 
@@ -26,7 +25,6 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
-from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -59,7 +57,6 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
-from itou.www.job_seekers_views.forms import annotate_last_contract_end_date
 from itou.www.search_views.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
@@ -118,17 +115,11 @@ def _employer_dashboard_context(request):
 
     contracts_ending_soon_count = None
     if current_org.is_subject_to_iae_rules:
-        today = timezone.localdate()
-        contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
         siae_job_seekers = User.objects.filter(
             kind=UserKind.JOB_SEEKER,
             pk__in=JobSeekerAssignment.objects.filter(company=current_org, ended_at=None).values("job_seeker"),
         )
-        contracts_ending_soon_count = (
-            annotate_last_contract_end_date(siae_job_seekers, company=current_org)
-            .filter(last_contract_end_date__range=contract_window)
-            .count()
-        )
+        contracts_ending_soon_count = siae_job_seekers.has_contract_ending_soon(siae=current_org).count()
 
     return {
         "contracts_ending_soon_count": contracts_ending_soon_count,
@@ -199,17 +190,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-                today = timezone.localdate()
-                contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
                 # Contracts are not scoped to a company: a prescriber follows the whole IAE journey.
                 assigned_job_seekers = User.objects.filter(
                     pk__in=User.objects.assigned_job_seeker_ids(request.user, current_org, archived=False)
                 )
-                context["contracts_ending_soon_count"] = (
-                    annotate_last_contract_end_date(assigned_job_seekers)
-                    .filter(last_contract_end_date__range=contract_window)
-                    .count()
-                )
+                context["contracts_ending_soon_count"] = assigned_job_seekers.has_contract_ending_soon().count()
     elif request.from_institution:
         current_org = get_current_institution_or_404(request)
         six_months_ago = timezone.now() - timezone.timedelta(days=182)

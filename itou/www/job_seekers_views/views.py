@@ -62,7 +62,6 @@ from itou.www.job_seekers_views.forms import (
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
-    annotate_last_contract_end_date,
 )
 
 
@@ -743,19 +742,14 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     request_from_siae = request.from_iae_actor and request.from_employer
     # Authorized prescribers get the same banners, pointing to the support request instead of the Tally form.
     show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
-    today = timezone.localdate()
-    contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
 
     # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
     # end-of-journey filter is not active. A SIAE only counts its own contracts, a prescriber all of them.
-    contracts_ending_soon_count = None
+    contracts_ending_soon_count = 0
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
         contracts_ending_soon_count = (
-            annotate_last_contract_end_date(
-                User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker")),
-                company=request.current_organization if request.from_employer else None,
-            )
-            .filter(last_contract_end_date__range=contract_window)
+            User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker"))
+            .has_contract_ending_soon(siae=request.current_organization if request.from_employer else None)
             .count()
         )
 
@@ -775,7 +769,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
     if request_from_siae:
-        queryset = annotate_last_contract_end_date(queryset, company=request.current_organization)
+        queryset = queryset.with_contract_ending_soon(
+            siae=request.current_organization if request.from_employer else None
+        )
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
@@ -792,11 +788,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
                 job_seeker.pro_support_request_company_email,
                 job_seeker.get_full_name(),
             )
-        job_seeker.contract_ending_soon = bool(
-            request_from_siae
-            and job_seeker.last_contract_end_date
-            and contract_window[0] <= job_seeker.last_contract_end_date <= contract_window[1]
-        )
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
             or job_seeker.jobseeker_profile.is_stalled

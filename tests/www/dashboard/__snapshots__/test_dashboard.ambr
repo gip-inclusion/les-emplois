@@ -409,14 +409,13 @@
                     FROM "users_jobseekerassignment" U0
                     WHERE (U0."company_id" = %s
                            AND U0."ended_at" IS NULL))
-                 AND
-                   (SELECT U0."end_date" AS "end_date"
+                 AND EXISTS
+                   (SELECT %s AS "a"
                     FROM "companies_contract" U0
-                    WHERE (U0."end_date" IS NOT NULL
+                    WHERE (U0."end_date" BETWEEN %s AND %s
                            AND U0."job_seeker_id" = ("users_user"."id")
                            AND U0."company_id" = %s)
-                    ORDER BY 1 DESC
-                    LIMIT 1) BETWEEN %s AND %s)
+                    LIMIT 1))
         ''',
       }),
       dict({

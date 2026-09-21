@@ -14,7 +14,6 @@ from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
-from itou.companies.models import Contract
 from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import (
@@ -30,21 +29,6 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithHelpTexts
-
-
-def annotate_last_contract_end_date(queryset, *, company=None):
-    # Latest known IAE contract end date of the job seeker, optionally scoped to a single SIAE.
-    # Scoping to the current SIAE avoids counting a contract signed with another structure, and keeps
-    # a renewed employee out of the cohort (their latest contract with the SIAE ends later).
-    # Shared business definition reused by the dashboard counter, the filter, the discovery banner and
-    # the per-row end-of-contract flag. Idempotent so the list view can annotate for the row flag while
-    # the filter also annotates for the same SIAE, without raising on a duplicate annotation.
-    if "last_contract_end_date" in queryset.query.annotations:
-        return queryset
-    contracts = Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
-    if company is not None:
-        contracts = contracts.filter(company=company)
-    return queryset.annotate(last_contract_end_date=Subquery(contracts.order_by("-end_date").values("end_date")[:1]))
 
 
 class AssignmentsChoices(TextChoices):
@@ -213,9 +197,7 @@ class FilterForm(forms.Form):
                 approval_window = (today, today + datetime.timedelta(days=APPROVAL_ENDING_SOON_DAYS))
                 end_of_journey_filter &= Q(last_approval_end_at__range=approval_window)
             if contract_ending_soon:
-                queryset = annotate_last_contract_end_date(queryset, company=self.company)
-                contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
-                end_of_journey_filter &= Q(last_contract_end_date__range=contract_window)
+                queryset = queryset.has_contract_ending_soon(siae=self.company)
             filters.append(end_of_journey_filter)
 
         if self.cleaned_data.get("is_stalled"):
