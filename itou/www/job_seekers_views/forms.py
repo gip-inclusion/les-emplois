@@ -8,10 +8,12 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
+from itou.approvals.constants import APPROVAL_ENDING_SOON_DAYS
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
+from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
 from itou.companies.models import Contract
 from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
@@ -28,10 +30,6 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithHelpTexts
-
-
-APPROVAL_ENDING_SOON_DAYS = 90
-IAE_CONTRACT_ENDING_SOON_DAYS = 30
 
 
 def annotate_last_contract_end_date(queryset, *, company=None):
