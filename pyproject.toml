@@ -34,10 +34,6 @@ preserve_blank_lines=true
 extend_exclude = "itou/static_collected,itou/templates/utils/widgets/duet_date_picker_widget.html"
 format_css = true
 format_js = true
-# new in 1.45.0
-name_endblocks = false
-keep_br_inline = false
-quote_style = "double"
 
 [tool.pytest]
 minversion = "9.0"
