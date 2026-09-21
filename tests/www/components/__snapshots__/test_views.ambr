@@ -17,7 +17,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte de type info
+                          Le titre de l’alerte de type info
                       </strong>
                   </p>
                   <p class="mb-0">
@@ -38,7 +38,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte de type success
+                          Le titre de l’alerte de type success
                       </strong>
                   </p>
                   <p class="mb-0">
@@ -59,7 +59,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte de type warning
+                          Le titre de l’alerte de type warning
                       </strong>
                   </p>
                   <p class="mb-0">
@@ -80,7 +80,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte de type danger
+                          Le titre de l’alerte de type danger
                       </strong>
                   </p>
                   <p class="mb-0">
@@ -101,7 +101,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte de type important
+                          Le titre de l’alerte de type important
                       </strong>
                   </p>
                   <p class="mb-0">
@@ -124,7 +124,7 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Le titre de l'alerte rejetable
+                          Le titre de l’alerte rejetable
                       </strong>
                   </p>
                   <p class="mb-0">

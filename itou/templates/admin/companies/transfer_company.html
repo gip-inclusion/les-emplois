@@ -30,14 +30,14 @@
 {% block breadcrumbs %}
     <div class="breadcrumbs">
         <a href="{% url 'admin:index' %}">{% translate "Home" %}</a>
-        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-        &rsaquo;
+        › <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        ›
         {% if has_view_permission %}
             <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
         {% else %}
             {{ opts.verbose_name_plural|capfirst }}
         {% endif %}
-        &rsaquo; Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_company.pk %}">{{ from_company|truncatewords:"18" }}</a>
+        › Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_company.pk %}">{{ from_company|truncatewords:"18" }}</a>
         {% if to_company %}
             vers <a href="{% url opts|admin_urlname:'change' object_id=to_company.pk %}">{{ to_company|truncatewords:"18" }}</a>
         {% endif %}

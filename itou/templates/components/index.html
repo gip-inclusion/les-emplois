@@ -42,7 +42,7 @@
             <h3 class="my-3">{{ variant }}</h3>
             {% component_alert title=title content=content variant=variant %}
                 {% fragment as title %}
-                    Le titre de l&apos;alerte de type {{ variant }}
+                    Le titre de l’alerte de type {{ variant }}
                 {% endfragment %}
                 {% fragment as content %}
                     <p class="mb-0">
@@ -55,7 +55,7 @@
         <h3 class="my-3">rejetable ("dismissible")</h3>
         {% component_alert variant="info" title=title content=content dismissible=True %}
             {% fragment as title %}
-                Le titre de l&apos;alerte rejetable
+                Le titre de l’alerte rejetable
             {% endfragment %}
             {% fragment as content %}
                 <p class="mb-0">

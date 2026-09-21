@@ -64,11 +64,11 @@
                                         </li>
                                         <li>
                                             {% if job_application.job_seeker.phone %}
-                                                <small>N&deg; de téléphone</small>
+                                                <small>N° de téléphone</small>
                                                 <strong>{{ job_application.job_seeker.phone|format_phone }}</strong>
                                             {% elif request.user.is_job_seeker %}
                                                 <small>
-                                                    N&deg; de téléphone
+                                                    N° de téléphone
                                                     <i class="ri-information-line text-info"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-title="L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement."
@@ -79,7 +79,7 @@
                                                 <i class="text-disabled">Non renseigné</i>
                                             {% else %}
                                                 <small>
-                                                    N&deg; de téléphone
+                                                    N° de téléphone
                                                     <i class="ri-information-line text-info"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-title="L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."

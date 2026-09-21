@@ -25,7 +25,7 @@
             {{ job_seeker.address_on_one_line|default:""|mask_unless:can_view_personal_information|strong_or_disabled_non_filled:"Non renseignée" }}
         </li>
         <li class="has-forced-line-break">
-            <small>N&deg; de téléphone</small>
+            <small>N° de téléphone</small>
             {{ job_seeker.phone|default:""|format_phone|mask_unless:can_view_personal_information|strong_or_disabled_non_filled }}
         </li>
         <li class="has-forced-line-break">
