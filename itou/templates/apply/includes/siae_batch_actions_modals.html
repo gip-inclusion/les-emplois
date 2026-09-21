@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load str_filters %}
+{# djlint:off H053 postpone_modal_title is used twice but never at the same time #}
 
 {% if display_batch_actions %}
     <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
