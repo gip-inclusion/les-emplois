@@ -35,7 +35,7 @@ ban-relative-imports = "all"
 
 [tool.djlint]
 profile="django"
-ignore="H006,H014,H017,H023,H030,H031,T003"
+ignore="H006,H014,H017,H030,H031,T003"
 custom_blocks="buttons,component_alert,component_alert_global,component_box_dashboard,component_box_nexus_activated_service,component_info,component_navinfo,component_title,endbuttons,fragment"
 max_attribute_length=200
 preserve_blank_lines=true
