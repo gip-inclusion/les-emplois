@@ -61,7 +61,7 @@
                                 <ul class="list-unstyled mb-0">
                                     {% for device in disabled_devices %}
                                         <li>
-                                            <strike>{{ device.name }}</strike>
+                                            <del>{{ device.name }}</del>
                                             <span class="badge badge-sm bg-tertiary rounded-pill">retiré</span>
                                             <br>
                                             Dernière utilisation le {{ device.last_used_at|date:"d F Y à H\hi"|default:'<i class="text-disabled">jamais</i>' }}
