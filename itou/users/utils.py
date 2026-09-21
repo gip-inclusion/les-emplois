@@ -32,3 +32,15 @@ def merge_job_seeker_assignments(*, assignment_to_delete, assignment_to_keep):
         reason=last_assignment.reason,
     )
     assignment_to_delete.delete()
+
+
+def auto_clear_last_name_if_same_as_birth_name(form):
+    """In the given form, clear last name field (i.e. set "") if it's
+    the same as the birth name.
+
+    This is for users who forget to remove the last name when setting
+    a birth name that is the same.
+    """
+    if set(form.cleaned_data).issuperset({"last_name", "birth_name"}):
+        if form.cleaned_data["last_name"].lower() == form.cleaned_data["birth_name"].lower():
+            form.cleaned_data["last_name"] = ""
