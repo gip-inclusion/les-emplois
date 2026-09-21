@@ -112,6 +112,33 @@ def test_collection_differ_data_converters():
     ]
 
 
+def test_collection_differ_force_update():
+    file = FileFactory()
+    comparative_data = {"key": file.key, "last_modified": file.last_modified}
+
+    differ = diff.CollectionDiffer(
+        File.objects.all(), [comparative_data], "key", watched_data={"last_modified": "last_modified"}
+    )
+    assert list(differ) == []
+
+    differ = diff.CollectionDiffer(
+        File.objects.all(),
+        [comparative_data],
+        "key",
+        watched_data={"last_modified": "last_modified"},
+        force_update=True,
+    )
+    assert list(differ) == [
+        diff.DiffItem(
+            diff.DiffItemKind.UPDATED,
+            (file.key,),
+            file,
+            comparative_data,
+            data=None,
+        ),
+    ]
+
+
 def test_if_not_set_converter():
     expected = python.Sentinel()
 

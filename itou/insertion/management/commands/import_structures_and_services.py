@@ -154,6 +154,7 @@ class Command(BaseCommand):
             "--data", choices=list(ArgumentData), default=list(ArgumentData), type=ArgumentData, nargs="+"
         )
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+        parser.add_argument("--force", dest="force_update", action="store_true")
 
     @functools.cached_property
     def cities_by_code_insee(self):
@@ -354,7 +355,7 @@ class Command(BaseCommand):
         else:
             structure.reseaux_porteurs.set(objs)
 
-    def import_structures(self, client, sources):
+    def import_structures(self, client, sources, *, force_update=False):
         self.logger.info("Importing structures")
 
         differ = diff.CollectionDiffer(
@@ -363,6 +364,7 @@ class Command(BaseCommand):
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
+            force_update=force_update,
         )
         removed_uids = []
         for diff_item in differ:
@@ -575,7 +577,7 @@ class Command(BaseCommand):
 
         self._fill_service_related_fields_from_data(service, data, dora_services, is_creation)  # Fill ManyToManyField
 
-    def import_services(self, di_client, dora_client, sources):
+    def import_services(self, di_client, dora_client, sources, *, force_update=False):
         self.logger.info("Importing services")
         dora_services = {"dora--" + item["id"]: item for item in DoraApiItemsIterator(dora_client.emplois_services)}
         structures = Structure.include_inactive.only("uid").in_bulk(field_name="uid")
@@ -586,6 +588,7 @@ class Command(BaseCommand):
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
+            force_update=force_update,
         )
         removed_uids = []
         for diff_item in differ:
@@ -642,7 +645,7 @@ class Command(BaseCommand):
         )
 
     @dry_runnable
-    def handle(self, *args, data, **options):
+    def handle(self, *args, data, force_update=False, **options):
         with (
             lock_timeout(10 * 60 * 1000),
             DataInclusionApiClient(
@@ -663,10 +666,10 @@ class Command(BaseCommand):
                 )
 
             if ArgumentData.STRUCTURES in data:
-                self.import_structures(di_client, sources_except_emplois)
+                self.import_structures(di_client, sources_except_emplois, force_update=force_update)
 
             if ArgumentData.SERVICES in data:
-                self.import_services(di_client, dora_client, sources_except_emplois)
+                self.import_services(di_client, dora_client, sources_except_emplois, force_update=force_update)
 
             if ArgumentData.STRUCTURES in data or ArgumentData.SERVICES in data:
                 # Some data·inclusion services are non orientable with DORA's form.

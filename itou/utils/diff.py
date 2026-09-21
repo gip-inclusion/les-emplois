@@ -91,10 +91,12 @@ class CollectionDiffer:
         *,
         current_data_converters: ConverterMapping | None = None,
         comparative_data_converters: ConverterMapping | None = None,
+        force_update: bool = False,
     ):
         self.current_collection = current_collection
         self.comparative_collection = comparative_collection
         self.watched_data = watched_data
+        self.force_update = force_update
 
         normalized_keys = self._normalize_key(key)
         self.current_collection_strategy = CollectionStrategy(
@@ -135,13 +137,14 @@ class CollectionDiffer:
                 )
             else:  # UPDATED
                 current_item = current_collection_data[item_key]
-                if updated_data := self._get_updated_data(current_item, comparative_item):
+                updated_data = self._get_updated_data(current_item, comparative_item)
+                if updated_data or self.force_update:
                     yield DiffItem(
                         kind=DiffItemKind.UPDATED,
                         key=item_key,
                         current_item=current_item,
                         comparative_item=comparative_item,
-                        data=updated_data,
+                        data=updated_data or None,
                     )
                     keys_updated += 1
 
