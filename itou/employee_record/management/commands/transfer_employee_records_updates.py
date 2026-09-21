@@ -34,9 +34,10 @@ class Command(EmployeeRecordTransferCommand):
         else:
             batch_data = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch).data
 
+        remote_path = EmployeeRecordBatch.get_remote_path()
         try:
             # accessing .data triggers serialization
-            remote_path = self.upload_json_file(batch_data, sftp, dry_run)
+            upload_success = self.upload_json_file(batch_data, remote_path, sftp, dry_run)
         except SerializationError as ex:
             self.logger.error(
                 "Employee records serialization error during upload, can't process.\n"
@@ -50,7 +51,7 @@ class Command(EmployeeRecordTransferCommand):
             # In any other case, bounce exception
             raise ex from Exception(f"Unhandled error during upload phase for batch: {raw_batch=}")
         else:
-            if not remote_path:
+            if not upload_success:
                 self.logger.warning("Could not upload file, exiting ...")
                 return
 
