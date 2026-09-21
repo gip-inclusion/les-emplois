@@ -33,6 +33,21 @@ class JobSeekerProfileFieldsMixin:
             if field not in self.fields:
                 self.fields[field] = JobSeekerProfile._meta.get_field(field).formfield()
 
+    def clean(self):
+        super().clean()
+        self.auto_clear_last_name_if_same_as_birth_name()
+
+    def auto_clear_last_name_if_same_as_birth_name(self):
+        """In the given form, clear last name field (i.e. set "") if it's
+        the same as the birth name.
+
+        This is for users who forget to remove the last name when setting
+        a birth name that is the same.
+        """
+        if set(self.cleaned_data).issuperset({"last_name", "birth_name"}):
+            if self.cleaned_data["last_name"].casefold() == self.cleaned_data["birth_name"].casefold():
+                self.cleaned_data["last_name"] = ""
+
     def save(self, commit=True):
         user = super().save(commit=commit)
         update_fields = []
