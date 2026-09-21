@@ -1,3 +1,4 @@
+import datetime
 import logging
 import time
 import uuid
@@ -35,7 +36,8 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.models import Company, CompanyMembership
+from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
+from itou.companies.models import Company, CompanyMembership, Contract
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -112,6 +114,20 @@ class UserQuerySet(models.QuerySet):
                 filter=Q(job_seeker_assignments__assigned_to_unknown_advisor=True) & status_filter,
             ),
         ).annotate(**{annotation_name: F("known_advisors_nb") + F("unknown_advisors_nb")})
+
+    def contract_ending_soon_lookup(self, siae=None):
+        today = timezone.localdate()
+        time_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
+        contract_subquery = Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__range=time_window)
+        if siae:
+            contract_subquery = contract_subquery.filter(company=siae)
+        return Exists(contract_subquery)
+
+    def has_contract_ending_soon(self, siae=None):
+        return self.filter(self.contract_ending_soon_lookup(siae))
+
+    def with_contract_ending_soon(self, siae=None):
+        return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):

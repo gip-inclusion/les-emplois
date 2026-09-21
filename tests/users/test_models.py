@@ -42,7 +42,7 @@ from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -102,6 +102,41 @@ class TestQuerySet:
         assert User.objects.with_advisors_count(active=None).get(pk=job_seeker.pk).advisors_nb == 4
         assert User.objects.with_advisors_count(active=True).get(pk=job_seeker.pk).active_advisors_nb == 2
         assert User.objects.with_advisors_count(active=False).get(pk=job_seeker.pk).old_advisors_nb == 2
+
+    @freezegun.freeze_time("2026-09-22")
+    def test_has_contract_ending_soon(self):
+        today = timezone.localdate()
+
+        job_seeker = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today + datetime.timedelta(days=20)
+        ).job_seeker
+        _job_seeker2 = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today + datetime.timedelta(days=31)
+        ).job_seeker
+        _job_seeker3 = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today - datetime.timedelta(days=1)
+        ).job_seeker
+
+        assertQuerySetEqual(User.objects.has_contract_ending_soon(), [job_seeker])
+
+    @freezegun.freeze_time("2026-09-22")
+    def test_with_contract_ending_soon(self):
+        today = timezone.localdate()
+
+        job_seeker = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today + datetime.timedelta(days=20)
+        ).job_seeker
+        job_seeker2 = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today + datetime.timedelta(days=31)
+        ).job_seeker
+        job_seeker3 = ContractFactory(
+            start_date=today - datetime.timedelta(days=200), end_date=today - datetime.timedelta(days=1)
+        ).job_seeker
+
+        job_seekers_qs = User.objects.with_contract_ending_soon()
+        assert job_seekers_qs.get(pk=job_seeker.pk).contract_ending_soon is True
+        assert job_seekers_qs.get(pk=job_seeker2.pk).contract_ending_soon is False
+        assert job_seekers_qs.get(pk=job_seeker3.pk).contract_ending_soon is False
 
 
 class TestManager:
