@@ -37,7 +37,6 @@ format_js = true
 # new in 1.45.0
 name_endblocks = false
 keep_br_inline = false
-no_entity_formatting = true
 no_indent_inner_html = true
 quote_style = "double"
 
