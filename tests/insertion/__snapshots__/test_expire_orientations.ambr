@@ -329,11 +329,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -353,11 +355,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -401,11 +405,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -449,11 +455,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -566,11 +574,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -590,11 +600,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -638,11 +650,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({
@@ -686,11 +700,13 @@
                                       "bcc",
                                       "subject",
                                       "body_text",
+                                      "body_html",
                                       "from_email",
                                       "reply_to",
                                       "created_at",
                                       "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
         ''',
       }),
       dict({

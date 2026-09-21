@@ -1,0 +1,109 @@
+# serializer version: 1
+# name: test_html_markup_removed
+  '''
+  <!DOCTYPE html>
+  <html lang="fr">
+   <head>
+    <meta charset="utf-8"/>
+   </head>
+   <body>
+    <p>
+     A user could set a really weird first name, such as Eve
+    </p>
+    Make sure the HTML markup does not end up in the email
+    <ul>
+     <li>
+      Lists are allowed
+     </li>
+    </ul>
+    <ol>
+     <li>
+      Even ordered
+     </li>
+    </ol>
+    <p>
+     Contact: me@me.com
+     <br/>
+     <br/>
+     <strong>
+      This is important
+     </strong>
+    </p>
+    alert('XSS');
+    <p>
+     <b>
+      Bold
+     </b>
+     <br/>
+     <i>
+      Italic
+     </i>
+     <br/>
+     Foo
+    </p>
+    Invalid HTML is ignored
+   </body>
+  </html>
+  
+  '''
+# ---
+# name: test_renders_markdown
+  '''
+  <!DOCTYPE html>
+  <html lang="fr">
+   <head>
+    <meta charset="utf-8"/>
+   </head>
+   <body>
+    <p>
+     This a
+     <strong>
+      Markdown
+     </strong>
+     message, in which we use italic.
+     <br/>
+     Line returns are preserved with a br.
+     <br/>
+     We also use lists:
+    </p>
+    <ul>
+     <li>
+      a
+     </li>
+     <li>
+      b
+     </li>
+    </ul>
+    <p>
+     And ordered lists:
+    </p>
+    <ol>
+     <li>
+      α
+     </li>
+     <li>
+      β
+     </li>
+    </ol>
+    <p>
+     Email addresses are highlighted contact@inclusion.gouv.fr
+     <br/>
+     So are links (in the allowlist)
+     <a href="https://diagoriente.beta.gouv.fr/path/to/somewhere">
+      https://diagoriente.beta.gouv.fr/path/to/somewhere
+     </a>
+    </p>
+    <h1>
+     Heading 1
+    </h1>
+    <h2>
+     Heading 2
+    </h2>
+    <h3>
+     Heading 3
+    </h3>
+   </body>
+  </html>
+  
+  '''
+# ---

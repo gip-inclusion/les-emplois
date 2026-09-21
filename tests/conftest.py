@@ -10,6 +10,7 @@ import socket
 import threading
 import uuid
 from functools import reduce
+from urllib.parse import urlsplit
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -37,6 +38,7 @@ from slippers.templatetags.slippers import AttrsNode
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 
+from itou.emails.markdown import known_domains  # noqa: E402
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import (  # noqa: E402
@@ -899,3 +901,13 @@ def detect_typography_rules():
 def mailoutbox(mailoutbox):
     yield mailoutbox
     assert_bonjour(mailoutbox)
+    # When markdownify-ing plain text emails, only links to an authorized known
+    # domain are transformed to <a href=""> tags. This fixture helps catching a
+    # domain that has not been added to known_domains.
+    for mail in mailoutbox:
+        for line in mail.body:
+            if "https://" in line:
+                links = [part for part in line.split() if part.startswith("https://")]
+                for link in links:
+                    domain = urlsplit(link).netloc
+                    assert domain in known_domains()
