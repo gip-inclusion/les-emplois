@@ -1,4 +1,6 @@
-<div class="modal-dialog modal-dialog-centered" id="savedSearchesSettingsModalContent"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+<div class="modal-dialog modal-dialog-centered"
+     id="savedSearchesSettingsModalContent"
+     {% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     <div class="modal-content">
         <div class="modal-header">
             <h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>
@@ -23,7 +25,10 @@
                                     <span class="fs-xs">{{ saved_search.display_details }}</span>
                                 </div>
                                 <div>
-                                    <button class="btn btn-danger btn-sm btn-ico-only" aria-label="Supprimer cette recherche" name="saved_search_id" value="{{ saved_search.id }}">
+                                    <button class="btn btn-danger btn-sm btn-ico-only"
+                                            aria-label="Supprimer cette recherche"
+                                            name="saved_search_id"
+                                            value="{{ saved_search.id }}">
                                         <i class="ri-delete-bin-line fw-medium" aria-hidden="true"></i>
                                     </button>
                                 </div>

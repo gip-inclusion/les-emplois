@@ -34,7 +34,8 @@
                                 {# Split form fields for easier collapsible behaviour #}
                                 {% bootstrap_field form.start_at %}
 
-                                <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
+                                <div id="collapse_end_at"
+                                     class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
                                     {% bootstrap_field form.end_at %}
                                 </div>
 

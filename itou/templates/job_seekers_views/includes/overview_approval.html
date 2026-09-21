@@ -17,7 +17,8 @@
                             <div class="mb-2">
                                 <span class="fw-semibold">PASS IAE suspendu depuis le {{ suspension.start_at|date:"d/m/Y" }} - motif déclaré : {{ suspension.get_reason_display|lower }}.</span>
                             </div>
-                            <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "voir-suspension-pass-iae" %}>Voir la suspension</a>
+                            <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "test-synthese" "clic" "voir-suspension-pass-iae" %}>Voir la suspension</a>
                         </div>
                         <div class="col-auto">
                             <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">suspendu</span>
@@ -36,7 +37,8 @@
                             <div class="mb-2">
                                 <span class="fw-semibold">PASS IAE prolongé jusqu'au {{ prolongation.end_at|date:"d/m/Y" }} - motif : {{ prolongation.get_reason_display|lower }}.</span>
                             </div>
-                            <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
+                            <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
                         </div>
                         <div class="col-auto">
                             <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">prolongé</span>
@@ -57,7 +59,8 @@
                                     <span class="fw-semibold">PASS IAE expire dans {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}, le {{ approval.remainder_as_date|date:"d/m/Y" }}.</span>
                                     A renouveler avant toute nouvelle embauche.
                                 </div>
-                                <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
+                                <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
                             </div>
                             <div class="col-auto">
                                 <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">bientôt expiré</span>
@@ -68,7 +71,8 @@
                                     <span class="fw-semibold">PASS IAE valide jusqu'au {{ approval.end_at|date:"d/m/Y" }}.</span>
                                     Aucune démarche à prévoir pour une embauche en SIAE.
                                 </div>
-                                <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
+                                <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
                             </div>
                             <div class="col-auto">
                                 <span class="badge badge-sm rounded-pill bg-success-lighter text-success flex-shrink-0">en cours</span>
@@ -90,7 +94,8 @@
                         <div class="mb-2">
                             <span class="fw-semibold">PASS IAE expiré le {{ approval.end_at|date:"d/m/Y" }}.</span>
                         </div>
-                        <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
+                        <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
                     </div>
                     <div class="col-auto">
                         <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger flex-shrink-0">expiré</span>

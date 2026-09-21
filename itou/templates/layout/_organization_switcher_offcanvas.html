@@ -11,7 +11,12 @@
         <strong>{{ current_organization.display_name }}</strong>
     </div>
 {% else %}
-    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchOrganizationDropdownMobile" aria-expanded="false">
+    <button type="button"
+            class="dropdown-toggle dropdown-toggle__summary"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-controls="switchOrganizationDropdownMobile"
+            aria-expanded="false">
         <i class="{{ icon }}" aria-hidden="true"></i>
         <span>{{ current_organization.kind }}</span>
         <strong>{{ current_organization.display_name }}</strong>

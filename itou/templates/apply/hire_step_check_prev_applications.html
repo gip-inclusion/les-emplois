@@ -42,7 +42,9 @@
                                     {% endif %}
                                 </b>
                             </span>
-                            <a href="{% url 'apply:start-accept' prev_app.pk %}" class="btn btn-link btn-sm stretched-link" {% matomo_event "candidature" "clic" "acceptation-candidature" %}>Accepter la candidature</a>
+                            <a href="{% url 'apply:start-accept' prev_app.pk %}"
+                               class="btn btn-link btn-sm stretched-link"
+                               {% matomo_event "candidature" "clic" "acceptation-candidature" %}>Accepter la candidature</a>
                         </li>
                     {% endfor %}
                 </ul>

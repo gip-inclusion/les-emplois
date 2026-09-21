@@ -42,7 +42,11 @@
                 {% endif %}
                 {% if criteria.written_proof_url %}
                     <li class="m-0">
-                        <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" class="has-external-link" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                        <a href="{{ criteria.written_proof_url }}"
+                           rel="noopener"
+                           target="_blank"
+                           class="has-external-link"
+                           aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
                             {{ criteria.written_proof_url }}
                         </a>
                     </li>

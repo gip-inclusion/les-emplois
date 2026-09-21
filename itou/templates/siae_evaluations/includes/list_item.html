@@ -13,7 +13,7 @@
                 {% if item.evaluated_siae.reviewed_at %}
                     {% if not item.hide_state_from_siae %}
                         {% with jobapp_state=item.compute_state %}
-                            {% if jobapp_state == 'REFUSED' or jobapp_state == 'REFUSED_2' %}
+                            {% if jobapp_state == "REFUSED" or jobapp_state == "REFUSED_2" %}
                                 <p class="h5">Commentaires de la DDETS</p>
                                 <div>{{ item.labor_inspector_explanation }}</div>
                             {% endif %}
@@ -22,7 +22,7 @@
                 {% endif %}
             </div>
             {# Note that a state different from `PENDING` implies there is at least one evaluated criterion associated with the job application. #}
-            {% if evaluated_job_application_state != 'PENDING' %}
+            {% if evaluated_job_application_state != "PENDING" %}
                 {% with collapse_id_suffix=item.pk|stringformat:"s" %}
                     {% with collapse_id="collapseItemsEvaluated"|add:collapse_id_suffix %}
                         {% component_info borderless=True c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id=collapse_id opened=True extra_classes="mt-3" %}
@@ -45,18 +45,22 @@
                                                 <div class="text-md-end mt-2">
                                                     {% if evaluated_administrative_criteria.can_upload %}
                                                         {% if evaluated_administrative_criteria.proof_id %}
-                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-link">
+                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
+                                                               class="btn btn-sm btn-ico btn-link">
                                                                 <i class="ri-pencil-line" aria-hidden="true"></i>
                                                                 <span>Modifier le justificatif</span>
                                                             </a>
                                                         {% else %}
-                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-primary">
+                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
+                                                               class="btn btn-sm btn-ico btn-primary">
                                                                 <i class="ri-add-line" aria-hidden="true"></i>
                                                                 <span>Ajouter un justificatif</span>
                                                             </a>
                                                         {% endif %}
                                                     {% elif evaluated_administrative_criteria.proof_id %}
-                                                        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank" class="btn btn-sm btn-ico btn-link">
+                                                        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
+                                                           target="_blank"
+                                                           class="btn btn-sm btn-ico btn-link">
                                                             <i class="ri-eye-line" aria-hidden="true"></i>
                                                             <span>Voir le justificatif</span>
                                                         </a>
@@ -79,13 +83,15 @@
     {% if should_select_criteria == "PENDING" %}
         <div class="c-box--results__footer">
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Sélectionner les critères</a>
+                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto">Sélectionner les critères</a>
             </div>
         </div>
     {% elif should_select_criteria == "EDITABLE" %}
         <div class="c-box--results__footer">
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Modifier les critères</a>
+                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto">Modifier les critères</a>
             </div>
         </div>
     {% endif %}

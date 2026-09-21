@@ -126,8 +126,12 @@
                                                             </button>
                                                         {% elif radio.data.value == RefusalReason.NO_POSITION %}
                                                             {{ radio.choice_label }}
-                                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
-                                                                <i class="ri-information-line ri-lg text-info ms-1" aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                            <button type="button"
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="right"
+                                                                    data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
+                                                                <i class="ri-information-line ri-lg text-info ms-1"
+                                                                   aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
                                                             </button>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}

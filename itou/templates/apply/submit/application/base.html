@@ -10,11 +10,11 @@
         {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
             {% fragment as c_title__main %}
                 <h1>
-                    {% include 'apply/includes/_submit_title.html' %}
+                    {% include "apply/includes/_submit_title.html" %}
                     {% if is_subject_to_iae_rules %}
-                        {% include 'eligibility/includes/iae/eligibility_badge.html' with job_seeker=job_seeker eligibility_diagnosis=eligibility_diagnosis force_valid_approval=True only %}
+                        {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=eligibility_diagnosis force_valid_approval=True only %}
                     {% elif is_subject_to_geiq_rules %}
-                        {% include 'eligibility/includes/geiq/eligibility_badge.html' with job_seeker=job_seeker geiq_eligibility_diagnosis=geiq_eligibility_diagnosis only %}
+                        {% include "eligibility/includes/geiq/eligibility_badge.html" with job_seeker=job_seeker geiq_eligibility_diagnosis=geiq_eligibility_diagnosis only %}
                     {% endif %}
 
                 </h1>
@@ -23,7 +23,8 @@
                 <p>
                     Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
                     {% if can_view_personal_information and not request.user.is_job_seeker %}
-                        <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}">Vérifier le profil</a>
+                        <a class="btn-link ms-3"
+                           href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}">Vérifier le profil</a>
                     {% endif %}
                     {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
                 </p>
@@ -60,8 +61,12 @@
                     <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                         <div class="c-stepper mb-3 mb-md-4">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                                </div>
+                                <div class="progress-bar progress-bar-{{ progress }}"
+                                     role="progressbar"
+                                     aria-valuenow="{{ progress }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-labelledby="currentProgressState"></div>
                             </div>
                             <p id="currentProgressState">
                                 {% block progress_title %}

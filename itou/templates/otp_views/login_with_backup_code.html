@@ -34,7 +34,10 @@
                                 Sans code de récupération, il n’est pas possible d'accéder à votre compte de manière autonome. Veuillez contacter notre support.
                             {% endfragment %}
                             {% fragment as call_to_action %}
-                                <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="btn btn-block btn-primary has-external-link">Contacter le support</a>
+                                <a href="{% zendesk_form_url request=request %}"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="btn btn-block btn-primary has-external-link">Contacter le support</a>
                             {% endfragment %}
                         {% endcomponent_alert %}
 

@@ -12,9 +12,11 @@ Arguments:
                name="{{ choice.data.name }}"
                value="{{ choice.data.value }}"
                {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}>
-        <label class="form-check-label" for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.choice_label }}</label>
+        <label class="form-check-label"
+               for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.choice_label }}</label>
         {% if choice.data.help_text %}
-            <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}" class="form-text">{{ choice.data.help_text }}</div>
+            <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}"
+                 class="form-text">{{ choice.data.help_text }}</div>
         {% endif %}
     </div>
 </div>

@@ -49,8 +49,12 @@
                     <div class="s-section__col col-12">
                         <div class="c-stepper mb-3 mb-md-4">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-66" role="progressbar" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                                </div>
+                                <div class="progress-bar progress-bar-66"
+                                     role="progressbar"
+                                     aria-valuenow="66"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-labelledby="currentProgressState"></div>
                             </div>
                             <p id="currentProgressState">
                                 <strong>Étape 2</strong>/3 : Associez votre compte
@@ -72,7 +76,7 @@
                                     {% bootstrap_form_errors form type="all" %}
                                     <ol class="list-ordered">
                                         <li>{% bootstrap_field form.name wrapper_class="form-group form-group-input-w-lg-33" %}</li>
-                                        {% if form.device_type.value == 'smartphone' %}
+                                        {% if form.device_type.value == "smartphone" %}
                                             <li>
                                                 <div>
                                                     <p class="mb-0">
@@ -82,7 +86,9 @@
                                                         Exemples d'application : Google Authenticator, Authy, Microsoft Authenticator
                                                     </p>
                                                     <p>
-                                                        <img src="{{ qrcode }}" width="250" alt="QR code pour la configuration de l’authentification à deux facteurs">
+                                                        <img src="{{ qrcode }}"
+                                                             width="250"
+                                                             alt="QR code pour la configuration de l’authentification à deux facteurs">
                                                     </p>
                                                     <p class="mb-1">
                                                         <strong>Ou copiez la clé de configuration suivante dans l’application (valable une seule fois pour configurer votre appareil) :</strong>
@@ -125,8 +131,12 @@
                     <div class="s-section__col col-12">
                         <div class="c-stepper mb-3 mb-md-4">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                                </div>
+                                <div class="progress-bar progress-bar-100"
+                                     role="progressbar"
+                                     aria-valuenow="100"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-labelledby="currentProgressState"></div>
                             </div>
                             <p id="currentProgressState">
                                 <strong>Étape 3</strong>/3 : Sauvegardez le code de récupération

@@ -12,7 +12,9 @@
             {% else %}
                 {% url_add_query "#" job_seeker_public_id=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
             {% endif %}
-            <a href="{{ job_url }}" class="fw-bold text-decoration-none stretched-link" {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
+            <a href="{{ job_url }}"
+               class="fw-bold text-decoration-none stretched-link"
+               {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
         {% endif %}
         {% if job.is_unpopular %}
             <span class="badge badge-sm rounded-pill bg-info text-white">

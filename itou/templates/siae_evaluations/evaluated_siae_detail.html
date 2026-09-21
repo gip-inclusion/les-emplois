@@ -73,7 +73,8 @@
                             <div class="p-0 flex-grow-1 m-0">
                                 Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE, veuillez valider le contrôle effectué pour la notifier de son résultat.
                             </div>
-                            <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                            <form method="post"
+                                  action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                 {% csrf_token %}
                                 <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-primary disabled{% endif %}">
                                     Valider
@@ -84,7 +85,8 @@
 
                     {% for evaluated_job_application in evaluated_siae.evaluated_job_applications.all %}
                         {# navigation : anchor to scroll to a specific card when returning to this page #}
-                        <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="{{ evaluated_job_application.pk }}">
+                        <div class="c-box c-box--results has-links-inside my-3 my-md-4"
+                             id="{{ evaluated_job_application.pk }}">
                             <div class="c-box--results__header">
                                 {% include "siae_evaluations/includes/job_seeker_infos.html" with request=request evaluated_job_application=evaluated_job_application only %}
                             </div>
@@ -93,7 +95,8 @@
                                     <hr class="m-0">
                                     <div class="c-box--results__footer">
                                         <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}"
+                                               class="btn btn-outline-primary btn-block w-100 w-md-auto">
                                                 Contrôler cette auto-prescription
                                             </a>
                                         </div>
@@ -131,7 +134,8 @@
                                     <hr class="m-0">
                                     <div class="c-box--results__footer">
                                         <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}"
+                                               class="btn btn-outline-primary btn-block w-100 w-md-auto">
                                                 Revoir ses justificatifs
                                             </a>
                                         </div>
@@ -146,7 +150,8 @@
                             <div class="p-0 flex-grow-1 m-0">
                                 Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE, veuillez valider le contrôle effectué pour la notifier de son résultat.
                             </div>
-                            <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                            <form method="post"
+                                  action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                 {% csrf_token %}
                                 <button class="btn btn-primary">Valider</button>
                             </form>

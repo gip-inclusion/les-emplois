@@ -3,7 +3,8 @@
 {% load django_bootstrap5 %}
 {% load matomo %}
 
-<div class="{% if location == "sidebar" %}c-box c-box--note{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-add-{{ location }}">
+<div class="{% if location == "sidebar" %}c-box c-box--note{% else %}c-form{% endif %} mb-3 mb-md-4"
+     id="comments-add-{{ location }}">
     <form hx-post="{% url 'apply:add_comment_for_company' job_application_id=job_application.id %}"
           hx-target="#comments-add-{{ location }}"
           hx-indicator="#comments-add-{{ location }}"
@@ -30,7 +31,9 @@
                         <span class="visually-hidden">Annuler l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
                         <i class="ri-close-line" aria-hidden="true"></i>
                     </button>
-                    <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" type="submit" {% matomo_event "candidature" "clic" "ajout-commentaire-sidebar" %}>
+                    <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white"
+                            type="submit"
+                            {% matomo_event "candidature" "clic" "ajout-commentaire-sidebar" %}>
                         <span class="visually-hidden">Valider l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
                         <i class="ri-check-line" aria-hidden="true"></i>
                     </button>

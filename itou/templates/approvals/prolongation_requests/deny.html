@@ -57,9 +57,11 @@
                                             <p>
                                                 Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                             </p>
-                                            <a class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" aria-label="En savoir plus concernant le contexte légal" rel="noopener" target="_blank">
-                                                En savoir plus
-                                            </a>
+                                            <a class="btn-link has-external-link"
+                                               href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367"
+                                               aria-label="En savoir plus concernant le contexte légal"
+                                               rel="noopener"
+                                               target="_blank">En savoir plus</a>
                                         {% endfragment %}
                                     {% endcomponent_info %}
                                 {% endif %}
@@ -69,7 +71,8 @@
                                     {% if wizard.steps.prev %}
                                         {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev formnovalidate=True %}
                                     {% else %}
-                                        <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
+                                        <a class="btn btn-link btn-outline-primary"
+                                           href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
                                     {% endif %}
                                     {% bootstrap_button wizard.steps.next|yesno:"Suivant,Confirmer le refus" button_type="submit" button_class="btn btn-primary" %}
                                 </div>

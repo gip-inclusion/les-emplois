@@ -27,9 +27,12 @@
                     {{ membership.user.get_truncated_full_name }}
                     de vous ajouter en tant que collaborateur.
                 </i>
-                <form method="post" action="{% url 'signup:prescriber_request_invitation' membership.id %}" class="js-prevent-multiple-submit">
+                <form method="post"
+                      action="{% url 'signup:prescriber_request_invitation' membership.id %}"
+                      class="js-prevent-multiple-submit">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-secondary mt-2">Demander à rejoindre cette organisation</button>
+                    <button type="submit"
+                            class="btn btn-secondary mt-2">Demander à rejoindre cette organisation</button>
                 </form>
             {% endwith %}
         {% else %}

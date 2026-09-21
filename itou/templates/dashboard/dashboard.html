@@ -8,7 +8,7 @@
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    {% include 'dashboard/includes/dashboard_title_content.html' %}
+    {% include "dashboard/includes/dashboard_title_content.html" %}
 {% endblock %}
 
 {% block title_messages %}
@@ -42,7 +42,11 @@
                             Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                         {% endwith %}
                     {% endif %}
-                    ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                    ou <a href="{{ ITOU_HELP_CENTER_URL }}"
+    target="_blank"
+    class="has-external-link"
+    rel="noopener"
+    aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
                 </p>
             {% endfragment %}
         {% endcomponent_alert %}
@@ -74,7 +78,11 @@
                                 Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                             {% endwith %}
                         {% endif %}
-                        ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                        ou <a href="{{ ITOU_HELP_CENTER_URL }}"
+    target="_blank"
+    class="has-external-link"
+    rel="noopener"
+    aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
                     {% endif %}
                 </p>
             {% endfragment %}
@@ -140,7 +148,10 @@
                 <p class="mb-0">Optimiser ses pratiques de prescription avec {% brand %} : bonnes pratiques, évolutions du service et échanges autour de cas concrets.</p>
             {% endfragment %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49064754839441-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
+                <a class="btn btn-sm btn-primary has-external-link"
+                   target="_blank"
+                   rel="noopener"
+                   href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49064754839441-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}
@@ -154,7 +165,10 @@
                 <p class="mb-0">Optimiser la gestion des recrutements et le traitement des candidatures : bonnes pratiques, évolutions du service et échanges autour de cas concrets.</p>
             {% endfragment %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49065016706449-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
+                <a class="btn btn-sm btn-primary has-external-link"
+                   target="_blank"
+                   rel="noopener"
+                   href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/49065016706449-Acc%C3%A9der-aux-webinaires">Je m'inscris</a>
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}
@@ -163,11 +177,20 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
+            <a class="nav-link active"
+               id="ensemble-tab"
+               data-bs-toggle="tab"
+               href="#ensemble"
+               role="tab"
+               aria-controls="ensemble"
+               aria-selected="true"
+               {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
         </li>
         {% if can_view_stats_dashboard_widget %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
+                <a class="nav-link"
+                   href="{% url "dashboard:index_stats" %}"
+                   {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
                     {% if request.from_iae_actor %}
                         <span>Pilotage</span>
                     {% else %}
@@ -185,7 +208,10 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="ensemble" role="tabpanel" aria-labelledby="ensemble-tab">
+                        <div class="tab-pane fade show active"
+                             id="ensemble"
+                             role="tabpanel"
+                             aria-labelledby="ensemble-tab">
                             <h2>Vue d’ensemble</h2>
                             <div class="c-search mt-3 mt-md-4">
                                 <div class="c-search__bar">
@@ -263,7 +289,12 @@
 {% endblock %}
 
 {% block modals %}
-    <div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+    <div class="modal fade"
+         id="savedSearchesSettingsModal"
+         tabindex="-1"
+         aria-labelledby="savedSearchesSettingsModalLabel"
+         aria-modal="true"
+         role="dialog">
         {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches display_save_button=False disable_save_button=False request=request csrf_token=csrf_token hx_swap_oob=False only %}
     </div>
 {% endblock %}

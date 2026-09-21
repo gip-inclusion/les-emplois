@@ -29,7 +29,7 @@
                     <li>
                         <small>Votre nouveau token</small>
                         <strong>{{ token_key }}</strong>
-                        {% include 'includes/copy_to_clipboard.html' with content=token_key css_classes="btn-link" only_icon=True %}
+                        {% include "includes/copy_to_clipboard.html" with content=token_key css_classes="btn-link" only_icon=True %}
                     </li>
                 </ul>
             {% endfragment %}
@@ -51,7 +51,10 @@
                             <p>En tant qu’administrateur de structures, vous avez accès aux API suivantes :</p>
                             <ul>
                                 <li>
-                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records"
+   target="_blank"
+   class="has-external-link"
+   rel="noopener">voir la documentation</a>)</strong>
                                     <br>
                                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2 mb-3" %}
                                         {% fragment as c_info__summary %}
@@ -65,7 +68,10 @@
                                     {% endcomponent_info %}
                                 </li>
                                 <li>
-                                    <strong>Candidats  (<a href="{% url 'v1:redoc' %}#tag/candidats" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <strong>Candidats  (<a href="{% url 'v1:redoc' %}#tag/candidats"
+   target="_blank"
+   class="has-external-link"
+   rel="noopener">voir la documentation</a>)</strong>
                                     <br>
                                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2" %}
                                         {% fragment as c_info__summary %}
@@ -98,7 +104,10 @@
                                 <span class="d-block text-center mb-2">
                                     Votre token d’API {{ token_is_new|yesno:"est, se termine par" }} : <strong>{{ token_key }}</strong>
                                 </span>
-                                <button type="button" class="btn btn-primary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#regenerate_token_modal">
+                                <button type="button"
+                                        class="btn btn-primary btn-block mt-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#regenerate_token_modal">
                                     Regénérer un nouveau token d’API
                                 </button>
                             {% endif %}
@@ -154,9 +163,10 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <button class="btn btn-sm btn-danger" aria-label="Regénérer le token" name="action" value="regenerate">
-                            Confirmer la regénération
-                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                aria-label="Regénérer le token"
+                                name="action"
+                                value="regenerate">Confirmer la regénération</button>
                     </form>
                 </div>
             </div>

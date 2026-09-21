@@ -19,7 +19,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <div class="c-stepper mb-3 mb-md-4">
-                        {% include 'approvals/includes/progress_bar.html' with ratio=40 only %}
+                        {% include "approvals/includes/progress_bar.html" with ratio=40 only %}
                         <p id="currentProgressState">
                             <strong>Étape 1/2</strong> : Choix de l'action
                         </p>
@@ -32,13 +32,22 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="action"
+                                           id="endDateRadios"
+                                           value="update_enddate"
+                                           checked>
                                     <label class="form-check-label" for="endDateRadios">
                                         Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="action"
+                                           id="deleteRadios"
+                                           value="delete">
                                     <label class="form-check-label" for="deleteRadios">
                                         Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
                                     </label>

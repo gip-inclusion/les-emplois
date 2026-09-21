@@ -6,7 +6,8 @@
 
 {% partialdef open-jobapps-cta %}
     {% if has_applied_for_job_seeker %}
-        <a href="{% url "apply:list_prescriptions" %}?job_seeker={{ job_seeker.pk }}" {% matomo_event "test-synthese" "clic" "voir-candidatures" %}>
+        <a href="{% url "apply:list_prescriptions" %}?job_seeker={{ job_seeker.pk }}"
+           {% matomo_event "test-synthese" "clic" "voir-candidatures" %}>
             {% if job_app and job_app.sender == request.user or job_app.sender_prescriber_organization == request.current_organization %}
                 Voir les candidatures
             {% else %}
@@ -157,7 +158,10 @@
                             Votre visibilité sur les candidatures de cet usager se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des candidatures de cet usager, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
                         </p>
                         <p class="mb-0">
-                            <a class="btn-link has-external-link" rel="noopener noreferrer" target="_blank" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                            <a class="btn-link has-external-link"
+                               rel="noopener noreferrer"
+                               target="_blank"
+                               href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
                         </p>
                     {% endfragment %}
                 {% endcomponent_info %}

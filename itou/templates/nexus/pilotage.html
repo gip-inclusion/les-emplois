@@ -7,7 +7,10 @@
 {% block title %}Suivi d’activité {{ block.super }}{% endblock %}
 
 {% block service_title %}
-    <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="35" width="35" alt="Le pilotage de l’inclusion">
+    <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}"
+         height="35"
+         width="35"
+         alt="Le pilotage de l’inclusion">
     Suivi d’activité
 {% endblock %}
 
@@ -28,14 +31,18 @@
         Prenez des décisions et argumentez grâce aux données.
     </p>
     {% if Service.PILOTAGE in activated_services %}
-        <a href="{{ pilotage_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.PILOTAGE %} target="_blank">
+        <a href="{{ pilotage_url }}"
+           class="btn btn-lg btn-primary has-external-link"
+           {% matomo_event "nexus" "acceder-service" Service.PILOTAGE %}
+           target="_blank">
             <span>Accéder à mon suivi d’activité</span>
         </a>
         <br>
     {% else %}
         <form method="post" action="{{ pilotage_url }}">
             {% csrf_token %}
-            <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+            <button class="btn btn-lg btn-ico btn-primary"
+                    {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
                 <i class="ri-toggle-line" aria-hidden="true"></i>
                 <span>Activer ce service</span>
             </button>

@@ -3,17 +3,26 @@
 {% else %}
     <fieldset>
         <legend>
-            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseStates" type="button" aria-expanded="false" aria-controls="collapseStates">
-                Statut
-            </button>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseStates"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseStates">Statut</button>
         </legend>
         <div class="my-3 collapse" id="collapseStates">
             <ul>
                 {% for choice in filters_form.states %}
                     <li>
                         <div class="form-check">
-                            <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
-                            <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                            <input id="{{ choice.id_for_label }}"
+                                   class="form-check-input"
+                                   name="{{ choice.data.name }}"
+                                   type="checkbox"
+                                   value="{{ choice.data.value }}"
+                                   {% if choice.data.selected %} checked{% endif %}>
+                            <label for="{{ choice.id_for_label }}"
+                                   class="form-check-label">{{ choice.choice_label }}</label>
                         </div>
                     </li>
                 {% endfor %}

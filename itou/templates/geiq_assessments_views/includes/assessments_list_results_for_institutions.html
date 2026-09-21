@@ -33,7 +33,8 @@
                         <tr>
                             <td>
                                 {% if can_access_details %}
-                                    <a class="btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
+                                    <a class="btn-link"
+                                       href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
                                         {{ assessment.label_geiq_name }}
                                     </a>
                                 {% else %}

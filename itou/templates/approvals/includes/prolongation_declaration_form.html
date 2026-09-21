@@ -2,7 +2,10 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
-<form id="new-prolongation-form" method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+<form id="new-prolongation-form"
+      method="post"
+      class="js-prevent-multiple-submit"
+      {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
 
     {% bootstrap_form_errors form type="non_fields" %}
@@ -18,7 +21,9 @@
             {% fragment as c_info__detail %}
                 <p>
                     Il n’est pas possible de sélectionner {{ form.max_end_limit.max_duration }} pour cette demande car ce PASS IAE aura atteint la limite des renouvellements possibles.
-                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE"
+    rel="noopener"
+    target="_blank">notre documentation</a>.
                 </p>
             {% endfragment %}
         {% endcomponent_info %}
@@ -32,7 +37,9 @@
             {% fragment as c_info__detail %}
                 <p>
                     Les prolongations de PASS IAE doivent respecter certaines conditions réglementaires pour être délivrées.
-                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE"
+    rel="noopener"
+    target="_blank">notre documentation</a>.
                 </p>
             {% endfragment %}
         {% endcomponent_info %}

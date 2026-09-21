@@ -9,7 +9,8 @@
                     <i class="{{ org.icon }}" aria-hidden="true"></i>
                     <span>{{ org.kind }}</span>
                     {% if org.display_name|length > 18 %}
-                        <strong data-bs-toggle="tooltip" data-bs-title="{{ org.display_name }}">{{ org.display_name }}</strong>
+                        <strong data-bs-toggle="tooltip"
+                                data-bs-title="{{ org.display_name }}">{{ org.display_name }}</strong>
                     {% else %}
                         <strong>{{ org.display_name }}</strong>
                     {% endif %}

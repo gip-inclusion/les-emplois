@@ -33,7 +33,8 @@
                                         <h2 class="mb-0">Informations générales</h2>
                                         <div class="d-flex flex-column flex-md-row gap-2">
                                             {% if can_edit_iae_eligibility %}
-                                                <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-ico btn-secondary">
+                                                <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-ico btn-secondary">
                                                     <i class="ri-checkbox-circle-line fw-normal" aria-hidden="true"></i>
                                                     {% if iae_eligibility_diagnosis %}
                                                         <span>Mettre à jour son éligibilité IAE</span>
@@ -55,7 +56,8 @@
                                                 </p>
                                             {% endfragment %}
                                             {% fragment as call_to_action %}
-                                                <a class="btn btn-sm btn-primary" href="{% url "job_seekers_views:overview" public_id=job_seeker.public_id %}">Découvrir la synthèse</a>
+                                                <a class="btn btn-sm btn-primary"
+                                                   href="{% url "job_seekers_views:overview" public_id=job_seeker.public_id %}">Découvrir la synthèse</a>
                                             {% endfragment %}
                                         {% endcomponent_alert %}
                                     {% endif %}
@@ -96,6 +98,9 @@
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
     {% if is_in_overview_test_perimeter and not show_overview_tab %}
         <script src="https://tally.so/widgets/embed.js"></script>
-        <script src='{% static "js/overview_survey_control_popup.js" %}' data-delaypopup="true" data-userkind="prescripteur" data-page="synthese-usager"></script>
+        <script src='{% static "js/overview_survey_control_popup.js" %}'
+                data-delaypopup="true"
+                data-userkind="prescripteur"
+                data-page="synthese-usager"></script>
     {% endif %}
 {% endblock script %}

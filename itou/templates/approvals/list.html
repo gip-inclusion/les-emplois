@@ -18,12 +18,14 @@
     {% if request.current_organization.can_use_employee_record %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item active">
-                <a class="nav-link active" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>
-                    PASS IAE
-                </a>
+                <a class="nav-link active"
+                   href="{% url 'approvals:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>PASS IAE</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'employee_record_views:list' %}" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
+                <a class="nav-link"
+                   href="{% url 'employee_record_views:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
                     <span>Fiches salarié ASP</span>
                     {% if num_rejected_employee_records %}
                         <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
@@ -31,9 +33,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'job_seekers_views:list_organization' %}" {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>
-                    Usagers accompagnés
-                </a>
+                <a class="nav-link"
+                   href="{% url 'job_seekers_views:list_organization' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>Usagers accompagnés</a>
             </li>
         </ul>
     {% endif %}

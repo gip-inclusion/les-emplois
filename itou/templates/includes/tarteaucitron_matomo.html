@@ -49,7 +49,6 @@
         "serverSide": false, /* Server side only, tags are not loaded client side */
         "partnersList": false /* Details the number of partners on the popup and middle banner */
     });
-
     {% if MATOMO_BASE_URL and send_to_matomo %}
     // Matomo:
     tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
@@ -106,7 +105,6 @@
         {% if matomo_user_id %}window._paq.push(['setUserId', '{{ matomo_user_id }}']);{% endif %}
 
         window._paq.push(['setCustomUrl', new URL('{{ matomo_custom_url }}', window.location.origin).href]);
-
         {% if matomo_custom_title|default:"" %}
             window._paq.push(['setDocumentTitle', '{{ matomo_custom_title }}']);
         {% else %}

@@ -8,12 +8,18 @@
             <div class="form-group col-12 col-lg order-3 order-lg-1">
                 {% if ask_confirmation_before_reset %}
                     {# If there is a previous step - which is what most secondaries link to - we want a confirmation before resetting everything #}
-                    <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
+                    <button type="button"
+                            class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+                            aria-label="Annuler la saisie de ce formulaire"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirm_reset_modal">
                         <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                         <span>Annuler</span>
                     </button>
                 {% elif reset_url is not None %}
-                    <a href="{{ reset_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                    <a href="{{ reset_url }}"
+                       class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+                       aria-label="Annuler la saisie de ce formulaire">
                         <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                         <span>Annuler</span>
                     </a>
@@ -22,11 +28,17 @@
             {% if secondary_name and secondary_value or secondary_url %}
                 <div class="form-group col col-lg-auto order-1 order-lg-2">
                     {% if secondary_name and secondary_value %}
-                        <button type="submit" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}" name="{{ secondary_name }}" value="{{ secondary_value }}">
+                        <button type="submit"
+                                class="btn btn-block btn-outline-primary"
+                                aria-label="{{ secondary_aria_label }}"
+                                name="{{ secondary_name }}"
+                                value="{{ secondary_value }}">
                             <span>{{ secondary_label }}</span>
                         </button>
                     {% else %}
-                        <a href="{{ secondary_url }}" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}">
+                        <a href="{{ secondary_url }}"
+                           class="btn btn-block btn-outline-primary"
+                           aria-label="{{ secondary_aria_label }}">
                             <span>{{ secondary_label }}</span>
                         </a>
                     {% endif %}

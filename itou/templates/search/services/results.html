@@ -26,7 +26,11 @@
 {% block title_extra %}
     <div class="c-search mt-3 mt-md-4">
         <div class="c-search__bar">
-            <form hx-boost="true" hx-push-url="true" hx-include="#filters_form" hx-indicator="#services-search-results" id="top_search_form">
+            <form hx-boost="true"
+                  hx-push-url="true"
+                  hx-include="#filters_form"
+                  hx-indicator="#services-search-results"
+                  id="top_search_form">
                 {% if job_seeker.public_id %}
                     <input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">
                 {% endif %}

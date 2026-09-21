@@ -9,7 +9,12 @@ Arguments:
 - matomo_category: When given, a matomo click event is set for each choice of this field.
 {% endcomment %}
 <div class="dropdown">
-    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle"
+            data-bs-toggle="dropdown"
+            data-bs-display="static"
+            data-bs-auto-close="outside"
+            aria-expanded="false">
         {% if nouveau|default:False %}
             <span>{{ label|default:field.label }}</span>
             {% new_badge extra_classes="badge-xs ms-2 mt-1" %}

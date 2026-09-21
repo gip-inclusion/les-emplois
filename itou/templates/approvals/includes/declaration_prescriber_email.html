@@ -1,9 +1,10 @@
 {% load django_bootstrap5 %}
 <div id="check_prescriber_email">
     {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
-    <button class="btn btn-secondary mt-2 mb-4" hx-post="{% url "approvals:check_prescriber_email" approval_id=approval.pk %}" hx-select="#check_prescriber_email" hx-target="#check_prescriber_email">
-        Vérifier l'e-mail
-    </button>
+    <button class="btn btn-secondary mt-2 mb-4"
+            hx-post="{% url "approvals:check_prescriber_email" approval_id=approval.pk %}"
+            hx-select="#check_prescriber_email"
+            hx-target="#check_prescriber_email">Vérifier l'e-mail</button>
     <p>L'organisation s'affichera ci-dessous, s'il y en a plusieurs, selectionnez-la dans la liste.</p>
     {% if form.prescriber_organization %}
         {% bootstrap_field form.prescriber_organization show_label="skip" %}

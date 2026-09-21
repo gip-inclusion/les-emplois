@@ -10,11 +10,17 @@
         </a>
     {% endif %}
     {% if assignment.is_active %}
-        <button class="btn btn-ico btn-outline-primary w-100 {% if in_last_advisor_box %}mt-3{% else %}w-md-auto{% endif %}" data-bs-toggle="modal" data-bs-target="#archive-assignment-{{ assignment.pk }}-modal">
+        <button class="btn btn-ico btn-outline-primary w-100 {% if in_last_advisor_box %}mt-3{% else %}w-md-auto{% endif %}"
+                data-bs-toggle="modal"
+                data-bs-target="#archive-assignment-{{ assignment.pk }}-modal">
             <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
             <span>Terminer mon accompagnement</span>
         </button>
-        <div class="modal" id="archive-assignment-{{ assignment.pk }}-modal" tabindex="-1" aria-labelledby="archive-assignment-{{ assignment.pk }}-modal-title" aria-hidden="true">
+        <div class="modal"
+             id="archive-assignment-{{ assignment.pk }}-modal"
+             tabindex="-1"
+             aria-labelledby="archive-assignment-{{ assignment.pk }}-modal-title"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <form method="post"
                       action="{% url 'job_seekers_views:archive_assignment' public_id=assignment.job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ request.get_full_path|urlencode }}"
@@ -22,17 +28,21 @@
                     {% csrf_token %}
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 id="archive-assignment-{{ assignment.pk }}-modal-title" class="modal-title">Terminer l'accompagnement</h3>
+                            <h3 id="archive-assignment-{{ assignment.pk }}-modal-title"
+                                class="modal-title">Terminer l'accompagnement</h3>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <p>Une fois votre accompagnement terminé, cet usager n'apparaîtra plus dans votre liste d'accompagnements.</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-bs-dismiss="modal">
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                    data-bs-dismiss="modal">
                                 <span>Annuler</span>
                             </button>
-                            <button class="btn btn-primary btn-block w-100 w-md-auto" {% matomo_event "accompagnateur" "submit" "terminer-accompagnement" %}>
+                            <button class="btn btn-primary btn-block w-100 w-md-auto"
+                                    {% matomo_event "accompagnateur" "submit" "terminer-accompagnement" %}>
                                 <span>Confirmer</span>
                             </button>
                         </div>

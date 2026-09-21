@@ -22,8 +22,12 @@
                 <div class="s-section__col col-12">
                     <div class="c-stepper mb-3 mb-md-4">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                            </div>
+                            <div class="progress-bar progress-bar-33"
+                                 role="progressbar"
+                                 aria-valuenow="33"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-labelledby="currentProgressState"></div>
                         </div>
                         <p id="currentProgressState">
                             <strong>Étape 1</strong>/3 : Choisissez votre méthode
@@ -38,7 +42,12 @@
                         <div class="c-card card has-rich-radio h-100">
                             <div class="card-header position-relative pb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="device_type" value="smartphone" id="device_type_smartphone_radio" required="">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="device_type"
+                                           value="smartphone"
+                                           id="device_type_smartphone_radio"
+                                           required="">
                                     <label class="form-check-label stretched-link" for="device_type_smartphone_radio">
                                         <strong>Application sur téléphone</strong>
                                         <i class="ri-phone-line"></i>
@@ -54,7 +63,12 @@
                                     <em>Google Authenticator</em>, <em>Authy</em>,
                                     <em>Microsoft Authenticator</em>…
                                 </p>
-                                <button type="button" class="btn btn-ico btn-link ps-0" data-bs-toggle="modal" data-bs-target="#device-type-smartphone-modal" aria-haspopup="dialog" aria-controls="device-type-smartphone-modal">
+                                <button type="button"
+                                        class="btn btn-ico btn-link ps-0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#device-type-smartphone-modal"
+                                        aria-haspopup="dialog"
+                                        aria-controls="device-type-smartphone-modal">
                                     <i class="ri-lightbulb-line" aria-hidden="true"></i>
                                     <span>Installez une application d’authentification</span>
                                 </button>
@@ -65,7 +79,12 @@
                         <div class="c-card card has-rich-radio h-100">
                             <div class="card-header position-relative pb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="device_type" value="desktop" id="device_type_desktop_radio" required="">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="device_type"
+                                           value="desktop"
+                                           id="device_type_desktop_radio"
+                                           required="">
                                     <label class="form-check-label stretched-link" for="device_type_desktop_radio">
                                         <strong>Gestionnaire de mots de passe</strong>
                                         <i class="ri-computer-line" aria-hidden="true"></i>
@@ -78,7 +97,12 @@
                                     générer ces codes depuis votre ordinateur.
                                 </p>
                                 <p class="fs-sm fst-italic text-muted">KeePassXC (gratuit), Vaultwarden (gratuit), Bitwarden (payant), …</p>
-                                <button type="button" class="btn btn-ico btn-link ps-0" data-bs-toggle="modal" data-bs-target="#device-type-desktop-modal" aria-haspopup="dialog" aria-controls="device-type-desktop-modal">
+                                <button type="button"
+                                        class="btn btn-ico btn-link ps-0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#device-type-desktop-modal"
+                                        aria-haspopup="dialog"
+                                        aria-controls="device-type-desktop-modal">
                                     <i class="ri-lightbulb-line" aria-hidden="true"></i>
                                     <span>Activez votre gestionnaire de mots de passe</span>
                                 </button>
@@ -87,7 +111,10 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <button type="submit" disabled class="btn btn-primary" id="next_step_button">Passer à l’étape suivante</button>
+                    <button type="submit"
+                            disabled
+                            class="btn btn-primary"
+                            id="next_step_button">Passer à l’étape suivante</button>
                 </div>
             </form>
         </div>
@@ -95,7 +122,11 @@
 {% endblock content %}
 
 {% block modals %}
-    <div class="modal fade" id="device-type-smartphone-modal" tabindex="-1" aria-labelledby="device-type-smartphone-modal-title" aria-hidden="true">
+    <div class="modal fade"
+         id="device-type-smartphone-modal"
+         tabindex="-1"
+         aria-labelledby="device-type-smartphone-modal-title"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -151,11 +182,16 @@
         </div>
     </div>
 
-    <div class="modal fade" id="device-type-desktop-modal" tabindex="-1" aria-labelledby="device-type-desktop-modal-title" aria-hidden="true">
+    <div class="modal fade"
+         id="device-type-desktop-modal"
+         tabindex="-1"
+         aria-labelledby="device-type-desktop-modal-title"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="device-type-desktop-modal-title">Activez votre gestionnaire de mots de passe</h3>
+                    <h3 class="modal-title"
+                        id="device-type-desktop-modal-title">Activez votre gestionnaire de mots de passe</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">

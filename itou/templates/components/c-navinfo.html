@@ -11,7 +11,24 @@
     <div class="c-navinfo">
         {% if c_navinfo__back_url|default:"" %}
             <div class="c-navinfo__prevstep">
-                <a href="{{ c_navinfo__back_url }}" class="btn btn-ico btn-link ps-0" aria-label={% if c_navinfo__back_url|is_list %}"Retour à la liste"{% else %}"Retour à la page précédente"{% endif %}>
+                <a href="{{ c_navinfo__back_url }}"
+                   class="btn btn-ico btn-link ps-0"
+                   aria-label="{% if c_navinfo__back_url|is_list %}"
+                   "
+                   Retour
+                   à
+                   la
+                   liste
+                   "
+                   {% else %}
+                   "
+                   Retour
+                   à
+                   la
+                   page
+                   précédente
+                   "
+                   {% endif %}>
                     <i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>
                     <span>
                         Retour
@@ -23,11 +40,19 @@
         {% if c_navinfo__prev_url|default:"" or c_navinfo__next_url|default:"" %}
             {% comment %} The logic will be completed soon, when the need arises {% endcomment %}
             <div class="c-navinfo__prevnext">
-                <a href="{{ c_navinfo__prev_url }}" class="btn btn-ico-only btn-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ c_navinfo__prev_label }}">
+                <a href="{{ c_navinfo__prev_url }}"
+                   class="btn btn-ico-only btn-link"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="bottom"
+                   data-bs-title="{{ c_navinfo__prev_label }}">
                     <span class="visually-hidden">{{ c_navinfo__prev_label }}</span>
                     <i class="ri-arrow-left-circle-line ri-xl fw-medium" aria-hidden="true"></i>
                 </a>
-                <a href="{{ c_navinfo__next_url }}" class="btn btn-ico-only btn-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ c_navinfo__next_label }}">
+                <a href="{{ c_navinfo__next_url }}"
+                   class="btn btn-ico-only btn-link"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="bottom"
+                   data-bs-title="{{ c_navinfo__next_label }}">
                     <span class="visually-hidden">{{ c_navinfo__next_label }}</span>
                     <i class="ri-arrow-right-circle-line ri-xl fw-medium" aria-hidden="true"></i>
                 </a>

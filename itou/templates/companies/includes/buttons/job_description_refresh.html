@@ -42,5 +42,6 @@
 </form>
 
 {% if request.htmx and not for_detail %}
-    <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at" hx-swap-oob="true">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
+    <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at"
+          hx-swap-oob="true">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
 {% endif %}

@@ -18,7 +18,10 @@
                 {# First page. #}
                 {% if page.number == 1 %}
                     <li class="page-item disabled">
-                        <a class="page-link" aria-disabled="true" tabindex="-1" href="{% url_add_query url page=1 %}">Premier</a>
+                        <a class="page-link"
+                           aria-disabled="true"
+                           tabindex="-1"
+                           href="{% url_add_query url page=1 %}">Premier</a>
                     </li>
                 {% else %}
                     <li class="page-item">
@@ -30,18 +33,26 @@
                 {% for i in page.pages_to_display %}
                     {% if page.number == i %}
                         <li class="page-item active">
-                            <a class="page-link" aria-label="Page {{ i }}" aria-current="page" href="{% url_add_query url page=i %}">{{ i }}</a>
+                            <a class="page-link"
+                               aria-label="Page {{ i }}"
+                               aria-current="page"
+                               href="{% url_add_query url page=i %}">{{ i }}</a>
                         </li>
                     {% else %}
                         <li class="page-item">
-                            <a class="page-link" aria-label="Page {{ i }}" href="{% url_add_query url page=i %}">{{ i }}</a>
+                            <a class="page-link"
+                               aria-label="Page {{ i }}"
+                               href="{% url_add_query url page=i %}">{{ i }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
                 {# Last page. #}
                 {% if page.number == page.paginator.num_pages %}
                     <li class="page-item disabled">
-                        <a class="page-link" aria-disabled="true" tabindex="-1" href="{% url_add_query url page=page.paginator.num_pages %}">Dernier</a>
+                        <a class="page-link"
+                           aria-disabled="true"
+                           tabindex="-1"
+                           href="{% url_add_query url page=page.paginator.num_pages %}">Dernier</a>
                     </li>
                 {% else %}
                     <li class="page-item">

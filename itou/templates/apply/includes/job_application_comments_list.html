@@ -9,7 +9,8 @@
     {% endif %}
     <ul class="list-note">
         {% for comment in comments %}
-            <li {% if comment.created_by == request.user %}class="is-current-user"{% endif %}{% if location == "tab" %} id="comment-{{ comment.pk }}"{% endif %}>
+            <li {% if comment.created_by == request.user %}class="is-current-user"{% endif %}
+                {% if location == "tab" %} id="comment-{{ comment.pk }}"{% endif %}>
                 {% if location == "tab" %}<i class="ri-user-line"></i>{% endif %}
                 <div>
                     <div class="d-flex justify-content-between align-items-start">
@@ -22,16 +23,28 @@
                         </div>
                         {% if location == "tab" and request.user == comment.created_by %}
                             {# Delete button with its confirmation modal #}
-                            <button class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#delete_comment_{{ comment.id }}_modal">
-                                <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce commentaire"></i>
+                            <button class="btn btn-sm btn-link btn-ico-only"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#delete_comment_{{ comment.id }}_modal">
+                                <i class="ri-delete-bin-line"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Supprimer"
+                                   aria-label="Supprimer ce commentaire"></i>
                             </button>
 
-                            <div id="delete_comment_{{ comment.id }}_modal" class="modal fade" tabindex="-1" aria-labelledby="delete_comment_{{ comment.id }}_title" aria-hidden="true">
+                            <div id="delete_comment_{{ comment.id }}_modal"
+                                 class="modal fade"
+                                 tabindex="-1"
+                                 aria-labelledby="delete_comment_{{ comment.id }}_title"
+                                 aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h3 id="delete_comment_{{ comment.id }}_title">Suppression du commentaire</h3>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Fermer"></button>
                                         </div>
                                         <div class="modal-body">
                                             <div class="row">
@@ -49,10 +62,13 @@
                                                   class="d-block js-prevent-multiple-submit">
                                                 {% csrf_token %}
                                                 <div class="text-end">
-                                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression du commentaire" type="button">
-                                                        Annuler
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer le commentaire">
+                                                    <button class="btn btn-outline-primary btn-sm"
+                                                            data-bs-dismiss="modal"
+                                                            aria-label="Annuler la suppression du commentaire"
+                                                            type="button">Annuler</button>
+                                                    <button class="btn btn-danger btn-sm"
+                                                            data-bs-dismiss="modal"
+                                                            aria-label="Supprimer le commentaire">
                                                         <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
                                                         <span>Supprimer</span>
                                                     </button>
@@ -89,8 +105,10 @@
         {% endfor %}
     </ul>
     {% if location == "sidebar" %}
-        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic" "commentaires-voir-tous" %}>
-            Voir tous les commentaires
-        </button>
+        <button class="btn btn-outline-primary btn-block bg-white mt-3"
+                id="comments-btn"
+                role="presentation"
+                hx-preserve="true"
+                {% matomo_event "candidature" "clic" "commentaires-voir-tous" %}>Voir tous les commentaires</button>
     {% endif %}
 </div>

@@ -9,7 +9,9 @@
 {% load django_bootstrap5 %}
 {% load theme_inclusion %}
 
-<form method="post" class="js-prevent-multiple-submit js-format-nir" data-matomo-name="dashboard-edit-job-seeker-identity">
+<form method="post"
+      class="js-prevent-multiple-submit js-format-nir"
+      data-matomo-name="dashboard-edit-job-seeker-identity">
     {% csrf_token %}
 
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
@@ -23,7 +25,8 @@
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
     {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
-    <div id="collapse_lack_of_nir_reason" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
+    <div id="collapse_lack_of_nir_reason"
+         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
         {% bootstrap_field form.lack_of_nir_reason %}
     </div>
     {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
@@ -44,7 +47,12 @@
     {% itou_buttons_form primary_label=submit_label primary_name="preview" primary_value="1" reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_name="edit_jobseeker_infos_submit" %}
 
     {% if preview_mode %}
-        <div class="modal" id="ask_for_confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="ask_for_confirmation_label" aria-modal="true">
+        <div class="modal"
+             id="ask_for_confirmation_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="ask_for_confirmation_label"
+             aria-modal="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">

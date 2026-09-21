@@ -11,7 +11,9 @@
                 </li>
                 <li class="d-flex">
                     <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                    <a href="mailto:{{ orientation.referent_email }}" aria-label="Contact par mail" class="text-break">{{ orientation.referent_email }}</a>
+                    <a href="mailto:{{ orientation.referent_email }}"
+                       aria-label="Contact par mail"
+                       class="text-break">{{ orientation.referent_email }}</a>
                 </li>
                 {% if orientation.referent_phone %}
                     <li class="d-flex">
@@ -29,7 +31,9 @@
             </li>
             <li>
                 <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                <a href="mailto:{{ orientation.sender.email }}" aria-label="Contact par mail" class="text-break">{{ orientation.sender.email }}</a>
+                <a href="mailto:{{ orientation.sender.email }}"
+                   aria-label="Contact par mail"
+                   class="text-break">{{ orientation.sender.email }}</a>
             </li>
             {% if orientation.sender.phone %}
                 <li>

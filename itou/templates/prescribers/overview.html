@@ -18,10 +18,14 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'prescribers_views:overview' %}" {% matomo_event "prescribers" "clic" "organisation-presentation" %}>Fiche de présentation</a>
+            <a class="nav-link active"
+               href="{% url 'prescribers_views:overview' %}"
+               {% matomo_event "prescribers" "clic" "organisation-presentation" %}>Fiche de présentation</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'prescribers_views:members' %}" {% matomo_event "prescribers" "clic" "gerer-collaborateurs" %}>Collaborateurs</a>
+            <a class="nav-link"
+               href="{% url 'prescribers_views:members' %}"
+               {% matomo_event "prescribers" "clic" "gerer-collaborateurs" %}>Collaborateurs</a>
         </li>
     </ul>
 {% endblock %}
@@ -35,7 +39,9 @@
                     <div class="tab-content">
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Fiche de présentation</h2>
-                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur l'organisation">
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end"
+                                 role="group"
+                                 aria-label="Actions sur l'organisation">
                                 <a class="btn {% if can_edit %}btn-outline-primary{% else %}btn-primary{% endif %} btn-ico"
                                    href="{{ organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
                                    {% matomo_event "prescribers" "clic" "voir-infos-organisation" %}>
@@ -62,7 +68,10 @@
                                         </article>
                                     {% else %}
                                         <div class="text-center">
-                                            <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+                                            <img class="img-fluid"
+                                                 src="{% static 'img/illustration-card-no-result.png' %}"
+                                                 alt=""
+                                                 loading="lazy">
                                             <p class="mb-0 mt-3">
                                                 <strong>Oups ! Aucune information en vue !</strong>
                                             </p>
@@ -74,7 +83,8 @@
                                                             à propos de votre organisation.
                                                         </i>
                                                     </p>
-                                                    <a class="btn btn-sm btn-primary btn-ico" href="{% url 'prescribers_views:edit_organization' %}?back_url={{ request.get_full_path|urlencode }}">
+                                                    <a class="btn btn-sm btn-primary btn-ico"
+                                                       href="{% url 'prescribers_views:edit_organization' %}?back_url={{ request.get_full_path|urlencode }}">
                                                         <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
                                                         <span>Modifier</span>
                                                     </a>

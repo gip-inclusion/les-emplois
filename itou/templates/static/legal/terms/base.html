@@ -41,7 +41,12 @@
                                 {% csrf_token %}
                                 <hr class="mb-3">
                                 <div class="form-check mb-3">
-                                    <input type="checkbox" id="cgu-acceptance-checkbox" class="form-check-input" value="{{ requested_terms_version.slug }}" name="terms_slug" required>
+                                    <input type="checkbox"
+                                           id="cgu-acceptance-checkbox"
+                                           class="form-check-input"
+                                           value="{{ requested_terms_version.slug }}"
+                                           name="terms_slug"
+                                           required>
                                     <label class="form-check-label" for="cgu-acceptance-checkbox">
                                         Je déclare avoir pris connaissance des Conditions Générales d'Utilisation et je les accepte.
                                     </label>

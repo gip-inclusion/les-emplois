@@ -13,13 +13,13 @@
         {% fragment as c_title__main %}
             <h1>
                 Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_inverted_full_name }}
-                {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
+                {% include "employee_record/includes/_status.html" with employee_record=employee_record only %}
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
 
     {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-        {% include 'employee_record/includes/_siret_changed_alert.html' with dismissible=True only %}
+        {% include "employee_record/includes/_siret_changed_alert.html" with dismissible=True only %}
     {% endif %}
 {% endblock %}
 
@@ -33,21 +33,24 @@
                     </div>
                 {% elif employee_record.status == "NEW" %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-lg btn-white btn-block btn-ico">
+                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW"
+                           class="btn btn-lg btn-white btn-block btn-ico">
                             <i class="ri-file-edit-line font-weight-medium" aria-hidden="true"></i>
                             <span>Compléter</span>
                         </a>
                     </div>
                 {% elif employee_record.status == "REJECTED" %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED" class="btn btn-lg btn-white btn-block btn-ico">
+                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED"
+                           class="btn btn-lg btn-white btn-block btn-ico">
                             <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
                             <span>Modifier</span>
                         </a>
                     </div>
                 {% elif employee_record.status == "DISABLED" %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url "employee_record_views:reactivate" employee_record.pk %}" class="btn btn-lg btn-white btn-block btn-ico">
+                        <a href="{% url "employee_record_views:reactivate" employee_record.pk %}"
+                           class="btn btn-lg btn-white btn-block btn-ico">
                             <i class="ri-reset-right-line font-weight-medium" aria-hidden="true"></i>
                             <span>Réactiver</span>
                         </a>
@@ -55,7 +58,8 @@
                 {% endif %}
                 {% if employee_record.disable.is_available %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                        <a href="{% url "employee_record_views:disable" employee_record.pk %}"
+                           class="btn btn-lg btn-outline-white btn-block btn-ico">
                             <i class="ri-file-close-line font-weight-medium" aria-hidden="true"></i>
                             <span>Désactiver la fiche salariée</span>
                         </a>

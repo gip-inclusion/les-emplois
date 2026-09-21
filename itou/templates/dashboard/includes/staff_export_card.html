@@ -9,7 +9,8 @@
             {% fragment as list %}
                 {% if perms.job_applications.export_job_applications_unknown_to_ft %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}" class="btn-link btn-ico">
+                        <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}"
+                           class="btn-link btn-ico">
                             <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
                             <span>Candidatures inconnues de France Travail</span>
                         </a>

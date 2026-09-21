@@ -18,7 +18,8 @@
         {% bootstrap_field form.last_name %}
         {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
         {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
-        <div id="collapse_lack_of_nir_reason" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
+        <div id="collapse_lack_of_nir_reason"
+             class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
             {% bootstrap_field form.lack_of_nir_reason %}
         </div>
         {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
@@ -30,7 +31,12 @@
 
     {% if confirmation_needed %}
         <!-- Modal -->
-        <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
+        <div class="modal"
+             id="email-confirmation-modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="email-confirmation-label"
+             aria-modal="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -51,7 +57,9 @@
                     </div>
                     <div class="modal-footer">
                         {# Go to the next step. #}
-                        <button name="confirm" value="1" class="btn btn-sm btn-outline-primary">Poursuivre la création du compte</button>
+                        <button name="confirm"
+                                value="1"
+                                class="btn btn-sm btn-outline-primary">Poursuivre la création du compte</button>
                         {# Reload this page with a new form. #}
                         <a href="{{ back_url }}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
                     </div>

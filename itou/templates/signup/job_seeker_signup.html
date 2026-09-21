@@ -29,9 +29,10 @@
                 </div>
                 {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" show_label=False %}
                 <div class="mt-n2 mb-3">
-                    <button type="button" class="btn-link fs-sm" data-bs-toggle="modal" data-bs-target="#no-email-modal">
-                        Pas d'adresse e-mail ?
-                    </button>
+                    <button type="button"
+                            class="btn-link fs-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#no-email-modal">Pas d'adresse e-mail ?</button>
                     {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
                 </div>
             </div>
@@ -43,7 +44,10 @@
                     {% fragment as content %}
                         <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
                         <p class="mb-0">
-                            <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
+                            <button name="skip"
+                                    value="1"
+                                    class="btn btn-link p-0"
+                                    {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
                                 Cliquez ici pour accéder à l'étape suivante.
                             </button>
                         </p>

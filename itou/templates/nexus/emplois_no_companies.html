@@ -23,7 +23,8 @@
     <p class="mb-md-4">
         Pour pouvoir activer ce service et gérer vos fiches de poste, vous devez être rattaché à une structure.
     </p>
-    <a href="{% url 'signup:company_select' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary">Se rattacher à une structure</a>
+    <a href="{% url 'signup:company_select' %}?next={{ request.get_full_path|urlencode }}"
+       class="btn btn-lg btn-ico btn-primary">Se rattacher à une structure</a>
     <br>
     <a href="{% url "dashboard:index" %}"
        class="btn btn-sm btn-link has-external-link d-inline-block mt-3"

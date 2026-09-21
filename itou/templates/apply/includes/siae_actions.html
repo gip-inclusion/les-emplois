@@ -4,7 +4,10 @@
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
-<div class="c-box c-box--action" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
+<div class="c-box c-box--action"
+     id="transition_buttons_{{ job_application.pk }}"
+     {% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %}
+     data-disable-btn-if=".editing-prior-action">
     <h2 class="visually-hidden">Actions rapides</h2>
     {% if not job_application.state.is_accepted %}
         <div class="form-row align-items-center gx-3">
@@ -27,7 +30,9 @@
                         </button>
                     </form>
                 {% elif can_refuse %}
-                    <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-lg btn-link-white btn-block btn-ico" {% matomo_event "candidature" "clic" "refuse_application" %}>
+                    <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+                       class="btn btn-lg btn-link-white btn-block btn-ico"
+                       {% matomo_event "candidature" "clic" "refuse_application" %}>
                         <i class="ri-close-line fw-medium" aria-hidden="true"></i>
                         <span>Décliner</span>
                     </a>
@@ -47,15 +52,23 @@
             </div>
             <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                 <div class="dropdown">
-                    <button id="other_actions" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                    <button id="other_actions"
+                            class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            data-bs-toggle="dropdown">
                         Autres actions
                         <span class="badge badge-base rounded-pill bg-info text-white ms-2">{{ other_actions_count }}</span>
                     </button>
                     <div class="dropdown-menu w-100" aria-labelledby="other_actions">
                         {% if can_process %}
-                            <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+                            <form method="post"
+                                  action="{% url 'apply:process' job_application_id=job_application.id %}"
+                                  class="js-prevent-multiple-submit">
                                 {% csrf_token %}
-                                <button class="btn btn-ico justify-content-start dropdown-item" {% matomo_event "candidature" "submit" "processing_application" %}>
+                                <button class="btn btn-ico justify-content-start dropdown-item"
+                                        {% matomo_event "candidature" "submit" "processing_application" %}>
                                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                                     <span>Étudier</span>
                                 </button>
@@ -73,7 +86,9 @@
                             </button>
                         {% endif %}
                         {% if can_postpone %}
-                            <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-ico justify-content-start dropdown-item" {% matomo_event "candidature" "clic" "postpone_application" %}>
+                            <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
+                               class="btn btn-ico justify-content-start dropdown-item"
+                               {% matomo_event "candidature" "clic" "postpone_application" %}>
                                 <i class="ri-history-line fw-medium" aria-hidden="true"></i>
                                 <span>Mettre en attente</span>
                             </a>
@@ -90,7 +105,9 @@
                             </button>
                         {% endif %}
                         {% if can_add_to_pool %}
-                            <a href="{% url 'apply:add_to_pool' job_application_id=job_application.id %}" class="btn btn-ico justify-content-start dropdown-item" {% matomo_event "candidature" "clic" "add_application_to_pool" %}>
+                            <a href="{% url 'apply:add_to_pool' job_application_id=job_application.id %}"
+                               class="btn btn-ico justify-content-start dropdown-item"
+                               {% matomo_event "candidature" "clic" "add_application_to_pool" %}>
                                 <i class="ri-folder-user-line fw-medium" aria-hidden="true"></i>
                                 <span>Ajouter au vivier</span>
                             </a>
@@ -108,12 +125,19 @@
                         {% endif %}
                         <hr class="dropdown-divider m-0">
                         {% if can_transfer_internal %}
-                            <button type="button" class="btn btn-ico justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
+                            <button type="button"
+                                    class="btn btn-ico justify-content-start dropdown-item"
+                                    id="transfer_to_button"
+                                    aria-haspopup="true"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#transfer_confirmation_modal">
                                 <i class="ri-arrow-left-right-line fw-medium" aria-hidden="true"></i>
                                 <span>Transférer vers</span>
                             </button>
                         {% elif can_transfer_external %}
-                            <a class="btn btn-ico justify-content-start dropdown-item" id="transfer_to_button" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
+                            <a class="btn btn-ico justify-content-start dropdown-item"
+                               id="transfer_to_button"
+                               href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
                                 <i class="ri-arrow-left-right-line fw-medium" aria-hidden="true"></i>
                                 <span>Transférer vers</span>
                             </a>
@@ -131,7 +155,8 @@
                             </button>
                         {% endif %}
                         {% if can_archive %}
-                            <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
+                            <form method="post"
+                                  action="{% url "apply:archive" job_application_id=job_application.pk %}">
                                 {% csrf_token %}
                                 <button class="btn btn-ico justify-content-start dropdown-item">
                                     <i class="ri-archive-line fw-medium" aria-hidden="true"></i>

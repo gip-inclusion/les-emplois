@@ -37,7 +37,9 @@
                         {% url "insertion_views:orientation_details_for_sender" orientation_id=orientation.id as details_url %}
                         <tr class="align-top">
                             <td>
-                                <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "orientation" "clic" "voir_orientation" %}>
+                                <a class="btn-link"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "orientation" "clic" "voir_orientation" %}>
                                     {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}
                                 </a>
                             </td>
@@ -66,7 +68,8 @@
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Voir l’orientation"
                                    {% matomo_event "orientation" "clic" "voir_orientation" %}>
-                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}"></i>
+                                    <i class="ri-arrow-drop-right-line fs-lg"
+                                       aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}"></i>
                                 </a>
                             </td>
                         </tr>

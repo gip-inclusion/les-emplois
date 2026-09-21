@@ -45,7 +45,8 @@
                                 </a>
                             </div>
                         {% else %}
-                            <form method="post" action="{% url 'apply:transfer' job_application_id=job_app_to_transfer.id %}">
+                            <form method="post"
+                                  action="{% url 'apply:transfer' job_application_id=job_app_to_transfer.id %}">
                                 {% csrf_token %}
 
                                 <input type="hidden" name="target_company_id" value="{{ company.pk }}" />

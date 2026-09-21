@@ -13,7 +13,11 @@
         {% endfragment %}
         {% if suggest_next_step_url %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link" href="{{ suggest_next_step_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
+                <a class="btn btn-sm btn-primary has-external-link"
+                   href="{{ suggest_next_step_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
             {% endfragment %}
         {% endif %}
     {% endcomponent_alert %}

@@ -18,7 +18,9 @@
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% url "job_seekers_views:get_or_create_start" as get_or_create_url %}
-            <a href="{% url_add_query get_or_create_url tunnel='standalone' from_url=request.path %}" {% matomo_event "compte-candidat" "clic" "creer-un-compte-candidat" %} class="btn btn-lg btn-secondary btn-ico">
+            <a href="{% url_add_query get_or_create_url tunnel='standalone' from_url=request.path %}"
+               {% matomo_event "compte-candidat" "clic" "creer-un-compte-candidat" %}
+               class="btn btn-lg btn-secondary btn-ico">
                 <i class="ri-user-add-line fw-medium" aria-hidden="true"></i>
                 <span>Ajouter un usager</span>
             </a>
@@ -34,25 +36,25 @@
     {% if request.from_prescriber and request.current_organization.memberships.count > 1 %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item">
-                <a class="nav-link{% if not list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list' %}">
-                    Usagers accompagnés
-                </a>
+                <a class="nav-link{% if not list_organization %} active{% endif %}"
+                   href="{% url 'job_seekers_views:list' %}">Usagers accompagnés</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link{% if list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list_organization' %}">
-                    Usagers accompagnés de la structure
-                </a>
+                <a class="nav-link{% if list_organization %} active{% endif %}"
+                   href="{% url 'job_seekers_views:list_organization' %}">Usagers accompagnés de la structure</a>
             </li>
         </ul>
     {% elif request.current_organization.can_use_employee_record %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item active">
-                <a class="nav-link" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>
-                    PASS IAE
-                </a>
+                <a class="nav-link"
+                   href="{% url 'approvals:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>PASS IAE</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'employee_record_views:list' %}" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
+                <a class="nav-link"
+                   href="{% url 'employee_record_views:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
                     <span>Fiches salarié ASP</span>
                     {% if num_rejected_employee_records %}
                         <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
@@ -60,9 +62,9 @@
                 </a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link active" href="{% url 'job_seekers_views:list_organization' %}" {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>
-                    Usagers accompagnés
-                </a>
+                <a class="nav-link active"
+                   href="{% url 'job_seekers_views:list_organization' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>Usagers accompagnés</a>
             </li>
         </ul>
     {% endif %}

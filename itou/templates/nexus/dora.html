@@ -28,11 +28,16 @@
         Gérez vos demandes de mobilisation dans un espace dédié.
     </p>
     {% if Service.DORA in activated_services %}
-        <a href="{{ dora_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.DORA %} target="_blank">
+        <a href="{{ dora_url }}"
+           class="btn btn-lg btn-primary has-external-link"
+           {% matomo_event "nexus" "acceder-service" Service.DORA %}
+           target="_blank">
             <span>Accéder à mes services d’insertion</span>
         </a>
     {% else %}
-        <a href="{{ dora_url }}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+        <a href="{{ dora_url }}"
+           class="btn btn-lg btn-ico btn-primary"
+           {% matomo_event "nexus" "activer-service" Service.DORA %}>
             <i class="ri-toggle-line" aria-hidden="true"></i>
             <span>Activer ce service</span>
         </a>

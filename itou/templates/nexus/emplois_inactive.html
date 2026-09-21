@@ -24,10 +24,15 @@
         <br>
         Recevez des candidatures de la part des accompagnateurs et des candidats.
         <br>
-        Obtenez un <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="has-external-link" target="_blank" rel="noopener">PASS IAE</a> en ligne dès l’embauche d’un candidat.
+        Obtenez un <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche"
+    class="has-external-link"
+    target="_blank"
+    rel="noopener">PASS IAE</a> en ligne dès l’embauche d’un candidat.
     </p>
     {# TODO : when it's possible to access this page without a EMPLOIS account #}
-    <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.EMPLOIS %} type="button">
+    <button class="btn btn-lg btn-ico btn-primary"
+            {% matomo_event "nexus" "activer-service" Service.EMPLOIS %}
+            type="button">
         <i class="ri-toggle-line" aria-hidden="true"></i>
         <span>Activer ce service</span>
     </button>

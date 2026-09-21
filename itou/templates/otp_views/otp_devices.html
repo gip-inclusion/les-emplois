@@ -18,8 +18,11 @@
                 <div class="s-section__col col-12">
                     <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                         <h2 class="mb-0">Mes appareils</h2>
-                        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
-                            <a href="{% url 'otp_views:enrollment_step_1_choose_device_type' %}" class="btn btn-primary btn-ico">
+                        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end"
+                             role="group"
+                             aria-label="Actions sur les collaborateurs">
+                            <a href="{% url 'otp_views:enrollment_step_1_choose_device_type' %}"
+                               class="btn btn-primary btn-ico">
                                 Configurer un
                                 {% if devices %}nouvel{% endif %}
                                 appareil
@@ -104,10 +107,13 @@
                             <p>Cette action est irréversible.</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                            <button class="btn btn-sm btn-danger" aria-label="Supprimer l’appareil {{ device.name }}" name="delete-device" value="{{ device.pk }}">
-                                Confirmer la suppression
-                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-bs-dismiss="modal">Retour</button>
+                            <button class="btn btn-sm btn-danger"
+                                    aria-label="Supprimer l’appareil {{ device.name }}"
+                                    name="delete-device"
+                                    value="{{ device.pk }}">Confirmer la suppression</button>
                         </div>
                     </div>
                 </div>

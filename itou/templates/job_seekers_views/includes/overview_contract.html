@@ -14,7 +14,8 @@
                         <div class="mb-2">
                             <span class="fw-semibold">Dernier contrat IAE : {{ contract.company.display_name }}, du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}.</span>
                         </div>
-                        <a href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "suivi-contrat" %}>Voir le suivi des contrats</a>
+                        <a href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "test-synthese" "clic" "suivi-contrat" %}>Voir le suivi des contrats</a>
                     </div>
                     <div class="col-auto">
                         <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">terminé</span>

@@ -1,8 +1,13 @@
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% if form %}
-    <div class="modal-dialog modal-dialog-centered" id="newSavedSearchModalContent" {% if hx_swap_oob %}hx-swap-oob="true"{% endif %}>
-        <form hx-post="{% url "search:add_saved_search" %}" hx-target="#newSavedSearchModalContent" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+    <div class="modal-dialog modal-dialog-centered"
+         id="newSavedSearchModalContent"
+         {% if hx_swap_oob %}hx-swap-oob="true"{% endif %}>
+        <form hx-post="{% url "search:add_saved_search" %}"
+              hx-target="#newSavedSearchModalContent"
+              hx-swap="outerHTML"
+              class="js-prevent-multiple-submit">
             {% csrf_token %}
             <div class="modal-content">
                 <div class="modal-header">
@@ -14,9 +19,8 @@
                     {% bootstrap_form form alert_error_type="non_fields" %}
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-primary" {% matomo_event "recherche" "clic" "enregistrer-une-recherche" %}>
-                        Enregistrer
-                    </button>
+                    <button class="btn btn-sm btn-primary"
+                            {% matomo_event "recherche" "clic" "enregistrer-une-recherche" %}>Enregistrer</button>
                 </div>
             </div>
         </form>

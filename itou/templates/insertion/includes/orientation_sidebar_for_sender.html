@@ -15,7 +15,9 @@
             {% if service.contact_email %}
                 <li class="d-flex">
                     <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                    <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
+                    <a href="mailto:{{ service.contact_email }}"
+                       aria-label="Contact par mail"
+                       class="text-break">{{ service.contact_email }}</a>
                 </li>
             {% endif %}
             {% if service.contact_phone %}

@@ -70,7 +70,8 @@
                     </p>
                 {% endfragment %}
                 {% fragment as call_to_action %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}" class="btn btn-sm btn-primary">Mettre à jour</a>
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}"
+                       class="btn btn-sm btn-primary">Mettre à jour</a>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% endif %}
@@ -86,7 +87,8 @@
                 {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
                 {% if request.from_employer %}
                     {% with back_and_next_url=request.get_full_path|urlencode %}
-                        <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary ms-2">Vérifier</a>
+                        <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}"
+                           class="btn btn-outline-primary ms-2">Vérifier</a>
                     {% endwith %}
                 {% endif %}
             </div>

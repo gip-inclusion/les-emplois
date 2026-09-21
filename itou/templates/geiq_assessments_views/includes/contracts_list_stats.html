@@ -1,7 +1,9 @@
 {% load components %}
 {% load format_filters %}
 
-<div id="contracts-list-stats"  class="c-box c-box--summary mb-3 mb-md-4"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+<div id="contracts-list-stats"
+     class="c-box c-box--summary mb-3 mb-md-4"
+     {% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     <div class="c-box--summary__body">
         <div class="c-box--summary__list-data">
             <ul class="list-unstyled">

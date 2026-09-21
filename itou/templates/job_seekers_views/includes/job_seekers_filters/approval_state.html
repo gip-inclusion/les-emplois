@@ -2,9 +2,11 @@
 
 {% if btn_dropdown_filter|default:False %}
     <div class="dropdown">
-        <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-            Situation IAE
-        </button>
+        <button type="button"
+                class="btn btn-dropdown-filter dropdown-toggle"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                aria-expanded="false">Situation IAE</button>
         <ul class="dropdown-menu">
             <li>
                 <strong class="dropdown-header">Éligibilité IAE</strong>
@@ -46,9 +48,12 @@
     <hr>
     <fieldset>
         <legend>
-            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseApproval" type="button" aria-expanded="false" aria-controls="collapseApproval">
-                PASS IAE
-            </button>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseApproval"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseApproval">PASS IAE</button>
         </legend>
         <div class="my-3 collapse" id="collapseApproval">
             <ul>

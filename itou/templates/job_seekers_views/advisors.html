@@ -51,7 +51,8 @@
                     {% endif %}
                 </div>
                 <div class="col-12 col-xxl-4 col-xxxl-3">
-                    <div id="collapseAdvisorReviewShow" class="c-box mb-4 has-no-transition collapse collapseAdvisorReview show">
+                    <div id="collapseAdvisorReviewShow"
+                         class="c-box mb-4 has-no-transition collapse collapseAdvisorReview show">
                         <h3>Cette page vous est-elle utile ?</h3>
                         <button class="btn btn-ico btn-block btn-outline-primary mb-2"
                                 type="button"
@@ -74,10 +75,13 @@
                             <span>Non</span>
                         </button>
                     </div>
-                    <div id="collapseAdvisorReviewHide" class="c-box mb-4 has-no-transition collapse collapseAdvisorReview">
+                    <div id="collapseAdvisorReviewHide"
+                         class="c-box mb-4 has-no-transition collapse collapseAdvisorReview">
                         <h3>Envie d'approfondir le sujet avec nous ?</h3>
                         <p>Choisissez un créneau qui vous convient pour un échange de 30 minutes.</p>
-                        <a href="{{ calendar_url }}" class="btn btn-ico btn-block btn-outline-primary" {% matomo_event "accompagnateur" "clic" "prendre-rendez-vous" %}>
+                        <a href="{{ calendar_url }}"
+                           class="btn btn-ico btn-block btn-outline-primary"
+                           {% matomo_event "accompagnateur" "clic" "prendre-rendez-vous" %}>
                             <i class="ri-calendar-line"></i>
                             <span>Prendre rendez-vous</span>
 
@@ -90,7 +94,8 @@
                                 <p>
                                     Mon Récap facilite la coordination entre pros en rassemblant les infos essentielles du bénéficiaire dans un support papier. Équipez vos usagers dès aujourd’hui pour réduire les redites, fluidifier les relais et sécuriser l’accompagnement multi-acteurs.
                                 </p>
-                                <a href="https://mon-recap.inclusion.beta.gouv.fr/?mtm_campaign=Encart%20GPS" class="btn btn-block w-100 w-md-auto btn-outline-primary has-external-link">Découvrir Mon Récap</a>
+                                <a href="https://mon-recap.inclusion.beta.gouv.fr/?mtm_campaign=Encart%20GPS"
+                                   class="btn btn-block w-100 w-md-auto btn-outline-primary has-external-link">Découvrir Mon Récap</a>
                             </div>
                             <div class="d-none d-md-inline-flex col-md-auto ms-auto">
                                 <img src="{% static 'img/illustration-mon-recap.png' %}" alt="">

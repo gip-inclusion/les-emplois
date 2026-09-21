@@ -77,7 +77,9 @@
                                         </i>
                                     </p>
                                     {% if request.from_employer %}
-                                        <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}" class="my-2">
+                                        <form method="post"
+                                              action="{% url "apply:unarchive" job_application_id=job_application.pk %}"
+                                              class="my-2">
                                             {% csrf_token %}
                                             <button class="btn btn-ico btn-outline-primary w-100">
                                                 <i class="ri-inbox-unarchive-line" aria-hidden="true"></i>

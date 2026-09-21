@@ -19,13 +19,14 @@
                 </caption>
                 <thead>
                     <tr>
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.FULL_NAME_ASC name="Nom Prénom" only %}
+                        {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.FULL_NAME_ASC name="Nom Prénom" only %}
                         {% if request.from_iae_actor %}<th scope="col">Situation IAE</th>{% endif %}
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_ACTION_AT_ASC name="Dernière action" only %}
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nbr de candidatures" only %}
-                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d’accompagnateurs" only %}
+                        {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.LAST_ACTION_AT_ASC name="Dernière action" only %}
+                        {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nbr de candidatures" only %}
+                        {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d’accompagnateurs" only %}
                         <th scope="col">Dernier accompagnateur connu</th>
-                        <th scope="col" class="text-end {% if request.current_organization.is_authorized or can_orient_towards_insertion_service %}w-100px{% else %}w-50px{% endif %}">
+                        <th scope="col"
+                            class="text-end {% if request.current_organization.is_authorized or can_orient_towards_insertion_service %}w-100px{% else %}w-50px{% endif %}">
                             <span class="visually-hidden">Actions possibles sur les usagers</span>
                         </th>
                     </tr>
@@ -37,7 +38,12 @@
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
                                 {% if job_seeker.archived %}
                                     {% with help_text=list_organization|yesno:"votre structure ne l'accompagne plus,vous ne l'accompagnez plus" %}
-                                        <i class="ri-information-line text-info" data-bs-toggle="tooltip" data-bs-title="Usager archivé ({{ help_text }})" aria-label="Usager archivé ({{ help_text }})" role="button" tabindex="0"></i>
+                                        <i class="ri-information-line text-info"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Usager archivé ({{ help_text }})"
+                                           aria-label="Usager archivé ({{ help_text }})"
+                                           role="button"
+                                           tabindex="0"></i>
                                     {% endwith %}
                                 {% endif %}
                                 {% if job_seeker.jobseeker_profile.is_considered_stalled %}
@@ -72,20 +78,37 @@
                                 {% else %}
                                     {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                 {% endif %}
-                                <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour cet usager" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
-                                    <i class="ri-draft-line" aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   href="{{ url_query }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Postuler pour cet usager"
+                                   {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
+                                    <i class="ri-draft-line"
+                                       aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
                                 </a>
                                 {% if job_seeker.show_more_actions %}
-                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d’actions">
+                                    <button id="dropdown_{{ forloop.counter }}_action_menu"
+                                            class="btn btn-sm btn-link btn-ico-only"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                            aria-label="Plus d’actions">
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                    <div class="dropdown-menu"
+                                         aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
                                         {% if suggest_next_step_url and job_seeker.contract_ending_soon %}
-                                            <a href="{{ suggest_next_step_url }}" class="dropdown-item has-external-link" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-liste" %}>Suggérer une suite de parcours</a>
+                                            <a href="{{ suggest_next_step_url }}"
+                                               class="dropdown-item has-external-link"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-liste" %}>Suggérer une suite de parcours</a>
                                         {% endif %}
                                         {% if request.current_organization.is_authorized %}
                                             {% if not job_seeker.has_valid_approval %}
-                                                <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
+                                                <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="dropdown-item">
                                                     {% if job_seeker.valid_eligibility_diagnosis %}
                                                         Mettre à jour son éligibilité IAE
                                                     {% else %}
@@ -94,19 +117,26 @@
                                                 </a>
                                             {% endif %}
                                             {% if job_seeker.jobseeker_profile.is_stalled %}
-                                                <form method="post" action="{% url "job_seekers_views:switch_stalled_status" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                                                <form method="post"
+                                                      action="{% url "job_seekers_views:switch_stalled_status" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="is_not_stalled_anymore" value="{{ job_seeker.jobseeker_profile.is_not_stalled_anymore|yesno:"0,1" }}">
+                                                    <input type="hidden"
+                                                           name="is_not_stalled_anymore"
+                                                           value="{{ job_seeker.jobseeker_profile.is_not_stalled_anymore|yesno:"0,1" }}">
                                                     {% if job_seeker.jobseeker_profile.is_not_stalled_anymore %}
-                                                        <button type="submit" class="dropdown-item">L’usager est sans solution</button>
+                                                        <button type="submit"
+                                                                class="dropdown-item">L’usager est sans solution</button>
                                                     {% else %}
-                                                        <button type="submit" class="dropdown-item">L’usager n’est plus sans solution</button>
+                                                        <button type="submit"
+                                                                class="dropdown-item">L’usager n’est plus sans solution</button>
                                                     {% endif %}
                                                 </form>
                                             {% endif %}
                                         {% endif %}
                                         {% if job_seeker.services_search_url %}
-                                            <a href="{{ job_seeker.services_search_url }}" class="dropdown-item" {% matomo_event "candidat" "clic" "services-search-from-list" %}>
+                                            <a href="{{ job_seeker.services_search_url }}"
+                                               class="dropdown-item"
+                                               {% matomo_event "candidat" "clic" "services-search-from-list" %}>
                                                 Orienter vers un service d’insertion
                                             </a>
                                         {% endif %}
@@ -124,7 +154,9 @@
                                             </a>
                                         {% endif %}
                                         {% if job_seeker.pro_support_request_mailto %}
-                                            <a href="{{ job_seeker.pro_support_request_mailto }}" class="dropdown-item" {% matomo_event "candidat" "clic" "demande_bilan_accompagnement" %}>Demander un bilan d’accompagnement à la SIAE</a>
+                                            <a href="{{ job_seeker.pro_support_request_mailto }}"
+                                               class="dropdown-item"
+                                               {% matomo_event "candidat" "clic" "demande_bilan_accompagnement" %}>Demander un bilan d’accompagnement à la SIAE</a>
                                         {% endif %}
                                     </div>
                                 {% endif %}

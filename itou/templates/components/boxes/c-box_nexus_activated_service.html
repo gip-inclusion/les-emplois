@@ -10,7 +10,9 @@
         </div>
         {% if url is None %}
             <div class="ms-auto align-self-start">
-                <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="Démo inexistante">
                     <span class="visually-hidden">Démo inexistante</span>
                     <i class="ri-close-line" aria-hidden="true"></i>
                 </span>
@@ -18,10 +20,14 @@
         {% endif %}
     </div>
     {% if url %}
-        <a href="{{ url }}" class="btn btn-outline-primary btn-block has-external-link mt-3" aria-label="{{ aria_label }} (lien externe)" {% matomo_event "nexus" "acceder-service" service %} target="_blank">Accéder</a>
+        <a href="{{ url }}"
+           class="btn btn-outline-primary btn-block has-external-link mt-3"
+           aria-label="{{ aria_label }} (lien externe)"
+           {% matomo_event "nexus" "acceder-service" service %}
+           target="_blank">Accéder</a>
     {% else %}
-        <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="{{ aria_label }} (lien externe)">
-            Accéder
-        </button>
+        <button class="btn btn-outline-primary btn-block has-external-link mt-3"
+                disabled
+                aria-label="{{ aria_label }} (lien externe)">Accéder</button>
     {% endif %}
 </div>
