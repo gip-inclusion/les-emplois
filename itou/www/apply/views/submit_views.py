@@ -140,6 +140,13 @@ class ApplicationPermissionMixin:
                 msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
             self.apply_session.delete()  # Don't allow to re-use the session in another step to skip this check
             raise PermissionDenied(msg)
+        # Prevent authorized prescribers from applying for companies they're a member of
+        if self.request.from_authorized_prescriber and self.company.has_member(request.user):
+            return render(
+                request,
+                "apply/submit/application/conflict_of_interest.html",
+                {"company": self.company, "back_url": self.get_reset_url()},
+            )
         return super().dispatch(request, *args, **kwargs)
 
 

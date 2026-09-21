@@ -33,7 +33,7 @@ from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import ActionKind, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
-from itou.utils import triggers
+from itou.utils import constants as global_constants, triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -1714,6 +1714,27 @@ class TestApplyAsAuthorizedPrescriber:
             """,
             html=True,
         )
+
+    def test_cannot_apply_when_member_of_target_company(self, client):
+        user = PrescriberFactory(membership__organization__authorized=True)
+        prescriber_organization = user.prescriberorganization_set.get()
+        company = CompanyFactory()
+        CompanyMembershipFactory(user=user, company=company)
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
+        url = reverse("apply:start", kwargs={"company_pk": company.pk})
+
+        client.force_login(user)
+
+        # We need to switch organization, otherwise we're logged as an employer and not a prescriber
+        session = client.session
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            prescriber_organization.organization_switch_key
+        )
+        session.save()
+
+        response = client.get(url, {"back_url": reset_url_company})
+        assertTemplateUsed(response, "apply/submit/application/conflict_of_interest.html")
+        assert get_session_name(client.session, APPLY_SESSION_KIND) is None
 
 
 class TestApplyAsPrescriber:
