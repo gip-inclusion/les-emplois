@@ -1314,6 +1314,15 @@ def test_end_of_contracts_banners_for_siae(client):
     url = reverse("job_seekers_views:list_organization")
     today = datetime.date(2026, 1, 15)
 
+    # Archived assignments should not be accounted for
+    archived_assignment = JobSeekerAssignmentFactory(company=company, ended=True)
+    ContractFactory(
+        job_seeker=archived_assignment.job_seeker,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
     # No contract ending soon: neither banner.
     response = client.get(url)
     assertNotContains(response, "Afficher ce salarié")
@@ -1328,16 +1337,26 @@ def test_end_of_contracts_banners_for_siae(client):
         start_date=today - datetime.timedelta(days=200),
         end_date=today + datetime.timedelta(days=20),
     )
-    print("here")
     response = client.get(url)
     assertContains(response, "Vous avez 1 salarié en fin de contrat")
     assertContains(response, "Afficher ce salarié")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
+    job_seeker2 = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker2,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous avez 2 salariés en fin de contrat")
+    assertContains(response, "Afficher ces salariés")
+    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
     response = client.get(url, {"contract_ending_soon": "on"})
     assertContains(response, "Suggérer une suite de parcours aux salariés")
-    assertNotContains(response, "Afficher ce salariés")
     assertNotContains(response, "Afficher ces salariés")
 
 
@@ -1349,6 +1368,16 @@ def test_end_of_contracts_banners_for_prescriber(client):
     url = reverse("job_seekers_views:list")
     today = datetime.date(2026, 1, 15)
     pedagogic_banner = "Demandez un bilan d’accompagnement à la SIAE"
+
+    # Archived assignments should not be accounted for
+    archived_assignment = JobSeekerAssignmentFactory(
+        professional=prescriber, prescriber_organization=organization, ended=True
+    )
+    ContractFactory(
+        job_seeker=archived_assignment.job_seeker,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
 
     # No contract ending soon: neither banner.
     response = client.get(url)
@@ -1369,16 +1398,27 @@ def test_end_of_contracts_banners_for_prescriber(client):
     assertContains(response, "Afficher ce bénéficiaire")
     assertNotContains(response, pedagogic_banner)
 
+    job_seeker2 = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
+    ContractFactory(
+        job_seeker=job_seeker2,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
+    assertContains(response, "Afficher ces bénéficiaires")
+    assertNotContains(response, pedagogic_banner)
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
     response = client.get(url, {"contract_ending_soon": "on"})
     assertContains(response, pedagogic_banner)
-    assertNotContains(response, "Afficher ce bénéficiaire")
+    assertNotContains(response, "Afficher ces bénéficiaires")
 
     # An unauthorized prescriber gets no banner.
     organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
     organization.save()
     response = client.get(url)
-    assertNotContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat de travail")
+    assertNotContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
 
 
 @freeze_time("2026-01-15")

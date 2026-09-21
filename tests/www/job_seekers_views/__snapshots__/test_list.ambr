@@ -4080,35 +4080,25 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*)
-          FROM
-            (SELECT
-               (SELECT U0."end_date" AS "end_date"
-                FROM "companies_contract" U0
-                WHERE (U0."end_date" IS NOT NULL
-                       AND U0."job_seeker_id" = ("users_user"."id"))
-                ORDER BY 1 DESC
-                LIMIT 1) AS "last_contract_end_date"
-             FROM "users_user"
-             LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
-             WHERE ("users_user"."kind" = %s
-                    AND "users_user"."id" IN
-                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
-                       FROM "users_jobseekerassignment" U0
-                       WHERE ((U0."company_id" IS NULL
-                               AND U0."prescriber_organization_id" IS NULL
-                               AND U0."professional_id" = %s)
-                              OR (U0."company_id" IS NULL
-                                  AND U0."prescriber_organization_id" = %s
-                                  AND U0."professional_id" = %s)))
-                    AND
-                      (SELECT U0."end_date" AS "end_date"
-                       FROM "companies_contract" U0
-                       WHERE (U0."end_date" IS NOT NULL
-                              AND U0."job_seeker_id" = ("users_user"."id"))
-                       ORDER BY 1 DESC
-                       LIMIT 1) BETWEEN %s AND %s)
-             GROUP BY "users_user"."id") subquery
+          SELECT COUNT(*) AS "__count"
+          FROM "users_user"
+          WHERE ("users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s
+                                AND U0."professional_id" = %s))
+                           AND U0."ended_at" IS NULL))
+                 AND
+                   (SELECT U0."end_date" AS "end_date"
+                    FROM "companies_contract" U0
+                    WHERE (U0."end_date" IS NOT NULL
+                           AND U0."job_seeker_id" = ("users_user"."id"))
+                    ORDER BY 1 DESC
+                    LIMIT 1) BETWEEN %s AND %s)
         ''',
       }),
       dict({
@@ -5327,34 +5317,24 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*)
-          FROM
-            (SELECT
-               (SELECT U0."end_date" AS "end_date"
-                FROM "companies_contract" U0
-                WHERE (U0."end_date" IS NOT NULL
-                       AND U0."job_seeker_id" = ("users_user"."id"))
-                ORDER BY 1 DESC
-                LIMIT 1) AS "last_contract_end_date"
-             FROM "users_user"
-             LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
-             WHERE ("users_user"."kind" = %s
-                    AND "users_user"."id" IN
-                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
-                       FROM "users_jobseekerassignment" U0
-                       WHERE ((U0."company_id" IS NULL
-                               AND U0."prescriber_organization_id" IS NULL
-                               AND U0."professional_id" = %s)
-                              OR (U0."company_id" IS NULL
-                                  AND U0."prescriber_organization_id" = %s)))
-                    AND
-                      (SELECT U0."end_date" AS "end_date"
-                       FROM "companies_contract" U0
-                       WHERE (U0."end_date" IS NOT NULL
-                              AND U0."job_seeker_id" = ("users_user"."id"))
-                       ORDER BY 1 DESC
-                       LIMIT 1) BETWEEN %s AND %s)
-             GROUP BY "users_user"."id") subquery
+          SELECT COUNT(*) AS "__count"
+          FROM "users_user"
+          WHERE ("users_user"."id" IN
+                   (SELECT U0."job_seeker_id" AS "job_seeker"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE (((U0."company_id" IS NULL
+                             AND U0."prescriber_organization_id" IS NULL
+                             AND U0."professional_id" = %s)
+                            OR (U0."company_id" IS NULL
+                                AND U0."prescriber_organization_id" = %s))
+                           AND U0."ended_at" IS NULL))
+                 AND
+                   (SELECT U0."end_date" AS "end_date"
+                    FROM "companies_contract" U0
+                    WHERE (U0."end_date" IS NOT NULL
+                           AND U0."job_seeker_id" = ("users_user"."id"))
+                    ORDER BY 1 DESC
+                    LIMIT 1) BETWEEN %s AND %s)
         ''',
       }),
       dict({
