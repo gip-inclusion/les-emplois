@@ -1041,6 +1041,35 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             },
         )
 
+    def test_auto_clear_last_name_if_same_as_birth_name(self, client, snapshot):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = ProfessionalFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+
+        user = self.company.members.first()
+        client.force_login(user)
+
+        client.get(self.start_url)  # init session
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+        post_data = {
+            "title": "M",
+            "first_name": self.job_seeker.first_name,
+            "last_name": "Durand",
+            "birth_name": "DURAND",
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.FRANCE_ID,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        client.post(self.get_step_url("1", client), data=post_data)
+        session = client.session[self.get_job_seeker_session_key(client)]
+
+        assert session["profile"]["birth_name"] == "DURAND"  # updated
+        assert session["user"]["last_name"] == ""  # cleared
+
     def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
         invalid_session_name = uuid.uuid4()

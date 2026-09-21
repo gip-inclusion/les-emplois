@@ -935,3 +935,27 @@ class TestEditUserInfoView:
         # djlint wraps long tags over several lines
         normalized_content = " ".join(response.content.decode().split())
         assert ALERT_COMPONENT[identity_provider] in normalized_content
+
+    def test_edit_auto_clear_last_name_if_same_as_birth_name(self, client):
+        user = JobSeekerFactory(last_name="Durand", jobseeker_profile__birth_name="")
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        post_data = {
+            "email": user.email,
+            "title": user.title,
+            "first_name": user.first_name,
+            "birth_name": "DURAND",
+            "last_name": "Durand",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        } | self.address_form_fields(fill_mode="ban_api")
+        response = client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        user.refresh_from_db()
+        assert user.jobseeker_profile.birth_name == "DURAND"  # updated
+        assert user.last_name == ""  # cleared

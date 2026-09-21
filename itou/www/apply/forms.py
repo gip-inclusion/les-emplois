@@ -30,6 +30,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
 from itou.users.models import JobSeekerProfile, User
+from itou.users.utils import auto_clear_last_name_if_same_as_birth_name
 from itou.utils import constants as global_constants
 from itou.utils.choices import get_choices_label
 from itou.utils.perms.utils import can_view_personal_information
@@ -820,6 +821,10 @@ class JobSeekerPersonalDataForm(
         ):
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
+
+    def clean(self):
+        super().clean()
+        auto_clear_last_name_if_same_as_birth_name(self)
 
 
 class BirthDateForm(forms.ModelForm):
