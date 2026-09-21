@@ -1,25 +1,27 @@
 import logging
+import warnings
 from itertools import batched
 
 import sentry_sdk
 from anymail.exceptions import AnymailError
 from django.conf import settings
-from django.core.mail import get_connection
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.message import EmailMessage
 from django.db import ProgrammingError, connection, transaction
 from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import CancelExecution
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
+from itou.utils.emails import generate_html_alternative
+from itou.utils.enums import ItouEnvironment
 
 
 logger = logging.getLogger("itou.emails")
 
 # Mailjet max number of recipients (CC, BCC, TO)
 _MAILJET_MAX_RECIPIENTS = 50
-_EMAIL_KEYS = ("from_email", "reply_to", "cc", "bcc", "subject", "body")
+_EMAIL_KEYS = ("from_email", "reply_to", "cc", "bcc", "subject", "body", "alternatives")
 
 
 def sanitize_mailjet_recipients(email_message):
@@ -34,7 +36,7 @@ def sanitize_mailjet_recipients(email_message):
     * creates new emails with a number of recipients in the Mailjet limit
     * **only** checks for `TO` recipients owerflows
 
-    `email_message` is an EmailMessage object (not serialized)
+    `email_message` is an EmailMultiAlternatives object (not serialized)
 
     Returns a **list** of "sanitized" emails.
     """
@@ -49,7 +51,7 @@ def sanitize_mailjet_recipients(email_message):
 
     for to_chunk in to_chunks:
         copy_kvs = {k: email_message.__dict__[k] for k in _EMAIL_KEYS}
-        copy_email = EmailMessage(**copy_kvs)
+        copy_email = EmailMultiAlternatives(**copy_kvs)
         copy_email.to = to_chunk
         sanitized_emails.append(copy_email)
 
@@ -74,7 +76,7 @@ def _async_send_message(email_id, *, task=None):
             # Email deleted from django admin, stop trying to send it.
             logger.warning("Not sending email_id=%d, it does not exist in the database.", email_id)
             return
-        message = EmailMessage(
+        message = EmailMultiAlternatives(
             from_email=email.from_email,
             reply_to=email.reply_to,
             to=email.to,
@@ -83,6 +85,8 @@ def _async_send_message(email_id, *, task=None):
             subject=email.subject,
             body=email.body_text,
         )
+        if email.body_html:
+            message.attach_alternative(email.body_html, "text/html")
         try:
             with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
                 connection.send_messages([message])
@@ -146,6 +150,11 @@ class AsyncEmailBackend(BaseEmailBackend):
             raise ProgrammingError("Sending email requires an active database transaction.")
         emails_count = 0
         for message in email_messages:
+            has_html_alternative = "text/html" in (alt.mimetype for alt in message.alternatives)
+            log_warning = not has_html_alternative
+            if not has_html_alternative:
+                # Plain-text emails sent by third-party libraries (django-allauth).
+                message.attach_alternative(generate_html_alternative(message.body), "text/html")
             for mjemail in sanitize_mailjet_recipients(message):
                 # Send each email in a separate task, so that Huey retry mecanism only
                 # retries the failed email.
@@ -154,6 +163,25 @@ class AsyncEmailBackend(BaseEmailBackend):
                 if not [*mjemail.to, *mjemail.cc, *mjemail.bcc]:
                     logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
                     continue
+                if log_warning:
+                    if settings.ITOU_ENVIRONMENT == ItouEnvironment.TEST:
+                        if email.subject not in {
+                            # allauth
+                            "[TEST] Confirmez votre adresse e-mail",
+                            "[TEST] Réinitialisation de votre mot de passe",
+                            "[TEST] E-mail de réinitialisation du mot de passe",
+                            # test_send_messages_warns_when_generating_html_body
+                            "test_send_messages_warns_when_generating_html_body",
+                        }:
+                            warnings.warn(f"{email.subject}", UserWarning)
+                    # The django-allauth project sends plain-text emails, with
+                    # no HTML alternatives. Brevo requires an HTML body,
+                    # otherwise it tries to convert the plain text to HTML,
+                    # doing worse than generate_html_alternative.
+                    logger.warning(
+                        f"Generated HTML alternative for message {email.pk=}, "
+                        "provide it to avoid fragile automatic generation."
+                    )
                 emails_count += 1
                 _async_send_message(email.pk)
         return emails_count
