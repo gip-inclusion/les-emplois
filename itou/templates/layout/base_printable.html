@@ -2,27 +2,27 @@
 
 <!DOCTYPE HTML>
 <html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>{% block title %}- {% brand %}{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    {% block meta_description %}{% endblock %}
-    <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
-    <link rel="stylesheet" href="{% static 'css/itou.css' %}">
-    <style>
-        .s-header-print {
-            display: block !important;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        {% include "layout/_header_print.html" %}
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
-    {% block script %}{% endblock %}
-</body>
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}- {% brand %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% block meta_description %}{% endblock %}
+        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
+        <link rel="stylesheet" href="{% static 'css/itou.css' %}">
+        <style>
+            .s-header-print {
+                display: block !important;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            {% include "layout/_header_print.html" %}
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
+        {% block script %}{% endblock %}
+    </body>
 </html>
