@@ -1,4 +1,6 @@
+import pytest
 from django.core.management import call_command
+from django.db import connection
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
@@ -10,8 +12,18 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import ProfessionalFactory
 
 
+@pytest.fixture
+def nexus_database(db, settings):
+    db_settings = connection.settings_dict
+    settings.NEXUS_METABASE_DB_HOST = db_settings["HOST"]
+    settings.NEXUS_METABASE_DB_PORT = db_settings["PORT"]
+    settings.NEXUS_METABASE_DB_DATABASE = db_settings["NAME"]
+    settings.NEXUS_METABASE_DB_USER = db_settings["USER"]
+    settings.NEXUS_METABASE_DB_PASSWORD = db_settings["PASSWORD"]
+
+
 @freeze_time()
-def test_populate_metabase_nexus(snapshot):
+def test_populate_metabase_nexus(snapshot, nexus_database):
     authorized_prescriber = ProfessionalFactory(email="1@mailinator.com")
     employer = ProfessionalFactory(email="2@mailinator.com")
     prescriber_1 = ProfessionalFactory(email="3@mailinator.com")
