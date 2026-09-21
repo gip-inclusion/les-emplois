@@ -101,7 +101,7 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li>
-                                {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche de poste" css_classes="btn btn-ico justify-content-start dropdown-item" %}
+                                {% include "includes/copy_to_clipboard.html" with content=job.get_absolute_url text="Copier le lien de cette fiche de poste" css_classes="btn btn-ico justify-content-start dropdown-item" %}
                             </li>
                             <li>
                                 <a href="{{ report_tally_url }}" rel="noopener" class="btn btn-ico justify-content-start dropdown-item" target="_blank">

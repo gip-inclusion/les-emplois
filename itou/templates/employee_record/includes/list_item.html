@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div>
-                {% include 'employee_record/includes/_status.html' with employee_record=employee_record extra_classes="badge-sm" only %}
+                {% include "employee_record/includes/_status.html" with employee_record=employee_record extra_classes="badge-sm" only %}
             </div>
         </div>
     </div>
@@ -96,7 +96,7 @@
         {% endif %}
         {# SIRET has changed #}
         {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-            {% include 'employee_record/includes/_siret_changed_alert.html' with dismissible=False only %}
+            {% include "employee_record/includes/_siret_changed_alert.html" with dismissible=False only %}
         {% endif %}
         {# Actions #}
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
@@ -113,7 +113,7 @@
             <li>
                 <small>Numéro de PASS IAE</small>
                 <strong>{{ employee_record.job_application.approval.number|format_approval_number }}</strong>
-                {% include 'includes/copy_to_clipboard.html' with content=employee_record.job_application.approval.number css_classes="btn-link" only_icon=True %}
+                {% include "includes/copy_to_clipboard.html" with content=employee_record.job_application.approval.number css_classes="btn-link" only_icon=True %}
             </li>
             <li>
                 <small>Date de début</small>
@@ -129,7 +129,7 @@
     <div class="c-box--results__footer">
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                {% include 'employee_record/includes/_regularize_nir_button.html' with job_application=employee_record.job_application back_url=current_url|urlencode only %}
+                {% include "employee_record/includes/_regularize_nir_button.html" with job_application=employee_record.job_application back_url=current_url|urlencode only %}
             </div>
         {% else %}
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">

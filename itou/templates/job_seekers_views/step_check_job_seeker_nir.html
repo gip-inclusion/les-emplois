@@ -11,7 +11,7 @@
     {% enums "companies" "CompanyKind" as CompanyKind %}
     {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
         {% fragment as c_title__main %}
-            <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+            <h1>{% include "apply/includes/_submit_title.html" %}</h1>
         {% endfragment %}
         {% fragment as c_title__secondary %}
             {% if auto_prescription_process or hire_process %}
@@ -46,7 +46,7 @@
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="c-form">
-            <h2 class="h3">{% include 'apply/includes/_submit_title.html' %}</h2>
+            <h2 class="h3">{% include "apply/includes/_submit_title.html" %}</h2>
             {% csrf_token %}
 
             {% bootstrap_form_errors form type="all" %}

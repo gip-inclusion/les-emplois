@@ -72,7 +72,7 @@
                                                 <li class="d-flex">
                                                     <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
                                                     <a href="mailto:{{ member.email }}" aria-label="Contact par mail" class="text-break">{{ member.email }}</a>
-                                                    {% include 'includes/copy_to_clipboard.html' with content=member.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                                                    {% include "includes/copy_to_clipboard.html" with content=member.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
                                                 </li>
                                             {% endif %}
                                         {% endfor %}

@@ -45,7 +45,7 @@
             <div class="row my-3 my-md-4">
                 <div class="col-12">
                     <div class="tab-content">
-                        {% include 'employee_record/includes/list_header.html' with num_recently_missing_employee_records=num_recently_missing_employee_records request=request show_siret_has_changed_warning=show_siret_has_changed_warning ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+                        {% include "employee_record/includes/list_header.html" with num_recently_missing_employee_records=num_recently_missing_employee_records request=request show_siret_has_changed_warning=show_siret_has_changed_warning ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                         <p>
                             Cette interface vous permet de créer et transmettre vos fiches salariés à l'Extranet IAE 2.0 de l'ASP.
                             <a href="{{ ITOU_HELP_CENTER_URL }}/articles/29251628906257--Fonctionnement-des-fiches-salarié"

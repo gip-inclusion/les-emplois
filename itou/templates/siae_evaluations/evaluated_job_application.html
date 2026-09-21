@@ -32,7 +32,7 @@
                             {% if evaluated_job_application.evaluated_siae.reviewed_at %}
                                 {% if not evaluated_job_application.hide_state_from_siae %}
                                     {% with jobapp_state=evaluated_job_application.compute_state %}
-                                        {% if jobapp_state == 'REFUSED' or jobapp_state == 'REFUSED_2' %}
+                                        {% if jobapp_state == "REFUSED" or jobapp_state == "REFUSED_2" %}
                                             <p>
                                                 <b>Commentaire de la DDETS</b>
                                             </p>
