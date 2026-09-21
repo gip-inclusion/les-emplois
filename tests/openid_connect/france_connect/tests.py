@@ -437,6 +437,7 @@ class TestFranceConnect:
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
         assert trail.data == {"idp": "FranceConnect"}
+        assert trail.browser_id
 
     @respx.mock
     def test_callback_mismatched_nonce(self, client):

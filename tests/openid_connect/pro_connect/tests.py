@@ -916,6 +916,7 @@ class TestProConnectMapChannel:
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
         assert trail.data == {"idp": "ProConnect"}
+        assert trail.browser_id
 
 
 class TestProConnectNexusChannel:

@@ -552,6 +552,7 @@ class TestPoleEmploiConnect:
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
         assert trail.data == {"idp": "FranceTravail"}
+        assert trail.browser_id
 
 
 @pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.FRANCE_CONNECT])
