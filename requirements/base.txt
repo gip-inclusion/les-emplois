@@ -960,9 +960,9 @@ jsonschema-specifications==2025.9.1 \
     --hash=sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe \
     --hash=sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d
     # via jsonschema
-jwcrypto==1.6.0 \
-    --hash=sha256:02a82b0a3a36b2553309d78c65e1c0e3350b640fe4091f53f66f582b11f49378 \
-    --hash=sha256:09ece277d48620079c90af7dfe84be085a229c1cbe06baa295de41e5019ac998
+jwcrypto==1.6.1 \
+    --hash=sha256:77e856818e514cb3d64a1043b6885a7d52f5cc37773f5e944de02103c8d3a54f \
+    --hash=sha256:a1e1570da5c2e35dbcd375ec1d2891a24de8eb35ee2c1fe8e91978efb72cfe90
     # via itoutils
 lxml==6.1.3 \
     --hash=sha256:032a0a97eed428bd143c75a11118238546424ceb2fa311cca5f073aa44658dc4 \
