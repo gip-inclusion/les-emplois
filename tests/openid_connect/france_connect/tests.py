@@ -1,5 +1,6 @@
 import base64
 import datetime
+import functools
 import hashlib
 import random
 import time
@@ -10,6 +11,7 @@ import httpx
 import jwt
 import pytest
 import respx
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
@@ -45,11 +47,17 @@ FC_USERINFO = {
 }
 
 
+# Cached for stability across calls to mock_oauth_dance().
+@functools.cache
+def france_connect_private_key():
+    return ec.generate_private_key(ec.SECP256R1())
+
+
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True):
     id_token_nonce = str(uuid.uuid4())
-    private_key = settings.FRANCE_CONNECT_OIDC_PRIVATE_KEY
+    private_key = france_connect_private_key()
     public_key_numbers = private_key.public_key().public_numbers()
     jwk_json = {
         "keys": [

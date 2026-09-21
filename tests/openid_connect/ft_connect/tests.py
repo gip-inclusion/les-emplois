@@ -1,5 +1,6 @@
 import base64
 import datetime
+import functools
 import hashlib
 import time
 import urllib.parse
@@ -8,6 +9,7 @@ import httpx
 import jwt
 import pytest
 import respx
+from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
@@ -42,6 +44,11 @@ FT_CONNECT_USERINFO = {
 }
 
 
+@functools.cache
+def france_travail_connect_private_key():
+    return rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(
@@ -52,7 +59,7 @@ def mock_oauth_dance(
     matching_nonces=True,
 ):
     id_token_nonce = crypto.get_random_string(length=12)
-    private_key = settings.FRANCE_TRAVAIL_CONNECT_OIDC_PRIVATE_KEY
+    private_key = france_travail_connect_private_key()
     public_key_numbers = private_key.public_key().public_numbers()
     jwk_json = {
         "keys": [
