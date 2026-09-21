@@ -184,7 +184,7 @@
 # ---
 # name: test_upload_and_download[upload]
   dict({
-    'num_queries': 4,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -480,6 +480,19 @@
           LIMIT 700
           FOR NO KEY
           UPDATE OF "employee_record_employeerecordupdatenotification"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command._upload_batch_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.upload[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecordupdatenotification"
+          WHERE "employee_record_employeerecordupdatenotification"."asp_batch_file" = %s
+          LIMIT 1
         ''',
       }),
       dict({

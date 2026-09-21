@@ -10,7 +10,12 @@ from itou.employee_record.common_management import EmployeeRecordTransferCommand
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import (
+    EmployeeRecord,
+    EmployeeRecordBatch,
+    EmployeeRecordTransitionLog,
+    EmployeeRecordUpdateNotification,
+)
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
@@ -29,6 +34,9 @@ class Command(EmployeeRecordTransferCommand):
             batch_data = EmployeeRecordBatchSerializer(raw_batch).data
 
         remote_path = EmployeeRecordBatch.get_remote_path()
+        # Safety check to prevent 2 concurrent command runs to upload the same file in the same second
+        if EmployeeRecordTransitionLog.objects.filter(asp_batch_file=remote_path).exists():
+            raise RuntimeError(f"{remote_path} has already been used (and likely uploaded): abort")
         try:
             upload_success = self.upload_json_file(batch_data, remote_path, sftp, dry_run)
         except SerializationError as ex:

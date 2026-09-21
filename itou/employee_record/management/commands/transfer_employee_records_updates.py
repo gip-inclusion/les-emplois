@@ -35,6 +35,9 @@ class Command(EmployeeRecordTransferCommand):
             batch_data = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch).data
 
         remote_path = EmployeeRecordBatch.get_remote_path()
+        # Safety check to prevent 2 concurrent command runs to upload the same file in the same second
+        if EmployeeRecordUpdateNotification.objects.filter(asp_batch_file=remote_path).exists():
+            raise RuntimeError(f"{remote_path} has already been used (and likely uploaded): abort")
         try:
             # accessing .data triggers serialization
             upload_success = self.upload_json_file(batch_data, remote_path, sftp, dry_run)
