@@ -470,6 +470,7 @@
           WHERE "employee_record_employeerecordupdatenotification"."status" = %s
           ORDER BY "employee_record_employeerecordupdatenotification"."updated_at" ASC,
                    "employee_record_employeerecordupdatenotification"."id" ASC
+          LIMIT 700
         ''',
       }),
       dict({
@@ -513,7 +514,7 @@
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
-    'Starting UPLOAD of 2 notification(s)',
+    'Starting UPLOAD of 1 notification(s)',
     'Successfully uploaded: RIAE_FS_20210927000000.json',
     '<EmployeeRecordUpdateNotification pk=1234> performed transition EmployeeRecordUpdateNotificationWorkflow.wait_for_asp_response (NEW -> SENT)',
     '[chan 0] sftp session closed.',
