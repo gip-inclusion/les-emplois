@@ -121,7 +121,7 @@ def _employer_dashboard_context(request):
         contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
         siae_job_seekers = User.objects.filter(
             kind=UserKind.JOB_SEEKER,
-            pk__in=JobSeekerAssignment.objects.filter(company=current_org).values("job_seeker"),
+            pk__in=JobSeekerAssignment.objects.filter(company=current_org, ended_at=None).values("job_seeker"),
         )
         contracts_ending_soon_count = (
             annotate_last_contract_end_date(siae_job_seekers, company=current_org)
@@ -202,7 +202,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
                 # Contracts are not scoped to a company: a prescriber follows the whole IAE journey.
                 assigned_job_seekers = User.objects.filter(
-                    pk__in=User.objects.assigned_job_seeker_ids(request.user, current_org)
+                    pk__in=User.objects.assigned_job_seeker_ids(request.user, current_org, archived=False)
                 )
                 context["contracts_ending_soon_count"] = (
                     annotate_last_contract_end_date(assigned_job_seekers)

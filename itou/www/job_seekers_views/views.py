@@ -717,7 +717,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         from_all_coworkers=list_organization,
     )
 
-    base_queryset = queryset
     filters_counter = 0
     end_of_journey_filter_active = False
     if form.is_valid():
@@ -761,7 +760,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
         contracts_ending_soon_count = (
             annotate_last_contract_end_date(
-                base_queryset, company=request.current_organization if request.from_employer else None
+                User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker")),
+                company=request.current_organization if request.from_employer else None,
             )
             .filter(last_contract_end_date__range=contract_window)
             .count()

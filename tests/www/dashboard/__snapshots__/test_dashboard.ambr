@@ -407,7 +407,8 @@
                  AND "users_user"."id" IN
                    (SELECT U0."job_seeker_id" AS "job_seeker"
                     FROM "users_jobseekerassignment" U0
-                    WHERE U0."company_id" = %s)
+                    WHERE (U0."company_id" = %s
+                           AND U0."ended_at" IS NULL))
                  AND
                    (SELECT U0."end_date" AS "end_date"
                     FROM "companies_contract" U0

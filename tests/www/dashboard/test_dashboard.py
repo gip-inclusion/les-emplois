@@ -243,6 +243,16 @@ class TestDashboardView:
         today = date(2026, 1, 15)
         url = reverse("dashboard:index")
 
+        # Archived assignments should not be accounted for
+        archived_assignment = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=organization, ended=True
+        )
+        ContractFactory(
+            job_seeker=archived_assignment.job_seeker,
+            start_date=today - timedelta(days=200),
+            end_date=today + timedelta(days=20),
+        )
+
         # No contract ending soon yet: the entry is shown without a badge.
         response = client.get(url)
         assertContains(response, "Fins de contrat de travail")
