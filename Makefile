@@ -30,7 +30,7 @@ runserver: $(VIRTUAL_ENV)
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 ifeq "$(NETWORK_MODE)" "online"
-	uv venv
+	uv venv --clear
 	uv pip sync --require-hashes $^
 	touch $@
 else
