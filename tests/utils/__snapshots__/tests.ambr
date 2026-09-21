@@ -138,7 +138,6 @@
           window._paq.push(['setUserId', '99999']);
   
           window._paq.push(['setCustomUrl', new URL('company/&lt;int:company_pk&gt;/card?mtm_bar=bidule&amp;mtm_foo=truc', window.location.origin).href]);
-  
           
               window._paq.push(['setDocumentTitle', 'Fiche de la structure d&#x27;insertion']);
           
