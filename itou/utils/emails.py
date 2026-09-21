@@ -5,6 +5,7 @@ import textwrap
 from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
+from markdownify.templatetags.markdownify import markdownify
 
 from itou.utils import constants as global_constants
 from itou.utils.enums import ItouEnvironment
@@ -36,14 +37,23 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
     subject = textwrap.shorten(
         subject_prefix + get_email_text_template(subject, email_context), width=250, placeholder="..."
     )
-    return mail.EmailMessage(
+    body_text = get_email_text_template(body, email_context)
+    email = mail.EmailMultiAlternatives(
         from_email=from_email,
         to=to,
         cc=cc,
         bcc=bcc,
         subject=subject,
-        body=get_email_text_template(body, email_context),
+        body=body_text,
     )
+    html_body = f"""
+        <!doctype html>
+        <html lang="fr">
+        <head><meta charset="utf-8"></head>
+        <body>{markdownify(body_text, "email")}
+        """  # End tags are optional
+    email.attach_alternative(html_body, "text/html")
+    return email
 
 
 def send_email_messages(email_messages, connection=None):
