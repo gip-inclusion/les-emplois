@@ -11,6 +11,7 @@ import datetime
 import logging
 from collections import defaultdict
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
@@ -168,6 +169,8 @@ def manually_refuse_approval(
                 reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
             ),
             "search_url": get_absolute_url(reverse("search:prescribers_home")),
+            "base_url": get_absolute_url(),
+            "itou_environment": settings.ITOU_ENVIRONMENT,
         },
     )
 

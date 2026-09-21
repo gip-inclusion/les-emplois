@@ -1,3 +1,4 @@
+import copy
 import re
 import textwrap
 
@@ -21,21 +22,19 @@ def remove_extra_line_breaks(text):
 
 
 def get_email_text_template(template, context):
-    context.update(
-        {
-            "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
-            "itou_environment": settings.ITOU_ENVIRONMENT,
-            "base_url": get_absolute_url(),
-        }
-    )
     return remove_extra_line_breaks(get_template(template).render(context).strip())
 
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
+    email_context = copy.deepcopy(context)
+    email_context["itou_help_center_url"] = global_constants.ITOU_HELP_CENTER_URL
+    email_context["itou_environment"] = settings.ITOU_ENVIRONMENT
+    email_context["base_url"] = get_absolute_url()
+
     subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
     subject = textwrap.shorten(
-        subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
+        subject_prefix + get_email_text_template(subject, email_context), width=250, placeholder="..."
     )
     return mail.EmailMessage(
         from_email=from_email,
@@ -43,7 +42,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         cc=cc,
         bcc=bcc,
         subject=subject,
-        body=get_email_text_template(body, context),
+        body=get_email_text_template(body, email_context),
     )
 
 
