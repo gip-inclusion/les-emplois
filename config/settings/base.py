@@ -146,7 +146,7 @@ MIDDLEWARE = [
     # Maintenance: if enabled we will skip all the remaning middlewares
     "itou.www.middleware.maintenance",
     # browser_id_cookie is before AuthenticationMiddleware so at login we already have a value
-    "itou.www.middleware.browser_id_cookie",
+    "itou.audit_trail.middleware.browser_id_cookie",
     # Django stack again
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
