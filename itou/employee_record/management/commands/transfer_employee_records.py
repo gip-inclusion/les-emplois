@@ -166,6 +166,7 @@ class Command(EmployeeRecordTransferCommand):
             "timezone": "UTC",
         },
     )
+    @transaction.atomic
     def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """
         Upload a file composed of all ready employee records
@@ -176,7 +177,8 @@ class Command(EmployeeRecordTransferCommand):
         batch = list(
             EmployeeRecord.objects.full_fetch()
             .filter(status=Status.READY, job_application__state=JobApplicationState.ACCEPTED)
-            .order_by("updated_at", "pk")[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
+            .order_by("updated_at", "pk")
+            .select_for_update(of=("self",), no_key=True)[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
         )
         if not batch:
             self.logger.info("No ready employee record found")

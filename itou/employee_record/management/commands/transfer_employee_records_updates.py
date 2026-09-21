@@ -141,6 +141,7 @@ class Command(EmployeeRecordTransferCommand):
             "timezone": "UTC",
         },
     )
+    @transaction.atomic
     def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         # Limit the records to MAX_EMPLOYEE_RECORDS and only send one batch/file:
         # this is confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
@@ -148,7 +149,8 @@ class Command(EmployeeRecordTransferCommand):
         batch = list(
             EmployeeRecordUpdateNotification.objects.full_fetch()
             .filter(status=NotificationStatus.NEW)
-            .order_by("updated_at", "pk")[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
+            .order_by("updated_at", "pk")
+            .select_for_update(of=("self",), no_key=True)[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
         )
         if not batch:
             self.logger.info("No new employee record notification found")

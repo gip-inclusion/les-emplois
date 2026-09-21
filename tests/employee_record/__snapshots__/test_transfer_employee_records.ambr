@@ -486,8 +486,15 @@
 # ---
 # name: test_upload_and_download[upload]
   dict({
-    'num_queries': 3,
+    'num_queries': 5,
     'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
       dict({
         'origin': list([
           'Command.upload[employee_record/management/commands/transfer_employee_records.py]',
@@ -782,6 +789,8 @@
           ORDER BY "employee_record_employeerecord"."updated_at" ASC,
                    "employee_record_employeerecord"."id" ASC
           LIMIT 700
+          FOR NO KEY
+          UPDATE OF "employee_record_employeerecord"
         ''',
       }),
       dict({
@@ -836,6 +845,13 @@
                                                                      "recovered")
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "employee_record_employeerecordtransitionlog"."id"
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
