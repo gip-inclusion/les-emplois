@@ -465,7 +465,7 @@
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
-    'Starting UPLOAD of employee records',
+    'Starting UPLOAD of 1 employee record(s)',
     'Successfully uploaded: RIAE_FS_20210927000000.json',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)',
     '[chan 0] sftp session closed.',
@@ -490,7 +490,6 @@
     'queries': list([
       dict({
         'origin': list([
-          'chunks[utils/iterators.py]',
           'Command.upload[employee_record/management/commands/transfer_employee_records.py]',
           'Command.handle[employee_record/management/commands/transfer_employee_records.py]',
         ]),
@@ -782,6 +781,7 @@
                  AND "employee_record_employeerecord"."status" = %s)
           ORDER BY "employee_record_employeerecord"."updated_at" ASC,
                    "employee_record_employeerecord"."id" ASC
+          LIMIT 700
         ''',
       }),
       dict({
@@ -845,7 +845,7 @@
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
-    'Starting UPLOAD of employee records',
+    'Starting UPLOAD of 1 employee record(s)',
     'Could not upload file: RIAE_FS_20210927000000.json, reason: [Errno 2] No such file',
     'Could not upload file, exiting ...',
     '[chan 0] sftp session closed.',
@@ -857,7 +857,7 @@
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
-    'Starting UPLOAD of employee records',
+    'Starting UPLOAD of 1 employee record(s)',
     'Successfully uploaded: RIAE_FS_20210927000000.json',
     '<EmployeeRecord pk=1234> performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)',
     '[chan 0] sftp session closed.',
@@ -869,7 +869,7 @@
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
-    'Starting UPLOAD of employee records',
+    'No ready employee record found',
     '[chan 0] sftp session closed.',
     'Employee records processing done!',
   ])

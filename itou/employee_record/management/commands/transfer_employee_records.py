@@ -14,7 +14,6 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, Emp
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
-from itou.utils.iterators import chunks
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -171,16 +170,19 @@ class Command(EmployeeRecordTransferCommand):
         """
         Upload a file composed of all ready employee records
         """
-        self.logger.info("Starting UPLOAD of employee records")
-        employee_records_to_send = (
+        # Limit the records to MAX_EMPLOYEE_RECORDS and only send one batch/file:
+        # this is confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
+        # The file naming scheme also disallows creating more than one file in the same seconds.
+        batch = list(
             EmployeeRecord.objects.full_fetch()
             .filter(status=Status.READY, job_application__state=JobApplicationState.ACCEPTED)
-            .order_by("updated_at", "pk")
+            .order_by("updated_at", "pk")[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
         )
-        for batch in chunks(
-            employee_records_to_send, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
-        ):
-            self._upload_batch_file(sftp, batch, dry_run)
+        if not batch:
+            self.logger.info("No ready employee record found")
+            return
+        self.logger.info("Starting UPLOAD of %d employee record(s)", len(batch))
+        self._upload_batch_file(sftp, batch, dry_run)
 
     def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:

@@ -24,10 +24,6 @@ class IgnoreFile(Exception):
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
-    # Limit confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
-    # The file naming scheme also disallows creating more than one file in the same seconds.
-    MAX_UPLOADED_FILES = 1
-
     ATOMIC_HANDLE = False
     AUTO_TRIGGER_CONTEXT = False
 
