@@ -26,6 +26,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -58,7 +59,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
-from itou.www.job_seekers_views.forms import IAE_CONTRACT_ENDING_SOON_DAYS, annotate_last_contract_end_date
+from itou.www.job_seekers_views.forms import annotate_last_contract_end_date
 from itou.www.search_views.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
