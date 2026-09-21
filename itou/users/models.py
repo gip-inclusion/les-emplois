@@ -203,7 +203,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         return result
 
-    def assigned_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
+    def assigned_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None, archived=None):
         """
         Return the ids of job seekers that appear in the user's job seekers list view, using
         JobSeekerAssignment objects.
@@ -217,7 +217,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         - job seekers created by a member of the given organization
         """
 
-        assignments_qs = JobSeekerAssignment.objects.assigned_to(user, organization, from_all_coworkers)
+        assignments_qs = JobSeekerAssignment.objects.assigned_to(user, organization, from_all_coworkers, archived)
 
         if stalled is not None:
             assignments_qs = assignments_qs.filter(
