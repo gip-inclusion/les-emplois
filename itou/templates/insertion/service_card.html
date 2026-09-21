@@ -242,6 +242,7 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Description du service</h2>
                             {% if service.description|wordcount > 30 %}
+                                {# djlint:off H053 collapse-description is used twice because of the way we switch from one to the other #}
                                 <div class="collapse show has-no-transition" id="collapse-description">
                                     <div class="mb-0">{{ service.description|markdownify|truncatewords_html:30 }}</div>
                                     <button class="bs-btn-active-color btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-description" aria-expanded="true" aria-controls="collapse-description">
@@ -251,6 +252,7 @@
                                 <div class="collapse has-no-transition" id="collapse-description">
                                     <div class="mb-0">{{ service.description|markdownify }}</div>
                                 </div>
+                                {# djlint:on H053 #}
                             {% else %}
                                 <p class="mb-0">{{ service.description|markdownify }}</p>
                             {% endif %}
