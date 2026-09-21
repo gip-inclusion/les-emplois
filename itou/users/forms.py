@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
+from itou.users.utils import auto_clear_last_name_if_same_as_birth_name
 from itou.utils import constants as global_constants
 
 
@@ -126,3 +127,7 @@ class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMix
                     accessor = modelfield.attname
                     value = getattr(self.instance.jobseeker_profile, accessor)
                     field.queryset = field.queryset.filter(pk=value)
+
+    def clean(self):
+        super().clean()
+        auto_clear_last_name_if_same_as_birth_name(self)
