@@ -1,0 +1,36 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Action interdite{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Vous ne pouvez pas orienter ce candidat vers cette structure</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="alert alert-warning" role="status">
+                        <p>
+                            Vous souhaitez orienter un candidat depuis votre espace de travail « prescripteur habilité » vers une structure « {{ company.get_kind_display }} » dont vous êtes membre.
+                            Cette situation présente un risque sérieux de conflit d’intérêts et d’atteinte à l’impartialité de l’orientation. C’est pourquoi cette action n’est pas autorisée.
+                        </p>
+                        <p class="mb-0">
+                            <strong>Si vous souhaitez recruter ce candidat</strong>, vous pouvez déclarer directement son embauche depuis l’espace de travail de l’entreprise {{ company.display_name }}, ou demander à un autre prescripteur habilité de l’orienter vers cette structure.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
