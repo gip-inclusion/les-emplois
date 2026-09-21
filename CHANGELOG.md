@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2026-09-21
+
+### Ajouté
+
+- [Annuaire pro (T2) : Feature flag par ville](https://github.com/gip-inclusion/les-emplois/pull/8790)
+- [Fiche salarié : Ajout d'un traitement automatique des erreurs 3437](https://github.com/gip-inclusion/les-emplois/pull/8825)
+- [Insertion : Ajout d’une API pour obtenir les orientations reçues par une structure offreuse de services](https://github.com/gip-inclusion/les-emplois/pull/8773)
+- [Interface : Ajout d'un onglet "Synthèse" pour les prescripteurs habilités](https://github.com/gip-inclusion/les-emplois/pull/8761)
+- [Prescripteur : Mettre en avant la demande de bilan d’accompagnement en fin de contrat](https://github.com/gip-inclusion/les-emplois/pull/8740)
+
+### Modifié
+
+- [Fiche salarié : Correction de la date de dernière transition affichée](https://github.com/gip-inclusion/les-emplois/pull/8823)
+- [Interface : Affichage du bon nombre d'accompagnateurs actuels and anciens](https://github.com/gip-inclusion/les-emplois/pull/8828)
+- [Interface : Mieux expliquer l’absence de résultats de recherche](https://github.com/gip-inclusion/les-emplois/pull/8769)
+- [Les Emplois de l’inclusion deviennent La plateforme de l’inclusion](https://github.com/gip-inclusion/les-emplois/pull/8696)
+- [Statistiques : Améliorer le tracking des actes métiers d'accompagnement](https://github.com/gip-inclusion/les-emplois/pull/8766)
+
+### Tech
+
+- [Tech : Erreurs plus concises pour le job pytest](https://github.com/gip-inclusion/les-emplois/pull/8746)
+- [Tech : Retirer la commande de migration des CV vers le bucket privé](https://github.com/gip-inclusion/les-emplois/pull/8812)
+
 ## 2026-09-14
 
 ### Ajouté
