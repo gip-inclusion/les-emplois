@@ -31,7 +31,7 @@
                                     <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
                                     <ul class="mb-0">
                                         {% for field in form %}
-                                            {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
+                                            {% if field.field.required and not field.value or field.name == "phone" and not field.value %}
                                                 <li>
                                                     <strong>{{ field.label }}</strong>
                                                 </li>

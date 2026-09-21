@@ -13,13 +13,13 @@
         {% fragment as c_title__main %}
             <h1>
                 Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_inverted_full_name }}
-                {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
+                {% include "employee_record/includes/_status.html" with employee_record=employee_record only %}
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
 
     {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-        {% include 'employee_record/includes/_siret_changed_alert.html' with dismissible=True only %}
+        {% include "employee_record/includes/_siret_changed_alert.html" with dismissible=True only %}
     {% endif %}
 {% endblock %}
 

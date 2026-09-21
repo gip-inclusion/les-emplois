@@ -41,7 +41,7 @@
         {% else %}
             <strong>{{ job_application.sender.email }}</strong>
             {% matomo_event "candidature" "clic" "copied_sender_email" as matomo_event_attrs %}
-            {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+            {% include "includes/copy_to_clipboard.html" with content=job_application.sender.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         {% endif %}
     </li>
 
@@ -57,7 +57,7 @@
             <small>Téléphone</small>
             <strong>{{ job_application.sender.phone|format_phone }}</strong>
             {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
-            {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+            {% include "includes/copy_to_clipboard.html" with content=job_application.sender.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         </li>
     {% endif %}
 

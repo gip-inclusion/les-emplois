@@ -287,7 +287,7 @@
                             <li class="d-flex">
                                 <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
                                 <a href="mailto:{{ assessment.created_by.email }}" aria-label="Contact par mail" class="text-break">{{ assessment.created_by.email }}</a>
-                                {% include 'includes/copy_to_clipboard.html' with content=assessment.created_by.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                                {% include "includes/copy_to_clipboard.html" with content=assessment.created_by.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
                             </li>
                         </ul>
                         {% if request.current_organization.kind == InstitutionKind.DDETS_GEIQ and dreets_contact_emails %}
@@ -299,7 +299,7 @@
                                     <li class="d-flex">
                                         <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
                                         <a href="mailto:{{ email }}" aria-label="Contact par mail" class="text-break">{{ email }}</a>
-                                        {% include 'includes/copy_to_clipboard.html' with content=email css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                                        {% include "includes/copy_to_clipboard.html" with content=email css_classes="btn-link fw-medium ms-1" only_icon=True %}
                                     </li>
                                 {% endfor %}
                             </ul>

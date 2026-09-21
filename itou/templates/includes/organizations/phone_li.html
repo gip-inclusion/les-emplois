@@ -2,5 +2,5 @@
 <li>
     <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
     {{ phonenumber|format_phone }}
-    {% include 'includes/copy_to_clipboard.html' with content=phonenumber|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
+    {% include "includes/copy_to_clipboard.html" with content=phonenumber|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
 </li>

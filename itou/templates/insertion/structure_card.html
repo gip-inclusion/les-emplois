@@ -93,7 +93,7 @@
                                 <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
                                 {{ structure.phone|format_phone }}
                             </div>
-                            {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True in_modal=True only %}
+                            {% include "includes/copy_to_clipboard.html" with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True in_modal=True only %}
                         </div>
                     {% endif %}
                     {% if structure.address_on_one_line %}

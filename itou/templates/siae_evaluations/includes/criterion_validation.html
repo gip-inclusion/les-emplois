@@ -14,7 +14,7 @@
     </div>
     {% if can_edit_proof %}
         <div class="d-flex gap-2">
-            {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
+            {% if evaluated_administrative_criteria.review_state == "PENDING" %}
                 <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
                     {% csrf_token %}
                     <button class="btn btn-success btn-sm" aria-label="Accepter ce justificatif">Accepter</button>

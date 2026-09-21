@@ -119,12 +119,12 @@
                                 <li>
                                     <small>Adresse e-mail de l'employeur</small>
                                     <strong>{{ prolongation_request.contact_email }}</strong>
-                                    {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_email css_classes="btn-link" only_icon=True %}
+                                    {% include "includes/copy_to_clipboard.html" with content=prolongation_request.contact_email css_classes="btn-link" only_icon=True %}
                                 </li>
                                 <li>
                                     <small>Téléphone de l'employeur</small>
                                     <strong>{{ prolongation_request.contact_phone|cut:" " }}</strong>
-                                    {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_phone|cut:" " css_classes="btn-link" only_icon=True %}
+                                    {% include "includes/copy_to_clipboard.html" with content=prolongation_request.contact_phone|cut:" " css_classes="btn-link" only_icon=True %}
                                 </li>
                             {% endif %}
                         </ul>
@@ -136,7 +136,7 @@
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}
-                            {% include "includes/organizations/_organization_info.html" with organization=siae company_show_cta=True extra_box_class='mb-3 mb-md-4' only %}
+                            {% include "includes/organizations/_organization_info.html" with organization=siae company_show_cta=True extra_box_class="mb-3 mb-md-4" only %}
                         {% endif %}
                     {% endwith %}
                 </div>
