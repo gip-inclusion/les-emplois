@@ -6,14 +6,13 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import connection
-from django.http import HttpResponseRedirect, JsonResponse, QueryDict
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
-from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
 
 
 def never_cache(get_response):
@@ -178,6 +177,4 @@ def _get_redirect_url(request):
     if user and user.is_authenticated and not user.is_staff:
         return None
 
-    query = QueryDict(request.GET.urlencode(), mutable=True)
-    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
-    return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
+    return f"https://{settings.NEW_DOMAIN}{request.get_full_path()}"
