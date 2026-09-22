@@ -221,7 +221,7 @@ class TestEmailNotification:
             name = "Manageable"
             category = "Manageable"
             subject_template = "layout/base_email_text_subject.txt"
-            body_template = "layout/base_email_text_body.txt"
+            body_template = "layout/base_email_text_body.md"
 
         yield FakeEmailNotification
         notifications_registry.unregister(FakeEmailNotification)

@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur {% brand %} !
+
+**Organisation** :
+
+- Nom : {{ organization.display_name }}
+- SIRET : {{ organization.siret }}
+- Type : {{ organization.kind }}
+
+Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus.
+{% endblock body %}

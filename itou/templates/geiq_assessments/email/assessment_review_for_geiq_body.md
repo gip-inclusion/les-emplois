@@ -1,0 +1,31 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load format_filters %}
+{% load str_filters %}
+{% block body %}
+Bonjour,
+
+Votre bilan d’exécution a été contrôlé par les services de l’État.
+
+Références du dossier :
+
+{{ assessment.label_antenna_names|pluralizefr:"Structure concernée,Structures concernées" }} par la convention :
+{% for antenna_name in assessment.label_antenna_names %}{{ antenna_name }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% with conventionned_institutions=assessment.conventionned_institutions %}
+{{ conventionned_institutions|pluralizefr:"Institution référente sélectionnée,Institutions référentes sélectionnées" }} par le GEIQ :
+{% for conventionned_institution in conventionned_institutions %}{{ conventionned_institution }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% endwith %}
+
+Vous trouverez ci-dessous le récapitulatif de la décision enregistrée par la {{ assessment.reviewed_by_institution.name }}.
+
+IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
+Seule la décision officielle émise par la {{ assessment.reviewed_by_institution.name }} pourra confirmer de manière définitive le montant accordé.
+
+Montant total accordé : {{ assessment.granted_amount|format_decimal_euros }}
+Montant du premier versement déjà réalisé : {{ assessment.advance_amount|format_decimal_euros }}
+Montant {% if assessment.granted_amount >= assessment.advance_amount %}du deuxième versement prévu{% else %}de l’ordre de reversement{% endif %} : {{ abs_balance_amount|format_decimal_euros }}
+
+Commentaire:
+{{ assessment.review_comment }}
+
+Cordialement,
+{% endblock body %}

@@ -212,7 +212,7 @@ class OrganizationAbstract(models.Model):
         """
         to = [user.email]
         subject = "common/emails/add_admin_email_subject.txt"
-        body = "common/emails/add_admin_email_body.txt"
+        body = "common/emails/add_admin_email_body.md"
         documentation_link = self.get_documentation_link()
         context = {"structure": self, "documentation_link": documentation_link, "user": user}
 
@@ -226,7 +226,7 @@ class OrganizationAbstract(models.Model):
         to = [user.email]
         context = {"structure": self, "user": user, "documentation_link": self.get_documentation_link()}
         subject = "common/emails/auto_admin_attribution_email_subject.txt"
-        body = "common/emails/auto_admin_attribution_email_body.txt"
+        body = "common/emails/auto_admin_attribution_email_body.md"
         return get_email_message(to, context, subject, body)
 
     def remove_admin_email(self, user):
@@ -236,7 +236,7 @@ class OrganizationAbstract(models.Model):
         to = [user.email]
         context = {"structure": self}
         subject = "common/emails/remove_admin_email_subject.txt"
-        body = "common/emails/remove_admin_email_body.txt"
+        body = "common/emails/remove_admin_email_body.md"
         return get_email_message(to, context, subject, body)
 
     def member_deactivation_email(self, user):
@@ -246,7 +246,7 @@ class OrganizationAbstract(models.Model):
         to = [user.email]
         context = {"structure": self}
         subject = "common/emails/member_deactivation_email_subject.txt"
-        body = "common/emails/member_deactivation_email_body.txt"
+        body = "common/emails/member_deactivation_email_body.md"
         return get_email_message(to, context, subject, body)
 
     @property

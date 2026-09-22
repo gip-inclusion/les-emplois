@@ -1,0 +1,8 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+
+Candidature transférée
+
+L’employeur de la structure {{ origin_company.display_name }} a transféré votre candidature à la structure {{ target_company.display_name }}.
+
+{% endblock body %}

@@ -15,7 +15,7 @@ class ProlongationRequestCreatedForProfessionalNotification(ProfessionalNotifica
     category = NotificationCategory.IAE_PASS
     can_be_disabled = False
     subject_template = "approvals/email/prolongation_request/created_subject.txt"
-    body_template = "approvals/email/prolongation_request/created_body.txt"
+    body_template = "approvals/email/prolongation_request/created_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -36,7 +36,7 @@ class ProlongationRequestCreatedReminderForProfessionalNotification(Professional
     category = NotificationCategory.IAE_PASS
     can_be_disabled = False
     subject_template = "approvals/email/prolongation_request/created_reminder_subject.txt"
-    body_template = "approvals/email/prolongation_request/created_reminder_body.txt"
+    body_template = "approvals/email/prolongation_request/created_reminder_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -56,7 +56,7 @@ class ProlongationRequestDeniedForProfessionalNotification(ProfessionalNotificat
     name = "Demande de prolongation refusée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/denied/employer_subject.txt"
-    body_template = "approvals/email/prolongation_request/denied/employer_body.txt"
+    body_template = "approvals/email/prolongation_request/denied/employer_body.md"
 
     def is_applicable(self):
         return self.structure and self.structure.kind in CompanyKind.siae_kinds()
@@ -69,7 +69,7 @@ class ProlongationRequestDeniedForJobSeekerNotification(JobSeekerNotification, E
     name = "Demande de prolongation refusée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/denied/jobseeker_subject.txt"
-    body_template = "approvals/email/prolongation_request/denied/jobseeker_body.txt"
+    body_template = "approvals/email/prolongation_request/denied/jobseeker_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -82,7 +82,7 @@ class PassAcceptedProfessionalNotification(ProfessionalNotification, EmailNotifi
     name = "PASS IAE accepté"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/deliver_subject.txt"
-    body_template = "approvals/email/deliver_body.txt"
+    body_template = "approvals/email/deliver_body.md"
 
     def validate_context(self):
         if not self.context["job_application"].approval:
@@ -98,7 +98,7 @@ class ProlongationRequestGrantedForProfessionalNotification(ProfessionalNotifica
     name = "Demande de prolongation acceptée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/employer_subject.txt"
-    body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
+    body_template = "approvals/email/prolongation_request/granted/employer_body.md"
 
     def is_applicable(self):
         return self.structure and self.structure.kind in CompanyKind.siae_kinds()
@@ -109,7 +109,7 @@ class ProlongationRequestGrantedForJobSeekerNotification(JobSeekerNotification, 
     name = "Demande de prolongation acceptée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/jobseeker_subject.txt"
-    body_template = "approvals/email/prolongation_request/granted/jobseeker_body.txt"
+    body_template = "approvals/email/prolongation_request/granted/jobseeker_body.md"
 
 
 @notifications_registry.register
@@ -120,4 +120,4 @@ class ApprovalClosedForJobSeekerNotification(JobSeekerNotification, EmailNotific
     category = NotificationCategory.IAE_PASS
     can_be_disabled = False
     subject_template = "approvals/email/closed/jobseeker_subject.txt"
-    body_template = "approvals/email/closed/jobseeker_body.txt"
+    body_template = "approvals/email/closed/jobseeker_body.md"

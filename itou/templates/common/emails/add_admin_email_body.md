@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour {{ user.get_full_name }},
+
+Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation {{ structure.name }} ({{ structure.kind }}) sur {% brand %}.
+
+{% if documentation_link %}
+Ce statut vous permet d’avoir accès à certaines fonctionnalités, la liste complète est disponible ici : {{ documentation_link }}.
+{% else %}
+Ce statut vous permet de gérer la liste des membres de votre organisation (retirer un collaborateur qui ne travaille plus dans votre organisation, nommer un autre collaborateur en tant qu’administrateur)
+{% endif %}
+
+Pour des raisons de gestion et de sécurité, nous vous invitons à nommer plusieurs administrateurs au sein de votre organisation.
+{% endblock body %}

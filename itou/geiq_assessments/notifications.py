@@ -14,7 +14,7 @@ class AssessmentSubmittedForLaborInspectorNotification(EmailNotification):
     category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_submission_subject.txt"
-    body_template = "geiq_assessments/email/assessment_submission_body.txt"
+    body_template = "geiq_assessments/email/assessment_submission_body.md"
 
 
 @notifications_registry.register
@@ -25,7 +25,7 @@ class AssessmentReviewedForDREETSLaborInspectorNotification(EmailNotification):
     category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_review_for_dreets_subject.txt"
-    body_template = "geiq_assessments/email/assessment_review_for_dreets_body.txt"
+    body_template = "geiq_assessments/email/assessment_review_for_dreets_body.md"
 
 
 @notifications_registry.register
@@ -36,7 +36,7 @@ class AssessmentReviewedForGeiqNotification(EmailNotification):
     category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_review_for_geiq_subject.txt"
-    body_template = "geiq_assessments/email/assessment_review_for_geiq_body.txt"
+    body_template = "geiq_assessments/email/assessment_review_for_geiq_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -68,7 +68,7 @@ class AssessmentFixRequestedForGeiqNotification(EmailNotification):
     category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_fix_requested_for_geiq_subject.txt"
-    body_template = "geiq_assessments/email/assessment_fix_requested_for_geiq_body.txt"
+    body_template = "geiq_assessments/email/assessment_fix_requested_for_geiq_body.md"
 
     def build(self):
         email_message = super().build()
@@ -94,4 +94,4 @@ class AssessmentFixRequestedForInstitutionNotification(EmailNotification):
     category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_fix_requested_for_institution_subject.txt"
-    body_template = "geiq_assessments/email/assessment_fix_requested_for_institution_body.txt"
+    body_template = "geiq_assessments/email/assessment_fix_requested_for_institution_body.md"

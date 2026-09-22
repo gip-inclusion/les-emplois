@@ -10,7 +10,7 @@ class OrganizationActiveMembersReminderNotification(ProfessionalNotification, Em
     name = "Rappel périodique pour s'assurer que les membres de sa structure sont bien actifs et autorisés"
     category = NotificationCategory.MEMBERS_MANAGEMENT
     subject_template = "users/emails/check_authorized_members_email_subject.txt"
-    body_template = "users/emails/check_authorized_members_email_body.txt"
+    body_template = "users/emails/check_authorized_members_email_body.md"
     can_be_disabled = False
 
 
@@ -19,7 +19,7 @@ class JobSeekerCreatedByProxyNotification(EmailNotification):
     name = "Invitation à accéder au compte d'un nouvel utilisateur créé par un tiers"
     category = NotificationCategory.REGISTRATION
     subject_template = "account/email/email_jobseeker_created_by_third_party_subject.txt"
-    body_template = "account/email/email_jobseeker_created_by_third_party_body.txt"
+    body_template = "account/email/email_jobseeker_created_by_third_party_body.md"
     can_be_disabled = False
 
 
@@ -28,7 +28,7 @@ class InactiveUser(EmailNotification):
     name = "Information avant suppression d'un compte utilisateur inactif"
     category = NotificationCategory.DELETION
     subject_template = "account/email/email_inactive_user_subject.txt"
-    body_template = "account/email/email_inactive_user_body.txt"
+    body_template = "account/email/email_inactive_user_body.md"
     can_be_disabled = False
 
 
@@ -37,7 +37,7 @@ class ArchiveUser(EmailNotification):
     name = "Suppression d'un compte utilisateur"
     category = NotificationCategory.DELETION
     subject_template = "account/email/email_archive_user_subject.txt"
-    body_template = "account/email/email_archive_user_body.txt"
+    body_template = "account/email/email_archive_user_body.md"
     can_be_disabled = False
 
 
@@ -46,7 +46,7 @@ class DisablePasswordAuthNotification(EmailNotification):
     name = "Désactivation de l'authentification par mot de passe"
     category = NotificationCategory.ACCOUNT_MANAGEMENT
     subject_template = "account/email/email_disable_password_auth_subject.txt"
-    body_template = "account/email/email_disable_password_auth_body.txt"
+    body_template = "account/email/email_disable_password_auth_body.md"
     can_be_disabled = False
 
     def get_context(self):
@@ -60,7 +60,7 @@ class EditJobSeekerInfoNotification(EmailNotification):
     name = "Modification des informations personnelles d'un candidat"
     category = NotificationCategory.ACCOUNT_MANAGEMENT
     subject_template = "account/email/email_jobseeker_personal_info_edited_subject.txt"
-    body_template = "account/email/email_jobseeker_personal_info_edited_body.txt"
+    body_template = "account/email/email_jobseeker_personal_info_edited_body.md"
     can_be_disabled = False
 
     def get_context(self):
@@ -74,7 +74,7 @@ class EditJobSeekerEmailNotification(EmailNotification):
     name = "Modification des informations personnelles d'un candidat"
     category = NotificationCategory.ACCOUNT_MANAGEMENT
     subject_template = "account/email/email_jobseeker_email_edited_subject.txt"
-    body_template = "account/email/email_jobseeker_email_edited_body.txt"
+    body_template = "account/email/email_jobseeker_email_edited_body.md"
     can_be_disabled = False
 
     def get_context(self):
@@ -95,5 +95,5 @@ class NewAPITokenNotification(EmailNotification):
     name = "Génération d'un nouveau token d’API"
     category = NotificationCategory.SECURITY
     subject_template = "account/email/email_new_API_token_subject.txt"
-    body_template = "account/email/email_new_API_token_body.txt"
+    body_template = "account/email/email_new_API_token_body.md"
     can_be_disabled = False

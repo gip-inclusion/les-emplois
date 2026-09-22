@@ -1,0 +1,10 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour,
+
+L’employeur {{ prolongation_request.declared_by_siae.display_name }} a sollicité un prescripteur habilité de l’organisation {{ prolongation_request.prescriber_organization.display_name }}  pour demander une prolongation de votre PASS IAE.
+
+L’organisation {{ prolongation_request.prescriber_organization.display_name }} a accepté la prolongation du PASS IAE.
+
+Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur {% brand %}.
+{% endblock body %}

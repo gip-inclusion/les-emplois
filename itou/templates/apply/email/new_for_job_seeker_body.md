@@ -1,0 +1,57 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load format_filters %}
+{% load str_filters %}
+{% block body %}
+{% if job_application.is_sent_by_proxy %}
+{{ job_application.sender.get_inverted_full_name }} a envoyé votre candidature chez {{ job_application.to_company.display_name }}.
+Vous et {{ job_application.sender.get_inverted_full_name }} serez tous les deux informés de l'avancement de cette candidature.
+{% else %}
+Candidature chez {{ job_application.to_company.display_name }} envoyée avec succès !
+{% endif %}
+
+**Nom de la structure** : {{ job_application.to_company.display_name }}
+
+{% if job_application.message %}
+
+**Message de candidature** :
+
+{{ job_application.message }}
+
+{% endif %}
+
+{% with jobs=job_application.selected_jobs.all %}
+{% if jobs %}
+
+**{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}** :
+
+{% for job in jobs %}
+- {{ job.display_name }}{% endfor %}
+
+{% endif %}
+{% endwith %}
+
+**Informations transmises à la structure** :
+
+- Nom : {{ job_application.job_seeker.last_name|upper }}
+- Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
+- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
+- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate %}
+- Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}{% endif %}
+{% if job_application.resume_id %}
+- CV en ligne : {{ job_application.resume_link }}
+{% endif %}
+
+{% if job_application.is_sent_by_proxy %}
+--------
+
+**Candidature envoyée par** :
+
+- {{ job_application.sender.get_inverted_full_name }}{% if job_application.sender_prescriber_organization %}
+- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
+
+{% endif %}
+
+---
+Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}
+Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
+{% endblock body %}

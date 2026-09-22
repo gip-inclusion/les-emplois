@@ -63,7 +63,7 @@ def notify_backup_code_has_been_used(user):
         to=[user.email],
         context={"user": user},
         subject="common/emails/used_otp_backup_code_subject.txt",
-        body="common/emails/used_otp_backup_code_body.txt",
+        body="common/emails/used_otp_backup_code_body.md",
     )
     email.send()
 

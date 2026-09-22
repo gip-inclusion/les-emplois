@@ -1,0 +1,30 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load str_filters %}
+{% block body %}
+
+La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} envoyée par {{ job_application.sender.get_inverted_full_name }} chez {{ job_application.to_company.display_name }} n'a malheureusement pas pu aboutir.
+
+{% if job_application.is_refused_due_to_deactivation %}
+Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
+{% endif %}
+
+**Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"transmis,non transmis" }} au candidat** :
+
+{{ job_application.get_refusal_reason_display|default:"Non renseigné" }}
+
+{% if job_application.answer %}
+**Réponse de l'entreprise transmise au candidat** :
+
+{{ job_application.answer }}
+{% endif %}
+
+{% if job_application.answer_to_prescriber %}
+**Message privé de l'entreprise (non transmis au candidat)** :
+
+{{ job_application.answer_to_prescriber }}
+{% endif %}
+
+-----
+
+Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
+{% endblock body %}

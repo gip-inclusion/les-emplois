@@ -1,0 +1,18 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour,
+
+Nous faisons suite à votre demande de PASS IAE pour {{ job_application.job_seeker.get_inverted_full_name }} :
+{{ job_application_url }}
+
+Nous sommes dans l'impossibilité de vous délivrer ce PASS IAE pour le motif suivant :
+
+Délai de carence non respecté, ce candidat a déjà bénéficié d'un parcours IAE il y a moins de 2 ans.
+
+Vous avez la possibilité de contacter un prescripteur habilité pour exposer la situation de votre candidat.
+
+Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_application.job_seeker.get_inverted_full_name }} via {% brand %}. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
+
+Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
+{{ search_url }}
+{% endblock body %}

@@ -484,7 +484,7 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
         signup_magic_link = get_absolute_url(self.signup_magic_link)
         context = {"siae": self, "signup_magic_link": signup_magic_link}
         subject = "companies/email/new_signup_activation_email_to_official_contact_subject.txt"
-        body = "companies/email/new_signup_activation_email_to_official_contact_body.txt"
+        body = "companies/email/new_signup_activation_email_to_official_contact_body.md"
         return get_email_message(to, context, subject, body)
 
     def admin_request_email(self, requesting_user, confirm_url):
@@ -500,7 +500,7 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
             "documentation_link": self.get_documentation_link(),
         }
         subject = "companies/email/admin_request_email_subject.txt"
-        body = "companies/email/admin_request_email_body.txt"
+        body = "companies/email/admin_request_email_body.md"
         return get_email_message(to, context, subject, body)
 
     def get_admin_request_token(self, user):
@@ -515,7 +515,7 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
         to = [self.auth_email]
         context = {"siae": self, "signup_url": get_absolute_url(reverse("signup:company_select"))}
         subject = "companies/email/activate_your_account_subject.txt"
-        body = "companies/email/activate_your_account_body.txt"
+        body = "companies/email/activate_your_account_body.md"
         return get_email_message(to, context, subject, body)
 
     @property

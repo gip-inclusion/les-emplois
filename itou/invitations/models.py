@@ -152,7 +152,7 @@ class InvitationAbstract(models.Model):
             "establishment": self.target,
         }
         subject = "invitations_views/email/invitation_establishment_subject.txt"
-        body = "invitations_views/email/invitation_establishment_body.txt"
+        body = "invitations_views/email/invitation_establishment_body.md"
         return get_email_message(to, context, subject, body)
 
     @property

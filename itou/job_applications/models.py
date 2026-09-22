@@ -1488,7 +1488,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if accepted_by:
             context["accepted_by"] = accepted_by
         subject = "approvals/email/manual_delivery_required_notification_subject.txt"
-        body = "approvals/email/manual_delivery_required_notification_body.txt"
+        body = "approvals/email/manual_delivery_required_notification_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1504,14 +1504,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             "search_url": get_absolute_url(reverse("search:prescribers_home")),
         }
         subject = "approvals/email/refuse_manually_subject.txt"
-        body = "approvals/email/refuse_manually_body.txt"
+        body = "approvals/email/refuse_manually_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
     def email_diagoriente_invite_for_prescriber(self):
         to = [self.sender.email]
         subject = "apply/email/diagoriente_prescriber_invite_subject.txt"
-        body = "apply/email/diagoriente_prescriber_invite_body.txt"
+        body = "apply/email/diagoriente_prescriber_invite_body.md"
         context = {
             "job_application": self,
             "can_view_personal_information": _can_view_personal_information(
@@ -1527,7 +1527,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def email_diagoriente_invite_for_job_seeker(self):
         to = [self.sender.email]
         subject = "apply/email/diagoriente_job_seeker_invite_subject.txt"
-        body = "apply/email/diagoriente_job_seeker_invite_body.txt"
+        body = "apply/email/diagoriente_job_seeker_invite_body.md"
         context = {"job_application": self}
         return get_email_message(to, context, subject, body)
 

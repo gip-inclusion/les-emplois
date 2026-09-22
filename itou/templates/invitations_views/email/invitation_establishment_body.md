@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour {{ first_name|title }} {{ last_name|upper }} !
+
+Vous avez été ajouté(e) à la structure {{ establishment.display_name }} sur {% brand %}. Cliquez sur le lien ci-dessous pour accéder à votre nouvel espace de travail.
+
+{{ acceptance_link }}
+
+{# Don't specify datetime format as it depends on the language. #}
+{# Better relying on the global DATE_FORMAT configuration variable. #}
+Le lien restera valide jusqu'au {{ expiration_date|date }}.
+{% endblock %}

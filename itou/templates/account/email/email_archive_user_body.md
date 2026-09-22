@@ -1,0 +1,16 @@
+{% extends "layout/base_email_text_body.md" %}
+
+{# context
+    user: User
+#}
+
+
+{% block body %}
+Bonjour {{ user.get_full_name }},
+
+Le {{ user.upcoming_deletion_notified_at|date:"d/m/Y" }}, nous vous avons informé que votre compte sur {% brand %} associé à l’email {{ user.email }} serait supprimé.
+
+À ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+
+En cas de besoin, vous pouvez toujours vous réinscrire sur {{ base_url }}
+{% endblock body %}

@@ -10,7 +10,7 @@ class OldJobDescriptionDeactivationNotification(EmailNotification, ProfessionalN
     name = "Désactivation de fiche de poste"
     category = NotificationCategory.JOB_DESCRIPTION
     subject_template = "companies/email/old_job_description_deactivated_subject.txt"
-    body_template = "companies/email/old_job_description_deactivated_body.txt"
+    body_template = "companies/email/old_job_description_deactivated_body.md"
 
 
 @notifications_registry.register
@@ -20,4 +20,4 @@ class SpontaneousJobApplicationsDeactivationNotification(EmailNotification, Prof
     name = "Désactivation des candidatures spontanées"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "companies/email/spontaneous_jobapps_deactivated_subject.txt"
-    body_template = "companies/email/spontaneous_jobapps_deactivated_body.txt"
+    body_template = "companies/email/spontaneous_jobapps_deactivated_body.md"

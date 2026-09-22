@@ -322,7 +322,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         to = [u.email for u in self.active_members]
         context = {"organization": self}
         subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
-        body = "prescribers/email/validated_prescriber_organization_email_body.txt"
+        body = "prescribers/email/validated_prescriber_organization_email_body.md"
         return get_email_message(to, context, subject, body)
 
     def refused_prescriber_organization_email(self):
@@ -333,7 +333,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         to = [u.email for u in self.active_members]
         context = {"organization": self}
         subject = "prescribers/email/refused_prescriber_organization_email_subject.txt"
-        body = "prescribers/email/refused_prescriber_organization_email_body.txt"
+        body = "prescribers/email/refused_prescriber_organization_email_body.md"
         return get_email_message(to, context, subject, body)
 
     def must_validate_prescriber_organization_email(self):
@@ -350,7 +350,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             ),
         }
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
-        body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
+        body = "prescribers/email/must_validate_prescriber_organization_email_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -424,7 +424,7 @@ class PrescriberMembership(MembershipAbstract):
             "invitation_url": get_absolute_url(invitation_url),
         }
         subject = "common/emails/request_for_invitation_subject.txt"
-        body = "common/emails/request_for_invitation_body.txt"
+        body = "common/emails/request_for_invitation_body.md"
         return get_email_message(to, context, subject, body)
 
     def get_organization(self):

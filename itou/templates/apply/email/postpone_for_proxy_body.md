@@ -1,0 +1,17 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load str_filters %}
+{% block body %}
+Bonjour,
+
+La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} au sein de la structure {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }} a été mise en attente par l’employeur.
+
+{% if job_application.answer %}
+Commentaire de l’employeur:
+
+{{ job_application.answer }}
+{% endif %}
+
+-----
+
+Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
+{% endblock body %}
