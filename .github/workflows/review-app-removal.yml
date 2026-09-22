@@ -1,14 +1,9 @@
 name: 🔪 Review app removal
 
-# Run this pipeline when a pull request having the label "1-recette-jetable" is
-# unlabeled or closed.
+# Run this pipeline when a pull request having the label "review-app" is closed.
 on:
   pull_request:
     types: [ unlabeled, closed ]
-
-concurrency:
-  group: review-app-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
 
 env:
   CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
@@ -26,9 +21,7 @@ jobs:
     if: >
       (github.event.action == 'unlabeled' && github.event.label.name == '1-recette-jetable')
       || (github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, '1-recette-jetable'))
-    permissions:
-      contents: read
-      deployments: write
+    permissions: {}
 
     steps:
     - name: 📥 Checkout to the PR branch
@@ -66,20 +59,3 @@ jobs:
     - name: 🗑 Delete the review app database
       run: |
         $CLEVER_CLI addon delete $REVIEW_APP_DB_NAME --org $CLEVER_ORG_ID --yes
-
-    - name: 💤 Deactivate GitHub environment deployments
-      if: always()
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ENVIRONMENT_NAME: recette/pr-${{ github.event.pull_request.number }}
-      run: |
-        encoded_env="${ENVIRONMENT_NAME//\//%2F}"
-        deployment_ids=$(gh api --paginate \
-          "/repos/${{ github.repository }}/deployments?environment=${encoded_env}" \
-          --jq '.[].id')
-        for id in $deployment_ids; do
-          gh api --method POST "/repos/${{ github.repository }}/deployments/${id}/statuses" \
-            -f state=inactive \
-            -f environment="$ENVIRONMENT_NAME" \
-            -f description="Review app removed"
-        done

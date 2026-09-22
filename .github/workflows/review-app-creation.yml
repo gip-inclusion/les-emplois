@@ -9,8 +9,7 @@ on:
     types: [ labeled, synchronize ]
 
 concurrency:
-  group: review-app-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
 
 env:
   CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
@@ -24,12 +23,8 @@ env:
 jobs:
   create:
     runs-on: ubuntu-latest
-    environment:
-      name: recette/pr-${{ github.event.pull_request.number }}
-      url: ${{ steps.deploy-url.outputs.url }}
     permissions:
-      contents: read
-      deployments: write
+      pull-requests: write
     if: github.event.action == 'labeled' && github.event.label.name == '1-recette-jetable'
 
     steps:
@@ -57,10 +52,8 @@ jobs:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
     - name: 🏷 Set deploy url
-      id: deploy-url
-      run: |
-        echo "DEPLOY_URL=${REVIEW_APP_NAME}.cleverapps.io" >> $GITHUB_ENV
-        echo "url=https://${REVIEW_APP_NAME}.cleverapps.io" >> $GITHUB_OUTPUT
+      run:
+        echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME}.cleverapps.io\"`" >> $GITHUB_ENV
     # End of environment variables
 
     - name: 🧫 Create a review app on Clever Cloud
@@ -104,14 +97,14 @@ jobs:
         done
         scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
 
+    - name: 🍻 Add link to pull request
+      run: gh pr comment ${{ github.event.pull_request.number }} --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   redeploy:
     runs-on: ubuntu-latest
-    environment:
-      name: recette/pr-${{ github.event.pull_request.number }}
-      url: ${{ steps.deploy-url.outputs.url }}
-    permissions:
-      contents: read
-      deployments: write
+    permissions: {}
     # A push event targets a new deployment.
     if: github.event.action == 'synchronize' && contains( github.event.pull_request.labels.*.name, '1-recette-jetable')
 
@@ -127,11 +120,6 @@ jobs:
     - name: 🏷 Set review app name
       run:
         echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63 | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
-
-    - name: 🏷 Set deploy url
-      id: deploy-url
-      run:
-        echo "url=https://${REVIEW_APP_NAME}.cleverapps.io" >> $GITHUB_OUTPUT
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
