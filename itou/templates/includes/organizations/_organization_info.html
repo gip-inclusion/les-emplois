@@ -9,11 +9,13 @@
             aria-controls="collapseBoxOrganization">
         <i class="ri-community-line" aria-hidden="true"></i>
         <div>
-            <span data-bs-toggle="tooltip" data-bs-title="{{ organization.get_kind_display }}">{{ organization.kind }}</span>
+            <span data-bs-toggle="tooltip"
+                  data-bs-title="{{ organization.get_kind_display }}">{{ organization.kind }}</span>
             <span class="d-block h3">{{ organization.display_name }}</span>
         </div>
     </button>
-    <div class="c-box--organization__detail collapse{% if show|default:False %} show{% endif %}" id="collapseBoxOrganization">
+    <div class="c-box--organization__detail collapse{% if show|default:False %} show{% endif %}"
+         id="collapseBoxOrganization">
         <hr class="my-4">
         <ul class="c-box--organization__list-contact">
             <li>
@@ -34,7 +36,9 @@
                 {% else %}
                     {% url_add_query company_url job_seeker_public_id=job_seeker.public_id|default:'' as company_url_params %}
                 {% endif %}
-                <a href="{{ company_url_params }}" class="btn btn-secondary btn-block mt-4" {% if open_in_tab|default:False %}target="_blank"{% endif %}>Voir la fiche de l'entreprise</a>
+                <a href="{{ company_url_params }}"
+                   class="btn btn-secondary btn-block mt-4"
+                   {% if open_in_tab|default:False %}target="_blank"{% endif %}>Voir la fiche de l'entreprise</a>
             {% endif %}
         {% endif %}
     </div>

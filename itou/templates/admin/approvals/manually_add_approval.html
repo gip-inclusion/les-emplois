@@ -41,9 +41,8 @@
                 <div class="submit-row">
 
                     <p class="deletelink-box">
-                        <a class="deletelink" href="{% url "admin:approvals_approval_manually_refuse_approval" job_application.id %}">
-                            Refuser
-                        </a>
+                        <a class="deletelink"
+                           href="{% url "admin:approvals_approval_manually_refuse_approval" job_application.id %}">Refuser</a>
                     </p>
 
                     <input type="submit" value="Enregistrer et envoyer par email" class="default">

@@ -12,9 +12,7 @@
 
         <div class="c-form">
             <h2 class="h3">Ce candidat a déjà postulé pour votre entreprise</h2>
-            <p>
-                Nous vous recommandons d'accepter une candidature existante plutôt que d'en créer une nouvelle avec la déclaration d'embauche.
-            </p>
+            <p>Nous vous recommandons d'accepter une candidature existante plutôt que d'en créer une nouvelle avec la déclaration d'embauche.</p>
             {% if prev_applications %}
                 <p>
                     <strong>
@@ -42,7 +40,9 @@
                                     {% endif %}
                                 </b>
                             </span>
-                            <a href="{% url 'apply:start-accept' prev_app.pk %}" class="btn btn-link btn-sm stretched-link" {% matomo_event "candidature" "clic" "acceptation-candidature" %}>Accepter la candidature</a>
+                            <a href="{% url 'apply:start-accept' prev_app.pk %}"
+                               class="btn btn-link btn-sm stretched-link"
+                               {% matomo_event "candidature" "clic" "acceptation-candidature" %}>Accepter la candidature</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -52,9 +52,7 @@
             {% if block_apply %}
                 {% component_alert content=content variant="warning" icon=False %}
                     {% fragment as content %}
-                        <p class="mb-0">
-                            Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
-                        </p>
+                        <p class="mb-0">Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.</p>
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% endif %}

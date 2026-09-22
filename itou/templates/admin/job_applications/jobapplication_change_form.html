@@ -24,7 +24,10 @@
                        {% if not original.can_be_cancelled %} disabled title="Une fiche salarié doit probablement être supprimée avant de pouvoir annuler cette candidature" {% endif %}>
             {% endif %}
             {% if original.state.is_obsolete %}
-                <input type='submit' class="danger js-with-confirm" name="transition_reset" value="Remettre au statut nouveau">
+                <input type='submit'
+                       class="danger js-with-confirm"
+                       name="transition_reset"
+                       value="Remettre au statut nouveau">
             {% endif %}
         </div>
 

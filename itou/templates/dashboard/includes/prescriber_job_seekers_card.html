@@ -28,7 +28,10 @@
             </li>
             {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="https://tally.so/r/w2Ex0M" aria-label="Demander une suspension de PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
+                    <a href="https://tally.so/r/w2Ex0M"
+                       aria-label="Demander une suspension de PASS IAE (ouverture dans un nouvel onglet)"
+                       target="_blank"
+                       class="btn-link btn-ico has-external-link">
                         <i class="ri-pause-circle-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Demander une suspension de PASS IAE</span>
                     </a>
@@ -36,7 +39,9 @@
             {% endif %}
             {% if contracts_ending_soon_count is not None %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'job_seekers_views:list' %}?contract_ending_soon=on" class="btn-link btn-ico" {% matomo_event "dashboard" "clic" "fins-de-contrat" %}>
+                    <a href="{% url 'job_seekers_views:list' %}?contract_ending_soon=on"
+                       class="btn-link btn-ico"
+                       {% matomo_event "dashboard" "clic" "fins-de-contrat" %}>
                         <i class="ri-history-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Fins de contrat de travail</span>
                     </a>
@@ -50,7 +55,9 @@
             {% fragment as extra_boxes %}
                 <div class="c-box bg-warning-lightest border-warning">
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url "job_seekers_views:list" %}?is_stalled=on" class="text-warning fw-bold text-decoration-none btn-ico" {% matomo_event "dashboard" "clic" "candidats-sans-solution" %}>
+                        <a href="{% url "job_seekers_views:list" %}?is_stalled=on"
+                           class="text-warning fw-bold text-decoration-none btn-ico"
+                           {% matomo_event "dashboard" "clic" "candidats-sans-solution" %}>
                             <i class="ri-user-forbid-line fw-normal" aria-hidden="true"></i>
                             <span>Usager{{ stalled_job_seekers_count|pluralizefr }} sans solution</span>
                         </a>

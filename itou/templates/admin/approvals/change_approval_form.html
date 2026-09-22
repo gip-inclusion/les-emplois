@@ -7,7 +7,9 @@
     {% endif %}
     {% if original.is_valid %}
         <li>
-            <form method="post" action="{% url "admin:approvals_approval_terminate_approval" original.pk %}" class="js-with-confirm">
+            <form method="post"
+                  action="{% url "admin:approvals_approval_terminate_approval" original.pk %}"
+                  class="js-with-confirm">
                 {% csrf_token %}
                 <input type="submit" value="Clôturer le PASS" />
             </form>

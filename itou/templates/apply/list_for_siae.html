@@ -9,10 +9,15 @@
 {% block title_content %}
     <div class="c-title">
         <div class="c-title__main">{% include "apply/includes/list_job_applications_title.html" %}</div>
-        <div class="c-title__cta" data-emplois-elements-visibility-on-selection="hidden" role="group" aria-label="Actions sur les candidatures">
+        <div class="c-title__cta"
+             data-emplois-elements-visibility-on-selection="hidden"
+             role="group"
+             aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             {% if can_apply %}
-                <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
+                <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}"
+                   class="btn btn-lg btn-primary btn-ico"
+                   {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
                     <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                     <span>Enregistrer une candidature</span>
                 </a>
@@ -47,11 +52,10 @@
             {% include "apply/includes/selected_job_applications.html" with selected_nb=0 request=request only %}
             <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4" data-emplois-elements-visibility-on-selection="hidden">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4"
+                         data-emplois-elements-visibility-on-selection="hidden">
                         <div class="flex-md-grow-1">{% include "apply/includes/list_counter.html" %}</div>
-                        <div class="flex-column flex-md-row mt-3 mt-md-0">
-                            {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
-                        </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}</div>
                     </div>
                     {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request csrf_token=csrf_token pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind order=order ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                 </div>
@@ -72,5 +76,8 @@
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
-    <script src='{% static "js/nps_popup.js" %}' data-delaypopup="true" data-userkind="employeur" data-page="liste-candidatures"></script>
+    <script src='{% static "js/nps_popup.js" %}'
+            data-delaypopup="true"
+            data-userkind="employeur"
+            data-page="liste-candidatures"></script>
 {% endblock %}

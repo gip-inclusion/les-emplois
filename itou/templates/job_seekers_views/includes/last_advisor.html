@@ -9,7 +9,10 @@
     <div class="d-flex gap-2 justify-content-between mb-3">
         <h3 class="mb-0">Dernier accompagnateur</h3>
         {% if request.from_employer or request.from_prescriber %}
-            <a href="{% url 'job_seekers_views:advisors' job_seeker.public_id %}" class="btn-link" aria-label="Voir tout les accompagnateurs" {% matomo_event "accompagnateur" "clic" "voir_tout" %}>Voir tout</a>
+            <a href="{% url 'job_seekers_views:advisors' job_seeker.public_id %}"
+               class="btn-link"
+               aria-label="Voir tout les accompagnateurs"
+               {% matomo_event "accompagnateur" "clic" "voir_tout" %}>Voir tout</a>
         {% endif %}
     </div>
     {% with assignment=job_seeker.last_assignment %}
@@ -89,7 +92,9 @@
                                     <span>Contacter l’accompagnateur</span>
                                 </div>
                                 <div class="loading-text">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm"
+                                          role="status"
+                                          aria-hidden="true"></span>
                                     <span>Affichage en cours</span>
                                 </div>
                             </button>
@@ -127,9 +132,7 @@
                                     Vous intervenez {% if last_user_assignment %}de nouveau {% endif %}sur le parcours de cet usager ?
                                     <a href="{% url 'job_seekers_views:create_assignment' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                        class="btn-link"
-                                       {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>
-                                        Ajoutez votre intervention
-                                    </a>
+                                       {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>Ajoutez votre intervention</a>
                                 </p>
                             {% endpartialdef %}
                         {% endif %}

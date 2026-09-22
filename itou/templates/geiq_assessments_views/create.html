@@ -63,8 +63,13 @@
                                     {% if form.main_geiq.field.disabled %}
                                         <div class="form-group">
                                             <div class="form-check">
-                                                <input type="checkbox" name="{{ form.main_geiq.name }}" class="form-check-input" disabled id="{{ form.main_geiq.auto_id }}">
-                                                <label class="form-check-label" for="{{ form.main_geiq.auto_id }}">{{ form.main_geiq.field.label }}</label>
+                                                <input type="checkbox"
+                                                       name="{{ form.main_geiq.name }}"
+                                                       class="form-check-input"
+                                                       disabled
+                                                       id="{{ form.main_geiq.auto_id }}">
+                                                <label class="form-check-label"
+                                                       for="{{ form.main_geiq.auto_id }}">{{ form.main_geiq.field.label }}</label>
                                                 <i class="ri-error-warning-line text-info"
                                                    aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
                                                    data-bs-toggle="tooltip"
@@ -79,8 +84,13 @@
                                         {% if field.field.disabled %}
                                             <div class="form-group">
                                                 <div class="form-check">
-                                                    <input type="checkbox" name="{{ field.name }}" class="form-check-input" disabled id="{{ field.auto_id }}">
-                                                    <label class="form-check-label" for="{{ field.auto_id }}">{{ field.field.label }}</label>
+                                                    <input type="checkbox"
+                                                           name="{{ field.name }}"
+                                                           class="form-check-input"
+                                                           disabled
+                                                           id="{{ field.auto_id }}">
+                                                    <label class="form-check-label"
+                                                           for="{{ field.auto_id }}">{{ field.field.label }}</label>
                                                     <i class="ri-error-warning-line text-info"
                                                        aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
                                                        data-bs-toggle="tooltip"

@@ -5,7 +5,10 @@
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
 {% if display_batch_actions %}
-    <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+    <div id="batch-action-box"
+         class="c-box c-box--action selection-indicator"
+         data-emplois-elements-visibility-on-selection="shown"
+         {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
             <div class="form-group col-12 col-lg-auto">
@@ -31,7 +34,9 @@
                         {% for application_id in selected_application_ids %}
                             <input type="hidden" name="application_ids" value="{{ application_id }}" />
                         {% endfor %}
-                        <button type="submit" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" {% matomo_event "candidature" "submit" "batch-refuse-applications-start-wizard" %}>
+                        <button type="submit"
+                                class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
+                                {% matomo_event "candidature" "submit" "batch-refuse-applications-start-wizard" %}>
                             <i class="ri-close-line" aria-hidden="true"></i>
                             <span>Décliner</span>
                         </button>
@@ -51,7 +56,12 @@
             </div>
             <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                 <div class="dropdown">
-                    <button id="other_actions" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                    <button id="other_actions"
+                            class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            data-bs-toggle="dropdown">
                         Autres actions
                         <span class="badge badge-base rounded-pill bg-info text-white ms-2">{{ other_actions_count }}</span>
                     </button>
@@ -121,7 +131,12 @@
                         {% endif %}
                         <hr class="dropdown-divider m-0">
                         {% if can_transfer_internal or can_transfer_external %}
-                            <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    id="transfer_to_button"
+                                    aria-haspopup="true"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#transfer_confirmation_modal">
                                 <i class="ri-arrow-left-right-line me-2"></i>
                                 <span>Transférer vers</span>
                             </button>

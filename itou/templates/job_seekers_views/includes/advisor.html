@@ -152,9 +152,13 @@
                         Connectez-vous à la structure {{ assignment.organization.display_name }} pour modifier {% if assignment.is_active %}ou terminer {% endif %}cet accompagnement.
                     {% endfragment %}
                     {% fragment as c_info__detail %}
-                        <form action="{% url 'dashboard:switch_organization' %}?next_url={{ request.get_full_path|urlencode }}" method="post">
+                        <form action="{% url 'dashboard:switch_organization' %}?next_url={{ request.get_full_path|urlencode }}"
+                              method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-link ps-0" name="organization_key" value="{{ assignment.organization.organization_switch_key }}">Me connecter à cette structure</button>
+                            <button type="submit"
+                                    class="btn btn-sm btn-link ps-0"
+                                    name="organization_key"
+                                    value="{{ assignment.organization.organization_switch_key }}">Me connecter à cette structure</button>
                         </form>
                     {% endfragment %}
                 {% endcomponent_info %}

@@ -10,7 +10,9 @@
     <div class="container py-4 px-5">
         <section class="mt-5">
             <span class="d-block fw-bold">Votre contact en direct :</span>
-            <a target="_blank" href="{{ itou_help_center_url }}" class="d-block text-decoration">{{ itou_help_center_url }}</a>
+            <a target="_blank"
+               href="{{ itou_help_center_url }}"
+               class="d-block text-decoration">{{ itou_help_center_url }}</a>
         </section>
 
         <section class="mt-5">
@@ -73,7 +75,10 @@
 
         <div class="row justify-content-center d-print-none">
             <div class="mt-5 mb-2">
-                <button class="btn btn-primary btn-ico" type="button" data-it-action="print" aria-label="Imprimer le PASS IAE de {{ approval.user.get_inverted_full_name }}">
+                <button class="btn btn-primary btn-ico"
+                        type="button"
+                        data-it-action="print"
+                        aria-label="Imprimer le PASS IAE de {{ approval.user.get_inverted_full_name }}">
                     <i class="ri-printer-line" aria-hidden="true"></i>
                     <span>Imprimer ce PASS IAE</span>
                 </button>

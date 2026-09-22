@@ -11,9 +11,7 @@
         {% endfragment %}
         {% fragment as content %}
             {% if request.current_organization.department in mon_recap_banner_departments %}
-                <p class="mb-0">
-                    Commandez gratuitement des carnets Mon Récap à distribuer aux personnes que vous accompagnez, pour les aider dans leur parcours et faciliter leur démarche.
-                </p>
+                <p class="mb-0">Commandez gratuitement des carnets Mon Récap à distribuer aux personnes que vous accompagnez, pour les aider dans leur parcours et faciliter leur démarche.</p>
             {% else %}
                 <p class="mb-0">
                     Offrez aux personnes que vous accompagnez un carnet pour les aider dans leurs démarches et gagner en autonomie.
@@ -22,7 +20,10 @@
             {% endif %}
         {% endfragment %}
         {% fragment as call_to_action %}
-            <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="{{ MON_RECAP_WWW_BASE_URL }}/commander-carnets/?mtm_campaign=lesemplois&mtm_kwd=commander">Je commande</a>
+            <a class="btn btn-sm btn-primary has-external-link"
+               target="_blank"
+               rel="noopener"
+               href="{{ MON_RECAP_WWW_BASE_URL }}/commander-carnets/?mtm_campaign=lesemplois&mtm_kwd=commander">Je commande</a>
         {% endfragment %}
     {% endcomponent_alert %}
 </div>

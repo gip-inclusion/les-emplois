@@ -19,11 +19,16 @@
                         <span class="visually-hidden">Menu</span>
                     </button>
                     <a href="{% url 'nexus:homepage' %}">
-                        <img src="{% static_theme_images 'nexus/logo-pdi-mini.svg' %}" alt="Nexus - La plateforme de l’inclusion" height="35" width="35">
+                        <img src="{% static_theme_images 'nexus/logo-pdi-mini.svg' %}"
+                             alt="Nexus - La plateforme de l’inclusion"
+                             height="35"
+                             width="35">
                     </a>
                 </div>
                 <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
-                    <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-toggle="tooltip" data-bs-title="{{ user.email }}">
+                    <span class="btn btn-lg btn-ico-only btn-nexus"
+                          data-bs-toggle="tooltip"
+                          data-bs-title="{{ user.email }}">
                         <i class="ri-account-circle-line" aria-hidden="true"></i>
                         <span class="visually-hidden">{{ user_name }}</span>
                     </span>
@@ -48,20 +53,27 @@
                 <div class="d-flex align-items-center mb-1">
                     <strong class="flex-grow-1 mb-0">TABLEAU DE BORD</strong>
                     <div class="d-md-none">
-                        <button type="button" class="btn btn-lg btn-ico-only btn-nexus justify-content-center" data-bs-dismiss="offcanvas" aria-label="Fermer le menu de navigation principale pour mobile">
+                        <button type="button"
+                                class="btn btn-lg btn-ico-only btn-nexus justify-content-center"
+                                data-bs-dismiss="offcanvas"
+                                aria-label="Fermer le menu de navigation principale pour mobile">
                             <i class="ri-close-line" id="close" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
                 <ul>
                     <li>
-                        <a href="{% url 'nexus:homepage' %}" class="btn btn-lg btn-ico btn-nexus{% if menu == 'homepage' %} active{% endif %}" aria-label="Retour à l'accueil">
+                        <a href="{% url 'nexus:homepage' %}"
+                           class="btn btn-lg btn-ico btn-nexus{% if menu == 'homepage' %} active{% endif %}"
+                           aria-label="Retour à l'accueil">
                             <i class="ri-home-line" aria-hidden="true"></i>
                             <span class="d-md-none d-xl-inline-flex">Accueil</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'nexus:structures' %}" class="btn btn-lg btn-ico btn-nexus{% if menu == 'structures' %} active{% endif %}" aria-label="Retour à l'accueil">
+                        <a href="{% url 'nexus:structures' %}"
+                           class="btn btn-lg btn-ico btn-nexus{% if menu == 'structures' %} active{% endif %}"
+                           aria-label="Retour à l'accueil">
                             <i class="ri-community-line" aria-hidden="true"></i>
                             <span class="d-md-none d-xl-inline-flex">Infos structure</span>
                         </a>
@@ -72,8 +84,13 @@
                         <strong>GÉRER MES OFFRES</strong>
                         <ul>
                             <li>
-                                <a href="{% url 'nexus:emplois' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.EMPLOIS %} active{% endif %}" aria-label="Mes offres d’emploi">
-                                    <img src="{% static_theme_images 'nexus/nx-header-logo-emplois.svg' %}" height="40" width="40" alt="">
+                                <a href="{% url 'nexus:emplois' %}"
+                                   class="btn btn-lg btn-logo btn-nexus{% if menu == Service.EMPLOIS %} active{% endif %}"
+                                   aria-label="Mes offres d’emploi">
+                                    <img src="{% static_theme_images 'nexus/nx-header-logo-emplois.svg' %}"
+                                         height="40"
+                                         width="40"
+                                         alt="">
                                     <span class="d-md-none d-xl-inline-flex flex-grow-1">Fiches de poste</span>
                                     {% if emplois_badge_count is not None %}
                                         <span class="badge rounded-pill badge-sm bg-info-lighter text-info">{{ emplois_badge_count }}</span>
@@ -81,14 +98,24 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'nexus:dora' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.DORA %} active{% endif %}" aria-label="Mes services d’insertion">
-                                    <img src="{% static_theme_images 'nexus/nx-header-logo-dora.svg' %}" height="40" width="40" alt="">
+                                <a href="{% url 'nexus:dora' %}"
+                                   class="btn btn-lg btn-logo btn-nexus{% if menu == Service.DORA %} active{% endif %}"
+                                   aria-label="Mes services d’insertion">
+                                    <img src="{% static_theme_images 'nexus/nx-header-logo-dora.svg' %}"
+                                         height="40"
+                                         width="40"
+                                         alt="">
                                     <span class="d-md-none d-xl-inline-flex flex-grow-1">Services d’insertion</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'nexus:marche' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.MARCHE %} active{% endif %}" aria-label="Mon activité commerciale">
-                                    <img src="{% static_theme_images 'nexus/nx-header-logo-marche.svg' %}" height="40" width="40" alt="">
+                                <a href="{% url 'nexus:marche' %}"
+                                   class="btn btn-lg btn-logo btn-nexus{% if menu == Service.MARCHE %} active{% endif %}"
+                                   aria-label="Mon activité commerciale">
+                                    <img src="{% static_theme_images 'nexus/nx-header-logo-marche.svg' %}"
+                                         height="40"
+                                         width="40"
+                                         alt="">
                                     <span class="d-md-none d-xl-inline-flex flex-grow-1">Prestations commerciales</span>
                                 </a>
                             </li>
@@ -99,14 +126,24 @@
                         <strong>TROUVER & ORIENTER</strong>
                         <ul>
                             <li>
-                                <a href="{% url 'search:employers_home' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.EMPLOIS %} active{% endif %}" aria-label="Offres d’emploi">
-                                    <img src="{% static_theme_images 'nexus/nx-header-logo-emplois.svg' %}" height="40" width="40" alt="">
+                                <a href="{% url 'search:employers_home' %}"
+                                   class="btn btn-lg btn-logo btn-nexus{% if menu == Service.EMPLOIS %} active{% endif %}"
+                                   aria-label="Offres d’emploi">
+                                    <img src="{% static_theme_images 'nexus/nx-header-logo-emplois.svg' %}"
+                                         height="40"
+                                         width="40"
+                                         alt="">
                                     <span class="d-md-none d-xl-inline-flex flex-grow-1">Offres d’emploi</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'nexus:dora' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.DORA %} active{% endif %}" aria-label="Mes services d’insertion">
-                                    <img src="{% static_theme_images 'nexus/nx-header-logo-dora.svg' %}" height="40" width="40" alt="">
+                                <a href="{% url 'nexus:dora' %}"
+                                   class="btn btn-lg btn-logo btn-nexus{% if menu == Service.DORA %} active{% endif %}"
+                                   aria-label="Mes services d’insertion">
+                                    <img src="{% static_theme_images 'nexus/nx-header-logo-dora.svg' %}"
+                                         height="40"
+                                         width="40"
+                                         alt="">
                                     <span class="d-md-none d-xl-inline-flex flex-grow-1">Services d’insertion</span>
                                 </a>
                             </li>
@@ -117,14 +154,24 @@
                     <strong>ACCOMPAGNER & SUIVRE</strong>
                     <ul>
                         <li>
-                            <a href="{% url 'nexus:mon_recap' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.MON_RECAP %} active{% endif %}" aria-label="Commande de carnets">
-                                <img src="{% static_theme_images 'nexus/nx-header-logo-monrecap.svg' %}" height="40" width="40" alt="">
+                            <a href="{% url 'nexus:mon_recap' %}"
+                               class="btn btn-lg btn-logo btn-nexus{% if menu == Service.MON_RECAP %} active{% endif %}"
+                               aria-label="Commande de carnets">
+                                <img src="{% static_theme_images 'nexus/nx-header-logo-monrecap.svg' %}"
+                                     height="40"
+                                     width="40"
+                                     alt="">
                                 <span class="d-md-none d-xl-inline-flex flex-grow-1">Commande de carnets</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'nexus:pilotage' %}" class="btn btn-lg btn-logo btn-nexus{% if menu == Service.PILOTAGE %} active{% endif %}" aria-label="Suivi d’activité">
-                                <img src="{% static_theme_images 'nexus/nx-header-logo-pilotage.svg' %}" height="40" width="40" alt="">
+                            <a href="{% url 'nexus:pilotage' %}"
+                               class="btn btn-lg btn-logo btn-nexus{% if menu == Service.PILOTAGE %} active{% endif %}"
+                               aria-label="Suivi d’activité">
+                                <img src="{% static_theme_images 'nexus/nx-header-logo-pilotage.svg' %}"
+                                     height="40"
+                                     width="40"
+                                     alt="">
                                 <span class="d-md-none d-xl-inline-flex flex-grow-1">Suivi d’activité</span>
                             </a>
                         </li>
@@ -135,13 +182,18 @@
                 <hr>
                 <ul>
                     <li>
-                        <span class="btn btn-lg btn-ico btn-nexus" aria-label="Accéder à votre compte" data-bs-toggle="tooltip" data-bs-title="{{ user.email }}">
+                        <span class="btn btn-lg btn-ico btn-nexus"
+                              aria-label="Accéder à votre compte"
+                              data-bs-toggle="tooltip"
+                              data-bs-title="{{ user.email }}">
                             <i class="ri-account-circle-line" aria-hidden="true"></i>
                             <span class="d-md-none d-xl-inline-flex">{{ user_name }}</span>
                         </span>
                     </li>
                     <li>
-                        <a href="{% url 'nexus:contact' %}" class="btn btn-lg btn-ico btn-nexus" aria-label="Besoin d'aide ?">
+                        <a href="{% url 'nexus:contact' %}"
+                           class="btn btn-lg btn-ico btn-nexus"
+                           aria-label="Besoin d'aide ?">
                             <i class="ri-question-line" aria-hidden="true"></i>
                             <span class="d-md-none d-xl-inline-flex">Besoin d'aide ?</span>
                         </a>
@@ -157,10 +209,15 @@
                     </li>
                     <li>
                         <a href="" class="d-none d-md-inline-block d-xl-none ms-1">
-                            <img src="{% static_theme_images 'nexus/logo-pdi-mini.svg' %}" alt="Nexus - La plateforme de l’inclusion" height="35" width="35">
+                            <img src="{% static_theme_images 'nexus/logo-pdi-mini.svg' %}"
+                                 alt="Nexus - La plateforme de l’inclusion"
+                                 height="35"
+                                 width="35">
                         </a>
                         <a href="" class="d-md-none d-xl-inline-block px-1 ms-3">
-                            <img src="{% static_theme_images 'nexus/logo-pdi.svg' %}" alt="Nexus - La plateforme de l’inclusion" height="35">
+                            <img src="{% static_theme_images 'nexus/logo-pdi.svg' %}"
+                                 alt="Nexus - La plateforme de l’inclusion"
+                                 height="35">
                         </a>
                     </li>
                 </ul>

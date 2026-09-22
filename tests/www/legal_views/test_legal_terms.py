@@ -21,7 +21,12 @@ def test_legal_terms_post_updates_timestamp_when_acceptance_required(client):
 
     response = client.get(reverse("legal-terms"))
     assertContains(response, CGU_FORM_BTN)
-    assertContains(response, 'name="terms_slug" required>')  # the checkbox is mandatory
+    latest_terms = get_terms_versions()[0]
+    INPUT_MARKUP = (
+        '<input type="checkbox" id="cgu-acceptance-checkbox" class="form-check-input"'
+        f' value="{latest_terms.slug}" name="terms_slug" required>'
+    )
+    assertContains(response, INPUT_MARKUP, html=True)  # the checkbox is mandatory
 
     next_url = reverse("dashboard:edit_user_info")
     with freeze_time("2024-02-19T10:00:00+01:00"):

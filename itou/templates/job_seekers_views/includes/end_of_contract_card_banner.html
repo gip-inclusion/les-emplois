@@ -21,11 +21,17 @@
         {% endfragment %}
         {% if suggest_next_step_url %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link" href="{{ suggest_next_step_url }}" target="_blank" rel="noopener noreferrer" {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
+                <a class="btn btn-sm btn-primary has-external-link"
+                   href="{{ suggest_next_step_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
             {% endfragment %}
         {% elif pro_support_request_mailto %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary" href="{{ pro_support_request_mailto }}" {% matomo_event "candidat" "clic" "demande-bilan-accompagnement-fiche" %}>Demander un bilan d’accompagnement</a>
+                <a class="btn btn-sm btn-primary"
+                   href="{{ pro_support_request_mailto }}"
+                   {% matomo_event "candidat" "clic" "demande-bilan-accompagnement-fiche" %}>Demander un bilan d’accompagnement</a>
             {% endfragment %}
         {% else %}
             {% fragment as call_to_action %}

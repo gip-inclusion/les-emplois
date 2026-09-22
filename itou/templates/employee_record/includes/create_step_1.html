@@ -22,9 +22,8 @@
                     {% bootstrap_field form.birth_place %}
                     {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
                     {% collapse_field form.lack_of_nir target_id="collapse_ntt" %}
-                    <div id="collapse_ntt" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
-                        {% bootstrap_field form.ntt %}
-                    </div>
+                    <div id="collapse_ntt"
+                         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">{% bootstrap_field form.ntt %}</div>
                     {% if not job_application.job_seeker.jobseeker_profile.nir %}
                         {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoNoNir" opened=True %}
                             {% fragment as c_info__summary %}
@@ -37,7 +36,10 @@
                                     <li>
                                         ou un numéro technique temporaire (NTT) en cochant la case ci-dessus.
                                         Celui-ci peut être généré par votre logiciel de paie ou créé manuellement.
-                                        <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
+                                        <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/"
+                                           class="has-external-link"
+                                           target="_blank"
+                                           rel="noopener">En savoir plus</a>.
                                     </li>
                                 </ul>
                             {% endfragment %}
@@ -51,7 +53,10 @@
                                 <p>Vous pouvez poursuivre la démarche en renseignant un numéro technique temporaire (NTT).</p>
                                 <p class="mt-0">
                                     Ce numéro peut être généré par votre logiciel de paie ou créé manuellement.
-                                    <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
+                                    <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/"
+                                       class="has-external-link"
+                                       target="_blank"
+                                       rel="noopener">En savoir plus</a>.
                                 </p>
                             {% endfragment %}
                         {% endcomponent_info %}

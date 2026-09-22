@@ -14,9 +14,7 @@ Arguments:
 {% endcomment %}
 {% enums "approvals" "Origin" as ApprovalOrigin %}
 <div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_classes }}">
-    <div class="mb-3 mb-md-4">
-        {% approval_state_badge approval in_approval_box=True span_extra_classes="badge-base" %}
-    </div>
+    <div class="mb-3 mb-md-4">{% approval_state_badge approval in_approval_box=True span_extra_classes="badge-base" %}</div>
     <ul class="list-data">
         <li>
             <small>Numéro de PASS IAE</small>
@@ -60,7 +58,9 @@ Arguments:
                 <strong {% if approval.state == "VALID" or approval.state == "FUTURE" %}class="text-success"{% endif %}>
                     {{ approval.get_remainder_display }}
                     <br>
-                    <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
+                    <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche"
+                       class="btn-link has-external-link"
+                       target="_blank">Comment est calculée cette durée ?</a>
                 </strong>
             </li>
         {% endif %}
@@ -80,9 +80,7 @@ Arguments:
                     <ul class="list-data">
                         <li>
                             <small>Demande de prolongation (en attente)</small>
-                            <strong>
-                                du {{ pending_prolongation_request.start_at|date:"d/m/Y" }} au {{ pending_prolongation_request.end_at|date:"d/m/Y" }}
-                            </strong>
+                            <strong>du {{ pending_prolongation_request.start_at|date:"d/m/Y" }} au {{ pending_prolongation_request.end_at|date:"d/m/Y" }}</strong>
                         </li>
                     </ul>
                 {% endif %}
@@ -104,9 +102,7 @@ Arguments:
             {% if approval.user.has_latest_approval_in_waiting_period %}
                 <hr class="my-3 my-md-4">
                 {% if approval.user.has_valid_diagnosis %}
-                    <p class="fs-sm mb-0">
-                        Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
-                    </p>
+                    <p class="fs-sm mb-0">Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.</p>
                     <p class="fs-sm my-0">
                         <a href="{% url 'search:employers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">Vous pouvez désormais travailler dans une structure d’insertion.</a>
                     </p>
@@ -127,7 +123,8 @@ Arguments:
             {% if approval.state == "SUSPENDED" %}
                 {% include "approvals/includes/suspended_pass_info_alert.html" %}
             {% endif %}
-            <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+            <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+               class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
             </a>

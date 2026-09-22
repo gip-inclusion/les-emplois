@@ -2,9 +2,7 @@
 
 <div class="c-box mb-3 mb-md-4">
     <h3>Données</h3>
-    <p>
-        Campagne du {{ evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }}
-    </p>
+    <p>Campagne du {{ evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }}</p>
     <ul class="fs-sm">
         <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
         {% if expected_crits_count %}
@@ -13,7 +11,9 @@
             </li>
         {% endif %}
     </ul>
-    <a target="_blank" href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}" class="btn-link">Revoir
+    <a target="_blank"
+       href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}"
+       class="btn-link">Revoir
         {% if job_apps_count == 1 %}
             l’auto-prescription
         {% else %}

@@ -3,9 +3,11 @@
 
 {% if btn_dropdown_filter|default:False %}
     <div class="dropdown">
-        <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-            Fin de parcours IAE à venir
-        </button>
+        <button type="button"
+                class="btn btn-dropdown-filter dropdown-toggle"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                aria-expanded="false">Fin de parcours IAE à venir</button>
         <ul class="dropdown-menu">
             <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-pass-iae" %}>{% bootstrap_field filters_form.approval_ending_soon wrapper_class="dropdown-item" %}</li>
             <li {% matomo_event "candidat" "clic" "filtre-fin-de-parcours-contrat-iae" %}>{% bootstrap_field filters_form.contract_ending_soon wrapper_class="dropdown-item" %}</li>

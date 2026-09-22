@@ -6,7 +6,11 @@
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
             {% include "insertion/includes/orientations/filters/status.html" with btn_dropdown_filter=True %}
             {% include "insertion/includes/orientations/filters/structures.html" with btn_dropdown_filter=True %}
-            <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+            <button type="button"
+                    class="btn btn-ico btn-dropdown-filter"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasApplyFilters"
+                    aria-controls="offcanvasApplyFilters">
                 <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
                 <span>Tous les filtres <span id="all-filters-btn"></span></span>
             </button>

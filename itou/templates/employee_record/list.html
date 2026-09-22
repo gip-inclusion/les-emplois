@@ -18,12 +18,14 @@
     {% if request.current_organization.can_use_employee_record %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>
-                    PASS IAE
-                </a>
+                <a class="nav-link"
+                   href="{% url 'approvals:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-pass-iae" %}>PASS IAE</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="{% url 'employee_record_views:list' %}" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
+                <a class="nav-link active"
+                   href="{% url 'employee_record_views:list' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
                     <span>Fiches salarié ASP</span>
                     {% if num_rejected_employee_records %}
                         <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
@@ -31,9 +33,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'job_seekers_views:list_organization' %}" {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>
-                    Usagers accompagnés
-                </a>
+                <a class="nav-link"
+                   href="{% url 'job_seekers_views:list_organization' %}"
+                   {% matomo_event "employeurs" "clic" "onglet-accompagnements-siae" %}>Usagers accompagnés</a>
             </li>
         </ul>
     {% endif %}
@@ -63,9 +65,11 @@
                               hx-push-url="true">
                             <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                                 <div class="dropdown">
-                                    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                        Statut
-                                    </button>
+                                    <button type="button"
+                                            class="btn btn-dropdown-filter dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false">Statut</button>
                                     <ul class="dropdown-menu">
                                         {% include "employee_record/includes/employee_record_filters/status.html" with badges=badges form=form request=request only %}
                                     </ul>

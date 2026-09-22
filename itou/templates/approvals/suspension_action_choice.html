@@ -32,13 +32,22 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="action"
+                                           id="endDateRadios"
+                                           value="update_enddate"
+                                           checked>
                                     <label class="form-check-label" for="endDateRadios">
                                         Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="action"
+                                           id="deleteRadios"
+                                           value="delete">
                                     <label class="form-check-label" for="deleteRadios">
                                         Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
                                     </label>
@@ -48,9 +57,7 @@
                         </form>
                     </div>
                 </div>
-                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% approval_details_box approval=suspension.approval version='box_without_link' extra_classes='mb-3 mb-md-4' %}
-                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">{% approval_details_box approval=suspension.approval version='box_without_link' extra_classes='mb-3 mb-md-4' %}</div>
             </div>
         </div>
     </section>

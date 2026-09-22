@@ -17,15 +17,19 @@
 <tr class="align-top">
     {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
         <th scope="row" class="text-start w-50px">
-            <input class="form-check-input" type="checkbox" name="selected-application" value="{{ job_application.pk }}" id="select-{{ job_application.pk }}" autocomplete="off">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="selected-application"
+                   value="{{ job_application.pk }}"
+                   id="select-{{ job_application.pk }}"
+                   autocomplete="off">
             <label class="visually-hidden" for="select-{{ job_application.pk }}">Sélectionner cette candidature</label>
         </th>
     {% endif %}
     {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
         <td>
-            <a class="btn-link d-block" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">
-                {{ job_application.to_company.display_name }}
-            </a>
+            <a class="btn-link d-block"
+               href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">{{ job_application.to_company.display_name }}</a>
             {% job_application_state_badge job_application extra_classes="badge-sm" %}
         </td>
     {% else %}
@@ -110,7 +114,12 @@
                         {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_application.job_seeker eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
                         {% if job_application.job_seeker.has_valid_approval and job_application.job_seeker.latest_approval.state == "SUSPENDED" %}
                             {% partialdef suspended-pass-info %}
-                                <i class="ms-1 ri-information-line text-info" aria-label="{{ suspended_tooltip }}" data-bs-toggle="tooltip" data-bs-title="{{ suspended_tooltip }}" role="button" tabindex="0"></i>
+                                <i class="ms-1 ri-information-line text-info"
+                                   aria-label="{{ suspended_tooltip }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="{{ suspended_tooltip }}"
+                                   role="button"
+                                   tabindex="0"></i>
                             {% endpartialdef %}
                             {% if request.from_employer %}
                                 {% with suspended_tooltip="Vous pouvez embaucher ce candidat. Le PASS IAE se réactivera automatiquement à la déclaration d'une nouvelle embauche." %}
@@ -167,7 +176,8 @@
                data-bs-toggle="tooltip"
                data-bs-title="Voir sa candidature"
                {% matomo_event "candidature" "clic" "voir_candidature_prescripteur" %}>
-                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+                <i class="ri-arrow-drop-right-line fs-lg"
+                   aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
             </a>
         {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
             <a class="btn btn-sm btn-link btn-ico-only"
@@ -175,10 +185,14 @@
                data-bs-toggle="tooltip"
                data-bs-title="Voir sa candidature"
                {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
-                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+                <i class="ri-arrow-drop-right-line fs-lg"
+                   aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
             </a>
         {% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
-            <a class="btn btn-sm btn-link btn-ico-only" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" data-bs-toggle="tooltip" data-bs-title="Voir ma candidature">
+            <a class="btn btn-sm btn-link btn-ico-only"
+               href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+               data-bs-toggle="tooltip"
+               data-bs-title="Voir ma candidature">
                 <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir ma candidature"></i>
             </a>
         {% endif %}

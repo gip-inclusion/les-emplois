@@ -27,7 +27,10 @@
 {% endblock %}
 
 {% block title_extra %}
-    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true" aria-labelledby="structure-tabs-title">
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0"
+        role="tablist"
+        data-it-sliding-tabs="true"
+        aria-labelledby="structure-tabs-title">
         <li class="nav-item" role="presentation">
             <a id="structure-description-tab"
                class="nav-link active"
@@ -69,7 +72,12 @@
 
 {% block modals %}
     {{ block.super }}
-    <div class="modal fade" id="structure-contact-modal" tabindex="-1" aria-labelledby="structure-contact-modal-label" aria-modal="true" role="dialog">
+    <div class="modal fade"
+         id="structure-contact-modal"
+         tabindex="-1"
+         aria-labelledby="structure-contact-modal-label"
+         aria-modal="true"
+         role="dialog">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -81,7 +89,9 @@
                         <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
                             <div class="d-flex align-items-start overflow-hidden me-2">
                                 <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                <a href="mailto:{{ structure.email }}" aria-label="Contact par mail" class="text-break">{{ structure.email }}</a>
+                                <a href="mailto:{{ structure.email }}"
+                                   aria-label="Contact par mail"
+                                   class="text-break">{{ structure.email }}</a>
                             </div>
                             {% matomo_event "fiche-structure" "clic" "copier-email-contact" as matomo_event_attrs %}
                             {% include "includes/copy_to_clipboard.html" with content=structure.email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l’adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}

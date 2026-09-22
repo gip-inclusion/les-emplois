@@ -18,7 +18,10 @@
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if is_employer_with_accepted_application %}
-                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-ico btn-secondary" rel="noopener" target="_blank">
+                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}"
+                   class="btn btn-lg btn-ico btn-secondary"
+                   rel="noopener"
+                   target="_blank">
                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                     <span>Afficher l’attestation</span>
                 </a>
@@ -50,12 +53,12 @@
     {% if can_view_contracts %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
             <li class="nav-item">
-                <a class="nav-link{% if active_tab == "details" %} active{% endif %}" href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ back_url|urlencode }}">
-                    Vue d'ensemble
-                </a>
+                <a class="nav-link{% if active_tab == "details" %} active{% endif %}"
+                   href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ back_url|urlencode }}">Vue d'ensemble</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link{% if active_tab == "contracts" %} active{% endif %}" href="{% url 'approvals:contracts' public_id=approval.public_id %}?back_url={{ back_url|urlencode }}">
+                <a class="nav-link{% if active_tab == "contracts" %} active{% endif %}"
+                   href="{% url 'approvals:contracts' public_id=approval.public_id %}?back_url={{ back_url|urlencode }}">
                     Suivi des contrats IAE
                 </a>
             </li>

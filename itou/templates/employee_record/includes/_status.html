@@ -1,21 +1,15 @@
 {% if employee_record.status == "NEW" %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi">Nouvelle à compléter</span>
 {% elif employee_record.status == "SENT" %}
-    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-warning">
-        Envoyée à l'ASP le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
-    </span>
+    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-warning">Envoyée à l'ASP le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
 {% elif employee_record.status == "REJECTED" %}
-    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-danger">
-        Retour en erreur le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
-    </span>
+    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-danger">Retour en erreur le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
 {% elif employee_record.status == "PROCESSED" %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-success">
         Intégrée par l'ASP le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "READY" %}
-    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-secondary">
-        Complétée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
-    </span>
+    <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-secondary">Complétée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
 {% elif employee_record.status == "DISABLED" %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Désactivée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}

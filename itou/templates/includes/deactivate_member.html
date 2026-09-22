@@ -19,18 +19,14 @@
             {% if request.from_prescriber %}
                 <li>Les candidatures effectuées par cet utilisateur resteront dans le tableau de bord de votre {{ org_display }}.</li>
             {% else %}
-                <li>
-                    Les modifications et ajouts réalisés par cet utilisateur seront toujours accessibles par les autres membres de votre {{ org_display }}.
-                </li>
+                <li>Les modifications et ajouts réalisés par cet utilisateur seront toujours accessibles par les autres membres de votre {{ org_display }}.</li>
             {% endif %}
             {% if request.from_prescriber %}
                 <li>Cet utilisateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.</li>
             {% else %}
                 <li>Cet utilisateur continuera de recevoir ses notifications e-mail.</li>
             {% endif %}
-            <li>
-                Toutes les notifications emails envoyées à cet utilisateur seront également envoyées aux administrateurs de votre {{ org_display }}.
-            </li>
+            <li>Toutes les notifications emails envoyées à cet utilisateur seront également envoyées aux administrateurs de votre {{ org_display }}.</li>
         </ul>
         <p>En cas d'erreur, vous pourrez toujours l'ajouter à nouveau afin qu'il rejoigne votre {{ org_display }}.</p>
     {% endwith %}

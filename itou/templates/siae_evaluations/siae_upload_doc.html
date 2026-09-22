@@ -18,9 +18,7 @@
                 Ajouter un justificatif
                 {% evaluated_job_application_state_display evaluated_administrative_criteria.evaluated_job_application %}
             </h1>
-            <p>
-                {{ evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}
-            </p>
+            <p>{{ evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -34,11 +32,14 @@
                         {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
                         {% if evaluated_administrative_criteria.proof_id %}
                             <div class="mt-3">
-                                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
+                                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
+                                   target="_blank">Visualiser le justificatif précédemment téléversé</a>
                             </div>
                         {% endif %}
                         <div class="mt-3">
-                            <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                            <form method="post"
+                                  class="js-prevent-multiple-submit"
+                                  {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                                 {% csrf_token %}
                                 {% bootstrap_form form alert_error_type="all" %}
                                 <div class="mt-3 alert alert-info" role="status">

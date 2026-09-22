@@ -182,7 +182,9 @@ class TestRdvInsertionAppointmentsList:
     def test_appointments_tab_should_display_upcoming_appointments(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
-        assertContains(response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">1</span>')
+        assertContains(
+            response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">1</span>', html=True
+        )
 
         # Past participation
         ParticipationFactory(
@@ -202,7 +204,9 @@ class TestRdvInsertionAppointmentsList:
         )
 
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
-        assertContains(response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">2</span>')
+        assertContains(
+            response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">2</span>', html=True
+        )
 
         # Delete appointments
         self.job_application.job_seeker.rdvi_appointments.all().delete()

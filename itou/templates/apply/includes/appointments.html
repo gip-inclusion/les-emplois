@@ -29,15 +29,30 @@
                         <td>{{ participation.appointment.start_at }}</td>
                         <td>{{ participation.appointment.reason }}</td>
                         <td id="participation-{{ participation.pk }}-row" class="text-end w-50px">
-                            <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal" {% matomo_event "candidature" "clic" "visualisation-rdv" %}>
-                                <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Voir" aria-label="Voir la participation commençant à {{ participation.appointment.start_at }}"></i>
+                            <button type="button"
+                                    class="btn btn-sm btn-link btn-ico-only"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#participation-{{ participation.pk }}-modal"
+                                    {% matomo_event "candidature" "clic" "visualisation-rdv" %}>
+                                <i class="ri-search-line"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir"
+                                   aria-label="Voir la participation commençant à {{ participation.appointment.start_at }}"></i>
                             </button>
-                            <div class="modal modal--mini fade text-start" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
+                            <div class="modal modal--mini fade text-start"
+                                 id="participation-{{ participation.pk }}-modal"
+                                 tabindex="-1"
+                                 aria-labelledby="participation-{{ participation.pk }}-modal-title"
+                                 aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h3 class="modal-title" id="participation-{{ participation.pk }}-modal-title">Détails du rendez-vous</h3>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            <h3 class="modal-title"
+                                                id="participation-{{ participation.pk }}-modal-title">Détails du rendez-vous</h3>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Fermer"></button>
                                         </div>
                                         <div class="modal-body">
                                             <p>

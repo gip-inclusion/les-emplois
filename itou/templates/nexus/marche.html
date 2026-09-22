@@ -7,7 +7,10 @@
 {% block title %}Prestations commerciales {{ block.super }}{% endblock %}
 
 {% block service_title %}
-    <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" width="35" alt="Le marché de l’inclusion">
+    <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}"
+         height="35"
+         width="35"
+         alt="Le marché de l’inclusion">
     Prestations commerciales
 {% endblock %}
 
@@ -28,11 +31,16 @@
         Développez votre activité commerciale.
     </p>
     {% if Service.MARCHE in activated_services %}
-        <a href="{{ marche_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.MARCHE %} target="_blank">
+        <a href="{{ marche_url }}"
+           class="btn btn-lg btn-primary has-external-link"
+           {% matomo_event "nexus" "acceder-service" Service.MARCHE %}
+           target="_blank">
             <span>Accéder à mon tableau de bord</span>
         </a>
     {% else %}
-        <a href="{{ marche_url }}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+        <a href="{{ marche_url }}"
+           class="btn btn-lg btn-ico btn-primary"
+           {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
             <i class="ri-toggle-line" aria-hidden="true"></i>
             <span>Activer ce service</span>
         </a>

@@ -36,8 +36,12 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-md-1 pe-xxl-5">
                     <div class="c-stepper mb-3 mb-md-4">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                            </div>
+                            <div class="progress-bar progress-bar-{{ progress }}"
+                                 role="progressbar"
+                                 aria-valuenow="{{ progress }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-labelledby="currentProgressState"></div>
                         </div>
                         <p id="currentProgressState">
                             {% block progress_title %}{% endblock %}
@@ -59,7 +63,9 @@
                             {% endcomponent_alert %}
                         {% endif %}
                         {% bootstrap_form_errors form type="all" %}
-                        <form method="post" class="js-collapsable-subfields js-format-nir"{% if matomo_form_name|default:"" %} data-matomo-name="{{ matomo_form_name }}"{% endif %}>
+                        <form method="post"
+                              class="js-collapsable-subfields js-format-nir"
+                              {% if matomo_form_name|default:"" %} data-matomo-name="{{ matomo_form_name }}"{% endif %}>
                             {% csrf_token %}
 
                             {% block form_content %}{% endblock %}

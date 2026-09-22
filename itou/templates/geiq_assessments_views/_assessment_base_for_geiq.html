@@ -14,7 +14,10 @@
             <h1>Bilan d’exécution - {{ assessment.name_for_geiq }} {% state_for_geiq assessment extra_classes="badge-base" %}</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
-            <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+            <button class="btn btn-lg btn-ico-only btn-link"
+                    type="button"
+                    data-it-action="print"
+                    aria-label="Imprimer la page">
                 <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
             </button>
         {% endfragment %}
@@ -24,13 +27,15 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link{% if active_tab == active_tab.MAIN %} active{% endif %}" href="{% url 'geiq_assessments_views:details_for_geiq' pk=assessment.pk %}">{{ active_tab.MAIN.label }}</a>
+            <a class="nav-link{% if active_tab == active_tab.MAIN %} active{% endif %}"
+               href="{% url 'geiq_assessments_views:details_for_geiq' pk=assessment.pk %}">{{ active_tab.MAIN.label }}</a>
         </li>
         {% include "geiq_assessments_views/includes/assessment_kpi_tab.html" with active_tab=active_tab assessment=assessment request_htmx=False only %}
 
         {% if assessment.final_reviewed_at %}
             <li class="nav-item">
-                <a class="nav-link{% if active_tab == active_tab.RESULT %} active{% endif %}" href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">{{ active_tab.RESULT.label }}</a>
+                <a class="nav-link{% if active_tab == active_tab.RESULT %} active{% endif %}"
+                   href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">{{ active_tab.RESULT.label }}</a>
             </li>
         {% endif %}
     </ul>

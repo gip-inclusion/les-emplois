@@ -1,11 +1,17 @@
 {% load str_filters %}
 
 {% if selected_nb %}
-    <div id="selected-nb-display" class="s-section__row row" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+    <div id="selected-nb-display"
+         class="s-section__row row"
+         data-emplois-elements-visibility-on-selection="shown"
+         {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <div class="col-12">
             <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
                 <p class="mb-0">{{ selected_nb }} {{ selected_nb|pluralizefr:"résultat sélectionné,résultats sélectionnés" }}</p>
-                <button type="reset" class="btn btn-link btn-ico btn-sm" data-emplois-setter-target="#select-all-applications" data-emplois-setter-checked="false">
+                <button type="reset"
+                        class="btn btn-link btn-ico btn-sm"
+                        data-emplois-setter-target="#select-all-applications"
+                        data-emplois-setter-checked="false">
                     <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                     <span>annuler la sélection</span>
                 </button>

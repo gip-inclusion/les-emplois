@@ -12,6 +12,7 @@ Arguments:
                name="{{ field.name }}"
                {% if field.value %}checked{% endif %}
                {% if id_suffix|default:"" %}data-emplois-sync-with="{{ field.id_for_label }}"{% endif %}>
-        <label class="form-check-label" for="{{ field.id_for_label }}{{ id_suffix|default:'' }}">{{ field.label }}</label>
+        <label class="form-check-label"
+               for="{{ field.id_for_label }}{{ id_suffix|default:'' }}">{{ field.label }}</label>
     </div>
 </div>

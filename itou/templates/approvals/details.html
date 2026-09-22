@@ -18,7 +18,9 @@
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                             <h2 class="h3">Suspensions</h2>
                             {% if is_employer_with_accepted_application %}
-                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                <div class="d-flex flex-column flex-md-row gap-3"
+                                     role="group"
+                                     aria-label="Actions sur le PASS IAE">
                                     {% if can_be_suspended_by_current_user %}
                                         <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"
@@ -85,8 +87,12 @@
                                                             <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                                                             <span class="visually-hidden">Modifier la suspension</span>
                                                         </a>
-                                                        <a class="btn btn-sm btn-link btn-ico-only" href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                                            <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer la suspension" aria-label="Supprimer la suspension"></i>
+                                                        <a class="btn btn-sm btn-link btn-ico-only"
+                                                           href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                                            <i class="ri-delete-bin-line"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-title="Supprimer la suspension"
+                                                               aria-label="Supprimer la suspension"></i>
                                                         </a>
                                                     {% endif %}
                                                 </td>
@@ -124,7 +130,9 @@
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                             <h2 class="h3">Prolongations</h2>
                             {% if is_employer_with_accepted_application %}
-                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                <div class="d-flex flex-column flex-md-row gap-3"
+                                     role="group"
+                                     aria-label="Actions sur le PASS IAE">
                                     {% if can_be_prolonged_by_current_user %}
                                         <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"

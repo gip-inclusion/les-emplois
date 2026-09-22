@@ -757,7 +757,7 @@ class TestStandaloneCreateAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % from_url)
+        assertContains(response, LINK_RESET_MARKUP % from_url, html=True)
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
 

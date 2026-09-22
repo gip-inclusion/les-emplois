@@ -8,7 +8,10 @@
         <div class="submit-row" id="employee-record-transitions">
             <p>Changer l'état de la fiche salarié :</p>
             {% for transition in available_transitions %}
-                <input type='submit' class="danger js-with-confirm" name="transition_{{ transition.name }}" value="{{ transition.target.title }}">
+                <input type='submit'
+                       class="danger js-with-confirm"
+                       name="transition_{{ transition.name }}"
+                       value="{{ transition.target.title }}">
             {% endfor %}
         </div>
 

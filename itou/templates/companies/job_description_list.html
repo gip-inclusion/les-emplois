@@ -18,19 +18,19 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'companies_views:overview' %}" {% matomo_event "employeurs" "clic" "structure-presentation" %}>
-                Fiche de présentation
-            </a>
+            <a class="nav-link"
+               href="{% url 'companies_views:overview' %}"
+               {% matomo_event "employeurs" "clic" "structure-presentation" %}>Fiche de présentation</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "fiches-de-postes" %}>
-                Fiches de postes
-            </a>
+            <a class="nav-link active"
+               href="{% url 'companies_views:job_description_list' %}"
+               {% matomo_event "employeurs" "clic" "fiches-de-postes" %}>Fiches de postes</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
-                Collaborateurs
-            </a>
+            <a class="nav-link"
+               href="{% url 'companies_views:members' %}"
+               {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>Collaborateurs</a>
         </li>
         {% if can_show_financial_annexes %}
             <li class="nav-item">
@@ -48,11 +48,15 @@
                     <div class="tab-content">
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Fiches de postes</h2>
-                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les candidatures">
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end"
+                                 role="group"
+                                 aria-label="Actions sur les candidatures">
                                 <form method="post" id="block_job_applications_form" hx-boost="true">
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="block_job_applications" />
-                                    <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
+                                    <input type="hidden"
+                                           name="block_job_applications"
+                                           value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
                                     <button type="submit" class="d-block w-100 btn btn-secondary btn-ico">
                                         {% if siae.block_job_applications %}
                                             <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
@@ -63,15 +67,15 @@
                                         {% endif %}
                                     </button>
                                 </form>
-                                <a class="btn btn-primary btn-ico" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
+                                <a class="btn btn-primary btn-ico"
+                                   href="{% url "companies_views:edit_job_description" %}"
+                                   {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
                                     <i class="ri-add-line ri-lg" aria-hidden="true"></i>
                                     <span>Créer une nouvelle fiche de poste</span>
                                 </a>
                             </div>
                         </div>
-                        <p class="mb-0">
-                            {{ job_pager.paginator.count }} {{ job_pager.paginator.count|pluralizefr:"métier exercé,métiers exercés" }}
-                        </p>
+                        <p class="mb-0">{{ job_pager.paginator.count }} {{ job_pager.paginator.count|pluralizefr:"métier exercé,métiers exercés" }}</p>
                         <div class="table-responsive mt-3 mt-md-4">
                             <table class="table table-hover">
                                 <caption class="visually-hidden">Liste des métiers exercés</caption>
@@ -114,9 +118,7 @@
                                                    class="btn-link"
                                                    {% matomo_event "candidature" "clic" "clic-metiers" %}
                                                    aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
-                                                   title="{{ job_description.display_name }}">
-                                                    {{ job_description.display_name|truncatechars:50 }}
-                                                </a>
+                                                   title="{{ job_description.display_name }}">{{ job_description.display_name|truncatechars:50 }}</a>
                                             </td>
                                             <td>
                                                 <span class="d-flex align-items-center">
@@ -127,10 +129,16 @@
                                             <td>{{ job_description.open_positions }}</td>
                                             <td>
                                                 {# Change job description status form #}
-                                                <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
+                                                <form method="post"
+                                                      hx-boost="true"
+                                                      hx-trigger="change"
+                                                      id="toggle_job_description_form_{{ job_description.id }}"
+                                                      class="js-prevent-multiple-submit">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="toggle_active" />
-                                                    <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
+                                                    <input type="hidden"
+                                                           name="job_description_id"
+                                                           value="{{ job_description.id }}" />
                                                     <div class="form-check form-switch has-state-label">
                                                         <input type="checkbox"
                                                                class="form-check-input"
@@ -138,8 +146,10 @@
                                                                id="job_description_is_active_{{ job_description.id }}"
                                                                {% if job_description.is_active %}checked{% endif %}
                                                                {% if siae.block_job_applications %}disabled{% endif %} />
-                                                        <label class="form-check-label" for="job_description_is_active_{{ job_description.id }}" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert">
-                                                        </label>
+                                                        <label class="form-check-label"
+                                                               for="job_description_is_active_{{ job_description.id }}"
+                                                               data-it-state-label-off="Fermé"
+                                                               data-it-state-label-on="Ouvert"></label>
                                                     </div>
                                                 </form>
                                             </td>
@@ -148,16 +158,30 @@
                                             </td>
                                             <td class="w-100px">
                                                 {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=False job_description=job_description csrf_token=csrf_token request=request only %}
-                                                <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
-                                                    <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
+                                                <button class="btn btn-sm btn-link btn-ico-only"
+                                                        type="button"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#_delete_modal_{{ job_description.id }}">
+                                                    <i class="ri-delete-bin-line"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="Supprimer"
+                                                       aria-label="Supprimer ce métier"></i>
                                                 </button>
                                                 {# Modal for job description deletion #}
-                                                <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModal{{ job_description.id }}" aria-hidden="true">
+                                                <div id="_delete_modal_{{ job_description.id }}"
+                                                     class="modal fade"
+                                                     tabindex="-1"
+                                                     aria-labelledby="confirmDeleteModal{{ job_description.id }}"
+                                                     aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h3 class="modal-title" id="confirmDeleteModal{{ job_description.id }}">Supprimer la fiche de poste</h3>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                                                <h3 class="modal-title"
+                                                                    id="confirmDeleteModal{{ job_description.id }}">Supprimer la fiche de poste</h3>
+                                                                <button type="button"
+                                                                        class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Fermer"></button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <p>
@@ -165,15 +189,23 @@
                                                                 </p>
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <form method="post" hx-boost="true" class="d-block js-prevent-multiple-submit">
+                                                                <form method="post"
+                                                                      hx-boost="true"
+                                                                      class="d-block js-prevent-multiple-submit">
                                                                     {% csrf_token %}
                                                                     <input type="hidden" name="action" value="delete" />
-                                                                    <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de la fiche de poste" type="button">
-                                                                        Annuler
-                                                                    </button>
-                                                                    <button type="submit" class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
-                                                                        <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
+                                                                    <input type="hidden"
+                                                                           name="job_description_id"
+                                                                           value="{{ job_description.id }}" />
+                                                                    <button class="btn btn-outline-primary btn-sm"
+                                                                            data-bs-dismiss="modal"
+                                                                            aria-label="Annuler la suppression de la fiche de poste"
+                                                                            type="button">Annuler</button>
+                                                                    <button type="submit"
+                                                                            class="btn btn-sm btn-ico btn-danger"
+                                                                            aria-label="Supprimer la fiche de poste">
+                                                                        <i class="ri-delete-bin-line fw-normal"
+                                                                           aria-hidden="true"></i>
                                                                         <span>Supprimer</span>
                                                                     </button>
                                                                 </form>

@@ -13,7 +13,8 @@
             </p>
         </div>
         <div class="w-100 w-md-50 text-center text-md-end mt-3 mt-md-0">
-            <form method="post" action="{% url 'apply:send_diagoriente_invite' job_application_id=job_application.id %}">
+            <form method="post"
+                  action="{% url 'apply:send_diagoriente_invite' job_application_id=job_application.id %}">
                 {% csrf_token %}
                 {% bootstrap_button "Inviter à créer un CV avec Diagoriente" button_type="submit" button_class="btn btn-partner btn-partner--diagoriente fs-sm" %}
             </form>

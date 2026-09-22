@@ -89,9 +89,7 @@
                             <p class="mb-2">
                                 <strong>Information</strong>
                             </p>
-                            <p class="mb-0">
-                                En cas d’embauche, l’employeur se chargera de valider l’éligibilité à un accompagnement par le GEIQ.
-                            </p>
+                            <p class="mb-0">En cas d’embauche, l’employeur se chargera de valider l’éligibilité à un accompagnement par le GEIQ.</p>
                         {% elif request.user.is_job_seeker %}
                             <p class="mb-2">
                                 <strong>Information</strong>
@@ -130,7 +128,11 @@
                 {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
-                        <a class="has-external-link" href="{{ ITOU_DIAGNOSTIC_URL }}" target="_blank" rel="noreferrer noopener" aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                        <a class="has-external-link"
+                           href="{{ ITOU_DIAGNOSTIC_URL }}"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
@@ -151,7 +153,11 @@
                 {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
-                        <a class="has-external-link" href="{{ ITOU_DIAGNOSTIC_URL }}" target="_blank" rel="noreferrer noopener" aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                        <a class="has-external-link"
+                           href="{{ ITOU_DIAGNOSTIC_URL }}"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
@@ -201,9 +207,7 @@
                 Le CV est fortement recommandé
             {% endfragment %}
             {% fragment as content %}
-                <p class="mb-0">
-                    L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
-                </p>
+                <p class="mb-0">L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.</p>
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}

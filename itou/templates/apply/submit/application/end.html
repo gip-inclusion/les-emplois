@@ -41,14 +41,18 @@
                                 {% endif %}
                             </b>
                         </p>
-                        <div id="informations" {% if form.is_bound %}class="d-none"{% endif %} data-swap-element-with=".c-form">
+                        <div id="informations"
+                             {% if form.is_bound %}class="d-none"{% endif %}
+                             data-swap-element-with=".c-form">
                             <div class="c-box c-box--results has-links-inside">
                                 <div class="c-box--results__header d-flex flex-row align-items-center">
                                     <h3 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_inverted_full_name }}</h3>
                                     {% if request.user.is_job_seeker %}
-                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url 'dashboard:edit_user_info' %}">Modifier</a>
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto"
+                                           href="{% url 'dashboard:edit_user_info' %}">Modifier</a>
                                     {% elif can_edit_personal_information %}
-                                        <span class="btn btn-primary btn-block w-100 w-md-auto" data-swap-element="#informations">Modifier</span>
+                                        <span class="btn btn-primary btn-block w-100 w-md-auto"
+                                              data-swap-element="#informations">Modifier</span>
                                     {% endif %}
                                 </div>
                                 <hr class="m-0">
@@ -97,16 +101,22 @@
                                         {% partialdef btn-group inline %}
                                             {% if search_url %}
                                                 {% if request.from_prescriber %}
-                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "job_seekers_views:details" job_application.job_seeker.public_id %}">Voir le profil candidat</a>
+                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                                       href="{% url "job_seekers_views:details" job_application.job_seeker.public_id %}">Voir le profil candidat</a>
                                                 {% elif request.from_employer %}
-                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                                       href="{% url "dashboard:index" %}">Tableau de bord</a>
                                                 {% endif %}
-                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href="{{ search_url }}">Revenir à la recherche pour ce candidat</a>
+                                                <a class="btn btn-primary btn-block w-100 w-md-auto"
+                                                   href="{{ search_url }}">Revenir à la recherche pour ce candidat</a>
                                             {% elif auto_prescription_process %}
-                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
-                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href={% url "apply:details_for_company" job_application_id=job_application.id %}>Voir la candidature</a>
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                                   href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                                   href="{% url "apply:details_for_company" job_application_id=job_application.id %}">Voir la candidature</a>
                                             {% else %}
-                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                                   href="{% url "dashboard:index" %}">Tableau de bord</a>
                                             {% endif %}
                                         {% endpartialdef %}
                                     </div>
@@ -114,7 +124,8 @@
                             </div>
                         </div>
                         {% if not request.user.is_job_seeker %}
-                            <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
+                            <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}"
+                                 data-swap-element-with="#informations">
                                 <h3>{{ job_application.job_seeker.get_inverted_full_name }}</h3>
 
                                 <form method="post">
@@ -151,6 +162,9 @@
     {{ form.media.js }}
     {% if request.from_employer or request.from_prescriber %}
         <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
-        <script src='{% static "js/nps_popup.js" %}' data-delaypopup="false" data-userkind="{% if request.from_employer %}employeur{% else %}prescripteur{% endif %}" data-page="depot-candidature"></script>
+        <script src='{% static "js/nps_popup.js" %}'
+                data-delaypopup="false"
+                data-userkind="{% if request.from_employer %}employeur{% else %}prescripteur{% endif %}"
+                data-page="depot-candidature"></script>
     {% endif %}
 {% endblock %}

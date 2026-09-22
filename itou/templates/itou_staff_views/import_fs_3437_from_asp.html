@@ -40,9 +40,7 @@
                                         <span {% if result.with_3437 is None %}class="text-muted"{% endif %}>{{ result.asp_uid }} - {{ result.summary }}</span>
                                         {% if result.with_3437 is not None %}
                                             <ul>
-                                                <li class="{{ result.with_3437|yesno:'text-success,text-warning' }}">
-                                                    Erreur 3437 détectée : {{ result.with_3437|yesno:"Oui,Non" }}
-                                                </li>
+                                                <li class="{{ result.with_3437|yesno:'text-success,text-warning' }}">Erreur 3437 détectée : {{ result.with_3437|yesno:"Oui,Non" }}</li>
                                                 {% if result.mismatch %}
                                                     <li>
                                                         Données différentes du fichier
@@ -52,9 +50,7 @@
                                                     </li>
                                                 {% endif %}
                                                 {% if result.duplicate_link %}
-                                                    <li class="text-warning">
-                                                        Nouvel idItou déjà connu pour un autre candidat (probable doublon) : {{ result.duplicate_link }}. L’identifiant ne sera pas modifié.
-                                                    </li>
+                                                    <li class="text-warning">Nouvel idItou déjà connu pour un autre candidat (probable doublon) : {{ result.duplicate_link }}. L’identifiant ne sera pas modifié.</li>
                                                 {% elif result.er_to_resend %}
                                                     <li>
                                                         {{ result.er_to_resend|length|pluralize:"Cette fiche salarié passera,Ces fiches salarié passeront" }} à l'état Complétée :
@@ -73,9 +69,7 @@
 
                     <div class="c-form">
                         <h2 class="h3">Fichier à importer</h2>
-                        <p>
-                            Dans la feuille principale, une colonne intitulée « idItou » doit contenir l’ancien identifiant itou et la colonne Commentaires le nouveau.
-                        </p>
+                        <p>Dans la feuille principale, une colonne intitulée « idItou » doit contenir l’ancien identifiant itou et la colonne Commentaires le nouveau.</p>
 
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}

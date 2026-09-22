@@ -22,9 +22,7 @@
             {% if block_apply %}
                 {% component_alert content=content variant="warning" icon=False %}
                     {% fragment as content %}
-                        <p class="mb-0">
-                            Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
-                        </p>
+                        <p class="mb-0">Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.</p>
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% endif %}

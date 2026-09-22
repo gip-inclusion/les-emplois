@@ -6,17 +6,13 @@
         {% if can_edit_personal_information %}
             <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary w-100 w-md-auto"
-               aria-label="Modifier les coordonnées de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
-                Modifier
-            </a>
+               aria-label="Modifier les coordonnées de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">Modifier</a>
         {% else %}
             <span tabindex="0"
                   class="btn btn-outline-primary w-100 w-md-auto disabled"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
-                  data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">
-                Modifier
-            </span>
+                  data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">Modifier</span>
         {% endif %}
     </div>
     <ul class="list-data mb-0 pe-md-5">

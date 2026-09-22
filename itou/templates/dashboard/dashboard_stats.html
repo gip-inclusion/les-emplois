@@ -11,7 +11,9 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link" href="{% url "dashboard:index" %}" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
+            <a class="nav-link"
+               href="{% url "dashboard:index" %}"
+               {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link active"
@@ -38,7 +40,10 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
+                        <div class="tab-pane fade show active"
+                             id="statistiques"
+                             role="tabpanel"
+                             aria-labelledby="statistiques-tab">
                             <h2>Pilotage de mon activité</h2>
                             {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
                                 <section class="s-section">
