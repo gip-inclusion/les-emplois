@@ -3,6 +3,7 @@ import random
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
 from itou.insertion.enums import MobilizationEventKind
@@ -121,6 +122,13 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
 def test_has_orientation_action(service_kwargs, expected):
     service = ServiceFactory.build(**service_kwargs)
     assert service.has_orientation_action is expected
+
+
+def test_lien_mobilisation_must_be_url():
+    service = ServiceFactory.build(lien_mobilisation="not-a-url")
+
+    with pytest.raises(ValidationError):
+        service.full_clean()
 
 
 def _search(vannes, *, reception, thematics=None):
