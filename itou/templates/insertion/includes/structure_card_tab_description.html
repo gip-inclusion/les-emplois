@@ -1,29 +1,75 @@
 {% load enums %}
 {% load markdownify %}
 {% load matomo %}
+{% load str_filters %}
 
 {% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
 
-<h2>Description de la structure</h2>
 <div class="row">
-    <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+    <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
         <div class="c-box">
-            <article>
-                <h3>Présentation de la structure</h3>
-                {{ structure.description|markdownify }}
-            </article>
+            <article>{{ structure.description|markdownify }}</article>
+
+            {% if structure.reseaux_porteurs.exists %}
+                <hr class="my-4">
+                <h3 class="mb-0">{{ structure.reseaux_porteurs.count|pluralizefr:"Réseau porteur,Réseaux porteurs" }}</h3>
+                <ul>
+                    {% for reseau in structure.reseaux_porteurs.all %}
+                        <li>{{ reseau }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if structure.opening_hours %}
+                <hr class="my-4">
+                <h3 class="mb-0">Horaires d'ouverture</h3>
+                {% if formatted_opening_hours %}
+                    <ul>
+                        {% for entry in formatted_opening_hours.entries %}
+                            <li>
+                                {{ entry.label }} : {{ entry.hours }}
+                                {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if formatted_opening_hours.comments %}
+                        {% for comment in formatted_opening_hours.comments %}
+                            <blockquote class="blockquote">
+                                {{ comment }}.
+                            </blockquote>
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    {{ structure.opening_hours }}
+                {% endif %}
+            {% endif %}
+
+            {% if structure.accessibilite_lieu or structure.website %}
+                <hr class="my-4">
+                <h3 class="mb-0">En savoir plus</h3>
+                {% if structure.accessibilite_lieu %}
+                    <p>
+                        Retrouvez les informations liées à l'accessibilité de notre structure sur <a href="{{ structure.accessibilite_lieu }}" class="has-external-link" target="_blank" rel="noopener noreferrer">{{ structure.accessibilite_lieu }}</a>
+                    </p>
+                {% endif %}
+                {% if structure.website %}
+                    <p>
+                        Plus d'informations sur <a href="{{ structure.website }}" class="has-external-link" target="_blank" rel="noopener noreferrer">{{ structure.website }}</a>
+                    </p>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
-    <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
         <div class="c-box mb-3 mb-md-4">
-            <h3>Informations pratiques</h3>
+            <h3>Informations de contact</h3>
             <button class="btn btn-secondary btn-block listen-for-mobilization-event"
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#structure-contact-modal"
                     data-emplois-mobilization-kind="{{ MobilizationEventKind.STRUCTURE_CONTACT }}"
                     {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
-                Voir les coordonnées de la structure
+                Voir les coordonnées
             </button>
         </div>
     </div>
