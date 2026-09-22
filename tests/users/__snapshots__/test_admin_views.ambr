@@ -639,6 +639,7 @@
                  "insertion_service"."access_conditions_dora",
                  "insertion_service"."eligibility_zones",
                  "insertion_service"."mobilizations_details",
+                 "insertion_service"."lien_mobilisation",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",
                  "insertion_service"."mobilization_modes_beneficiaries_other",
@@ -650,6 +651,8 @@
                  "insertion_service"."credentials_online_form",
                  "insertion_service"."opening_hours",
                  "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
@@ -660,7 +663,8 @@
                  "insertion_service"."updated_on",
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
-                 "insertion_service"."updated_at"
+                 "insertion_service"."updated_at",
+                 "insertion_service"."extra"
           FROM "insertion_orientation"
           INNER JOIN "users_user" T3 ON ("insertion_orientation"."beneficiary_id" = T3."id")
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")

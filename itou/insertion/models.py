@@ -149,6 +149,11 @@ class Structure(GeolocatedAddressMixin, models.Model):
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
+    accessibilite_lieu = models.URLField(
+        verbose_name="accessibilité du lieu",
+        blank=True,
+        max_length=2000,
+    )
 
     reseaux_porteurs = models.ManyToManyField(
         verbose_name="réseaux porteurs",
@@ -359,6 +364,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
     mobilizations_details = models.TextField(verbose_name="modes de mobilisation - précisions", blank=True)
+    lien_mobilisation = models.URLField(verbose_name="lien de mobilisation", blank=True, max_length=2000)
     mobilization_publics = models.ManyToManyField(
         verbose_name="personne mobilisatrices",
         to=GenericReferenceItem,
@@ -432,6 +438,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
     opening_hours_text = models.CharField(verbose_name="horaires d'accueil (texte libre)", blank=True)
+    volume_horaire_hebdomadaire = models.FloatField(verbose_name="volume horaire hebdomadaire", null=True, blank=True)
+    nombre_semaines = models.PositiveIntegerField(verbose_name="nombre de semaines", null=True, blank=True)
 
     contact_full_name = models.CharField(verbose_name="contact", blank=True)
     contact_email = models.EmailField(verbose_name="e-mail du contact", blank=True)
@@ -451,6 +459,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    extra = models.JSONField(verbose_name="données complémentaires (data·inclusion)", null=True)
 
     @property
     def is_dora(self):

@@ -1,6 +1,7 @@
 [
   {
     "fields": {
+      "accessibilite_lieu": "https://acceslibre.beta.gouv.fr/app/montpellier-34000/a/agefiph-montpellier/",
       "address_line_1": "119 Avenue Jacques Cartier",
       "address_line_2": "Immeuble Antalya - Zac Antigone - CS 19008",
       "city": "Montpellier",
@@ -29,6 +30,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "Rue des Freres Lumiere",
       "address_line_2": "",
       "city": "Bethoncourt",
@@ -57,6 +59,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "AV DE MONEIN",
       "address_line_2": "Avenue de Monein",
       "city": "Mourenx",
@@ -86,6 +89,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "rue Emile Combes",
       "address_line_2": "",
       "city": "Clermont-Ferrand",
@@ -112,6 +116,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "2 Rue de la Merci",
       "address_line_2": "",
       "city": "Montpellier",
@@ -140,6 +145,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "2bis place royale",
       "address_line_2": "HOTEL DE FRANCE",
       "city": "Pau",
@@ -170,6 +176,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "59 Rue de Ponthieu",
       "address_line_2": "CHEZ SOURCE BUREAU 562",
       "city": "Paris",
@@ -196,6 +203,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "2 Rue Aristide Finco",
       "address_line_2": "",
       "city": "Serres-Castet",
@@ -224,6 +232,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "110 Rue du Lavandin",
       "address_line_2": "",
       "city": "Montpellier",
@@ -252,6 +261,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "13 Rue Jean Paul Alaux",
       "address_line_2": "Millenium 2 ZAC Coeur de Bastide - CS 61404",
       "city": "Bordeaux",
@@ -280,6 +290,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "38 Rue Robert Schuman",
       "address_line_2": "",
       "city": "Bordeaux",
@@ -306,6 +317,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "18 Rue de Stoxey",
       "address_line_2": "",
       "city": "Metz",
@@ -334,6 +346,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "2 Rue Pilatre de Rozier",
       "address_line_2": "BATIMENT TERTIAIRE DE L'AREOPORT",
       "city": "Goin",
@@ -363,6 +376,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "23 Rue Calvimont",
       "address_line_2": "",
       "city": "Bordeaux",
@@ -389,6 +403,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "11 Rue Claude Chappe",
       "address_line_2": "",
       "city": "Metz",
@@ -417,6 +432,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "40 Rue de Marseille",
       "address_line_2": "",
       "city": "Bordeaux",
@@ -447,6 +463,7 @@
   },
   {
     "fields": {
+      "accessibilite_lieu": "",
       "address_line_1": "Rue des Bleuets",
       "address_line_2": "",
       "city": "Boust",
