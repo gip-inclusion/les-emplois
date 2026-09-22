@@ -1,8 +1,12 @@
+import datetime
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from freezegun import freeze_time
 
 from itou.insertion.enums import MobilizationEventKind
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEvent, Service
@@ -366,3 +370,41 @@ class TestIsActiveManager:
 
         results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert list(results) == [active]
+
+
+@pytest.mark.parametrize(
+    "today,updated_on,expected",
+    [
+        (datetime.date(2025, 4, 15), datetime.date(2025, 1, 15), False),
+        (datetime.date(2025, 10, 15), datetime.date(2025, 1, 15), True),
+    ],
+)
+def test_service_is_update_needed(today, updated_on, expected):
+    service = ServiceFactory.build(updated_on=updated_on)
+    with freeze_time(today):
+        assert service.is_update_needed is expected
+
+
+def test_generate_extra_credential_documents_info():
+    service = ServiceFactory(
+        extra={
+            "forms": [
+                {"name": "my_form.pdf", "url": "production/eed8a0d4-238d-4921-a133-f5895e79fafb/my_form.pdf"},
+            ]
+        }
+    )
+
+    with patch(
+        "itou.insertion.models.generate_dora_storage_url",
+        return_value="https://s3.example.com/my_form.pdf?token=aaa",
+    ) as mock_generate_url:
+        assert service.generate_extra_credential_documents_info() == [
+            ("my_form.pdf", "https://s3.example.com/my_form.pdf?token=aaa")
+        ]
+        mock_generate_url.assert_called_once_with("production/eed8a0d4-238d-4921-a133-f5895e79fafb/my_form.pdf")
+
+
+def test_generate_extra_credential_documents_info_without_extra():
+    service = ServiceFactory(extra=None)
+
+    assert service.generate_extra_credential_documents_info() == []
