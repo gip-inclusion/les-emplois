@@ -46,7 +46,7 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
     name = "Confirmation d’envoi de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/new_for_job_seeker_subject.txt"
-    body_template = "apply/email/new_for_job_seeker_body.txt"
+    body_template = "apply/email/new_for_job_seeker_body.md"
 
 
 @notifications_registry.register
@@ -56,7 +56,7 @@ class JobApplicationNewForProxyNotification(WithJobSeekersApplicationsLink, Prox
     name = "Confirmation d’envoi de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/new_for_prescriber_subject.txt"
-    body_template = "apply/email/new_for_prescriber_body.txt"
+    body_template = "apply/email/new_for_prescriber_body.md"
 
 
 @notifications_registry.register
@@ -66,7 +66,7 @@ class JobApplicationNewForProfessionalNotification(ProfessionalNotification, Ema
     name = "Nouvelle candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/new_for_employer_subject.txt"
-    body_template = "apply/email/new_for_employer_body.txt"
+    body_template = "apply/email/new_for_employer_body.md"
 
 
 @notifications_registry.register
@@ -76,7 +76,7 @@ class JobApplicationAddedToPoolForJobSeekerNotification(JobSeekerNotification, E
     name = "Ajout de candidature au vivier"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/add_to_pool_for_job_seeker_subject.txt"
-    body_template = "apply/email/add_to_pool_for_job_seeker_body.txt"
+    body_template = "apply/email/add_to_pool_for_job_seeker_body.md"
 
 
 @notifications_registry.register
@@ -86,7 +86,7 @@ class JobApplicationAddedToPoolForProxyNotification(WithJobSeekersApplicationsLi
     name = "Ajout au vivier d’une candidature envoyée"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/add_to_pool_for_proxy_subject.txt"
-    body_template = "apply/email/add_to_pool_for_proxy_body.txt"
+    body_template = "apply/email/add_to_pool_for_proxy_body.md"
 
 
 @notifications_registry.register
@@ -96,7 +96,7 @@ class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, Ema
     name = "Mise en attente de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/postpone_for_job_seeker_subject.txt"
-    body_template = "apply/email/postpone_for_job_seeker_body.txt"
+    body_template = "apply/email/postpone_for_job_seeker_body.md"
 
 
 @notifications_registry.register
@@ -106,7 +106,7 @@ class JobApplicationPostponedForProxyNotification(WithJobSeekersApplicationsLink
     name = "Mise en attente d’une candidature envoyée"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/postpone_for_proxy_subject.txt"
-    body_template = "apply/email/postpone_for_proxy_body.txt"
+    body_template = "apply/email/postpone_for_proxy_body.md"
 
 
 @notifications_registry.register
@@ -116,7 +116,7 @@ class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, Emai
     name = "Confirmation d’acceptation de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/accept_for_job_seeker_subject.txt"
-    body_template = "apply/email/accept_for_job_seeker_body.txt"
+    body_template = "apply/email/accept_for_job_seeker_body.md"
 
 
 @notifications_registry.register
@@ -126,7 +126,7 @@ class JobApplicationAcceptedForProxyNotification(ProxyNotification):
     name = "Confirmation d’acceptation de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/accept_for_proxy_subject.txt"
-    body_template = "apply/email/accept_for_proxy_body.txt"
+    body_template = "apply/email/accept_for_proxy_body.md"
 
 
 @notifications_registry.register
@@ -136,7 +136,7 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
     name = "Refus de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
-    body_template = "apply/email/refuse_body_for_job_seeker.txt"
+    body_template = "apply/email/refuse_body_for_job_seeker.md"
 
     def get_context(self):
         context = super().get_context()
@@ -151,7 +151,7 @@ class JobApplicationRefusedForProxyNotification(WithJobSeekersApplicationsLink, 
     name = "Refus de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
-    body_template = "apply/email/refuse_body_for_proxy.txt"
+    body_template = "apply/email/refuse_body_for_proxy.md"
 
     def is_applicable(self):
         if job_application := self.context.get("job_application"):
@@ -166,7 +166,7 @@ class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, E
     name = "Transfert de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_job_seeker_subject.txt"
-    body_template = "apply/email/transfer_job_seeker_body.txt"
+    body_template = "apply/email/transfer_job_seeker_body.md"
 
 
 @notifications_registry.register
@@ -176,7 +176,7 @@ class JobApplicationTransferredForProxyNotification(WithJobSeekersApplicationsLi
     name = "Transfert d'une candidature envoyée"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_prescriber_subject.txt"
-    body_template = "apply/email/transfer_prescriber_body.txt"
+    body_template = "apply/email/transfer_prescriber_body.md"
 
 
 @notifications_registry.register
@@ -186,7 +186,7 @@ class JobApplicationTransferredForProfessionalNotification(ProfessionalNotificat
     name = "Transfert de candidature"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_source_employer_subject.txt"
-    body_template = "apply/email/transfer_source_employer_body.txt"
+    body_template = "apply/email/transfer_source_employer_body.md"
 
 
 @notifications_registry.register
@@ -194,4 +194,4 @@ class JobApplicationCanceledNotification(ProxyNotification):
     name = "Embauche annulée"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/cancel_subject.txt"
-    body_template = "apply/email/cancel_body.txt"
+    body_template = "apply/email/cancel_body.md"

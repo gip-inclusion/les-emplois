@@ -9,4 +9,4 @@ class InvitationAcceptedNotification(WithStructureMixin, ProfessionalNotificatio
     name = "Demande d'ajout acceptée"
     category = NotificationCategory.MEMBERS_MANAGEMENT
     subject_template = "invitations_views/email/accepted_notif_sender_subject.txt"
-    body_template = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
+    body_template = "invitations_views/email/accepted_notif_establishment_sender_body.md"

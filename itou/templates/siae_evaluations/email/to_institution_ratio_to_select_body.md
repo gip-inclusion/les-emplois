@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour,
+
+La 1ère étape de la campagne de contrôle a posteriori est lancée.
+
+Vous trouverez dans votre tableau de bord ({{ dashboard_url }}), la liste de toutes les embauches soumises au contrôle.
+
+Vous pouvez consulter cette liste et ensuite choisir le taux de SIAE à contrôler.
+
+Vous disposez de 4 semaines pour choisir votre taux de SIAE à contrôler. Passé ce délai, le taux de 30% sera appliqué par défaut.
+
+Cordialement,
+{% endblock %}

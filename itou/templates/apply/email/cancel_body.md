@@ -1,0 +1,54 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load enums %}
+{% load format_filters %}
+{% load str_filters %}
+{% block body %}
+{% enums "job_applications" "SenderKind" as SenderKind %}
+Embauche annulée
+
+Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} a bien été annulée.
+
+----------------------------------------------------------
+
+**Candidat** :
+
+- Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
+- Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information%}
+- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone and can_view_personal_information %}
+- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate and can_view_personal_information %}
+- Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}{% endif %}
+
+{% if job_application.message %}
+
+**Message du candidat** :
+
+{{ job_application.message }}
+
+{% endif %}
+
+{% with jobs=job_application.selected_jobs.all %}
+{% if jobs %}
+
+**{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}** :
+
+{% for job in jobs %}
+- {{ job.display_name }}{% endfor %}
+
+{% endif %}
+{% endwith %}
+
+**Candidature envoyée par :**
+
+{% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
+Le candidat lui même.
+{% endif %}
+
+{% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+{% if job_application.sender %}
+- {{ job_application.sender.get_inverted_full_name }}{% endif %}{% if job_application.sender_prescriber_organization %}
+- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}{% if job_application.sender and job_application.sender.email %}
+- {{ job_application.sender.email }}{% endif %}{% if job_application.sender and job_application.sender.phone %}
+- {{ job_application.sender.phone|format_phone }}{% endif %}
+
+{% endif %}
+{% endblock body %}

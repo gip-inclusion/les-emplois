@@ -1,0 +1,18 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour,
+
+La {{evaluation_campaign.institution.name}} a vérifié tous les justificatifs que vous avez transmis dans le cadre du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{evaluation_campaign.evaluated_period_start_at|date:"d E Y"}} et le {{evaluation_campaign.evaluated_period_end_at|date:"d E Y"}}.
+
+Suite à cette vérification, un ou plusieurs justificatifs sont attendus par la {{evaluation_campaign.institution.name}}.
+
+Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{siae.id}} à la rubrique “Campagne en cours”.
+
+Une ou plusieurs de vos auto-prescriptions nécessitent la transmission de nouveaux justificatifs.
+
+Dans la page de chaque auto-prescription, un commentaire concernant le refus du premier justificatif peut être présent afin de vous fournir plus de précisions.
+
+En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ itou_help_center_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE
+
+Cordialement,
+{% endblock %}

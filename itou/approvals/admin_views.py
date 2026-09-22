@@ -161,7 +161,7 @@ def manually_refuse_approval(
         "approvals/email/refuse_manually_subject.txt", {"job_application": job_application}
     )
     email_body_template = get_email_text_template(
-        "approvals/email/refuse_manually_body.txt",
+        "approvals/email/refuse_manually_body.md",
         {
             "job_application": job_application,
             "job_application_url": get_absolute_url(

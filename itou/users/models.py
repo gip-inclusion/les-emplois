@@ -1584,7 +1584,7 @@ class NirModificationRequest(models.Model):
         url = get_absolute_url(reverse("admin:users_nirmodificationrequest_change", args=[self.pk]))
         context = {"pk": self.pk, "request_url": url}
         subject = "users/emails/nir_modification_request_subject.txt"
-        body = "users/emails/nir_modification_request_body.txt"
+        body = "users/emails/nir_modification_request_body.md"
         return get_email_message(to, context, subject, body)
 
 

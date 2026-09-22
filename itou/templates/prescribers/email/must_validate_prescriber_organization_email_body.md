@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier.
+
+**Organisation** :
+
+- Nom : {{ organization.display_name }}
+- ID : {{ organization.id }}
+- Type sélectionné par l’utilisateur : {{ organization.get_kind_display }}
+
+{{ admin_url }}
+{% endblock body %}

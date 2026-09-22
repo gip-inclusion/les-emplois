@@ -115,7 +115,7 @@ def test_unused_templates():
         os.walk(os.path.join(settings.ROOT_DIR, "config")), os.walk(settings.APPS_DIR)
     ):
         for filename in filenames:
-            if template_names_to_check and filename.endswith((".py", ".html", ".txt")):
+            if template_names_to_check and filename.endswith((".py", ".html", ".txt", ".md")):
                 with open(os.path.join(dirpath, filename)) as f:
                     file_content = f.read()
                 for template_name in tuple(template_names_to_check):

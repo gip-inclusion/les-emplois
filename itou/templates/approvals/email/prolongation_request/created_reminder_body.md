@@ -1,0 +1,10 @@
+{% extends "approvals/email/prolongation_request/created_body.md" %}
+{% block body %}
+Bonjour,
+
+Une demande de prolongation du PASS IAE a été transmise à un membre de votre organisation, cette demande est toujours en attente de réponse. Si des démarches sont en cours, veuillez ne pas tenir compte de ce message.
+
+Rappel du message initial :
+
+{{ block.super }}
+{% endblock body %}

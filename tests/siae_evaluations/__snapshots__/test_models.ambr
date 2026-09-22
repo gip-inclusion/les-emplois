@@ -790,10 +790,10 @@
       }),
       dict({
         'origin': list([
-          'VariableNode[siae_evaluations/email/to_siae_selected_body.txt]',
-          'BlockNode[layout/base_email_text_body.txt]',
-          'AutoEscapeControlNode[layout/base_email_text_body.txt]',
-          'ExtendsNode[siae_evaluations/email/to_siae_selected_body.txt]',
+          'VariableNode[siae_evaluations/email/to_siae_selected_body.md]',
+          'BlockNode[layout/base_email_text_body.md]',
+          'AutoEscapeControlNode[layout/base_email_text_body.md]',
+          'ExtendsNode[siae_evaluations/email/to_siae_selected_body.md]',
           'get_email_text_template[utils/emails.py]',
           'get_email_message[utils/emails.py]',
           'SIAEEmailFactory.selected[siae_evaluations/emails.py]',

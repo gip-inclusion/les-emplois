@@ -17,7 +17,7 @@ class CampaignEmailFactory:
             "dashboard_url": get_absolute_url(reverse("dashboard:index")),
         }
         subject = "siae_evaluations/email/to_institution_ratio_to_select_subject.txt"
-        body = "siae_evaluations/email/to_institution_ratio_to_select_body.txt"
+        body = "siae_evaluations/email/to_institution_ratio_to_select_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def selected_siae(self):
@@ -26,7 +26,7 @@ class CampaignEmailFactory:
             "evaluated_period_end_at": self.evaluation_campaign.evaluated_period_end_at,
         }
         subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
-        body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
+        body = "siae_evaluations/email/to_institution_selected_siae_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def transition_to_adversarial_stage(self, siaes_forced_to_adversarial_stage, siaes_accepted_by_default):
@@ -35,18 +35,18 @@ class CampaignEmailFactory:
             "siaes_accepted_by_default": siaes_accepted_by_default,
         }
         subject = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_body.txt"
+        body = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def submission_frozen(self):
         subject = "siae_evaluations/email/to_institution_siaes_submission_frozen_subject.txt"
-        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_body.txt"
+        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_body.md"
         return get_email_message(self.recipients, {}, subject, body)
 
     def submission_frozen_reminder(self):
         context = {"institution_name": self.evaluation_campaign.institution.name}
         subject = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_subject.txt"
-        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_body.txt"
+        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def close(self):
@@ -59,7 +59,7 @@ class CampaignEmailFactory:
             )
         }
         subject = "siae_evaluations/email/to_institution_campaign_close_subject.txt"
-        body = "siae_evaluations/email/to_institution_campaign_close_body.txt"
+        body = "siae_evaluations/email/to_institution_campaign_close_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
 
@@ -74,7 +74,7 @@ class InstitutionEmailFactory:
             "dashboard_url": get_absolute_url(reverse("dashboard:index")),
         }
         subject = "siae_evaluations/email/to_institution_submitted_by_siae_subject.txt"
-        body = "siae_evaluations/email/to_institution_submitted_by_siae_body.txt"
+        body = "siae_evaluations/email/to_institution_submitted_by_siae_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
 
@@ -94,7 +94,7 @@ class SIAEEmailFactory:
             "url": get_absolute_url(evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
-        body = "siae_evaluations/email/to_siae_selected_body.txt"
+        body = "siae_evaluations/email/to_siae_selected_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def accepted(self, adversarial=False):
@@ -104,7 +104,7 @@ class SIAEEmailFactory:
             "adversarial": adversarial,
         }
         subject = "siae_evaluations/email/to_siae_accepted_subject.txt"
-        body = "siae_evaluations/email/to_siae_accepted_body.txt"
+        body = "siae_evaluations/email/to_siae_accepted_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def accepted_from_certified_criteria(self):
@@ -113,7 +113,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_accepted_from_certified_criteria_subject.txt"
-        body = "siae_evaluations/email/to_siae_accepted_from_certified_criteria_body.txt"
+        body = "siae_evaluations/email/to_siae_accepted_from_certified_criteria_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def force_accepted(self):
@@ -122,7 +122,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_force_accepted_subject.txt"
-        body = "siae_evaluations/email/to_siae_force_accepted_body.txt"
+        body = "siae_evaluations/email/to_siae_force_accepted_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def notify_before_adversarial_stage(self):
@@ -136,7 +136,7 @@ class SIAEEmailFactory:
             "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
         }
         subject = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_body.txt"
+        body = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def adversarial_stage(self):
@@ -145,7 +145,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
+        body = "siae_evaluations/email/to_siae_adversarial_stage_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def forced_to_adversarial_stage(self):
@@ -163,7 +163,7 @@ class SIAEEmailFactory:
             ),
         }
         subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"
+        body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def notify_before_campaign_close(self):
@@ -178,7 +178,7 @@ class SIAEEmailFactory:
             "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
         }
         subject = "siae_evaluations/email/to_siae_notify_before_campaign_close_subject.txt"
-        body = "siae_evaluations/email/to_siae_notify_before_campaign_close_body.txt"
+        body = "siae_evaluations/email/to_siae_notify_before_campaign_close_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def refused(self):
@@ -187,7 +187,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_refused_subject.txt"
-        body = "siae_evaluations/email/to_siae_refused_body.txt"
+        body = "siae_evaluations/email/to_siae_refused_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def refused_no_proofs(self):
@@ -196,13 +196,13 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_refused_no_proofs_subject.txt"
-        body = "siae_evaluations/email/to_siae_refused_no_proofs_body.txt"
+        body = "siae_evaluations/email/to_siae_refused_no_proofs_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def not_sanctioned(self):
         context = {"sanctions": self.evaluated_siae.sanctions}
         subject = "siae_evaluations/email/to_siae_not_sanctioned_subject.txt"
-        body = "siae_evaluations/email/to_siae_not_sanctioned_body.txt"
+        body = "siae_evaluations/email/to_siae_not_sanctioned_body.md"
         return get_email_message(self.recipients, context, subject, body)
 
     def sanctioned_with_training_session(self):
@@ -211,5 +211,5 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
         }
         subject = "siae_evaluations/email/to_siae_sanctioned_with_training_session_subject.txt"
-        body = "siae_evaluations/email/to_siae_sanctioned_with_training_session_body.txt"
+        body = "siae_evaluations/email/to_siae_sanctioned_with_training_session_body.md"
         return get_email_message(self.recipients, context, subject, body)

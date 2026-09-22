@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.md" %}
+{% load str_filters %}
+{% block body %}
+
+Candidature transférée
+
+{{ transferred_by.get_inverted_full_name }} a transféré la candidature de : {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} de la structure {{ origin_company.display_name }} vers la structure {{ target_company.display_name }}.
+
+-----
+
+Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
+{% endblock body %}

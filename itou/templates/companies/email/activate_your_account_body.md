@@ -1,0 +1,19 @@
+{% extends "layout/base_email_text_body.md" %}
+{% block body %}
+Bonjour,
+
+Le compte de votre {{siae.kind}} SIRET {{siae.siret}} vient d’être créé sur {% brand %} !
+
+Pour activer le compte de l’entreprise, pouvoir embaucher, obtenir des PASS IAE et créer vos fiches salarié, activez votre compte en cliquant ici {{ signup_url }}
+
+Vous avez déjà un compte employeur sur {% brand %} ?
+
+- Demandez à un de vos collègues qui n’en a pas encore d’activer le compte.
+- Vous recevrez l’e-mail d’authentification nécessaire à la première connexion.
+- Votre collègue rejoindra le compte de la SIAE.
+- Elle pourra ensuite vous inviter à le rejoindre aussi via le bouton « gérer les collaborateurs de ma structure ».
+
+Pour en savoir plus, consultez notre mode d’emploi {{ itou_help_center_url }}/categories/14722747750673--Modes-d-emploi-pour-les-SIAE/
+
+Cordialement,
+{% endblock body%}
