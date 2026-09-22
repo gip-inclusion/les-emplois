@@ -20,7 +20,7 @@ SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE = datetime.timedelta(days=365)
 def can_close_approval(approval):
     """Return True when approval meets all conditions for a user-initiated closure:
 
-    0. It isn't already ending today or earlier (nothing left to close).
+    0. It hasn't expired yet (a PASS IAE in its last day can still be closed).
     1. At least one suspension has been running (or ran) for more than 12
        consecutive months, and no accepted hiring occurred after it ended.
     2. The job seeker has no recent pending applications.
@@ -28,8 +28,7 @@ def can_close_approval(approval):
     """
     today = timezone.localdate()
 
-    if approval.end_at <= today:
-        # Already closed (or naturally ending) today: nothing left to close.
+    if approval.end_at < today:  # Already expired: nothing left to close
         return False
 
     long_suspensions = [
@@ -71,11 +70,13 @@ def _clip_approval_dependency(approval, model, end_date, acting_user):
     _, deletions = model.objects.filter(approval=approval, start_at__gte=end_date).delete()
     if deletions:
         logger.info(
-            "Terminating approval pk=%(approval_id)d, deleting %(deletions)d future %(model_name)s.",
+            "Terminating approval pk=%(approval_id)d, "
+            "deleting %(deletions)d %(model_name)s starting on or after %(end_at)s.",
             {
                 "approval_id": approval.pk,
                 "deletions": deletions[model._meta.label],
                 "model_name": model._meta.label,
+                "end_at": end_date,
             },
         )
     try:
@@ -100,16 +101,12 @@ def _clip_approval_dependency(approval, model, end_date, acting_user):
         obj.save(update_fields=["end_at", "updated_at", "updated_by"])
 
 
-def close_approval(approval, *, closed_by, end_at="today"):
-    """Terminate approval as of today or yesterday (end_at is inclusive)."""
-    # `end_at`` is currently needed to support both admin's historical behavior,
-    # and the new self-service "clôturer le PASS IAE" button. It should be removed
-    # once the admin adopts the new behavior, which is on its way.
+def close_approval(approval, *, closed_by):
+    """Terminate approval as of yesterday (end_at is inclusive), leaving no remaining days."""
     from itou.approvals.models import Prolongation, Suspension
 
     today = timezone.localdate()
-    assert end_at in ["today", "yesterday"]
-    new_end = today if end_at == "today" else today - datetime.timedelta(days=1)
+    new_end = today - datetime.timedelta(days=1)
     _clip_approval_dependency(approval, Prolongation, new_end, closed_by)
     _clip_approval_dependency(approval, Suspension, new_end, closed_by)
     logger.info(
@@ -126,7 +123,7 @@ def close_approval(approval, *, closed_by, end_at="today"):
     approval.save(update_fields=["end_at", "updated_at"])
     add_support_remark_to_obj(
         approval,
-        f"{new_end} : PASS IAE clôturé par l'utilisateur {closed_by.get_full_name()} "
+        f"{today} : PASS IAE clôturé par l'utilisateur {closed_by.get_full_name()} "
         f"({closed_by.get_kind_display()}, id: {closed_by.id}).",
     )
 

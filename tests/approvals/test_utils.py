@@ -28,6 +28,24 @@ class TestCanCloseApproval:
         _make_long_suspension(approval)
         assert can_close_approval(approval) is True
 
+    # --- Condition 0: not expired yet ---
+
+    @pytest.mark.parametrize(
+        "days_until_end,expected",
+        [
+            (-1, False),
+            (0, True),  # Last day: closing sets end_at to yesterday, removing the remaining day
+            (1, True),
+        ],
+    )
+    def test_approval_end_at(self, days_until_end, expected):
+        approval = ApprovalFactory(
+            start_at=TODAY - relativedelta(years=2),
+            end_at=TODAY + datetime.timedelta(days=days_until_end),
+        )
+        _make_long_suspension(approval, in_progress=False)
+        assert can_close_approval(approval) is expected
+
     # --- Condition 1: long suspension ---
 
     def test_no_suspension_at_all(self):

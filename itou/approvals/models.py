@@ -634,6 +634,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         """
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
+    def can_be_terminated(self):
+        """Whether staff can close this PASS IAE from the admin."""
+        new_end_at = timezone.localdate() - datetime.timedelta(days=1)
+        # Closing sets end_at to yesterday, which must stay after start_at (DB constraint)
+        return self.start_at < new_end_at < self.end_at
+
     def can_be_deleted(self):
         JobApplication = self.jobapplication_set.model
         try:

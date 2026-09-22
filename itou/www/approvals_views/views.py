@@ -747,7 +747,7 @@ def close(request, approval_id, template_name="approvals/close.html"):
     form = CloseApprovalForm(data=request.POST if request.method == "POST" else None)
 
     if request.method == "POST" and form.is_valid():
-        close_approval(approval, closed_by=request.user, end_at="yesterday")
+        close_approval(approval, closed_by=request.user)
         notifications.ApprovalClosedForJobSeekerNotification(approval.user, siae, approval=approval).send()
         logger.info("user=%s closed approval=%s", request.user.pk, approval.pk)
         messages.success(
