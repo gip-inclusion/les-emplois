@@ -1,0 +1,16 @@
+[
+  {
+    "fields": {
+      "city": 4387
+    },
+    "model": "cities.directoryactivecity",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "city": 4401
+    },
+    "model": "cities.directoryactivecity",
+    "pk": 2
+  }
+]

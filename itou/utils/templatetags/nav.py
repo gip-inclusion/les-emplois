@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
+from itou.www.directory_views.perms import can_access_directory
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
     employer_has_access_to_assessments,
@@ -93,6 +94,15 @@ NAV_ENTRIES = {
         label="Un service d'insertion",
         target=reverse_lazy("search:services_results"),
         active_view_names=["search:services_home", "search:services_results"],
+    ),
+    "professional-directory": NavItem(
+        label="Annuaire pro",
+        icon="ri-contacts-book-line",
+        target=reverse_lazy("directory:people_results"),
+        active_view_names=[
+            "directory:people_results",
+        ],
+        is_beta=True,
     ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
@@ -392,6 +402,8 @@ def nav(request):
             )
             if request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST:
                 menu_items.append(NAV_ENTRIES["institutional-geiq-assessments"])
+        if can_access_directory(request):
+            menu_items.append(NAV_ENTRIES["professional-directory"])
         menu_items.append(
             NavGroup(
                 label="Rechercher",
