@@ -472,12 +472,6 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.updated_on < timezone.localdate() - relativedelta(months=6)
 
     @property
-    def prerequisites(self) -> list[str]:
-        if self.is_dora:
-            return [*self.access_conditions_dora, *self.credentials]
-        return [line for line in self.access_conditions_di.split("\\n") if line]
-
-    @property
     def has_prerequisites(self) -> bool:
         return bool(self.access_conditions_di.strip())
 
@@ -489,25 +483,8 @@ class Service(GeolocatedAddressMixin, models.Model):
     def should_mobilize_via_external_link(self) -> bool:
         return bool(self.lien_mobilisation)
 
-    @property
-    def has_orientation_action(self):
-        return (
-            self.is_orientable_with_form and bool(self.contact_email) and not self.from_non_orientable_di_source
-        ) or bool(self.mobilization_modes_professionals_external_form_link)
-
-    def has_mobilization_modes(self):
-        return (not self.is_dora and bool(self.mobilizations.all())) or (
-            self.is_dora
-            and (
-                bool(self.mobilization_modes_professionals.all())
-                or self.mobilization_modes_professionals_external_form_link
-                or self.mobilization_modes_professionals_other
-                or bool(self.mobilization_modes_beneficiaries.all())
-                or self.mobilization_modes_beneficiaries_external_form_link
-                or self.mobilization_modes_beneficiaries_other
-            )
-        )
-
+    # FIXME(vperron): this method is now completely unused, remove it along with
+    # any "legacy" DORA fields in the services and structures models and their related uses.
     def generate_credential_documents_info(self) -> list[tuple[str, str]]:
         return [
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents

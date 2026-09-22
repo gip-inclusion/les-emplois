@@ -97,35 +97,6 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
     assert structure.address_on_one_line is None
 
 
-@pytest.mark.parametrize(
-    "service_kwargs,expected",
-    [
-        pytest.param({"is_orientable_with_form": True}, True, id="orientable_with_form"),
-        pytest.param(
-            {"is_orientable_with_form": True, "contact_email": ""},
-            False,
-            id="orientable_with_form_without_contact_email",
-        ),
-        pytest.param(
-            {"mobilization_modes_professionals_external_form_link": "https://example.com"},
-            True,
-            id="external_form_link",
-        ),
-        pytest.param(
-            {
-                "is_orientable_with_form": False,
-                "mobilization_modes_professionals_external_form_link": "",
-            },
-            False,
-            id="no_orientation_action",
-        ),
-    ],
-)
-def test_has_orientation_action(service_kwargs, expected):
-    service = ServiceFactory.build(**service_kwargs)
-    assert service.has_orientation_action is expected
-
-
 def test_lien_mobilisation_must_be_url():
     service = ServiceFactory.build(lien_mobilisation="not-a-url")
 
