@@ -132,3 +132,50 @@ class TestOrientationAPI:
 
         response = api_client.post(self.url, data={"structure_uid": "no_match"})
         assert response.json() == {"count": 0, "next": None, "previous": None, "results": []}
+
+
+class TestOrientationCountAPI:
+    url = reverse("v1:orientations-count")
+
+    def api_client(self):
+        token = ServiceToken.objects.create(service="dora")
+        headers = {"Authorization": f"Token {token.key}"}
+        return APIClient(headers=headers)
+
+    def test_unauthenticated(self, api_client):
+        response = api_client.post(self.url)
+        assert response.status_code == 401
+
+        response = api_client.post(self.url, data={"structure_uid": "dora--structure-uid"})
+        assert response.status_code == 401
+
+    def test_count(self, snapshot):
+        api_client = self.api_client()
+        pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        structure = pending_orientation.service.structure
+
+        for status in OrientationStatus:
+            OrientationFactory(status=status, service__structure=structure)
+
+        # Orientation for another structure
+        OrientationFactory()
+
+        with assertSnapshotQueries(snapshot):
+            response = api_client.get(self.url, query_params={"structure_uid": structure.uid})
+
+        assert response.json() == {"pending_count": 2, "total_count": len(OrientationStatus) + 1}
+
+    def test_bad_input(self):
+        api_client = self.api_client()
+
+        response = api_client.get(self.url)
+        assert response.json() == {"structure_uid": ["Ce champ est obligatoire."]}
+
+        response = api_client.get(self.url, query_params={"structure_uid": ""})
+        assert response.json() == {"structure_uid": ["Ce champ ne peut être vide."]}
+
+    def test_no_match(self):
+        api_client = self.api_client()
+
+        response = api_client.get(self.url, query_params={"structure_uid": "no_match"})
+        assert response.json() == {"pending_count": 0, "total_count": 0}
