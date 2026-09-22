@@ -1,4 +1,4 @@
-from itou.archive.anonymize import anonymize_professionals_without_deletion
+from itou.archive.anonymize import deactivate_professionals_without_deletion
 from itou.companies.models import CompanyMembership
 from itou.users.models import User
 from itou.utils import triggers
@@ -7,7 +7,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import ItouStaffFactory
 
 
-def test_anonymize_professional_without_deletion():
+def test_deactivate_professional_without_deletion():
     city = create_city_saint_andre()
     membership = CompanyMembershipFactory(
         user__is_active=True,
@@ -31,7 +31,7 @@ def test_anonymize_professional_without_deletion():
     updated_at_before_anonymization = membership.updated_at
 
     with triggers.fake_context():
-        anonymize_professionals_without_deletion([employer])
+        deactivate_professionals_without_deletion([employer])
 
     employer = User.objects.get(pk=employer.pk)
     assert not employer.is_active

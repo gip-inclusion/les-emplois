@@ -65,7 +65,7 @@ def anonymize_and_delete_professionals(users):
     User.objects.filter(id__in=[user.id for user in users]).delete()
 
 
-def anonymize_professionals_without_deletion(users):
+def deactivate_professionals_without_deletion(users):
     user_ids = [user.id for user in users]
 
     # `updated_at` is `auto_now`, but `auto_now` is only automatically updated when calling Model.save().
