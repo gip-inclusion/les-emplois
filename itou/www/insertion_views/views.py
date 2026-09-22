@@ -2,6 +2,7 @@ import datetime
 import enum
 import functools
 import logging
+from collections import defaultdict
 
 from data_inclusion.schema.v1.thematiques import Categorie
 from django.conf import settings
@@ -135,8 +136,6 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
         Prefetch("receptions", queryset=insertion_models.GenericReferenceItem.objects.order_by("label")),
         "mobilizations",
         "mobilization_publics",
-        "mobilization_modes_beneficiaries",
-        "mobilization_modes_professionals",
     )
     slug_field = "uid"
     slug_url_kwarg = "service_uid"
@@ -144,39 +143,42 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
     context_object_name = "service"
 
     def format_categories(self) -> list[tuple[str, str]]:
-        formatted_categories = []
+        categories = defaultdict(list)
         for thematic in self.object.thematics.all():
             category = thematic.value.split("--")[0]
-            category_label = Categorie(category).label
-            subcategory_label = thematic.label
-            formatted_categories.append((category_label, subcategory_label))
-        return formatted_categories
+            categories[Categorie(category).label].append(thematic.label)
+        return [
+            (category_label, ", ".join(sorted(categories[category_label])))
+            for category_label in sorted(categories.keys())
+        ]
+
+    def get_contact_button_label(self) -> str:
+        if self.object.contact_phone and self.object.contact_email:
+            return "Contacter le service par téléphone ou email"
+        if self.object.contact_phone:
+            return "Contacter le service par téléphone"
+        if self.object.contact_email:
+            return "Contacter le service par email"
+        return "Contacter le service"
 
     def get_context_data(self, **kwargs):
         has_contact_to_display = (
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
         )
-        user_is_authorized = (
+        can_view_modal = has_contact_to_display and (
             self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
         )
-        can_view_modal = has_contact_to_display and user_is_authorized
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)
             | {
                 "formatted_opening_hours": format_osm_hours(self.object.opening_hours),
                 "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("search:services_home")),
-                "matomo_custom_title": "Fiche de la service d'insértion",
+                "matomo_custom_title": "Fiche de service d'insertion",
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
-                "credential_documents": self.object.generate_credential_documents_info(),
-                "show_mobilization_section": self.object.has_mobilization_modes(),
-                "professionals_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_professionals.all()
-                ),
-                "beneficiaries_has_autre": any(
-                    m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
-                ),
+                "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "formatted_categories": self.format_categories(),
+                "contact_button_label": self.get_contact_button_label(),
                 "can_view_modal": can_view_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
             }

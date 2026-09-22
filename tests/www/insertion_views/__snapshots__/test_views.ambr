@@ -3094,8 +3094,10 @@
                       </div>
                       <h1>
                           Mon service de test
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 15/01/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 15/01/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
@@ -3106,13 +3108,13 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
-                                          Orienter un bénéficiaire
+                                          Orienter votre bénéficiaire en ligne
                                       </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
                                   <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Voir les coordonnées de contact du service
+                                      Contacter le service par email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3144,21 +3146,76 @@
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
-                              Informations du service
+                              Présentation du service
+                          </h2>
+                          <div class="mb-0">
+                              <p>
+                                  Description du service.
+                              </p>
+                          </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
                           </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
-                                      Lieu d'accueil
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Éligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <div class="fw-bold">
+                                      <p>
+                                          Ne doit pas apparaître pour dora
+                                      </p>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
                                   </small>
                                   <strong>
-                                      en-presentiel
+                                      France entière
                                   </strong>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          en-presentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -3172,49 +3229,6 @@
                           <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/?back_url=/insertion/services/test-service-uid/" type="button">
                               Voir la fiche structure
                           </a>
-                      </div>
-                  </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  Avoir plus de 18 ans
-                              </li>
-                              <li>
-                                  Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
                       </div>
                   </div>
               </div>
@@ -3244,8 +3258,10 @@
                       </div>
                       <h1>
                           Mon service de test
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 15/01/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 15/01/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
@@ -3256,13 +3272,13 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
-                                          Orienter un bénéficiaire
+                                          Orienter votre bénéficiaire en ligne
                                       </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
                                   <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Voir les coordonnées de contact du service
+                                      Contacter le service par email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3294,21 +3310,78 @@
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
-                              Informations du service
+                              Présentation du service
+                          </h2>
+                          <div class="mb-0">
+                              <p>
+                                  Description du service.
+                              </p>
+                          </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
                           </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
-                                      Lieu d'accueil
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Mobilité
+                                          </strong>
+                                          : Accéder à un véhicule
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Éligibilité au service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <div class="fw-bold">
+                                      <p>
+                                          Être orienté par un prescripteur
+                                          <br/>
+                                          Avoir 18 ans
+                                      </p>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
                                   </small>
                                   <strong>
-                                      en-presentiel
+                                      France entière
                                   </strong>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Other
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          en-presentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -3324,50 +3397,6 @@
                           </a>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                          </p>
-                          <p>
-                              Description du service.
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Mobilité
-                                  </b>
-                                  : mobilite--acceder-a-un-vehicule
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <p>
-                                      Être orienté par un prescripteur
-                                  </p>
-                              </li>
-                              <li>
-                                  <p>
-                                      Avoir 18 ans
-                                  </p>
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
               </div>
           </div>
       </section>
@@ -3381,7 +3410,7 @@
       <h2 class="h3">
           Documents à compléter
       </h2>
-      <ul class="mb-0">
+      <ul class="list-data mb-0">
           <li>
               <a href="https://s3.example.com/my_form.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
                   my_form.pdf
@@ -3392,41 +3421,12 @@
                   justificatif.docx
               </a>
           </li>
+          <li>
+              <a href="https://example.com/formulaire-inscription" rel="noopener noreferrer" target="_blank">
+                  https://example.com/formulaire-inscription
+              </a>
+          </li>
       </ul>
-  </div>
-  
-  '''
-# ---
-# name: TestServices.test_detail_not_orientable
-  '''
-  <div class="c-box c-box--action">
-      <h2 class="visually-hidden">
-          Actions rapides
-      </h2>
-      <div class="form-row align-items-center gx-3">
-          <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
-              </button>
-          </div>
-          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown">
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
-                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
-                      </i>
-                  </button>
-                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-not-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
-                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                          </i>
-                          <span>
-                              Copier le lien de cette page
-                          </span>
-                      </button>
-                  </div>
-              </div>
-          </div>
-      </div>
   </div>
   
   '''
@@ -3441,13 +3441,13 @@
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
                   <span>
-                      Orienter un bénéficiaire
+                      Orienter votre bénéficiaire en ligne
                   </span>
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
               <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
+                  Contacter le service par email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3492,8 +3492,10 @@
                       </div>
                       <h1>
                           Service complet
-                          <span class="badge badge-base rounded-pill text-bg-success">
-                              Mise à jour 01/06/2025
+                          <span class="badge badge-base rounded-pill text-bg-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line me-1">
+                              </i>
+                              Mise à jour ancienne : 01/06/2025
                           </span>
                       </h1>
                       <div class="c-box c-box--action">
@@ -3504,13 +3506,13 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
                                       <span>
-                                          Orienter un bénéficiaire
+                                          Orienter votre bénéficiaire en ligne
                                       </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
                                   <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Voir les coordonnées de contact du service
+                                      Contacter le service par téléphone ou email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3541,52 +3543,171 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3 mb-2">
-                              Informations du service
+                          <h2 class="h3">
+                              Présentation du service
                           </h2>
-                          <p class="fs-sm text-success">
-                              <i aria-hidden="true" class="ri-time-line">
-                              </i>
-                              <strong>
-                                  Réponse rapide : sous 3 jours
-                              </strong>
-                          </p>
-                          <p>
-                              Résumé court du service.
-                          </p>
+                          <div class="mb-0">
+                              Description complète
+                              <p>
+                                  Avec du
+                                  <strong>
+                                      markdown
+                                  </strong>
+                                  .
+                              </p>
+                          </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Type de service
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Thématiques et besoins associés
+                                  </small>
+                                  <div>
+                                      <div>
+                                          <strong>
+                                              Logement et hébergement
+                                          </strong>
+                                          : Louer un logement
+                                      </div>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Service financé par
+                                  </small>
+                                  <strong>
+                                      France Travail, Conseil départemental
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Éligibilité au service
+                          </h2>
                           <ul class="list-data">
                               <li>
                                   <small>
                                       Public concerné
-                                      <i aria-label="Toute personne majeure." class="ri-information-line ri-xl text-info" data-bs-title="Toute personne majeure." data-bs-toggle="tooltip" role="button" tabindex="0">
-                                      </i>
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Adultes
+                                      </strong>
+                                      <small class="d-block">
+                                          Toute personne majeure.
+                                      </small>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Conditions d'accès
+                                  </small>
+                                  <div class="fw-bold">
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Frais à charge
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Gratuit
+                                      </strong>
+                                      <p>
+                                          <small class="mb-0">
+                                              Sous conditions de ressources.
+                                          </small>
+                                      </p>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Service mobilisable par
                                   </small>
                                   <strong>
-                                      Adultes
+                                      Professionnels
                                   </strong>
                               </li>
+                              <li>
+                                  <small>
+                                      Mode de mobilisation
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          Par téléphone
+                                      </strong>
+                                      <small class="d-block">
+                                          Contacter le service par téléphone.
+                                      </small>
+                                  </div>
+                              </li>
+                              <hr class="my-4"/>
+                              <li>
+                                  <small>
+                                      Zones d'éligibilité
+                                  </small>
+                                  <div class="collapse show has-no-transition" id="collapse-eligibility-collapsed">
+                                      <strong>
+                                          Commune numéro 1 en Bretagne (56), Commune numéro 2 en Bretagne (56), Commune numéro 3 en Bretagne …
+                                      </strong>
+                                      <button aria-controls="collapse-eligibility-collapsed collapse-eligibility-expanded" aria-expanded="true" class="bs-btn-active-color btn-link d-inline-block mt-2" data-bs-target="#collapse-eligibility-collapsed, #collapse-eligibility-expanded" data-bs-toggle="collapse" type="button">
+                                          Lire la suite
+                                      </button>
+                                  </div>
+                                  <div class="collapse has-no-transition" id="collapse-eligibility-expanded">
+                                      <strong>
+                                          Commune numéro 1 en Bretagne (56), Commune numéro 2 en Bretagne (56), Commune numéro 3 en Bretagne (56), Commune numéro 4 en Bretagne (56), Commune numéro 5 en Bretagne (56), Commune numéro 6 en Bretagne (56), Commune numéro 7 en Bretagne (56), Commune numéro 8 en Bretagne (56), Commune numéro 9 en Bretagne (56), Commune numéro 10 en Bretagne (56), Commune numéro 11 en Bretagne (56), Commune numéro 12 en Bretagne (56), Commune numéro 13 en Bretagne (56), Commune numéro 14 en Bretagne (56), Commune numéro 15 en Bretagne (56)
+                                      </strong>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Conditions d'accueil
+                          </h2>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Mode d'accueil
+                                  </small>
+                                  <div>
+                                      <strong>
+                                          En présentiel
+                                      </strong>
+                                  </div>
+                              </li>
+                              <li>
+                                  <small>
+                                      Durée de la prestation
+                                  </small>
+                                  <strong>
+                                      21 heures par semaine, pendant
+                                          
+                                          
+                                              16 semaines
+                                  </strong>
+                              </li>
+                              <hr class="my-4"/>
                               <li>
                                   <small>
                                       Lieu d'accueil
                                   </small>
-                                  <strong>
-                                      En présentiel — 12 rue de la Paix, Bâtiment B, 75001 Paris
-                                  </strong>
+                                  <address>
+                                      12 rue de la Paix, Bâtiment B, 75001 Paris
+                                  </address>
                               </li>
                               <li>
                                   <small>
-                                      Frais à charge
-                                      <i aria-label="Sous conditions de ressources." class="ri-information-line ri-xl text-info" data-bs-title="Sous conditions de ressources." data-bs-toggle="tooltip" role="button" tabindex="0">
-                                      </i>
-                                  </small>
-                                  <strong>
-                                      Gratuit
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Fréquence et horaires
-                                      <i aria-label="Hors jours fériés" class="ri-information-line ri-xl text-info" data-bs-title="Hors jours fériés" data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      Horaires d'ouverture
+                                      <i aria-label="Hors jours fériés" class="ri-information-line text-info" data-bs-title="Hors jours fériés" data-bs-toggle="tooltip" role="button" tabindex="0">
                                       </i>
                                   </small>
                                   <div>
@@ -3633,9 +3754,28 @@
                                   </div>
                               </li>
                           </ul>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
-                              Source : Dora
-                          </span>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4" id="credentials-documents">
+                          <h2 class="h3">
+                              Documents à compléter
+                          </h2>
+                          <ul class="list-data mb-0">
+                              <li>
+                                  <a href="https://s3.example.com/dossier-inscription.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
+                                      dossier-inscription.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb" rel="noopener noreferrer" target="_blank">
+                                      autorisation-traitement-donnees.pdf
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://s3.example.com/bilan-competences.docx?token=ccc" rel="noopener noreferrer" target="_blank">
+                                      bilan-competences.docx
+                                  </a>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
@@ -3649,48 +3789,6 @@
                           <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-full-uid/?back_url=/insertion/services/test-service-full-uid/" type="button">
                               Voir la fiche structure
                           </a>
-                      </div>
-                  </div>
-                  <div class="col-12 col-lg-8 order-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Description du service
-                          </h2>
-                          <p class="mb-0">
-                              Description complète
-                          </p>
-                          <p>
-                              Avec du
-                              <strong>
-                                  markdown
-                              </strong>
-                              .
-                          </p>
-                          <p>
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Thématiques et besoins associés
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <b>
-                                      Logement et hébergement
-                                  </b>
-                                  : Louer un logement
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Pré-requis et justificatifs
-                          </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  Être orienté par un prescripteur.
-                              </li>
-                          </ul>
                       </div>
                   </div>
               </div>
@@ -3708,15 +3806,15 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center has-external-link" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
-                      Test link
+                      Orienter votre bénéficiaire en ligne
                   </span>
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
               <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
+                  Contacter le service par email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3741,6 +3839,42 @@
   
   '''
 # ---
+# name: TestServices.test_detail_without_mobilization_link_uses_wizard_regardless_of_dora_orientability
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-not-orientable-uid/start/">
+                  <span>
+                      Orienter votre bénéficiaire en ligne
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-not-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestServices.test_di_service_orientable_with_external_link_prefers_link
   '''
   <div class="c-box c-box--action">
@@ -3749,97 +3883,15 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center has-external-link" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
-                      Lien externe
+                      Orienter votre bénéficiaire en ligne
                   </span>
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
               <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
-              </button>
-          </div>
-          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown">
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
-                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
-                      </i>
-                  </button>
-                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-ext-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
-                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                          </i>
-                          <span>
-                              Copier le lien de cette page
-                          </span>
-                      </button>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  '''
-# ---
-# name: TestServices.test_dora_service_not_orientable_with_form_prefers_external_link
-  '''
-  <div class="c-box c-box--action">
-      <h2 class="visually-hidden">
-          Actions rapides
-      </h2>
-      <div class="form-row align-items-center gx-3">
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
-                  <span>
-                      Lien externe
-                  </span>
-              </a>
-          </div>
-          <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
-              </button>
-          </div>
-          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown">
-                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
-                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
-                      </i>
-                  </button>
-                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-ext-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
-                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                          </i>
-                          <span>
-                              Copier le lien de cette page
-                          </span>
-                      </button>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  '''
-# ---
-# name: TestServices.test_dora_service_orientable_with_form_and_external_link_prefers_wizard
-  '''
-  <div class="c-box c-box--action">
-      <h2 class="visually-hidden">
-          Actions rapides
-      </h2>
-      <div class="form-row align-items-center gx-3">
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-ext-uid/start/">
-                  <span>
-                      Orienter un bénéficiaire
-                  </span>
-              </a>
-          </div>
-          <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Voir les coordonnées de contact du service
+                  Contacter le service par email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">

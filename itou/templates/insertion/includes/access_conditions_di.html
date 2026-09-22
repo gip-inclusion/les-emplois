@@ -1,0 +1,6 @@
+{% load markdownify %}
+{% load str_filters %}
+
+{% if service.access_conditions_di %}
+    <div class="{{ extra_classes|default:"" }}">{{ service.access_conditions_di|normalize_di_markdown|markdownify }}</div>
+{% endif %}

@@ -60,6 +60,12 @@ def split_literal_newlines(value: str) -> list[str]:
     return [line for line in value.split("\\n") if line]
 
 
+@register.filter
+@defaultfilters.stringfilter
+def normalize_di_markdown(value: str) -> str:
+    return value.replace("\\n", "\n")
+
+
 @register.filter(is_safe=True)
 @defaultfilters.stringfilter
 def urlize_new_tab(value: str) -> str:
