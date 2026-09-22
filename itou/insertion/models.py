@@ -4,6 +4,7 @@ import secrets
 import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
@@ -149,6 +150,11 @@ class Structure(GeolocatedAddressMixin, models.Model):
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
+    accessibilite_lieu = models.URLField(
+        verbose_name="accessibilité du lieu",
+        blank=True,
+        max_length=2000,
+    )
 
     reseaux_porteurs = models.ManyToManyField(
         verbose_name="réseaux porteurs",
@@ -359,6 +365,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
     mobilizations_details = models.TextField(verbose_name="modes de mobilisation - précisions", blank=True)
+    lien_mobilisation = models.URLField(verbose_name="lien de mobilisation", blank=True, max_length=2000)
     mobilization_publics = models.ManyToManyField(
         verbose_name="personne mobilisatrices",
         to=GenericReferenceItem,
@@ -432,6 +439,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
     opening_hours_text = models.CharField(verbose_name="horaires d'accueil (texte libre)", blank=True)
+    volume_horaire_hebdomadaire = models.FloatField(verbose_name="volume horaire hebdomadaire", null=True, blank=True)
+    nombre_semaines = models.PositiveIntegerField(verbose_name="nombre de semaines", null=True, blank=True)
 
     contact_full_name = models.CharField(verbose_name="contact", blank=True)
     contact_email = models.EmailField(verbose_name="e-mail du contact", blank=True)
@@ -452,19 +461,19 @@ class Service(GeolocatedAddressMixin, models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
+    extra = models.JSONField(verbose_name="données complémentaires (data·inclusion)", null=True)
+
     @property
     def is_dora(self):
         return self.source.value == "dora"
 
     @property
-    def prerequisites(self) -> list[str]:
-        if self.is_dora:
-            return [*self.access_conditions_dora, *self.credentials]
-        return [line for line in self.access_conditions_di.split("\\n") if line]
+    def is_update_needed(self):
+        return self.updated_on < timezone.localdate() - relativedelta(months=6)
 
     @property
     def has_prerequisites(self) -> bool:
-        return bool(self.prerequisites)
+        return bool(self.access_conditions_di.strip())
 
     @property
     def from_non_orientable_di_source(self) -> bool:
@@ -472,31 +481,19 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def should_mobilize_via_external_link(self) -> bool:
-        return not self.is_dora and bool(self.mobilization_modes_professionals_external_form_link)
+        return bool(self.lien_mobilisation)
 
-    @property
-    def has_orientation_action(self):
-        return (
-            self.is_orientable_with_form and bool(self.contact_email) and not self.from_non_orientable_di_source
-        ) or bool(self.mobilization_modes_professionals_external_form_link)
-
-    def has_mobilization_modes(self):
-        return (not self.is_dora and bool(self.mobilizations.all())) or (
-            self.is_dora
-            and (
-                bool(self.mobilization_modes_professionals.all())
-                or self.mobilization_modes_professionals_external_form_link
-                or self.mobilization_modes_professionals_other
-                or bool(self.mobilization_modes_beneficiaries.all())
-                or self.mobilization_modes_beneficiaries_external_form_link
-                or self.mobilization_modes_beneficiaries_other
-            )
-        )
-
+    # FIXME(vperron): this method is now completely unused, remove it along with
+    # any "legacy" DORA fields in the services and structures models and their related uses.
     def generate_credential_documents_info(self) -> list[tuple[str, str]]:
         return [
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
+
+    def generate_extra_credential_documents_info(self) -> list[tuple[str, str]]:
+        if not self.extra:
+            return []
+        return [(form["name"], form["url"]) for form in self.extra.get("forms") or []]
 
     objects = ServiceManager()
     include_inactive = ServiceQuerySet.as_manager()

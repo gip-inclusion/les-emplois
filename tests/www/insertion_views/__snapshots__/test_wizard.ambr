@@ -16,7 +16,7 @@
                           </strong>
                           :
           
-              Valider la conformité
+              Valider l’éligibilité
                       </p>
                   </div>
               </div>
@@ -117,7 +117,7 @@
                               <div class="form-check">
                                   <input checked="" class="form-check-input is-valid" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
+                                      Je confirme que la situation de l'usager répond à ces conditions.
                                   </label>
                               </div>
                           </div>
@@ -195,7 +195,7 @@
                           </strong>
                           :
           
-              Valider la conformité
+              Valider l’éligibilité
                       </p>
                   </div>
               </div>
@@ -277,24 +277,21 @@
                               </li>
                           </ul>
                           <p class="fw-bold mb-2">
-                              Pré-requis et justificatifs
+                              Conditions requises
                           </p>
-                          <ul class="mb-3 mb-md-4">
-                              <li>
-                                  Résident QPV / ZFRR
-                              </li>
-                              <li>
-                                  Pièce d'identité
-                              </li>
-                              <li>
-                                  Justificatif de domicile
-                              </li>
-                          </ul>
+                          <div class="mb-3 mb-md-4">
+                              <p>
+                                  Résident
+                                  <strong>
+                                      QPV / ZFRR
+                                  </strong>
+                              </p>
+                          </div>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
                                   <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
+                                      Je confirme que la situation de l'usager répond à ces conditions.
                                   </label>
                               </div>
                           </div>
@@ -372,7 +369,7 @@
                           </strong>
                           :
           
-              Documents et justificatifs requis
+              Documents requis
                       </p>
                   </div>
               </div>
@@ -403,17 +400,14 @@
                           <p>
                               (A récupérer auprès de l'usager)
                           </p>
-                          <ul class="mb-3 mb-md-4">
-                              <li>
-                                  Résident QPV / ZFRR
-                              </li>
-                              <li>
-                                  Pièce d'identité
-                              </li>
-                              <li>
-                                  Justificatif de domicile
-                              </li>
-                          </ul>
+                          <div class="mb-3 mb-md-4">
+                              <p>
+                                  Résident
+                                  <strong>
+                                      QPV / ZFRR
+                                  </strong>
+                              </p>
+                          </div>
                           <div class="form-group">
                               <label class="visually-hidden" for="id_credentials_proof_files">
                                   Pré-requis et justificatifs
@@ -462,9 +456,9 @@
                                           </a>
                                       </div>
                                       <div class="form-group col col-lg-auto order-2 order-lg-3">
-                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="orientation-submit-submit" type="submit">
+                                          <button aria-label="Enregistrer" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="orientation-submit-submit" type="submit">
                                               <span>
-                                                  Suivant
+                                                  Enregistrer
                                               </span>
                                           </button>
                                       </div>

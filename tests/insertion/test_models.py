@@ -1,9 +1,12 @@
+import datetime
 import random
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from freezegun import freeze_time
 
 from itou.insertion.enums import MobilizationEventKind
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEvent, Service
@@ -94,33 +97,11 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
     assert structure.address_on_one_line is None
 
 
-@pytest.mark.parametrize(
-    "service_kwargs,expected",
-    [
-        pytest.param({"is_orientable_with_form": True}, True, id="orientable_with_form"),
-        pytest.param(
-            {"is_orientable_with_form": True, "contact_email": ""},
-            False,
-            id="orientable_with_form_without_contact_email",
-        ),
-        pytest.param(
-            {"mobilization_modes_professionals_external_form_link": "https://example.com"},
-            True,
-            id="external_form_link",
-        ),
-        pytest.param(
-            {
-                "is_orientable_with_form": False,
-                "mobilization_modes_professionals_external_form_link": "",
-            },
-            False,
-            id="no_orientation_action",
-        ),
-    ],
-)
-def test_has_orientation_action(service_kwargs, expected):
-    service = ServiceFactory.build(**service_kwargs)
-    assert service.has_orientation_action is expected
+def test_lien_mobilisation_must_be_url():
+    service = ServiceFactory.build(lien_mobilisation="not-a-url")
+
+    with pytest.raises(ValidationError):
+        service.full_clean()
 
 
 def _search(vannes, *, reception, thematics=None):
@@ -372,3 +353,16 @@ class TestIsActiveManager:
 
         results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert list(results) == [active]
+
+
+@pytest.mark.parametrize(
+    "today,updated_on,expected",
+    [
+        (datetime.date(2025, 4, 15), datetime.date(2025, 1, 15), False),
+        (datetime.date(2025, 10, 15), datetime.date(2025, 1, 15), True),
+    ],
+)
+def test_service_is_update_needed(today, updated_on, expected):
+    service = ServiceFactory.build(updated_on=updated_on)
+    with freeze_time(today):
+        assert service.is_update_needed is expected
