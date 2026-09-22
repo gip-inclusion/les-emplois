@@ -1,12 +1,10 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-
 {{ first_name|title }} {{ last_name|upper }} est désormais membre de la structure {{ establishment_name }}.
 
-Détails
--------------------
+# Détails
+
 - Prénom : {{ first_name|title }}
 - Nom : {{ last_name|upper }}
 - Adresse e-mail : {{ email }}
-
 {% endblock %}

@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-
 Un nouvel utilisateur souhaite rejoindre votre structure sur {% brand %} !
 
 Organisation :
@@ -16,8 +15,5 @@ Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un col
 
 Si vous êtes certain que cette demande n'émane d'aucun de vos collaborateurs ou collaboratrices, vous pouvez simplement ignorer notre e-mail.
 
-Cet e-mail a été envoyé à
-{{ siae.auth_email }}
-adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (extranet IAE 2.0 de l'ASP, GEIQ...).
-
+Cet e-mail a été envoyé à {{ siae.auth_email }}, adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (extranet IAE 2.0 de l'ASP, GEIQ...).
 {% endblock body %}

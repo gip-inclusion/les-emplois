@@ -4,14 +4,14 @@ Nouvelle embauche sur Itou.
 
 Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candidat via {% brand %} :
 
-*Candidat* :
+**Candidat** :
 
 - Nom : {{ job_application.job_seeker.last_name|upper }}
 - Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
 - Email : {{ job_application.job_seeker.email }}{% endif %}
 - Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}
 
-*Employeur inclusif* :
+**Employeur inclusif** :
 
 - Siret : {{ job_application.to_company.siret }}
 - Nom : {{ job_application.to_company.display_name }}

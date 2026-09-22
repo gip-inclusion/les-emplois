@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-
 Bonjour {{ to.get_full_name }},
 
 {{ full_name|title }} a demandé à rejoindre votre organisation « {{ organization.display_name }} ».
@@ -9,5 +8,4 @@ Accédez à la rubrique d’ajout des collaborateurs {{ invitation_url }} pour c
 Vous avez aussi la possibilité de contacter cette personne via son adresse e-mail {{ email }}
 
 En cas de refus, vous pouvez simplement ignorer ce mail.
-
 {% endblock body %}

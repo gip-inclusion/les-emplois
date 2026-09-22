@@ -10,7 +10,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 
 ----------------------------------------------------------
 
-*Candidat* :
+**Candidat** :
 
 - Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
 - Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information%}
@@ -20,7 +20,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 
 {% if job_application.message %}
 
-*Message du candidat* :
+**Message du candidat** :
 
 {{ job_application.message }}
 
@@ -29,7 +29,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
+**{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}** :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}
@@ -37,7 +37,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverte
 {% endif %}
 {% endwith %}
 
-*Candidature envoyée par :*
+**Candidature envoyée par :**
 
 {% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
 Le candidat lui même.
@@ -51,5 +51,4 @@ Le candidat lui même.
 - {{ job_application.sender.phone|format_phone }}{% endif %}
 
 {% endif %}
-
 {% endblock body %}

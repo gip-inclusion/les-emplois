@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-
 Bonjour,
 
 Nous faisons suite à votre demande de PASS IAE pour {{ job_application.job_seeker.get_inverted_full_name }} :
@@ -16,5 +15,4 @@ Si le prescripteur habilité est favorable à une dérogation de son délai de c
 
 Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
 {{ search_url }}
-
 {% endblock body %}

@@ -25,13 +25,12 @@ Au sein de la structure :
 
 Votre contact : {{ itou_help_center_url }}
 
+Le reliquat est calculé sur la base d’un nombre de jours calendaires.
 
-* Le reliquat est calculé sur la base d’un nombre de jours calendaires.
 Si le PASS IAE n'est pas suspendu, il décroit donc tous les jours (samedi, dimanche et jours fériés compris).
 {% else %}
 Merci d'avoir confirmé l'embauche d'un candidat sur {% brand %}.
 
 Votre contact : {{ itou_help_center_url }}
 {% endif %}
-
 {% endblock body %}

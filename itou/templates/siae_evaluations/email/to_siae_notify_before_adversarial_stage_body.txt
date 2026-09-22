@@ -11,23 +11,18 @@ Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un dél
 
 Comment ça marche ?
 
-1- Visualiser la liste des embauches concernées par la procédure de contrôle :
+1. **Visualiser la liste des embauches concernées par la procédure de contrôle** :
+   Depuis le tableau de bord de votre structure à la rubrique “Contrôle a posteriori”, cliquez sur “Campagne en cours”.
+   La liste des embauches concernées par la procédure est affichée.
+   Accès direct à votre liste d’auto-prescriptions : {{ evaluated_job_app_list_url }}
 
-Depuis le tableau de bord de votre structure à la rubrique “Contrôle a posteriori”, cliquez sur “Campagne en cours”.
-La liste des embauches concernées par la procédure est affichée.
+2. **Transmettez vos justificatifs en ligne** :
+   Pour chaque embauche, cliquez sur “Sélectionner les critères”, les critères que vous avez enregistrés sont affichés.
+   Sélectionnez le ou les critères que vous souhaitez justifier (sur cette page, nous vous rappelons le nombre minimum de justificatifs requis en fonction du type de critères et de SIAE).
+   Ensuite cliquez sur “Ajouter un justificatif” pour déposer le justificatif demandé.
 
-Accès direct à votre liste d’auto-prescriptions : {{ evaluated_job_app_list_url }}
-
-2- Transmettez vos justificatifs en ligne
-
-Pour chaque embauche, cliquez sur “Sélectionner les critères”,
-les critères que vous avez enregistrés sont affichés.
-Sélectionnez le ou les critères que vous souhaitez justifier (sur cette page, nous vous rappelons le nombre minimum de justificatifs requis en fonction du type de critères et de SIAE).
-Ensuite cliquez sur “Ajouter un justificatif” pour déposer le justificatif demandé.
-
-3- Validez votre dossier de contrôle :
-
-Lorsque tous les justificatifs sont ajoutés, cliquez sur “Soumettre à validation” pour les transmettre à votre DDETS.
+3. **Validez votre dossier de contrôle** :
+   Lorsque tous les justificatifs sont ajoutés, cliquez sur “Soumettre à validation” pour les transmettre à votre DDETS.
 
 Vous serez notifié(e) par e-mail lorsque la DDETS aura vérifié vos justificatifs.
 
