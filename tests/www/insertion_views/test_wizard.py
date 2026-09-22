@@ -60,8 +60,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mailoutbox):
         structure__updated_on="2025-01-15",
         fee=fee,
         fee_details="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location",
-        access_conditions_dora=["Résident QPV / ZFRR"],
-        credentials=["Pièce d'identité", "Justificatif de domicile"],
+        access_conditions_di="Résident **QPV / ZFRR**",
         contact_email="service.contact@email.fake",
     )
     service.publics.add(public)
@@ -181,10 +180,18 @@ def test_documents_step_credential_documents(client):
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
         is_orientable_with_form=True,
-        credentials_documents=[
-            "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_PACEA_2025.pdf",
-            "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf",
-        ],
+        extra={
+            "forms": [
+                {
+                    "name": "flyer_PACEA_2025.pdf",
+                    "url": "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_PACEA_2025.pdf",
+                },
+                {
+                    "name": "flyer_CEJ_2025.pdf",
+                    "url": "production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf",
+                },
+            ]
+        },
         structure__name="Structure orientation wizard",
     )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -223,7 +230,7 @@ def test_documents_step_credential_documents(client):
     with patch(
         "itou.insertion.models.generate_dora_storage_url",
         side_effect=s3_urls,
-    ):
+    ) as mock_generate_url:
         response = client.get(documents_url)
 
     assert response.status_code == 200
@@ -231,6 +238,8 @@ def test_documents_step_credential_documents(client):
         ("flyer_PACEA_2025.pdf", "https://s3.example.com/flyer_PACEA_2025.pdf?token=aaa"),
         ("flyer_CEJ_2025.pdf", "https://s3.example.com/flyer_CEJ_2025.pdf?token=bbb"),
     ]
+    mock_generate_url.assert_any_call("production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_PACEA_2025.pdf")
+    mock_generate_url.assert_any_call("production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf")
     assertContains(response, "flyer_PACEA_2025.pdf")
     assertContains(response, "flyer_CEJ_2025.pdf")
     assertContains(response, "https://s3.example.com/flyer_PACEA_2025.pdf?token=aaa")
@@ -264,24 +273,31 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
     assert response.status_code == status_code
 
 
-def test_start_with_service_missing_contact_email(client):
+@pytest.mark.parametrize(
+    "service_kwargs",
+    [
+        pytest.param({"contact_email": ""}, id="missing_contact_email"),
+        pytest.param({"is_orientable_with_form": False}, id="not_orientable_with_dora_form"),
+    ],
+)
+def test_start_without_mobilization_link_uses_wizard(client, service_kwargs):
     prescriber = PrescriberFactory()
-    service = ServiceFactory(is_orientable_with_form=True, contact_email="")
+    service = ServiceFactory(**service_kwargs)
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
     client.force_login(prescriber)
 
     response = client.get(start_url)
-    assert response.status_code == 404
+    assert response.status_code == 302
 
 
-def test_start_orientation_redirects_when_external_link_preferred(client):
-    # A DI service that both is form-orientable and has an external link prefers the link:
-    # direct access to the form flow must bounce back to the service detail page.
+def test_start_orientation_redirects_when_external_link_preferred(client, settings):
     prescriber = PrescriberFactory()
+    source_value = "blacklisted-source"
+    settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
     service = ServiceFactory(
-        is_orientable_with_form=True,
-        source__value="other",
-        mobilization_modes_professionals_external_form_link="https://test.example.com",
+        is_orientable_with_form=False,
+        source__value=source_value,
+        lien_mobilisation="https://test.example.com",
     )
     assert service.should_mobilize_via_external_link
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -292,12 +308,27 @@ def test_start_orientation_redirects_when_external_link_preferred(client):
     assertRedirects(response, service_detail_url, fetch_redirect_response=False)
 
 
+@pytest.mark.parametrize("is_blacklisted,status_code", [(True, 404), (False, 200)])
+def test_orientation_select_job_seeker_with_non_orientable_di_sources(client, settings, is_blacklisted, status_code):
+    prescriber = PrescriberFactory()
+    source_value = "source-name"
+    if is_blacklisted:
+        settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
+    service = ServiceFactory(is_orientable_with_form=False, source__value=source_value)
+    select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+    client.force_login(prescriber)
+
+    response = client.get(select_url)
+
+    assert response.status_code == status_code
+
+
 def test_orientation_select_job_seeker_redirects_when_external_link_preferred(client):
     prescriber = PrescriberFactory()
     service = ServiceFactory(
         is_orientable_with_form=True,
         source__value="other",
-        mobilization_modes_professionals_external_form_link="https://test.example.com",
+        lien_mobilisation="https://test.example.com",
     )
     assert service.should_mobilize_via_external_link
     select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})

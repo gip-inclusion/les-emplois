@@ -218,15 +218,11 @@ class OrientationStep(enum.StrEnum):
 
 @readonly_view
 def start_orientation(request, service_uid):
-    service = get_object_or_404(
-        insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES).exclude(
-            contact_email=""
-        ),
-        uid=service_uid,
-        is_orientable_with_form=True,
-    )
+    service = get_object_or_404(insertion_models.Service.objects.select_related("source"), uid=service_uid)
     if service.should_mobilize_via_external_link:
         return HttpResponseRedirect(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+    if service.from_non_orientable_di_source:
+        raise Http404
     if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
         logger.info(
             "orientation wizard start_without_job_seeker user=%s service_uid=%s",
@@ -267,14 +263,15 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             return HttpResponseRedirect(
                 reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
             )
+        if self.service.from_non_orientable_di_source:
+            raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, service_uid, **kwargs):
         super().setup(request, *args, **kwargs)
         self.service = get_object_or_404(
-            insertion_models.Service.objects.select_related("kind", "structure"),
+            insertion_models.Service.objects.select_related("kind", "source", "structure"),
             uid=service_uid,
-            is_orientable_with_form=True,
         )
 
     def get_form_kwargs(self):
@@ -323,6 +320,8 @@ class OrientationWizardView(WizardView):
             ),
             uid=self.wizard_session.get("service_uid"),
         )
+        if self.service.should_mobilize_via_external_link or self.service.from_non_orientable_di_source:
+            raise Http404
         self.job_seeker = get_object_or_404(
             User.objects.select_related("jobseeker_profile"),
             public_id=self.wizard_session.get("job_seeker_public_id"),
@@ -478,12 +477,14 @@ class OrientationWizardView(WizardView):
             "can_view_personal_information": self.can_view_personal_information,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "missing_beneficiary_fields": get_missing_orientation_beneficiary_field_labels(self.job_seeker),
-            "credential_documents": self.service.generate_credential_documents_info(),
+            "credential_documents": self.service.generate_extra_credential_documents_info(),
             "OrientationStep": OrientationStep,
             "matomo_custom_title": matomo_titles[self.step],
             "matomo_custom_url": f"orientations/<uuid:session_uuid>/create/{self.step}/",
             "matomo_event_name": f"orientation-{self.step}-submit",
-            "show_orientation_disclaimer": not self.wizard_session.get("disclaimer_dismissed", False),
+            "show_orientation_disclaimer": (
+                self.step == OrientationStep.CONFORMITY and not self.wizard_session.get("disclaimer_dismissed", False)
+            ),
             "orientation_session_uuid": self.wizard_session.name,
             "exit_url": get_orient_for_job_seeker_context(self.request)["exit_url"],
         }

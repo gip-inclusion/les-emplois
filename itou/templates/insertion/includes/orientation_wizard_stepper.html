@@ -12,11 +12,11 @@
     <p id="currentProgressState">
         <strong>Étape {{ wizard_steps.step1 }}/{{ wizard_steps.count }}</strong> :
         {% if wizard_steps.current == OrientationStep.CONFORMITY %}
-            Valider la conformité
+            Valider l’éligibilité
         {% elif wizard_steps.current == OrientationStep.REFERENT %}
             Compléter la demande
         {% elif wizard_steps.current == OrientationStep.DOCUMENTS %}
-            Documents et justificatifs requis
+            Documents requis
         {% endif %}
     </p>
 </div>
