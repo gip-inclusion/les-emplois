@@ -3,7 +3,7 @@
   '''
   <div class="invalid-feedback d-block">
       Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur La plateforme de l’inclusion, vous pouvez
-      <a aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)" href="/search/prescribers" rel="noopener" target="_blank">
+      <a aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)" class="has-external-link" href="/search/prescribers" rel="noopener" target="_blank">
           retrouver ici
       </a>
       des prescripteurs habilités autour de chez vous.
@@ -21,7 +21,7 @@
 # ---
 # name: TestApprovalProlongation.test_end_at_limits[COMPLETE_TRAINING]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -38,7 +38,7 @@
 # ---
 # name: TestApprovalProlongation.test_end_at_limits[PARTICULAR_DIFFICULTIES]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -55,7 +55,7 @@
 # ---
 # name: TestApprovalProlongation.test_end_at_limits[RQTH]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -72,7 +72,7 @@
 # ---
 # name: TestApprovalProlongation.test_end_at_limits[SENIOR]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -89,7 +89,7 @@
 # ---
 # name: TestApprovalProlongation.test_end_at_limits[SENIOR_CDI]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -138,7 +138,7 @@
 # ---
 # name: TestApprovalProlongation.test_prolong_approval_view_no_end_at
   '''
-  <div class="form-group is-invalid form-group-required">
+  <div class="form-group form-group-input-w-lg-33 is-invalid form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
@@ -160,7 +160,7 @@
 # ---
 # name: TestApprovalProlongation.test_prolong_approval_view_prepopulates_SENIOR_CDI[value is set to max_end_at]
   '''
-  <div class="form-group form-group-required">
+  <div class="form-group form-group-input-w-lg-33 form-group-required">
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
