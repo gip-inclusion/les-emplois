@@ -112,7 +112,8 @@ PyJWT  # https://github.com/jpadilla/pyjwt
 httpx  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
-paramiko  # https://github.com/paramiko/paramiko
+# We need rsa signing compatibility (see PR https://github.com/gip-inclusion/les-emplois/pull/8071)
+paramiko<5  # https://github.com/paramiko/paramiko
 pyzipper  # https://github.com/danifus/pyzipper
 
 # Stream XLSX files
