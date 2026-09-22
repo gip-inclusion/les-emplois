@@ -17,7 +17,6 @@ from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.ft_connect import constants as pe_constants
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
-from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
@@ -138,17 +137,6 @@ class TestPreLogin:
                 assert response.status_code == 200
             response = client.post(url, data=form_data)
             assertContains(response, "trop de requêtes", status_code=429)
-
-    def test_login_show_redirect_from_old_domain_notice(self, client):
-        pre_login_url = reverse("account_login")
-        marker = "Vous arrivez de l’ancienne adresse"
-
-        response = client.get(pre_login_url)
-        assertNotContains(response, marker)
-
-        next_url = f"/next_url?{REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM}=1"
-        response = client.get(pre_login_url, query_params={"next": next_url})
-        assertContains(response, marker)
 
 
 class TestItouLoginForm:
@@ -295,8 +283,10 @@ class TestExistingUserLogin:
         # test_login ensures that every IdentityProvider is supported by the existing-login view
         # it relies on the assumption that UNSUPPORTED_IDENTITY_PROVIDER_TEXT is displayed when it is not
         # this is a test for that assumption
+        original_get_context_data = ExistingUserLoginView.get_context_data
+
         def override_identity_provider_in_context(self, **kwargs):
-            context = super(ExistingUserLoginView, self).get_context_data(**kwargs)
+            context = original_get_context_data(self)
             context["login_provider"] = "somethingInvalid"
             return context
 

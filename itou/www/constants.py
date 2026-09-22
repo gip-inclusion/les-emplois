@@ -1,1 +1,2 @@
-REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM = "redirected-from-old-domain"
+# Used as a query param and a session key
+REDIRECTED_FROM_OLD_DOMAIN_KEY = "redirected-from-old-domain"

@@ -1,4 +1,5 @@
 import datetime
+import logging
 import secrets
 from math import ceil
 
@@ -12,10 +13,14 @@ from django.http import HttpResponseRedirect, JsonResponse, QueryDict
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.cache import add_never_cache_headers
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
-from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM
+from itou.www.constants import REDIRECTED_FROM_OLD_DOMAIN_KEY
+
+
+logger = logging.getLogger()
 
 
 def never_cache(get_response):
@@ -141,6 +146,13 @@ class RedirectToNewDomainMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        try:
+            response = _add_redirected_from_old_domain_session(request)
+        except Exception:
+            logger.exception("Got exception in _add_redirected_from_old_domain_session")
+        else:
+            if response:
+                return response
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
@@ -148,6 +160,18 @@ class RedirectToNewDomainMiddleware:
         if url is None:
             return None
         return HttpResponseRedirect(url)
+
+
+def _add_redirected_from_old_domain_session(request):
+    if REDIRECTED_FROM_OLD_DOMAIN_KEY not in request.GET:
+        return
+    # Pop from GET params, to avoid GET-based forms to report an
+    # error on a non-existing field.
+    query = request.GET.copy()
+    query.pop(REDIRECTED_FROM_OLD_DOMAIN_KEY)
+    # Set session for further use in the password form.
+    request.session[REDIRECTED_FROM_OLD_DOMAIN_KEY] = timezone.now()
+    return HttpResponseRedirect(f"{request.path}{query.urlencode()}")
 
 
 def _get_redirect_url(request):
@@ -181,7 +205,7 @@ def _get_redirect_url(request):
         return None
 
     query = QueryDict(request.GET.urlencode(), mutable=True)
-    query[REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM] = "1"
+    query[REDIRECTED_FROM_OLD_DOMAIN_KEY] = "1"
     return f"https://{settings.NEW_DOMAIN}{request.path}?{query.urlencode()}"
 
 

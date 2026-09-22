@@ -14,25 +14,6 @@
             <h1>Se connecter</h1>
         {% endfragment %}
     {% endcomponent_title %}
-
-    {% if redirected_from_old_domain %}
-        {% component_alert title=title content=content variant="info" icon=False %}
-            {% fragment as title %}
-                La plateforme de l’inclusion change d’adresse.
-            {% endfragment %}
-            {% fragment as content %}
-                <p class="mb-2">
-                    Vous arrivez de l’ancienne adresse (emplois.inclusion.beta.gouv.fr). La plateforme de l’inclusion est désormais accessible à l’adresse <a href="https://plateforme.inclusion.gouv.fr">https://plateforme.inclusion.gouv.fr</a>.
-                </p>
-                <p class="mb-0">
-                    La transition est automatique. Nous vous invitons
-                    cependant à mettre à jour vos favoris de
-                    navigateur et vos gestionnaires de mots de passe.
-                </p>
-            {% endfragment %}
-        {% endcomponent_alert %}
-    {% endif %}
-
 {% endblock %}
 
 {% block content %}
