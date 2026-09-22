@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 from freezegun import freeze_time
-from itoutils.django.decoupage_administratif.models import Department, Region
+from itoutils.django.decoupage_administratif.models import City, Department, Region
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
@@ -42,6 +42,7 @@ from itou.insertion.models import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
+from itou.www.insertion_views.views import ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.insertion.factories import (
@@ -289,13 +290,13 @@ class TestStructures:
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")
-    ORIENT_BTN_LABEL = "Orienter un bénéficiaire"
+    ORIENT_BTN_LABEL = "Orienter votre bénéficiaire en ligne"
     DISPLAY_SERVICE_CONTACT_BTN = """
     <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
             data-bs-target="#service-contact-modal" data-emplois-mobilization-kind="service_contact"
             data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
             data-matomo-option="voir-coordonnees-contact">
-        Voir les coordonnées de contact du service
+        Contacter le service par email
     </button>"""
     MISSING_CONTACT_LABEL = "Informations de contact non renseignées"
     DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
@@ -306,6 +307,12 @@ class TestServices:
 
     def get_nexus_auto_login_url(self, service_url):
         return reverse("nexus:auto_login", query={"next_url": service_url})
+
+    @staticmethod
+    def format_categories(service):
+        view = ServiceDetailView()
+        view.object = service
+        return view.format_categories()
 
     def test_detail_accessible_without_login(self, client):
         service = ServiceFactory(
@@ -340,8 +347,69 @@ class TestServices:
         assert hours["Lundi"] == "7h45 à 18h30"
         assert hours["Samedi"] == "ouvert"
         assert formatted_opening_hours["comments"] == ["Fermé en août", "Fermé du 25 décembre au 1er janvier"]
-        assertContains(response, "Fermé en août.")
-        assertContains(response, "Fermé du 25 décembre au 1er janvier.")
+        assertContains(response, "7h45 à 18h30")
+        assertContains(response, "ouvert")
+        assertContains(response, "Fermé en août")
+        assertContains(response, "Fermé du 25 décembre au 1er janvier")
+
+    @pytest.mark.parametrize(
+        ("volume_horaire_hebdomadaire", "nombre_semaines", "expected_texts", "unexpected_texts"),
+        [
+            pytest.param(
+                21,
+                None,
+                ["Durée de la prestation", "21 heures par semaine"],
+                [", pendant", " semaines"],
+                id="volume_only",
+            ),
+            pytest.param(
+                None,
+                16,
+                ["Durée de la prestation", "16 semaines"],
+                ["heures par semaine", ", pendant"],
+                id="semaines_only",
+            ),
+            pytest.param(
+                21,
+                16,
+                [
+                    "Durée de la prestation",
+                    "21 heures par semaine",
+                    ", pendant",
+                    "16 semaines",
+                ],
+                [],
+                id="both",
+            ),
+            pytest.param(None, None, [], ["Durée de la prestation"], id="neither"),
+        ],
+    )
+    def test_detail_prestation_duration(
+        self,
+        client,
+        volume_horaire_hebdomadaire,
+        nombre_semaines,
+        expected_texts,
+        unexpected_texts,
+    ):
+        service = ServiceFactory(
+            uid="test-prestation-duration-uid",
+            name="Mon service de test",
+            updated_on="2025-01-15",
+            source__value="dora",
+            source__label="Dora",
+            volume_horaire_hebdomadaire=volume_horaire_hebdomadaire,
+            nombre_semaines=nombre_semaines,
+            structure__uid="test-structure-uid",
+            structure__name="Ma structure de test",
+            structure__updated_on="2025-01-15",
+        )
+        response = client.get(self.get_service_url(service))
+        assert response.status_code == 200
+        for text in expected_texts:
+            assertContains(response, text)
+        for text in unexpected_texts:
+            assertNotContains(response, text)
 
     def test_detail_basic_dora(self, client, snapshot):
         user = PrescriberFactory()
@@ -405,6 +473,22 @@ class TestServices:
         mobilization = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.MOBILIZATION, value="telephonique", label="Par téléphone"
         )
+        mobilization_public = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION_PUBLIC,
+            value="professionnels",
+            label="Professionnels",
+        )
+
+        Region.objects.create(code="53", name="Bretagne")
+        Department.objects.create(code="56", name="Morbihan", region="53")
+        eligibility_zones = [
+            City.objects.create(
+                code=f"56{i:03}",
+                name=f"Commune numéro {i} en Bretagne",
+                department="56",
+            ).code
+            for i in range(1, 16)
+        ]
 
         service = ServiceFactory(
             uid="test-service-full-uid",
@@ -423,14 +507,34 @@ class TestServices:
             contact_phone="01 23 45 67 89",
             is_orientable_with_form=True,
             average_orientation_response_delay_days=3,
+            volume_horaire_hebdomadaire=21,
+            nombre_semaines=16,
             opening_hours="Mo-Fr 09:00-17:00; PH off",
             address_line_1="12 rue de la Paix",
             address_line_2="Bâtiment B",
             post_code="75001",
             city="Paris",
+            eligibility_zones=eligibility_zones,
             structure__uid="test-structure-full-uid",
             structure__name="Structure complète",
             structure__updated_on="2025-06-01",
+            extra={
+                "funding_labels": ["France Travail", "Conseil départemental"],
+                "forms": [
+                    {
+                        "name": "dossier-inscription.pdf",
+                        "url": "https://s3.example.com/dossier-inscription.pdf?token=aaa",
+                    },
+                    {
+                        "name": "autorisation-traitement-donnees.pdf",
+                        "url": "https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb",
+                    },
+                    {
+                        "name": "bilan-competences.docx",
+                        "url": "https://s3.example.com/bilan-competences.docx?token=ccc",
+                    },
+                ],
+            },
             thematics=[],
             receptions=[],
         )
@@ -438,10 +542,19 @@ class TestServices:
         service.receptions.add(reception)
         service.thematics.add(thematic)
         service.mobilizations.add(mobilization)
+        service.mobilization_publics.add(mobilization_public)
 
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assert response.status_code == 200
+        assert response.context["credential_documents"] == [
+            ("dossier-inscription.pdf", "https://s3.example.com/dossier-inscription.pdf?token=aaa"),
+            (
+                "autorisation-traitement-donnees.pdf",
+                "https://s3.example.com/autorisation-traitement-donnees.pdf?token=bbb",
+            ),
+            ("bilan-competences.docx", "https://s3.example.com/bilan-competences.docx?token=ccc"),
+        ]
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
     def test_detail_with_external_orientation_link(self, client, snapshot):
@@ -452,18 +565,80 @@ class TestServices:
             name="Service avec lien externe",
             updated_on="2025-01-15",
             is_orientable_with_form=True,
-            mobilization_modes_professionals_external_form_link="https://test.example.com",
-            mobilization_modes_professionals_external_form_link_text="Test link",
+            lien_mobilisation="https://test.example.com",
             structure__uid="test-structure-external-uid",
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, "Test link")
+        assertContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, f'href="{test_link}"')
+        orientation_link = parse_response_to_soup(response, ".c-box--action").find("a", href=test_link)
+        assert "has-external-link" in orientation_link["class"]
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
-    def test_detail_with_external_orientation_link_without_text(self, client):
+    def test_detail_mobilization_link_in_modes(self, client):
+        user = PrescriberFactory()
+        mobilization = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION,
+            value="utiliser-lien-mobilisation",
+            label="Utiliser le lien de mobilisation",
+        )
+        external_link = "https://example.com/mobilisation"
+        service = ServiceFactory(
+            uid="test-mobilization-link-uid",
+            updated_on="2025-01-15",
+            lien_mobilisation=external_link,
+            contact_is_public=True,
+            structure__updated_on="2025-01-15",
+        )
+        service.mobilizations.add(mobilization)
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, f'href="{external_link}"')
+        assertContains(response, "Utiliser le lien de mobilisation")
+        assertContains(response, "has-external-link")
+        mobilization_link = parse_response_to_soup(response, "main").find("a", href=external_link)
+        assert mobilization_link["data-emplois-mobilization-kind"] == "service_ext_link"
+
+    def test_detail_mobilization_link_clickable_without_authentication(self, client):
+        mobilization = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.MOBILIZATION,
+            value="utiliser-lien-mobilisation",
+            label="Utiliser le lien de mobilisation",
+        )
+        external_link = "https://example.com/mobilisation"
+        service = ServiceFactory(
+            uid="test-mobilization-link-private-uid",
+            updated_on="2025-01-15",
+            lien_mobilisation=external_link,
+            contact_is_public=False,
+            structure__updated_on="2025-01-15",
+        )
+        service.mobilizations.add(mobilization)
+        response = client.get(self.get_service_url(service))
+        mobilization_modes = (
+            parse_response_to_soup(response, "main").find("small", string="Mode de mobilisation").find_next("strong")
+        )
+        assert "Utiliser le lien de mobilisation" in mobilization_modes.get_text()
+        assert mobilization_modes.find("a", href=external_link)
+
+    def test_detail_contact_modal_has_phone_copy_button(self, client):
+        user = PrescriberFactory()
+        service = ServiceFactory(
+            uid="test-contact-phone-copy-uid",
+            updated_on="2025-01-15",
+            contact_phone="01 23 45 67 89",
+            contact_is_public=True,
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        modal = parse_response_to_soup(response, "#service-contact-modal")
+        assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
+        assertNotContains(response, 'class="modal-footer"')
+
+    def test_detail_with_external_orientation_link_for_non_orientable_service(self, client):
         user = PrescriberFactory()
         external_link = "https://test.example.com"
         service = ServiceFactory(
@@ -471,8 +646,7 @@ class TestServices:
             name="Service avec lien externe sans intitulé",
             updated_on="2025-01-15",
             is_orientable_with_form=False,
-            mobilization_modes_professionals_external_form_link=external_link,
-            mobilization_modes_professionals_external_form_link_text="",
+            lien_mobilisation=external_link,
             structure__uid="test-structure-external-no-text-uid",
             structure__updated_on="2025-01-15",
         )
@@ -489,51 +663,11 @@ class TestServices:
             name="DI service orientable avec lien externe",
             updated_on="2025-01-15",
             is_orientable_with_form=True,
-            mobilization_modes_professionals_external_form_link=external_link,
-            mobilization_modes_professionals_external_form_link_text="Lien externe",
+            lien_mobilisation=external_link,
             structure__uid="test-structure-orientable-ext-uid",
             structure__updated_on="2025-01-15",
         )
 
-        client.force_login(user)
-        response = client.get(self.get_service_url(service))
-        assertContains(response, f'href="{external_link}"')
-        assertNotContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
-        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
-
-    def test_dora_service_orientable_with_form_and_external_link_prefers_wizard(self, client, snapshot):
-        user = PrescriberFactory()
-        external_link = "https://test.example.com"
-        service = ServiceFactory(
-            uid="test-orientable-ext-uid",
-            name="Dora service orientable avec lien externe",
-            updated_on="2025-01-15",
-            is_orientable_with_form=True,
-            mobilization_modes_professionals_external_form_link=external_link,
-            mobilization_modes_professionals_external_form_link_text="Lien externe",
-            structure__uid="test-structure-orientable-ext-uid",
-            structure__updated_on="2025-01-15",
-            source__value="dora",
-        )
-        client.force_login(user)
-        response = client.get(self.get_service_url(service))
-        assertContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
-        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
-
-    def test_dora_service_not_orientable_with_form_prefers_external_link(self, client, snapshot):
-        user = PrescriberFactory()
-        external_link = "https://test.example.com"
-        service = ServiceFactory(
-            uid="test-orientable-ext-uid",
-            name="Dora service pas orientable avec le formulaire qui a un lien externe",
-            updated_on="2025-01-15",
-            is_orientable_with_form=False,
-            mobilization_modes_professionals_external_form_link=external_link,
-            mobilization_modes_professionals_external_form_link_text="Lien externe",
-            structure__uid="test-structure-orientable-ext-uid",
-            structure__updated_on="2025-01-15",
-            source__value="dora",
-        )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertContains(response, f'href="{external_link}"')
@@ -553,6 +687,11 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertContains(response, self.ORIENT_BTN_LABEL)
+        orientation_link = parse_response_to_soup(response, ".c-box--action").find(
+            "a",
+            href=reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}),
+        )
+        assert "has-external-link" not in orientation_link["class"]
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_orientable_and_job_seeker_authenticated(self, client):
@@ -588,29 +727,31 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
 
-    def test_detail_not_orientable(self, client, snapshot):
+    def test_detail_without_mobilization_link_uses_wizard_regardless_of_dora_orientability(self, client, snapshot):
         user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-not-orientable-uid",
-            name="Service non orientable",
+            name="Service orientable via le formulaire interne",
             updated_on="2025-01-15",
             is_orientable_with_form=False,
+            contact_email="",
+            source__value="dora",
             structure__uid="test-structure-not-orientable-uid",
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
-    def test_detail_not_orientable_because_of_missing_email(self, client):
+    def test_detail_without_mobilization_link_uses_wizard_without_contact_email(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(
             is_orientable_with_form=True, contact_email="", contact_full_name="Ludwig B.", contact_phone="3949"
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, self.ORIENT_BTN_LABEL)
 
     def test_detail_non_orientable_di_sources(self, client, settings):
         user = PrescriberFactory()
@@ -622,10 +763,14 @@ class TestServices:
             updated_on="2025-01-15",
             is_orientable_with_form=True,
             source__value=blacklisted_source,
+            contact_full_name="",
+            contact_email="",
+            contact_phone="",
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_non_orientable_di_sources_with_external_link(self, client, settings):
         user = PrescriberFactory()
@@ -637,8 +782,7 @@ class TestServices:
             name="Service non orientable",
             updated_on="2025-01-15",
             is_orientable_with_form=True,
-            mobilization_modes_professionals_external_form_link=external_link,
-            mobilization_modes_professionals_external_form_link_text="",
+            lien_mobilisation=external_link,
             source__value=blacklisted_source,
         )
         client.force_login(user)
@@ -646,7 +790,7 @@ class TestServices:
         assertContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, f'href="{external_link}"')
 
-    def test_detail_contact_section_hidden_without_contact_info(self, client):
+    def test_detail_without_contact_info_still_uses_wizard(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-no-contact-uid",
@@ -661,7 +805,8 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
-        assertContains(response, self.MISSING_CONTACT_LABEL)
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory()
@@ -678,6 +823,31 @@ class TestServices:
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
+
+    @pytest.mark.parametrize(
+        "contact_email,contact_phone,expected_label",
+        [
+            pytest.param("", "01 23 45 67 89", "Contacter le service par téléphone", id="phone"),
+            pytest.param("contact@example.com", "", "Contacter le service par email", id="email"),
+            pytest.param(
+                "contact@example.com",
+                "01 23 45 67 89",
+                "Contacter le service par téléphone ou email",
+                id="phone_and_email",
+            ),
+        ],
+    )
+    def test_detail_contact_button_label(self, client, contact_email, contact_phone, expected_label):
+        user = PrescriberFactory()
+        service = ServiceFactory(contact_email=contact_email, contact_phone=contact_phone)
+        client.force_login(user)
+
+        response = client.get(self.get_service_url(service))
+
+        contact_button = parse_response_to_soup(response, ".c-box--action").find(
+            "button", {"data-bs-target": "#service-contact-modal"}
+        )
+        assert contact_button.get_text(strip=True) == expected_label
 
     def test_detail_contact_button_shown_when_public(self, client):
         service = ServiceFactory(
@@ -706,6 +876,7 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, "Contacter le service par email")
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertNotContains(response, "contact@example.com")
 
@@ -759,7 +930,7 @@ class TestServices:
         service = ServiceFactory(
             uid="test-creds-empty-uid",
             updated_on="2025-01-15",
-            credentials_documents=[],
+            extra=None,
             structure__uid="test-structure-creds-empty-uid",
             structure__updated_on="2025-01-15",
         )
@@ -772,19 +943,17 @@ class TestServices:
         service = ServiceFactory(
             uid="test-creds-uid",
             updated_on="2025-01-15",
-            credentials_documents=["folder/sub/my_form.pdf", "other/justificatif.docx"],
+            extra={
+                "forms": [
+                    {"name": "my_form.pdf", "url": "https://s3.example.com/my_form.pdf?token=aaa"},
+                    {"name": "justificatif.docx", "url": "https://s3.example.com/justificatif.docx?token=bbb"},
+                ],
+                "online_form": "https://example.com/formulaire-inscription",
+            },
             structure__uid="test-structure-creds-uid",
             structure__updated_on="2025-01-15",
         )
-        s3_urls = [
-            "https://s3.example.com/my_form.pdf?token=aaa",
-            "https://s3.example.com/justificatif.docx?token=bbb",
-        ]
-        with patch(
-            "itou.insertion.models.generate_dora_storage_url",
-            side_effect=s3_urls,
-        ):
-            response = client.get(self.get_service_url(service))
+        response = client.get(self.get_service_url(service))
 
         assertContains(response, self.FORMS_TO_FILL)
         assert response.context["credential_documents"] == [
@@ -793,7 +962,7 @@ class TestServices:
         ]
         assert pretty_indented(parse_response_to_soup(response, "#credentials-documents")) == snapshot
 
-    def test_format_categories_no_thematics(self, client):
+    def test_format_categories_no_thematics(self):
         service = ServiceFactory(
             uid="test-categories-uid",
             updated_on="2025-01-15",
@@ -801,10 +970,9 @@ class TestServices:
             structure__updated_on="2025-01-15",
             thematics=[],
         )
-        response = client.get(self.get_service_url(service))
-        assert response.context["formatted_categories"] == []
+        assert self.format_categories(service) == []
 
-    def test_format_categories_single_thematic(self, client):
+    def test_format_categories_single_thematic(self):
         thematic = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -815,13 +983,11 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
-            thematics=[],
+            thematics=[thematic],
         )
-        service.thematics.add(thematic)
-        response = client.get(self.get_service_url(service))
-        assert response.context["formatted_categories"] == [("Choisir un métier", "Explorer des métiers")]
+        assert self.format_categories(service) == [("Choisir un métier", "Explorer des métiers")]
 
-    def test_format_categories_multiple_categories(self, client):
+    def test_format_categories_multiple_categories(self):
         thematic_a = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -837,134 +1003,34 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
-            thematics=[],
+            thematics=[thematic_a, thematic_b],
         )
-        service.thematics.add(thematic_a, thematic_b)
-        response = client.get(self.get_service_url(service))
-        assert sorted(response.context["formatted_categories"]) == [
+        assert self.format_categories(service) == [
             ("Choisir un métier", "Explorer des métiers"),
             ("Créer une entreprise", "Définir son projet"),
         ]
 
-    # --- Mobilization modes: 'autre' handling ---
-
-    def test_professionals_has_autre_true_when_autre_mode_selected(self, client):
-        mode = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="autre",
-            label="Autre",
+    def test_format_categories_groups_thematics_by_category(self):
+        thematic_a = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="creer-une-entreprise--developper-son-entreprise",
+            label="Développer son entreprise",
+        )
+        thematic_b = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="creer-une-entreprise--definir-son-projet",
+            label="Définir son projet",
         )
         service = ServiceFactory(
-            uid="prof-autre-true",
+            uid="test-categories-grouped-uid",
             updated_on="2025-01-15",
-            source__value="dora",
-            structure__uid="structure-prof-autre-true",
+            structure__uid="test-structure-categories-grouped-uid",
             structure__updated_on="2025-01-15",
+            thematics=[thematic_a, thematic_b],
         )
-        service.mobilization_modes_professionals.add(mode)
-        response = client.get(self.get_service_url(service))
-        assert response.context["professionals_has_autre"] is True
-
-    def test_professionals_has_autre_false_without_autre_mode(self, client):
-        mode = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="telephonique",
-            label="Par téléphone",
-        )
-        service = ServiceFactory(
-            uid="prof-autre-false",
-            updated_on="2025-01-15",
-            source__value="dora",
-            structure__uid="structure-prof-autre-false",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_professionals.add(mode)
-        response = client.get(self.get_service_url(service))
-        assert response.context["professionals_has_autre"] is False
-
-    def test_beneficiaries_has_autre_true_when_autre_mode_selected(self, client):
-        mode = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            value="autre",
-            label="Autre",
-        )
-        service = ServiceFactory(
-            uid="ben-autre-true",
-            updated_on="2025-01-15",
-            source__value="dora",
-            structure__uid="structure-ben-autre-true",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_beneficiaries.add(mode)
-        response = client.get(self.get_service_url(service))
-        assert response.context["beneficiaries_has_autre"] is True
-
-    def test_beneficiaries_has_autre_false_without_autre_mode(self, client):
-        mode = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            value="en-presentiel",
-            label="En présentiel",
-        )
-        service = ServiceFactory(
-            uid="ben-autre-false",
-            updated_on="2025-01-15",
-            source__value="dora",
-            structure__uid="structure-ben-autre-false",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_beneficiaries.add(mode)
-        response = client.get(self.get_service_url(service))
-        assert response.context["beneficiaries_has_autre"] is False
-
-    def test_autre_mode_label_not_rendered_in_list(self, client):
-        mode_autre = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="autre",
-            label="Autre (ne doit pas apparaître)",
-        )
-        mode_phone = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="telephonique",
-            label="Par téléphone",
-        )
-        service = ServiceFactory(
-            uid="autre-not-in-list",
-            updated_on="2025-01-15",
-            source__value="dora",
-            mobilization_modes_professionals_other="Contacter par courrier",
-            structure__uid="structure-autre-not-in-list",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_professionals.add(mode_autre, mode_phone)
-        response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Autre (ne doit pas apparaître)")
-        assertContains(response, "Par téléphone")
-        assertContains(response, "Contacter par courrier")
-
-    def test_other_field_shown_when_autre_mode_selected(self, client):
-        mode_autre = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="autre",
-            label="Autre",
-        )
-        service = ServiceFactory(
-            uid="other-shown-with-autre",
-            updated_on="2025-01-15",
-            source__value="dora",
-            mobilization_modes_professionals_other="Contacter le service par email",
-            structure__uid="structure-other-shown-with-autre",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_professionals.add(mode_autre)
-        response = client.get(self.get_service_url(service))
-        assertContains(response, "Contacter le service par email")
+        assert self.format_categories(service) == [
+            ("Créer une entreprise", "Définir son projet, Développer son entreprise"),
+        ]
 
     def test_other_field_not_shown_without_autre_mode(self, client):
         mode_phone = GenericReferenceItemFactory(
@@ -985,33 +1051,6 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte ne doit pas apparaître")
 
-    def test_beneficiaries_autre_mode_label_not_rendered_in_list(self, client):
-        mode_autre = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            value="autre",
-            label="Autre (bénéficiaire ne doit pas apparaître)",
-        )
-        mode_presentiel = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            value="en-presentiel",
-            label="En présentiel",
-        )
-        service = ServiceFactory(
-            uid="ben-autre-not-in-list",
-            updated_on="2025-01-15",
-            source__value="dora",
-            mobilization_modes_beneficiaries_other="Prise en charge specifique",
-            structure__uid="structure-ben-autre-not-in-list",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_beneficiaries.add(mode_autre, mode_presentiel)
-        response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Autre (bénéficiaire ne doit pas apparaître)")
-        assertContains(response, "En présentiel")
-        assertContains(response, "Prise en charge specifique")
-
     def test_beneficiaries_other_field_not_shown_without_autre_mode(self, client):
         mode_presentiel = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
@@ -1030,22 +1069,6 @@ class TestServices:
         service.mobilization_modes_beneficiaries.add(mode_presentiel)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte beneficiaire ne doit pas apparaitre")
-
-    def test_change_name_of_via_formulaire_dora_mobilization_mode(self, client):
-        dora_form_mobilization_mode = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="formulaire-dora",
-            label="Via le formulaire DORA",
-        )
-
-        service = ServiceFactory(source__value="dora")
-
-        service.mobilization_modes_professionals.add(dora_form_mobilization_mode)
-
-        response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Via le formulaire DORA")
-        assertContains(response, "Via le formulaire (bouton “Orienter votre bénéficiaire”)")
 
     @pytest.mark.parametrize(
         "user_factory,assertion",

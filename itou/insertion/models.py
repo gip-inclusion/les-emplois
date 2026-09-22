@@ -4,6 +4,7 @@ import secrets
 import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
@@ -467,6 +468,10 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.source.value == "dora"
 
     @property
+    def is_update_needed(self):
+        return self.updated_on < timezone.localdate() - relativedelta(months=6)
+
+    @property
     def prerequisites(self) -> list[str]:
         if self.is_dora:
             return [*self.access_conditions_dora, *self.credentials]
@@ -482,7 +487,7 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def should_mobilize_via_external_link(self) -> bool:
-        return not self.is_dora and bool(self.mobilization_modes_professionals_external_form_link)
+        return bool(self.lien_mobilisation)
 
     @property
     def has_orientation_action(self):
@@ -507,6 +512,11 @@ class Service(GeolocatedAddressMixin, models.Model):
         return [
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
+
+    def generate_extra_credential_documents_info(self) -> list[tuple[str, str]]:
+        if not self.extra:
+            return []
+        return [(form["name"], form["url"]) for form in self.extra.get("forms") or []]
 
     objects = ServiceManager()
     include_inactive = ServiceQuerySet.as_manager()
