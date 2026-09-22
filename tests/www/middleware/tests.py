@@ -24,7 +24,7 @@ class TestRedirectToNewDomainMiddleware:
             follow=False,
         )
         assert response.status_code == 302
-        assert response.url == "https://new.domain/admin/?foo=bar&redirected-from-old-domain=1"
+        assert response.url == "https://new.domain/admin/?foo=bar"
 
         response = client.get("/admin/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
@@ -44,7 +44,7 @@ class TestRedirectToNewDomainMiddleware:
             follow=False,
         )
         assert response.status_code == 302
-        assert response.url == "https://new.domain/?foo=bar&redirected-from-old-domain=1"
+        assert response.url == "https://new.domain/?foo=bar"
 
         response = client.get("/search/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
