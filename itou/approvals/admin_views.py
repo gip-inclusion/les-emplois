@@ -15,7 +15,7 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -190,8 +190,9 @@ def terminate_approval(request, model_admin, approval_id):
     codename = get_permission_codename("change", opts)
     if not request.user.has_perm(f"{app_label}.{codename}"):
         raise PermissionDenied
-
-    approval = get_object_or_404(Approval, pk=approval_id, end_at__gte=timezone.localdate())
+    approval = get_object_or_404(Approval, pk=approval_id)
+    if not approval.can_be_terminated():
+        raise Http404
     close_approval(approval, closed_by=request.user)
     return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
 

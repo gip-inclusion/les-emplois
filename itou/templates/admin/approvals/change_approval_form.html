@@ -5,7 +5,7 @@
             <a href="{% url "admin:approvals_approval_prolongation_derogation" original.pk %}">Générer un lien de demande de prolongation</a>
         </li>
     {% endif %}
-    {% if original.is_valid %}
+    {% if has_change_permission and original.can_be_terminated %}
         <li>
             <form method="post"
                   action="{% url "admin:approvals_approval_terminate_approval" original.pk %}"
@@ -20,7 +20,7 @@
         (function() {
             Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
                 form.addEventListener("submit", function(e) {
-                    if (!confirm("Voulez-vous clôturer ce PASS IAE ?")) {
+                    if (!confirm("Voulez-vous clôturer ce PASS IAE ? Sa date de fin sera fixée à hier.")) {
                         e.preventDefault();
                     }
                 })
