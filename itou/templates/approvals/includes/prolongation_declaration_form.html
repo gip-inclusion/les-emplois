@@ -8,7 +8,7 @@
     {% bootstrap_form_errors form type="non_fields" %}
 
     {% bootstrap_field form.reason %}
-    {% bootstrap_field form.end_at %}
+    {% bootstrap_field form.end_at wrapper_class="form-group form-group-input-w-lg-33" %}
 
     {% if form.max_end_limit %}
         {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="maxEndAtCollapseInfo" extra_classes="mb-3" %}

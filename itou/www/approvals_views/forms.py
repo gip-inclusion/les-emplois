@@ -270,7 +270,8 @@ class CreateProlongationRequestForm(CreateProlongationForm):
     email = forms.EmailField(
         label="Adresse e-mail du prescripteur habilité sollicité pour cette prolongation",
         help_text=(
-            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
+            "Contactez directement la structure pour récupérer ou identifier un collaborateur susceptible de traiter "
+            "votre demande et indiquez son adresse e-mail."
         ),
         required=False,
         error_messages={
@@ -393,7 +394,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                     "email",
                     format_html(
                         "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur {}, "
-                        'vous pouvez <a href="{}" rel="noopener" target="_blank" '
+                        'vous pouvez <a href="{}" class="has-external-link" rel="noopener" target="_blank" '
                         'aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">retrouver ici'
                         "</a> des prescripteurs habilités autour de chez vous.",
                         product_name(),
