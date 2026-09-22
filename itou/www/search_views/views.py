@@ -26,6 +26,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, kinds_for_cate
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.enums import ItouEnvironment
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.readonly import ReadonlyViewMixin, readonly_view
@@ -53,17 +54,21 @@ def search_home(request, template_name="search/search_home.html"):
     if request.user.is_authenticated:
         warnings.warn("Access to 'search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
-    iframe_url = settings.PLATEFORME_ACCUEIL_BASE_URL
-    iframe_url = add_url_params(iframe_url, {"host": settings.ITOU_FQDN})
-    match request.resolver_match.url_name:
-        case "prescribers_home":
-            iframe_url = add_url_params(iframe_url, {"type": "accompagnateur"})
-        case "services_home":
-            iframe_url = add_url_params(iframe_url, {"type": "insertion"})
+    # plateforme-accueil CSP frame-ancestors does not allow *.cleverapps.io.
+    embed_accueil = settings.ITOU_ENVIRONMENT != ItouEnvironment.REVIEW_APP
+    iframe_url = None
+    if embed_accueil:
+        iframe_url = add_url_params(settings.PLATEFORME_ACCUEIL_BASE_URL, {"host": settings.ITOU_FQDN})
+        match request.resolver_match.url_name:
+            case "prescribers_home":
+                iframe_url = add_url_params(iframe_url, {"type": "accompagnateur"})
+            case "services_home":
+                iframe_url = add_url_params(iframe_url, {"type": "insertion"})
     return render(
         request,
         template_name,
         {
+            "embed_accueil": embed_accueil,
             "iframe_url": iframe_url,
             "siae_search_form": SiaeSearchForm(),
         },

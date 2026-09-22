@@ -17,6 +17,7 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Appellation, Rome
 from itou.prescribers.enums import PrescriberOrganizationCategory, PrescriberOrganizationKind
+from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.str_filters import pluralizefr
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import (
@@ -62,6 +63,14 @@ class TestSearchCompany:
             response,
             'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
         )
+
+    def test_home_anonymous_review_app(self, client, settings):
+        settings.ITOU_ENVIRONMENT = ItouEnvironment.REVIEW_APP
+        settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
+        response = client.get(reverse("search:home"))
+        assertContains(response, "Rechercher un emploi inclusif")
+        assertNotContains(response, "data-plateforme-accueil")
+        assertNotContains(response, "mode dégradé")
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
