@@ -75,11 +75,6 @@ CONFIRM_BUTTON_MARKUP = (
     "<span>Confirmer l’embauche</span>"
     "</button>"
 )
-NEXT_BUTTON_MARKUP = (
-    '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
-    "<span>Suivant</span>"
-    "</button>"
-)
 
 
 def fake_session_initialization(client, company, job_seeker, data):
