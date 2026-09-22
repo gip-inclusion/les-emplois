@@ -1122,11 +1122,7 @@ class TestOrientationDetailsForSender:
             source__value="dora",
             source__label="Dora",
             source_link="https://domain.fake/services/test-service-uid",
-            # dora-only fields — should appear
-            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
-            credentials=["Pièce d'identité en cours de validité"],
-            # DI-only field — should NOT appear
-            access_conditions_di="Ne doit pas apparaître pour dora",
+            access_conditions_di="Avoir plus de 18 ans\nRésider en France",
             structure__name="Gonflable",
             structure__uid="structure-uid",
         )
@@ -1162,11 +1158,7 @@ class TestOrientationDetailsForSender:
             updated_on="2025-01-15",
             source__value="other",
             source__label="Other",
-            # DI-only field — should appear
-            access_conditions_di="Être orienté par un prescripteur\\nAvoir 18 ans",
-            # dora-only fields — should NOT appear
-            access_conditions_dora=["Ne doit pas apparaître pour data·inclusion"],
-            credentials=["Ne doit pas apparaître pour data·inclusion"],
+            access_conditions_di="Être orienté par un prescripteur\nAvoir 18 ans",
             structure__name="Gonflable",
             structure__uid="structure-uid",
         )
@@ -1199,7 +1191,7 @@ class TestOrientationDetailsForSender:
             name="Service complet",
             updated_on="2025-06-01",
             source__value="dora",
-            access_conditions_dora=["Être orienté par un prescripteur."],
+            access_conditions_di="Être orienté par un prescripteur.",
             mobilizations_details="Contacter le service par téléphone.",
             contact_email="contact@service.fr",
             contact_phone="01 23 45 67 89",
@@ -1427,8 +1419,7 @@ class TestOrientationDetailsForServiceProvider:
             source__value="dora",
             source__label="Dora",
             source_link="https://domain.fake/services/test-service-uid",
-            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
-            credentials=["Pièce d'identité en cours de validité"],
+            access_conditions_di="Avoir plus de 18 ans\nRésider en France",
         )
 
         membership = PrescriberMembershipFactory(user__for_snapshot=True, organization__for_snapshot=True)
@@ -1457,7 +1448,7 @@ class TestOrientationDetailsForServiceProvider:
             name="Service complet",
             updated_on="2025-06-01",
             source__value="dora",
-            access_conditions_dora=["Être orienté par un prescripteur."],
+            access_conditions_di="Être orienté par un prescripteur.",
             mobilizations_details="Contacter le service par téléphone.",
             contact_email="contact@service.fr",
             contact_phone="01 23 45 67 89",

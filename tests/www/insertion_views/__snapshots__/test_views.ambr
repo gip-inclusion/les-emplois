@@ -95,17 +95,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Avoir plus de 18 ans
-                              </li>
-                              <li>
+                                  <br/>
                                   Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -683,18 +679,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
-                                  <p>
-                                      Être orienté par un prescripteur
-                                  </p>
-                              </li>
-                              <li>
-                                  <p>
-                                      Avoir 18 ans
-                                  </p>
-                              </li>
-                          </ul>
+                          <div class="">
+                              <p>
+                                  Être orienté par un prescripteur
+                                  <br/>
+                                  Avoir 18 ans
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -848,11 +839,11 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Être orienté par un prescripteur.
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -1067,17 +1058,13 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Avoir plus de 18 ans
-                              </li>
-                              <li>
+                                  <br/>
                                   Résider en France
-                              </li>
-                              <li>
-                                  Pièce d'identité en cours de validité
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -1635,11 +1622,11 @@
                           <h2 class="h3">
                               Conditions et critères requis
                           </h2>
-                          <ul class="mb-0">
-                              <li>
+                          <div class="">
+                              <p>
                                   Être orienté par un prescripteur.
-                              </li>
-                          </ul>
+                              </p>
+                          </div>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -3601,13 +3588,6 @@
                                       <small class="d-block">
                                           Toute personne majeure.
                                       </small>
-                                  </div>
-                              </li>
-                              <li>
-                                  <small>
-                                      Conditions d'accès
-                                  </small>
-                                  <div class="fw-bold">
                                   </div>
                               </li>
                               <hr class="my-4"/>
