@@ -21,10 +21,10 @@ class DoraPermission(BasePermission):
         )
 
 
-orientations_view_description = """
-# API des orientations
+orientations_view_description = f"""
+# Liste des orientations
 
-Cette API est à l’usage exclusif du service [DORA](https://dora.inclusion.gouv.fr).
+Cette API est à l’usage exclusif du service [DORA]({settings.DORA_WWW_BASE_URL}).
 
 Elle retourne une liste d’orientations reçues par une structure porteuse de services.
 Il est nécessaire de passer dans le corps de la requête (formulaire POST ou json) une valeur pour `structure_uid`
