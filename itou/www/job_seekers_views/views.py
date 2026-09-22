@@ -1,4 +1,3 @@
-import datetime
 import logging
 import urllib.parse
 from functools import cached_property
@@ -27,7 +26,6 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
 from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -164,6 +162,9 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
 class JobSeekerDetailTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/details.html"
 
+    def get_queryset(self):
+        return super().get_queryset().with_contract_ending_soon()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -200,19 +201,14 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         contract_ending_soon_date = None
         suggest_next_step_url = None
         pro_support_request_mailto = None
-        request_from_siae = self.request.from_iae_actor and self.request.from_employer
-        if request_from_siae or self.request.from_authorized_prescriber:
-            today = timezone.localdate()
-            contracts = Contract.objects.filter(job_seeker=self.object, end_date__isnull=False)
-            if request_from_siae:
-                # A SIAE only looks at its own contract; a prescriber follows the whole IAE journey.
-                contracts = contracts.filter(company=self.request.current_organization)
-            last_contract_end_date = contracts.order_by("-end_date").values_list("end_date", flat=True).first()
-            if last_contract_end_date and today <= last_contract_end_date <= today + datetime.timedelta(
-                days=IAE_CONTRACT_ENDING_SOON_DAYS
-            ):
-                contract_ending_soon_date = last_contract_end_date
-                if request_from_siae:
+        last_contract = get_contracts(self.approval).first() if self.approval else None
+        if (
+            self.request.from_authorized_prescriber
+            or getattr(last_contract, "company", None) == self.request.current_organization
+        ):
+            if self.object.contract_ending_soon:
+                contract_ending_soon_date = last_contract.end_date
+                if self.request.from_employer:
                     suggest_next_step_url = get_tally_form_url(
                         settings.TALLY_SUGGEST_NEXT_STEP_FORM_ID,
                         iduser=self.request.user.pk,

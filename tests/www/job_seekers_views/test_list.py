@@ -1461,6 +1461,12 @@ def test_suggest_next_step_banner_on_job_seeker_card(client):
     client.force_login(employer)
     today = datetime.date(2026, 1, 15)
     job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    # We rely on the current valid approval's dates to retrieve the last contract
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=200),
+        end_at=today + datetime.timedelta(days=20),
+    )
     ContractFactory(
         job_seeker=job_seeker,
         company=company,
@@ -1488,6 +1494,12 @@ def test_pro_support_request_banner_on_job_seeker_card(client):
         job_seeker__last_name="Dupont",
         with_job_seeker_assignment=True,
     ).job_seeker
+    # We rely on the current valid approval's dates to retrieve the last contract
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=200),
+        end_at=today + datetime.timedelta(days=20),
+    )
     contract = ContractFactory(
         job_seeker=job_seeker,
         company__email="",
