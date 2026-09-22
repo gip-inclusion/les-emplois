@@ -92,7 +92,7 @@
                                 <form method="post" action="{% url 'dashboard:api_token' %}">
                                     {% csrf_token %}
                                     <span class="d-block text-center mb-2">Vous n’avez pas encore de token d’API</span>
-                                    <button class="btn btn-primary btn-block">Créer un token d’API</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Créer un token d’API</button>
                                 </form>
                             {% else %}
                                 <span class="d-block text-center mb-2">
@@ -154,7 +154,7 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <button class="btn btn-sm btn-danger" aria-label="Regénérer le token" name="action" value="regenerate">
+                        <button type="submit" class="btn btn-sm btn-danger" aria-label="Regénérer le token" name="action" value="regenerate">
                             Confirmer la regénération
                         </button>
                     </form>

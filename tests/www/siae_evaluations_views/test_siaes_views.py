@@ -438,12 +438,12 @@ class TestSiaeJobApplicationListView:
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-primary disabled">
+            <button type="submit" class="btn btn-primary disabled">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary">
+            <button type="submit" class="btn btn-primary">
                 Soumettre à validation
             </button>
         """
@@ -512,12 +512,12 @@ class TestSiaeJobApplicationListView:
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-primary disabled">
+            <button type="submit" class="btn btn-primary disabled">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary">
+            <button type="submit" class="btn btn-primary">
                 Soumettre à validation
             </button>
         """

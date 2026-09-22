@@ -48,7 +48,7 @@
     <li class="dropdown-item position-relative">
         <form method="post" action="{% url 'account_logout' %}">
             {% csrf_token %}
-            <button class="text-danger stretched-link">Déconnexion</button>
+            <button type="submit" class="text-danger stretched-link">Déconnexion</button>
         </form>
     </li>
 </ul>

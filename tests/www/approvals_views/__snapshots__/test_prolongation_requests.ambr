@@ -2396,7 +2396,7 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <form action="/approvals/prolongation/request/666/grant" class="js-prevent-multiple-submit" method="post">
                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" type="submit">
                                           <i aria-hidden="true" class="ri-check-line">
                                           </i>
                                           <span>

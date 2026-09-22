@@ -4143,7 +4143,7 @@ def test_detect_existing_job_seeker(client):
     )
     assertContains(
         response,
-        '<button name="confirm" value="1" class="btn btn-sm btn-outline-primary">'
+        '<button type="submit" name="confirm" value="1" class="btn btn-sm btn-outline-primary">'
         "Poursuivre la création du compte</button>",
         html=True,
     )

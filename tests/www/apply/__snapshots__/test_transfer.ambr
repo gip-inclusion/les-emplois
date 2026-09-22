@@ -80,7 +80,7 @@
                               Une autre structure
                           </strong>
                       </button>
-                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit" type="submit">
                           Confirmer
                       </button>
                   </div>
@@ -136,7 +136,7 @@
                               Une autre structure
                           </strong>
                       </a>
-                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit" type="submit">
                           Confirmer
                       </button>
                   </div>

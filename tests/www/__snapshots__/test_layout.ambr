@@ -14,7 +14,7 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <ul class="list-unstyled">
                   <li>
-                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-government-line">
                           </i>
                           <span>
@@ -26,7 +26,7 @@
                       </button>
                   </li>
                   <li>
-                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-community-line">
                           </i>
                           <span>
@@ -38,7 +38,7 @@
                       </button>
                   </li>
                   <li>
-                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-home-smile-line">
                           </i>
                           <span>
@@ -84,7 +84,7 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <ul class="list-unstyled">
                   <li>
-                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-government-line">
                           </i>
                           <span>
@@ -96,7 +96,7 @@
                       </button>
                   </li>
                   <li>
-                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-community-line">
                           </i>
                           <span>
@@ -108,7 +108,7 @@
                       </button>
                   </li>
                   <li>
-                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                           <i aria-hidden="true" class="ri-home-smile-line">
                           </i>
                           <span>
@@ -156,7 +156,7 @@
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>
-                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                                   <i aria-hidden="true" class="ri-community-line">
                                   </i>
                                   <span>
@@ -427,7 +427,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -572,7 +572,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -593,7 +593,7 @@
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>
-                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" type="submit" value="ORGANIZATION_KEY">
                                   <i aria-hidden="true" class="ri-community-line">
                                   </i>
                                   <span>
@@ -765,7 +765,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -908,7 +908,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1055,7 +1055,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1181,7 +1181,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1425,7 +1425,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1563,7 +1563,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1802,7 +1802,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -1935,7 +1935,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -2071,7 +2071,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -2204,7 +2204,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -2509,7 +2509,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -2816,7 +2816,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>
@@ -3125,7 +3125,7 @@
                       <li class="dropdown-item position-relative">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="text-danger stretched-link">
+                              <button class="text-danger stretched-link" type="submit">
                                   Déconnexion
                               </button>
                           </form>

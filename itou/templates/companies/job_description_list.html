@@ -53,7 +53,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="block_job_applications" />
                                     <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
-                                    <button class="d-block w-100 btn btn-secondary btn-ico">
+                                    <button type="submit" class="d-block w-100 btn btn-secondary btn-ico">
                                         {% if siae.block_job_applications %}
                                             <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
                                             <span>Débloquer l'envoi de candidatures</span>
@@ -172,7 +172,7 @@
                                                                     <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de la fiche de poste" type="button">
                                                                         Annuler
                                                                     </button>
-                                                                    <button class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
+                                                                    <button type="submit" class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
                                                                         <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
                                                                         <span>Supprimer</span>
                                                                     </button>

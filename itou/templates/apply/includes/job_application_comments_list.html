@@ -22,7 +22,7 @@
                         </div>
                         {% if location == "tab" and request.user == comment.created_by %}
                             {# Delete button with its confirmation modal #}
-                            <button class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#delete_comment_{{ comment.id }}_modal">
+                            <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#delete_comment_{{ comment.id }}_modal">
                                 <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce commentaire"></i>
                             </button>
 
@@ -52,7 +52,7 @@
                                                     <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression du commentaire" type="button">
                                                         Annuler
                                                     </button>
-                                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer le commentaire">
+                                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer le commentaire" type="button">
                                                         <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
                                                         <span>Supprimer</span>
                                                     </button>
@@ -89,7 +89,7 @@
         {% endfor %}
     </ul>
     {% if location == "sidebar" %}
-        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic" "commentaires-voir-tous" %}>
+        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic" "commentaires-voir-tous" %} type="button">
             Voir tous les commentaires
         </button>
     {% endif %}

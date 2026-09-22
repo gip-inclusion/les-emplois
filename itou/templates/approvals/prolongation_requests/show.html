@@ -32,7 +32,7 @@
                 <div class="form-group col-12 col-lg-auto">
                     <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}" class="js-prevent-multiple-submit">
                         {% csrf_token %}
-                        <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
+                        <button type="submit" class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
                             <i class="ri-check-line" aria-hidden="true"></i>
                             <span>Accepter</span>
                         </button>

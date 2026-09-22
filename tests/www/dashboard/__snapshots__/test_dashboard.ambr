@@ -15,7 +15,7 @@
               </select>
           </div>
           <div class="input-group input-group-xl">
-              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                   </i>
                   <span class="me-1">
@@ -1472,7 +1472,7 @@
                                               </select>
                                           </div>
                                           <div class="input-group input-group-xl">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
                                                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                                                   </i>
                                                   <span class="me-1">
@@ -1664,7 +1664,7 @@
                                               </select>
                                           </div>
                                           <div class="input-group input-group-xl">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
                                                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                                                   </i>
                                                   <span class="me-1">

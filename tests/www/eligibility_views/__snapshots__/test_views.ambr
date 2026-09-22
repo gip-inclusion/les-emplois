@@ -627,7 +627,7 @@
                                       <p class="mb-0">
                                           Tant que l’éligibilité IAE est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée jusqu'au 22/09/2025.
                                       </p>
-                                      <button class="btn btn-link text-start ps-0" data-shroud-clear="">
+                                      <button class="btn btn-link text-start ps-0" data-shroud-clear="" type="button">
                                           Mettre à jour l’éligibilité
                                       </button>
                                   </div>

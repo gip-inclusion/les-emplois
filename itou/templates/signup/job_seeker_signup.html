@@ -43,7 +43,7 @@
                     {% fragment as content %}
                         <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
                         <p class="mb-0">
-                            <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
+                            <button type="submit" name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
                                 Cliquez ici pour accéder à l'étape suivante.
                             </button>
                         </p>

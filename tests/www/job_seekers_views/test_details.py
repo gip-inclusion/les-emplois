@@ -832,7 +832,7 @@ class TestLastAdvisor:
         organization = user.prescriberorganization_set.get()
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
         archive_assignment_btn = f"""
-            <button class="btn btn-ico btn-outline-primary w-100 mt-3"
+            <button type="button" class="btn btn-ico btn-outline-primary w-100 mt-3"
                   data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
                 <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
                 <span>Terminer mon accompagnement</span>
@@ -1385,7 +1385,7 @@ class TestAdvisorsTab:
         organization = user.prescriberorganization_set.get()
         url = reverse("job_seekers_views:advisors", kwargs={"public_id": assignment.job_seeker.public_id})
         archive_assignment_btn = f"""
-            <button class="btn btn-ico btn-outline-primary w-100 w-md-auto"
+            <button type="button" class="btn btn-ico btn-outline-primary w-100 w-md-auto"
                   data-bs-toggle="modal" data-bs-target="#archive-assignment-{assignment.pk}-modal">
                 <i class="ri-stop-circle-line ri-lg" aria-hidden="true"></i>
                 <span>Terminer mon accompagnement</span>

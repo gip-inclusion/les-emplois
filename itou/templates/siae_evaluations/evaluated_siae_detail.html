@@ -75,7 +75,7 @@
                             </div>
                             <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                 {% csrf_token %}
-                                <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-primary disabled{% endif %}">
+                                <button type="submit" class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-primary disabled{% endif %}">
                                     Valider
                                 </button>
                             </form>
@@ -148,7 +148,7 @@
                             </div>
                             <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                 {% csrf_token %}
-                                <button class="btn btn-primary">Valider</button>
+                                <button type="submit" class="btn btn-primary">Valider</button>
                             </form>
                         </div>
                     {% endif %}
