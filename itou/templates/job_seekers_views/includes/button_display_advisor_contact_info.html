@@ -1,7 +1,8 @@
 {% load matomo %}
 
 {% if value %}
-    <button class="btn-link btn-ico"
+    <button type="button"
+            class="btn-link btn-ico"
             id="{{ mode }}-{{ assignment.pk }}"
             hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk mode %}"
             hx-swap="outerHTML"

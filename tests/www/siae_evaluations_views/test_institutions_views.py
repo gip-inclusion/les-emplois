@@ -1029,11 +1029,11 @@ class TestInstitutionEvaluatedSiaeDetailView:
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-primary disabled">
+            <button type="submit" class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
         validation_button = f"""
-            <button class="btn btn-primary">
+            <button type="submit" class="btn btn-primary">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -1347,7 +1347,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-primary disabled">
+            <button type="submit" class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -3461,7 +3461,9 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
 
 class TestInstitutionEvaluatedJobApplicationView:
     btn_modifier_html = """
-    <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
+    <button type="submit"
+            class="btn btn-sm btn-primary"
+            aria-label="Modifier l'état de ce justificatif">Modifier</button>
     """
     change_admin_criteria_text = "certains critères ne sont pas nécessaires pour valider cette auto-prescription"
     save_text = "Enregistrer le commentaire et retourner à la liste des auto-prescriptions"

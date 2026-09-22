@@ -18,7 +18,7 @@
         <li>
             <form method="post" action="{% url 'admin:deactivate_user' user_pk=original.pk %}">
                 {% csrf_token %}
-                <button class="button with-confirm">Désactiver</button>
+                <button type="submit" class="button with-confirm">Désactiver</button>
             </form>
         </li>
     {% endif %}
@@ -26,7 +26,7 @@
         <li>
             <form method="post" action="{% url 'admin:reactivate_user' user_pk=original.pk %}">
                 {% csrf_token %}
-                <button class="button with-confirm">Réactiver</button>
+                <button type="submit" class="button with-confirm">Réactiver</button>
             </form>
         </li>
     {% endif %}

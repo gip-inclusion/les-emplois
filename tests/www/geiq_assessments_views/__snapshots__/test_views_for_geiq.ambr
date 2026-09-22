@@ -3699,7 +3699,7 @@
                           <div aria-label="Actions sur les bilans d’exécution" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
                               
                                   <span class="d-inline-block" data-bs-title="La création d’un bilan est autorisée uniquement lorsque la phase de transmission des bilans d’exécution est ouverte." data-bs-toggle="tooltip" tabindex="0">
-                                      <button class="btn btn-primary disabled">Créer un bilan d’exécution</button>
+                                      <button class="btn btn-primary disabled" type="button">Créer un bilan d’exécution</button>
                                   </span>
                               
                           </div>

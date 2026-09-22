@@ -31,7 +31,7 @@
                                   </span>
                               </div>
                               <div>
-                                  <button aria-label="Supprimer cette recherche" class="btn btn-danger btn-sm btn-ico-only" name="saved_search_id" value="[Pk of SavedSearch]">
+                                  <button aria-label="Supprimer cette recherche" class="btn btn-danger btn-sm btn-ico-only" name="saved_search_id" type="submit" value="[Pk of SavedSearch]">
                                       <i aria-hidden="true" class="ri-delete-bin-line fw-medium">
                                       </i>
                                   </button>

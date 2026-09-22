@@ -14,7 +14,7 @@
     {% if job_application.can_change_prior_actions and request.from_employer %}
         <div class="my-3">
             {# Delete button with its confirmation modal #}
-            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete_prior_action_{{ prior_action.pk }}_modal">
+            <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete_prior_action_{{ prior_action.pk }}_modal">
                 Supprimer
             </button>
 
@@ -43,7 +43,7 @@
                                     <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de l'action préalable à l'embauche" type="button">
                                         Annuler
                                     </button>
-                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer l'action préalable à l'embauche">
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer l'action préalable à l'embauche">
                                         <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
                                         <span>Supprimer</span>
                                     </button>
@@ -53,7 +53,8 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-outline-primary"
+            <button type="button"
+                    class="btn btn-outline-primary"
                     id="prior-action-{{ prior_action.pk }}-modify-btn"
                     hx-get="{% url 'apply:modify_prior_action' job_application_id=job_application.id prior_action_id=prior_action.id %}?modify="
                     hx-target="#prior-action-{{ prior_action.pk }}"

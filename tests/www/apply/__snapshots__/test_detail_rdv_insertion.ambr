@@ -2469,7 +2469,7 @@
           <div class="d-flex flex-column flex-md-row gap-2">
               <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv" type="submit">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>
@@ -2505,7 +2505,7 @@
           <div class="d-flex flex-column flex-md-row gap-2">
               <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv" type="submit">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-mail-send-line fw-medium">
                           </i>

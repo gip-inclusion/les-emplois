@@ -20,7 +20,7 @@
     {% if url %}
         <a href="{{ url }}" class="btn btn-outline-primary btn-block has-external-link mt-3" aria-label="{{ aria_label }} (lien externe)" {% matomo_event "nexus" "acceder-service" service %} target="_blank">Accéder</a>
     {% else %}
-        <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="{{ aria_label }} (lien externe)">
+        <button type="button" class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="{{ aria_label }} (lien externe)">
             Accéder
         </button>
     {% endif %}

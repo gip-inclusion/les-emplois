@@ -28,7 +28,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -77,7 +77,7 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
@@ -112,7 +112,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -161,7 +161,7 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
@@ -213,7 +213,7 @@
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
                       <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application" type="submit">
                               <i aria-hidden="true" class="ri-eye-line fw-medium">
                               </i>
                               <span>
@@ -277,7 +277,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -326,7 +326,7 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
@@ -361,7 +361,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -410,7 +410,7 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
@@ -462,7 +462,7 @@
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
                       <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application" type="submit">
                               <i aria-hidden="true" class="ri-eye-line fw-medium">
                               </i>
                               <span>
@@ -916,7 +916,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -965,7 +965,7 @@
                       </a>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
@@ -1000,7 +1000,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico" type="submit">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1049,7 +1049,7 @@
                       </a>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico justify-content-start dropdown-item">
+                          <button class="btn btn-ico justify-content-start dropdown-item" type="submit">
                               <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>

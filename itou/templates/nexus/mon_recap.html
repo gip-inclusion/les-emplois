@@ -26,7 +26,7 @@
                 <span>Commander des carnets</span>
             </a>
         {% else %}
-            <button class="btn btn-lg btn-primary has-external-link" disabled data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+            <button type="button" class="btn btn-lg btn-primary has-external-link" disabled data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
                 <span>Commander des carnets</span>
             </button>
         {% endif %}
@@ -42,7 +42,7 @@
         </p>
         <form method="post" action="{{ monrecap_url }}">
             {% csrf_token %}
-            <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+            <button type="submit" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
                 <i class="ri-toggle-line" aria-hidden="true"></i>
                 <span>Activer ce service</span>
             </button>

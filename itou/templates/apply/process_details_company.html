@@ -60,7 +60,7 @@
 
 {% block title_inline_actions %}
     {% if can_be_cancelled %}
-        <button class="btn btn-danger btn-lg btn-ico" data-bs-toggle="modal" data-bs-target="#cancel_hire_modal">
+        <button type="button" class="btn btn-danger btn-lg btn-ico" data-bs-toggle="modal" data-bs-target="#cancel_hire_modal">
             <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
             <span>Annuler l’embauche</span>
         </button>
@@ -232,7 +232,7 @@
                                     <strong>Une autre structure</strong>
                                 </button>
                             {% endif %}
-                            <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
+                            <button type="submit" class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
                                 Confirmer
                             </button>
                         </div>
@@ -274,7 +274,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
                         <form method="post" action="{% url 'apply:cancel' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
                             {% csrf_token %}
-                            <button class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
+                            <button type="submit" class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
                         </form>
                     </div>
                 </div>

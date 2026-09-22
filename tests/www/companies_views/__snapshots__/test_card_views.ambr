@@ -265,7 +265,7 @@
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                                   <div class="dropdown">
-                                      <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                                      <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                                           <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                                           </i>
                                           <span class="d-lg-none">
@@ -462,7 +462,7 @@
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
               <div class="dropdown">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                       </i>
                       <span class="d-lg-none">
@@ -505,7 +505,7 @@
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
               <div class="dropdown">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                       </i>
                       <span class="d-lg-none">
@@ -557,7 +557,7 @@
           </div>
           <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
               <div class="dropdown">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                       </i>
                       <span class="d-lg-none">
@@ -618,7 +618,7 @@
           </div>
           <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
               <div class="dropdown">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                       </i>
                       <span class="d-lg-none">
@@ -670,7 +670,7 @@
           </div>
           <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
               <div class="dropdown">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
                       </i>
                       <span class="d-lg-none">

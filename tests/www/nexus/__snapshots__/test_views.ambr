@@ -186,7 +186,7 @@
                                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                           <ul class="list-unstyled">
                                               <li>
-                                                  <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="COMPANY-[PK of Company]">
+                                                  <button class="dropdown-item dropdown-item__summary active" name="organization_key" type="submit" value="COMPANY-[PK of Company]">
                                                       <i aria-hidden="true" class="ri-community-line">
                                                       </i>
                                                       <span>
@@ -198,7 +198,7 @@
                                                   </button>
                                               </li>
                                               <li>
-                                                  <button class="dropdown-item dropdown-item__summary" name="organization_key" value="COMPANY-[PK of other Company]">
+                                                  <button class="dropdown-item dropdown-item__summary" name="organization_key" type="submit" value="COMPANY-[PK of other Company]">
                                                       <i aria-hidden="true" class="ri-community-line">
                                                       </i>
                                                       <span>
@@ -838,7 +838,7 @@
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-lg btn-ico-only btn-nexus">
+                          <button class="btn btn-lg btn-ico-only btn-nexus" type="submit">
                               <i aria-hidden="true" class="ri-logout-circle-line">
                               </i>
                               <span class="visually-hidden">
@@ -966,7 +966,7 @@
                       <li>
                           <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="btn btn-lg btn-ico btn-nexus">
+                              <button class="btn btn-lg btn-ico btn-nexus" type="submit">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
                                   </i>
                                   <span class="d-md-none d-xl-inline-flex">
@@ -1026,7 +1026,7 @@
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-lg btn-ico-only btn-nexus">
+                          <button class="btn btn-lg btn-ico-only btn-nexus" type="submit">
                               <i aria-hidden="true" class="ri-logout-circle-line">
                               </i>
                               <span class="visually-hidden">
@@ -1154,7 +1154,7 @@
                       <li>
                           <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="btn btn-lg btn-ico btn-nexus">
+                              <button class="btn btn-lg btn-ico btn-nexus" type="submit">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
                                   </i>
                                   <span class="d-md-none d-xl-inline-flex">
@@ -1214,7 +1214,7 @@
                       </a>
                       <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-lg btn-ico-only btn-nexus">
+                          <button class="btn btn-lg btn-ico-only btn-nexus" type="submit">
                               <i aria-hidden="true" class="ri-logout-circle-line">
                               </i>
                               <span class="visually-hidden">
@@ -1339,7 +1339,7 @@
                       <li>
                           <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="btn btn-lg btn-ico btn-nexus">
+                              <button class="btn btn-lg btn-ico btn-nexus" type="submit">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
                                   </i>
                                   <span class="d-md-none d-xl-inline-flex">
@@ -1709,7 +1709,7 @@
                           </p>
                           <form action="/portal/service/mon-recap/activate" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                              <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" type="submit">
                                   <i aria-hidden="true" class="ri-toggle-line">
                                   </i>
                                   <span>
@@ -1844,7 +1844,7 @@
                           </p>
                           <form action="/dashboard/stats" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage">
+                              <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" type="submit">
                                   <i aria-hidden="true" class="ri-toggle-line">
                                   </i>
                                   <span>

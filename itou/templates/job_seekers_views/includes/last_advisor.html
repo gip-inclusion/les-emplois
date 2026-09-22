@@ -77,7 +77,8 @@
                         {% fragment as content %}
                             <p class="mb-2">{{ assignment.professional.get_full_name }} ne fait plus partie de {{ assignment.organization.display_name }}.</p>
                             {# similar display as button_display_advisor_contact_info but with the matomo event of button_display_last_advisor_contact_info and a different wording #}
-                            <button class="btn-link btn-ico"
+                            <button type="button"
+                                    class="btn-link btn-ico"
                                     id="email-{{ assignment.pk }}"
                                     hx-post="{% url "job_seekers_views:display_advisor_contact_info" assignment.pk "email" %}"
                                     hx-swap="outerHTML"

@@ -13,7 +13,7 @@
                 {% if can_archive %}
                     <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
                         {% csrf_token %}
-                        <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                        <button type="submit" class="btn btn-lg btn-link-white btn-block btn-ico">
                             <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
                             <span>Archiver</span>
                         </button>
@@ -21,7 +21,7 @@
                 {% elif can_unarchive %}
                     <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}">
                         {% csrf_token %}
-                        <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                        <button type="submit" class="btn btn-lg btn-link-white btn-block btn-ico">
                             <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
                             <span>Désarchiver</span>
                         </button>
@@ -55,7 +55,7 @@
                         {% if can_process %}
                             <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
-                                <button class="btn btn-ico justify-content-start dropdown-item" {% matomo_event "candidature" "submit" "processing_application" %}>
+                                <button type="submit" class="btn btn-ico justify-content-start dropdown-item" {% matomo_event "candidature" "submit" "processing_application" %}>
                                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                                     <span>Étudier</span>
                                 </button>
@@ -133,7 +133,7 @@
                         {% if can_archive %}
                             <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
                                 {% csrf_token %}
-                                <button class="btn btn-ico justify-content-start dropdown-item">
+                                <button type="submit" class="btn btn-ico justify-content-start dropdown-item">
                                     <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
                                     <span>Archiver</span>
                                 </button>

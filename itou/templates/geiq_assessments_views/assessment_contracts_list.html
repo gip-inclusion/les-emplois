@@ -40,7 +40,7 @@
                 {% else %}
                     <form method="post">
                         {% csrf_token %}
-                        <button class="btn btn-lg btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
+                        <button type="submit" class="btn btn-lg btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
                             Modifier la sélection
                         </button>
                     </form>
@@ -268,7 +268,7 @@
                         <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
                         <form method="post">
                             {% csrf_token %}
-                            <button class="btn btn-sm btn-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
+                            <button type="submit" class="btn btn-sm btn-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
                         </form>
                     </div>
                 </div>
