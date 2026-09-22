@@ -174,9 +174,10 @@ def _get_redirect_url(request):
         # are redirected to the new domain (see `if block below).
         return None
     user = request.user
-    if not (user and user.is_authenticated and user.is_staff):
-        # For now, redirect only staff users. We'll expand to
-        # other users once we're sure that everything is fine.
+    # Do not redirect authenticated users (except staff), to avoid
+    # disruption by the login form appearing on the new domain when
+    # the user has never logged in there.
+    if user and user.is_authenticated and not user.is_staff:
         return None
 
     query = QueryDict(request.GET.urlencode(), mutable=True)

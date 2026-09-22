@@ -29,13 +29,30 @@ class TestRedirectToNewDomainMiddleware:
         response = client.get("/admin/", HTTP_HOST="new.domain")
         assert response.status_code == 200  # no redirect (already on new domain)
 
+    def test_redirect_anonymous_users(self, settings, client):
+        settings.NEW_DOMAIN = "new.domain"
+        settings.ALLOWED_HOSTS = ["old.domain", settings.NEW_DOMAIN]
+
+        response = client.get("/search/", HTTP_HOST="old.domain")
+        assert response.status_code == 200  # no redirect (not enabled)
+
+        settings.REDIRECT_TO_NEW_DOMAIN = True
+        response = client.get(
+            "/",
+            query_params={"foo": "bar"},
+            HTTP_HOST="old.domain",
+            follow=False,
+        )
+        assert response.status_code == 302
+        assert response.url == "https://new.domain/?foo=bar&redirected-from-old-domain=1"
+
+        response = client.get("/search/", HTTP_HOST="new.domain")
+        assert response.status_code == 200  # no redirect (already on new domain)
+
     def test_do_not_redirect_non_staff(self, settings, client):
         settings.NEW_DOMAIN = "new.domain"
         settings.ALLOWED_HOSTS = ["old.domain", settings.NEW_DOMAIN]
         settings.REDIRECT_TO_NEW_DOMAIN = True
-
-        response = client.get("/search/employers", HTTP_HOST="old.domain", follow=False)
-        assert response.status_code == 200
 
         user = PrescriberFactory()
         client.force_login(user)
@@ -67,7 +84,7 @@ class TestRedirectToNewDomainMiddleware:
             HTTP_HOST="old.domain",
             follow=False,
         )
-        assert response.status_code == 200  # no rediect
+        assert response.status_code == 200  # no redirect
 
 
 def test_browser_id_cookie_not_set_for_viewers(client):
