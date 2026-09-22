@@ -479,7 +479,7 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def has_prerequisites(self) -> bool:
-        return bool(self.prerequisites)
+        return bool(self.access_conditions_di.strip())
 
     @property
     def from_non_orientable_di_source(self) -> bool:
