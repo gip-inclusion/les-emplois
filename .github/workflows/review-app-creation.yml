@@ -30,7 +30,6 @@ jobs:
     permissions:
       contents: read
       deployments: write
-      pull-requests: write
     if: github.event.action == 'labeled' && github.event.label.name == '1-recette-jetable'
 
     steps:
@@ -104,11 +103,6 @@ jobs:
           sleep 1
         done
         scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
-
-    - name: 🍻 Add link to pull request
-      run: gh pr comment ${{ github.event.pull_request.number }} --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   redeploy:
     runs-on: ubuntu-latest
