@@ -10,6 +10,7 @@ import pathlib
 import re
 
 from botocore.config import Config
+from django.forms import BooleanField
 from django.utils.csp import CSP
 from dotenv import load_dotenv
 from redis.backoff import ExponentialBackoff
@@ -979,4 +980,9 @@ XP_REF_IAE_END_DATE = datetime.date(2026, 12, 31)
 # This API seems to be rarely used (which is understandable) and will soon have to be dropped
 API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT = (
     os.getenv("API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT", "False") == "True"
+)
+
+# Experiment: Professional directory
+PROFESSIONAL_DIRECTORY_ACTIVE = BooleanField().to_python(
+    os.getenv("PROFESSIONAL_DIRECTORY_ACTIVE", ITOU_ENVIRONMENT != ItouEnvironment.PROD)
 )

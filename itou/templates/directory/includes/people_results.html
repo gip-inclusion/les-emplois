@@ -1,0 +1,51 @@
+{% load str_filters %}
+<div id="people-search-results">
+    {% for person in results %}
+        {% with person.directory_organizations.0 as closest_organization %}
+            <div class="c-box c-box--results mb-3 mb-md-4">
+                <div class="c-box--results__header">
+                    <div class="d-flex flex-column flex-md-row gap-2 gap-md-3">
+                        <div class="c-box--results__summary flex-grow-1">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            <div>
+                                <h3>{{ person.get_inverted_full_name }}</h3>
+                                <span>{{ closest_organization.member_kind_display|capfirst }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="m-0">
+                <div class="c-box--results__body">
+                    <ul class="list-data list-data__two-column-md">
+                        <li>
+                            <small>Structure</small>
+                            <strong>
+                                {{ closest_organization.display_name }}
+                                {% if person.directory_organizations|length > 1 %}
+                                    {% with person.directory_organizations|length|add:"-1" as other_orgs_count %}
+                                        (+ {{ other_orgs_count }} {{ other_orgs_count|pluralizefr:"autre structure,autres structures" }})
+                                    {% endwith %}
+                                {% endif %}
+                            </strong>
+                        </li>
+                        <li>
+                            <small>Type</small>
+                            <strong>{{ closest_organization.get_kind_display }}</strong>
+                        </li>
+                        <li>
+                            <small>Adresse</small>
+                            <address class="m-0">{{ closest_organization.address_on_one_line }}</address>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endwith %}
+    {% empty %}
+        <div class="c-box c-box--results mb-3 mb-md-4">
+            <div class="c-box--results__body">
+                <p class="mb-0">Annuaire vide.</p>
+            </div>
+        </div>
+    {% endfor %}
+    {% include "includes/pagination.html" with page=results request=request only %}
+</div>
