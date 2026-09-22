@@ -892,6 +892,8 @@ SERIALIZATION_MODULES = {
 # OTP
 # ------------------------------------------------------------------------------
 OTP_TOTP_ISSUER = f"{product_name()} ({ITOU_ENVIRONMENT})"
+MFA_RESET_REQUEST_VALIDITY = datetime.timedelta(days=15)
+MFA_RESET_LINK_VALIDITY = datetime.timedelta(hours=24)
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 REQUIRE_MFA_FOR_PROS = os.getenv("REQUIRE_MFA_FOR_PROS", "False") == "True"
 SHOW_UPCOMING_MFA_FOR_PROS_BANNER = os.getenv("SHOW_UPCOMING_MFA_FOR_PROS_BANNER", "False") == "True"
