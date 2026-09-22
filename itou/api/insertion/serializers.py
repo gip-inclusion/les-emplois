@@ -38,3 +38,8 @@ class OrientationRequestSerializer(serializers.Serializer):
     structure_uid = serializers.CharField(
         write_only=True, label="Identifiant data·inclusion de la structure qui reçoit les demandes d’orientations"
     )
+
+
+class OrientationCountSerializer(serializers.Serializer):
+    pending_count = serializers.IntegerField(read_only=True)
+    total_count = serializers.IntegerField(read_only=True)

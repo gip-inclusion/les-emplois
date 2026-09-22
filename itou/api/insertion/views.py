@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Count, Q
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics
@@ -6,8 +7,13 @@ from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
 from itou.api.auth import ServiceAccount, ServiceTokenAuthentication
-from itou.api.insertion.serializers import OrientationRequestSerializer, OrientationSerializer
+from itou.api.insertion.serializers import (
+    OrientationCountSerializer,
+    OrientationRequestSerializer,
+    OrientationSerializer,
+)
 from itou.api.models import ServiceToken
+from itou.insertion.enums import OrientationStatus
 from itou.insertion.models import Orientation, OrientationProcessLink
 from itou.nexus.enums import Service
 from itou.utils.auth import LoginNotRequiredMixin
@@ -97,3 +103,59 @@ class OrientationsView(LoginNotRequiredMixin, generics.GenericAPIView):
         self.request_serializer = OrientationRequestSerializer(data=request.data)
         self.request_serializer.is_valid(raise_exception=True)
         return self.list(request, *args, **kwargs)
+
+
+orientations_count_description = f"""
+# Nombre d’orientations par structure
+
+Cette API est à l’usage exclusif du service [DORA]({settings.DORA_WWW_BASE_URL}).
+
+Elle retourne le nombre d’orientations ouvertes (statut `PENDING`) et le nombre total d’orientations reçues,
+pour une structure porteuse de services donnée.
+Il est nécessaire de passer une valeur pour le paramètre `structure_uid` qui est l’identifiant data·inclusion
+de la structure.
+
+## Permissions
+
+L’utilisation de cette API nécessite un token d’autorisation.
+"""
+
+
+@extend_schema_view(
+    get=extend_schema(
+        operation_id="orientations-count",
+        parameters=[
+            OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY),
+            OpenApiParameter("page_size", OpenApiTypes.INT, OpenApiParameter.QUERY),
+            OpenApiParameter("structure_uid", OpenApiTypes.STR, OpenApiParameter.QUERY),
+        ],
+        request=OrientationRequestSerializer,
+        responses={
+            200: OrientationCountSerializer,
+        },
+        description=orientations_count_description,
+    )
+)
+class OrientationsCountView(LoginNotRequiredMixin, generics.GenericAPIView):
+    authentication_classes = (ServiceTokenAuthentication,)
+    permission_classes = (DoraPermission,)
+    serializer_class = OrientationCountSerializer
+    queryset = Orientation.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        """
+        Filtering is hard-coded here as to block any method overriding.
+        """
+        self.request_serializer = OrientationRequestSerializer(data=request.query_params)
+        self.request_serializer.is_valid(raise_exception=True)
+        validated_data = self.request_serializer.validated_data
+        queryset = (
+            self.get_queryset()
+            .filter(service__structure__uid=validated_data["structure_uid"])
+            .aggregate(
+                pending_count=Count("pk", filter=Q(status=OrientationStatus.PENDING)),
+                total_count=Count("pk"),
+            )
+        )
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data)
