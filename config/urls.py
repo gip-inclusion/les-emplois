@@ -75,6 +75,7 @@ urlpatterns = [
     path("approvals/", include("itou.www.approvals_views.urls")),
     path("autocomplete/", include("itou.www.autocomplete.urls")),
     path("dashboard/", include("itou.www.dashboard.urls")),
+    path("directory/", include("itou.www.directory_views.urls")),
     path("eligibility/", include("itou.www.eligibility_views.urls")),
     path("employee_record/", include("itou.www.employee_record_views.urls")),
     path("geiq-assessments/", include("itou.www.geiq_assessments_views.urls")),

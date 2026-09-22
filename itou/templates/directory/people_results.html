@@ -1,0 +1,52 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load theme_inclusion %}
+
+{% block title %}Annuaire des professionnels {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Annuaire des professionnels {% beta_badge extra_classes="badge-base" %}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% component_alert title=title content=content call_to_action=call_to_action variant="important" dismissible_once=True extra_id="directory-beta-notice" extra_classes="d-none" %}
+        {% fragment as title %}
+            Annuaire Pro en accès bêta restreint
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Vous faites partie des premiers à accéder à cette fonctionnalité : votre profil est visible des professionnels de votre ville, mais vous gardez la main.
+                Complétez vos informations quand vous le souhaitez, ou choisissez de ne pas apparaître dans l'annuaire.
+            </p>
+        {% endfragment %}
+        {% fragment as call_to_action %}
+            <a href="{% url 'dashboard:edit_user_info' %}"
+               id="directory-beta-profile-link"
+               class="btn btn-sm btn-primary">Modifier mon profil</a>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">
+                            {% include "directory/includes/people_counter.html" with results=results request=request only %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="col-12">{% include "directory/includes/people_results.html" %}</div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
