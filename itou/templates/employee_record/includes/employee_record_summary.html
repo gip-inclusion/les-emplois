@@ -65,17 +65,13 @@
                 <li>Maîtrise de la langue française inférieure au niveau A1</li>
             {% endif %}
             {% if profile.pole_emploi_since %}
-                <li>
-                    Inscrit à France Travail depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
-                </li>
+                <li>Inscrit à France Travail depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})</li>
             {% endif %}
             {% if profile.resourceless %}
                 <li>Le {{ request.current_organization|worker_denomination }} ne dispose d'aucune ressource</li>
             {% endif %}
             {% if profile.unemployed_since %}
-                <li>
-                    {{ request.current_organization|worker_denomination|capfirst }} sans emploi depuis {{ profile.get_unemployed_since_display|lower }}
-                </li>
+                <li>{{ request.current_organization|worker_denomination|capfirst }} sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</li>
             {% endif %}
             {% if profile.oeth_employee %}
                 <li>{{ profile|profile_field_display:'oeth_employee' }}</li>

@@ -30,7 +30,8 @@
                                 <span class="fw-semibold">Accompagné de {{ assignment.created_at|date:"F Y" }} à {{ assignment.ended_at|date:"F Y" }} par {% partial advisor_with_org %}.</span>
                                 Accompagnement {% if assignment.end_reason == AssignmentEndReason.MANUAL %}clos manuellement{% else %}clos automatiquement{% endif %} le {{ assignment.ended_at|date:"d/m/Y" }}.
                             </div>
-                            <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les anciens accompagnements</a>
+                            <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les anciens accompagnements</a>
                         </div>
                         <div class="col-auto">
                             <span class="badge badge-sm rounded-pill bg-disabled-color-light text-primary flex-shrink-0">ancien</span>
@@ -52,9 +53,7 @@
                             </div>
                             <a class="btn btn-outline-primary mt-2"
                                href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
-                               {% matomo_event "test-synthese" "clic" "creer-accompagnement" %}>
-                                Se positionner comme accompagnateur
-                            </a>
+                               {% matomo_event "test-synthese" "clic" "creer-accompagnement" %}>Se positionner comme accompagnateur</a>
                         </div>
                         <div class="col-auto">
                             <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary flex-shrink-0">jamais accompagné</span>
@@ -79,7 +78,8 @@
                         <div class="mb-2">
                             <span class="fw-semibold">Accompagné depuis {{ assignment.created_at|date:"F Y" }} par {% partial advisor_with_org %}.</span>
                         </div>
-                        <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
+                        <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
                     </div>
                     <div class="col-auto">
                         <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">accompagnateur</span>
@@ -100,7 +100,8 @@
                     <div class="mb-2">
                         <span class="fw-semibold">Actuellement suivi par plusieurs accompagnateurs.</span>
                     </div>
-                    <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
+                    <a href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                       {% matomo_event "test-synthese" "clic" "accompagnements" %}>Voir les accompagnements</a>
                 </div>
                 <div class="col-auto">
                     <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning flex-shrink-0">{{ job_seeker.active_advisors_nb }} accompagnements</span>

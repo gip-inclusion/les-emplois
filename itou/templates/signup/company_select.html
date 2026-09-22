@@ -19,8 +19,12 @@
 {% block title_extra %}
     <div class="c-stepper">
         <div class="progress">
-            <div class="progress-bar progress-bar-66" role="progressbar" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-            </div>
+            <div class="progress-bar progress-bar-66"
+                 role="progressbar"
+                 aria-valuenow="66"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-labelledby="currentProgressState"></div>
         </div>
         <p id="currentProgressState">
             <strong>Étape 2</strong>/3 : Rattachement à votre structure
@@ -64,25 +68,33 @@
                                 Vérifier que l’annexe financière valide ou provisoire de la structure a bien été enregistrée dans l’extranet IAE 2.0 de l’ASP :
                             </p>
                             <ul>
-                                <li>
-                                    Si oui, le délai de réception des données de l’ASP peut prendre une dizaine de jours. Merci de retenter l’inscription après ce délai.
-                                </li>
+                                <li>Si oui, le délai de réception des données de l’ASP peut prendre une dizaine de jours. Merci de retenter l’inscription après ce délai.</li>
                                 <li>Si non, faire une demande d’enregistrement de l’annexe financière dans l’ASP auprès de votre DDETS.</li>
                             </ul>
                             <p>
-                                En cas de nécessité, contacter l’<a href="{% zendesk_form_url request=request %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">Aide & Assistance</a>.
+                                En cas de nécessité, contacter l’<a href="{% zendesk_form_url request=request %}"
+   class="has-external-link"
+   target="_blank"
+   rel="noopener"
+   aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">Aide & Assistance</a>.
                             </p>
 
                             <p>
                                 <strong>Un GEIQ</strong> :
                                 <br>
-                                Complétez <a href="{% tally_form_url "wA799W" %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien pour un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
+                                Complétez <a href="{% tally_form_url "wA799W" %}"
+    class="has-external-link"
+    target="_blank"
+    rel="noopener"
+    aria-label="lien pour un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
                             </p>
 
                             <p>
                                 <strong>Si votre organisation est porteuse de la clause sociale</strong> :
                                 <br>
-                                Complétez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
+                                Complétez <a href="{% url "signup:facilitator_search" %}"
+    rel="noopener"
+    aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
                             </p>
 
                         </div>
@@ -91,9 +103,7 @@
 
                     {% if companies_without_active_members and company_select_form %}
                         <div class="c-form mt-3 mt-md-5">
-                            <h3 class="mb-1">
-                                {{ companies_without_active_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}
-                            </h3>
+                            <h3 class="mb-1">{{ companies_without_active_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}</h3>
                             <p>Les données sont fournies par la DGEFP et l’extranet IAE 2.0 de l’ASP.</p>
 
                             <form method="post" class="js-prevent-multiple-submit">
@@ -114,8 +124,14 @@
                                 <ul class="list-group list-group-flush">
                                     {% for company in companies_without_active_members %}
                                         <li class="list-group-item list-group-item-action">
-                                            <input class="form-check-input me-1" type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ company.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
-                                            <label class="form-check-label" for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}">
+                                            <input class="form-check-input me-1"
+                                                   type="radio"
+                                                   name="{{ company_select_form.siaes.html_name }}"
+                                                   value="{{ company.pk }}"
+                                                   id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
+                                                   required>
+                                            <label class="form-check-label"
+                                                   for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}">
                                                 <b>{{ company.siren }} {{ company.siret_nic }}</b> - {{ company.kind }}
                                                 <br>
                                                 {{ company.display_name }}
@@ -135,9 +151,7 @@
                                 <hr>
                                 {% component_alert content=content variant="info" icon=False %}
                                     {% fragment as content %}
-                                        <p>
-                                            En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
-                                        </p>
+                                        <p>En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :</p>
                                         <ul class="mb-0">
                                             <li>Pour les SIAE, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 de l’ASP,</li>
                                             <li>Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.</li>
@@ -153,12 +167,8 @@
 
                     {% if companies_with_active_members %}
                         <div class="c-form mt-3 mt-md-5">
-                            <h3 class="mb-1">
-                                {{ companies_with_active_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}
-                            </h3>
-                            <p>
-                                Par mesure de sécurité, seuls les membres déjà inscrits dans {{ companies_with_active_members|pluralizefr:"cette structure,ces structures" }} peuvent ajouter de nouveaux collaborateurs.
-                            </p>
+                            <h3 class="mb-1">{{ companies_with_active_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}</h3>
+                            <p>Par mesure de sécurité, seuls les membres déjà inscrits dans {{ companies_with_active_members|pluralizefr:"cette structure,ces structures" }} peuvent ajouter de nouveaux collaborateurs.</p>
 
                             <ul class="list-group list-group-flush">
                                 {% for company in companies_with_active_members %}
@@ -188,7 +198,11 @@
                     {% if companies_without_active_members or companies_with_active_members %}
                         <div class="mt-3 mt-md-4 text-end">
                             <p>
-                                En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}"  class="has-external-link" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
+                                En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}"
+    class="has-external-link"
+    target="_blank"
+    rel="noopener"
+    aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
                             </p>
                         </div>
                     {% endif %}

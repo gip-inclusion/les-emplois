@@ -21,8 +21,12 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-stepper mb-3 mb-md-4">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                            </div>
+                            <div class="progress-bar progress-bar-100"
+                                 role="progressbar"
+                                 aria-valuenow="100"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-labelledby="currentProgressState"></div>
                         </div>
                         <p id="currentProgressState">
                             <strong>Étape 3</strong>/3 : Précision de la sanction
@@ -51,9 +55,7 @@
                                 <hr class="my-3">
                                 <fieldset>
                                     <legend class="h3">Retrait temporaire de la capacité d’auto-prescription</legend>
-                                    <p>
-                                        La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une durée déterminée par l'autorité administrative.
-                                    </p>
+                                    <p>La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une durée déterminée par l'autorité administrative.</p>
                                     {% bootstrap_field forms.siae_sanctions_form.temporary_suspension_from %}
                                     {% bootstrap_field forms.siae_sanctions_form.temporary_suspension_to %}
                                 </fieldset>

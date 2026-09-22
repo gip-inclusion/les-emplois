@@ -85,9 +85,7 @@
                                 </p>
                             {% elif wizard_steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <h2 class="h3">Réponse {{ to_prescriber }}</h2>
-                                <p class="mb-3 mb-md-4">
-                                    Vous pouvez partager un message {{ to_prescriber }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
-                                </p>
+                                <p class="mb-3 mb-md-4">Vous pouvez partager un message {{ to_prescriber }} uniquement, comme détailler ou évoquer d’autres motifs de refus.</p>
                                 <p class="mb-3 mb-md-4">
                                     <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
@@ -126,8 +124,12 @@
                                                             </button>
                                                         {% elif radio.data.value == RefusalReason.NO_POSITION %}
                                                             {{ radio.choice_label }}
-                                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
-                                                                <i class="ri-information-line ri-lg text-info ms-1" aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                            <button type="button"
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="right"
+                                                                    data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
+                                                                <i class="ri-information-line ri-lg text-info ms-1"
+                                                                   aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
                                                             </button>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
@@ -148,9 +150,7 @@
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-group">
-                                        <legend class="fs-base fw-bold">
-                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?
-                                        </legend>
+                                        <legend class="fs-base fw-bold">Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?</legend>
                                         {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>
                                 </fieldset>

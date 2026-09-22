@@ -9,7 +9,12 @@ Arguments:
 - matomo_category: When given, a matomo click event is set for each choice of this field.
 {% endcomment %}
 <div class="dropdown">
-    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle"
+            data-bs-toggle="dropdown"
+            data-bs-display="static"
+            data-bs-auto-close="outside"
+            aria-expanded="false">
         {% if nouveau|default:False %}
             <span>{{ label|default:field.label }}</span>
             {% new_badge extra_classes="badge-xs ms-2 mt-1" %}
@@ -29,9 +34,8 @@ Arguments:
                            {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}
                            {% if choice.data.selected %}checked{% endif %}
                            {% if matomo_category|default:False %}{% matomo_event matomo_category "clic" choice.data.name|add:"_"|add:choice.data.value %}{% endif %}>
-                    <label for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}" class="form-check-label">
-                        {{ choice.choice_label }}
-                    </label>
+                    <label for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}"
+                           class="form-check-label">{{ choice.choice_label }}</label>
                 </div>
             </li>
         {% endfor %}

@@ -24,18 +24,21 @@
                     <legend>Ressources</legend>
                     {% bootstrap_field form.resourceless %}
                     {% collapse_field form.rsa_allocation target_id="collapse_rsa_allocation" %}
-                    <div id="collapse_rsa_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
+                    <div id="collapse_rsa_allocation"
+                         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.rsa_markup %}
                         {% bootstrap_field form.rsa_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
                     </div>
 
                     {% collapse_field form.ass_allocation target_id="collapse_ass_allocation" %}
-                    <div id="collapse_ass_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
+                    <div id="collapse_ass_allocation"
+                         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.ass_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
                     </div>
 
                     {% collapse_field form.aah_allocation target_id="collapse_aah_allocation" %}
-                    <div id="collapse_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
+                    <div id="collapse_aah_allocation"
+                         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.aah_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
                     </div>
                 </fieldset>
@@ -44,13 +47,15 @@
                 <fieldset>
                     <legend>Situation professionnelle</legend>
                     {% collapse_field form.unemployed target_id="collapse_unemployed" %}
-                    <div id="collapse_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
+                    <div id="collapse_unemployed"
+                         class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
                         {% bootstrap_field form.unemployed_since wrapper_class="form-group form-group-input-w-lg-66" %}
                     </div>
 
                     {% if not is_registered_to_pole_emploi %}
                         {% collapse_field form.pole_emploi target_id="collapse_pole_emploi" %}
-                        <div id="collapse_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+                        <div id="collapse_pole_emploi"
+                             class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
                             {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
                             {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
                         </div>
@@ -82,12 +87,14 @@
                     <fieldset>
                         <legend>Informations spécifiques au travailleur indépendant</legend>
                         {% collapse_field form.are_allocation target_id="collapse_are_allocation" %}
-                        <div id="collapse_are_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.are_allocation.value %} show{% endif %}">
+                        <div id="collapse_are_allocation"
+                             class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.are_allocation.value %} show{% endif %}">
                             {% bootstrap_field form.are_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
                         </div>
 
                         {% collapse_field form.activity_bonus target_id="collapse_activity_bonus" %}
-                        <div id="collapse_activity_bonus" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.activity_bonus.value %} show{% endif %}">
+                        <div id="collapse_activity_bonus"
+                             class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.activity_bonus.value %} show{% endif %}">
                             {% bootstrap_field form.activity_bonus_since wrapper_class="form-group form-group-input-w-lg-66" %}
                         </div>
 

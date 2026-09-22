@@ -23,9 +23,7 @@
                 {# Weird point. Should be cleanup someday. This form uses objects_dict, despite single field is already sent #}
                 {% with objects_dict|get_dict_item:field.name as criteria %}
                     {% if certified_criteria_keys and field.name in certified_criteria_keys %}
-                        <p class="small mb-0 form-text text-muted">
-                            Ce critère étant certifié, aucun justificatif n’est demandé pour le moment.
-                        </p>
+                        <p class="small mb-0 form-text text-muted">Ce critère étant certifié, aucun justificatif n’est demandé pour le moment.</p>
                     {% else %}
                         {% if criteria.written_proof %}
                             <p class="small mb-0 form-text text-muted">
@@ -41,9 +39,10 @@
                         {% endif %}
                         {% if criteria.written_proof_url %}
                             <p class="small mb-0 form-text text-muted">
-                                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
-                                    {{ criteria.written_proof_url }}
-                                </a>
+                                <a href="{{ criteria.written_proof_url }}"
+                                   rel="noopener"
+                                   target="_blank"
+                                   aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">{{ criteria.written_proof_url }}</a>
                             </p>
                         {% endif %}
                     {% endif %}

@@ -17,7 +17,9 @@
                     Un modèle au format excel (modele_bilan_prolongation_PASS_IAE.xlsx) pour réaliser ce bilan permettra au prescripteur habilité d’avoir une meilleure connaissance du contexte de la prolongation.
                     Vous devez désormais télécharger, compléter et téléverser ce modèle pour enregistrer une demande de prolongation.
                 </p>
-                <a href="{% static 'templates/modele_bilan_prolongation_PASS_IAE.xlsx' %}" class="btn btn-ico btn-primary my-4" download="modele_bilan_prolongation_PASS_IAE.xlsx">
+                <a href="{% static 'templates/modele_bilan_prolongation_PASS_IAE.xlsx' %}"
+                   class="btn btn-ico btn-primary my-4"
+                   download="modele_bilan_prolongation_PASS_IAE.xlsx">
                     <i class="ri-download-2-line" aria-hidden="true"></i>
                     <span>Télécharger le modèle</span>
                 </a>
@@ -32,7 +34,11 @@
             {# HTMX: confirm prescriber organization if many #}
             {% include "approvals/includes/declaration_prescriber_email.html" %}
             <p>
-                <a href="{% url 'search:prescribers_home' %}" class="btn btn-secondary mb-3" rel="noopener" target="_blank" aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">Rechercher des prescripteurs</a>
+                <a href="{% url 'search:prescribers_home' %}"
+                   class="btn btn-secondary mb-3"
+                   rel="noopener"
+                   target="_blank"
+                   aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">Rechercher des prescripteurs</a>
             </p>
         </div>
 

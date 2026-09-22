@@ -15,18 +15,27 @@
     {% if can_edit_proof %}
         <div class="d-flex gap-2">
             {% if evaluated_administrative_criteria.review_state == "PENDING" %}
-                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
+                <form method="post"
+                      action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-success btn-sm" aria-label="Accepter ce justificatif">Accepter</button>
+                    <button type="submit"
+                            class="btn btn-success btn-sm"
+                            aria-label="Accepter ce justificatif">Accepter</button>
                 </form>
-                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'refuse' %}">
+                <form method="post"
+                      action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'refuse' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm" aria-label="Refuser ce justificatif">Refuser</button>
+                    <button type="submit"
+                            class="btn btn-danger btn-sm"
+                            aria-label="Refuser ce justificatif">Refuser</button>
                 </form>
             {% else %}
-                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'reinit' %}">
+                <form method="post"
+                      action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'reinit' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
+                    <button type="submit"
+                            class="btn btn-sm btn-primary"
+                            aria-label="Modifier l'état de ce justificatif">Modifier</button>
                 </form>
             {% endif %}
         </div>

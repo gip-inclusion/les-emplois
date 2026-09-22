@@ -53,7 +53,8 @@
                                     </ul>
                                     {% if can_edit_personal_information %}
                                         <p class="mb-0 mt-3">
-                                            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-sm">Compléter les informations du candidat</a>
+                                            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-outline-primary btn-sm">Compléter les informations du candidat</a>
                                         </p>
                                     {% endif %}
                                 {% endfragment %}
@@ -145,7 +146,11 @@
                                     <ul class="list-unstyled mb-3">
                                         {% for document_name, document_url in credential_documents %}
                                             <li class="mb-2">
-                                                <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer" class="has-external-link" download>
+                                                <a href="{{ document_url }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   class="has-external-link"
+                                                   download>
                                                     <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                                                     {{ document_name }}
                                                 </a>
@@ -161,9 +166,10 @@
                                     <p>Informations complémentaires ou formulaires à compléter</p>
                                     <ul>
                                         <li>
-                                            <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener" class="has-external-link">
-                                                {{ service.credentials_online_form }}
-                                            </a>
+                                            <a href="{{ service.credentials_online_form }}"
+                                               target="_blank"
+                                               rel="noopener"
+                                               class="has-external-link">{{ service.credentials_online_form }}</a>
                                         </li>
                                     </ul>
                                     <hr class="my-3">

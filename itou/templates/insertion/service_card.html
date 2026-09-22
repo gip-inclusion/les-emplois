@@ -81,14 +81,12 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#service-contact-modal"
                                     data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
-                                    {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
-                                Voir les coordonnées de contact du service
-                            </button>
+                                    {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>Voir les coordonnées de contact du service</button>
                         {% else %}
                             <a class="btn btn-lg btn-outline-white btn-block justify-content-center"
                                type="button"
                                href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}> Voir les coordonnées de contact du service </a>
+                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>Voir les coordonnées de contact du service</a>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -154,7 +152,12 @@
                                 <li>
                                     <small> Public concerné
                                         {% if service.publics_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
+                                            <i class="ri-information-line ri-xl text-info"
+                                               aria-label="{{ service.publics_details }}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="{{ service.publics_details }}"
+                                               role="button"
+                                               tabindex="0"></i>
                                         {% endif %}
                                     </small>
                                     <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
@@ -173,7 +176,12 @@
                                     <small>
                                         Frais à charge
                                         {% if service.fee_details %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
+                                            <i class="ri-information-line ri-xl text-info"
+                                               aria-label="{{ service.fee_details }}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="{{ service.fee_details }}"
+                                               role="button"
+                                               tabindex="0"></i>
                                         {% endif %}
                                     </small>
                                     <strong>{{ service.fee.label }}</strong>
@@ -185,7 +193,12 @@
                                     <small>
                                         Fréquence et horaires
                                         {% if formatted_opening_hours.has_ph_off %}
-                                            <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
+                                            <i class="ri-information-line ri-xl text-info"
+                                               aria-label="Hors jours fériés"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="Hors jours fériés"
+                                               role="button"
+                                               tabindex="0"></i>
                                         {% endif %}
                                     </small>
                                     {% if formatted_opening_hours %}
@@ -245,9 +258,12 @@
                                 {# djlint:off H053 collapse-description is used twice because of the way we switch from one to the other #}
                                 <div class="collapse show has-no-transition" id="collapse-description">
                                     <div class="mb-0">{{ service.description|markdownify|truncatewords_html:30 }}</div>
-                                    <button class="bs-btn-active-color btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-description" aria-expanded="true" aria-controls="collapse-description">
-                                        Lire la suite
-                                    </button>
+                                    <button class="bs-btn-active-color btn-link d-inline-block mt-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapse-description"
+                                            aria-expanded="true"
+                                            aria-controls="collapse-description">Lire la suite</button>
                                 </div>
                                 <div class="collapse has-no-transition" id="collapse-description">
                                     <div class="mb-0">{{ service.description|markdownify }}</div>
@@ -275,7 +291,8 @@
 
                     {# Mobilizations #}
                     {% if show_mobilization_section %}
-                        <div class="c-box mb-3 mb-md-4" data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
+                        <div class="c-box mb-3 mb-md-4"
+                             data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}">
                             <h2 class="h3">Les démarches à réaliser</h2>
                             {% if service.is_dora %}
                                 {% if service.mobilization_modes_professionals.exists or service.mobilization_modes_professionals_external_form_link or service.mobilization_modes_professionals_other %}
@@ -353,12 +370,16 @@
                             <ul class="mb-0">
                                 {% for document_name, document_url in credential_documents %}
                                     <li>
-                                        <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
+                                        <a href="{{ document_url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">{{ document_name }}</a>
                                     </li>
                                 {% endfor %}
                                 {% if service.credentials_online_form %}
                                     <li>
-                                        <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener noreferrer">{{ service.credentials_online_form }}</a>
+                                        <a href="{{ service.credentials_online_form }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">{{ service.credentials_online_form }}</a>
                                     </li>
                                 {% endif %}
                             </ul>
@@ -373,7 +394,12 @@
 
 {% block modals %}
     {% if can_view_modal %}
-        <div class="modal fade" id="service-contact-modal" tabindex="-1" aria-labelledby="service-contact-modal-label" aria-modal="true" role="dialog">
+        <div class="modal fade"
+             id="service-contact-modal"
+             tabindex="-1"
+             aria-labelledby="service-contact-modal-label"
+             aria-modal="true"
+             role="dialog">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -391,7 +417,9 @@
                             <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
                                 <div class="d-flex align-items-start overflow-hidden me-2">
                                     <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                    <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
+                                    <a href="mailto:{{ service.contact_email }}"
+                                       aria-label="Contact par mail"
+                                       class="text-break">{{ service.contact_email }}</a>
                                 </div>
                                 {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
                                 {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}

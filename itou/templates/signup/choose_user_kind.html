@@ -27,7 +27,12 @@
                         <div class="c-card card has-one-link-inside has-rich-radio h-100">
                             <div class="card-header pb-3 pb-me-4">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="kind" value="professional" id="kind_professional" required>
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="kind"
+                                           value="professional"
+                                           id="kind_professional"
+                                           required>
                                     <label class="form-check-label stretched-link" for="kind_professional">
                                         <strong>Professionnel de l’inclusion</strong>
                                     </label>
@@ -44,7 +49,10 @@
                                         </div>
                                     </div>
                                     <figure class="d-none d-md-inline-flex">
-                                        <img src="{% static_theme_images 'illustration-signup-01.png' %}" loading="lazy" alt="" width="150">
+                                        <img src="{% static_theme_images 'illustration-signup-01.png' %}"
+                                             loading="lazy"
+                                             alt=""
+                                             width="150">
                                     </figure>
                                 </div>
                             </div>
@@ -54,7 +62,12 @@
                         <div class="c-card card has-one-link-inside has-rich-radio h-100">
                             <div class="card-header pb-3 pb-me-4">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="kind" value="job_seeker" id="kind_job_seeker" required>
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="kind"
+                                           value="job_seeker"
+                                           id="kind_job_seeker"
+                                           required>
                                     <label class="form-check-label stretched-link" for="kind_job_seeker">
                                         <strong>Candidat</strong>
                                     </label>
@@ -66,7 +79,10 @@
                                         <p>Vous êtes à la recherche d’un emploi inclusif et souhaitez être accompagné dans votre parcours.</p>
                                     </div>
                                     <figure class="d-none d-md-inline-flex">
-                                        <img src="{% static_theme_images 'illustration-signup-02.png' %}" loading="lazy" alt="" width="150">
+                                        <img src="{% static_theme_images 'illustration-signup-02.png' %}"
+                                             loading="lazy"
+                                             alt=""
+                                             width="150">
                                     </figure>
                                 </div>
                             </div>
@@ -79,12 +95,14 @@
                                 Vous êtes membre d’une institution partenaire ?
                             {% endfragment %}
                             {% fragment as c_info__detail %}
-                                <p class="mb-0">
-                                    DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour accéder à votre espace de travail, demandez à un membre de l’organisme concerné de vous ajouter.
-                                </p>
+                                <p class="mb-0">DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour accéder à votre espace de travail, demandez à un membre de l’organisme concerné de vous ajouter.</p>
                                 <p>
                                     Si vous avez besoin d’aide,
-                                    <a href="{{ ITOU_CONTACT_FORM_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="contactez-nous (ouverture dans un nouvel onglet)">contactez-nous</a>
+                                    <a href="{{ ITOU_CONTACT_FORM_URL }}"
+                                       target="_blank"
+                                       class="has-external-link"
+                                       rel="noopener"
+                                       aria-label="contactez-nous (ouverture dans un nouvel onglet)">contactez-nous</a>
                                 </p>
                             {% endfragment %}
                         {% endcomponent_info %}

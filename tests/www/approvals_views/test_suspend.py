@@ -332,11 +332,13 @@ class TestApprovalSuspendActionChoiceView:
                 'id="endDateRadios" value="update_enddate" checked>'
             ),
             status_code=200,
+            html=True,
         )
         assertContains(
             response,
             '<input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">',
             status_code=200,
+            html=True,
         )
 
     def test_post_delete(self, client):

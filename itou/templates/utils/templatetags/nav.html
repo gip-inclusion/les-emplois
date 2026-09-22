@@ -22,7 +22,8 @@
                         {% endif %}
                     </span>
                 </button>
-                <div class="collapse{% if menu_group_or_item.active %} show{% endif %}" id="collapse-nav-{{ menu_group_or_item.slug }}">
+                <div class="collapse{% if menu_group_or_item.active %} show{% endif %}"
+                     id="collapse-nav-{{ menu_group_or_item.slug }}">
                     <ul>
                         {% for menu_item in menu_group_or_item.items %}
                             <li>

@@ -17,13 +17,9 @@
         </div>
 
         {% if diagnosis.allowance_amount %}
-            <p class="fs-sm text-success">
-                Confirmée le {{ diagnosis.created_at|date:"d/m/Y" }} par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).
-            </p>
+            <p class="fs-sm text-success">Confirmée le {{ diagnosis.created_at|date:"d/m/Y" }} par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).</p>
         {% else %}
-            <p class="fs-sm">
-                Renseignée le {{ diagnosis.created_at|date:"d/m/Y" }} par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).
-            </p>
+            <p class="fs-sm">Renseignée le {{ diagnosis.created_at|date:"d/m/Y" }} par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).</p>
         {% endif %}
 
         <ul class="list-data mb-3">
@@ -65,12 +61,11 @@
                     Aide à l'accompagement GEIQ
                 {% endfragment %}
                 {% fragment as content %}
-                    <p class="mb-0">
-                        Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.
-                    </p>
+                    <p class="mb-0">Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.</p>
                 {% endfragment %}
                 {% fragment as call_to_action %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}" class="btn btn-sm btn-primary">Mettre à jour</a>
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}"
+                       class="btn btn-sm btn-primary">Mettre à jour</a>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% endif %}
@@ -86,7 +81,8 @@
                 {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
                 {% if request.from_employer %}
                     {% with back_and_next_url=request.get_full_path|urlencode %}
-                        <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary ms-2">Vérifier</a>
+                        <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}"
+                           class="btn btn-outline-primary ms-2">Vérifier</a>
                     {% endwith %}
                 {% endif %}
             </div>

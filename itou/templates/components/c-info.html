@@ -27,9 +27,8 @@
                 <span>{{ c_info__summary }}</span>
             </button>
             {% if c_info__detail|default:"" %}
-                <div class="c-info__detail collapse{% if is_opened %} show{% endif %}" id="{{ collapse_id }}">
-                    {{ c_info__detail }}
-                </div>
+                <div class="c-info__detail collapse{% if is_opened %} show{% endif %}"
+                     id="{{ collapse_id }}">{{ c_info__detail }}</div>
             {% endif %}
         {% endwith %}
     {% else %}

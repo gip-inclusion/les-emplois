@@ -6,7 +6,9 @@
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.institutions only %}
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.states only %}
             {% partialdef assessments-filter-counter inline %}
-                <div class="ms-md-auto" id="assessments-filter-counter"{% if hx_swap_oob|default:False %} hx-swap-oob="true"{% endif %}>
+                <div class="ms-md-auto"
+                     id="assessments-filter-counter"
+                     {% if hx_swap_oob|default:False %} hx-swap-oob="true"{% endif %}>
                     {% if filters_counter > 0 %}
                         <a href="{% url "geiq_assessments_views:list_for_institution" %}"
                            class="btn btn-ico btn-dropdown-filter"

@@ -74,10 +74,14 @@ from tests.www.apply.test_process import ARCHIVED_MARKUP, UNARCHIVE_BUTTON_MARKU
 NIR_FIELD_ID = 'id="id_nir"'
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
-LINK_RESET_MARKUP = (
-    '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
-    ' aria-label="Annuler la saisie de ce formulaire">'
-)
+LINK_RESET_MARKUP = """
+    <a href="%s"
+       class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+       aria-label="Annuler la saisie de ce formulaire">
+        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+        <span>Annuler</span>
+    </a>
+"""
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
 NEXT_BUTTON_MARKUP = (
     '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
@@ -235,7 +239,7 @@ class TestProcessAcceptViewsInWizard:
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
             assertContains(response, BACK_BUTTON_ARIA_LABEL)
         else:
-            assertContains(response, LINK_RESET_MARKUP % reset_url)
+            assertContains(response, LINK_RESET_MARKUP % reset_url, html=True)
             assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         JOB_SEEKER_NAME = job_application.job_seeker.get_inverted_full_name()
         assertContains(response, f"Accompagnateur de {JOB_SEEKER_NAME} au sein de votre structure")
@@ -290,7 +294,9 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]))
+        assertContains(
+            response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]), html=True
+        )
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
@@ -378,7 +384,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, LINK_RESET_MARKUP % details_url)
+        assertContains(response, LINK_RESET_MARKUP % details_url, html=True)
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
@@ -410,7 +416,7 @@ class TestProcessAcceptViewsInWizard:
         }
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, LINK_RESET_MARKUP % next_url)
+        assertContains(response, LINK_RESET_MARKUP % next_url, html=True)
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
@@ -439,7 +445,9 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]))
+        assertContains(
+            response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]), html=True
+        )
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
@@ -1901,7 +1909,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, LINK_RESET_MARKUP % details_url)
+        assertContains(response, LINK_RESET_MARKUP % details_url, html=True)
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)

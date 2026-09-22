@@ -17,7 +17,10 @@
     <div class="c-box--summary__footer">
         {% if assessment.action_financial_assessment_file %}
             <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-                <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn-link mb-3 mb-md-0" rel="noopener" target="_blank">
+                <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}"
+                   class="btn-link mb-3 mb-md-0"
+                   rel="noopener"
+                   target="_blank">
                     <span>{{ assessment.action_financial_assessment_filename }}</span>
                 </a>
                 {% if not assessment.submitted_at %}
@@ -27,7 +30,8 @@
             </div>
         {% else %}
             <div class="d-flex justify-content-end">
-                <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-primary btn-block w-100 w-md-auto">Compléter</a>
+                <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                   class="btn btn-primary btn-block w-100 w-md-auto">Compléter</a>
             </div>
         {% endif %}
     </div>

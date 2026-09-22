@@ -119,9 +119,7 @@
 
                                 {% if sanctions.suspension_dates and sanctions.suspension_dates.upper %}
                                     <h3 class="mt-5">Retrait temporaire de la capacité d’auto-prescription</h3>
-                                    <p>
-                                        Période concernée : Du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }} au {{ sanctions.suspension_dates.upper|date:"d/m/Y" }}
-                                    </p>
+                                    <p>Période concernée : Du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }} au {{ sanctions.suspension_dates.upper|date:"d/m/Y" }}</p>
                                 {% elif sanctions.suspension_dates %}
                                     <h3 class="mt-5">Retrait définitif de la capacité d’auto-prescription</h3>
                                     <p>Période concernée : À partir du {{ sanctions.suspension_dates.lower|date:"d/m/Y" }}</p>
@@ -189,12 +187,13 @@
                                 La décision prise <b>nécessite l’envoi d’une lettre recommandée avec accusé de réception</b>.
                                 <br>
                                 Vous devez notifier à la SIAE la sanction applicable, au plus tard 5 mois après le début de la phase contradictoire
-                                (<a href="{% url 'siae_evaluations_views:campaign_calendar' evaluated_siae.evaluation_campaign.pk %}" target="_blank">Voir calendrier</a>).
+                                (<a href="{% url 'siae_evaluations_views:campaign_calendar' evaluated_siae.evaluation_campaign.pk %}"
+   target="_blank">Voir calendrier</a>).
                             </p>
-                            <p class="fs-sm">
-                                Pour rédiger votre notification, appuyez-vous sur les éléments figurant dans le détail de la décision afin de transmettre à la SIAE toutes les informations nécessaires.
-                            </p>
-                            <a href="{% static 'templates/modele_decision_sanction_controle_a_posteriori.docx' %}" target="_blank" class="btn btn-outline-primary btn-block btn-ico bg-white">Télécharger le modèle de courrier</a>
+                            <p class="fs-sm">Pour rédiger votre notification, appuyez-vous sur les éléments figurant dans le détail de la décision afin de transmettre à la SIAE toutes les informations nécessaires.</p>
+                            <a href="{% static 'templates/modele_decision_sanction_controle_a_posteriori.docx' %}"
+                               target="_blank"
+                               class="btn btn-outline-primary btn-block btn-ico bg-white">Télécharger le modèle de courrier</a>
                         </div>
                     {% endif %}
                     {% include "siae_evaluations/includes/evaluation_data.html" %}

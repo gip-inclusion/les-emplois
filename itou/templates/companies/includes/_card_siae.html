@@ -126,9 +126,7 @@
                         data-bs-target="#collapseMoreJobs_{{ siae.pk }}"
                         aria-expanded="false"
                         aria-controls="collapseMoreJobs_{{ siae.pk }}"
-                        aria-label="Voir ou masquer les autres métiers">
-                    les {{ siae.active_job_descriptions|length|add:"-3" }} autres métiers
-                </button>
+                        aria-label="Voir ou masquer les autres métiers">les {{ siae.active_job_descriptions|length|add:"-3" }} autres métiers</button>
             </div>
         {% endif %}
     {% elif not siae.is_open_to_spontaneous_applications %}

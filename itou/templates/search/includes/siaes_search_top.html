@@ -8,23 +8,32 @@
             <div class="d-lg-flex">
                 {% if siaes_count %}
                     <div>
-                        <button type="button" class="btn btn-ico btn-link text-nowrap" data-bs-toggle="modal" data-bs-target="#companiesSortingTipModal">
+                        <button type="button"
+                                class="btn btn-ico btn-link text-nowrap"
+                                data-bs-toggle="modal"
+                                data-bs-target="#companiesSortingTipModal">
                             <i class="ri-information-line fw-medium" aria-hidden="true"></i>
                             <span>Comment sont triés ces résultats ?</span>
                         </button>
-                        <div class="modal fade" id="companiesSortingTipModal" tabindex="-1" aria-labelledby="companiesSortingTipModalLabel" aria-hidden="true">
+                        <div class="modal fade"
+                             id="companiesSortingTipModal"
+                             tabindex="-1"
+                             aria-labelledby="companiesSortingTipModalLabel"
+                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h3 class="modal-title" id="companiesSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                        <h3 class="modal-title"
+                                            id="companiesSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Fermer"></button>
                                     </div>
                                     <div class="modal-body">
                                         <p class="fw-bold">Pour les résultats d’employeurs inclusifs, l’ordre de priorité est le suivant&nbsp;:</p>
                                         <ol>
-                                            <li>
-                                                Les employeurs actifs (c’est à dire les structures qui ont des membres inscrits) qui ont moins de candidatures par rapport au nombre de postes ouverts au recrutement
-                                            </li>
+                                            <li>Les employeurs actifs (c’est à dire les structures qui ont des membres inscrits) qui ont moins de candidatures par rapport au nombre de postes ouverts au recrutement</li>
                                             <li>Les employeurs actifs ayant des postes ouverts au recrutement</li>
                                             <li>Les employeurs actifs ayant publié des fiches de postes</li>
                                             <li>Les employeurs actifs ayant bloqué la réception des candidatures</li>
@@ -32,7 +41,9 @@
                                         </ol>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">J’ai compris</button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary"
+                                                data-bs-dismiss="modal">J’ai compris</button>
                                     </div>
                                 </div>
                             </div>
@@ -53,15 +64,23 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
             <p class="mb-0">{{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}</p>
             {% if job_descriptions_count %}
-                <button type="button" class="btn btn-ico btn-link text-nowrap" data-bs-toggle="modal" data-bs-target="#jobDescriptionsSortingTipModal">
+                <button type="button"
+                        class="btn btn-ico btn-link text-nowrap"
+                        data-bs-toggle="modal"
+                        data-bs-target="#jobDescriptionsSortingTipModal">
                     <i class="ri-information-line fw-medium" aria-hidden="true"></i>
                     <span>Comment sont triés ces résultats ?</span>
                 </button>
-                <div class="modal fade" id="jobDescriptionsSortingTipModal" tabindex="-1" aria-labelledby="jobDescriptionsSortingTipModalLabel" aria-hidden="true">
+                <div class="modal fade"
+                     id="jobDescriptionsSortingTipModal"
+                     tabindex="-1"
+                     aria-labelledby="jobDescriptionsSortingTipModalLabel"
+                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h3 class="modal-title" id="jobDescriptionsSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
+                                <h3 class="modal-title"
+                                    id="jobDescriptionsSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                             </div>
                             <div class="modal-body">
@@ -72,7 +91,9 @@
                                 </ol>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">J’ai compris</button>
+                                <button type="button"
+                                        class="btn btn-sm btn-primary"
+                                        data-bs-dismiss="modal">J’ai compris</button>
                             </div>
                         </div>
                     </div>

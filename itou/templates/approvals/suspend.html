@@ -34,9 +34,8 @@
                                 {# Split form fields for easier collapsible behaviour #}
                                 {% bootstrap_field form.start_at %}
 
-                                <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
-                                    {% bootstrap_field form.end_at %}
-                                </div>
+                                <div id="collapse_end_at"
+                                     class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">{% bootstrap_field form.end_at %}</div>
 
                                 {% collapse_field form.set_default_end_date target_id="collapse_end_at" %}
 
@@ -75,9 +74,7 @@
                                 </p>
                                 {% component_alert content=content variant="warning" %}
                                     {% fragment as content %}
-                                        <p class="mb-0">
-                                            En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
-                                        </p>
+                                        <p class="mb-0">En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.</p>
                                     {% endfragment %}
                                 {% endcomponent_alert %}
 
@@ -88,9 +85,7 @@
 
                     {% endif %}
                 </div>
-                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% approval_details_box approval=approval version='box_without_link' extra_classes='mb-3 mb-md-4' %}
-                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">{% approval_details_box approval=approval version='box_without_link' extra_classes='mb-3 mb-md-4' %}</div>
             </div>
         </div>
     </section>

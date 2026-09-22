@@ -30,7 +30,9 @@
             <h2 class="visually-hidden">Actions rapides</h2>
             <div class="form-row align-items-center gx-3">
                 <div class="form-group col-12 col-lg-auto">
-                    <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}" class="js-prevent-multiple-submit">
+                    <form method="post"
+                          action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}"
+                          class="js-prevent-multiple-submit">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
                             <i class="ri-check-line" aria-hidden="true"></i>
@@ -39,7 +41,8 @@
                     </form>
                 </div>
                 <div class="form-group col-12 col-lg-auto">
-                    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="{% url "approvals:prolongation_request_deny" prolongation_request.pk %}?reset=1">
+                    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                       href="{% url "approvals:prolongation_request_deny" prolongation_request.pk %}?reset=1">
                         <i class="ri-close-line" aria-hidden="true"></i>
                         <span>Refuser</span>
                     </a>
@@ -80,8 +83,11 @@
                             <li>
                                 <small>
                                     Adressé à
-                                    <button type="button" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
-                                        <i class="ri-information-line ri-xl text-info" aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                    <button type="button"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
+                                        <i class="ri-information-line ri-xl text-info"
+                                           aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                                     </button>
                                 </small>
                                 <p>{{ prolongation_request.assigned_to.get_full_name }}</p>

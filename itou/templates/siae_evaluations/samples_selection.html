@@ -45,9 +45,9 @@
                             </p>
                             <p class="fw-bold">Données du contrôle a posteriori cette campagne</p>
                             <p>
-                                <a class="btn btn-outline-primary" href="{% url 'stats:stats_ddets_iae_siae_evaluation' %}{% if back_url %}?back_url={{ back_url }}{% endif %}" aria-label="Voir les données">
-                                    Voir les données
-                                </a>
+                                <a class="btn btn-outline-primary"
+                                   href="{% url 'stats:stats_ddets_iae_siae_evaluation' %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                                   aria-label="Voir les données">Voir les données</a>
                             </p>
 
                             <h4>Sélection des salariés à contrôler</h4>
@@ -60,9 +60,7 @@
                                     Exemple
                                 {% endfragment %}
                                 {% fragment as content %}
-                                    <p class="mb-0">
-                                        Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)
-                                    </p>
+                                    <p class="mb-0">Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)</p>
                                 {% endfragment %}
                             {% endcomponent_alert %}
                             {% if evaluation_campaign.percent_set_at %}

@@ -35,12 +35,13 @@
             {% if tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and tab != AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <li class="nav-item">
                     {# FIXME(ewen): use span as below #}
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
-                    </a>
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}</a>
                 </li>
             {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and contract.requires_justification %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
                         <span>{{ tab.label }}</span>
                         {% if not contract.allowance_request_justification_reason %}
                             <i class="ri-error-warning-line text-warning ms-2"></i>
@@ -49,7 +50,8 @@
                 </li>
             {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and request.from_institution and not contract.allowance_granted %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
                         {% if not contract.allowance_refusal_reason %}<i class="ri-error-warning-line ri-xl text-warning ms-2"></i>{% endif %}
                     </a>
                 </li>
@@ -75,9 +77,7 @@
                     {% if request.from_institution and active_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
                         {% component_alert content=refusal_confidentiality_notice variant="info" icon=False extra_classes="mb-3 mb-md-4" %}
                             {% fragment as refusal_confidentiality_notice %}
-                                <p class="mb-0">
-                                    Le motif et le commentaire de refus sont réservés à la DDETS/DREETS et ne sont pas transmis au GEIQ.
-                                </p>
+                                <p class="mb-0">Le motif et le commentaire de refus sont réservés à la DDETS/DREETS et ne sont pas transmis au GEIQ.</p>
                             {% endfragment %}
                         {% endcomponent_alert %}
                     {% endif %}

@@ -1,5 +1,6 @@
 {% load badges %}
-<div class="col-12 col-md-12 col-xxl-12 {% if kind == "IAE" %}col-xxxl-6{% else %}col-xxxl-12{% endif %} mb-3 mb-md-5" id="{% if kind == "GEIQ" %}geiq{% else %}iae{% endif %}-eligibility-diagnosis">
+<div class="col-12 col-md-12 col-xxl-12 {% if kind == "IAE" %}col-xxxl-6{% else %}col-xxxl-12{% endif %} mb-3 mb-md-5"
+     id="{% if kind == "GEIQ" %}geiq{% else %}iae{% endif %}-eligibility-diagnosis">
     <div class="c-box p-0 h-100">
         <div class="p-3 p-lg-4">
             <span class="h4 mb-0">
@@ -55,9 +56,7 @@
                     </div>
                 {% endif %}
             {% elif kind == "GEIQ" %}
-                <p class="fs-sm text-success">
-                    Éligibilité GEIQ confirmée par {{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }}).
-                </p>
+                <p class="fs-sm text-success">Éligibilité GEIQ confirmée par {{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }}).</p>
                 <ul class="list-data mb-3">
                     <li>
                         <small>Durée de validité du diagnostic</small>

@@ -18,8 +18,12 @@
 {% block title_extra %}
     <div class="c-stepper">
         <div class="progress">
-            <div class="progress-bar progress-bar-66" role="progressbar" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-            </div>
+            <div class="progress-bar progress-bar-66"
+                 role="progressbar"
+                 aria-valuenow="66"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-labelledby="currentProgressState"></div>
         </div>
         <p id="currentProgressState">
             <strong>Étape 2</strong>/3 : Rattachement à votre structure
@@ -91,13 +95,13 @@
                                 {% endcomponent_alert %}
                             {% else %}
                                 <p class="mb-0">
-                                    <small>
-                                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.
-                                    </small>
+                                    <small>Si vous ne trouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.</small>
                                 </p>
                             {% endif %}
-                            <a class="btn btn btn-outline-secondary mt-3" href="">Retour</a>{# Reload the current page with an empty form #}
-                            <a href="{% url 'signup:prescriber_choose_org' siret=form.cleaned_data.siret %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
+                            <a class="btn btn btn-outline-secondary mt-3"
+                               href="">Retour</a>{# Reload the current page with an empty form #}
+                            <a href="{% url 'signup:prescriber_choose_org' siret=form.cleaned_data.siret %}"
+                               class="btn btn-primary mt-3">Inscrire mon organisation</a>
                         </div>
                     {% endif %}
                 </div>

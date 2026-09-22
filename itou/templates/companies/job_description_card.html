@@ -95,7 +95,11 @@
                 {% endif %}
                 <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                     <div class="dropdown">
-                        <button type="button" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
+                        <button type="button"
+                                class="btn btn-lg btn-ico btn-link-white"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-label="Ouverture et fermeture du menu des actions complémentaires">
                             <i class="ri-more-2-line ri-lg fw-normal" aria-hidden="true"></i>
                             <span class="d-lg-none">Autres actions</span>
                         </button>
@@ -104,7 +108,10 @@
                                 {% include "includes/copy_to_clipboard.html" with content=job.get_absolute_url text="Copier le lien de cette fiche de poste" css_classes="btn btn-ico justify-content-start dropdown-item" %}
                             </li>
                             <li>
-                                <a href="{{ report_tally_url }}" rel="noopener" class="btn btn-ico justify-content-start dropdown-item" target="_blank">
+                                <a href="{{ report_tally_url }}"
+                                   rel="noopener"
+                                   class="btn btn-ico justify-content-start dropdown-item"
+                                   target="_blank">
                                     <i class="ri-notification-4-line fw-medium" aria-hidden="true"></i>
                                     <span>Signaler cette fiche de poste</span>
                                 </a>
@@ -139,16 +146,28 @@
                 <div class="s-tabs-01__row row">
                     <div class="s-tabs-01__col col-12">
                         <h2 class="visually-hidden" id="recrutements-title">Recrutements de la structure</h2>
-                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true" aria-labelledby="recrutements-title">
+                        <ul class="s-tabs-01__nav nav nav-tabs"
+                            role="tablist"
+                            data-it-sliding-tabs="true"
+                            aria-labelledby="recrutements-title">
                             <li class="nav-item" role="presentation">
-                                <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
+                                <a id="recrutements-en-cours-tab"
+                                   class="nav-link active"
+                                   role="tab"
+                                   href="#recrutements-en-cours"
+                                   data-bs-toggle="tab"
+                                   aria-selected="true"
+                                   aria-controls="recrutements-en-cours">
                                     <span>Recrutement{{ other_active_jobs|pluralizefr }} en cours dans cette structure</span>
                                     <span class="badge badge-sm rounded-pill ms-2">{{ other_active_jobs|length }}</span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
+                            <div id="recrutements-en-cours"
+                                 class="tab-pane fade active show"
+                                 aria-labelledby="recrutements-en-cours-tab"
+                                 role="tabpanel">
                                 <ul class="list-group list-group-flush list-group-link">
                                     {% for other_job in other_active_jobs %}
                                         {% include "companies/includes/_siae_jobdescription.html" with job=other_job %}

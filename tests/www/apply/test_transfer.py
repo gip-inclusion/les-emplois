@@ -455,7 +455,9 @@ def test_start_session_internal_transfer(client):
     assertContains(response, INTERNAL_TRANSFER_CONFIRM_BUTTON, html=True)
     assertContains(response, "<h1>Confirmation du transfert</h1>")
     internal_transfer_post_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
-    assertContains(response, f'<form method="post" action="{internal_transfer_post_url}">')
+    assertContains(
+        response, f'<form method="post"\n                                  action="{internal_transfer_post_url}">'
+    )
 
     response = client.post(internal_transfer_post_url, data={"target_company_id": other_company.pk})
     assertRedirects(response, list_url_with_params)

@@ -1,9 +1,11 @@
 {% load django_bootstrap5 %}
 
 <div class="dropdown">
-    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-        Statut du PASS IAE
-    </button>
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"
+            aria-expanded="false">Statut du PASS IAE</button>
     <ul class="dropdown-menu">
         <li>{% bootstrap_field filters_form.status_valid wrapper_class="dropdown-item" %}</li>
         <li>{% bootstrap_field filters_form.status_suspended wrapper_class="dropdown-item" %}</li>

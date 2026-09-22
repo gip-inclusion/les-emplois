@@ -65,10 +65,14 @@ from tests.utils.testing import default_storage_ls_files, get_session_name, pars
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
-LINK_RESET_MARKUP = (
-    '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
-    ' aria-label="Annuler la saisie de ce formulaire">'
-)
+LINK_RESET_MARKUP = """
+    <a href="%s"
+       class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+       aria-label="Annuler la saisie de ce formulaire">
+        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+        <span>Annuler</span>
+    </a>
+"""
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
 CONFIRM_BUTTON_MARKUP = (
     '<button type="submit" class="btn btn-block btn-primary" aria-label="Confirmer l’embauche de %s">'
@@ -584,7 +588,7 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         nir = "178122978200508"
         post_data = {"nir": nir, "confirm": 1}
@@ -605,7 +609,7 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
 
@@ -632,7 +636,7 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
@@ -783,7 +787,7 @@ class TestApplyAsJobSeeker:
         assertRedirects(response, next_url)
         response = client.get(next_url)
 
-        assertContains(response, LINK_RESET_MARKUP % reset_url_job_description)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_job_description, html=True)
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_job_seeker_sent_emails(self, client, pdf_file, mailoutbox):
@@ -990,7 +994,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % from_url)
+        assertContains(response, LINK_RESET_MARKUP % from_url, html=True)
 
         response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, existing_job_seeker, with_personal_information=False)
@@ -1300,7 +1304,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, existing_job_seeker)
@@ -1503,7 +1507,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
@@ -1787,7 +1791,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, existing_job_seeker, with_personal_information=False)
@@ -2030,7 +2034,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company, html=True)
 
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
@@ -2521,7 +2525,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url)
+        assertContains(response, LINK_RESET_MARKUP % reset_url, html=True)
 
         response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, existing_job_seeker)
@@ -2742,7 +2746,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url)
+        assertContains(response, LINK_RESET_MARKUP % reset_url, html=True)
 
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
@@ -4487,7 +4491,7 @@ class TestCheckPreviousApplicationsView:
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
 
         # Reset URL is correct
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_job_seeker(self, client, snapshot):
@@ -4536,7 +4540,7 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     def test_no_previous_as_authorized_prescriber(self, client):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
@@ -4547,7 +4551,7 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_prescriber(self, client, snapshot):
@@ -4597,7 +4601,7 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_authorized_prescriber(self, client, snapshot):
@@ -4685,7 +4689,7 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     def test_no_previous_as_employer(self, client):
         self._login_and_setup_session(client, self.company.members.first())
@@ -4718,7 +4722,7 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_another_employer(self, client, snapshot):
@@ -4771,4 +4775,4 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
-        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1, html=True)

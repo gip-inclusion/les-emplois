@@ -13,7 +13,9 @@
             </div>
             <div class="modal-body">
                 <div class="text-center mb-3" aria-hidden="true">
-                    <img class="img-fluid color-filter-primary" src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="" />
+                    <img class="img-fluid color-filter-primary"
+                         src="{% static_theme_images 'ico-bicro-important.svg' %}"
+                         alt="" />
                 </div>
                 <ol>
                     {% for item in active_campaign_announce_items %}
@@ -25,7 +27,9 @@
                 </ol>
             </div>
             <div class="modal-footer">
-                <a href="{% url 'announcements:news' %}" class="btn btn-sm btn-primary" {% matomo_event "modale-nouveautes" "clic" "toutes-les-nouveautes" %}>Voir toutes les nouveautés</a>
+                <a href="{% url 'announcements:news' %}"
+                   class="btn btn-sm btn-primary"
+                   {% matomo_event "modale-nouveautes" "clic" "toutes-les-nouveautes" %}>Voir toutes les nouveautés</a>
             </div>
         </div>
     </div>

@@ -16,9 +16,7 @@
                 Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}
             {% endfragment %}
             {% fragment as content %}
-                <p>
-                    Tant que l’éligibilité à l'aide de l'accompagnement GEIQ est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée de six mois.
-                </p>
+                <p>Tant que l’éligibilité à l'aide de l'accompagnement GEIQ est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée de six mois.</p>
                 <span class="btn btn-link text-start p-0" data-shroud-clear>Mettre à jour l’éligibilité</span>
             {% endfragment %}
         {% endcomponent_alert %}

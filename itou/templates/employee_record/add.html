@@ -32,9 +32,7 @@
                             {% csrf_token %}
 
                             {% if wizard_steps.current == "choose-employee" %}
-                                <p>
-                                    Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
-                                </p>
+                                <p>Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.</p>
                             {% else %}
                                 <p>
                                     Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.

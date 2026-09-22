@@ -1248,7 +1248,7 @@
                   à la liste
               </span>
           </a>
-      </div>
+             </div>
   
   
   
@@ -1260,11 +1260,9 @@
           </div>
       
           <div class="c-title__cta">
-              
               <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
                   <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
               </button>
-          
           </div>
       
       
@@ -1693,7 +1691,7 @@
                   à la liste
               </span>
           </a>
-      </div>
+             </div>
   
   
   
@@ -1705,11 +1703,9 @@
           </div>
       
           <div class="c-title__cta">
-              
               <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
                   <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
               </button>
-          
           </div>
       
       
@@ -2035,7 +2031,7 @@
                   à la liste
               </span>
           </a>
-      </div>
+             </div>
   
   
   
@@ -2047,11 +2043,9 @@
           </div>
       
           <div class="c-title__cta">
-              
               <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
                   <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
               </button>
-          
           </div>
       
       

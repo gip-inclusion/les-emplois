@@ -8,10 +8,19 @@
 {% endif %}
 
 <div class="d-flex align-items-start" id="toggle_allowance_for_contract_{{ contract.pk }}">
-    <form hx-post="{{ post_url }}" hx-trigger="change" hx-target="#toggle_allowance_for_contract_{{ contract.pk }}" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+    <form hx-post="{{ post_url }}"
+          hx-trigger="change"
+          hx-target="#toggle_allowance_for_contract_{{ contract.pk }}"
+          hx-swap="outerHTML"
+          class="js-prevent-multiple-submit">
         {% csrf_token %}
         <div class="form-check form-switch mb-0">
-            <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
+            <input type="checkbox"
+                   class="form-check-input"
+                   name="allowance"
+                   id="allowance_for_contract_{{ contract.pk }}"
+                   {% if value %}checked{% endif %}
+                   {% if not editable %}disabled{% endif %} />
             <label class="form-check-label" for="allowance_for_contract_{{ contract.pk }}">
                 <span class="visually-hidden">
                     {% if request.from_employer %}
@@ -30,14 +39,20 @@
                class="text-success text-decoration-none"
                data-bs-toggle="tooltip"
                data-bs-title="Vous avez motivé la demande d’aide de ce contrat">
-                <i class="ri-check-line" aria-label="Vous avez motivé la demande d’aide de ce contrat" role="button" tabindex="0"></i>
+                <i class="ri-check-line"
+                   aria-label="Vous avez motivé la demande d’aide de ce contrat"
+                   role="button"
+                   tabindex="0"></i>
             </a>
         {% else %}
             <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
                class="text-warning text-decoration-none"
                data-bs-toggle="tooltip"
                data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat">
-                <i class="ri-error-warning-line" aria-label="Vous devez encore motiver la demande d’aide de ce contrat" role="button" tabindex="0"></i>
+                <i class="ri-error-warning-line"
+                   aria-label="Vous devez encore motiver la demande d’aide de ce contrat"
+                   role="button"
+                   tabindex="0"></i>
             </a>
         {% endif %}
     {% elif request.from_institution and not contract.allowance_granted %}
@@ -46,14 +61,20 @@
                class="text-success text-decoration-none"
                data-bs-toggle="tooltip"
                data-bs-title="Voir le motif de refus pour contrat.">
-                <i class="ri-check-line" aria-label="Se rendre au formulaire de justification de refus" role="button" tabindex="0"></i>
+                <i class="ri-check-line"
+                   aria-label="Se rendre au formulaire de justification de refus"
+                   role="button"
+                   tabindex="0"></i>
             </a>
         {% else %}
             <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}"
                class="text-warning text-decoration-none"
                data-bs-toggle="tooltip"
                data-bs-title="Vous devez encore motiver le refus pour ce contrat.">
-                <i class="ri-error-warning-line" aria-label="Se rendre au formulaire de justification de refus" role="button" tabindex="0"></i>
+                <i class="ri-error-warning-line"
+                   aria-label="Se rendre au formulaire de justification de refus"
+                   role="button"
+                   tabindex="0"></i>
             </a>
         {% endif %}
     {% endif %}

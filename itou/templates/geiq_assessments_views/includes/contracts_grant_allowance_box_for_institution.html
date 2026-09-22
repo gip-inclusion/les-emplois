@@ -7,7 +7,11 @@
         <p>Vous pouvez refuser la demande pour ce contrat tant que le bilan n’a pas été validé.</p>
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-block btn-lg btn-ico" name="action" value="{{ InstitutionAction.REFUSE_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+            <button type="submit"
+                    class="btn btn-primary btn-block btn-lg btn-ico"
+                    name="action"
+                    value="{{ InstitutionAction.REFUSE_ALLOWANCE }}"
+                    {% if disabled %} disabled{% endif %}>
                 <i class="ri-close-line" aria-hidden="true"></i>
                 <span>Refuser l’aide</span>
             </button>
@@ -40,7 +44,11 @@
 
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-block" name="action" value="{{ InstitutionAction.GRANT_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>Accorder l’aide</button>
+            <button type="submit"
+                    class="btn btn-primary btn-block"
+                    name="action"
+                    value="{{ InstitutionAction.GRANT_ALLOWANCE }}"
+                    {% if disabled %} disabled{% endif %}>Accorder l’aide</button>
         </form>
     {% endif %}
 </div>

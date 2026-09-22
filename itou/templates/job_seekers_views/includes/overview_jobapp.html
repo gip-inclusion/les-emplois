@@ -6,7 +6,8 @@
 
 {% partialdef open-jobapps-cta %}
     {% if has_applied_for_job_seeker %}
-        <a href="{% url "apply:list_prescriptions" %}?job_seeker={{ job_seeker.pk }}" {% matomo_event "test-synthese" "clic" "voir-candidatures" %}>
+        <a href="{% url "apply:list_prescriptions" %}?job_seeker={{ job_seeker.pk }}"
+           {% matomo_event "test-synthese" "clic" "voir-candidatures" %}>
             {% if job_app and job_app.sender == request.user or job_app.sender_prescriber_organization == request.current_organization %}
                 Voir les candidatures
             {% else %}
@@ -16,9 +17,8 @@
     {% else %}
         {% url "search:employers_results" as search_url %}
         {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}
-        <a href="{{ url_query }}" {% matomo_event "test-synthese" "clic" "postuler-pour-usager" %}>
-            Postuler pour {{ job_seeker.get_inverted_full_name }}
-        </a>
+        <a href="{{ url_query }}"
+           {% matomo_event "test-synthese" "clic" "postuler-pour-usager" %}>Postuler pour {{ job_seeker.get_inverted_full_name }}</a>
     {% endif %}
 {% endpartialdef %}
 
@@ -99,7 +99,7 @@
                     <div class="row gx-4 align-items-start justify-content-between">
                         <div class="col-6">
                             <div class="mb-2">
-                                <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} refusée le {{ job_app.processed_at|date:"d/m/Y" }} </span>
+                                <span class="fw-semibold">Candidature à {{ job_app.to_company.display_name }} refusée le {{ job_app.processed_at|date:"d/m/Y" }}</span>
                                 - motif de refus : {{ job_app.get_refusal_reason_display|lower }}.
                             </div>
                             {% partial open-jobapps-cta %}
@@ -119,7 +119,7 @@
                     <div class="row gx-4 align-items-start justify-content-between">
                         <div class="col-6">
                             <div class="mb-2">
-                                <span class="fw-semibold">Embauche déclarée à {{ job_app.to_company.display_name }} le {{ job_app.hiring_start_at|date:"d/m/Y" }}, </span>
+                                <span class="fw-semibold">Embauche déclarée à {{ job_app.to_company.display_name }} le {{ job_app.hiring_start_at|date:"d/m/Y" }},</span>
                                 à la suite de la candidature du {{ job_app.created_at|date:"d/m/Y" }}.
                             </div>
                             {% partial open-jobapps-cta %}
@@ -157,7 +157,10 @@
                             Votre visibilité sur les candidatures de cet usager se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des candidatures de cet usager, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
                         </p>
                         <p class="mb-0">
-                            <a class="btn-link has-external-link" rel="noopener noreferrer" target="_blank" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                            <a class="btn-link has-external-link"
+                               rel="noopener noreferrer"
+                               target="_blank"
+                               href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
                         </p>
                     {% endfragment %}
                 {% endcomponent_info %}

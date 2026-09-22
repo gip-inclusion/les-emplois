@@ -11,7 +11,8 @@
                     <p>
                         Vous devez encore motiver {{ contracts_awaiting_justification_nb|pluralizefr:"la demande,les demandes" }} d’aide de {{ contracts_awaiting_justification_nb }} {{ contracts_awaiting_justification_nb|pluralizefr:"contrat,contrats" }}.
                     </p>
-                    <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
+                    <a class="btn-link"
+                       href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
                         Afficher les contrats concernés
                     </a>
                 {% endfragment %}
@@ -25,9 +26,8 @@
                     <p>
                         Vous devez encore motiver {{ contracts_awaiting_justification_nb|pluralizefr:"le,les" }} refus d’aide de {{ contracts_awaiting_justification_nb }} {{ contracts_awaiting_justification_nb|pluralizefr:"contrat,contrats" }}.
                     </p>
-                    <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?allowance_eligibility_off=on#contracts-results-table">
-                        Afficher les contrats concernés
-                    </a>
+                    <a class="btn-link"
+                       href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?allowance_eligibility_off=on#contracts-results-table">Afficher les contrats concernés</a>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% endif %}

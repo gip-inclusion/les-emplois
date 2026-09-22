@@ -34,38 +34,46 @@
         {% fragment as c_title__cta %}
             {% if can_invalidate %}
                 {% if assessment.decision_validated_at %}
-                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
-                        Modifier la sélection
-                    </button>
+                    <button type="button"
+                            class="btn btn-lg btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#invalidate_modal">Modifier la sélection</button>
                 {% else %}
                     <form method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-lg btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
-                            Modifier la sélection
-                        </button>
+                        <button type="submit"
+                                class="btn btn-lg btn-outline-primary"
+                                name="action"
+                                value="{{ ContractsAction.INVALIDATE }}">Modifier la sélection</button>
                     </form>
                 {% endif %}
             {% endif %}
             {% if request.from_employer %}
-                <a class="btn btn-lg btn-ico btn-secondary" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
+                <a class="btn btn-lg btn-ico btn-secondary"
+                   href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
                     <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                     <span>Exporter</span>
                 </a>
             {% elif request.from_institution %}
                 <div class="dropdown">
-                    <button class="btn btn-secondary btn-ico dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary btn-ico dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
                         <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
                         <span>Exporter</span>
                     </button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
+                            <a class="dropdown-item"
+                               href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
                                 <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
                                 <span>Exporter tous les contrats soumis par le GEIQ</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url "geiq_assessments_views:assessment_contracts_export_all" pk=assessment.pk %}">
+                            <a class="dropdown-item"
+                               href="{% url "geiq_assessments_views:assessment_contracts_export_all" pk=assessment.pk %}">
                                 <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
                                 <span>Exporter tous les contrats</span>
                             </a>
@@ -85,9 +93,7 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% if request.from_employer %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
-                        <p>
-                            Les contrats compris dans la période du 1er octobre de l’année {{ previous_campaign_year }} au 31 décembre de l’année {{ campaign_year }} sont importés ici depuis le site Label GEIQ.
-                        </p>
+                        <p>Les contrats compris dans la période du 1er octobre de l’année {{ previous_campaign_year }} au 31 décembre de l’année {{ campaign_year }} sont importés ici depuis le site Label GEIQ.</p>
                         <p>
                             Par défaut, seuls les contrats éligibles à une aide et dont la durée est supérieure à 3 mois (90 jours) sont sélectionnés.
                             Vous pouvez toutefois corriger cette sélection et inclure les contrats de votre choix au bilan.
@@ -103,9 +109,7 @@
                     {% elif request.from_institution %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide</h2>
                         <p>L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.</p>
-                        <p>
-                            Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
-                        </p>
+                        <p>Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.</p>
                     {% endif %}
                     {% include "geiq_assessments_views/includes/contracts_list_justification_alert.html" with contracts_awaiting_justification_nb=stats.contracts_awaiting_justification_nb assessment=assessment request=request hx_swap_oob=False only %}
                     {% if stats.with_allowance_granted_previous_year_nb %}
@@ -136,13 +140,12 @@
                         <div class="flex-md-grow-1">
                             {% include "geiq_assessments_views/includes/list_counter.html" with contracts_page=contracts_page request=request only %}
                         </div>
-                        <div class="flex-column flex-md-row mt-3 mt-md-0">
-                            {% bootstrap_field filters_form.employee wrapper_class="w-lg-400px" show_label=False %}
-                        </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.employee wrapper_class="w-lg-400px" show_label=False %}</div>
                     </div>
                     {% partialdef contracts-results-table inline %}
                         {% if request.htmx and not request.htmx.boosted %}
-                            <div id="form-errors-container" hx-swap-oob="true">{% bootstrap_form_errors filters_form %}</div>
+                            <div id="form-errors-container"
+                                 hx-swap-oob="true">{% bootstrap_form_errors filters_form %}</div>
                             {% include "geiq_assessments_views/includes/list_counter.html" with contracts_page=contracts_page request=request only %}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
@@ -150,14 +153,20 @@
                         <div id="contracts-results-table">
                             {% if filters_form.errors %}
                                 <div class="text-center my-3 my-md-4">
-                                    <img class="img-fluid" src="{% static 'img/illustration-error.png' %}" alt="" loading="lazy">
+                                    <img class="img-fluid"
+                                         src="{% static 'img/illustration-error.png' %}"
+                                         alt=""
+                                         loading="lazy">
                                     <p class="mb-1 mt-3">
                                         <strong>Les filtres contiennent des erreurs</strong>
                                     </p>
                                 </div>
                             {% elif not contracts_page %}
                                 <div class="text-center my-3 my-md-4">
-                                    <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+                                    <img class="img-fluid"
+                                         src="{% static 'img/illustration-card-no-result.png' %}"
+                                         alt=""
+                                         loading="lazy">
                                     <p class="mb-1 mt-3">
                                         <strong>Aucun contrat pour le moment</strong>
                                     </p>
@@ -185,7 +194,8 @@
                                             {% for contract in contracts_page %}
                                                 <tr>
                                                     <td>
-                                                        <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
+                                                        <a class="btn-link"
+                                                           href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
                                                         {% if contract.employee.allowance_granted_previous_year %}
                                                             <i class="ri-file-warning-line ri-lg text-warning"
                                                                aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière."
@@ -214,7 +224,10 @@
                                                                    class="text-info text-decoration-none lh-1"
                                                                    data-bs-toggle="tooltip"
                                                                    data-bs-title="Le GEIQ a motivé cette demande d’aide">
-                                                                    <i class="ri-information-line ri-xl" aria-label="Le GEIQ a motivé cette demande d’aide" role="button" tabindex="0"></i>
+                                                                    <i class="ri-information-line ri-xl"
+                                                                       aria-label="Le GEIQ a motivé cette demande d’aide"
+                                                                       role="button"
+                                                                       tabindex="0"></i>
                                                                 </a>
                                                             {% endif %}
                                                         {% endif %}
@@ -251,7 +264,11 @@
 {% block modals %}
     {{ block.super }}
     {% if can_invalidate and assessment.decision_validated_at %}
-        <div id="invalidate_modal" class="modal" tabindex="-1" aria-labelledby="invalidate_modal_title" aria-hidden="true">
+        <div id="invalidate_modal"
+             class="modal"
+             tabindex="-1"
+             aria-labelledby="invalidate_modal_title"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -268,7 +285,10 @@
                         <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
                         <form method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
+                            <button type="submit"
+                                    class="btn btn-sm btn-primary"
+                                    name="action"
+                                    value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
                         </form>
                     </div>
                 </div>

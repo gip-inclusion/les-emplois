@@ -6,9 +6,12 @@ Arguments:
     suffix to make its input id unique.
 {% endcomment %}
 <div class="dropdown">
-    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
-        {{ label|default:field.label }}
-    </button>
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle"
+            data-bs-toggle="dropdown"
+            data-bs-display="static"
+            data-bs-auto-close="outside"
+            aria-expanded="false">{{ label|default:field.label }}</button>
     <ul class="dropdown-menu">
         {% for choice in field %}
             <li class="dropdown-item">
@@ -20,9 +23,11 @@ Arguments:
                            value="{{ choice.data.value }}"
                            {% if choice.data.selected %} checked{% endif %}
                            {% if id_suffix|default:"" %}data-emplois-sync-with="{{ choice.id_for_label }}"{% endif %}>
-                    <label class="form-check-label" for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.data.label }}</label>
+                    <label class="form-check-label"
+                           for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}">{{ choice.data.label }}</label>
                     {% if choice.data.help_text %}
-                        <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}" class="form-text">{{ choice.data.help_text }}</div>
+                        <div id="{{ choice.id_for_label }}-helptext{{ id_suffix|default:'' }}"
+                             class="form-text">{{ choice.data.help_text }}</div>
                     {% endif %}
                 </div>
             </li>

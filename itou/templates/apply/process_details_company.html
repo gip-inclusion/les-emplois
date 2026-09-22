@@ -41,26 +41,44 @@
                    {% matomo_event "candidature" "clic-onglet" "appointments" %}>
                     <span>Rendez-vous</span>
                     {% if job_application.upcoming_participations_count %}
-                        <span id="upcoming-appointments-count" class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>
+                        <span id="upcoming-appointments-count"
+                              class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>
                     {% endif %}
                 </a>
             </li>
         {% endif %}
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="comments-tab" data-bs-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
+            <a class="nav-link"
+               id="comments-tab"
+               data-bs-toggle="tab"
+               href="#comments"
+               role="tab"
+               aria-controls="comments"
+               aria-selected="false"
+               {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
                 {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
             </a>
 
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="historique-tab" data-bs-toggle="tab" href="#historique" role="tab" aria-controls="historique" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
+            <a class="nav-link"
+               id="historique-tab"
+               data-bs-toggle="tab"
+               href="#historique"
+               role="tab"
+               aria-controls="historique"
+               aria-selected="false"
+               {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
         </li>
     </ul>
 {% endblock %}
 
 {% block title_inline_actions %}
     {% if can_be_cancelled %}
-        <button type="button" class="btn btn-danger btn-lg btn-ico" data-bs-toggle="modal" data-bs-target="#cancel_hire_modal">
+        <button type="button"
+                class="btn btn-danger btn-lg btn-ico"
+                data-bs-toggle="modal"
+                data-bs-target="#cancel_hire_modal">
             <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
             <span>Annuler l’embauche</span>
         </button>
@@ -76,7 +94,10 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="tab-content">
-                <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
+                <div class="tab-pane fade show active"
+                     id="informations"
+                     role="tabpanel"
+                     aria-labelledby="informations-tab">
                     <div class="s-section__row row">
                         <div class="s-section__col col-12 col-xxl-12 order-1 order-xxl-1">
                             <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
@@ -196,7 +217,11 @@
     {{ block.super }}
     {# Job application transfer modals triggered by apply/includes/transfer_job_application.html #}
     {% if can_transfer_internal %}
-        <div id="transfer_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="transfer_modal_title" aria-hidden="true">
+        <div id="transfer_confirmation_modal"
+             class="modal"
+             tabindex="-1"
+             aria-labelledby="transfer_modal_title"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
                     {% csrf_token %}
@@ -214,9 +239,12 @@
                             {% endcomponent_info %}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary me-auto"
+                                    data-bs-dismiss="modal">Annuler</button>
                             {% if can_transfer_external %}
-                                <a class="btn btn-sm btn-ico btn-outline-primary" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
+                                <a class="btn btn-sm btn-ico btn-outline-primary"
+                                   href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
                                     <i class="ri-home-smile-line" aria-hidden="true"></i>
                                     <strong>Une autre structure</strong>
                                 </a>
@@ -232,9 +260,9 @@
                                     <strong>Une autre structure</strong>
                                 </button>
                             {% endif %}
-                            <button type="submit" class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
-                                Confirmer
-                            </button>
+                            <button type="submit"
+                                    class="btn btn-sm btn-primary"
+                                    {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>Confirmer</button>
                         </div>
                     </div>
                 </form>
@@ -242,13 +270,16 @@
         </div>
     {% endif %}
     {% if can_be_cancelled %}
-        <div id="cancel_hire_modal" class="modal" tabindex="-1" aria-labelledby="cancel_hire_modal_title" aria-hidden="true">
+        <div id="cancel_hire_modal"
+             class="modal"
+             tabindex="-1"
+             aria-labelledby="cancel_hire_modal_title"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3 class="modal-title" id="cancel_hire_modal_title">
-                            Annuler l’embauche de {{ job_application.job_seeker.get_inverted_full_name }}
-                        </h3>
+                        <h3 class="modal-title"
+                            id="cancel_hire_modal_title">Annuler l’embauche de {{ job_application.job_seeker.get_inverted_full_name }}</h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
@@ -257,24 +288,30 @@
                                 En validant, <strong>vous renoncez aux aides au poste</strong> liées à cette candidature pour tous les jours travaillés de ce salarié.
                                 Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE.
                             </p>
-                            <p>
-                                {{ job_application.job_seeker.get_inverted_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
-                            </p>
+                            <p>{{ job_application.job_seeker.get_inverted_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.</p>
                         {% else %}
                             <p>En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.</p>
                         {% endif %}
                         {% if display_warning_in_cancel_modal %}
                             <p>
                                 Cette candidature sera automatiquement masquée, car elle a été créée il y a plus de 2 ans.
-                                Pour plus de détails, consultez <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank">notre documentation</a>.
+                                Pour plus de détails, consultez
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745"
+                                   rel="noopener"
+                                   target="_blank">notre documentation</a>.
                             </p>
                         {% endif %}
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <form method="post" action="{% url 'apply:cancel' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-bs-dismiss="modal">Annuler</button>
+                        <form method="post"
+                              action="{% url 'apply:cancel' job_application_id=job_application.id %}"
+                              class="js-prevent-multiple-submit">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
                         </form>
                     </div>
                 </div>

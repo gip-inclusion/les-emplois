@@ -51,21 +51,25 @@
                             <p>En tant qu’administrateur de structures, vous avez accès aux API suivantes :</p>
                             <ul>
                                 <li>
-                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records"
+   target="_blank"
+   class="has-external-link"
+   rel="noopener">voir la documentation</a>)</strong>
                                     <br>
                                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2 mb-3" %}
                                         {% fragment as c_info__summary %}
                                             Cette API est disponible par défaut pour toutes vos structures
                                         {% endfragment %}
                                         {% fragment as c_info__detail %}
-                                            <p class="mb-0">
-                                                Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
-                                            </p>
+                                            <p class="mb-0">Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.</p>
                                         {% endfragment %}
                                     {% endcomponent_info %}
                                 </li>
                                 <li>
-                                    <strong>Candidats  (<a href="{% url 'v1:redoc' %}#tag/candidats" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <strong>Candidats (<a href="{% url 'v1:redoc' %}#tag/candidats"
+   target="_blank"
+   class="has-external-link"
+   rel="noopener">voir la documentation</a>)</strong>
                                     <br>
                                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2" %}
                                         {% fragment as c_info__summary %}
@@ -92,15 +96,17 @@
                                 <form method="post" action="{% url 'dashboard:api_token' %}">
                                     {% csrf_token %}
                                     <span class="d-block text-center mb-2">Vous n’avez pas encore de token d’API</span>
-                                    <button type="submit" class="btn btn-primary btn-block">Créer un token d’API</button>
+                                    <button type="submit"
+                                            class="btn btn-primary btn-block">Créer un token d’API</button>
                                 </form>
                             {% else %}
                                 <span class="d-block text-center mb-2">
                                     Votre token d’API {{ token_is_new|yesno:"est, se termine par" }} : <strong>{{ token_key }}</strong>
                                 </span>
-                                <button type="button" class="btn btn-primary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#regenerate_token_modal">
-                                    Regénérer un nouveau token d’API
-                                </button>
+                                <button type="button"
+                                        class="btn btn-primary btn-block mt-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#regenerate_token_modal">Regénérer un nouveau token d’API</button>
                             {% endif %}
                         </div>
                     </div>
@@ -154,9 +160,11 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <button type="submit" class="btn btn-sm btn-danger" aria-label="Regénérer le token" name="action" value="regenerate">
-                            Confirmer la regénération
-                        </button>
+                        <button type="submit"
+                                class="btn btn-sm btn-danger"
+                                aria-label="Regénérer le token"
+                                name="action"
+                                value="regenerate">Confirmer la regénération</button>
                     </form>
                 </div>
             </div>

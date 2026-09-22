@@ -23,7 +23,8 @@
                 <p>
                     Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
                     {% if can_view_personal_information and not request.user.is_job_seeker %}
-                        <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}">Vérifier le profil</a>
+                        <a class="btn-link ms-3"
+                           href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}">Vérifier le profil</a>
                     {% endif %}
                     {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
                 </p>
@@ -41,9 +42,7 @@
                     Veuillez vérifier les informations du candidat
                 {% endfragment %}
                 {% fragment as content %}
-                    <p class="mb-0">
-                        La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                    </p>
+                    <p class="mb-0">La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.</p>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% endif %}
@@ -60,8 +59,12 @@
                     <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                         <div class="c-stepper mb-3 mb-md-4">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
-                                </div>
+                                <div class="progress-bar progress-bar-{{ progress }}"
+                                     role="progressbar"
+                                     aria-valuenow="{{ progress }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-labelledby="currentProgressState"></div>
                             </div>
                             <p id="currentProgressState">
                                 {% block progress_title %}

@@ -69,10 +69,14 @@ from tests.www.apply.test_submit import (
 )
 
 
-LINK_RESET_MARKUP = (
-    '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
-    ' aria-label="Annuler la saisie de ce formulaire">'
-)
+LINK_RESET_MARKUP = """
+    <a href="%s"
+       class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+       aria-label="Annuler la saisie de ce formulaire">
+        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+        <span>Annuler</span>
+    </a>
+"""
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
 CONFIRM_BUTTON_MARKUP = (
     '<button type="submit" class="btn btn-block btn-primary" aria-label="Confirmer l’embauche de %s">'
@@ -405,7 +409,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(check_nir_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard, html=True)
 
         response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, existing_job_seeker)
@@ -766,7 +770,7 @@ class TestDirectHireFullProcess:
         # Step determine the job seeker with a NIR. First: show modal
         # ----------------------------------------------------------------------
         response = client.get(check_nir_url)
-        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
+        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard, html=True)
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
         assert_contains_apply_nir_modal(response, job_seeker)

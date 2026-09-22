@@ -135,7 +135,10 @@
                             <ul class="mb-0 list-unstyled">
                                 {% for document_name, document_url in orientation.attachments_details %}
                                     <li class="mb-2">
-                                        <a class="btn-link btn-ico" href="{{ document_url }}" target="_blank" rel="noopener noreferrer">
+                                        <a class="btn-link btn-ico"
+                                           href="{{ document_url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
                                             <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                                             <span>{{ document_name }}</span>
                                         </a>
