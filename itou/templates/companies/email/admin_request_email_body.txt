@@ -15,5 +15,4 @@ Cliquez sur le lien suivant pour attribuer le statut d'administrateur à {{ requ
 {{ confirm_url }}
 
 Si vous ne souhaitez pas donner suite à cette demande, merci de ne pas prendre en compte ce message.
-
 {% endblock body %}

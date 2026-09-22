@@ -2,10 +2,9 @@
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
-
 La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_company.display_name }} ({{ job_application.to_company.kind }}) localisée à {{ job_application.to_company.city }} !
 
-*Candidat* :
+**Candidat** :
 
 - Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
 - Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information %}
@@ -18,7 +17,7 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 
 {% if job_application.message %}
 
-*Message de candidature* :
+**Message de candidature** :
 
 {{ job_application.message }}
 
@@ -27,7 +26,7 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
+**{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}** :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}
@@ -37,7 +36,8 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 
 -----
 
-*Candidature envoyée par* :
+**Candidature envoyée par** :
+
 - {{ job_application.sender.get_inverted_full_name }}{% if job_application.sender_prescriber_organization %}
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
 - {{ job_application.sender.email }}{% if job_application.sender.phone %}

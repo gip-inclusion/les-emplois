@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestConfirmAdminRole.test_promotes_user_to_admin[add_admin email body]
   '''
-  Bonjour Jean MICHEL
+  Bonjour Jean MICHEL,
   
   Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation ACME Inc. (EI) sur La plateforme de l’inclusion.
   
@@ -200,7 +200,6 @@
   
   - Nom : Les petits paniers
   - Type : EI
-  
   - Email de contact : petitspaniers@mailinator.com
   
   Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur La plateforme de l’inclusion.

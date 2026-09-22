@@ -6,6 +6,7 @@ Bonjour,
 L’organisation {{ prolongation_request.prescriber_organization.display_name }} a accepté votre demande de prolongation du PASS IAE.
 
 Références :
+
 Numéro : {{ prolongation_request.approval.number_with_spaces }}
 Bénéficiaire : {{ prolongation_request.approval.user.get_inverted_full_name }}
 

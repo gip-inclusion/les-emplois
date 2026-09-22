@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-
 Bonjour {{ user.get_full_name }}
 
 L'espace de travail de votre structure {{ structure.name }} ({{ structure.kind }}) sur {% brand %} ne disposait plus d'administrateur actif. Nous vous avons donc attribué automatiquement ce rôle afin d'en assurer la gestion.
@@ -12,5 +11,4 @@ Ce statut vous permet de gérer la liste des membres de votre organisation (reti
 {% endif %}
 
 Si vous ne souhaitez plus assumer le rôle d'administrateur, vous devez désigner un autre administrateur, qui se chargera de vous retirer ce statut.
-
 {% endblock body %}

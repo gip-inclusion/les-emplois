@@ -14,7 +14,6 @@
   
   - Email de l’employeur: email@example.com
   - Numéro de téléphone de l’employeur : +33123456789
-  
   - Numéro de PASS : 999999999999
   - Prénom : Jane
   - Nom : DOE
@@ -30,17 +29,19 @@
   
   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
   
-  * Motifs de refus et actions associées :
+  **Motifs de refus et actions associées** :
   
   1/ L’IAE ne correspond plus aux besoins / à la situation de la personne :
   
   Actions possibles :
+  
   - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire
   - Orientation vers un partenaire de l’accompagnement social/professionnel
   
   2/ La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne
   
   Action possible :
+  
   - Orientation vers un autre type de SIAE
   
   ---
@@ -73,7 +74,6 @@
   
   - Email de l’employeur: email@example.com
   - Numéro de téléphone de l’employeur : +33123456789
-  
   - Numéro de PASS : 999999999999
   - Prénom : Jane
   - Nom : DOE
@@ -89,17 +89,19 @@
   
   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
   
-  * Motifs de refus et actions associées :
+  **Motifs de refus et actions associées** :
   
   1/ L’IAE ne correspond plus aux besoins / à la situation de la personne :
   
   Actions possibles :
+  
   - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire
   - Orientation vers un partenaire de l’accompagnement social/professionnel
   
   2/ La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne
   
   Action possible :
+  
   - Orientation vers un autre type de SIAE
   
   ---
@@ -118,10 +120,12 @@
   L’organisation Pres. Org. a refusé votre demande de prolongation du PASS IAE.
   
   Références :
+  
   Numéro : 99999 99 99999
   Bénéficiaire : DOE Jane
   
   Motif de refus :
+  
   - L’IAE ne correspond plus aux besoins / à la situation de la personne.
   - Explications du prescripteur habilité : [reason_explanation]
   
@@ -155,15 +159,14 @@
   L’organisation Pres. Org. a refusé la prolongation du PASS IAE.
   
   Motif de refus :
+  
   - L’IAE ne correspond plus aux besoins / à la situation de la personne.
   - Explications du prescripteur habilité : [reason_explanation]
   
   Actions envisagées par le prescripteur :
   
   - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire.
-  
   - Orientation vers un partenaire de l’accompagnement social/professionnel.
-  
   - Autre
   
   - Précisions : [proposed_actions_explanation]
@@ -188,15 +191,14 @@
   L’organisation Pres. Org. a refusé la prolongation du PASS IAE.
   
   Motif de refus :
+  
   - L’IAE ne correspond plus aux besoins / à la situation de la personne.
   - Explications du prescripteur habilité : [reason_explanation]
   
   Actions envisagées par le prescripteur :
   
   - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire.
-  
   - Orientation vers un partenaire de l’accompagnement social/professionnel.
-  
   - Autre
   
   - Précisions : [proposed_actions_explanation]
@@ -219,6 +221,7 @@
   L’organisation Pres. Org. a accepté votre demande de prolongation du PASS IAE.
   
   Références :
+  
   Numéro : 99999 99 99999
   Bénéficiaire : DOE Jane
   

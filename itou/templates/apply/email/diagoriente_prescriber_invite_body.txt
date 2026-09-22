@@ -15,8 +15,8 @@ Voilà la marche à suivre pour ajouter une expérience (à reproduire autant de
 3. Choisissez le type d’expérience que vous voulez renseigner.
 4. Sélectionnez les activités, la période et les compétences.
 5. Si quelqu’un peut confirmer que vous avez réalisé cette expérience, n’hésitez pas à
-remplir le formulaire pour obtenir une recommandation de sa part. Sinon, cette étape
-est facultative donc vous pouvez aussi la passer.
+   remplir le formulaire pour obtenir une recommandation de sa part. Sinon, cette étape
+   est facultative donc vous pouvez aussi la passer.
 
 Vous avez fini d’ajouter des expériences ?
 
@@ -26,5 +26,4 @@ Vous avez fini d’ajouter des expériences ?
 4. Une fois que vous avez terminé, téléchargez-le en PDF pour pouvoir le partager.{% endblock content %}
 
 {% block footer %}{% endblock footer %}
-
 {% endblock body %}
