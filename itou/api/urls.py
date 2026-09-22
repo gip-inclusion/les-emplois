@@ -7,7 +7,7 @@ from itou.api.applicants_api.views import ApplicantsView
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
 from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificationViewSet, EmployeeRecordViewSet
 from itou.api.geiq.views import GeiqJobApplicationListView
-from itou.api.insertion.views import OrientationsView
+from itou.api.insertion.views import OrientationsCountView, OrientationsView
 from itou.api.job_application_api.views import JobApplicationSearchView
 from itou.api.marche_api.views import MarcheCompanyView
 from itou.api.nexus.views import (
@@ -67,5 +67,6 @@ urlpatterns = [
     path("nexus/sync-completed", SyncCompletedView.as_view(), name="nexus-sync-completed"),
     path("nexus/dropdown-status", DropDownStatusView.as_view(), name="nexus-dropdown-status"),
     path("insertion/orientations", OrientationsView.as_view(), name="orientations-list"),
+    path("insertion/orientations-count", OrientationsCountView.as_view(), name="orientations-count"),
     *router.urls,
 ]
