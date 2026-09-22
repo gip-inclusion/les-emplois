@@ -1,0 +1,22 @@
+{% load components %}
+
+{% component_alert title=title content=content variant="info" dismissible=True extra_id="directory-beta-notice" extra_classes="d-none" %}
+    {% fragment as title %}
+        Annuaire Pro en accès bêta restreint
+    {% endfragment %}
+    {% fragment as content %}
+        <p class="mb-3">
+            Vous faites partie des premiers à accéder à cette fonctionnalité : votre profil est visible des professionnels de votre ville, mais vous gardez la main.
+            Complétez vos informations quand vous le souhaitez, ou choisissez de ne pas apparaître dans l'annuaire.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'dashboard:edit_user_info' %}"
+               id="directory-beta-profile-link"
+               class="btn btn-sm btn-primary">Modifier mon profil</a>
+            <a href="{{ ITOU_HELP_CENTER_URL }}"
+               class="btn btn-sm btn-outline-primary has-external-link"
+               target="_blank"
+               rel="noopener">Documentation</a>
+        </div>
+    {% endfragment %}
+{% endcomponent_alert %}
