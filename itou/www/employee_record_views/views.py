@@ -571,12 +571,19 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         employee_record.job_application.job_seeker.last_checked_at = timezone.now()
         employee_record.job_application.job_seeker.save(update_fields=["last_checked_at"])
 
-        employee_record.ready(user=request.user)
-        toast_title = (
-            "La fiche salarié a été renvoyée"
-            if previous_status == Status.PROCESSED
-            else "La création de cette fiche salarié est terminée"
-        )
+        if employee_record.ready.is_available():
+            employee_record.ready(user=request.user)
+            toast_title = (
+                "La fiche salarié a été renvoyée"
+                if previous_status == Status.PROCESSED
+                else "La création de cette fiche salarié est terminée"
+            )
+        elif employee_record.retry_modification.is_available():
+            employee_record.retry_modification(user=request.user)
+            toast_title = "La fiche salarié va être renvoyée pour mise à jour"
+        else:
+            raise PermissionDenied
+
         toast_message = (
             "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts."
         )
