@@ -30,7 +30,7 @@ class TestJobSeekerSignup:
     def test_choose_user_kind(self, client):
         url = reverse("signup:choose_user_kind")
         response = client.get(url)
-        assertContains(response, "Usager")
+        assertContains(response, "Candidat")
 
         response = client.post(url, data={"kind": UserKind.JOB_SEEKER})
         assertRedirects(response, reverse("signup:job_seeker_start"))
