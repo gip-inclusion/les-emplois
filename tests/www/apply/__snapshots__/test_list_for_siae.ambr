@@ -8707,7 +8707,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -8759,7 +8759,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -8809,7 +8809,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -9014,7 +9014,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   VOITURE Béatrice
                               </a>
                               <span class="d-block">
@@ -9069,7 +9069,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   MARTIN Martine
                               </a>
                               <span class="d-block">
@@ -9117,7 +9117,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   BATO Aline
                               </a>
                               <span class="d-block">
@@ -9167,7 +9167,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -9224,7 +9224,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -9281,7 +9281,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DOE Jane
                               </a>
                               <span class="d-block">
@@ -9338,7 +9338,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   DIAGNOSTIQUE Pas De
                               </a>
                               <span class="d-block">
