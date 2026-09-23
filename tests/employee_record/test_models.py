@@ -546,6 +546,32 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == minimal_archive
         assert self.employee_record.watched_data_updated_at is None
 
+    def test_state_processed_with_watched_data_updated_at_and_uptodate_approval_dates_but_as_duplicate(self, faker):
+        EmployeeRecord.objects.filter(pk=self.employee_record.pk).update(watched_data_updated_at=timezone.now())
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
+            "Un PASS IAE doit être unique pour un même SIRET",
+        )
+        minimal_archive = {
+            "personnePhysique": {
+                "passDateDeb": self.employee_record.job_application.approval.start_at.strftime("%d/%m/%Y"),
+                "passDateFin": self.employee_record.job_application.approval.end_at.strftime("%d/%m/%Y"),
+            }
+        }
+        self.employee_record.process(
+            code=process_code,
+            label=process_message,
+            archive=minimal_archive,
+            as_duplicate=True,
+        )
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == "Statut forcé suite à doublon ASP"
+        assert self.employee_record.archived_json == minimal_archive
+        assert self.employee_record.watched_data_updated_at is not None
+
     def test_state_processed_with_watched_data_updated_at_and_obsolete_approval_dates(self, faker):
         EmployeeRecord.objects.filter(pk=self.employee_record.pk).update(watched_data_updated_at=timezone.now())
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
