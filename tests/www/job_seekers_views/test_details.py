@@ -300,30 +300,46 @@ def test_both_diag_from_company(client, snapshot):
     assert pretty_indented(soup) == snapshot(name="snapshot with IAE diag")
 
 
+@pytest.mark.parametrize("is_authorized", [True, False], ids=["authorized prescriber", "prescriber"])
 @freeze_time("2024-08-14")
-def test_job_application_tab(client, snapshot):
+def test_job_application_tab(client, snapshot, is_authorized):
     prescriber_membership = PrescriberMembershipFactory(
-        user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
+        user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=is_authorized
     )
-    job_application_1 = JobApplicationFactory(
+    sent_by_trait = {"sent_by_authorized_prescriber": True} if is_authorized else {"sent_by_prescriber": True}
+    job_application_from_prescriber = JobApplicationFactory(
         for_snapshot=True,
-        sent_by_authorized_prescriber=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
         with_iae_eligibility_diagnosis=True,
-    )
-    job_application_2 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
-        job_seeker=job_application_1.job_seeker,
-        to_company__name="Autre Entreprise",
-        sent_by_authorized_prescriber=True,
-        sender_prescriber_organization=prescriber_membership.organization,
-        sender=prescriber_membership.user,
         with_job_seeker_assignment=True,
+        **sent_by_trait,
+    )
+    company_membership = CompanyMembershipFactory(
+        company__name="Mann Co.", user__first_name="Elsa", user__last_name="Pithiviers"
+    )
+    job_application_from_company = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
+        job_seeker=job_application_from_prescriber.job_seeker,
+        to_company__name="Black Mesa",
+        sent_by_employer=True,
+        sender_company=company_membership.company,
+        sender=company_membership.user,
+    )
+    job_application_from_job_seeker = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
+        job_seeker=job_application_from_prescriber.job_seeker,
+        to_company__name="Aperture Science",
+        sent_by_job_seeker=True,
+        sender=job_application_from_prescriber.job_seeker,
+        created_at=timezone.now() - datetime.timedelta(seconds=10),
     )
     client.force_login(prescriber_membership.user)
-    url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
+    url = reverse(
+        "job_seekers_views:job_applications",
+        kwargs={"public_id": job_application_from_prescriber.job_seeker.public_id},
+    )
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(url)
@@ -331,11 +347,20 @@ def test_job_application_tab(client, snapshot):
         response,
         selector="#main",
         replace_in_attr=[
-            ("href", f"/company/{job_application_1.to_company.pk}/card", "/company/[PK of Company]/card"),
-            ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),
+            (
+                "href",
+                f"/company/{job_application_from_prescriber.to_company.pk}/card",
+                "/company/[PK of Company]/card",
+            ),
+            ("href", f"/company/{job_application_from_company.to_company.pk}/card", "/company/[PK of Company]/card"),
+            (
+                "href",
+                f"/company/{job_application_from_job_seeker.to_company.pk}/card",
+                "/company/[PK of Company]/card",
+            ),
         ],
     )
-    assert pretty_indented(soup) == snapshot
+    assert pretty_indented(soup) == snapshot(name="HTML")
 
 
 @freeze_time("2026-06-02")
@@ -343,61 +368,71 @@ def test_job_application_tab_as_siae(client, snapshot):
     employer_membership = CompanyMembershipFactory(
         user__for_snapshot=True, company__for_snapshot=True, company__subject_to_iae_rules=True
     )
-    job_application_1 = JobApplicationFactory(
+    job_application_autoprescription = JobApplicationFactory(
         for_snapshot=True,
         sent_by_prescriber_alone=True,
         to_company=employer_membership.company,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+        with_job_seeker_assignment=True,
     )
-    JobSeekerAssignmentFactory(
-        job_seeker=job_application_1.job_seeker,
-        professional=employer_membership.user,
-        company=employer_membership.company,
-    )
-
-    # Job applications that have not been accepted and are older than 2 years should not be displayed
-    created_at = timezone.now() - datetime.timedelta(days=3 * 365)
-    job_application_2 = JobApplicationFactory(
-        sent_by_employer=True,
+    job_application_from_prescriber = JobApplicationFactory(
         pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
-        job_seeker=job_application_1.job_seeker,
-        to_company__name="Autre Entreprise",
-        sender=employer_membership.user,
-        sender_company=employer_membership.company,
-        created_at=created_at,
-        state=JobApplicationState.ACCEPTED,
+        sent_by_prescriber_alone=True,
+        job_seeker=job_application_autoprescription.job_seeker,
+        to_company=employer_membership.company,
+        sender__first_name="Elsa",
+        sender__last_name="Pithiviers",
     )
 
-    prescriber_membership = PrescriberMembershipFactory(
-        organization__authorized=True,
-        organization__name="L'Autre Organisation",
+    colleague = EmployerFactory(
+        first_name="Gerard", last_name="Menvussa", membership__company=employer_membership.company
     )
-    JobApplicationFactory(
-        sent_by_prescriber_alone=True,
+    job_application_to_other_company = JobApplicationFactory(
         pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
-        job_seeker=job_application_1.job_seeker,
-        to_company=employer_membership.company,
-        sender=prescriber_membership.user,
-        sender_prescriber_organization=prescriber_membership.organization,
-        created_at=timezone.now() - datetime.timedelta(days=2 * 365 + 2),
+        sent_by_employer=True,
+        job_seeker=job_application_autoprescription.job_seeker,
+        to_company__name="Mann Co.",
+        sender_company=employer_membership.company,
+        sender=colleague,
     )
+    # External job applications are not visible for employers
+    JobApplicationFactory(sent_by_job_seeker=True, job_seeker=job_application_autoprescription.job_seeker)
 
     client.force_login(employer_membership.user)
-    url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
+    url = reverse(
+        "job_seekers_views:job_applications",
+        kwargs={"public_id": job_application_autoprescription.job_seeker.public_id},
+    )
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(url)
 
-    assert response.context["received_job_applications"] == [job_application_1]
-    assert response.context["sent_job_applications"] == [job_application_2]
+    assert response.context["received_job_applications"] == [
+        job_application_autoprescription,
+        job_application_from_prescriber,
+    ]
+    assert response.context["sent_job_applications"] == [job_application_to_other_company]
     assertContains(response, "Candidatures envoyées")
     assertContains(response, "Candidatures reçues")
     soup = parse_response_to_soup(
         response,
         selector="#main",
         replace_in_attr=[
-            ("href", f"/company/{job_application_1.to_company.pk}/card", "/company/[PK of Company]/card"),
-            ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),
+            (
+                "href",
+                f"/company/{job_application_autoprescription.to_company.pk}/card",
+                "/company/[PK of Company]/card",
+            ),
+            (
+                "href",
+                f"/company/{job_application_from_prescriber.to_company.pk}/card",
+                "/company/[PK of Company]/card",
+            ),
+            (
+                "href",
+                f"/company/{job_application_to_other_company.to_company.pk}/card",
+                "/company/[PK of Company]/card",
+            ),
         ],
     )
     assert pretty_indented(soup) == snapshot(name="HTML")
@@ -940,6 +975,8 @@ def test_job_application_tab_shows_external_application_to_authorized_prescriber
     other_prescriber_membership = PrescriberMembershipFactory(
         organization__authorized=True,
         organization__name="L'Autre Organisation",
+        user__first_name="Gerard",
+        user__last_name="Menvussa",
     )
     job_application_2 = JobApplicationFactory(
         sent_by_prescriber=True,
