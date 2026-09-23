@@ -716,7 +716,7 @@ class TestDirectHireFullProcess:
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=user, to_company=company
         )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
         assertRedirects(response, next_url, fetch_redirect_response=False)
 
         assert job_application.job_seeker == new_job_seeker
@@ -1863,7 +1863,9 @@ class TestFillJobSeekerInfosForHire:
             sender=self.company.members.first(), to_company=self.company
         )
         if self.company.is_subject_to_iae_rules:
-            expected_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+            expected_url = reverse(
+                "job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id}
+            )
         else:
             expected_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, expected_url, fetch_redirect_response=False)
@@ -2384,7 +2386,7 @@ class TestHireContract:
         job_application = JobApplication.objects.select_related("job_seeker").get(
             sender=company.members.first(), to_company=company
         )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
         assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
@@ -2458,7 +2460,7 @@ class TestHireContract:
         job_application = JobApplication.objects.select_related("job_seeker").get(
             sender=company.members.first(), to_company=company
         )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
         assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
@@ -2593,7 +2595,7 @@ class TestHireContract:
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=company.members.first(), to_company=company
         )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
         assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
@@ -2776,7 +2778,7 @@ class TestHireConfirmation:
         job_application = JobApplication.objects.select_related("job_seeker").get(
             sender=company.members.first(), to_company=company
         )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
         assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker

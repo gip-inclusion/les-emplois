@@ -21,11 +21,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import (
-    JobApplication,
-    JobApplicationComment,
-    PriorAction,
-)
+from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
 from itou.prescribers.models import PrescriberMembership
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
@@ -547,12 +543,6 @@ def cancel(request, job_application_id):
         logger.info("user=%d cancelled an old job_application=%s", request.user.pk, job_application_id)
     else:
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-
-    session_key = JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY % job_application.pk
-    if back_url := request.session.get(session_key):
-        if back_url.startswith(reverse("employees:detail", args=(job_application.job_seeker.public_id,))):
-            # Don't keep this back_url as the job seeker won't be an employee anymore
-            request.session.pop(session_key)
 
     if not job_application.can_be_cancelled:
         messages.error(request, "Vous ne pouvez pas annuler cette embauche.")
