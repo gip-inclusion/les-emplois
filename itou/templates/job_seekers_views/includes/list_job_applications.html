@@ -1,17 +1,135 @@
-{% load matomo %}
+{% load badges %}
+{% load enums %}
+{% load static %}
+{% load str_filters %}
+{% enums "job_applications" "SenderKind" as SenderKind %}
 
-{% matomo_event "candidat" "clic" matomo_event_label as matomo_event_attrs %}
-{% for job_application in job_applications %}
-    {% if job_application.to_company == request.current_organization %}
-        {% url 'apply:details_for_company' job_application_id=job_application.id as detail_url %}
-    {% else %}
-        {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
-    {% endif %}
-    {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application detail_url=detail_url can_view_personal_information=can_view_personal_information matomo_event_attrs=matomo_event_attrs request=request only %}
-{% empty %}
-    <div class="c-box c-box--results my-3 my-md-4">
-        <div class="c-box--results__body">
-            <p class="mb-0">{{ no_application_text }}</p>
-        </div>
+{% if job_applications %}
+    <p class="mb-3 mb-md-4">
+        {% with job_applications|length as counter %}
+            {{ counter }} résultat{{ counter|pluralizefr }}
+        {% endwith %}
+    </p>
+    <div class="table-responsive mb-3 mb-md-4">
+        <table class="table table-hover table-sortable">
+            <thead>
+                <tr>
+                    <th scope="col">Poste</th>
+                    <th scope="col">Employeur</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Émise le</th>
+                    <th scope="col">Émetteur</th>
+                    <th scope="col">Structure</th>
+                    <th scope="col" class="text-end w-50px">
+                        <span class="visually-hidden">Actions possibles sur les candidatures</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job_application in job_applications %}
+                    {% if from_prescriber %}
+                        {% url "apply:details_for_prescriber" job_application_id=job_application as details_url %}
+                    {% else %}
+                        {% url "apply:details_for_company" job_application_id=job_application as details_url %}
+                    {% endif %}
+                    <tr class="align-top">
+                        <td>
+                            {% partialdef selected_jobs %}
+                                {% with all_jobs=job_application.selected_jobs.all %}
+                                    {% if all_jobs|length == 0 %}
+                                        Candidature spontanée
+                                    {% else %}
+                                        <ul class="list-unstyled">
+                                            {% for job in all_jobs %}
+                                                <li class="fw-bold">{{ job.display_name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endpartialdef %}
+
+                            {% if job_application.user_can_see_details %}
+                                <a class="btn-link"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   {{ matomo_event_attrs }}>{% partial selected_jobs %}</a>
+                            {% else %}
+                                {% partial selected_jobs %}
+                            {% endif %}
+                        </td>
+
+                        <td>{{ job_application.to_company.display_name }}</td>
+
+                        <td>{% job_application_state_badge job_application extra_classes="badge-sm" %}</td>
+
+                        <td>{{ job_application.created_at|date:"d/m/Y" }}</td>
+
+                        <td>
+                            {% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
+                                {{ job_application.sender.get_inverted_full_name|mask_unless:can_view_personal_information }}
+                            {% else %}
+                                {{ job_application.sender.get_inverted_full_name }}
+                            {% endif %}
+                            {% if job_application.sender == request.user %}
+                                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if job_application.sender_kind == SenderKind.EMPLOYER %}
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                {{ job_application.sender_company.display_name }}
+                            {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+                                {% if job_application.sender_prescriber_organization %}
+                                    <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+                                    {{ job_application.sender_prescriber_organization.display_name }}
+                                {% else %}
+                                    Aucune structure associée
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if job_application.user_can_see_details %}
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir la candidature"
+                                   {{ matomo_event_attrs }}>
+                                    <i class="ri-arrow-drop-right-line fs-lg"
+                                       aria-label="Voir la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}"></i>
+                                </a>
+                            {% else %}
+                                {% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
+                                    <span class="btn btn-sm btn-link btn-ico-only disabled"
+                                          data-bs-toggle="tooltip"
+                                          tabindex="0"
+                                          aria-label="Candidature réalisée par {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}"
+                                          data-bs-title="Candidature réalisée par {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}">
+                                        <i class="ri-arrow-drop-right-line fs-lg" aria-hidden="true"></i>
+                                    </span>
+                                {% else %}
+                                    <span class="btn btn-sm btn-link btn-ico-only disabled"
+                                          data-bs-toggle="tooltip"
+                                          tabindex="0"
+                                          aria-label="Candidature réalisée par une personne extérieure à votre organisation"
+                                          data-bs-title="Candidature réalisée par une personne extérieure à votre organisation">
+                                        <i class="ri-arrow-drop-right-line fs-lg" aria-hidden="true"></i>
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-{% endfor %}
+{% else %}
+    <div class="text-center my-3 my-md-4">
+        <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+        <p class="mb-1 mt-3">
+            <strong>Aucune candidature pour le moment</strong>
+        </p>
+    </div>
+{% endif %}

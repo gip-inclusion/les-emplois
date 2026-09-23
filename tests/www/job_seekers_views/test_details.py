@@ -940,6 +940,8 @@ def test_job_application_tab_shows_external_application_to_authorized_prescriber
     other_prescriber_membership = PrescriberMembershipFactory(
         organization__authorized=True,
         organization__name="L'Autre Organisation",
+        user__first_name="Gordon",
+        user__last_name="Freeman",
     )
     job_application_2 = JobApplicationFactory(
         sent_by_prescriber=True,
