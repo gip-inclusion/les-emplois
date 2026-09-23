@@ -111,6 +111,10 @@ class Command(EmployeeRecordTransferCommand):
                     employee_record.reject_for_update(
                         code=processing_code, label=processing_label, archive=raw_employee_record
                     )
+                    if processing_code == EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE:
+                        # The employee record is apparently missing on ASP side and cannot be updated
+                        # Try to recreate it from scratch.
+                        employee_record.retry_create()
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
