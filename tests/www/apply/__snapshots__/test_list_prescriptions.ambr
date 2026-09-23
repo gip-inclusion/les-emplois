@@ -6332,7 +6332,7 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DIAGNOSTIQUE Pas De
                           </a>
                           <span class="d-block">
@@ -6379,7 +6379,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -6433,7 +6433,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -6487,7 +6487,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -6541,7 +6541,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               BATO Aline
                           </a>
                           <span class="d-block">
@@ -6588,7 +6588,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               NAVIRE Alain
                           </a>
                           <span class="d-block">
@@ -6640,7 +6640,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               MARTIN Martine
                           </a>
                           <span class="d-block">
@@ -6685,7 +6685,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ PAR PRESCRIPTEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -6732,7 +6732,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               SANS DIAG GEIQ Jean
                           </a>
                           <span class="d-block">
@@ -6777,7 +6777,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ DIAG GEIQ Jean-Diag
                           </a>
                           <span class="d-block">
@@ -6822,7 +6822,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ EXPIRÉ PAR EMPLOYEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -6867,7 +6867,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ EXPIRÉ PAR EMPLOYEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -6962,7 +6962,7 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DIAGNOSTIQUE Pas De
                           </a>
                           <span class="d-block">
@@ -7009,7 +7009,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -7063,7 +7063,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -7117,7 +7117,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -7171,7 +7171,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               BATO Aline
                           </a>
                           <span class="d-block">
@@ -7218,7 +7218,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               MARTIN Martine
                           </a>
                           <span class="d-block">
@@ -7263,7 +7263,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               MARTIN Martine
                           </a>
                           <span class="d-block">
@@ -7308,7 +7308,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               DOE Jane
                           </a>
                           <span class="d-block">
@@ -7353,7 +7353,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ PAR PRESCRIPTEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -7400,7 +7400,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ PAR PRESCRIPTEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -7447,7 +7447,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               SANS DIAG GEIQ Jean
                           </a>
                           <span class="d-block">
@@ -7492,7 +7492,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ EXPIRÉ PAR PRESCRIPTEUR Jean-Diag
                           </a>
                           <span class="d-block">
@@ -7537,7 +7537,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ EXPIRÉ PAR PRESCRIPTEUR SUR CANDIDATURE Jean-Diag
                           </a>
                           <span class="d-block">
@@ -7584,7 +7584,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ DIAG GEIQ Jean-Diag
                           </a>
                           <span class="d-block">
@@ -7629,7 +7629,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               GEIQ SANS AIDE Jean-Diag
                           </a>
                           <span class="d-block">

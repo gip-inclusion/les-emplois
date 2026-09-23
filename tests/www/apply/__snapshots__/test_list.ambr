@@ -33,7 +33,7 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link d-block" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn-link d-block" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
                               Hit Pit
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-111111111111">
@@ -52,7 +52,7 @@
                           THROUGHPUT Max
                       </td>
                       <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -60,7 +60,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link d-block" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn-link d-block" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
                               Hit Pit
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_22222222-2222-2222-2222-222222222222">
@@ -79,7 +79,7 @@
                           THROUGHPUT Max
                       </td>
                       <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -87,7 +87,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link d-block" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn-link d-block" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
                               Hit Pit
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_33333333-3333-3333-3333-333333333333">
@@ -106,7 +106,7 @@
                           THROUGHPUT Max
                       </td>
                       <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -164,7 +164,7 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriptions/list">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriptions/list">
                               H… J…
                           </a>
                           <span class="d-block">
@@ -211,7 +211,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriptions/list">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriptions/list">
                               H… J…
                           </a>
                           <span class="d-block">
@@ -258,7 +258,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriptions/list">
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriptions/list">
                               H… J…
                           </a>
                           <span class="d-block">
@@ -365,7 +365,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
                                   HENRY Jacques
                               </a>
                               <span class="d-block">
@@ -417,7 +417,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
                                   HENRY Jacques
                               </a>
                               <span class="d-block">
@@ -469,7 +469,7 @@
                               </label>
                           </th>
                           <td>
-                              <a class="btn-link" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
+                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
                                   HENRY Jacques
                               </a>
                               <span class="d-block">
