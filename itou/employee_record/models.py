@@ -429,7 +429,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_processing_information(
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
-        if self.has_watched_data_updated_at_set() and archive:
+        if archive and self.has_watched_data_updated_at_set():
             _check_and_remove_watched_data_updated_at(self, archive)
 
     @xwf_models.transition()
@@ -788,7 +788,7 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     @xwf_models.transition()
     def process(self, *, code, label, archive):
         self.set_asp_processing_information(code, label, archive)
-        if self.employee_record.has_watched_data_updated_at_set() and archive:
+        if archive and self.employee_record.has_watched_data_updated_at_set():
             employee_record = (
                 EmployeeRecord.objects.select_for_update(of=("self",), no_key=True)
                 .select_related("job_application__approval")
