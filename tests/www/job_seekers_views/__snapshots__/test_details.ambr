@@ -5212,7 +5212,7 @@
   
   '''
 # ---
-# name: test_job_application_tab.1
+# name: test_job_application_tab[authorized prescriber][HTML]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -5297,8 +5297,11 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <h2>
-                                  Candidatures envoyées
+                                  Candidatures
                               </h2>
+                              <h3>
+                                  Candidatures envoyées
+                              </h3>
                               <div class="alert alert-info mb-3 mb-md-4" role="status">
                                   <div class="row">
                                       <div class="col-auto pe-0">
@@ -5322,93 +5325,134 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                  <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                          <div class="fs-sm mb-0 flex-grow-1">
-                                              <span class="d-block">
-                                                  Émise le 14 août 2024 par
-                                                  <strong>
-                                                      Vous
-                                                  </strong>
-                                                  chez
-                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                                                      </i>
-                                                      <span>
-                                                          ACME Inc.
-                                                      </span>
+                              <p class="mb-3 mb-md-4">
+                                  3 résultats
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Poste
+                                              </th>
+                                              <th scope="col">
+                                                  Employeur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Candidature spontanée
                                                   </a>
-                                              </span>
-                                          </div>
-                                          <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_11111111-1111-1111-1111-111111111111">
-                                                  Candidature acceptée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <hr class="m-0"/>
-                                  <div class="c-box--results__body">
-                                      <div class="c-box--results__list-data">
-                                          <div class="c-info c-info--borderless">
-                                              <span class="c-info__summary">
-                                                  Candidature spontanée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="c-box--results__footer">
-                                      <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature-prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                              Voir sa candidature
-                                          </a>
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                  <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                          <div class="fs-sm mb-0 flex-grow-1">
-                                              <span class="d-block">
-                                                  Émise le 14 août 2024 par
-                                                  <strong>
-                                                      Vous
-                                                  </strong>
-                                                  chez
-                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                              </td>
+                                              <td>
+                                                  ACME Inc.
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_11111111-1111-1111-1111-111111111111">
+                                                      Candidature acceptée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  DUPONT Pierre
+                                                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                                                      C’est vous
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-home-smile-line">
+                                                  </i>
+                                                  Pres. Org.
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                                       </i>
-                                                      <span>
-                                                          Autre Entreprise
-                                                      </span>
                                                   </a>
-                                              </span>
-                                          </div>
-                                          <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">
-                                                  Nouvelle candidature
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <hr class="m-0"/>
-                                  <div class="c-box--results__body">
-                                      <div class="c-box--results__list-data">
-                                          <div class="c-info c-info--borderless">
-                                              <span class="c-info__summary">
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
                                                   Candidature spontanée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="c-box--results__footer">
-                                      <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature-prescripteur" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                              Voir sa candidature
-                                          </a>
-                                      </div>
-                                  </div>
+                                              </td>
+                                              <td>
+                                                  Black Mesa
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-222222222222">
+                                                      Nouvelle candidature
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  PITHIVIERS Elsa
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Mann Co.
+                                              </td>
+                                              <td>
+                                                  <span aria-label="Candidature réalisée par une personne extérieure à votre organisation" class="btn btn-sm btn-link btn-ico-only disabled" data-bs-title="Candidature réalisée par une personne extérieure à votre organisation" data-bs-toggle="tooltip" tabindex="0">
+                                                      <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </span>
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
+                                                  Candidature spontanée
+                                              </td>
+                                              <td>
+                                                  Aperture Science
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-333333333333">
+                                                      Nouvelle candidature
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  DOE Jane
+                                              </td>
+                                              <td>
+                                                  -
+                                              </td>
+                                              <td>
+                                                  <span aria-label="Candidature réalisée par DOE Jane" class="btn btn-sm btn-link btn-ico-only disabled" data-bs-title="Candidature réalisée par DOE Jane" data-bs-toggle="tooltip" tabindex="0">
+                                                      <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </span>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
                               </div>
                           </div>
                       </div>
@@ -5420,7 +5464,7 @@
   
   '''
 # ---
-# name: test_job_application_tab[SQL queries]
+# name: test_job_application_tab[authorized prescriber][SQL queries]
   dict({
     'num_queries': 16,
     'queries': list([
@@ -5853,6 +5897,43 @@
                          OR U0."sender_prescriber_organization_id" = %s)
                     AND U0."id" = ("job_applications_jobapplication"."id"))
              LIMIT 1) AS "user_can_see_details",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T3."id",
                  T3."password",
                  T3."last_login",
@@ -5926,10 +6007,79 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T6."id",
+                 T6."fields_history",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."name",
+                 T6."created_at",
+                 T6."updated_at",
+                 T6."uid",
+                 T6."active_members_email_reminder_last_sent_at",
+                 T6."automatic_geocoding_update",
+                 T6."siret",
+                 T6."naf",
+                 T6."kind",
+                 T6."brand",
+                 T6."phone",
+                 T6."email",
+                 T6."auth_email",
+                 T6."website",
+                 T6."description",
+                 T6."provided_support",
+                 T6."source",
+                 T6."created_by_id",
+                 T6."block_job_applications",
+                 T6."job_applications_blocked_at",
+                 T6."spontaneous_applications_open_since",
+                 T6."convention_id",
+                 T6."job_app_score",
+                 T6."is_searchable",
+                 T6."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
-          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "companies_company" T6 ON ("job_applications_jobapplication"."to_company_id" = T6."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
@@ -5973,7 +6123,812 @@
           WHERE (NOT ("companies_company"."kind" IN (%s,
                                                      %s))
                  AND "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                             %s,
                                                                                              %s))
+          ORDER BY "jobs_appellation"."name" ASC,
+                   "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_job_application_tab[prescriber][HTML]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  D… J…
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <h2>
+                                  Candidatures
+                              </h2>
+                              <h3>
+                                  Candidatures envoyées
+                              </h3>
+                              <p class="mb-3 mb-md-4">
+                                  1 résultat
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Poste
+                                              </th>
+                                              <th scope="col">
+                                                  Employeur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Candidature spontanée
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  ACME Inc.
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_11111111-1111-1111-1111-111111111111">
+                                                      Candidature acceptée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  DUPONT Pierre
+                                                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                                                      C’est vous
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-home-smile-line">
+                                                  </i>
+                                                  Pres. Org.
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir la candidature de D… J…" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_job_application_tab[prescriber][SQL queries]
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at",
+                 COALESCE(
+                            (SELECT U0."valid_since" AS "valid_since"
+                             FROM "nexus_nexusressourcesyncstatus" U0
+                             WHERE U0."service" = ("nexus_nexususer"."source")
+                             ORDER BY RANDOM() ASC
+                             LIMIT 1), %s) AS "_threshold"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
+                                                               (SELECT U0."valid_since" AS "valid_since"
+                                                                FROM "nexus_nexusressourcesyncstatus" U0
+                                                                WHERE U0."service" = ("nexus_nexususer"."source")
+                                                                ORDER BY RANDOM() ASC
+                                                                LIMIT 1), %s))
+                 AND "nexus_nexususer"."email" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_activatedservice"."id",
+                 "nexus_activatedservice"."user_id",
+                 "nexus_activatedservice"."service",
+                 "nexus_activatedservice"."created_at"
+          FROM "nexus_activatedservice"
+          WHERE "nexus_activatedservice"."user_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTabView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 %s AS "user_can_see_details",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."fields_history",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."terms_accepted_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T6."id",
+                 T6."fields_history",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."name",
+                 T6."created_at",
+                 T6."updated_at",
+                 T6."uid",
+                 T6."active_members_email_reminder_last_sent_at",
+                 T6."automatic_geocoding_update",
+                 T6."siret",
+                 T6."naf",
+                 T6."kind",
+                 T6."brand",
+                 T6."phone",
+                 T6."email",
+                 T6."auth_email",
+                 T6."website",
+                 T6."description",
+                 T6."provided_support",
+                 T6."source",
+                 T6."created_by_id",
+                 T6."block_job_applications",
+                 T6."job_applications_blocked_at",
+                 T6."spontaneous_applications_open_since",
+                 T6."convention_id",
+                 T6."job_app_score",
+                 T6."is_searchable",
+                 T6."rdv_solidarites_id"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          INNER JOIN "companies_company" T6 ON ("job_applications_jobapplication"."to_company_id" = T6."id")
+          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
+                 AND (("job_applications_jobapplication"."sender_id" = %s
+                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."last_employer_update_at",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
@@ -6087,94 +7042,178 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <h2>
-                                  Candidatures envoyées
+                                  Candidatures
                               </h2>
-                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                  <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                          <div class="fs-sm mb-0 flex-grow-1">
-                                              <span class="d-block">
-                                                  Émise le 03 juin 2023 par
-                                                  <strong>
-                                                      Vous
-                                                  </strong>
-                                                  chez
-                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                                                      </i>
-                                                      <span>
-                                                          Autre Entreprise
-                                                      </span>
+                              <h3>
+                                  Candidatures envoyées
+                              </h3>
+                              <p class="mb-3 mb-md-4">
+                                  1 résultat
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Poste
+                                              </th>
+                                              <th scope="col">
+                                                  Employeur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-333333333333/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Candidature spontanée
                                                   </a>
-                                              </span>
-                                          </div>
-                                          <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_11111111-1111-1111-1111-222222222222">
-                                                  Candidature acceptée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <hr class="m-0"/>
-                                  <div class="c-box--results__body">
-                                      <div class="c-box--results__list-data">
-                                          <div class="c-info c-info--borderless">
-                                              <span class="c-info__summary">
-                                                  Candidature spontanée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="c-box--results__footer">
-                                      <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de MICHEL Jean" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature-envoyee-employeur" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                              Voir sa candidature
-                                          </a>
-                                      </div>
-                                  </div>
+                                              </td>
+                                              <td>
+                                                  Mann Co.
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-333333333333">
+                                                      Nouvelle candidature
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  02/06/2026
+                                              </td>
+                                              <td>
+                                                  MENVUSSA Gerard
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  ACME Inc.
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-333333333333/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
                               </div>
                           </div>
-                          <h2>
+                          <h3>
                               Candidatures reçues
-                          </h2>
-                          <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                              <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                      <div class="fs-sm mb-0 flex-grow-1">
-                                          <span class="d-block">
-                                              Émise le 02 juin 2026 par
-                                              <strong>
-                                                  DUPONT Pierre
-                                              </strong>
-                                              <i aria-hidden="true" class="ri-home-smile-2-line me-1">
-                                              </i>
-                                              Orienteur
-                                          </span>
-                                      </div>
-                                      <div>
-                                          <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">
-                                              Nouvelle candidature
-                                          </span>
-                                      </div>
-                                  </div>
-                              </div>
-                              <hr class="m-0"/>
-                              <div class="c-box--results__body">
-                                  <div class="c-box--results__list-data">
-                                      <div class="c-info c-info--borderless">
-                                          <span class="c-info__summary">
-                                              Candidature spontanée
-                                          </span>
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="c-box--results__footer">
-                                  <div class="d-flex justify-content-end">
-                                      <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature-recue-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                          Voir sa candidature
-                                      </a>
-                                  </div>
-                              </div>
+                          </h3>
+                          <p class="mb-3 mb-md-4">
+                              2 résultats
+                          </p>
+                          <div class="table-responsive mb-3 mb-md-4">
+                              <table class="table table-hover table-sortable">
+                                  <thead>
+                                      <tr>
+                                          <th scope="col">
+                                              Poste
+                                          </th>
+                                          <th scope="col">
+                                              Employeur
+                                          </th>
+                                          <th scope="col">
+                                              Statut
+                                          </th>
+                                          <th scope="col">
+                                              Émise le
+                                          </th>
+                                          <th scope="col">
+                                              Émetteur
+                                          </th>
+                                          <th scope="col">
+                                              Structure
+                                          </th>
+                                          <th class="text-end w-50px" scope="col">
+                                              <span class="visually-hidden">
+                                                  Actions possibles sur les candidatures
+                                              </span>
+                                          </th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr class="align-top">
+                                          <td>
+                                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Candidature spontanée
+                                              </a>
+                                          </td>
+                                          <td>
+                                              ACME Inc.
+                                          </td>
+                                          <td>
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-111111111111">
+                                                  Nouvelle candidature
+                                              </span>
+                                          </td>
+                                          <td>
+                                              02/06/2026
+                                          </td>
+                                          <td>
+                                              DUPONT Pierre
+                                          </td>
+                                          <td>
+                                              Aucune structure associée
+                                          </td>
+                                          <td>
+                                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-label="Voir la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                                                  </i>
+                                              </a>
+                                          </td>
+                                      </tr>
+                                      <tr class="align-top">
+                                          <td>
+                                              <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-222222222222/siae/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Candidature spontanée
+                                              </a>
+                                          </td>
+                                          <td>
+                                              ACME Inc.
+                                          </td>
+                                          <td>
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-222222222222">
+                                                  Nouvelle candidature
+                                              </span>
+                                          </td>
+                                          <td>
+                                              02/06/2026
+                                          </td>
+                                          <td>
+                                              PITHIVIERS Elsa
+                                          </td>
+                                          <td>
+                                              Aucune structure associée
+                                          </td>
+                                          <td>
+                                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-222222222222/siae/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-label="Voir la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                                                  </i>
+                                              </a>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                              </table>
                           </div>
                       </div>
                   </div>
@@ -6187,7 +7226,7 @@
 # ---
 # name: test_job_application_tab_as_siae[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -6647,6 +7686,43 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  %s AS "user_can_see_details",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -6684,6 +7760,72 @@
                  T5."first_login",
                  T5."upcoming_deletion_notified_at",
                  T5."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
                  T3."id",
                  T3."fields_history",
                  T3."address_line_1",
@@ -6722,8 +7864,11 @@
                  T3."is_searchable",
                  T3."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
           INNER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."to_company_id" = T3."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T5 ON ("job_applications_jobapplication"."sender_id" = T5."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ((EXISTS
                     (SELECT %s AS "a"
                      FROM "job_applications_jobapplication" U0
@@ -6777,57 +7922,10 @@
           WHERE (NOT ("companies_company"."kind" IN (%s,
                                                      %s))
                  AND "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                             %s,
                                                                                              %s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."fields_history",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."spontaneous_applications_open_since",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE "companies_company"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
@@ -6990,8 +8088,11 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <h2>
-                                  Candidatures envoyées
+                                  Candidatures
                               </h2>
+                              <h3>
+                                  Candidatures envoyées
+                              </h3>
                               <div class="alert alert-info mb-3 mb-md-4" role="status">
                                   <div class="row">
                                       <div class="col-auto pe-0">
@@ -7015,97 +8116,106 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                  <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                          <div class="fs-sm mb-0 flex-grow-1">
-                                              <span class="d-block">
-                                                  Émise le 14 août 2024 par
-                                                  <strong>
-                                                      Vous
-                                                  </strong>
-                                                  chez
-                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                                                      </i>
-                                                      <span>
-                                                          ACME Inc.
-                                                      </span>
+                              <p class="mb-3 mb-md-4">
+                                  2 résultats
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Poste
+                                              </th>
+                                              <th scope="col">
+                                                  Employeur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Candidature spontanée
                                                   </a>
-                                              </span>
-                                          </div>
-                                          <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_11111111-1111-1111-1111-111111111111">
-                                                  Candidature acceptée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <hr class="m-0"/>
-                                  <div class="c-box--results__body">
-                                      <div class="c-box--results__list-data">
-                                          <div class="c-info c-info--borderless">
-                                              <span class="c-info__summary">
-                                                  Candidature spontanée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="c-box--results__footer">
-                                      <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature-prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                              Voir sa candidature
-                                          </a>
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                  <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
-                                          <div class="fs-sm mb-0 flex-grow-1">
-                                              <span class="d-block">
-                                                  Émise le 14 août 2024 par
-                                                  <strong>
-                                                      L'Autre Organisation
-                                                  </strong>
-                                                  <i aria-hidden="true" class="ri-home-smile-2-line me-1">
+                                              </td>
+                                              <td>
+                                                  ACME Inc.
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_11111111-1111-1111-1111-111111111111">
+                                                      Candidature acceptée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  DUPONT Pierre
+                                                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                                                      C’est vous
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-home-smile-line">
                                                   </i>
-                                                  Prescripteur habilité
-                  
-              
-              
-                  chez
-                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                                  Pres. Org.
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                                       </i>
-                                                      <span>
-                                                          Autre Entreprise
-                                                      </span>
                                                   </a>
-                                              </span>
-                                              <span class="text-muted">
-                                                  <i aria-hidden="true" class="ri-lock-line ri-sm">
-                                                  </i>
-                                                  Candidature externe, détail non accessible
-                                              </span>
-                                          </div>
-                                          <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">
-                                                  Nouvelle candidature
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <hr class="m-0"/>
-                                  <div class="c-box--results__body">
-                                      <div class="c-box--results__list-data">
-                                          <div class="c-info c-info--borderless">
-                                              <span class="c-info__summary">
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
                                                   Candidature spontanée
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
+                                              </td>
+                                              <td>
+                                                  Autre Entreprise
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-222222222222">
+                                                      Nouvelle candidature
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  14/08/2024
+                                              </td>
+                                              <td>
+                                                  MENVUSSA Gerard
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-home-smile-line">
+                                                  </i>
+                                                  L'Autre Organisation
+                                              </td>
+                                              <td>
+                                                  <span aria-label="Candidature réalisée par une personne extérieure à votre organisation" class="btn btn-sm btn-link btn-ico-only disabled" data-bs-title="Candidature réalisée par une personne extérieure à votre organisation" data-bs-toggle="tooltip" tabindex="0">
+                                                      <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </span>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
                               </div>
                           </div>
                       </div>
@@ -7119,7 +8229,7 @@
 # ---
 # name: test_job_application_tab_shows_external_application_to_authorized_prescriber[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -7550,6 +8660,43 @@
                          OR U0."sender_prescriber_organization_id" = %s)
                     AND U0."id" = ("job_applications_jobapplication"."id"))
              LIMIT 1) AS "user_can_see_details",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T3."id",
                  T3."password",
                  T3."last_login",
@@ -7623,10 +8770,79 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T6."id",
+                 T6."fields_history",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."name",
+                 T6."created_at",
+                 T6."updated_at",
+                 T6."uid",
+                 T6."active_members_email_reminder_last_sent_at",
+                 T6."automatic_geocoding_update",
+                 T6."siret",
+                 T6."naf",
+                 T6."kind",
+                 T6."brand",
+                 T6."phone",
+                 T6."email",
+                 T6."auth_email",
+                 T6."website",
+                 T6."description",
+                 T6."provided_support",
+                 T6."source",
+                 T6."created_by_id",
+                 T6."block_job_applications",
+                 T6."job_applications_blocked_at",
+                 T6."spontaneous_applications_open_since",
+                 T6."convention_id",
+                 T6."job_app_score",
+                 T6."is_searchable",
+                 T6."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
-          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "companies_company" T6 ON ("job_applications_jobapplication"."to_company_id" = T6."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
@@ -7673,52 +8889,6 @@
                                                                                              %s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/job_application_creation_info.html]',
-          'IfNode[apply/includes/job_application_creation_info.html]',
-          'IncludeNode[apply/includes/job_application_box_for_user.html]',
-          'IncludeNode[job_seekers_views/includes/list_job_applications.html]',
-          'ForNode[job_seekers_views/includes/list_job_applications.html]',
-          'IncludeNode[job_seekers_views/job_applications.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/job_applications.html]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescriberorganization"."id",
-                 "prescribers_prescriberorganization"."address_line_1",
-                 "prescribers_prescriberorganization"."address_line_2",
-                 "prescribers_prescriberorganization"."post_code",
-                 "prescribers_prescriberorganization"."city",
-                 "prescribers_prescriberorganization"."department",
-                 "prescribers_prescriberorganization"."coords",
-                 "prescribers_prescriberorganization"."geocoding_score",
-                 "prescribers_prescriberorganization"."geocoding_updated_at",
-                 "prescribers_prescriberorganization"."ban_api_resolved_address",
-                 "prescribers_prescriberorganization"."insee_city_id",
-                 "prescribers_prescriberorganization"."name",
-                 "prescribers_prescriberorganization"."created_at",
-                 "prescribers_prescriberorganization"."updated_at",
-                 "prescribers_prescriberorganization"."uid",
-                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                 "prescribers_prescriberorganization"."automatic_geocoding_update",
-                 "prescribers_prescriberorganization"."siret",
-                 "prescribers_prescriberorganization"."kind",
-                 "prescribers_prescriberorganization"."is_brsa",
-                 "prescribers_prescriberorganization"."phone",
-                 "prescribers_prescriberorganization"."email",
-                 "prescribers_prescriberorganization"."website",
-                 "prescribers_prescriberorganization"."description",
-                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                 "prescribers_prescriberorganization"."created_by_id",
-                 "prescribers_prescriberorganization"."authorization_status",
-                 "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
-          FROM "prescribers_prescriberorganization"
-          WHERE "prescribers_prescriberorganization"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
