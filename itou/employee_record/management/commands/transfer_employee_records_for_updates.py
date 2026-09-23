@@ -27,6 +27,7 @@ class Command(EmployeeRecordTransferCommand):
         else:
             batch_data = EmployeeRecordForUpdateBatchSerializer(raw_batch).data
 
+        # XXX: adapt this code if https://github.com/gip-inclusion/les-emplois/pull/8853 is merged
         try:
             remote_path = self.upload_json_file(batch_data, sftp, dry_run)
         except SerializationError as ex:
@@ -55,7 +56,7 @@ class Command(EmployeeRecordTransferCommand):
             # Now that file is transferred, update employee records status (SENT)
             # and store in which file they have been sent
             for idx, employee_record in enumerate(employee_records, 1):
-                employee_record.wait_for_asp_response(
+                employee_record.wait_for_asp_response_for_update(
                     file=remote_path,
                     line_number=idx,
                     archive=batch_data["lignesTelechargement"][idx - 1],
@@ -178,6 +179,8 @@ class Command(EmployeeRecordTransferCommand):
 
                 # Send files to ASP
                 if upload:
+                    with transaction.atomic():
+                        EmployeeRecord.objects.plan_updates()
                     self.upload(sftp, not wet_run)
 
                 # Fetch result files from ASP
