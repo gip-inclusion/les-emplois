@@ -339,7 +339,7 @@ class ConfirmationForHireView(HireWizardMixin, common_views.BaseConfirmationView
 
     def get_success_url(self):
         if self.company.is_subject_to_iae_rules and self.job_application.approval:
-            return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
+            return reverse("job_seekers_views:details", kwargs={"public_id": self.job_seeker.public_id})
         return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
     def get_context_data(self, **kwargs):
