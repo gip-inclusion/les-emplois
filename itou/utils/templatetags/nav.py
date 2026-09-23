@@ -92,7 +92,6 @@ NAV_ENTRIES = {
         label="Un service d'insertion",
         target=reverse("search:services_results"),
         active_view_names=["search:services_home", "search:services_results"],
-        is_beta=True,
     ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
