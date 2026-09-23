@@ -21,6 +21,7 @@ from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, View
 
+from itou.approvals.constants import APPROVAL_ENDING_SOON_DAYS
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
@@ -40,6 +41,7 @@ from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.emails import redact_email_address
+from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
@@ -228,6 +230,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 
         return context | {
             "approval": self.approval,
+            "approval_expires_soon": self.approval and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS,
             "contract_ending_soon_date": contract_ending_soon_date,
             "pro_support_request_mailto": pro_support_request_mailto,
             "suggest_next_step_url": suggest_next_step_url,
@@ -235,6 +238,8 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
+            "immersion_convention_url": immersion_convention_url(),
+            "immersion_search_url": immersion_search_url(self.object),
             "last_user_assignment": get_last_assignment(self.request, self.object),
         }
 

@@ -81,6 +81,43 @@
                                         {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
                                     {% endif %}
                                     {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_seeker last_user_assignment=last_user_assignment request=request csrf_token=csrf_token only %}
+                                    {% if immersion_search_url %}
+                                        {# Immersion Facilitée proposal #}
+                                        <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
+                                            <div class="c-box__header--immersion-facile p-3 p-lg-4">
+                                                <span class="h4 m-0">Trouver une immersion</span>
+                                            </div>
+                                            <div class="p-3 p-lg-4">
+                                                <p>
+                                                    {% if approval_expires_soon %}
+                                                        Le PASS IAE de cet usager arrive bientôt à expiration.
+                                                        <br />
+                                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                                    {% elif not approval %}
+                                                        Cet usager n'a pas de PASS IAE aujourd'hui.
+                                                        <br />
+                                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                                    {% else %}
+                                                        <strong>Immersion Facilitée</strong> vous aide à trouver une immersion professionnelle pour cet usager sur son territoire.
+                                                    {% endif %}
+                                                </p>
+                                                <p>
+                                                    <a href="{{ immersion_search_url }}"
+                                                       class="btn-link has-external-link"
+                                                       rel="noopener"
+                                                       target="_blank"
+                                                       aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">Rechercher une immersion</a>
+                                                </p>
+                                                <p class="mb-0">
+                                                    <a href="{{ immersion_convention_url }}"
+                                                       class="btn-link has-external-link"
+                                                       rel="noopener"
+                                                       target="_blank"
+                                                       aria-label="Initier une convention (ouverture dans un nouvel onglet)">Initier une convention</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
