@@ -19,6 +19,15 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    {% component_alert content=content variant="info" %}
+        {% fragment as content %}
+            <p class="mb-0">Retrouvez ici toutes les demandes d’orientation envoyées vers des services d’insertion pour les personnes accompagnées par votre structure (ex : service de levée des freins en français, mobilité, logement…).</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endblock %}
+
 {% block content %}
     {% include "insertion/includes/orientations/filters/offcanvas.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
     <section class="s-section">

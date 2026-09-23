@@ -1566,6 +1566,19 @@
                               </a>
                           </div>
                       </div>
+                      <div class="alert alert-info" role="status">
+                          <div class="row">
+                              <div class="col-auto pe-0">
+                                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                  </i>
+                              </div>
+                              <div class="col">
+                                  <p class="mb-0">
+                                      Retrouvez ici toutes les demandes d’orientation envoyées vers des services d’insertion pour les personnes accompagnées par votre structure (ex : service de levée des freins en français, mobilité, logement…).
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1759,6 +1772,19 @@
                                       Orienter un usager
                                   </span>
                               </a>
+                          </div>
+                      </div>
+                      <div class="alert alert-info" role="status">
+                          <div class="row">
+                              <div class="col-auto pe-0">
+                                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                  </i>
+                              </div>
+                              <div class="col">
+                                  <p class="mb-0">
+                                      Retrouvez ici toutes les demandes d’orientation envoyées vers des services d’insertion pour les personnes accompagnées par votre structure (ex : service de levée des freins en français, mobilité, logement…).
+                                  </p>
+                              </div>
                           </div>
                       </div>
                   </div>
