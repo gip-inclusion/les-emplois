@@ -1056,6 +1056,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return get_absolute_url(reverse("apply:resume_download", kwargs={"job_application_id": self.pk}))
         return ""
 
+    @property
+    def sender_organization(self):
+        return self.sender_prescriber_organization or self.sender_company
+
     def get_sender_kind_display(self):
         # Override default getter since we want to separate Orienteur and Prescripteur
         if self.sender_kind == SenderKind.PRESCRIBER and (
