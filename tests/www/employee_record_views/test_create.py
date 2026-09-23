@@ -1407,6 +1407,39 @@ class TestResubmitRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
         assert self.employee_record.status == Status.READY
 
 
+class TestResubmitModificationRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
+    """
+    Check if update and resubmission is possible after employee record rejection (on update)
+    """
+
+    URL_NAME = "employee_record_views:create_step_5"
+
+    def _default_step_3_data(self):
+        data = super()._default_step_3_data()
+        if self.company.kind == CompanyKind.EITI:
+            data.update(
+                actor_met_for_business_creation=self.job_application.job_seeker.jobseeker_profile.actor_met_for_business_creation,
+                mean_monthly_income_before_process=self.job_application.job_seeker.jobseeker_profile.mean_monthly_income_before_process,
+                eiti_contributions=self.job_application.job_seeker.jobseeker_profile.eiti_contributions,
+            )
+        return data
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
+        self.pass_step_4(client)
+
+        # Reject employee record
+        self.employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        self.employee_record.status = Status.MODIFICATION_REJECTED
+        self.employee_record.save(update_fields={"status", "updated_at"})
+
+    def test_submit_after_rejection(self, client):
+        client.post(self.url)
+
+        self.employee_record.refresh_from_db()
+        assert self.employee_record.status == Status.MODIFICATION_PENDING
+
+
 class TestResendProcessedEmployeeRecord(CreateEmployeeRecordTestMixin):
     URL_NAME = "employee_record_views:create_step_5"
 
