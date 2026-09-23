@@ -276,11 +276,14 @@ JOBSEEKERPROFILE_FORMSETS_PAYLOAD = {
 }
 
 
+DEFAULT_ASP_UID_SENTINEL = object()
+
+
 @pytest.mark.parametrize(
     "submitted_asp_uid, expected_asp_uid, expects_error",
     [
         ("57d76450cd919cc770d1fe9d2ca0f7", "57d76450cd919cc770d1fe9d2ca0f7", False),
-        ("", "d2f4adaea3c94c498322d38aa1768e", False),  # expected generated asp_uid for an user_id of 42
+        ("", DEFAULT_ASP_UID_SENTINEL, False),
         ("57D76450CD919CC770D1FE9D2CA0F7", "57d76450cd919cc770d1fe9d2ca0f7", False),
         ("000000001", "000000000000000000000000000000", True),
         (
@@ -299,8 +302,9 @@ JOBSEEKERPROFILE_FORMSETS_PAYLOAD = {
 )
 def test_change_asp_uid(admin_client, submitted_asp_uid, expected_asp_uid, expects_error):
     # force user_id to get a deterministic asp_uid
-    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000", user__pk=42)
-
+    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
+    if expected_asp_uid is DEFAULT_ASP_UID_SENTINEL:
+        expected_asp_uid = profile._default_asp_uid()
     response = admin_client.post(
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
         {
