@@ -1142,7 +1142,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django, django-testing]==26.7.9.0 \
+itoutils[django,django-testing]==26.7.9.0 \
     --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
     --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
     # via -r test.txt
@@ -2497,11 +2497,11 @@ python-dateutil==2.9.0.post0 \
     #   freezegun
     #   pandas
     #   pendulum
-python-discovery==1.6.0 \
-    --hash=sha256:6393b4eae1be8b2182670635e7baff89ac21cb9f8e86fd1ff40c7b1144febb4c \
-    --hash=sha256:6393b4eae1be8b2182670635e7baff89ac21cb9f8e86fd1ff40c7b1144febb4c \
-    --hash=sha256:d4e244cf17b8b29819ed78003d55fbacf86eda23425b075454fff9271b79377a \
-    --hash=sha256:d4e244cf17b8b29819ed78003d55fbacf86eda23425b075454fff9271b79377a
+python-discovery==1.6.1 \
+    --hash=sha256:cf87d3627dfb4412437fdd5b13eae402607722998d21567993aedbc59b23c15e \
+    --hash=sha256:cf87d3627dfb4412437fdd5b13eae402607722998d21567993aedbc59b23c15e \
+    --hash=sha256:d43fcdef879fe795352bd13ccf8d185ba5a9f86f36cfcd00529f596e737442b3 \
+    --hash=sha256:d43fcdef879fe795352bd13ccf8d185ba5a9f86f36cfcd00529f596e737442b3
     # via virtualenv
 python-dotenv==1.2.3 \
     --hash=sha256:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9 \
