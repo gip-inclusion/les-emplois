@@ -926,6 +926,24 @@ class JobDescription(models.Model):
     def is_employeur_handi_engage_from_ft(self):
         return self.is_from_pole_emploi and self.source_tags and JobSourceTag.FT_EHE_OFFER.value in self.source_tags
 
+    @property
+    def matomo_name(self):
+        """Matomo tag name for this job description.
+
+        Computing the matomo tag name here is more readable than in
+        the template.
+        """
+        tag = "clic-card-fichedeposte"
+        if self.is_external:
+            tag += "-externe"
+        if self.is_ea_offer_from_ft:
+            tag += "-ea"
+        if self.is_employeur_handi_engage_from_ft:
+            tag += "-ehe"
+        if self.is_pec_offer:
+            tag += "-pec"
+        return tag
+
     def get_absolute_url(self):
         if self.is_external:
             return self.source_url
