@@ -531,8 +531,8 @@ class MobilizationEventManager(models.Manager):
         prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
         company = organization if isinstance(organization, Company) else None
 
-        if user.is_authenticated and not prescriber_organization and not company:
-            # Ignore job seekers, labor inspectors and itou_staff
+        if user.is_authenticated and not user.is_job_seeker and not prescriber_organization and not company:
+            # Ignore labor inspectors and itou_staff
             return
 
         MobilizationEvent(
@@ -550,9 +550,7 @@ class MobilizationEventManager(models.Manager):
 class MobilizationEvent(models.Model):
     session_key = models.CharField(verbose_name="clé de session", max_length=40)
     kind = models.CharField(verbose_name="type", choices=MobilizationEventKind)
-    user = models.ForeignKey(
-        User, verbose_name="prescripteur ou employeur", on_delete=models.CASCADE, null=True, related_name="+"
-    )
+    user = models.ForeignKey(User, verbose_name="utilisateur", on_delete=models.CASCADE, null=True, related_name="+")
     prescriber_organization = models.ForeignKey(
         PrescriberOrganization,
         verbose_name="organisation prescriptrice",
@@ -598,14 +596,6 @@ class MobilizationEvent(models.Model):
                     service__isnull=False,
                 )
                 | models.Q(kind=MobilizationEventKind.STRUCTURE_CONTACT, service__isnull=True),
-            ),
-            models.CheckConstraint(
-                name="authenticated_user_has_organization",
-                condition=models.Q(user=None, prescriber_organization=None, company=None)
-                | (
-                    models.Q(user__isnull=False)
-                    & (models.Q(prescriber_organization__isnull=False) | models.Q(company__isnull=False))
-                ),
             ),
             models.CheckConstraint(
                 name="service_external_link_coherence",

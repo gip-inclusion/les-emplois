@@ -1,12 +1,14 @@
 from itou.insertion.models import MobilizationEvent
 from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get_model_field
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
+from itou.users.enums import KIND_EMPLOYER, KIND_JOB_SEEKER, KIND_PRESCRIBER
 
 
 def get_user_kind(mobilization_event):
     PREFIX = "emplois_"
     if mobilization_event.user_id is None:
         return PREFIX + "anonymous"
+    elif mobilization_event.user.is_job_seeker:
+        return PREFIX + KIND_JOB_SEEKER
     elif mobilization_event.prescriber_organization_id is not None:
         return PREFIX + KIND_PRESCRIBER
     elif mobilization_event.company_id is not None:

@@ -3,7 +3,12 @@ def can_orient_towards_insertion_service(request):
 
 
 def can_register_mobilization_event(request):
-    return bool(not request.user.is_authenticated or request.from_employer or request.from_prescriber)
+    return bool(
+        not request.user.is_authenticated
+        or request.user.is_job_seeker
+        or request.from_employer
+        or request.from_prescriber
+    )
 
 
 def add_user_can_view_personal_information(objects, can_view, user_attr="job_seeker"):
