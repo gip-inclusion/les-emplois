@@ -89,18 +89,18 @@
   window.addEventListener("resize", schedule);
   window.addEventListener("load", schedule);
 
-  setTimeout(function () {
-    if (!frameLoaded) {
-      document
-        .getElementById("loading-error-fallback")
-        .classList.remove("d-none");
-      frame.classList.add("d-none");
-      window._paq.push([
-        "trackEvent",
-        "iframe",
-        "load-failure",
-        "plateforme-accueil",
-      ]);
-    }
-  }, 10000);
+  // TODO: REMOVE ME!
+  const searchForms = Array.from(
+    document.querySelectorAll("form[role=search]"),
+  );
+  Array.from(document.querySelectorAll("[data-toggle-target]")).forEach(
+    function (btn) {
+      btn.addEventListener("click", (event) => {
+        const formIndex = parseInt(event.target.dataset["toggleTarget"]);
+        for (let i = 0; i < searchForms.length; i++) {
+          searchForms[i].classList.toggle("d-none", formIndex !== i);
+        }
+      });
+    },
+  );
 })();
