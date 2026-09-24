@@ -43,7 +43,7 @@ class DatadogApiClient:
             return 0
         try:
             data_received = data_received[0]["computes"]["c0"]
-        except (IndexError, KeyError):
+        except IndexError, KeyError:
             exc = DatadogBadResponseException(data_sent=data, data_received=response.json())
             logger.error(exc)
             raise exc
