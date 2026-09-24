@@ -594,7 +594,7 @@ class JobSeekerAssignmentForm(forms.ModelForm):
 
     def __init__(self, active_assignment_exists, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.pk:
+        if self.instance.pk and not self.instance.assigned_to_unknown_advisor:
             self.fields["is_ongoing"] = forms.ChoiceField(
                 label="Accompagnement",
                 required=False,

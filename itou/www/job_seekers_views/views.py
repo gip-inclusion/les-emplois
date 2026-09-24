@@ -114,7 +114,6 @@ def get_last_assignment(request, job_seeker, from_all_coworkers=False, archived=
             archived=archived,
         )
         .exclude(prescriber_organization=None, company=None)
-        .exclude(assigned_to_unknown_advisor=True)
         .filter(job_seeker=job_seeker)
         .order_by("-last_action_at")
         .first()
@@ -499,9 +498,7 @@ def create_or_edit_assignment(
             last_action_kind=ActionKind.SELF_ASSIGN,
         )
 
-    assignment_exists = assignment_pk is not None
     active_assignment_exists = active_assignment and active_assignment != assignment
-
     if request.method == "POST":
         form = JobSeekerAssignmentForm(
             data=request.POST, instance=assignment, active_assignment_exists=active_assignment_exists
@@ -512,6 +509,7 @@ def create_or_edit_assignment(
     else:
         form = JobSeekerAssignmentForm(instance=assignment, active_assignment_exists=active_assignment_exists)
 
+    assignment_exists = assignment.pk and not assignment.assigned_to_unknown_advisor
     context = {
         "form": form,
         "job_seeker": job_seeker,
