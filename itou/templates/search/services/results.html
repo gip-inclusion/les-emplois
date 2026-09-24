@@ -33,7 +33,7 @@
                 {% if job_seeker.public_id %}
                     <input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">
                 {% endif %}
-                {% include "search/services/includes/form.html" with form=form is_home=False only %}
+                {% include "search/includes/services_search_form.html" with form=form is_home=False only %}
             </form>
         </div>
     </div>
