@@ -3,7 +3,7 @@
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
-          <div aria-atomic="true" aria-live="assertive" class="toast toast--success" data-delay="6000" role="status">
+          <div aria-atomic="true" aria-live="assertive" class="toast toast--success" data-bs-delay="6000" role="status">
               <div class="toast-header">
                   <i aria-hidden="true" class="ri-check-line ri-lg me-1">
                   </i>
