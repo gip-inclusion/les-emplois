@@ -747,7 +747,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return HttpResponseNotAllowed(["POST"])
         user = get_object_or_404(models.User.objects.filter(is_active=True), pk=user_pk)
 
-        user.emailaddress_set.filter(email=user.email).delete()
+        user.emailaddress_set.all().delete()
 
         now = timezone.now()
         # The user is active and we only want to update active memberships
@@ -761,7 +761,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             is_active=False, is_admin=False, updated_by=request.user, updated_at=now
         )
 
-        user.email = f"{user.email}_old"
+        user.email = None
         user.username = user.deactivated_username
         user.is_active = False
         changed_fields = ["email", "username", "is_active"]  # As a list to mimic Django change_message format

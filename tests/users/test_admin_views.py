@@ -666,6 +666,7 @@ class TestDeactivateView:
             email="user@example.com",
         )
         EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
+        EmailAddress.objects.create(user=user, email="secondary@example.com", primary=False, verified=True)
         if user.is_professional:
             memberships = [
                 CompanyMembershipFactory(user=user),
@@ -682,7 +683,7 @@ class TestDeactivateView:
         user.refresh_from_db()
         assert user.is_active is False
         assert user.username == f"old_{user.pk}_0e8bee68-6c4b-48bb-850c-0dea09915d94"
-        assert user.email == "user@example.com_old"
+        assert user.email is None
         assert not EmailAddress.objects.filter(user=user).exists()
         for membership in memberships:
             membership.refresh_from_db()
