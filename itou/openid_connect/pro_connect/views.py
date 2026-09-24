@@ -395,7 +395,7 @@ def pro_connect_callback(request):
                 "(not an error: config should be fixed, see comments in code)",
                 {"idp_id": idp_id},
             )
-        if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+        if ItouTOTPDevice.objects.active().filter(user=user).exists():
             # We probably could remove the user's ItouTOTPDevice
             # object(s), since they will not be used anymore (as long
             # as the identity provider enforces MFA).
