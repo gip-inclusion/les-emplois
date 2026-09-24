@@ -384,8 +384,8 @@ def nav(request):
                 icon="ri-search-line",
                 items=[
                     NAV_ENTRIES["employers-search"],
-                    NAV_ENTRIES["prescribers-search"],
                     NAV_ENTRIES["services-search"],
+                    NAV_ENTRIES["prescribers-search"],
                 ],
             )
         )

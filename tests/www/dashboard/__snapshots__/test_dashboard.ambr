@@ -11,11 +11,11 @@
                   <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                   </i>
               </label>
-              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Ville ou code postal" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
               </select>
           </div>
           <div class="input-group input-group-xl">
-              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
+              <button aria-label="Rechercher un emploi inclusif par ville ou code postal" class="btn btn-block btn-ico btn-link" type="submit">
                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                   </i>
                   <span class="me-1">
@@ -1468,11 +1468,11 @@
                                                   <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                                                   </i>
                                               </label>
-                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Ville ou code postal" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
                                               </select>
                                           </div>
                                           <div class="input-group input-group-xl">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
+                                              <button aria-label="Rechercher un emploi inclusif par ville ou code postal" class="btn btn-block btn-ico btn-link" type="submit">
                                                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                                                   </i>
                                                   <span class="me-1">
@@ -1660,11 +1660,11 @@
                                                   <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                                                   </i>
                                               </label>
-                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Ville ou code postal" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
                                               </select>
                                           </div>
                                           <div class="input-group input-group-xl">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link" type="submit">
+                                              <button aria-label="Rechercher un emploi inclusif par ville ou code postal" class="btn btn-block btn-ico btn-link" type="submit">
                                                   <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
                                                   </i>
                                                   <span class="me-1">
