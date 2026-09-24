@@ -174,7 +174,7 @@ class OrientationsFilterForm(forms.Form):
         beneficiaries_qs = (
             User.objects.annotate_with_last_name_for_display()
             .filter(pk__in=orientations_qs.values("beneficiary"))
-            .order_by("last_name_for_display")
+            .order_by("last_name_for_display", "first_name")
         )
 
         return [
