@@ -1,6 +1,3 @@
-{% load markdownify %}
-{% load str_filters %}
-
 <div id="services-search-results">
     {% for service in results %}
         <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
@@ -56,7 +53,9 @@
             </div>
             <hr class="m-0">
             <div class="c-box--results__body">
-                <p class="mb-2">{{ service.description|markdownify|striptags|shorten:200 }}</p>
+                {% if service.display_mobilization_modes %}
+                    <span class="badge badge-xs rounded-pill bg-info">Mobilisation par : {{ service.display_mobilization_modes }}</span>
+                {% endif %}
                 <span class="badge badge-xs rounded-pill bg-light text-primary">Source : {{ service.source.value }}, via data·inclusion</span>
             </div>
         </div>
