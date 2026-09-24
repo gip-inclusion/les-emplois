@@ -279,20 +279,27 @@ class TestEmployeeRecordModel:
         assert employee_record_without_watched_data_updated_at.update_notifications.all().count() == 0
 
     @pytest.mark.parametrize(
-        "code,expected",
+        "code,available_transitions",
         [
-            (None, Status.NEW),
-            ("0000", Status.PROCESSED),
-            ("31", None),
-            ("32", Status.REJECTED),
-            ("33", Status.REJECTED),
-            ("34", Status.REJECTED),
-            ("3436", Status.PROCESSED),
+            (None, [EmployeeRecordTransition.UNARCHIVE_NEW]),
+            ("0000", [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
+            ("31", []),
+            ("32", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
+            ("33", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
+            ("34", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
+            ("3436", [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
         ],
     )
-    def test_status_based_on_asp_processing_code(self, code, expected):
-        employee_record = BareEmployeeRecordFactory(asp_processing_code=code)
-        assert employee_record.status_based_on_asp_processing_code is expected
+    def test_available_unarchive_transitions(self, code, available_transitions):
+        employee_record = BareEmployeeRecordFactory(asp_processing_code=code, status=Status.ARCHIVED)
+        for unarchive_transition in [
+            EmployeeRecordTransition.UNARCHIVE_NEW,
+            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
+            EmployeeRecordTransition.UNARCHIVE_REJECTED,
+        ]:
+            assert getattr(employee_record, unarchive_transition).is_available() is (
+                unarchive_transition in available_transitions
+            )
 
     @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source(self):
