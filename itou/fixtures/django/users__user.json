@@ -3266,5 +3266,50 @@
     },
     "model": "users.user",
     "pk": 130
+  },
+  {
+    "fields": {
+      "address_filled_at": null,
+      "address_line_1": "",
+      "address_line_2": "",
+      "allow_next_sso_sub_update": false,
+      "ban_api_resolved_address": null,
+      "city": "",
+      "coords": null,
+      "created_by": 1,
+      "date_joined": "2026-09-07T15:22:58Z",
+      "department": "",
+      "email": "itouadmin@example.com",
+      "external_data_source_history": null,
+      "fields_history": "[]",
+      "first_login": "2026-09-07T15:32:03.691Z",
+      "first_name": "",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "groups": [
+        3
+      ],
+      "has_completed_welcoming_tour": false,
+      "identity_provider": "DJANGO",
+      "insee_city": null,
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": false,
+      "kind": "itou_staff",
+      "last_checked_at": "2026-09-07T15:22:58Z",
+      "last_login": "2026-09-07T15:32:03.691Z",
+      "last_name": "",
+      "password": "pbkdf2_sha256$1200000$8U3FTo9P8BPNU5U9nV1HvN$ets3tTAUxvbPDHX/JRPnPt1qGVNI0M/E5NYWY0QOq7E=",
+      "phone": "",
+      "post_code": "",
+      "public_id": "b6a83559-b18c-412e-8c23-f3d68c8328d1",
+      "terms_accepted_at": null,
+      "title": "",
+      "upcoming_deletion_notified_at": null,
+      "user_permissions": [],
+      "username": "itouadmin"
+    },
+    "model": "users.user",
+    "pk": 148
   }
 ]
