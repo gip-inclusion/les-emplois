@@ -94,12 +94,21 @@ class TestCreateOrEditAssignment:
         # Trying to create an assignment when one already exists redirects the user to the edit view
         response = client.get(url)
         back_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-        redirect_url = reverse(
+        edit_assignment_url = reverse(
             "job_seekers_views:edit_assignment",
             kwargs={"public_id": job_seeker.public_id, "assignment_pk": assignment.pk},
             query={"back_url": back_url},
         )
-        assertRedirects(response, redirect_url)
+        assertRedirects(response, edit_assignment_url)
+
+        # If the user created an assignment with an unknown advisor and wants to appoint themselves
+        # as an advisor, reuse the existing assignment by setting `assigned_to_unknown_advisor` to `False`
+        # and redirect to the edition view.
+        assignment.assigned_to_unknown_advisor = True
+        assignment.save()
+
+        response = client.get(url)
+        assertRedirects(response, edit_assignment_url)
 
     def test_edit_view(self, client, snapshot):
         job_seeker = JobSeekerFactory(for_snapshot=True)
@@ -201,16 +210,18 @@ class TestCreateOrEditAssignment:
         assert assignment.reason == "iae"
 
         # Make sure an assignment is no longer assigned to an unknown advisor after edition
+        # and that the end date cannot be modified
         assignment.assigned_to_unknown_advisor = True
         assignment.save()
         post_data = {
-            "is_ongoing": "True",
+            "is_ongoing": "False",
             "reason": "iae",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("job_seekers_views:advisors", kwargs={"public_id": job_seeker.public_id}))
         assignment.refresh_from_db()
         assert assignment.assigned_to_unknown_advisor is False
+        assert assignment.is_active
 
     def test_form(self):
         job_seeker = JobSeekerFactory()
@@ -232,6 +243,16 @@ class TestCreateOrEditAssignment:
         form = JobSeekerAssignmentForm(instance=archived_assignment, active_assignment_exists=True)
         assert form.fields.get("is_ongoing") is not None
         assert form.fields.get("is_ongoing").disabled
+
+        # Check the is_ongoing field is not present if the advisor is unknown
+        assignment_with_unknown_advisor = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=professional,
+            prescriber_organization=professional.prescriberorganization_set.get(),
+            assigned_to_unknown_advisor=True,
+        )
+        form = JobSeekerAssignmentForm(instance=assignment_with_unknown_advisor, active_assignment_exists=False)
+        assert form.fields.get("is_ongoing") is None
 
 
 class TestArchiveAssignment:

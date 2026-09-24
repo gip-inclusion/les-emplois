@@ -10587,7 +10587,6 @@
                       AND "users_jobseekerassignment"."professional_id" = %s))
                  AND NOT ("users_jobseekerassignment"."company_id" IS NULL
                           AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
-                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
                  AND "users_jobseekerassignment"."job_seeker_id" = %s)
           ORDER BY "users_jobseekerassignment"."last_action_at" DESC
           LIMIT 1
@@ -12060,7 +12059,6 @@
                       AND "users_jobseekerassignment"."professional_id" = %s))
                  AND NOT ("users_jobseekerassignment"."company_id" IS NULL
                           AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL)
-                 AND NOT ("users_jobseekerassignment"."assigned_to_unknown_advisor")
                  AND "users_jobseekerassignment"."job_seeker_id" = %s)
           ORDER BY "users_jobseekerassignment"."last_action_at" DESC
           LIMIT 1

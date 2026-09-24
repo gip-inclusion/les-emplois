@@ -120,21 +120,27 @@
                         <span class="visually-hidden">Contacter la structure</span>
                         {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
                         {% include "job_seekers_views/includes/button_display_last_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                        {# If assignment.advisor != request.user but assignment.professional == request.user then assigned_to_unknown_advisor is True #}
+                        {% if assignment.organization == request.current_organization and assignment.professional == request.user %}
+                            <div class="c-box--accompagnateur__detail">
+                                {% partialdef create-assignment-link inline %}
+                                    <hr class="mt-4 mb-3">
+                                    <p class="mb-0">
+                                        Vous intervenez {% if last_user_assignment and last_user_assignment.advisor == request.user %}de nouveau {% endif %}sur le parcours de cet usager ?
+                                        <a href="{% url 'job_seekers_views:create_assignment' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn-link"
+                                           {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>Ajoutez votre intervention</a>
+                                    </p>
+                                {% endpartialdef %}
+                            </div>
+                        {% endif %}
                     {% endif %}
                 {% elif assignment.organization == request.current_organization or not assignment.organization %}
                     <div class="c-box--accompagnateur__detail">
                         {% if assignment.is_active %}
                             {% include "job_seekers_views/includes/assignment_actions.html" with in_last_advisor_box=True %}
                         {% else %}
-                            {% partialdef create-assignment-link inline %}
-                                <hr class="mt-4 mb-3">
-                                <p class="mb-0">
-                                    Vous intervenez {% if last_user_assignment %}de nouveau {% endif %}sur le parcours de cet usager ?
-                                    <a href="{% url 'job_seekers_views:create_assignment' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
-                                       class="btn-link"
-                                       {% matomo_event "accompagnateur" "clic" "ajouter-accompagnement" %}>Ajoutez votre intervention</a>
-                                </p>
-                            {% endpartialdef %}
+                            {% partial create-assignment-link %}
                         {% endif %}
                     </div>
                 {% endif %}
