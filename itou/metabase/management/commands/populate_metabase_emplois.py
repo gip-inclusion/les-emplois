@@ -675,7 +675,7 @@ class Command(BaseCommand):
 
     def populate_mobilization_events(self):
         queryset = MobilizationEvent.objects.all().select_related(
-            "structure", "service", "structure__source", "orientation"
+            "user", "structure", "service", "structure__source", "orientation"
         )
         metabase_db.populate_table(
             mobilization_events.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"

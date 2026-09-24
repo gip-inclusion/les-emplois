@@ -262,7 +262,7 @@ class TestStructures:
         "user_factory,assertion",
         [
             (None, assertContains),
-            (JobSeekerFactory, assertNotContains),
+            (JobSeekerFactory, assertContains),
             (PrescriberFactory, assertContains),
             (EmployerFactory, assertContains),
             (LaborInspectorFactory, assertNotContains),
@@ -1051,7 +1051,7 @@ class TestServices:
         "user_factory,assertion",
         [
             (None, assertContains),
-            (JobSeekerFactory, assertNotContains),
+            (JobSeekerFactory, assertContains),
             (PrescriberFactory, assertContains),
             (EmployerFactory, assertContains),
             (LaborInspectorFactory, assertNotContains),
@@ -2276,7 +2276,7 @@ class TestOrientationsList:
 
 
 class TestRegisterMobilizationEvent:
-    @pytest.mark.parametrize("user_factory", [None, PrescriberFactory])
+    @pytest.mark.parametrize("user_factory", [None, PrescriberFactory, JobSeekerFactory])
     @pytest.mark.parametrize(
         "kind, with_service, service_external_link",
         [
@@ -2314,10 +2314,7 @@ class TestRegisterMobilizationEvent:
             service_external_link=service_external_link,
         ).exists()
 
-    @pytest.mark.parametrize(
-        "user_factory",
-        [ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory],
-    )
+    @pytest.mark.parametrize("user_factory", [ItouStaffFactory, LaborInspectorFactory])
     def test_register_mobilization_event_bad_user(self, client, user_factory):
         structure = StructureFactory()
         user = user_factory()
