@@ -51,6 +51,18 @@
     z-index: 4051 !important;
 }
 
+@media (min-width: 768px) {
+    .c-search-dropdown .select2-results__options:not(.select2-results__options--nested) {
+        max-height: none !important;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .c-search-dropdown .select2-results__message {
+        grid-column: 1 / -1;
+    }
+}
+
 .select2-selection__choice__remove {
     float: right;
     margin-left: 2px;
