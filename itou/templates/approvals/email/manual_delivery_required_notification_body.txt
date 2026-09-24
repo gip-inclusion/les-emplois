@@ -2,9 +2,9 @@
 {% block body %}
 Nouvelle embauche sur Itou.
 
-Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candidat via {% brand %} :
+Informations pour l'obtention d'un PASS IAE suite à l'embauche de l’usager via {% brand %} :
 
-*Candidat* :
+*Usager* :
 
 - Nom : {{ job_application.job_seeker.last_name|upper }}
 - Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}

@@ -862,7 +862,7 @@ class GetOrCreateJobSeekerStartView(View):
 
     def dispatch(self, request, *args, **kwargs):
         if not (request.from_employer or request.from_prescriber):
-            raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte candidat.")
+            raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte usager.")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -1179,9 +1179,9 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 if JobSeekerProfile.objects.filter(nir=nir).exclude(pk=job_seeker.jobseeker_profile.pk).exists():
                     msg = format_html(
                         "Le<b> numéro de sécurité sociale</b> renseigné ({}) est "
-                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                        "déjà utilisé par un autre usager sur la Plateforme.<br>"
                         "Merci de renseigner <b>le numéro personnel et unique</b> "
-                        "du candidat pour lequel vous souhaitez postuler.",
+                        "de l’usager pour lequel vous souhaitez postuler.",
                         nir,
                     )
                     messages.warning(request, msg)
@@ -1507,14 +1507,14 @@ class UpdateJobSeekerStartView(View):
                 User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=request.GET.get("job_seeker_public_id")
             )
         except ValidationError:
-            raise Http404("Aucun candidat n'a été trouvé")
+            raise Http404("Aucun usager n'a été trouvé")
 
         from_url = get_safe_url(request, "from_url")
         if not from_url:
             raise Http404
 
         if request.user.is_job_seeker or not can_view_personal_information(request, job_seeker):
-            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de cet usager")
 
         self.job_seeker_session = SessionNamespace.create(
             request.session,
@@ -1551,7 +1551,7 @@ class UpdateJobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         )
         if request.user.is_job_seeker or not can_view_personal_information(request, self.job_seeker):
             # Since the link leading to this process isn't visible to those users, this should never happen
-            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de cet usager")
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -1866,7 +1866,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form is None:
-            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de cet usager")
         if self.form.is_valid():
             self.form.save()
             return HttpResponseRedirect(self.get_redirect_url())

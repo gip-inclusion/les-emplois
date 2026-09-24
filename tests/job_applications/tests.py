@@ -172,7 +172,7 @@ class TestJobApplicationModel:
     def test_application_on_non_job_seeker(self):
         with pytest.raises(ValidationError) as excinfo:
             JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=ProfessionalFactory()).clean()
-        assert "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat" in str(
+        assert "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte usager" in str(
             excinfo.value
         )
 
@@ -1414,7 +1414,7 @@ class TestJobApplicationNotifications:
             extra_kwargs = {
                 "sent_by_authorized_prescriber": True,
                 "sender_prescriber_organization__membership__user__for_snapshot": True,
-                "answer_to_prescriber": "Le candidat n'est pas venu.",
+                "answer_to_prescriber": "L’usager n'est pas venu.",
             }
         else:
             extra_kwargs = {"sent_by_prescriber_alone": True}
@@ -1445,7 +1445,7 @@ class TestJobApplicationNotifications:
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber=True,
             refusal_reason=RefusalReason.DID_NOT_COME,
-            answer_to_prescriber="Le candidat n'est pas venu.",
+            answer_to_prescriber="L’usager n'est pas venu.",
         )
         job_application.process()
         # User account is deleted.
@@ -1463,7 +1463,7 @@ class TestJobApplicationNotifications:
             sent_by_job_seeker=True,
             job_seeker__jobseeker_profile__hexa_post_code="59284",
             refusal_reason=RefusalReason.DID_NOT_COME,
-            answer_to_prescriber="Le candidat n'est pas venu.",
+            answer_to_prescriber="L’usager n'est pas venu.",
         )
         email = job_application.notifications_refuse_for_job_seeker.build()
         assert [job_application.job_seeker.email] == email.to
@@ -2580,7 +2580,7 @@ class TestJobApplicationXlsxExport:
                 "Candidature déclinée",
                 excel_date_format(job_application.hiring_start_at),
                 excel_date_format(job_application.hiring_end_at),
-                "Candidat non joignable",
+                "Usager non joignable",
                 "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 "",
@@ -2824,7 +2824,7 @@ class TestJobApplicationAdminForm:
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Émetteur candidat manquant."] == form.errors["__all__"]
+        assert ["Émetteur usager manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
         job_application.sender_kind = SenderKind.PRESCRIBER
@@ -2977,9 +2977,7 @@ class TestJobApplicationAdminForm:
         job_application.job_seeker = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature."] == form.errors[
-            "__all__"
-        ]
+        assert ["Le diagnostic d'éligibilité n'appartient pas à l’usager de la candidature."] == form.errors["__all__"]
 
 
 class TestJobApplicationsEnums:

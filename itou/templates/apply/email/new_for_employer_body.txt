@@ -6,7 +6,7 @@
 {% enums "job_applications" "SenderKind" as SenderKind %}
 Vous avez reçu une nouvelle candidature !
 
-*Candidat* :
+*Usager* :
 
 - Nom : {{ job_application.job_seeker.last_name|upper }}
 - Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
@@ -19,7 +19,7 @@ Vous avez reçu une nouvelle candidature !
 
 {% if job_application.message %}
 
-*Message du candidat* :
+*Message de l’usager* :
 
 {{ job_application.message }}
 
@@ -39,7 +39,7 @@ Vous avez reçu une nouvelle candidature !
 *Candidature envoyée par :*
 
 {% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
-Le candidat lui même.
+L’usager lui même.
 {% endif %}
 
 {% if job_application.sender_kind == SenderKind.PRESCRIBER %}

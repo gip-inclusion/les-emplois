@@ -33,7 +33,7 @@
                                   </button>
                               </p>
                           </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-assignment-edit" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2F7614fc4b-aef9-4694-ab17-12324300180a%2Fassignments%2F[PK of Assignment]%2Fedit&city=rennes-35">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
@@ -89,7 +89,7 @@
                                   </label>
                                   <textarea aria-describedby="id_reason_helptext" class="form-control" cols="40" id="id_reason" name="reason" rows="3"></textarea>
                                   <div class="form-text" id="id_reason_helptext">
-                                      Raison de l’accompagnement et/ou actions menées avec l'usager.
+                                      Raison de l’accompagnement et/ou actions menées avec l’usager.
                                   </div>
                               </div>
                               <div class="c-info mb-3">

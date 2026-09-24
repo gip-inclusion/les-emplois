@@ -8,18 +8,18 @@ La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unle
 Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
 {% endif %}
 
-*Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"transmis,non transmis" }} au candidat* :
+*Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"transmis,non transmis" }} à l’usager* :
 
 {{ job_application.get_refusal_reason_display|default:"Non renseigné" }}
 
 {% if job_application.answer %}
-*Réponse de l'entreprise transmise au candidat* :
+*Réponse de l'entreprise transmise à l’usager* :
 
 {{ job_application.answer }}
 {% endif %}
 
 {% if job_application.answer_to_prescriber %}
-*Message privé de l'entreprise (non transmis au candidat)* :
+*Message privé de l'entreprise (non transmis à l’usager)* :
 
 {{ job_application.answer_to_prescriber }}
 {% endif %}

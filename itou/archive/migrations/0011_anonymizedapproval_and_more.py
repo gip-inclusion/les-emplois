@@ -155,7 +155,7 @@ class Migration(migrations.Migration):
                     models.PositiveSmallIntegerField(
                         blank=True,
                         null=True,
-                        verbose_name="année de naissance du candidat",
+                        verbose_name="année de naissance de l’usager",
                     ),
                 ),
                 (
@@ -164,7 +164,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=3,
                         null=True,
-                        verbose_name="département du candidat",
+                        verbose_name="département de l’usager",
                     ),
                 ),
                 (
@@ -272,7 +272,7 @@ class Migration(migrations.Migration):
                     models.PositiveSmallIntegerField(
                         blank=True,
                         null=True,
-                        verbose_name="année de naissance du candidat",
+                        verbose_name="année de naissance de l’usager",
                     ),
                 ),
                 (
@@ -281,7 +281,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=3,
                         null=True,
-                        verbose_name="département du candidat",
+                        verbose_name="département de l’usager",
                     ),
                 ),
                 (

@@ -960,7 +960,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         verbose_name="pas d'identifiant France Travail ?",
         help_text=mark_safe(
             "Indiquez la raison de l'absence d'identifiant France Travail.<br>"
-            "Renseigner l'identifiant France Travail des candidats inscrits "
+            "Renseigner l'identifiant France Travail des usagers inscrits "
             "permet d'instruire instantanément votre demande.<br>"
             "Dans le cas contraire un délai de deux jours est nécessaire "
             "pour effectuer manuellement les vérifications d’usage."
@@ -1178,7 +1178,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         max_length=48,
         help_text=(
             "Identifiant France Travail chiffré, utilisé dans la communication à France Travail. "
-            "Son existence implique que le nom, prénom, date de naissance et NIR de ce candidat "
+            "Son existence implique que le nom, prénom, date de naissance et NIR de cet usager "
             "sont connus et valides du point de vue de France Travail."
         ),
     )
@@ -1186,15 +1186,15 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     pe_last_certification_attempt_at = models.DateTimeField(
         verbose_name="date de la dernière tentative de certification",
         null=True,
-        help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
+        help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier cet usager",
     )
 
     is_stalled = models.BooleanField(
-        verbose_name="candidat sans solution",
+        verbose_name="usager sans solution",
         default=False,
         editable=False,
         help_text=(
-            "Un candidat est dans la file active de l'IAE depuis plus de 30 jours "
+            "Un usager est dans la file active de l'IAE depuis plus de 30 jours "
             "s'il a émis une candidature dans les 6 derniers mois, "
             "n'a pas de candidature acceptée, "
             "et a émis sa première candidature il y a plus de 30 jours."
@@ -1577,7 +1577,7 @@ class NirModificationRequest(models.Model):
         verbose_name_plural = "demandes de régularisation NIR"
 
     def __str__(self):
-        return f"Demande de régularisation NIR pour le candidat #{self.jobseeker_profile.pk}"
+        return f"Demande de régularisation NIR pour l’usager #{self.jobseeker_profile.pk}"
 
     def email_nir_modification_request_notification(self):
         to = [settings.ITOU_EMAIL_CONTACT]
@@ -1690,7 +1690,7 @@ class JobSeekerAssignment(models.Model):
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     job_seeker = models.ForeignKey(
         User,
-        verbose_name="candidat",
+        verbose_name="usager",
         on_delete=models.CASCADE,
         related_name="job_seeker_assignments",
         limit_choices_to={"kind": UserKind.JOB_SEEKER},
@@ -1738,8 +1738,8 @@ class JobSeekerAssignment(models.Model):
     objects = JobSeekerAssignmentManager()
 
     class Meta:
-        verbose_name = "affectation candidat"
-        verbose_name_plural = "affectations candidats"
+        verbose_name = "affectation usager"
+        verbose_name_plural = "affectations usagers"
         ordering = ["-updated_at"]
         constraints = [
             # NB: the clean way would be to add condition=Q(ended_at=None) instead of
@@ -1751,7 +1751,7 @@ class JobSeekerAssignment(models.Model):
                 fields=["job_seeker", "professional", "prescriber_organization", "company", "ended_at"],
                 nulls_distinct=False,
                 violation_error_message=(
-                    "Une affectation existe déjà entre le candidat, le prescripteur "
+                    "Une affectation existe déjà entre l’usager, le prescripteur "
                     "et l'organisation prescriptrice ou l'entreprise."
                 ),
             ),

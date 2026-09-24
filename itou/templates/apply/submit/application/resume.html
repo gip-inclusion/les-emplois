@@ -10,7 +10,7 @@
     {% if is_subject_to_iae_rules %}
         {% if not request.user.is_job_seeker and eligibility_diagnosis.author_organization %}
             <div class="mb-5">
-                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                <p>L’éligibilité à l'IAE de l’usager a été validée par :</p>
                 <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
@@ -24,9 +24,9 @@
                         </p>
                         <p class="mb-0">
                             {% if request.from_authorized_prescriber or auto_prescription_process %}
-                                Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
+                                Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative de l’usager.
                             {% elif prescription_process %}
-                                Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.
+                                Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE de l’usager.
                             {% elif request.user.is_job_seeker %}
                                 Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier votre éligibilité à l’IAE.
                             {% endif %}
@@ -37,9 +37,9 @@
                         </p>
                         <p class="mb-0">
                             {% if prescription_process %}
-                                Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs du candidat.
+                                Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs de l’usager.
                             {% elif auto_prescription_process %}
-                                Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs du candidat.
+                                Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs de l’usager.
                             {% elif request.user.is_job_seeker %}
                                 Tant que votre éligibilité IAE est valide, l’employeur n’aura pas à vérifier vos critères administratifs.
                             {% endif %}
@@ -49,7 +49,7 @@
                             <p class="mb-2">
                                 <strong>Information</strong>
                             </p>
-                            <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider l’éligibilité IAE du candidat.</p>
+                            <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider l’éligibilité IAE de l’usager.</p>
                         {% elif request.user.is_job_seeker %}
                             <p class="mb-2">
                                 <strong>Information</strong>
@@ -63,7 +63,7 @@
     {% elif is_subject_to_geiq_rules %}
         {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
             <div class="mb-5">
-                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
+                <p>L’éligibilité GEIQ de l’usager a été validée par :</p>
                 <p class="text-tertiary fw-bold">{{ geiq_eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
@@ -77,9 +77,9 @@
                         </p>
                         <p class="mb-0">
                             {% if prescription_process %}
-                                Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs du candidat.
+                                Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs de l’usager.
                             {% elif auto_prescription_process %}
-                                Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs du candidat.
+                                Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs de l’usager.
                             {% elif request.user.is_job_seeker %}
                                 Tant que votre éligibilité GEIQ est valide, l’employeur n’aura pas à valider votre éligibilité à un accompagnement par le GEIQ.
                             {% endif %}
@@ -116,7 +116,7 @@
             {% if auto_prescription_process %}
                 <p class="mb-0">Précisez dans le message :</p>
                 <ul class="mb-0">
-                    <li>les motivations du candidat,</li>
+                    <li>les motivations de l’usager,</li>
                     <li>ses compétences,</li>
                     <li>ses disponibilités</li>
                 </ul>
@@ -132,7 +132,7 @@
                            href="{{ ITOU_DIAGNOSTIC_URL }}"
                            target="_blank"
                            rel="noreferrer noopener"
-                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                           aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
@@ -141,13 +141,13 @@
                            href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
                            target="_blank"
                            rel="noreferrer noopener"
-                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                           aria-label="Orienter un usager vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
                     </p>
                 {% endif %}
                 <p class="mb-0">Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.</p>
             {% elif is_subject_to_iae_rules or is_subject_to_geiq_rules %}
                 <p class="mb-0">
-                    Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                    Pour retenir l’attention du recruteur, décrivez la situation actuelle de l’usager,
                     son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
                 </p>
                 {% if is_subject_to_iae_rules %}
@@ -157,7 +157,7 @@
                            href="{{ ITOU_DIAGNOSTIC_URL }}"
                            target="_blank"
                            rel="noreferrer noopener"
-                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                           aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
@@ -173,7 +173,7 @@
             {% else %}
                 <p class="mb-0">Précisez dans le message :</p>
                 <ul class="mb-0">
-                    <li>les motivations du candidat,</li>
+                    <li>les motivations de l’usager,</li>
                     <li>ses compétences,</li>
                     <li>ses disponibilités</li>
                 </ul>
@@ -187,7 +187,7 @@
     {% if prescription_process or request.user.is_job_seeker %}
         <div class="c-info p-3 mb-4">
             {% if prescription_process %}
-                <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
+                <p class="fw-bold fs-sm mb-1">Cet usager n’a pas encore de CV ?</p>
                 <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
             {% else %}
                 <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>

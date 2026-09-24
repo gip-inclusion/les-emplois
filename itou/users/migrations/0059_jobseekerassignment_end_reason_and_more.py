@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 name="unique_jobseekerassignment_assignment_per_jobseeker",
                 nulls_distinct=False,
                 violation_error_message=(
-                    "Une affectation existe déjà entre le candidat, le prescripteur"
+                    "Une affectation existe déjà entre l’usager, le prescripteur"
                     " et l'organisation prescriptrice ou l'entreprise."
                 ),
             ),

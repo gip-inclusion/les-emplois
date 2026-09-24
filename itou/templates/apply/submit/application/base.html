@@ -39,10 +39,10 @@
         {% if new_check_needed %}
             {% component_alert title=title content=content variant="warning" dismissible=True %}
                 {% fragment as title %}
-                    Veuillez vérifier les informations du candidat
+                    Veuillez vérifier les informations de l’usager
                 {% endfragment %}
                 {% fragment as content %}
-                    <p class="mb-0">La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.</p>
+                    <p class="mb-0">La situation de l’usager a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.</p>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% endif %}
