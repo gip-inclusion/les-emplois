@@ -483,6 +483,26 @@ class Service(GeolocatedAddressMixin, models.Model):
     def should_mobilize_via_external_link(self) -> bool:
         return bool(self.lien_mobilisation)
 
+    @property
+    def display_mobilization_modes(self) -> str:
+        EXTERNAL_LINK = "Site web de la structure"
+        INTERNAL_FORM = "Formulaire"
+        TELEPHONE = "Téléphone"
+        EMAIL = "Email"
+
+        modes = []
+
+        if self.lien_mobilisation:
+            modes.append(EXTERNAL_LINK)
+        elif not self.from_non_orientable_di_source:
+            modes.append(INTERNAL_FORM)
+        if self.contact_phone:
+            modes.append(TELEPHONE)
+        if self.contact_email:
+            modes.append(EMAIL)
+
+        return " | ".join(modes)
+
     # FIXME(vperron): this method is now completely unused, remove it along with
     # any "legacy" DORA fields in the services and structures models and their related uses.
     def generate_credential_documents_info(self) -> list[tuple[str, str]]:

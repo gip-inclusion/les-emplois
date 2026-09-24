@@ -104,6 +104,42 @@ def test_lien_mobilisation_must_be_url():
         service.full_clean()
 
 
+@pytest.mark.parametrize(
+    "lien_mobilisation, is_from_non_orientation_di_source, contact_phone, contact_email, expected",
+    [
+        pytest.param(
+            "https://ext.link",
+            False,
+            "3949",
+            "contact@email.fake",
+            "Site web de la structure | Téléphone | Email",
+            id="full_with_ext_link",
+        ),
+        pytest.param("", False, "3949", "contact@email.fake", "Formulaire | Téléphone | Email", id="full_with_form"),
+        pytest.param("", False, "", "", "Formulaire", id="form_only"),
+        pytest.param("", True, "3949", "contact@email.fake", "Téléphone | Email", id="no_ext_link_no_form"),
+        pytest.param("", True, "", "", "", id="nothing"),
+    ],
+)
+def test_display_mobilization_modes(
+    lien_mobilisation,
+    is_from_non_orientation_di_source,
+    contact_phone,
+    contact_email,
+    expected,
+    settings,
+):
+
+    service = ServiceFactory(
+        lien_mobilisation=lien_mobilisation, contact_phone=contact_phone, contact_email=contact_email
+    )
+
+    if is_from_non_orientation_di_source:
+        settings.NON_ORIENTABLE_DI_SOURCES = [service.source.value]
+
+    assert service.display_mobilization_modes == expected
+
+
 def _search(vannes, *, reception, thematics=None):
     return Service.objects.search(
         city=vannes,
