@@ -55,13 +55,17 @@ class TestSearchCompany:
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
     applications_open_str = "Cette structure vous intéresse ?"
 
-    def test_home_anonymous(self, client, settings):
+    def test_home_anonymous(self, client, settings, snapshot):
         settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
         response = client.get(reverse("search:employers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1"',
         )
+        soup = parse_response_to_soup(response)
+        [tabButton, tabContent] = soup.find_all(class_="active")
+        assert list(tabButton.stripped_strings) == ["Un emploi inclusif", "Emploi inclusif"]
+        assert tabContent.prettify() == snapshot
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())
@@ -608,13 +612,17 @@ class TestSearchCompany:
 
 
 class TestSearchPrescriber:
-    def test_home_anonymous(self, client, settings):
+    def test_home_anonymous(self, client, settings, snapshot):
         settings.PLATEFORME_ACCUEIL_BASE_URL = "https://plateforme.accueil.fr"
         response = client.get(reverse("search:prescribers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;type=accompagnateur"',
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1"',
         )
+        soup = parse_response_to_soup(response)
+        [tabButton, tabContent] = soup.find_all(class_="active")
+        assert list(tabButton.stripped_strings) == ["Un accompagnement", "Accompagnement"]
+        assert tabContent.prettify() == snapshot
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())

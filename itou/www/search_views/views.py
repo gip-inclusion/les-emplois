@@ -24,6 +24,7 @@ from itou.insertion.utils import get_orient_for_job_seeker_context
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus, kinds_for_category
 from itou.prescribers.models import PrescriberOrganization
+from itou.search.enums import SearchType
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
@@ -54,18 +55,24 @@ def search_home(request, template_name="search/search_home.html"):
         warnings.warn("Access to 'search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
     iframe_url = settings.PLATEFORME_ACCUEIL_BASE_URL
-    iframe_url = add_url_params(iframe_url, {"host": settings.ITOU_FQDN})
+    iframe_url = add_url_params(iframe_url, {"host": settings.ITOU_FQDN, "no_forms": "1"})
     match request.resolver_match.url_name:
         case "prescribers_home":
-            iframe_url = add_url_params(iframe_url, {"type": "accompagnateur"})
+            search_type = SearchType.PRESCRIBERS
         case "services_home":
-            iframe_url = add_url_params(iframe_url, {"type": "insertion"})
+            search_type = SearchType.SERVICES
+        case _:
+            search_type = SearchType.EMPLOYERS
     return render(
         request,
         template_name,
         {
             "iframe_url": iframe_url,
-            "company_search_form": CompanySearchForm(),
+            "search_type": search_type,
+            "company_search_form": CompanySearchForm(auto_id="id_company_%s"),
+            "prescribers_search_form": PrescriberSearchForm(auto_id="id_prescribers_%s"),
+            "services_search_form": ServiceSearchForm(auto_id="id_services_%s"),
+            "job_seeker": None,
         },
     )
 

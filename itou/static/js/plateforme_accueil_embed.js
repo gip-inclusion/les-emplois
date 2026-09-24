@@ -88,19 +88,4 @@
   window.addEventListener("scroll", schedule, { passive: true });
   window.addEventListener("resize", schedule);
   window.addEventListener("load", schedule);
-
-  setTimeout(function () {
-    if (!frameLoaded) {
-      document
-        .getElementById("loading-error-fallback")
-        .classList.remove("d-none");
-      frame.classList.add("d-none");
-      window._paq.push([
-        "trackEvent",
-        "iframe",
-        "load-failure",
-        "plateforme-accueil",
-      ]);
-    }
-  }, 10000);
 })();
