@@ -14,7 +14,7 @@ from tests.utils.tests import get_response_for_middlewaremixin
 
 
 class FailingForm:
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         raise Exception("Something bad")
 
 
