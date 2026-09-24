@@ -77,8 +77,6 @@
     "pk": 9
   },
   {
-    "model": "companies.contract",
-    "pk": 10,
     "fields": {
       "company": 3852,
       "details": "[]",
@@ -86,11 +84,11 @@
       "job_seeker": 2,
       "start_date": "2025-08-01",
       "updated_at": "2025-08-01T09:00:00Z"
-    }
+    },
+    "model": "companies.contract",
+    "pk": 10
   },
   {
-    "model": "companies.contract",
-    "pk": 11,
     "fields": {
       "company": 3852,
       "details": "[]",
@@ -98,6 +96,8 @@
       "job_seeker": 98,
       "start_date": "2024-08-15",
       "updated_at": "2026-08-15T09:00:00Z"
-    }
+    },
+    "model": "companies.contract",
+    "pk": 11
   }
 ]
