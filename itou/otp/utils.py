@@ -13,7 +13,7 @@ STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 def get_user_devices(user):
     return sorted(
-        ItouTOTPDevice.objects.filter(user=user, disabled_at=None),
+        ItouTOTPDevice.objects.active().filter(user=user),
         key=lambda device: device.name,
     )
 
@@ -32,7 +32,8 @@ def verify_token_for_user(user, otp_token):
     """
     with transaction.atomic():
         devices = (
-            ItouTOTPDevice.objects.filter(user=user, disabled_at=None)
+            ItouTOTPDevice.objects.active()
+            .filter(user=user)
             .select_for_update()
             .order_by("name")  # deterministic lock order
         )
@@ -102,7 +103,7 @@ def user_can_enroll_otp_device(user):
 
 def user_can_manage_otp_devices(user):
     """Same as `user_can_enroll_otp_device`, plus at least one device to see, use or delete."""
-    return user_can_enroll_otp_device(user) and ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists()
+    return user_can_enroll_otp_device(user) and ItouTOTPDevice.objects.active().filter(user=user).exists()
 
 
 def require_otp(user):
@@ -126,7 +127,7 @@ def _require_otp_for_pro(user):
     # We tested the enrollment flow on some users who were not yet in
     # the targeted batches that we check below. If they have enrolled
     # a device, we should require them to use it.
-    if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+    if ItouTOTPDevice.objects.active().filter(user=user).exists():
         return True
     org_ids = set(
         PrescriberMembership.objects.active().filter(user_id=user.id).values_list("organization_id", flat=True)
