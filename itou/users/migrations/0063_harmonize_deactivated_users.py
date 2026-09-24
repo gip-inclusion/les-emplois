@@ -3,12 +3,14 @@ from itertools import batched
 from django.db import migrations
 
 
-def prefix_deactivated_usernames(apps, schema_editor):
+def harmonize_deactivated_users(apps, schema_editor):
     """
-    Rewrite the username of users deactivated before prefixing the username with `old_<pk>_<sub>`.
+    Align users deactivated before the username was prefixed with `old_<pk>_<sub>` and the email was removed.
     """
     BATCH_SIZE = 10_000
     User = apps.get_model("users", "User")
+    EmailAddress = apps.get_model("account", "EmailAddress")
+
     users = User.objects.filter(is_active=False)
     total = users.count()
     nb_updated = 0
@@ -17,9 +19,12 @@ def prefix_deactivated_usernames(apps, schema_editor):
     for user_batch in batched(users.iterator(chunk_size=BATCH_SIZE), BATCH_SIZE):
         for user in user_batch:
             user.username = f"old_{user.pk}_{user.username.removeprefix('old_').removesuffix('_old')}"
-        nb_updated += User.objects.bulk_update(user_batch, ["username"])
+            user.email = None
+        nb_updated += User.objects.bulk_update(user_batch, ["username", "email"])
         print(f"Updated {nb_updated}/{total} deactivated users")
 
+    nb_deleted, _ = EmailAddress.objects.filter(user__in=users).delete()
+    print(f"Deleted {nb_deleted} email addresses of deactivated users")
 
 
 class Migration(migrations.Migration):
@@ -28,5 +33,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(prefix_deactivated_usernames, reverse_code=migrations.RunPython.noop, elidable=True),
+        migrations.RunPython(harmonize_deactivated_users, reverse_code=migrations.RunPython.noop, elidable=True),
     ]
