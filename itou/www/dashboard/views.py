@@ -57,7 +57,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
-from itou.www.search_views.forms import SiaeSearchForm
+from itou.www.search_views.forms import CompanySearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
 
@@ -171,7 +171,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "saved_searches": saved_searches,
         "siae_suspension_text_with_dates": None,
-        "siae_search_form": SiaeSearchForm(),
+        "company_search_form": CompanySearchForm(),
         "stalled_job_seekers_count": None,
     }
 

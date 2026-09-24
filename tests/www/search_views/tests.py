@@ -431,7 +431,7 @@ class TestSearchCompany:
             name="Entreprise Guérande", department="44", coords=guerande.coords, post_code="44350"
         )
 
-        # Using SiaeSearchForm.DISTANCE_DEFAULT.
+        # Using CompanySearchForm.DISTANCE_DEFAULT.
         response = client.get(self.URL, {"city": guerande.slug})
         guerande_opt = f'<option value="{company_guerande.pk}">{company_guerande.name}</option>'
         vannes_opt = f'<option value="{company_vannes.pk}">{company_vannes.name}</option>'
@@ -1444,7 +1444,7 @@ class TestJobDescriptionSearchView:
         )
         JobDescriptionFactory(company=company_guerande)
 
-        # Using SiaeSearchForm.DISTANCE_DEFAULT.
+        # Using CompanySearchForm.DISTANCE_DEFAULT.
         response = client.get(self.URL, {"city": guerande.slug})
         simulated_page = parse_response_to_soup(response)
 

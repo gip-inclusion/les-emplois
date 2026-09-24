@@ -31,11 +31,11 @@ from itou.utils.pagination import pager
 from itou.utils.readonly import ReadonlyViewMixin, readonly_view
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search_views.forms import (
+    CompanySearchForm,
     JobDescriptionSearchForm,
     NewSavedSearchForm,
     PrescriberSearchForm,
     ServiceSearchForm,
-    SiaeSearchForm,
 )
 
 
@@ -65,14 +65,14 @@ def search_home(request, template_name="search/search_home.html"):
         template_name,
         {
             "iframe_url": iframe_url,
-            "siae_search_form": SiaeSearchForm(),
+            "company_search_form": CompanySearchForm(),
         },
     )
 
 
 class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJobSeekerMixin, FormView):
-    form_class = SiaeSearchForm
-    initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
+    form_class = CompanySearchForm
+    initial = {"distance": CompanySearchForm.DISTANCE_DEFAULT}
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
