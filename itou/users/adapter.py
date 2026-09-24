@@ -103,8 +103,6 @@ class UserAdapter(DefaultAccountAdapter):
 
     def send_mail(self, template_prefix, email, context):
         context["itou_environment"] = settings.ITOU_ENVIRONMENT
-        context["itou_protocol"] = settings.ITOU_PROTOCOL
-        context["itou_fqdn"] = settings.ITOU_FQDN
         context["base_url"] = get_absolute_url()
         context["signup_url"] = get_absolute_url(reverse("signup:choose_user_kind"))
         super().send_mail(template_prefix, email, context)
