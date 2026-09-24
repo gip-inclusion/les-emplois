@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django_xworkflows import models as xwf_models
 
-from itou.companies.models import Company
+from itou.companies.models import Company, JobDescription
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
@@ -384,6 +384,34 @@ def refuse(request):
     )
 
 
+def _get_recruitment_to_close(company, applications):
+    """Return what refusing the applications with the "no position" reason would close.
+
+    Transferred applications keep the selected jobs of their previous company, hence the filter on `company`.
+    For the same reason, an application counts as spontaneous when none of its selected jobs belong to `company`.
+
+    Returns:
+        A tuple `(job_descriptions, close_spontaneous_applications)`: the open job descriptions of `company`
+        selected in the applications, and whether spontaneous applications are open and at least one of the
+        applications is spontaneous.
+    """
+    application_ids = [application.pk for application in applications]
+    job_descriptions = list(
+        JobDescription.objects.filter(
+            company=company,
+            is_active=True,
+            pk__in=JobApplication.selected_jobs.through.objects.filter(jobapplication_id__in=application_ids).values(
+                "jobdescription_id"
+            ),
+        ).select_related("appellation")  # otherwise, JobDescription.display_name could lead to N+1 queries
+    )
+    close_spontaneous_applications = bool(
+        company.spontaneous_applications_open_since
+        and JobApplication.objects.filter(pk__in=application_ids).exclude(selected_jobs__company=company).exists()
+    )
+    return job_descriptions, close_spontaneous_applications
+
+
 class RefuseWizardView(UserPassesTestMixin, WizardView):
     url_name = "apply:batch_refuse_steps"
     expected_session_kind = "job-applications-batch-refuse"
@@ -483,13 +511,30 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
             reason_data = self.wizard_session.get(RefuseViewStep.REASON, {})
             context["refusal_reason_label"] = job_applications_enums.RefusalReason(reason_data["refusal_reason"]).label
             context["refusal_reason_shared_with_job_seeker"] = reason_data.get("refusal_reason_shared_with_job_seeker")
+        else:
+            company = get_current_company_or_404(self.request)
+            context["job_descriptions_to_close"], context["close_spontaneous_applications"] = (
+                _get_recruitment_to_close(company, self.applications)
+            )
 
         return context
+
+    def _close_recruitment(self, refused_applications):
+        company = get_current_company_or_404(self.request)
+        job_descriptions, close_spontaneous_applications = _get_recruitment_to_close(company, refused_applications)
+        for job_description in job_descriptions:
+            job_description.is_active = False
+            # Save each instance (instead of a bulk update) to record the change in field_history
+            job_description.save(update_fields=["is_active", "updated_at"])
+        if close_spontaneous_applications:
+            company.spontaneous_applications_open_since = None
+            company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+        return job_descriptions, close_spontaneous_applications
 
     def done(self):
         refuse_session_data = self.wizard_session.as_dict()
         # We're done, refuse all applications !
-        refused_ids = []
+        refused_applications = []
         for job_application in _get_and_lock_received_applications(
             self.request,
             [application.pk for application in self.applications],
@@ -515,26 +560,44 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
                     extra_tags="toast",
                 )
             else:
-                refused_ids.append(job_application.pk)
-        refused_nb = len(refused_ids)
+                refused_applications.append(job_application)
+        refused_nb = len(refused_applications)
+        closed_job_descriptions, closed_spontaneous_applications = [], False
         if refused_nb:
-            messages.success(
-                self.request,
-                (
-                    f"{refused_nb} candidatures ont bien été refusées."
-                    if refused_nb > 1
-                    else f"La candidature de {self.applications[0].job_seeker.get_inverted_full_name()} "
-                    "a bien été refusée."
-                ),
-                extra_tags="toast",
-            )
+            if (
+                refuse_session_data[RefuseViewStep.REASON]["refusal_reason"]
+                == job_applications_enums.RefusalReason.NO_POSITION
+            ):
+                closed_job_descriptions, closed_spontaneous_applications = self._close_recruitment(
+                    refused_applications
+                )
+            if refused_nb > 1:
+                message = f"{refused_nb} candidatures ont bien été refusées."
+            else:
+                inverted_full_name = refused_applications[0].job_seeker.get_inverted_full_name()
+                message = f"La candidature de {inverted_full_name} a bien été refusée."
+            extra_tags = "toast"
+            if closed_job_descriptions:
+                message += " La réception des candidatures a été désactivée pour les fiches de poste concernées."
+            if closed_spontaneous_applications:
+                message += " La réception des candidatures spontanées a été désactivée."
+            if closed_job_descriptions or closed_spontaneous_applications:
+                # The message is longer when recruitment was closed, give 10 seconds to read it
+                extra_tags += " toast-long"
+            messages.success(self.request, message, extra_tags=extra_tags)
         logger.info(
             f"user=%s {self.tunnel} refused %s applications: %s",
             self.request.user.pk,
             refused_nb,
-            ",".join(str(app_uid) for app_uid in refused_ids),
+            ",".join(str(application.pk) for application in refused_applications),
         )
-
+        if closed_job_descriptions or closed_spontaneous_applications:
+            logger.info(
+                "user=%s closed recruitment for job_descriptions=%s spontaneous_applications=%s",
+                self.request.user.pk,
+                ",".join(str(job_description.pk) for job_description in closed_job_descriptions),
+                closed_spontaneous_applications,
+            )
         return self.reset_url
 
 
