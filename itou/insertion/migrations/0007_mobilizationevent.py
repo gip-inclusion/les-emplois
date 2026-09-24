@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="+",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="prescripteur ou employeur",
+                        verbose_name="utilisateur",
                     ),
                 ),
             ],

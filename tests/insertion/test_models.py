@@ -274,18 +274,6 @@ class TestMobilizationEvent:
         # No integrity error
         MobilizationEventFactory(service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT)
 
-    def test_authenticated_user_has_organization(self):
-        with transaction.atomic():
-            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
-                MobilizationEventFactory(user=None, company=CompanyFactory())
-        with transaction.atomic():
-            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
-                MobilizationEventFactory(user=None, prescriber_organization=PrescriberOrganizationFactory())
-
-        with transaction.atomic():
-            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
-                MobilizationEventFactory(user=ProfessionalFactory())
-
     def test_service_external_link_coherence(self):
         service = ServiceFactory()
 
@@ -311,6 +299,7 @@ class TestMobilizationEvent:
             (None, None),
             (ProfessionalFactory, PrescriberOrganizationFactory),
             (ProfessionalFactory, CompanyFactory),
+            (JobSeekerFactory, None),
         ],
     )
     @pytest.mark.parametrize(
@@ -336,7 +325,7 @@ class TestMobilizationEvent:
         assert MobilizationEvent.objects.filter(session_key="session123", kind=kind).count() == 1
 
     def test_create_mobilization_event_bad_user_kind(self):
-        user = random.choice([JobSeekerFactory(), ItouStaffFactory(), ProfessionalFactory()])
+        user = random.choice([ItouStaffFactory(), ProfessionalFactory()])
         MobilizationEvent.objects.create_mobilization_event(
             session_key="session123",
             kind=MobilizationEventKind.STRUCTURE_CONTACT,
