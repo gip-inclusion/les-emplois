@@ -3,7 +3,7 @@
     "fields": {
       "company": 3850,
       "details": "[]",
-      "end_date": "2024-06-01",
+      "end_date": "2024-01-01",
       "job_seeker": 18,
       "start_date": "2024-01-01"
     },
@@ -69,7 +69,7 @@
     "fields": {
       "company": 3850,
       "details": "[]",
-      "end_date": "2025-10-10",
+      "end_date": "2025-01-01",
       "job_seeker": 123,
       "start_date": "2024-10-10"
     },
@@ -92,7 +92,7 @@
     "fields": {
       "company": 3852,
       "details": "[]",
-      "end_date": "2026-08-15",
+      "end_date": "2026-01-01",
       "job_seeker": 98,
       "start_date": "2024-08-15",
       "updated_at": "2026-08-15T09:00:00Z"
