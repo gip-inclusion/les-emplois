@@ -27,7 +27,7 @@
                 </div>
                 <h2 class="mt-3">Rechercher un emploi inclusif</h2>
                 <form action="{% url 'search:employers_results' %}" role="search">
-                    {% bootstrap_field siae_search_form.city alert_error_type="all" %}
+                    {% bootstrap_field company_search_form.city alert_error_type="all" %}
                     <button type="submit" class="btn btn-primary">Rechercher</button>
                 </form>
             </div>

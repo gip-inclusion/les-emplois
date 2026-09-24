@@ -20,7 +20,7 @@ from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
-class SiaeSearchForm(forms.Form):
+class CompanySearchForm(forms.Form):
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 25
 
@@ -117,7 +117,7 @@ class SiaeSearchForm(forms.Form):
         )
 
 
-class JobDescriptionSearchForm(SiaeSearchForm):
+class JobDescriptionSearchForm(CompanySearchForm):
     KIND_CHOICES = CompanyKind.for_job_description_filter()
     CONTRACT_TYPE_CHOICES = sorted(
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
