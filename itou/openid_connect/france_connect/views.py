@@ -47,7 +47,10 @@ def get_es256_key():
         return key
 
     jwks = httpx.get(constants.FRANCE_CONNECT_ENDPOINT_JWKS, timeout=5)
-    es256_keys = [key for key in jwks.json()["keys"] if key["alg"] == "ES256"]
+    keys = jwks.json()["keys"]
+    if len(keys) > 1:
+        logger.error("More than one key in FranceConnect JWKS")
+    es256_keys = [key for key in keys if key["alg"] == "ES256"]
     if not es256_keys:
         raise ValueError("No ES256 key found in FranceConnect JWKS")
     key = es256_keys[0]

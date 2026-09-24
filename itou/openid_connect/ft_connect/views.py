@@ -51,9 +51,12 @@ def get_rsa_key():
         return key
 
     jwks = httpx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_JWKS, timeout=5)
-    rsa256_keys = [key for key in jwks.json()["keys"] if key["kty"] == "RSA"]
+    keys = jwks.json()["keys"]
+    if len(keys) > 1:
+        logger.error("More than one key in FranceTravail Connect JWKS")
+    rsa256_keys = [key for key in keys if key["kty"] == "RSA"]
     if not rsa256_keys:
-        raise ValueError("No RSA key found in FranceConnect JWKS")
+        raise ValueError("No RSA key found in FranceTravail Connect JWKS")
     key = rsa256_keys[0]
     cache.set(FRANCE_TRAVAIL_CONNECT_KEY, key, 24 * 60 * 60)
     return key
