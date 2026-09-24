@@ -120,7 +120,7 @@ def test_can_orient_towards_insertion_service(user_factory, expected):
     "user_factory,expected",
     (
         pytest.param(make_anonymous, True, id="anonymous"),
-        pytest.param(make_jobseeker, False, id="job_seeker"),
+        pytest.param(make_jobseeker, True, id="job_seeker"),
         pytest.param(make_employer, True, id="employer"),
         pytest.param(
             lambda: make_prescriber(organization__authorized=False),

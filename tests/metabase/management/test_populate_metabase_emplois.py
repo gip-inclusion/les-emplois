@@ -1422,8 +1422,12 @@ def test_populate_organizations(snapshot):
 def test_populate_mobilization_events(snapshot):
     company_membership = CompanyMembershipFactory()
     prescriber_membership = PrescriberMembershipFactory()
+    job_seeker = JobSeekerFactory()
 
     structure_mobilization_event = MobilizationEventFactory(user=None, kind=MobilizationEventKind.STRUCTURE_CONTACT)
+    structure_mobilization_event_by_job_seeker = MobilizationEventFactory(
+        user=job_seeker, kind=MobilizationEventKind.STRUCTURE_CONTACT
+    )
     service_mobilization_event = MobilizationEventFactory(
         user=prescriber_membership.user,
         prescriber_organization=prescriber_membership.organization,
@@ -1466,6 +1470,23 @@ def test_populate_mobilization_events(snapshot):
             "structure_id": structure_mobilization_event.structure.uid,
             "service_id": None,
             "source": structure_mobilization_event.structure.source.value,
+            "external_link": "",
+            "orientation_id": None,
+            "beneficiary_id": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": structure_mobilization_event_by_job_seeker.pk,
+            "date": structure_mobilization_event_by_job_seeker.created_at,
+            "user_session": structure_mobilization_event_by_job_seeker.session_key,
+            "user_kind": "emplois_job_seeker",
+            "user_id": job_seeker.pk,
+            "user_prescriber_organization_id": None,
+            "user_company_id": None,
+            "kind": MobilizationEventKind.STRUCTURE_CONTACT.value,
+            "structure_id": structure_mobilization_event_by_job_seeker.structure.uid,
+            "service_id": None,
+            "source": structure_mobilization_event_by_job_seeker.structure.source.value,
             "external_link": "",
             "orientation_id": None,
             "beneficiary_id": None,
