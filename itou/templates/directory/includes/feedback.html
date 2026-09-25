@@ -1,0 +1,10 @@
+{% load static %}
+
+<script defer src="https://tally.so/widgets/embed.js"></script>
+<script defer
+        src="{% static 'js/directory_feedback.js' %}"
+        data-user-id="{{ request.user.pk }}"
+        data-kind="{% if request.from_employer %}employeur{% elif request.from_prescriber %}prescripteur{% else %}{{ request.user.get_kind_display }}{% endif %}"
+        data-mail="{{ request.user.email }}"
+        data-org="{{ request.current_organization.display_name }}"
+        data-town="{{ request.current_organization.city }}"></script>
