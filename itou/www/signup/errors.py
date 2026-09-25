@@ -58,13 +58,9 @@ class JobSeekerSignupConflictModalResolver:
                         last_name__unaccent__iexact=cleaned_data["last_name"],
                     )
                     | Q(
-                        # Match recent users who changed their last name.
-                        jobseeker_profile__birth_name__iexact=cleaned_data["birth_name"],
-                    )
-                    | Q(
                         # Match for older users who have an empty birth name.
                         jobseeker_profile__birth_name="",
-                        last_name__unaccent__iexact=cleaned_data["birth_name"] or cleaned_data["last_name"],
+                        last_name__unaccent__iexact=cleaned_data["last_name"] or cleaned_data["birth_name"],
                     )
                 )
                 .first()
