@@ -41,16 +41,17 @@ from tests.openid_connect.pro_connect.testing import ProConnectSetup
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 
-from itou.emails.markdown import known_domains  # noqa: E402
-from itou.utils import faker_providers  # noqa: E402
-from itou.utils.cache import UnclearableCache  # noqa: E402
-from itou.utils.storage.s3 import (  # noqa: E402
+# ruff: disable[E402]
+from itou.emails.markdown import known_domains
+from itou.utils import faker_providers
+from itou.utils.cache import UnclearableCache
+from itou.utils.storage.s3 import (
     NoObjectsInBucket,
     delete_all_objects_versions,
     s3_client,
 )
-from tests.utils.htmx.testing import HtmxClient  # noqa: E402
-from tests.utils.testing import ItouClient, assert_bonjour  # noqa: E402
+from tests.utils.htmx.testing import HtmxClient
+from tests.utils.testing import ItouClient, assert_bonjour  # ruff: enable[E402]
 
 
 def pytest_addoption(parser):
