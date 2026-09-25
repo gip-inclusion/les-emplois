@@ -251,7 +251,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 class JobApplicationTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/job_applications.html"
 
-    def get_job_applications(self, can_see_external):
+    def get_job_applications(self, can_view_external):
         if self.request.from_employer:
             # Retrieve the applications of the job seeker sent by the company or to the company
             applications_qs = JobApplication.objects.for_company(self.request.current_organization).filter(
@@ -263,7 +263,7 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
                 self.request.user,
                 self.request.current_organization,
             )
-        if can_see_external:
+        if can_view_external:
             applications = self.object.job_applications.annotate(
                 user_can_see_details=Exists(applications_qs.filter(pk=OuterRef("pk"))),
             ).all()
@@ -276,8 +276,8 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        can_see_external = can_see_external_job_applications(self.object, self.request)
-        job_applications = self.get_job_applications(can_see_external)
+        can_view_external = can_view_external_actions(self.object, self.request)
+        job_applications = self.get_job_applications(can_view_external)
         received_job_applications, sent_job_applications = None, job_applications
 
         if self.request.from_employer:
@@ -291,7 +291,7 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
         has_external_applications = any(not a.user_can_see_details for a in job_applications)
 
         return context | {
-            "can_see_external_job_applications": can_see_external,
+            "can_view_external_job_applications": can_view_external,
             "received_job_applications": received_job_applications,
             "sent_job_applications": sent_job_applications,
             "has_external_applications": has_external_applications,
@@ -460,7 +460,7 @@ def job_seeker_overview(request, public_id, template_name="job_seekers_views/ove
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),
-        "can_see_external_job_applications": can_see_external_job_applications(job_seeker, request),
+        "can_view_external_job_applications": can_view_external_actions(job_seeker, request),
         "matomo_custom_title": "Synthèse usager",
         "show_overview_tab": True,
         "has_applied_for_job_seeker": has_applied_for_job_seeker,
@@ -560,7 +560,15 @@ def archive_assignment(request, public_id, assignment_pk):
     return HttpResponseRedirect(next_url)
 
 
-def can_see_external_job_applications(job_seeker, request):
+def can_view_external_actions(job_seeker, request):
+    """
+    An external action refers to an action made for a job seeker by a professional
+    from an organization other than `request.current_organization`, such as a job
+    application or an orientation.
+    Authorized prescribers who have been involved with the job seeker as an advisor
+    or by prolonging their approval can view these actions, but do not gain access
+    to their details however.
+    """
     if not request.from_authorized_prescriber:
         return False
 

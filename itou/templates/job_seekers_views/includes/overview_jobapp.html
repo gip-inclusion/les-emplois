@@ -25,7 +25,7 @@
 <div id="overview-jobapp" class="row gx-3 align-items-start">
     {% if job_app %}
 
-        {% if job_app.sender_prescriber_organization == request.current_organization or job_app.sender == request.user or can_see_external_job_applications %}
+        {% if job_app.sender_prescriber_organization == request.current_organization or job_app.sender == request.user or can_view_external_job_applications %}
 
             {% if job_app.transferred_at and job_app.state == JobApplicationState.NEW %}
 
