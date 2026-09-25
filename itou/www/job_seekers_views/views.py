@@ -1965,8 +1965,12 @@ def display_advisor_contact_info(
     }.get(mode)
     if not getter:
         raise ValueError(f"Invalid mode: {mode}")
+    assignment_qs = JobSeekerAssignment.objects
+    if request.user.is_job_seeker:
+        assignment_qs = assignment_qs.filter(job_seeker=request.user)
+    # XXX: No filter for professional users for now: it is known and under consideration.
     assignment = get_object_or_404(
-        JobSeekerAssignment.objects.select_related("company", "professional", "prescriber_organization"),
+        assignment_qs.select_related("company", "professional", "prescriber_organization"),
         pk=assignment_id,
     )
     try:
