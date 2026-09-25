@@ -1,6 +1,7 @@
 import datetime
 import random
 import uuid
+from functools import partial
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -22,7 +23,7 @@ from pytest_django.asserts import (
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
-from itou.job_applications.enums import JobApplicationState, RefusalReason
+from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import JobApplication, can_view_external_actions
@@ -34,6 +35,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.insertion.factories import OrientationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
@@ -1622,6 +1624,99 @@ class TestAdvisorsTab:
         assertNotContains(response, fill_assignment_reason_btn, html=True)
         assertNotContains(response, switch_organization_btn)
         assertNotContains(response, not_a_member_warning)
+
+
+class TestOrientationsTab:
+    def get_tab_url(self, job_seeker):
+        return reverse("job_seekers_views:orientations", kwargs={"public_id": job_seeker.public_id})
+
+    def test_forbidden_access(self, client):
+        job_seeker = JobSeekerFactory()
+
+        for user in [job_seeker, LaborInspectorFactory()]:
+            client.force_login(user)
+            response = client.get(self.get_tab_url(job_seeker))
+            assert response.status_code == 403
+
+    def test_tab_access(self, client):
+        job_seeker = JobSeekerFactory()
+        url = self.get_tab_url(job_seeker)
+
+        client.force_login(job_seeker)
+        response = client.get(url)
+        assert response.status_code == 403
+
+        user = random.choice([PrescriberFactory, EmployerFactory])()
+        client.force_login(user)
+        response = client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            partial(PrescriberFactory, membership__organization__name="Presc. Org."),
+            partial(
+                PrescriberFactory,
+                membership__organization__name="France Travail - CHATELLERAULT",
+                membership__organization__authorized=True,
+            ),
+            partial(EmployerFactory, membership__company__name="Mann Co."),
+        ],
+        ids=["prescriber", "authorized prescriber", "employer"],
+    )
+    @freeze_time("2026-09-25")
+    def test_tab(self, client, snapshot, user_factory):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        user = user_factory()
+        prescriber_organization = user.prescriberorganization_set.first()
+        company = user.company_set.first()
+        sender_kind = SenderKind.PRESCRIBER if prescriber_organization else SenderKind.EMPLOYER
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=user,
+            prescriber_organization=prescriber_organization,
+            company=company,
+            last_action_kind=ActionKind.APPLY,
+        )
+        now = timezone.now()
+        _orientation_by_self = OrientationFactory(
+            pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            beneficiary=job_seeker,
+            service__name="Service 1",
+            service__structure__name="Structure 1",
+            sender__first_name="Pierre",
+            sender__last_name="Dupont",
+            sender_kind=sender_kind,
+            sender_prescriber_organization=prescriber_organization,
+            sender_company=company,
+            created_at=now - relativedelta(days=1),
+        )
+        _orientation_by_colleague = OrientationFactory(
+            pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
+            beneficiary=job_seeker,
+            service__name="Service 2",
+            service__structure__name="Structure 2",
+            sender__first_name="Coralie",
+            sender__last_name="Martin",
+            sender_kind=sender_kind,
+            sender_prescriber_organization=prescriber_organization,
+            sender_company=company,
+            created_at=now - relativedelta(days=2),
+        )
+        _orientation_from_outside = OrientationFactory(
+            pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
+            beneficiary=job_seeker,
+            service__name="Service 3",
+            service__structure__name="Structure 3",
+            sender__first_name="Ulrich",
+            sender__last_name="Vasseur",
+            sender_prescriber_organization__name="France Travail - CHASSENEUIL",
+            created_at=now - relativedelta(days=3),
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_tab_url(job_seeker))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
 
 class TestOverviewTab:
