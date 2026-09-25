@@ -1,6 +1,5 @@
-{% extends "layout/base_email_for_beneficiary_text_body.txt" %}
+{% extends "layout/base_email_for_beneficiary_text_body.md" %}
 {% block body %}
-
 Une orientation a été effectuée en votre nom.
 
 Bonjour,
@@ -8,15 +7,16 @@ Bonjour,
 {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} a réalisé une prescription en votre nom, pour le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
 
 Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :
+
 - {{ orientation.sender.get_full_name }}
 - {{ orientation.sender.email }}
-
 {% if not orientation.sender_is_referent %}
+
 ou bien votre conseiller·e référent·e :
+
 - {{ orientation.referent_first_name|title }} {{ orientation.referent_last_name|upper }}
 - {{ orientation.referent_email }}
 {% endif %}
 
 La structure {{ orientation.service.structure.name }} ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
-
 {% endblock body %}

@@ -153,10 +153,12 @@
   Vous n’avez rien à faire : l’accompagnateur de la structure Les joies de l’apprentissage a également été informé.
   
   Des questions ? Contactez la personne qui vous accompagne :
+  
   - Pierre DUPONT
   - pierre.dupont@test.local
   
   ou bien votre conseiller·e référent·e :
+  
   - Flora TRISTAN
   - prescriptrice@inclusion.gouv.fr
   - 01 02 03 04 05
@@ -301,10 +303,12 @@
   Pierre DUPONT de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
   
   Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :
+  
   - Pierre DUPONT
   - pierre.dupont@test.local
   
   ou bien votre conseiller·e référent·e :
+  
   - Flora TRISTAN
   - prescriptrice@inclusion.gouv.fr
   
@@ -333,6 +337,7 @@
   Pierre DUPONT de la structure Pres. Org. a réalisé une prescription en votre nom, pour le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
   
   Pour des questions concernant cette demande, veuillez contacter le prescripteur ou la prescriptrice :
+  
   - Pierre DUPONT
   - pierre.dupont@test.local
   
@@ -361,6 +366,7 @@
   Pierre DUPONT de la structure Pres. Org. a orienté Jane DOE vers le service Aide aux devoirs, ayant lieu au : 13 rue de la porte, 29200 Brest.
   
   Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :
+  
   - Jean Dupont
   - service.contact@email.fake
   - 01 02 03 04 05
@@ -498,7 +504,6 @@
   Pierre DUPONT de la structure Pres. Org. vous a adressé un bénéficiaire pour le service Aide aux devoirs.
   
   Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
-  
   http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
   
   ---
@@ -522,7 +527,6 @@
   Un nouveau lien a été demandé pour accéder à une orientation réalisée par Pierre DUPONT de la structure Pres. Org. pour le service Aide aux devoirs.
   
   Afin de visualiser les détails de la demande et de contacter la personne orientée ou la personne prescriptrice, cliquez sur le lien suivant :
-  
   http://localhost:8000/insertion/orientations/process/?token=[PK of OrientationProcessLink]
   
   Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
@@ -606,10 +610,12 @@
   Malheureusement, la structure n’a pas pu donner suite à cette demande d’orientation sur ce service.
   
   Des questions ? Contactez la personne qui vous accompagne :
+  
   - Pierre DUPONT
   - pierre.dupont@test.local
   
   ou bien votre conseiller·e référent·e :
+  
   - Flora TRISTAN
   - prescriptrice@inclusion.gouv.fr
   - 01 02 03 04 05
@@ -637,6 +643,7 @@
   La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
   
   La ou les raisons spécifiques évoquées sont les suivantes :
+  
   - Bénéficiaire non joignable
   - Bénéficiaire ne s’étant pas présenté à l’entretien
   - Bénéficiaire indisponible : en emploi
@@ -673,6 +680,7 @@
   La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
   
   La ou les raisons spécifiques évoquées sont les suivantes :
+  
   - Bénéficiaire non joignable
   - Bénéficiaire ne s’étant pas présenté à l’entretien
   - Bénéficiaire indisponible : en emploi
@@ -709,6 +717,7 @@
   La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour Jane DOE sur le service Aide aux devoirs.
   
   La ou les raisons spécifiques évoquées sont les suivantes :
+  
   - Bénéficiaire non joignable
   - Bénéficiaire ne s’étant pas présenté à l’entretien
   - Bénéficiaire indisponible : en emploi
@@ -745,6 +754,7 @@
   La structure Les joies de l’apprentissage n’a pas pu donner suite à votre demande d’orientation pour J… D… sur le service Aide aux devoirs.
   
   La ou les raisons spécifiques évoquées sont les suivantes :
+  
   - Bénéficiaire non joignable
   - Bénéficiaire ne s’étant pas présenté à l’entretien
   - Bénéficiaire indisponible : en emploi
@@ -783,6 +793,7 @@
   Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
   
   Votre décision de ne pas donner suite à cette demande pour le moment a été transmise à ou aux accompagnateur(s) de Jane DOE. La ou les raisons spécifiques évoquées sont les suivantes :
+  
   - Bénéficiaire non joignable
   - Bénéficiaire ne s’étant pas présenté à l’entretien
   - Bénéficiaire indisponible : en emploi

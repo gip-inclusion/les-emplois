@@ -1,6 +1,5 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_text_body.md" %}
 {% block body %}
-
 Vous venez de refuser la demande d’orientation pour {{ orientation.beneficiary.get_full_name }}.
 
 Bonjour,
@@ -10,8 +9,10 @@ Bonjour,
 Nous vous remercions d’avoir examiné attentivement cette demande et d’y avoir répondu.
 
 Votre décision de ne pas donner suite à cette demande pour le moment a été transmise à ou aux accompagnateur(s) de {{ orientation.beneficiary.get_full_name }}. La ou les raisons spécifiques évoquées sont les suivantes :
+
 {% for reason in reasons %}- {{ reason }}
 {% endfor %}
+
 {% if orientation.refusal_details %}Les accompagnateurs en ont été informés au travers du message suivant :
 {{ orientation.refusal_details }}{% endif %}
 
@@ -26,5 +27,4 @@ Visualiser le récapitulatif de la demande :
 Le saviez-vous ?
 Le formulaire d’orientation DORA est maintenant intégré à la Plateforme de l’inclusion. Cela permet aux prescripteurs et orienteurs de gérer au même endroit les candidatures en IAE, GEIQ, OPCS, et les orientations vers des services d’insertion.
 DORA reste l’annuaire de référence pour toute offre de service d'insertion.
-
 {% endblock body %}

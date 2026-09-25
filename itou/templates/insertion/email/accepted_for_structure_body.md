@@ -1,6 +1,5 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_text_body.md" %}
 {% block body %}
-
 Vous venez de valider la demande d’orientation pour {{ orientation.beneficiary.get_inverted_full_name }} ! 🎉
 
 Bonjour,
@@ -20,5 +19,4 @@ Accéder à la demande :
 Le saviez-vous ?
 Le formulaire d’orientation DORA est maintenant intégré à la Plateforme de l’inclusion. Cela permet aux prescripteurs et orienteurs de gérer au même endroit les candidatures en IAE, GEIQ, OPCS, et les orientations vers des services d’insertion.
 DORA reste l’annuaire de référence pour toute offre de service d'insertion.
-
 {% endblock body %}

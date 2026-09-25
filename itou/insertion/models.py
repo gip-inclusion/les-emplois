@@ -921,7 +921,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "reminder_two_delay_days": self.REMINDER_EMAIL_DELAY_DAYS * 2,
         }
         subject = "insertion/email/new_for_referent_subject.txt"
-        body = "insertion/email/new_for_referent_body.txt"
+        body = "insertion/email/new_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -931,7 +931,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "orientation": self,
         }
         subject = "insertion/email/accepted_for_referent_subject.txt"
-        body = "insertion/email/accepted_for_referent_body.txt"
+        body = "insertion/email/accepted_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -942,7 +942,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "reasons": [OrientationRefusalReason(reason).label for reason in self.refusal_reasons],
         }
         subject = "insertion/email/refused_for_referent_subject.txt"
-        body = "insertion/email/refused_for_referent_body.txt"
+        body = "insertion/email/refused_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -952,7 +952,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "orientation": self,
         }
         subject = "insertion/email/expired_for_referent_subject.txt"
-        body = "insertion/email/expired_for_referent_body.txt"
+        body = "insertion/email/expired_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
 
@@ -1009,7 +1009,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/new_for_structure_subject.txt"
-        body = "insertion/email/new_for_structure_body.txt"
+        body = "insertion/email/new_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1020,7 +1020,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/accepted_for_structure_subject.txt"
-        body = "insertion/email/accepted_for_structure_body.txt"
+        body = "insertion/email/accepted_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1032,7 +1032,7 @@ class OrientationProcessLink(models.Model):
             "reasons": [OrientationRefusalReason(reason).label for reason in self.orientation.refusal_reasons],
         }
         subject = "insertion/email/refused_for_structure_subject.txt"
-        body = "insertion/email/refused_for_structure_body.txt"
+        body = "insertion/email/refused_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1043,7 +1043,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/expired_for_structure_subject.txt"
-        body = "insertion/email/expired_for_structure_body.txt"
+        body = "insertion/email/expired_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1054,7 +1054,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/new_link_for_structure_subject.txt"
-        body = "insertion/email/new_link_for_structure_body.txt"
+        body = "insertion/email/new_link_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1066,5 +1066,5 @@ class OrientationProcessLink(models.Model):
             "days_count": (timezone.now() - self.orientation.created_at).days,
         }
         subject = "insertion/email/reminder_for_structure_subject.txt"
-        body = "insertion/email/reminder_for_structure_body.txt"
+        body = "insertion/email/reminder_for_structure_body.md"
         return get_email_message(to, context, subject, body)
