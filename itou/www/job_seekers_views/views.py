@@ -265,7 +265,9 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
             ).all()
         else:
             applications = applications_qs.annotate(user_can_see_details=Value(True)).all()
-        return applications.select_related("to_company", "sender").prefetch_related("selected_jobs")
+        return applications.select_related(
+            "to_company", "sender", "sender_company", "sender_prescriber_organization"
+        ).prefetch_related("selected_jobs")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
