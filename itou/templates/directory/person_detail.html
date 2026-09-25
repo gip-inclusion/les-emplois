@@ -98,4 +98,5 @@
     {{ block.super }}
     <script src="{% static 'js/htmx_compat.js' %}"></script>
     <script src="{% static 'js/directory.js' %}"></script>
+    {% include "directory/includes/feedback.html" %}
 {% endblock %}
