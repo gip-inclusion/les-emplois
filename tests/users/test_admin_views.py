@@ -15,13 +15,16 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import SenderKind
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
+from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     ItouStaffFactory,
@@ -661,18 +664,33 @@ class TestDeactivateView:
 
     @freeze_time("2023-08-31 12:34:56")
     def test_deactivate_user(self, admin_client, caplog):
+        city = create_city_saint_andre()
         user = random.choice([ProfessionalFactory, JobSeekerFactory])(
             username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
             email="user@example.com",
+            with_password=True,
+            phone="0606060606",
+            address_line_1="8 rue du moulin",
+            address_line_2="Apt 4B",
+            post_code=city.post_codes[0],
+            city=city.name,
+            coords=city.coords,
+            insee_city=city,
         )
         EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
         EmailAddress.objects.create(user=user, email="secondary@example.com", primary=False, verified=True)
+        ItouTOTPDeviceFactory(user=user)
+        ItouStaticDevice.objects.create(user=user, name="static")
         if user.is_professional:
             memberships = [
                 CompanyMembershipFactory(user=user),
                 PrescriberMembershipFactory(user=user),
                 InstitutionMembershipFactory(user=user),
             ]
+            assignment_without_organization = JobSeekerAssignmentFactory(professional=user)
+            assignment_with_organization = JobSeekerAssignmentFactory(
+                professional=user, prescriber_organization=memberships[1].organization
+            )
         else:
             memberships = []
 
@@ -684,11 +702,24 @@ class TestDeactivateView:
         assert user.is_active is False
         assert user.username == f"old_{user.pk}_0e8bee68-6c4b-48bb-850c-0dea09915d94"
         assert user.email is None
+        assert not user.has_usable_password()
+        assert user.phone == ""
+        assert user.address_line_1 == ""
+        assert user.address_line_2 == ""
+        assert user.post_code == ""
+        assert user.city == ""
+        assert user.coords is None
+        assert user.insee_city is None
         assert not EmailAddress.objects.filter(user=user).exists()
+        assert not ItouTOTPDevice.objects.filter(user=user).exists()
+        assert not ItouStaticDevice.objects.filter(user=user).exists()
         for membership in memberships:
             membership.refresh_from_db()
             assert membership.is_active is False
             assert membership.updated_by == admin_user
+        if user.is_professional:
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_without_organization.pk).exists()
+            assert JobSeekerAssignment.objects.filter(pk=assignment_with_organization.pk).exists()
 
         assert f"user={user.pk} deactivated" in caplog.text
         assertMessages(
