@@ -1,0 +1,85 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-orientations" only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_overview_tab=show_overview_tab active_nav_tab="orientations" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active">
+                            <h2>Orientations</h2>
+                            {% if request.from_authorized_prescriber %}
+                                {% if can_see_external_orientations %}
+                                    {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as title %}
+                                            Périmètre de suivi : Accès à toutes les orientations
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p>
+                                                En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les demandes d’orientation émises pour l’usager, y compris celles déposées par d’autres organisations. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                            </p>
+                                            {# FIXME: Lien vers la documentation #}
+                                            {% comment %}
+                                            <p class="mb-0">
+                                                <a class="btn-link has-external-link"
+                                                   rel="noopener noreferrer"
+                                                   target="_blank"
+                                                   href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                                            </p>
+                                            {% endcomment %}
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% else %}
+                                    {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as title %}
+                                            Périmètre de suivi : Accès limité aux orientations réalisées par votre structure
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p>
+                                                Votre visibilité sur les demandes d’orientation de cet usager se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des demandes d’orientation de cet usager, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
+                                            </p>
+                                            {# FIXME: Lien vers la documentation #}
+                                            {% comment %}
+                                            <p class="mb-0">
+                                                <a class="btn-link has-external-link"
+                                                   rel="noopener noreferrer"
+                                                   target="_blank"
+                                                   href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                                            </p>
+                                            {% endcomment %}
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                            {% endif %}
+                            {% include "job_seekers_views/includes/list_orientations.html" with request=request orientations=orientations can_view_personal_information=can_view_personal_information only %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}

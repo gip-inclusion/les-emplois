@@ -1,0 +1,88 @@
+{% load badges %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% if orientations %}
+    <p class="mb-3 mb-md-4">
+        {% with orientations|length as counter %}
+            {{ counter }} résultat{{ counter|pluralizefr }}
+        {% endwith %}
+    </p>
+    <div class="table-responsive mb-3 mb-md-4">
+        <table class="table table-hover table-sortable">
+            <thead>
+                <tr>
+                    <th scope="col">Service concerné</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Émise le</th>
+                    <th scope="col">Émetteur</th>
+                    <th scope="col">Structure</th>
+                    <th scope="col" class="text-end w-50px">
+                        <span class="visually-hidden">Actions possibles sur les candidatures</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orientation in orientations %}
+                    {% url "insertion_views:orientation_details_for_sender" orientation_id=orientation.id as details_url %}
+                    <tr class="align-top">
+                        <td>
+                            {% if orientation.user_can_see_details %}
+                                <a class="btn-link"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "orientation" "clic" "voir_orientation" %}>
+                                    {{ orientation.service.name }}
+                                </a>
+                            {% else %}
+                                <span class="fw-bold">{{ orientation.service.name }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{% orientation_state_badge orientation extra_classes="badge-sm" %}</td>
+
+                        <td>{{ orientation.created_at|date:"d/m/Y" }}</td>
+
+                        <td>
+                            <i class="ri-user-line me-1" aria-hidden="true"></i>
+                            {{ orientation.sender.get_inverted_full_name }}
+                        </td>
+
+                        <td>
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            {{ orientation.service.structure.name }}
+                        </td>
+
+                        <td>
+                            {% if orientation.user_can_see_details %}
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir l’orientation"
+                                   {% matomo_event "orientation" "clic" "voir_orientation" %}>
+                                    <i class="ri-arrow-drop-right-line fs-lg"
+                                       aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }}"></i>
+                                </a>
+                            {% else %}
+                                <span class="btn btn-sm btn-link btn-ico-only disabled"
+                                      data-bs-toggle="tooltip"
+                                      tabindex="0"
+                                      aria-label="Demande d’orientation réalisée par une personne extérieure à votre organisation"
+                                      data-bs-title="Demande d’orientation réalisée par une personne extérieure à votre organisation">
+                                    <i class="ri-arrow-drop-right-line fs-lg" aria-hidden="true"></i>
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="text-center my-3 my-md-4">
+        <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+        <p class="mb-1 mt-3">
+            <strong>Aucune demande d’orientation pour le moment</strong>
+        </p>
+    </div>
+{% endif %}

@@ -28,6 +28,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.insertion.factories import OrientationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
@@ -1486,6 +1487,78 @@ class TestAdvisorsTab:
         assertNotContains(response, fill_assignment_reason_btn, html=True)
         assertNotContains(response, switch_organization_btn)
         assertNotContains(response, not_a_member_warning)
+
+
+class TestOrientationsTab:
+    def test_forbidden_access(self, client):
+        job_seeker = JobSeekerFactory()
+        url = reverse("job_seekers_views:orientations", kwargs={"public_id": job_seeker.public_id})
+
+        for user in [job_seeker, LaborInspectorFactory()]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == 403
+
+    def test_tab_access(self, client):
+        job_seeker = JobSeekerFactory()
+        orientations_url = reverse("job_seekers_views:orientations", kwargs={"public_id": job_seeker.public_id})
+
+        client.force_login(job_seeker)
+        response = client.get(orientations_url)
+        assert response.status_code == 403
+
+        user = random.choice([PrescriberFactory, EmployerFactory])()
+        client.force_login(user)
+        response = client.get(orientations_url)
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize("is_authorized", [True, False], ids=["authorized prescriber", "prescriber"])
+    @freeze_time("2026-09-25")
+    def test_tab(self, client, snapshot, is_authorized):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        url = reverse("job_seekers_views:orientations", kwargs={"public_id": job_seeker.public_id})
+        user = PrescriberFactory(membership__organization__authorized=is_authorized)
+        prescriber_organization = user.prescriberorganization_set.get()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.APPLY,
+        )
+        now = timezone.now()
+        _orientation_by_self = OrientationFactory(
+            pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            beneficiary=job_seeker,
+            service__name="Service 1",
+            service__structure__name="Structure 1",
+            sender__first_name="Pierre",
+            sender__last_name="Dupont",
+            sender_prescriber_organization=prescriber_organization,
+            created_at=now - relativedelta(months=1),
+        )
+        _orientation_by_colleague = OrientationFactory(
+            pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+            beneficiary=job_seeker,
+            service__name="Service 2",
+            service__structure__name="Structure 2",
+            sender__first_name="Coralie",
+            sender__last_name="Martin",
+            sender_prescriber_organization=prescriber_organization,
+            created_at=now - relativedelta(months=2),
+        )
+        _orientation_from_outside = OrientationFactory(
+            pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
+            beneficiary=job_seeker,
+            service__name="Service 3",
+            service__structure__name="Structure 3",
+            sender__first_name="Ulrich",
+            sender__last_name="Vasseur",
+            created_at=now - relativedelta(weeks=1),
+        )
+
+        client.force_login(user)
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
 
 class TestOverviewTab:

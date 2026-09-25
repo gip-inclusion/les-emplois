@@ -1533,6 +1533,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -1799,6 +1804,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -2028,6 +2038,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -2899,6 +2914,444 @@
           </div>
       </body>
   </html>
+  
+  '''
+# ---
+# name: TestOrientationsTab.test_tab[authorized prescriber]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  DOE Jane
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-orientations" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Forientations%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <h2>
+                                  Orientations
+                              </h2>
+                              <div class="alert alert-info mb-3 mb-md-4" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </div>
+                                      <div class="col">
+                                          <p class="mb-2">
+                                              <strong>
+                                                  Périmètre de suivi : Accès à toutes les orientations
+                                              </strong>
+                                          </p>
+                                          <p>
+                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les demandes d’orientation émises pour l’usager, y compris celles déposées par d’autres organisations. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <p class="mb-3 mb-md-4">
+                                  3 résultats
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Service concerné
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/11111111-1111-1111-1111-111111111111/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Service 1
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-111111111111">
+                                                      En cours de traitement
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  25/08/2026
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-user-line me-1">
+                                                  </i>
+                                                  DUPONT Pierre
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Structure 1
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/11111111-1111-1111-1111-111111111111/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir l’orientation de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/22222222-2222-2222-2222-222222222222/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Service 2
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_22222222-2222-2222-2222-222222222222">
+                                                      En cours de traitement
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  25/07/2026
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-user-line me-1">
+                                                  </i>
+                                                  MARTIN Coralie
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Structure 2
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/22222222-2222-2222-2222-222222222222/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir l’orientation de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <span class="fw-bold">
+                                                      Service 3
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_33333333-3333-3333-3333-333333333333">
+                                                      En cours de traitement
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  18/09/2026
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-user-line me-1">
+                                                  </i>
+                                                  VASSEUR Ulrich
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Structure 3
+                                              </td>
+                                              <td>
+                                                  <span aria-label="Demande d’orientation réalisée par une personne extérieure à votre organisation" class="btn btn-sm btn-link btn-ico-only disabled" data-bs-title="Demande d’orientation réalisée par une personne extérieure à votre organisation" data-bs-toggle="tooltip" tabindex="0">
+                                                      <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </span>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestOrientationsTab.test_tab[prescriber]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  D… J…
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-orientations" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Forientations%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <h2>
+                                  Orientations
+                              </h2>
+                              <p class="mb-3 mb-md-4">
+                                  2 résultats
+                              </p>
+                              <div class="table-responsive mb-3 mb-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  Service concerné
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Émise le
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Structure
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                                  <span class="visually-hidden">
+                                                      Actions possibles sur les candidatures
+                                                  </span>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/11111111-1111-1111-1111-111111111111/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Service 1
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_11111111-1111-1111-1111-111111111111">
+                                                      En cours de traitement
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  25/08/2026
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-user-line me-1">
+                                                  </i>
+                                                  DUPONT Pierre
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Structure 1
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/11111111-1111-1111-1111-111111111111/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir l’orientation de D… J…" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr class="align-top">
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/22222222-2222-2222-2222-222222222222/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      Service 2
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_22222222-2222-2222-2222-222222222222">
+                                                      En cours de traitement
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  25/07/2026
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-user-line me-1">
+                                                  </i>
+                                                  MARTIN Coralie
+                                              </td>
+                                              <td>
+                                                  <i aria-hidden="true" class="ri-community-line">
+                                                  </i>
+                                                  Structure 2
+                                              </td>
+                                              <td>
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/22222222-2222-2222-2222-222222222222/?back_url=/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-label="Voir l’orientation de D… J…" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
   '''
 # ---
@@ -3881,6 +4334,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -4241,6 +4699,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -4583,6 +5046,11 @@
                                   Suivi des contrats IAE
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -4882,6 +5350,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -5283,6 +5756,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -6073,6 +6551,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -6978,6 +7461,11 @@
                                   Suivi des contrats IAE
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -7818,6 +8306,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -8191,6 +8684,11 @@
                                   Suivi des contrats IAE
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -8542,6 +9040,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -8829,6 +9332,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -9178,6 +9686,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -9531,6 +10044,11 @@
                                   Candidatures
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Orientations
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -9823,6 +10341,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>
@@ -11188,6 +11711,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Suivi des contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
                               </a>
                           </li>
                       </ul>

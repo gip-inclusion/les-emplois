@@ -34,4 +34,9 @@
                {% matomo_event "candidat" "clic-onglet" "suivi contrats iae" %}>Suivi des contrats IAE</a>
         </li>
     {% endif %}
+    <li class="nav-item">
+        <a class="nav-link{% if active_nav_tab == "orientations" %} active{% endif %}"
+           href="{% url 'job_seekers_views:orientations' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
+           {% matomo_event "candidat" "clic-onglet" "orientations" %}>Orientations</a>
+    </li>
 </ul>
