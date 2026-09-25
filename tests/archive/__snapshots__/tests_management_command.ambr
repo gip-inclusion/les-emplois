@@ -1034,12 +1034,11 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update",
-                 "users_user"."email"::text IS NULL AS "is_deactivated"
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."upcoming_deletion_notified_at" <= %s)
-          ORDER BY 38 ASC,
+          ORDER BY "users_user"."is_active" DESC,
                    "users_user"."upcoming_deletion_notified_at" ASC
           LIMIT 200
           FOR
