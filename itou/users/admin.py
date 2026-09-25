@@ -11,6 +11,7 @@ from django.contrib.admin import models as admin_models
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.utils import display_for_value
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponseNotAllowed
@@ -32,7 +33,7 @@ from itou.geo.models import QPV
 from itou.insertion.models import Orientation
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
-from itou.otp.models import ItouTOTPDevice
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.otp.utils import user_is_concerned_by_otp
 from itou.prescribers.models import PrescriberMembership
 from itou.users import models
@@ -749,6 +750,15 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
         user.emailaddress_set.all().delete()
 
+        ItouTOTPDevice.objects.filter(user=user).delete()
+        ItouStaticDevice.objects.filter(user=user).delete()
+
+        models.JobSeekerAssignment.objects.filter(
+            professional=user,
+            prescriber_organization__isnull=True,
+            company__isnull=True,
+        ).delete()
+
         now = timezone.now()
         # The user is active and we only want to update active memberships
         PrescriberMembership.objects.filter(user=user).update(
@@ -764,7 +774,28 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         user.email = None
         user.username = user.deactivated_username
         user.is_active = False
-        changed_fields = ["email", "username", "is_active"]  # As a list to mimic Django change_message format
+        user.password = make_password(None)
+        user.phone = ""
+        user.address_line_1 = ""
+        user.address_line_2 = ""
+        user.post_code = ""
+        user.city = ""
+        user.coords = None
+        user.insee_city = None
+        # As a list to mimic Django change_message format
+        changed_fields = [
+            "email",
+            "username",
+            "is_active",
+            "password",
+            "phone",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "coords",
+            "insee_city",
+        ]
         user.save(update_fields=changed_fields)
         self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
 
