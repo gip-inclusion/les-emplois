@@ -1,4 +1,9 @@
 ---
-{% if itou_environment != "PROD" %}[{{ itou_environment }}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{ itou_environment }}]{% endif %}
+{% if itou_environment != "PROD" %}[{{ itou_environment }}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{ itou_environment }}]{% endif %}{% if display_gdpr|default:False %}
+{% brand %} est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
+Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
+Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
+Pour plus d’informations, notamment sur vos autres droits RGPD (droit d’accès, d’opposition, de limitation, notamment) : {{ legal_privacy_url }}
+{% endif %}
 {% brand %}
 {{ base_url }}
