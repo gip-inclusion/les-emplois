@@ -32,6 +32,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -391,6 +392,37 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
             "active_assignments": active_assignments,
             "ended_assignments": ended_assignments,
             "calendar_url": settings.ADVISORS_CALENDAR_URL,
+        }
+
+
+class OrientationsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/orientations.html"
+
+    def get_orientations(self, can_view_external):
+        orientation_kwargs = {"beneficiary": self.object} | (
+            {"sender_company": self.request.current_organization}
+            if self.request.from_employer
+            else {"sender_prescriber_organization": self.request.current_organization}
+        )
+        orientations_qs = Orientation.objects.filter(**orientation_kwargs)
+        if can_view_external:
+            orientations = self.object.orientations.annotate(
+                user_can_see_details=Exists(orientations_qs.filter(pk=OuterRef("pk")))
+            )
+        else:
+            orientations = orientations_qs.annotate(user_can_see_details=Value(True))
+
+        return orientations.order_by("-updated_at").select_related(
+            "beneficiary", "sender", "service", "service__structure"
+        )
+
+    def get_context_data(self, **kwargs):
+        can_view_external = can_view_external_actions(self.object, self.request)
+        orientations = self.get_orientations(can_view_external)
+
+        return super().get_context_data(**kwargs) | {
+            "can_view_external_orientations": can_view_external,
+            "orientations": orientations,
         }
 
 

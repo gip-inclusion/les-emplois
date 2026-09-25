@@ -27,6 +27,11 @@ urlpatterns = [
         name="advisors",
     ),
     path(
+        "orientations/<uuid:public_id>",
+        views.OrientationsTabView.as_view(),
+        name="orientations",
+    ),
+    path(
         "overview/<uuid:public_id>",
         views.job_seeker_overview,
         name="overview",
