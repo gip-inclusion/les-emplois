@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
+from django.db import connection
+from django.utils.functional import cached_property
 
 
 class ItouPaginator(Paginator):
@@ -63,3 +65,34 @@ def pager(queryset, page, items_per_page=settings.PAGE_SIZE_SMALL, pages_num=10)
     except (EmptyPage, InvalidPage):
         # If page request is out of range, deliver last page of results.
         return paginator.page(total_pages)
+
+
+class FuzzyCount(int):
+    def __new__(cls, value: int, is_fuzzy: bool):
+        instance = super().__new__(cls, value)
+        instance.fuzzy = is_fuzzy
+        return instance
+
+
+class FuzzyCountPaginator(Paginator):
+    """
+    Paginator that uses PostgreSQL statistics for fast approximate counts.
+    On large tables, COUNT(*) is slow. This paginator uses pg_class.reltuples (updated by ANALYZE)
+    for unfiltered queries, falling back to precise counts when filters are applied or stats are unavailable.
+    """
+
+    @cached_property
+    def count(self):
+        if self.object_list.query.where:
+            return FuzzyCount(super().count, False)
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT reltuples FROM pg_class WHERE relname = %s;",
+                [self.object_list.model._meta.db_table],
+            )
+            result = cursor.fetchone()
+            # reltuples is -1 if the table has never been analyzed
+            if result is None or result[0] < 1:
+                return FuzzyCount(super().count, False)
+            return FuzzyCount(int(result[0]), True)
