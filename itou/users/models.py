@@ -539,7 +539,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         # Do not show if user has already enrolled a device: we may be
         # displaying the "Verify OTP" form, no need to show the
         # banner there.
-        return not ItouTOTPDevice.objects.filter(user=self, disabled_at=None).exists()
+        return not ItouTOTPDevice.objects.active().filter(user=self).exists()
 
     @property
     def is_itou_staff(self):

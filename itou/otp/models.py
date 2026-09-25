@@ -17,6 +17,15 @@ from encrypted_fields import EncryptedCharField
 from itou.utils.models import CopyModelFieldsMeta
 
 
+class ItouTOTPDeviceQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(disabled_at=None)
+
+
+class ItouTOTPDeviceManager(models.Manager.from_queryset(ItouTOTPDeviceQuerySet)):
+    pass
+
+
 # `django_otp.TOTPDevice` needs a few adjustments, but it's not an
 # abstract model, so we cannot easily subclass it. Let's copy its
 # fields and methods instead, and make a few additions and
@@ -56,6 +65,8 @@ class ItouTOTPDevice(
                 condition=models.Q(disabled_at=None),
             )
         ]
+
+    objects = ItouTOTPDeviceManager()
 
     @classmethod
     def from_persistent_id(cls, persistent_id, for_verify=False):

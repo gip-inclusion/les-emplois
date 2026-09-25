@@ -48,7 +48,7 @@ class ConfirmTOTPDeviceForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.device.user.itou_totp_devices.filter(name=cleaned_data["name"], disabled_at=None).exists():
+        if self.device.user.itou_totp_devices.active().filter(name=cleaned_data["name"]).exists():
             self.add_error(
                 "name", "Vous avez déjà enregistré un appareil sous le même nom. Veuillez choisir un nom différent."
             )
