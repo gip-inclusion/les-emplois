@@ -96,7 +96,14 @@ def test_all_admin(admin_client, mocker, subtests):
     Token.objects.create(user=admin_user)
     ItouTOTPDeviceFactory(user=admin_user)
     EmailAddress.objects.create(user=admin_user, email="foobar@example.com", primary=False, verified=False)
-    Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+    Email.objects.create(
+        to=["foobar@example.com"],
+        cc=[],
+        bcc=[],
+        subject="Hi",
+        body_text="Hello",
+        body_html="<html><body>Bonjour",
+    )
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
     EvaluatedJobApplicationSanctionFactory(sanctions__evaluated_siae=evaluated_siae)
     InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
