@@ -846,6 +846,19 @@ class TestLastAdvisor:
 
         assert pretty_indented(simulated_page) == snapshot
 
+    @pytest.mark.parametrize("mode", ["email", "phone", "org_email", "org_phone"])
+    def test_display_advisor_contact_job_seeker_is_restricted(self, client, mode):
+        job_seeker = JobSeekerFactory()
+        another_assignment = JobSeekerAssignmentFactory()
+
+        client.force_login(job_seeker)
+        url = reverse(
+            "job_seekers_views:display_advisor_contact_info",
+            args=(another_assignment.pk, mode),
+        )
+        response = client.post(url)
+        assert response.status_code == 404
+
     @pytest.mark.parametrize("display_mode", JobSeekerAssignmentDisplayMode)
     @freeze_time("2026-08-08")
     def test_last_assignment_display(self, snapshot, display_mode):
