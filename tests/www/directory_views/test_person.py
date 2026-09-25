@@ -6,7 +6,7 @@ from tests.www.directory_views.helpers import get_target_person, setup_directory
 
 def test_person_detail_preserves_back_url_and_hides_contact(client):
     _, target, target_organization, person = get_target_person(client)
-    back_url = reverse("dashboard:index")
+    back_url = f"{reverse('directory:people_results')}?q=Alice"
 
     response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}), {"back_url": back_url})
 

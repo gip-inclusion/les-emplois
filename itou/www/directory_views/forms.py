@@ -1,6 +1,28 @@
 from django import forms
 
 from itou.directory.enums import ContactSubject
+from itou.nexus.enums import NexusStructureKind
+
+
+class PeopleSearchForm(forms.Form):
+    q = forms.CharField(
+        label="Rechercher une personne",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "id": "q-personnes",
+                "placeholder": "Nom ou prénom",
+                "autocomplete": "off",
+                "class": "form-control",
+            }
+        ),
+    )
+    types = forms.MultipleChoiceField(
+        label="Types de structure",
+        choices=NexusStructureKind.choices,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
 
 
 class ContactMessageForm(forms.Form):
