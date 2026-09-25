@@ -3,8 +3,8 @@ import random
 from functools import partial
 
 import pytest
-from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -69,20 +69,6 @@ def test_orientation_rejects_inconsistent_sender_organization():
         )
 
 
-def test_orientation_attachments(temporary_dora_bucket_name):
-    orientation = OrientationFactory(
-        attachments=[
-            "local/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG1XPYQRtQ/document0.pdf",
-            "local/#orientations/LuBBIUvx6idprXo6QjpYyHi4QsmcXTdS/document1.pdf",
-        ]
-    )
-
-    for idx, attachment_detail in enumerate(orientation.attachments_details):
-        assert attachment_detail[0] == f"document{idx}.pdf"
-        assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail[1]
-        assert temporary_dora_bucket_name in attachment_detail[1]
-
-
 def test_delete_documents():
     orientation = OrientationFactory()
     files = [FileFactory(), FileFactory()]
@@ -92,6 +78,22 @@ def test_delete_documents():
     orientation.delete_documents()
     assert not orientation.documents.exists()
     assert File.objects.exists()
+
+
+def test_orientation_documents():
+    orientation = OrientationFactory()
+    files = [
+        FileFactory(key="orientations/cv_2026.pdf"),
+        FileFactory(key="orientations/carte_identité.pdf"),
+        FileFactory(key="orientations/custom/name/by/user.pdf"),
+    ]
+    orientation.documents.set(files)
+
+    assert set(orientation.documents_details) == {
+        ("cv_2026.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[0].pk})),
+        ("carte_identité.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[1].pk})),
+        ("user.pdf", reverse("insertion_views:document_download", kwargs={"document_id": files[2].pk})),
+    }
 
 
 @pytest.mark.parametrize(
