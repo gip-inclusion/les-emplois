@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -1959,8 +1959,19 @@ def display_advisor_contact_info(
     }.get(mode)
     if not getter:
         raise ValueError(f"Invalid mode: {mode}")
+    assignment_qs = JobSeekerAssignment.objects
+    if request.user.is_job_seeker:
+        assignment_qs = assignment_qs.filter(job_seeker=request.user)
+    elif request.user.is_professional:
+        assignment_qs = assignment_qs.filter(
+            Q(professional=request.user)
+            | Q(prescriber_organization__in=request.user.prescriberorganization_set.all())
+            | Q(company=request.user.company_set.all())
+        )
+    else:
+        raise ValueError(f"Unexpected access from user kind {request.user.kind}")
     assignment = get_object_or_404(
-        JobSeekerAssignment.objects.select_related("company", "professional", "prescriber_organization"),
+        assignment_qs.select_related("company", "professional", "prescriber_organization"),
         pk=assignment_id,
     )
     try:
