@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import F, Q
+from django.db.models import F
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
@@ -60,8 +60,8 @@ class Command(BaseCommand):
         # split users to anonymize into those that can be deleted and those that can only be deactivated
         users_to_delete = self.get_users_to_anonymize_and_delete(users)
 
-        # users that can be deactivated but not deleted. Users without email are already deactivated.
-        users_to_deactivate = [user for user in users if user not in users_to_delete and user.email is not None]
+        # users that can be deactivated but not deleted. Inactive users are already deactivated.
+        users_to_deactivate = [user for user in users if user not in users_to_delete and user.is_active]
 
         # users to deactivate or delete that have an email set
         users_to_remove_from_contact = [user for user in users if user.email]
@@ -83,8 +83,7 @@ class Command(BaseCommand):
     def get_users(self, grace_period_since):
         return list(
             User.objects.filter(kind=UserKind.PROFESSIONAL, upcoming_deletion_notified_at__lte=grace_period_since)
-            .annotate(is_deactivated=Q(email__isnull=True))
-            .order_by("is_deactivated", "upcoming_deletion_notified_at")
+            .order_by("-is_active", "upcoming_deletion_notified_at")
             .select_for_update(of=("self",), skip_locked=True)[: self.batch_size]
         )
 
