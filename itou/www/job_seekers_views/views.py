@@ -164,7 +164,10 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/details.html"
 
     def get_queryset(self):
-        return super().get_queryset().with_contract_ending_soon()
+        siae = None
+        if self.request.from_iae_actor and self.request.from_employer:
+            siae = self.request.current_organization
+        return super().get_queryset().with_contract_ending_soon(siae)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -203,11 +206,12 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         suggest_next_step_url = None
         pro_support_request_mailto = None
         last_contract = get_contracts(self.approval).first() if self.approval else None
-        if (
-            self.request.from_authorized_prescriber
-            or getattr(last_contract, "company", None) == self.request.current_organization
-        ):
-            if self.object.contract_ending_soon:
+        request_from_siae = self.request.from_iae_actor and self.request.from_employer
+        if self.object.contract_ending_soon and (self.request.from_authorized_prescriber or request_from_siae):
+            last_contract_qs = Contract.objects.filter(job_seeker=self.object).order_by("-end_date")
+            if request_from_siae:
+                last_contract_qs = last_contract_qs.filter(company=self.request.current_organization)
+            if last_contract := last_contract_qs.first():
                 contract_ending_soon_date = last_contract.end_date
                 if self.request.from_employer:
                     suggest_next_step_url = get_tally_form_url(

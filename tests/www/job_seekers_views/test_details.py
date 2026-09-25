@@ -11,7 +11,13 @@ from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from itoutils.urls import add_url_params
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertRedirects,
+    assertTemplateNotUsed,
+    assertTemplateUsed,
+)
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
@@ -532,6 +538,86 @@ def test_update_iae_eligibility_buttons(client):
     response = client.get(url)
     assertNotContains(response, update_eligibility_str)
     assertNotContains(response, validate_eligibility_str)
+
+
+@freeze_time("2026-09-24")
+def test_end_of_contract_banner(client, snapshot):
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    today = timezone.localdate()
+    a_year_ago = today - datetime.timedelta(days=365)
+    ten_days_ago = today - datetime.timedelta(days=10)
+    in_ten_days = today + datetime.timedelta(days=10)
+    in_ninety_days = today + datetime.timedelta(days=90)
+    ContractFactory(
+        job_seeker=job_seeker,
+        company__email="siae@test.local",
+        start_date=a_year_ago,
+        end_date=in_ten_days,
+    )
+
+    client.force_login(prescriber)
+
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    assertTemplateUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
+    assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+
+    # Banner does not appear if the contract does not end soon
+    job_seeker = ContractFactory(
+        company__email="siae@test.local",
+        start_date=a_year_ago,
+        end_date=in_ninety_days,
+    ).job_seeker
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    assertTemplateNotUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
+
+    # Banner does not appear if the contract has ended
+    job_seeker = ContractFactory(
+        company__email="siae@test.local",
+        start_date=a_year_ago,
+        end_date=ten_days_ago,
+    ).job_seeker
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    assertTemplateNotUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
+
+
+@freeze_time("2026-09-24")
+def test_can_see_end_of_contract_banner(client, subtests):
+    prescriber = PrescriberFactory()
+    authorized_prescriber = PrescriberFactory(membership__organization__authorized=True)
+    siae_employer = EmployerFactory(membership__company__subject_to_iae_rules=True)
+    other_employer = EmployerFactory(membership__company__not_subject_to_iae_rules=True)
+    job_seeker = JobSeekerFactory()
+    today = timezone.localdate()
+    a_year_ago = today - datetime.timedelta(days=365)
+    in_ten_days = today + datetime.timedelta(days=10)
+    contract = ContractFactory(
+        job_seeker=job_seeker,
+        company=siae_employer.company_set.get(),
+        start_date=a_year_ago,
+        end_date=in_ten_days,
+    )
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    test_cases = {
+        "prescriber": (prescriber, assertTemplateNotUsed),
+        "authorized prescriber": (authorized_prescriber, assertTemplateUsed),
+        "siae employer": (siae_employer, assertTemplateUsed),
+        "other employer": (other_employer, assertTemplateNotUsed),
+    }
+
+    for test_label, (user, assert_function) in test_cases.items():
+        with subtests.test(test_label):
+            client.force_login(user)
+            response = client.get(url)
+            assert_function(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
+
+    # An SIAE employer can only see the banner if the ending contract is with their own company
+    contract.company = CompanyFactory()
+    contract.save()
+    client.force_login(siae_employer)
+    response = client.get(url)
+    assertTemplateNotUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
 
 
 class TestLastAdvisor:
