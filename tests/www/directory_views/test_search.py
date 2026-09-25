@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.gis.geos import Point
+from django.templatetags.static import static
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
@@ -74,7 +75,7 @@ def test_people_search_restores_query_from_url(client):
     assert response.context["form"]["q"].value() == "Alice"
     assert response.context["form"]["types"].value() == [NexusStructureKind.ML]
     assertContains(response, 'id="q-personnes"')
-    assertContains(response, "js/directory_feedback.js")
+    assertContains(response, static("js/directory_feedback.js"))
     assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "Vous faites partie des premiers à accéder à cette fonctionnalité")
     assertContains(response, reverse("dashboard:edit_user_info"))
