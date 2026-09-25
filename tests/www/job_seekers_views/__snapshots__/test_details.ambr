@@ -6119,7 +6119,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -6135,7 +6135,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -6152,7 +6152,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -8882,7 +8882,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -8898,7 +8898,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -8915,7 +8915,7 @@
       }),
       dict({
         'origin': list([
-          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'can_view_external_actions[www/job_seekers_views/views.py]',
           'JobApplicationTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),

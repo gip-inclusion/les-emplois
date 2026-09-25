@@ -25,7 +25,7 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
-from itou.www.job_seekers_views.views import JobApplication, can_see_external_job_applications
+from itou.www.job_seekers_views.views import JobApplication, can_view_external_actions
 from tests.approvals.factories import (
     ApprovalFactory,
     ProlongationFactory,
@@ -1102,7 +1102,7 @@ def test_job_application_tab_shows_external_application_to_authorized_prescriber
     assert pretty_indented(soup) == snapshot(name="HTML")
 
 
-class TestCanSeeExternalJobApplication(TestCase):
+class TestCanViewExternalAction(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -1111,32 +1111,32 @@ class TestCanSeeExternalJobApplication(TestCase):
             membership__organization__authorized=True,
         )
 
-    def test_only_authorized_prescriber_can_see_external_job_applications(self):
+    def test_only_authorized_prescriber_can_view_external_actions(self):
         request = get_request(ProfessionalFactory())
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
-    def test_authorized_prescriber_can_see_external_job_applications_if_approval_exists(self):
+    def test_authorized_prescriber_can_view_external_actions_if_approval_exists(self):
         org = self.authorized_prescriber.prescribermembership_set.get().organization
         request = get_request(self.authorized_prescriber)
 
         # No approval => not authorized
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Approval by another organization => not authorized
         approval = ApprovalFactory(user=self.job_seeker)
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Approval by the prescriber organization => authorized
         approval.eligibility_diagnosis.author_prescriber_organization = org
         approval.eligibility_diagnosis.save()
-        assert can_see_external_job_applications(self.job_seeker, request)
+        assert can_view_external_actions(self.job_seeker, request)
 
-    def test_authorized_prescriber_can_see_external_job_applications_if_recently_assigned(self):
+    def test_authorized_prescriber_can_view_external_actions_if_recently_assigned(self):
         org = self.authorized_prescriber.prescribermembership_set.get().organization
         request = get_request(self.authorized_prescriber)
 
         # No application => not authorized
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Only application is by another organization => not authorized
         _another_org_application = JobApplicationFactory(
@@ -1144,7 +1144,7 @@ class TestCanSeeExternalJobApplication(TestCase):
             sent_by_authorized_prescriber=True,
             with_job_seeker_assignment=True,
         )
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Own application, but too old => not authorized
         _too_old_application = JobApplicationFactory(
@@ -1154,7 +1154,7 @@ class TestCanSeeExternalJobApplication(TestCase):
             created_at=timezone.localtime() - datetime.timedelta(days=500),
             with_job_seeker_assignment=True,
         )
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Own application is recent enough => authorized
         recent_application = JobApplicationFactory(
@@ -1168,19 +1168,19 @@ class TestCanSeeExternalJobApplication(TestCase):
         ).get()
         assignment.last_action_at = recent_application.created_at
         assignment.save()
-        assert can_see_external_job_applications(self.job_seeker, request)
+        assert can_view_external_actions(self.job_seeker, request)
 
-    def test_authorized_prescriber_can_see_external_job_applications_if_recently_prolonged(self):
+    def test_authorized_prescriber_can_view_external_actions_if_recently_prolonged(self):
         approval = ApprovalFactory(user=self.job_seeker)
         org = self.authorized_prescriber.prescribermembership_set.get().organization
         request = get_request(self.authorized_prescriber)
 
         # No prolongation => not authorized
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
 
         # Prolongation by another organization => not authorized
         p = ProlongationRequestFactory(approval=approval)
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
         p.delete()  # prolongation model has non-overlapping constraints
 
         # Prolongation by the same org, but too old => not authorized
@@ -1189,7 +1189,7 @@ class TestCanSeeExternalJobApplication(TestCase):
             prescriber_organization=org,
             created_at=timezone.localtime() - datetime.timedelta(days=500),
         )
-        assert not can_see_external_job_applications(self.job_seeker, request)
+        assert not can_view_external_actions(self.job_seeker, request)
         p.delete()  # prolongation model has non-overlapping constraints
 
         # Recent prolongation by the same or => authorized
@@ -1199,7 +1199,7 @@ class TestCanSeeExternalJobApplication(TestCase):
             prescriber_organization=org,
             created_at=timezone.localtime() - datetime.timedelta(days=1),
         )
-        assert can_see_external_job_applications(self.job_seeker, request)
+        assert can_view_external_actions(self.job_seeker, request)
 
 
 class TestContracts:
@@ -1972,7 +1972,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": None,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2002,7 +2002,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2022,7 +2022,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2045,7 +2045,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2067,7 +2067,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2088,7 +2088,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": True,
+                    "can_view_external_job_applications": True,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }
@@ -2106,7 +2106,7 @@ class TestOverviewTab:
                 {
                     "job_seeker": job_seeker,
                     "job_app": job_app,
-                    "can_see_external_job_applications": False,
+                    "can_view_external_job_applications": False,
                     "has_applied_for_job_seeker": True,
                     "request": request,
                 }

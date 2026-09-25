@@ -30,7 +30,7 @@
                             <h2>Candidatures</h2>
                             <h3>Candidatures envoyées</h3>
                             {% if request.from_authorized_prescriber %}
-                                {% if can_see_external_job_applications %}
+                                {% if can_view_external_job_applications %}
                                     {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
                                         {% fragment as title %}
                                             Périmètre de suivi : Accès à toutes les candidatures
