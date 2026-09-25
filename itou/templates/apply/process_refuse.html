@@ -122,15 +122,6 @@
                                                                 <i class="ri-information-line ri-lg text-info ms-1"
                                                                    aria-label="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
                                                             </button>
-                                                        {% elif radio.data.value == RefusalReason.NO_POSITION %}
-                                                            {{ radio.choice_label }}
-                                                            <button type="button"
-                                                                    data-bs-toggle="tooltip"
-                                                                    data-bs-placement="right"
-                                                                    data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
-                                                                <i class="ri-information-line ri-lg text-info ms-1"
-                                                                   aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
-                                                            </button>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
                                                             {% if with_prescriber %}(détails à fournir dans le message {{ to_prescriber }}){% endif %}
@@ -142,11 +133,26 @@
                                             </li>
                                         {% endfor %}
                                     </ul>
-                                    {% component_info c_info__summary=c_info__summary extra_classes="refusal-reason-no-position-info mt-2 d-none" %}
-                                        {% fragment as c_info__summary %}
-                                            En choisissant ce motif, les fiches de postes associées seront dépubliées.
+                                    {% if job_descriptions_to_close or close_spontaneous_applications %}
+                                        {% fragment as no_position_alert_content %}
+                                            <p class="mb-2">
+                                                En choisissant ce motif, la réception des candidatures sera <strong>désactivée</strong> pour :
+                                            </p>
+                                            <ul class="mb-0">
+                                                {% for job_description in job_descriptions_to_close %}
+                                                    <li>
+                                                        La fiche de poste <strong>{{ job_description.display_name }}</strong>
+                                                    </li>
+                                                {% endfor %}
+                                                {% if close_spontaneous_applications %}
+                                                    <li>
+                                                        Toutes les <strong>candidatures spontanées</strong>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
                                         {% endfragment %}
-                                    {% endcomponent_info %}
+                                        {% include "components/alerts/alert.html" with variant="info" content=no_position_alert_content extra_classes="refusal-reason-no-position-info mt-2 d-none" %}
+                                    {% endif %}
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-group">

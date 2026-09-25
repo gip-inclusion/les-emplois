@@ -1,16 +1,19 @@
 import random
 import uuid
 
+import pytest
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.companies.models import JobDescription
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.www.apply.views.batch_views import RefuseWizardView
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import get_session_name
 
@@ -1113,6 +1116,201 @@ class TestBatchRefuse:
     FAKE_JOB_SEEKER_ANSWER = "Lorem ipsum candidatum"
     FAKE_PRESCRIBER_ANSWER = "Lorem ipsum prescribum"
 
+    NO_POSITION_INFO = (
+        '<p class="mb-2">En choisissant ce motif, la réception des candidatures sera '
+        "<strong>désactivée</strong> pour :</p>"
+    )
+    SPONTANEOUS_ITEM = "<li>Toutes les <strong>candidatures spontanées</strong></li>"
+    JOB_DESCRIPTIONS_CLOSED = "La réception des candidatures a été désactivée pour les fiches de poste concernées."
+    SPONTANEOUS_CLOSED = "La réception des candidatures spontanées a été désactivée."
+
+    @staticmethod
+    def job_description_item(name):
+        return f"<li>La fiche de poste <strong>{name}</strong></li>"
+
+    @staticmethod
+    def random_refusal_reason(company):
+        # NO_POSITION closes recruitment and changes the success message, it has dedicated tests
+        return random.choice(
+            [
+                (reason, label)
+                for reason, label in job_applications_enums.RefusalReason.displayed_choices(kind=company.kind)
+                if reason != job_applications_enums.RefusalReason.NO_POSITION
+            ]
+        )
+
+    @staticmethod
+    def assert_success_message(response, message, extra_tags="toast"):
+        assert [(m.level, m.message, m.extra_tags) for m in messages.get_messages(response.wsgi_request)] == [
+            (messages.SUCCESS, message, extra_tags)
+        ]
+
+    @staticmethod
+    def processing_application(company, sender_trait="sent_by_job_seeker", **kwargs):
+        return JobApplicationFactory(
+            to_company=company, state=JobApplicationState.PROCESSING, **{sender_trait: True}, **kwargs
+        )
+
+    @pytest.fixture
+    def recruiting_company(self, client):
+        create_test_romes_and_appellations(["N1101"], appellations_per_rome=4)
+        company = CompanyFactory(with_membership=True)
+        client.force_login(company.members.first())
+        return company
+
+    def refuse(self, client, applications, reason, with_prescriber=False):
+        next_url = reverse("apply:list_for_siae")
+        response = client.post(
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
+            data={"application_ids": [application.pk for application in applications]},
+        )
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
+
+        def step_url(step):
+            return reverse("apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": step})
+
+        assertRedirects(response, step_url("reason"), fetch_redirect_response=False)
+        reason_step_response = client.get(step_url("reason"))
+        response = client.post(
+            step_url("reason"),
+            data={"refusal_reason": reason, "refusal_reason_shared_with_job_seeker": True},
+            follow=True,
+        )
+        assertRedirects(response, step_url("job-seeker-answer"))
+        response = client.post(
+            step_url("job-seeker-answer"), data={"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}, follow=True
+        )
+        if with_prescriber:
+            assertRedirects(response, step_url("prescriber-answer"))
+            response = client.post(
+                step_url("prescriber-answer"), data={"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}, follow=True
+            )
+        assertRedirects(response, next_url)
+        return reason_step_response, response
+
+    @pytest.mark.parametrize("sender_trait", ["sent_by_job_seeker", "sent_by_prescriber_alone"])
+    def test_no_position_closes_job_descriptions(self, client, recruiting_company, sender_trait):
+        company = recruiting_company
+        open_job = JobDescriptionFactory(company=company, custom_name="Maraîcher")
+        closed_job = JobDescriptionFactory(company=company, custom_name="Cuisinier", is_active=False)
+        other_company_job = JobDescriptionFactory(custom_name="Menuisier")
+        unrelated_job = JobDescriptionFactory(company=company, custom_name="Plombier")
+        application = self.processing_application(
+            company,
+            sender_trait=sender_trait,
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+            # other_company_job was kept after a transfer
+            selected_jobs=[open_job, closed_job, other_company_job],
+        )
+
+        reason_step_response, response = self.refuse(
+            client,
+            [application],
+            job_applications_enums.RefusalReason.NO_POSITION,
+            with_prescriber=sender_trait == "sent_by_prescriber_alone",
+        )
+
+        assertContains(reason_step_response, self.NO_POSITION_INFO, html=True)
+        assertContains(reason_step_response, self.job_description_item("Maraîcher"), html=True)
+        for job in [closed_job, other_company_job, unrelated_job]:
+            assertNotContains(reason_step_response, self.job_description_item(job.custom_name), html=True)
+        assertNotContains(reason_step_response, self.SPONTANEOUS_ITEM, html=True)
+        self.assert_success_message(
+            response,
+            f"La candidature de BOND Jean a bien été refusée. {self.JOB_DESCRIPTIONS_CLOSED}",
+            extra_tags="toast toast-long",
+        )
+        assert set(JobDescription.objects.filter(is_active=True)) == {other_company_job, unrelated_job}
+        open_job.refresh_from_db()
+        assert [(entry["field"], entry["from"], entry["to"]) for entry in open_job.field_history] == [
+            ("is_active", True, False)
+        ]
+        company.refresh_from_db()
+        assert company.spontaneous_applications_open_since is not None
+
+    @pytest.mark.parametrize("transferred", [False, True])
+    def test_no_position_closes_spontaneous_applications(self, client, recruiting_company, transferred):
+        company = recruiting_company
+        job_description = JobDescriptionFactory(company=company)
+        # A transferred application keeps the selected jobs of its previous company
+        other_company_job_description = JobDescriptionFactory()
+        application = self.processing_application(
+            company,
+            selected_jobs=[other_company_job_description] if transferred else [],
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+        )
+
+        reason_step_response, response = self.refuse(
+            client, [application], job_applications_enums.RefusalReason.NO_POSITION
+        )
+
+        assertContains(reason_step_response, self.NO_POSITION_INFO, html=True)
+        assertContains(reason_step_response, self.SPONTANEOUS_ITEM, html=True)
+        assertNotContains(reason_step_response, self.job_description_item(job_description.display_name), html=True)
+        self.assert_success_message(
+            response,
+            f"La candidature de BOND Jean a bien été refusée. {self.SPONTANEOUS_CLOSED}",
+            extra_tags="toast toast-long",
+        )
+        company.refresh_from_db()
+        assert company.spontaneous_applications_open_since is None
+        job_description.refresh_from_db()
+        assert job_description.is_active is True
+        other_company_job_description.refresh_from_db()
+        assert other_company_job_description.is_active is True
+
+    def test_no_position_nothing_to_close(self, client, recruiting_company):
+        company = recruiting_company
+        company.spontaneous_applications_open_since = None
+        company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+        applications = [
+            self.processing_application(company),
+            self.processing_application(
+                company, selected_jobs=[JobDescriptionFactory(company=company, is_active=False)]
+            ),
+        ]
+
+        reason_step_response, response = self.refuse(
+            client, applications, job_applications_enums.RefusalReason.NO_POSITION
+        )
+
+        assertNotContains(reason_step_response, self.NO_POSITION_INFO, html=True)
+        self.assert_success_message(response, "2 candidatures ont bien été refusées.")
+
+    @pytest.mark.parametrize("no_position", [True, False])
+    def test_batch_with_spontaneous_and_job_description(self, client, recruiting_company, no_position):
+        company = recruiting_company
+        job_description = JobDescriptionFactory(company=company)
+        applications = [
+            self.processing_application(company),
+            self.processing_application(company, selected_jobs=[job_description]),
+        ]
+        if no_position:
+            reason = job_applications_enums.RefusalReason.NO_POSITION
+        else:
+            reason, _ = self.random_refusal_reason(company)
+
+        reason_step_response, response = self.refuse(client, applications, reason)
+
+        # The info box is rendered before any reason is chosen, then toggled client-side
+        assertContains(reason_step_response, self.NO_POSITION_INFO, html=True, count=1)
+        assertContains(reason_step_response, self.job_description_item(job_description.display_name), html=True)
+        assertContains(reason_step_response, self.SPONTANEOUS_ITEM, html=True)
+        if no_position:
+            self.assert_success_message(
+                response,
+                f"2 candidatures ont bien été refusées. {self.JOB_DESCRIPTIONS_CLOSED} {self.SPONTANEOUS_CLOSED}",
+                extra_tags="toast toast-long",
+            )
+        else:
+            self.assert_success_message(response, "2 candidatures ont bien été refusées.")
+        job_description.refresh_from_db()
+        assert job_description.is_active is not no_position
+        company.refresh_from_db()
+        assert (company.spontaneous_applications_open_since is None) is no_position
+
     def test_invalid_access(self, client):
         refusable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         assert refusable_app.refuse.is_available()
@@ -1214,7 +1412,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         refusable_app = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
@@ -1305,7 +1503,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         refusable_apps = [
             JobApplicationFactory(
                 to_company=company,
@@ -1400,7 +1598,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         job_seeker = JobSeekerFactory()
         refusable_apps = JobApplicationFactory.create_batch(
             2,
@@ -1481,7 +1679,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         refusable_app = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
@@ -1540,7 +1738,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         refusable_app = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
@@ -1598,7 +1796,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
+        reason, reason_label = self.random_refusal_reason(company)
         refusable_apps = [
             JobApplicationFactory(
                 to_company=company,

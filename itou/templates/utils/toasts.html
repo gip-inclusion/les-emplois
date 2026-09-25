@@ -5,7 +5,7 @@
              role="status"
              aria-live="assertive"
              aria-atomic="true"
-             data-delay="6000">
+             data-bs-delay="{% if "toast-long" in message.tags %}10000{% else %}6000{% endif %}">
             <div class="toast-header">
                 {% if message.level_tag == "warning" %}
                     <i class="ri-error-warning-line ri-lg me-1" aria-hidden="true"></i>
