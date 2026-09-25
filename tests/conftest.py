@@ -10,6 +10,7 @@ import socket
 import threading
 import uuid
 from functools import reduce
+from urllib.parse import urlsplit
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -37,15 +38,20 @@ from slippers.templatetags.slippers import AttrsNode
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.utils import faker_providers  # noqa: E402
-from itou.utils.cache import UnclearableCache  # noqa: E402
-from itou.utils.storage.s3 import (  # noqa: E402
+# ruff: disable[E402]
+from itou.emails.markdown import KNOWN_DOMAINS
+from itou.utils import faker_providers
+from itou.utils.cache import UnclearableCache
+from itou.utils.storage.s3 import (
     NoObjectsInBucket,
     delete_all_objects_versions,
     s3_client,
 )
-from tests.utils.htmx.testing import HtmxClient  # noqa: E402
-from tests.utils.testing import ItouClient  # noqa: E402
+from tests.utils.htmx.testing import HtmxClient
+from tests.utils.testing import ItouClient
+
+
+# ruff: enable[E402]
 
 
 def pytest_addoption(parser):
@@ -893,3 +899,18 @@ def detect_typography_rules():
         return result
 
     Template.render = render
+
+
+@pytest.fixture()
+def mailoutbox(mailoutbox):
+    yield mailoutbox
+    # When markdownify-ing plain text emails, only links to an authorized known
+    # domain are transformed to <a href=""> tags. This fixture helps catching a
+    # domain that has not been added to KNOWN_DOMAINS.
+    for mail in mailoutbox:
+        for line in mail.body:
+            if "https://" in line:
+                links = [part for part in line.split() if part.startswith("https://")]
+                for link in links:
+                    domain = urlsplit(link).netloc
+                    assert domain in KNOWN_DOMAINS

@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 import itou
 import itou.api.changelog
 from config.sentry import sentry_init
+from itou.emails.markdown import markdown_url_trusted_location
 from itou.utils.brand import product_name
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
@@ -685,6 +686,15 @@ MARKDOWNIFY = {
         "LINKIFY_TEXT": {
             "PARSE_URLS": True,
             "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
+            "PARSE_EMAIL": True,
+        },
+    },
+    "email": {
+        "WHITELIST_TAGS": ["a", "p", "ul", "ol", "li", "strong", "br", "b", "i", "h1", "h2", "h3", "h4", "h5", "h6"],
+        "MARKDOWN_EXTENSIONS": ["nl2br", "sane_lists"],
+        "LINKIFY_TEXT": {
+            "PARSE_URLS": True,
+            "CALLBACKS": [markdown_url_trusted_location],
             "PARSE_EMAIL": True,
         },
     },

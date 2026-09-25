@@ -1,9 +1,11 @@
+import copy
 import re
 import textwrap
 
 from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
+from markdownify.templatetags.markdownify import markdownify
 
 from itou.utils import constants as global_constants
 from itou.utils.enums import ItouEnvironment
@@ -21,30 +23,37 @@ def remove_extra_line_breaks(text):
 
 
 def get_email_text_template(template, context):
-    context.update(
-        {
-            "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
-            "itou_environment": settings.ITOU_ENVIRONMENT,
-            "base_url": get_absolute_url(),
-        }
-    )
     return remove_extra_line_breaks(get_template(template).render(context).strip())
 
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
+    email_context = copy.deepcopy(context)
+    email_context["itou_help_center_url"] = global_constants.ITOU_HELP_CENTER_URL
+    email_context["itou_environment"] = settings.ITOU_ENVIRONMENT
+    email_context["base_url"] = get_absolute_url()
+
     subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
     subject = textwrap.shorten(
-        subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
+        subject_prefix + get_email_text_template(subject, email_context), width=250, placeholder="..."
     )
-    return mail.EmailMessage(
+    body_text = get_email_text_template(body, email_context)
+    email = mail.EmailMultiAlternatives(
         from_email=from_email,
         to=to,
         cc=cc,
         bcc=bcc,
         subject=subject,
-        body=get_email_text_template(body, context),
+        body=body_text,
     )
+    html_body = f"""
+        <!doctype html>
+        <html lang="fr">
+        <head><meta charset="utf-8"></head>
+        <body>{markdownify(body_text, "email")}
+        """  # End tags are optional
+    email.attach_alternative(html_body, "text/html")
+    return email
 
 
 def send_email_messages(email_messages, connection=None):

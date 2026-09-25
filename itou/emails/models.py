@@ -11,6 +11,7 @@ class Email(models.Model):
     bcc = ArrayField(CIEmailField(), blank=True, default=list, verbose_name="cci")
     subject = models.TextField(verbose_name="sujet", blank=True)
     body_text = models.TextField(verbose_name="message", blank=True)
+    body_html = models.TextField(verbose_name="message HTML", blank=True, default="", db_default="")
     from_email = CIEmailField(verbose_name="de")
     reply_to = ArrayField(CIEmailField(), blank=True, default=list, verbose_name="répondre à")
     created_at = models.DateTimeField(default=timezone.now, db_index=True, verbose_name="demande d’envoi à")
@@ -27,6 +28,9 @@ class Email(models.Model):
 
     @staticmethod
     def from_email_message(email_message):
+        [alternative] = email_message.alternatives
+        if alternative.mimetype != "text/html":
+            raise ValueError("Unsupported {content_type=}")
         return Email(
             from_email=email_message.from_email,
             reply_to=email_message.reply_to,
@@ -35,4 +39,5 @@ class Email(models.Model):
             bcc=email_message.bcc,
             subject=email_message.subject,
             body_text=email_message.body,
+            body_html=alternative.content,
         )

@@ -4,7 +4,7 @@ from itertools import batched
 import sentry_sdk
 from anymail.exceptions import AnymailError
 from django.conf import settings
-from django.core.mail import get_connection
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.db import ProgrammingError, connection, transaction
@@ -74,7 +74,7 @@ def _async_send_message(email_id, *, task=None):
             # Email deleted from django admin, stop trying to send it.
             logger.warning("Not sending email_id=%d, it does not exist in the database.", email_id)
             return
-        message = EmailMessage(
+        message = EmailMultiAlternatives(
             from_email=email.from_email,
             reply_to=email.reply_to,
             to=email.to,
@@ -83,6 +83,8 @@ def _async_send_message(email_id, *, task=None):
             subject=email.subject,
             body=email.body_text,
         )
+        if email.body_html:
+            message.attach_alternative(email.body_html, "text/html")
         try:
             with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
                 connection.send_messages([message])

@@ -16,6 +16,7 @@ class TestEmailAdmin:
             bcc=[],
             subject="Hi",
             body_text="Hello",
+            body_html="<html><body>Bonjour",
             esp_response=success_response,
         )
         response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
@@ -41,6 +42,7 @@ class TestEmailAdmin:
             bcc=[],
             subject="Hi",
             body_text="Hello",
+            body_html="<html><body>Bonjour",
             esp_response=error_response,
         )
         response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
@@ -63,10 +65,17 @@ class TestEmailAdmin:
             bcc=[],
             subject="Hi",
             body_text="Hello",
+            body_html="<html><body>Bonjour",
             # No esp_response.
         )
         error_email = Email(
-            to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello", esp_response=error_response
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+            esp_response=error_response,
         )
         success_email = Email(
             to=["you@test.local"],
@@ -74,6 +83,7 @@ class TestEmailAdmin:
             bcc=[],
             subject="Hi",
             body_text="Hello",
+            body_html="<html><body>Bonjour",
             esp_response=success_response,
         )
         Email.objects.bulk_create([waiting_email, error_email, success_email])
