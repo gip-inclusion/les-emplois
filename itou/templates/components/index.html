@@ -25,6 +25,13 @@
             {% endfragment %}
         {% endcomponent_alert_global %}
 
+        <h3 class="my-3">dismissible_once</h3>
+        {% component_alert_global content=content variant="info" dismissible_once=True extra_id="demo-components-alert-global-dismissible-once" %}
+            {% fragment as content %}
+                Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+
         <h3 class="my-3">primary</h3>
         {% component_alert_global content=content variant="primary" exit_url="https://example.com" %}
             {% fragment as content %}

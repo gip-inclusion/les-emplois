@@ -12,7 +12,7 @@
 
     Documentation -> https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-global-alert--docs
 {% endcomment %}
-{% with is_dismissible=dismissible|default:False has_extra_id=extra_id|default:"" %}
+{% with is_dismissible=dismissible|default:False is_dismissible_once=dismissible_once|default:False has_extra_id=extra_id|default:"" %}
     {% if variant != "info" and variant != "danger" and variant != "warning" and variant != "primary" %}
         {% should_not_happen "Unexpected variant for alert_global component: '%s'" variant %}
     {% endif %}
@@ -22,11 +22,22 @@
     {% if is_dismissible and variant == "primary" %}
         {% should_not_happen "dismissible when variant is primary - '%s'" variant %}
     {% endif %}
+    {% if is_dismissible_once and variant == "primary" %}
+        {% should_not_happen "dismissible_once when variant is primary - '%s'" variant %}
+    {% endif %}
+    {% if is_dismissible_once and not has_extra_id %}
+        {% should_not_happen "dismissible_once without extra_id for alert component: '%s'" variant %}
+    {% endif %}
+    {% if is_dismissible_once and is_dismissible %}
+        {% should_not_happen "dismissible_once and dismissible can't go together" %}
+    {% endif %}
     {% if variant != "primary" %}
-        <div class="alert alert-{{ variant }}{% if is_dismissible %} alert-dismissible fade show{% endif %}"
+        <div class="alert alert-{{ variant }}{% if is_dismissible %} alert-dismissible fade show{% endif %}{% if is_dismissible_once %} alert-dismissible-once d-none{% endif %}"
              role="{% if variant == "danger" %}alert{% else %}status{% endif %}"
              {% if has_extra_id %}id="{{ extra_id }}"{% endif %}>
-            {% if is_dismissible %}
+            {% if is_dismissible_once %}
+                <button type="button" class="btn-close" aria-label="Fermer"></button>
+            {% elif is_dismissible %}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             {% endif %}
             <div>{{ content }}</div>

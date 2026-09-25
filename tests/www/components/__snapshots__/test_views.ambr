@@ -194,6 +194,16 @@
           </div>
       </div>
       <h3 class="my-3">
+          dismissible_once
+      </h3>
+      <div class="alert alert-info alert-dismissible-once d-none" id="demo-components-alert-global-dismissible-once" role="status">
+          <button aria-label="Fermer" class="btn-close" type="button">
+          </button>
+          <div>
+              Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+          </div>
+      </div>
+      <h3 class="my-3">
           primary
       </h3>
       <div class="alert alert-primary fade show" role="status">
