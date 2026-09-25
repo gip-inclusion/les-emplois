@@ -11,7 +11,6 @@ from django.contrib.admin import models as admin_models
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.utils import display_for_value
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponseNotAllowed
@@ -33,7 +32,7 @@ from itou.geo.models import QPV
 from itou.insertion.models import Orientation
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
-from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
+from itou.otp.models import ItouTOTPDevice
 from itou.otp.utils import user_is_concerned_by_otp
 from itou.prescribers.models import PrescriberMembership
 from itou.users import models
@@ -45,7 +44,7 @@ from itou.users.admin_forms import (
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
 from itou.users.notifications import DisablePasswordAuthNotification
-from itou.users.utils import NIR_RE, merge_job_seeker_assignments
+from itou.users.utils import NIR_RE, deactivate_users, merge_job_seeker_assignments
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -748,40 +747,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return HttpResponseNotAllowed(["POST"])
         user = get_object_or_404(models.User.objects.filter(is_active=True), pk=user_pk)
 
-        user.emailaddress_set.all().delete()
-
-        ItouTOTPDevice.objects.filter(user=user).delete()
-        ItouStaticDevice.objects.filter(user=user).delete()
-
-        models.JobSeekerAssignment.objects.filter(
-            professional=user,
-            prescriber_organization__isnull=True,
-            company__isnull=True,
-        ).delete()
-
-        now = timezone.now()
-        # The user is active and we only want to update active memberships
-        PrescriberMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-        CompanyMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-        InstitutionMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-
-        user.email = None
-        user.username = user.deactivated_username
-        user.is_active = False
-        user.password = make_password(None)
-        user.phone = ""
-        user.address_line_1 = ""
-        user.address_line_2 = ""
-        user.post_code = ""
-        user.city = ""
-        user.coords = None
-        user.insee_city = None
+        deactivate_users([user], updated_by=request.user)
         # As a list to mimic Django change_message format
         changed_fields = [
             "email",
@@ -796,14 +762,13 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             "coords",
             "insee_city",
         ]
-        user.save(update_fields=changed_fields)
         self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
 
         logger.info("user=%d deactivated", user.pk)
         messages.success(request, format_html("Désactivation de l'utilisateur {user} effectuée.", user=user))
         add_support_remark_to_obj(
             user,
-            f"{now:%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
+            f"{timezone.now():%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
         )
         return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
 
