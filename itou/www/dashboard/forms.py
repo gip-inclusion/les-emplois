@@ -11,6 +11,7 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
+from itou.directory.models import DirectoryProfile
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
@@ -113,6 +114,11 @@ class EditJobSeekerInfoForm(
 
 
 class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
+    is_directory_opted_out = forms.BooleanField(
+        label="Ne pas apparaître dans l'annuaire des professionnels",
+        required=False,
+    )
+
     class Meta:
         model = User
         fields = [
@@ -126,10 +132,21 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         assert not self.instance.is_job_seeker, self.instance
+        if self.instance.pk:
+            self.fields["is_directory_opted_out"].initial = DirectoryProfile.objects.filter(
+                user=self.instance,
+                is_opted_out=True,
+            ).exists()
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()
-        return super().save(commit=commit)
+        user = super().save(commit=commit)
+        if commit:
+            DirectoryProfile.objects.update_or_create(
+                user=user,
+                defaults={"is_opted_out": self.cleaned_data["is_directory_opted_out"]},
+            )
+        return user
 
 
 class EditUserEmailForm(forms.Form):

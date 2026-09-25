@@ -79,6 +79,9 @@
                         {% endfragment %}
                     {% endcomponent_alert_global %}
                 {% endif %}
+                {% if show_directory_beta_notice|default:False %}
+                    {% include "directory/includes/beta_notice.html" %}
+                {% endif %}
                 {% if request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
                     {% component_alert_global content=content variant="info" extra_id="deactivation-job-banner" %}
                         {% fragment as content %}
@@ -173,6 +176,9 @@
         </script>
 
         {% block script %}{% endblock %}
+        {% if show_directory_beta_notice|default:False %}
+            <script src="{% static 'js/directory.js' %}"></script>
+        {% endif %}
 
         {% if display_campaign_announce %}
             {% include "layout/_news_modal.html" %}

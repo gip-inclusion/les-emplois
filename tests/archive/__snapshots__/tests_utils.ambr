@@ -246,6 +246,16 @@
       'model': 'companies.CompanyMembership',
     }),
     dict({
+      'field': 'sender',
+      'hidden': True,
+      'model': 'directory.ContactMessage',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'directory.DirectoryProfile',
+    }),
+    dict({
       'field': 'job_seeker',
       'hidden': False,
       'model': 'eligibility.EligibilityDiagnosis',
