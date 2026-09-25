@@ -67,7 +67,7 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
     return HttpResponseRedirect(reverse("search:home"))
 
 
-def _generate_pro_params_from_session(pc_data, host):
+def _generate_pro_params_from_session(pc_data, host, request):
     redirect_uri = get_absolute_url(reverse("pro_connect:callback"), host=host)
     nonce = crypto.get_random_string(length=12)
     state = ProConnectState.save_state(data=pc_data, nonce=nonce)
@@ -75,11 +75,19 @@ def _generate_pro_params_from_session(pc_data, host):
         "response_type": "code",
         "client_id": constants.PRO_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "acr_values": "eidas1",
         "scope": constants.PRO_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
     }
+    if "acr_levels" in request.GET:
+        acr_levels = request.GET["acr_levels"].split(",")
+    else:
+        acr_levels = [
+            "eidas0-mfa",
+            "eidas1-mfa",
+            "eidas2",
+            "eidas3",
+        ]
     data.update(
         {
             "claims": json.dumps(
@@ -89,18 +97,9 @@ def _generate_pro_params_from_session(pc_data, host):
                         # tells us which authentication methods have been
                         # used.
                         "amr": {"essential": True},
-                        # Request the use of 2FA _if possible_. Until all
-                        # identity providers implement 2FA, we must NOT
-                        # mention `"essential": True`. If we do, we'll get
-                        # an error in `pro_connect_callback` (missing
-                        # "code" ) that says that the requested ACRs could
-                        # not be satisfied.
                         "acr": {
-                            "essential": False,
-                            "values": [
-                                "eidas2",
-                                "eidas3",
-                            ],
+                            "essential": settings.PRO_CONNECT_ACR_ESSENTIAL,
+                            "values": acr_levels,
                         },
                     },
                 }
@@ -145,7 +144,7 @@ def pro_connect_authorize(request):
     if user_email := request.GET.get("user_email"):
         pc_data.user_email = user_email
 
-    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data), request.get_host())
+    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data), request.get_host(), request)
 
     base_url = constants.PRO_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
@@ -351,6 +350,14 @@ def pro_connect_callback(request):
 
     amr = ()
     idp_id = None
+
+    # FIXME: DEBUG ONLY
+    # La doc de ProConnect dit de vérifier le retour pour comparer
+    # avec les ACR demandés (et renvoyer une erreur 403 en cas de
+    # mismatch)
+    # https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification#4-validation-c%C3%B4t%C3%A9-serveur-obligatoire
+    logger.info("acr: %s", id_token_data.get("acr"))
+
     try:
         amr = id_token_data.get("amr") or ()
         idp_id = user_data.get("idp_id", "")
