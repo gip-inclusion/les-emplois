@@ -54,7 +54,7 @@ def search_home(request, template_name="search/search_home.html"):
         warnings.warn("Access to 'search_home' while authenticated", category=RuntimeWarning)
         return HttpResponseRedirect(reverse("search:employers_results"))
     iframe_url = settings.PLATEFORME_ACCUEIL_BASE_URL
-    iframe_url = add_url_params(iframe_url, {"host": settings.ITOU_FQDN})
+    iframe_url = add_url_params(iframe_url, {"host": settings.ITOU_FQDN, "no_forms": "1"})
     match request.resolver_match.url_name:
         case "prescribers_home":
             iframe_url = add_url_params(iframe_url, {"type": "accompagnateur"})
@@ -65,7 +65,9 @@ def search_home(request, template_name="search/search_home.html"):
         template_name,
         {
             "iframe_url": iframe_url,
-            "company_search_form": CompanySearchForm(),
+            "company_search_form": CompanySearchForm(auto_id="id_company_%s"),
+            "prescribers_search_form": PrescriberSearchForm(auto_id="id_prescribers_%s"),
+            "services_search_form": ServiceSearchForm(auto_id="id_services_%s"),
         },
     )
 

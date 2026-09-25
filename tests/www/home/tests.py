@@ -12,7 +12,7 @@ def test_home_anonymous(client, settings):
     assertRedirects(response, reverse("search:home"))
     assertContains(
         response,
-        'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
+        'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1"',
     )
 
     query = {REDIRECTED_FROM_OLD_DOMAIN_QUERY_PARAM: "1"}

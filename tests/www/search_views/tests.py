@@ -60,7 +60,7 @@ class TestSearchCompany:
         response = client.get(reverse("search:employers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000"',
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1"',
         )
 
     def test_home_connected(self, client):
@@ -613,7 +613,7 @@ class TestSearchPrescriber:
         response = client.get(reverse("search:prescribers_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;type=accompagnateur"',
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1&amp;type=accompagnateur"',
         )
 
     def test_home_connected(self, client):
