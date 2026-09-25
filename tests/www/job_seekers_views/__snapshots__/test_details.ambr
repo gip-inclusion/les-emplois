@@ -5212,6 +5212,334 @@
   
   '''
 # ---
+# name: test_end_of_contract_banner
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  DOE Jane
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Suivi des contrats IAE
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Valider son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 order-1 order-xxl-1">
+                                      <div class="alert alert-info alert-dismissible-once d-none mb-3 mb-md-4" id="fin-de-contrat-fiche-7614fc4b-aef9-4694-ab17-12324300180a" role="status">
+                                          <button aria-label="Fermer" class="btn-close" type="button">
+                                          </button>
+                                          <div class="row">
+                                              <div class="col-auto pe-0">
+                                                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                                  </i>
+                                              </div>
+                                              <div class="col">
+                                                  <p class="mb-2">
+                                                      <strong>
+                                                          Ce bénéficiaire arrive en fin de contrat de travail
+                                                      </strong>
+                                                  </p>
+                                                  <p class="mb-0">
+                                                      Son contrat de travail se termine le 04/10/2026. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                                                  </p>
+                                              </div>
+                                              <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="demande-bilan-accompagnement-fiche" href="mailto:siae@test.local?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement%20en%20fin%20de%20parcours%20IAE&body=%C2%A0%C2%A0%C2%A0%C2%A0Bonjour%2C%0A%0AJane%20DOE%20arrive%20bient%C3%B4t%20en%20fin%20de%20parcours%20IAE%0A%0APour%20pr%C3%A9parer%20la%20suite%20de%20son%20accompagnement%2C%20pouvez-vous%20me%20partager%20les%20%C3%A9l%C3%A9ments%20utiles%C2%A0%3A%20ce%20qui%20a%20%C3%A9t%C3%A9%20travaill%C3%A9%2C%20les%20freins%20encore%20pr%C3%A9sents%20et%20votre%20pr%C3%A9conisation%20pour%20la%20suite%C2%A0%3F%0A%0AOn%20peut%20aussi%20s%27appeler%20si%20c%27est%20plus%20simple.%0A%0AMerci.%0A">
+                                                      Demander un bilan d’accompagnement
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                                      <div class="c-box mb-3 mb-md-4">
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Informations personnelles
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                                      </i>
+                                                      <span>
+                                                          Modifier
+                                                      </span>
+                                                  </a>
+                                              </div>
+                                          </div>
+                                          <ul class="list-data mb-3">
+                                              <li>
+                                                  <small>
+                                                      Prénom
+                                                  </small>
+                                                  <strong>
+                                                      Jane
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom
+                                                  </small>
+                                                  <strong>
+                                                      DOE
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Téléphone
+                                                  </small>
+                                                  <strong>
+                                                      06 12 34 56 78
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse e-mail
+                                                  </small>
+                                                  <strong>
+                                                      jane.doe@test.local
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Date de naissance
+                                                  </small>
+                                                  <strong>
+                                                      01/01/1990
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse
+                                                  </small>
+                                                  <address>
+                                                      12 rue Georges Bizet, 35000 Rennes
+                                                  </address>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Numéro de sécurité sociale
+                                                  </small>
+                                                  <strong>
+                                                      <span>
+                                                          2
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          90
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          010
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          101
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          25
+                                                      </span>
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Identifiant France Travail
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                                      <div class="c-box c-box--accompagnateur mb-3 mb-md-4" id="last-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <div class="d-flex gap-2 justify-content-between mb-3">
+                                              <h3 class="mb-0">
+                                                  Dernier accompagnateur
+                                              </h3>
+                                              <a aria-label="Voir tout les accompagnateurs" class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="voir_tout" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  Voir tout
+                                              </a>
+                                          </div>
+                                          <div class="c-box--accompagnateur__summary">
+                                              <i aria-hidden="true" class="ri-home-smile-line disabled">
+                                              </i>
+                                              <div>
+                                                  <span class="d-block h5 disabled">
+                                                      Accompagnateur non renseigné
+                                                  </span>
+                                                  <span class="d-block mb-1 disabled">
+                                                      Aucune structure associée
+                                                  </span>
+                                              </div>
+                                          </div>
+                                          <div class="c-box--accompagnateur__detail">
+                                              <div class="c-box--accompagnateur__detail">
+                                                  <hr class="mt-4 mb-3"/>
+                                                  <p class="mb-0">
+                                                      Vous intervenez sur le parcours de cet usager ?
+                                                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="accompagnateur" data-matomo-event="true" data-matomo-option="ajouter-accompagnement" href="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/assignments/create?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                          Ajoutez votre intervention
+                                                      </a>
+                                                  </p>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
+                                          <div class="c-box__header--immersion-facile p-3 p-lg-4">
+                                              <span class="h4 m-0">
+                                                  Trouver une immersion
+                                              </span>
+                                          </div>
+                                          <div class="p-3 p-lg-4">
+                                              <p>
+                                                  Cet usager n'a pas de PASS IAE aujourd'hui.
+                                                  <br/>
+                                                  <strong>
+                                                      Immersion Facilitée
+                                                  </strong>
+                                                  vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                              </p>
+                                              <p>
+                                                  <a aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/recherche?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
+                                                      Rechercher une immersion
+                                                  </a>
+                                              </p>
+                                              <p class="mb-0">
+                                                  <a aria-label="Initier une convention (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/initier-convention?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
+                                                      Initier une convention
+                                                  </a>
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: test_job_application_tab.1
   '''
   <main class="s-main" id="main" role="main">

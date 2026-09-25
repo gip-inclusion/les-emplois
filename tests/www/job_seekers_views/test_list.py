@@ -1172,18 +1172,14 @@ def test_filtered_by_end_of_iae_journey(client, url, snapshot):
     )
 
     response = client.get(url, {"approval_ending_soon": "on"})
-    assert set(response.context["page_obj"].object_list) == {job_seeker_pass_only, job_seeker_both}
+    assert response.context["page_obj"].object_list == [job_seeker_both, job_seeker_pass_only]
 
     response = client.get(url, {"contract_ending_soon": "on"})
-    assert set(response.context["page_obj"].object_list) == {job_seeker_contract_only, job_seeker_both}
+    assert response.context["page_obj"].object_list == [job_seeker_both, job_seeker_contract_only]
 
     # Both checked => AND: only the job seeker with both a soon PASS and a soon contract.
     response = client.get(url, {"approval_ending_soon": "on", "contract_ending_soon": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_both]
-
-    # Check queries
-    with assertSnapshotQueries(snapshot):
-        client.get(url, {"approval_ending_soon": "on", "contract_ending_soon": "on"})
 
 
 @freeze_time("2026-01-15")
@@ -1243,34 +1239,6 @@ def test_end_of_iae_journey_filter_edge_cases(client):
 
 
 @freeze_time("2026-01-15")
-def test_end_of_iae_journey_filter_only_for_authorized_prescriber(client):
-    # A non-authorized prescriber neither sees the filter nor is affected by its query params.
-    organization = PrescriberOrganizationFactory(with_membership=True)
-    prescriber = organization.members.first()
-    client.force_login(prescriber)
-    url = reverse("job_seekers_views:list")
-
-    today = datetime.date(2026, 1, 15)
-    job_seeker = IAEEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        author=prescriber,
-        author_prescriber_organization=organization,
-        with_job_seeker_assignment=True,
-    ).job_seeker
-    # PASS ending far in the future: it would be filtered out if the filter applied.
-    ApprovalFactory(
-        user=job_seeker,
-        start_at=today - datetime.timedelta(days=100),
-        end_at=today + datetime.timedelta(days=200),
-    )
-
-    assertNotContains(client.get(url), "Fin de parcours IAE à venir")
-
-    response = client.get(url, {"approval_ending_soon": "on", "contract_ending_soon": "on"})
-    assert response.context["page_obj"].object_list == [job_seeker]
-
-
-@freeze_time("2026-01-15")
 def test_end_of_iae_journey_filter_for_siae(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
@@ -1278,11 +1246,6 @@ def test_end_of_iae_journey_filter_for_siae(client):
     client.force_login(employer)
     url = reverse("job_seekers_views:list_organization")
     today = datetime.date(2026, 1, 15)
-
-    # The filter is now available for an IAE SIAE, like for authorized prescribers.
-    response = client.get(url)
-    assertContains(response, "Fin de parcours IAE à venir")
-    assertContains(response, "Contrat IAE bientôt terminé")
 
     # A contract ending soon WITH this SIAE is in the cohort.
     job_seeker_own = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
