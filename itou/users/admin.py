@@ -13,7 +13,7 @@ from django.contrib.admin.utils import display_for_value
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponseNotAllowed, HttpResponseNotFound
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, path, reverse
@@ -44,7 +44,7 @@ from itou.users.admin_forms import (
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
 from itou.users.notifications import DisablePasswordAuthNotification
-from itou.users.utils import NIR_RE, merge_job_seeker_assignments
+from itou.users.utils import NIR_RE, deactivate_users, merge_job_seeker_assignments
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -725,11 +725,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 name="deactivate_user",
             ),
             path(
-                "reactivate/<int:user_pk>",
-                self.admin_site.admin_view(self.reactivate_view),
-                name="reactivate_user",
-            ),
-            path(
                 "transfer/<int:from_user_pk>",
                 self.admin_site.admin_view(self.transfer_view),
                 name="transfer_user_data",
@@ -752,59 +747,28 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return HttpResponseNotAllowed(["POST"])
         user = get_object_or_404(models.User.objects.filter(is_active=True), pk=user_pk)
 
-        user.emailaddress_set.filter(email=user.email).delete()
-
-        now = timezone.now()
-        # The user is active and we only want to update active memberships
-        PrescriberMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-        CompanyMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-        InstitutionMembership.objects.filter(user=user).update(
-            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
-        )
-
-        user.email = f"{user.email}_old"
-        user.username = f"old_{user.username}"
-        user.is_active = False
-        changed_fields = ["email", "username", "is_active"]  # As a list to mimic Django change_message format
-        user.save(update_fields=changed_fields)
+        deactivate_users([user], updated_by=request.user)
+        # As a list to mimic Django change_message format
+        changed_fields = [
+            "email",
+            "username",
+            "is_active",
+            "password",
+            "phone",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "coords",
+            "insee_city",
+        ]
         self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
 
         logger.info("user=%d deactivated", user.pk)
         messages.success(request, format_html("Désactivation de l'utilisateur {user} effectuée.", user=user))
         add_support_remark_to_obj(
             user,
-            f"{now:%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
-        )
-        return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
-
-    def reactivate_view(self, request, user_pk):
-        if not self.has_change_permission(request):
-            raise PermissionDenied
-        if request.method != "POST":
-            return HttpResponseNotAllowed(["POST"])
-        user = get_object_or_404(models.User, pk=user_pk)
-
-        if not user.can_be_reactivated():
-            return HttpResponseNotFound()
-
-        user.is_active = True
-        user.upcoming_deletion_notified_at = None
-        changed_fields = [
-            "is_active",
-            "upcoming_deletion_notified_at",
-        ]  # As a list to mimic Django change_message format
-        user.save(update_fields=changed_fields)
-        self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
-
-        logger.info("user=%d reactivated", user.pk)
-        messages.success(request, format_html("Réactivation de l'utilisateur {user} effectuée.", user=user))
-        add_support_remark_to_obj(
-            user,
-            f"{timezone.localdate():%Y-%m-%d} ({request.user.get_full_name()}): Réactivation de l’utilisateur",
+            f"{timezone.now():%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
         )
         return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
 

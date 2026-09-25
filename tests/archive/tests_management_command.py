@@ -84,7 +84,7 @@ def respx_delete_mock(respx_mock):
 @pytest.fixture(autouse=True)
 def mock_make_password():
     with patch(
-        "itou.archive.anonymize.make_password",
+        "itou.users.utils.make_password",
         return_value="pbkdf2_sha256$test$hash",
     ):
         yield
@@ -1398,7 +1398,7 @@ class TestAnonymizeProfessionalManagementCommand:
                     "user__insee_city": None,
                     "user__email": None,
                 }
-            org = factory(
+            membership = factory(
                 user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
                 user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
                 user__for_snapshot=True,
@@ -1408,7 +1408,7 @@ class TestAnonymizeProfessionalManagementCommand:
                 user__last_name="Has Related Objects" if has_related_objects else "No Related Objects",
                 **kwargs,
             )
-            professional = org.user
+            professional = membership.user
 
             if has_related_objects:
                 JobApplicationFactory(sent_by_prescriber_alone=True, sender=professional)

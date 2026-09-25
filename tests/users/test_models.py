@@ -540,42 +540,6 @@ class TestModel:
             },
         ]
 
-    @pytest.mark.parametrize("email", ["user@example.com", None])
-    @pytest.mark.parametrize("upcoming_deletion_notified", [True, False])
-    @pytest.mark.parametrize("has_sso_provider", [True, False])
-    @pytest.mark.parametrize("username", ["a-username", ""])
-    @pytest.mark.parametrize("is_active", [True, False])
-    @pytest.mark.parametrize("kind", UserKind)
-    @pytest.mark.no_django_db
-    def test_can_be_reactivated(self, kind, is_active, username, has_sso_provider, upcoming_deletion_notified, email):
-        # Build the user
-        factory_kwargs = {
-            "is_active": is_active,
-            "username": username,
-            "email": email,
-            "upcoming_deletion_notified_at": timezone.now() if upcoming_deletion_notified else None,
-        }
-        if kind == UserKind.PROFESSIONAL:
-            factory_kwargs["identity_provider"] = (
-                IdentityProvider.PRO_CONNECT if has_sso_provider else IdentityProvider.DJANGO
-            )
-        user = {
-            UserKind.JOB_SEEKER: JobSeekerFactory,
-            UserKind.PROFESSIONAL: ProfessionalFactory,
-            UserKind.ITOU_STAFF: ItouStaffFactory,
-        }[kind].build(**factory_kwargs)
-
-        assert user.can_be_reactivated() is all(
-            [
-                kind == UserKind.PROFESSIONAL,
-                not is_active,
-                username,
-                has_sso_provider,
-                upcoming_deletion_notified,
-                not email,
-            ]
-        )
-
     def test_is_account_creator(self):
         user = ProfessionalFactory()
 

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import F, Q
+from django.db.models import F
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
@@ -7,7 +7,7 @@ from sentry_sdk.crons import monitor
 from itou.archive.anonymize import (
     annotate_and_prefetch_for_anonymization,
     anonymize_and_delete_professionals,
-    anonymize_professionals_without_deletion,
+    deactivate_professionals_without_deletion,
 )
 from itou.archive.constants import GRACE_PERIOD
 from itou.archive.tasks import async_delete_contact
@@ -57,20 +57,20 @@ class Command(BaseCommand):
 
         users = self.get_users(grace_period_since)
 
-        # split users to anonymize into those that can be deleted and those that can only be anonymized
+        # split users to anonymize into those that can be deleted and those that can only be deactivated
         users_to_delete = self.get_users_to_anonymize_and_delete(users)
 
-        # users that can be anonymized but not deleted. Users without email are already anonymized
-        users_to_anonymize = [user for user in users if user not in users_to_delete and user.email is not None]
+        # users that can be deactivated but not deleted. Inactive users are already deactivated.
+        users_to_deactivate = [user for user in users if user not in users_to_delete and user.is_active]
 
-        # users to anonymize or delete that have an email set
+        # users to deactivate or delete that have an email set
         users_to_remove_from_contact = [user for user in users if user.email]
 
         for user in users:
             ArchiveUser(user).send()
 
         anonymize_and_delete_professionals(users_to_delete)
-        anonymize_professionals_without_deletion(users_to_anonymize)
+        deactivate_professionals_without_deletion(users_to_deactivate)
         self.remove_from_contact(users_to_remove_from_contact)
 
         self.logger.info("Anonymized professionals after grace period, count: %d", len(users))
@@ -83,8 +83,7 @@ class Command(BaseCommand):
     def get_users(self, grace_period_since):
         return list(
             User.objects.filter(kind=UserKind.PROFESSIONAL, upcoming_deletion_notified_at__lte=grace_period_since)
-            .annotate(is_deactivated=Q(email__isnull=True))
-            .order_by("is_deactivated", "upcoming_deletion_notified_at")
+            .order_by("-is_active", "upcoming_deletion_notified_at")
             .select_for_update(of=("self",), skip_locked=True)[: self.batch_size]
         )
 

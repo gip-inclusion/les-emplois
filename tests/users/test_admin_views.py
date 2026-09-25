@@ -15,13 +15,16 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import SenderKind
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
+from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     ItouStaffFactory,
@@ -661,17 +664,33 @@ class TestDeactivateView:
 
     @freeze_time("2023-08-31 12:34:56")
     def test_deactivate_user(self, admin_client, caplog):
+        city = create_city_saint_andre()
         user = random.choice([ProfessionalFactory, JobSeekerFactory])(
             username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
             email="user@example.com",
+            with_password=True,
+            phone="0606060606",
+            address_line_1="8 rue du moulin",
+            address_line_2="Apt 4B",
+            post_code=city.post_codes[0],
+            city=city.name,
+            coords=city.coords,
+            insee_city=city,
         )
         EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
+        EmailAddress.objects.create(user=user, email="secondary@example.com", primary=False, verified=True)
+        ItouTOTPDeviceFactory(user=user)
+        ItouStaticDevice.objects.create(user=user, name="static")
         if user.is_professional:
             memberships = [
                 CompanyMembershipFactory(user=user),
                 PrescriberMembershipFactory(user=user),
                 InstitutionMembershipFactory(user=user),
             ]
+            assignment_without_organization = JobSeekerAssignmentFactory(professional=user)
+            assignment_with_organization = JobSeekerAssignmentFactory(
+                professional=user, prescriber_organization=memberships[1].organization
+            )
         else:
             memberships = []
 
@@ -681,13 +700,26 @@ class TestDeactivateView:
         admin_user = get_user(admin_client)
         user.refresh_from_db()
         assert user.is_active is False
-        assert user.username == "old_0e8bee68-6c4b-48bb-850c-0dea09915d94"
-        assert user.email == "user@example.com_old"
+        assert user.username == f"old_{user.pk}_0e8bee68-6c4b-48bb-850c-0dea09915d94"
+        assert user.email is None
+        assert not user.has_usable_password()
+        assert user.phone == ""
+        assert user.address_line_1 == ""
+        assert user.address_line_2 == ""
+        assert user.post_code == ""
+        assert user.city == ""
+        assert user.coords is None
+        assert user.insee_city is None
         assert not EmailAddress.objects.filter(user=user).exists()
+        assert not ItouTOTPDevice.objects.filter(user=user).exists()
+        assert not ItouStaticDevice.objects.filter(user=user).exists()
         for membership in memberships:
             membership.refresh_from_db()
             assert membership.is_active is False
             assert membership.updated_by == admin_user
+        if user.is_professional:
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_without_organization.pk).exists()
+            assert JobSeekerAssignment.objects.filter(pk=assignment_with_organization.pk).exists()
 
         assert f"user={user.pk} deactivated" in caplog.text
         assertMessages(
@@ -699,78 +731,3 @@ class TestDeactivateView:
         user_content_type = ContentType.objects.get_for_model(User)
         user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).first()
         assert f"2023-08-31 ({admin_user.get_full_name()}): Désactivation de l’utilisateur" in user_remark.remark
-
-
-class TestReactivateView:
-    def test_reactivate_button(self, client):
-        user = ProfessionalFactory(
-            is_active=False,
-            notified_days_ago=40,
-            email=None,
-        )
-        reactivate_url = reverse("admin:reactivate_user", kwargs={"user_pk": user.pk})
-
-        admin_user = ItouStaffFactory()
-        admin_user.user_permissions.add(*Permission.objects.filter(codename="view_user"))
-        client.force_login(admin_user)
-
-        assert user.can_be_reactivated() is True
-        # Basic staff users without write access don't see the button
-        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
-        assertNotContains(response, reactivate_url)
-
-        # With the change permission, the button appears
-        admin_user.user_permissions.add(*Permission.objects.filter(codename="change_user"))
-        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
-        assertContains(response, reactivate_url)
-
-    def test_reactivate_without_change_permission(self, client):
-        user = ProfessionalFactory(
-            is_active=False,
-            notified_days_ago=40,
-            email=None,
-        )
-        admin_user = ItouStaffFactory()
-        admin_user.user_permissions.add(*Permission.objects.filter(codename="view_user"))
-        client.force_login(admin_user)
-
-        assert user.can_be_reactivated() is True
-        response = client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
-        assert response.status_code == 403
-
-    def test_reactivate_non_reactivable_user(self, admin_client):
-        user = random.choice([ProfessionalFactory, JobSeekerFactory])()
-
-        assert user.can_be_reactivated() is False
-        response = admin_client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
-        assert response.status_code == 404
-
-    def test_reactivate_user(self, admin_client, caplog):
-        user = ProfessionalFactory(
-            username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
-            is_active=False,
-            notified_days_ago=40,
-            email=None,
-        )
-
-        response = admin_client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
-        assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
-
-        user.refresh_from_db()
-        assert user.is_active is True
-        assert user.upcoming_deletion_notified_at is None
-
-        assert f"user={user.pk} reactivated" in caplog.text
-        assertMessages(
-            response,
-            [
-                messages.Message(messages.SUCCESS, f"Réactivation de l'utilisateur {user} effectuée."),
-            ],
-        )
-        user_content_type = ContentType.objects.get_for_model(User)
-        user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).first()
-        expected = (
-            f"{timezone.localdate():%Y-%m-%d} ({get_user(admin_client).get_full_name()}):"
-            " Réactivation de l’utilisateur"
-        )
-        assert expected in user_remark.remark

@@ -1,5 +1,3 @@
-from allauth.account.models import EmailAddress
-from django.contrib.auth.hashers import make_password
 from django.db.models import Exists, OuterRef, Prefetch
 from django.utils import timezone
 
@@ -7,10 +5,10 @@ from itou.archive.models import AnonymizedProfessional
 from itou.archive.utils import get_year_month_or_none
 from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
-from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
-from itou.users.models import JobSeekerAssignment, User
+from itou.users.models import User
+from itou.users.utils import deactivate_users
 from itou.utils.admin import bulk_add_support_remark_to_objs
 
 
@@ -65,36 +63,8 @@ def anonymize_and_delete_professionals(users):
     User.objects.filter(id__in=[user.id for user in users]).delete()
 
 
-def anonymize_professionals_without_deletion(users):
-    user_ids = [user.id for user in users]
-    for model in [CompanyMembership, InstitutionMembership, PrescriberMembership]:
-        model.objects.filter(user_id__in=user_ids).update(is_active=False)
+def deactivate_professionals_without_deletion(users):
+    deactivate_users(users)
 
-    EmailAddress.objects.filter(user_id__in=user_ids).delete()
-
-    ItouTOTPDevice.objects.filter(user_id__in=user_ids).delete()
-    ItouStaticDevice.objects.filter(user_id__in=user_ids).delete()
-
-    # No need to keep assignments from professionals without organization or company.
-    # If a professional was anonymized without deletion just because of an assignment
-    # like these, he will be deleted on the next command run.
-    JobSeekerAssignment.objects.filter(
-        professional_id__in=user_ids,
-        prescriber_organization_id__isnull=True,
-        company_id__isnull=True,
-    ).delete()
-
-    User.objects.filter(id__in=user_ids).update(
-        is_active=False,
-        password=make_password(None),
-        email=None,
-        phone="",
-        address_line_1="",
-        address_line_2="",
-        post_code="",
-        city="",
-        coords=None,
-        insee_city=None,
-    )
     text = f"{timezone.localtime().replace(microsecond=0)} - Désactivation/archivage de l'utilisateur"
     bulk_add_support_remark_to_objs(users, text)
