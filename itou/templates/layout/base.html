@@ -1,5 +1,6 @@
 {% load components %}
 {% load django_bootstrap5 %}
+{% load old_domain %}
 {% load static %}
 {% load theme_inclusion %}
 <!DOCTYPE HTML>
@@ -79,7 +80,14 @@
                         {% endfragment %}
                     {% endcomponent_alert_global %}
                 {% endif %}
-                {% if request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
+                {% redirected_from_old_domain request as redirected_from_old_domain %}
+                {% if redirected_from_old_domain %}
+                    {% component_alert_global content=content variant="info" extra_id="redirected-from-old-domain-global-alert" dismissible_once=True %}
+                        {% fragment as content %}
+                            La plateforme de l’inclusion change d’adresse. Elle est désormais accessible à l’adresse <a href="https://plateforme.inclusion.gouv.fr">https://plateforme.inclusion.gouv.fr</a>. La transition est automatique. Nous vous invitons cependant à mettre à jour vos favoris de navigateur.
+                        {% endfragment %}
+                    {% endcomponent_alert_global %}
+                {% elif request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
                     {% component_alert_global content=content variant="info" extra_id="deactivation-job-banner" %}
                         {% fragment as content %}
                             Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. Elles seront automatiquement dépubliées après 3 mois sans mise à jour. <a href="{% url "companies_views:job_description_list" %}">Pensez à les mettre à jour pour maintenir leur visibilité</a>.

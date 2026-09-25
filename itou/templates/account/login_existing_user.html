@@ -17,6 +17,35 @@
 {% endblock %}
 
 {% block content %}
+    {% if show_new_domain_notice %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        {% component_alert title=title content=content variant="info" icon=False dismissible=True %}
+                            {% fragment as title %}
+                                La plateforme de l’inclusion change d’adresse.
+                            {% endfragment %}
+                            {% fragment as content %}
+                                <p class="mb-2">
+                                    Vous arrivez de l’ancienne adresse (emplois.inclusion.beta.gouv.fr). La plateforme de l’inclusion est désormais accessible à l’adresse <a href="https://plateforme.inclusion.gouv.fr">https://plateforme.inclusion.gouv.fr</a>.
+                                </p>
+                                <p class="mb-2">
+                                    La transition est automatique. Nous vous invitons
+                                    cependant à mettre à jour vos favoris de
+                                    navigateur et vos gestionnaires de mots de passe.
+                                </p>
+                                <p class="mb-2">
+                                    Si vous avez enregistré votre mot de passe dans votre navigateur, vous pouvez le retrouver en suivant la documentation de votre navigateur. Par exemple : <a href="https://support.mozilla.org/fr/kb/gestionnaire-mots-passe" class="btn-link has-external-link" target="_blank">ici pour Firefox</a>, <a href="https://support.google.com/chrome/answer/95606" class="btn-link has-external-link" target="_blank">ici pour Chrome</a>, <a href="https://explore.microsoft.com/fr-fr/edge/features/microsoft-password-manager" class="btn-link has-external-link" target="_blank">ici pour Edge</a>, <a href="https://support.apple.com/fr-fr/105115" class="btn-link has-external-link" target="_blank">ici pour Safari</a>.
+                                </p>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
