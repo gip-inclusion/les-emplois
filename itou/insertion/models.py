@@ -762,6 +762,9 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     # `documents` are saved but not displayed for now; we still display `attachments` until we stop posting to DORA
     documents = models.ManyToManyField(File, verbose_name="documents joints", related_name="+")  #
 
+    last_reminder_email_sent_at = models.DateTimeField(
+        verbose_name="date d’envoi du dernier rappel par email", blank=True, null=True
+    )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     dora_status_updated_at = models.DateTimeField(
@@ -871,6 +874,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         self.notification_expired_for_beneficiary.send()
         self.notification_expired_for_sender.send()
 
+    def send_reminder_email(self):
+        process_link = OrientationProcessLink.objects.create(orientation=self)
+        process_link.email_reminder_for_structure.send()
+
     # Notifications
     @property
     def notification_new_for_beneficiary(self):
@@ -914,7 +921,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "reminder_two_delay_days": self.REMINDER_EMAIL_DELAY_DAYS * 2,
         }
         subject = "insertion/email/new_for_referent_subject.txt"
-        body = "insertion/email/new_for_referent_body.txt"
+        body = "insertion/email/new_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -924,7 +931,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "orientation": self,
         }
         subject = "insertion/email/accepted_for_referent_subject.txt"
-        body = "insertion/email/accepted_for_referent_body.txt"
+        body = "insertion/email/accepted_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -935,7 +942,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "reasons": [OrientationRefusalReason(reason).label for reason in self.refusal_reasons],
         }
         subject = "insertion/email/refused_for_referent_subject.txt"
-        body = "insertion/email/refused_for_referent_body.txt"
+        body = "insertion/email/refused_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -945,7 +952,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             "orientation": self,
         }
         subject = "insertion/email/expired_for_referent_subject.txt"
-        body = "insertion/email/expired_for_referent_body.txt"
+        body = "insertion/email/expired_for_referent_body.md"
         return get_email_message(to, context, subject, body)
 
 
@@ -1002,7 +1009,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/new_for_structure_subject.txt"
-        body = "insertion/email/new_for_structure_body.txt"
+        body = "insertion/email/new_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1013,7 +1020,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/accepted_for_structure_subject.txt"
-        body = "insertion/email/accepted_for_structure_body.txt"
+        body = "insertion/email/accepted_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1025,7 +1032,7 @@ class OrientationProcessLink(models.Model):
             "reasons": [OrientationRefusalReason(reason).label for reason in self.orientation.refusal_reasons],
         }
         subject = "insertion/email/refused_for_structure_subject.txt"
-        body = "insertion/email/refused_for_structure_body.txt"
+        body = "insertion/email/refused_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1036,7 +1043,7 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/expired_for_structure_subject.txt"
-        body = "insertion/email/expired_for_structure_body.txt"
+        body = "insertion/email/expired_for_structure_body.md"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -1047,5 +1054,17 @@ class OrientationProcessLink(models.Model):
             "orientation": self.orientation,
         }
         subject = "insertion/email/new_link_for_structure_subject.txt"
-        body = "insertion/email/new_link_for_structure_body.txt"
+        body = "insertion/email/new_link_for_structure_body.md"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_reminder_for_structure(self):
+        to = [self.orientation.service.contact_email]
+        context = {
+            "process_link": self.process_link,
+            "orientation": self.orientation,
+            "days_count": (timezone.now() - self.orientation.created_at).days,
+        }
+        subject = "insertion/email/reminder_for_structure_subject.txt"
+        body = "insertion/email/reminder_for_structure_body.md"
         return get_email_message(to, context, subject, body)

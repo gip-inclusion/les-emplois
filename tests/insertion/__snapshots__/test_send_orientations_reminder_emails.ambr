@@ -1,47 +1,34 @@
 # serializer version: 1
-# name: TestOrientationAPI.test_list
+# name: test_send_orientation_reminder_email[sql]
   dict({
-    'num_queries': 8,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
-          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
-        'sql': '''
-          SELECT "api_servicetoken"."id",
-                 "api_servicetoken"."key",
-                 "api_servicetoken"."service",
-                 "api_servicetoken"."purpose",
-                 "api_servicetoken"."created_at"
-          FROM "api_servicetoken"
-          WHERE "api_servicetoken"."key" = %s
-          LIMIT 21
-        ''',
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
-          'Paginator.count[<site-packages>/django/core/paginator.py]',
-          'OrientationsView.list[api/insertion/views.py]',
-          'OrientationsView.post[api/insertion/views.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "insertion_orientation"
-          INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
-          INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
-          WHERE "insertion_structure"."uid" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'OrientationsView.list[api/insertion/views.py]',
-          'OrientationsView.post[api/insertion/views.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -111,89 +98,43 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
-                 "users_jobseekerprofile"."fields_history",
-                 "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."ase_exit",
-                 "users_jobseekerprofile"."isolated_parent",
-                 "users_jobseekerprofile"."housing_issue",
-                 "users_jobseekerprofile"."refugee",
-                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
-                 "users_jobseekerprofile"."low_level_in_french",
-                 "users_jobseekerprofile"."mobility_issue",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 T6."id",
-                 T6."password",
-                 T6."last_login",
-                 T6."is_superuser",
-                 T6."username",
-                 T6."first_name",
-                 T6."last_name",
-                 T6."is_staff",
-                 T6."is_active",
-                 T6."date_joined",
-                 T6."fields_history",
-                 T6."address_line_1",
-                 T6."address_line_2",
-                 T6."post_code",
-                 T6."city",
-                 T6."department",
-                 T6."coords",
-                 T6."geocoding_score",
-                 T6."geocoding_updated_at",
-                 T6."ban_api_resolved_address",
-                 T6."insee_city_id",
-                 T6."title",
-                 T6."full_name_search_vector",
-                 T6."email",
-                 T6."phone",
-                 T6."kind",
-                 T6."identity_provider",
-                 T6."has_completed_welcoming_tour",
-                 T6."created_by_id",
-                 T6."external_data_source_history",
-                 T6."last_checked_at",
-                 T6."terms_accepted_at",
-                 T6."public_id",
-                 T6."address_filled_at",
-                 T6."first_login",
-                 T6."upcoming_deletion_notified_at",
-                 T6."allow_next_sso_sub_update",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."fields_history",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."terms_accepted_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -305,25 +246,30 @@
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at"
           FROM "insertion_orientation"
-          INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
-          INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           INNER JOIN "users_user" ON ("insertion_orientation"."beneficiary_id" = "users_user"."id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          INNER JOIN "users_user" T6 ON ("insertion_orientation"."sender_id" = T6."id")
+          INNER JOIN "users_user" T3 ON ("insertion_orientation"."sender_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("insertion_orientation"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("insertion_orientation"."sender_company_id" = "companies_company"."id")
-          WHERE "insertion_structure"."uid" = %s
+          INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
+          WHERE ("insertion_orientation"."status" = %s
+                 AND (("insertion_orientation"."created_at" <= %s
+                       AND "insertion_orientation"."last_reminder_email_sent_at" IS NULL)
+                      OR "insertion_orientation"."last_reminder_email_sent_at" <= %s)
+                 AND "insertion_orientation"."created_at" >= %s)
           ORDER BY "insertion_orientation"."created_at" ASC,
                    "insertion_orientation"."id" ASC
-          LIMIT 3
+          LIMIT 100
         ''',
       }),
       dict({
         'origin': list([
           'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
-          '_add_process_link[api/insertion/views.py]',
-          'OrientationsView.list[api/insertion/views.py]',
-          'OrientationsView.post[api/insertion/views.py]',
+          'Orientation.send_reminder_email[insertion/models.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationprocesslink" ("id",
@@ -335,10 +281,37 @@
       }),
       dict({
         'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.send_reminder_email[insertion/models.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
           'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
-          '_add_process_link[api/insertion/views.py]',
-          'OrientationsView.list[api/insertion/views.py]',
-          'OrientationsView.post[api/insertion/views.py]',
+          'Orientation.send_reminder_email[insertion/models.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationprocesslink" ("id",
@@ -350,70 +323,146 @@
       }),
       dict({
         'origin': list([
-          'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
-          '_add_process_link[api/insertion/views.py]',
-          'OrientationsView.list[api/insertion/views.py]',
-          'OrientationsView.post[api/insertion/views.py]',
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.send_reminder_email[insertion/models.py]',
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          INSERT INTO "insertion_orientationprocesslink" ("id",
-                                                          "orientation_id",
-                                                          "created_at",
-                                                          "first_opened_at")
-          VALUES (%s, %s, %s, %s)
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[insertion/management/commands/send_orientations_reminder_emails.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_orientation"
+          SET "last_reminder_email_sent_at" = (CASE
+                                                   WHEN ("insertion_orientation"."id" = %s) THEN %s
+                                                   WHEN ("insertion_orientation"."id" = %s) THEN %s
+                                                   ELSE NULL
+                                               END)::timestamp WITH TIME ZONE
+          WHERE "insertion_orientation"."id" IN (%s,
+                                                 %s)
         ''',
       }),
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
-    ]),
-  })
-# ---
-# name: TestOrientationCountAPI.test_count
-  dict({
-    'num_queries': 4,
-    'queries': list([
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
-          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          '_async_send_message[emails/tasks.py]',
         ]),
         'sql': '''
-          SELECT "api_servicetoken"."id",
-                 "api_servicetoken"."key",
-                 "api_servicetoken"."service",
-                 "api_servicetoken"."purpose",
-                 "api_servicetoken"."created_at"
-          FROM "api_servicetoken"
-          WHERE "api_servicetoken"."key" = %s
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
           LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
         ''',
       }),
       dict({
         'origin': list([
-          'OrientationsCountView.get[api/insertion/views.py]',
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
         ]),
         'sql': '''
-          SELECT COUNT("insertion_orientation"."id") FILTER (
-                                                             WHERE "insertion_orientation"."status" = %s) AS "pending_count",
-                 COUNT("insertion_orientation"."id") AS "total_count"
-          FROM "insertion_orientation"
-          INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
-          INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
-          WHERE "insertion_structure"."uid" = %s
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
         ''',
       }),
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

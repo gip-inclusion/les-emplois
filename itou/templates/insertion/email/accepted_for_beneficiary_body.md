@@ -1,7 +1,6 @@
-{% extends "layout/base_email_for_beneficiary_text_body.txt" %}
+{% extends "layout/base_email_for_beneficiary_text_body.md" %}
 {% load format_filters %}
 {% block body %}
-
 Votre demande a été acceptée ! 🎉
 
 Bonjour,
@@ -11,5 +10,4 @@ Nous avons le plaisir de vous informer que la structure {{ orientation.service.s
 Pour toute information supplémentaire, n’hésitez pas à contacter votre référent ou la structure directement{% if orientation.service.contact_phone %} au {{ orientation.service.contact_phone|format_phone }}{% endif %}.
 
 Nous vous souhaitons une bonne continuation.
-
 {% endblock body %}

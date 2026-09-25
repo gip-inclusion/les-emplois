@@ -12,7 +12,7 @@ class NewOrientationForBeneficiary(JobSeekerNotification, EmailNotification):
     name = "Confirmation d’envoi d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/new_for_beneficiary_subject.txt"
-    body_template = "insertion/email/new_for_beneficiary_body.txt"
+    body_template = "insertion/email/new_for_beneficiary_body.md"
 
 
 @notifications_registry.register
@@ -22,7 +22,7 @@ class NewOrientationForSender(ProfessionalNotification, EmailNotification):
     name = "Confirmation d’envoi d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/new_for_sender_subject.txt"
-    body_template = "insertion/email/new_for_sender_body.txt"
+    body_template = "insertion/email/new_for_sender_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -40,7 +40,7 @@ class AcceptedOrientationForBeneficiary(JobSeekerNotification, EmailNotification
     name = "Acceptation d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/accepted_for_beneficiary_subject.txt"
-    body_template = "insertion/email/accepted_for_beneficiary_body.txt"
+    body_template = "insertion/email/accepted_for_beneficiary_body.md"
 
 
 @notifications_registry.register
@@ -50,7 +50,7 @@ class AcceptedOrientationForSender(ProfessionalNotification, EmailNotification):
     name = "Acceptation d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/accepted_for_sender_subject.txt"
-    body_template = "insertion/email/accepted_for_sender_body.txt"
+    body_template = "insertion/email/accepted_for_sender_body.md"
 
 
 @notifications_registry.register
@@ -60,7 +60,7 @@ class RefusedOrientationForBeneficiary(JobSeekerNotification, EmailNotification)
     name = "Refus d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/refused_for_beneficiary_subject.txt"
-    body_template = "insertion/email/refused_for_beneficiary_body.txt"
+    body_template = "insertion/email/refused_for_beneficiary_body.md"
 
 
 @notifications_registry.register
@@ -70,7 +70,7 @@ class RefusedOrientationForSender(ProfessionalNotification, EmailNotification):
     name = "Refus d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/refused_for_sender_subject.txt"
-    body_template = "insertion/email/refused_for_sender_body.txt"
+    body_template = "insertion/email/refused_for_sender_body.md"
 
     def get_context(self):
         context = super().get_context()
@@ -87,7 +87,7 @@ class ExpiredOrientationForBeneficiary(JobSeekerNotification, EmailNotification)
     name = "Expiration d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/expired_for_beneficiary_subject.txt"
-    body_template = "insertion/email/expired_for_beneficiary_body.txt"
+    body_template = "insertion/email/expired_for_beneficiary_body.md"
 
 
 @notifications_registry.register
@@ -97,4 +97,4 @@ class ExpiredOrientationForSender(ProfessionalNotification, EmailNotification):
     name = "Expiration d’une orientation"
     category = NotificationCategory.ORIENTATION
     subject_template = "insertion/email/expired_for_sender_subject.txt"
-    body_template = "insertion/email/expired_for_sender_body.txt"
+    body_template = "insertion/email/expired_for_sender_body.md"

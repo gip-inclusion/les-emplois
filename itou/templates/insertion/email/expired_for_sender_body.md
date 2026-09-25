@@ -1,7 +1,6 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-
 Votre demande d’orientation pour {{ orientation.beneficiary.get_full_name|mask_unless:orientation.sender_can_view_personal_information }} est restée sans réponse
 
 Bonjour,
@@ -12,5 +11,4 @@ Cette demande a été automatiquement annulée.
 
 Vous pouvez rechercher un autre service pour votre bénéficiaire :
 {{ orientation.new_service_search_url }}
-
 {% endblock body %}

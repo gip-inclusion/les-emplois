@@ -1,7 +1,6 @@
-{% extends "layout/base_email_for_beneficiary_text_body.txt" %}
+{% extends "layout/base_email_for_beneficiary_text_body.md" %}
 {% load format_filters %}
 {% block body %}
-
 Une orientation effectuée en votre nom a été refusée.
 
 Bonjour,
@@ -11,14 +10,15 @@ Bonjour,
 Malheureusement, la structure n’a pas pu donner suite à cette demande d’orientation sur ce service.
 
 Des questions ? Contactez la personne qui vous accompagne :
+
 - {{ orientation.sender.get_full_name }}
 - {{ orientation.sender.email }}
-
 {% if not orientation.sender_is_referent %}
+
 ou bien votre conseiller·e référent·e :
+
 - {{ orientation.referent_first_name|title }} {{ orientation.referent_last_name|upper }}
 - {{ orientation.referent_email }}
 - {{ orientation.referent_phone|format_phone }}
 {% endif %}
-
 {% endblock body %}

@@ -1,7 +1,6 @@
-{% extends "layout/base_email_for_beneficiary_text_body.txt" %}
+{% extends "layout/base_email_for_beneficiary_text_body.md" %}
 {% load format_filters %}
 {% block body %}
-
 Une orientation effectuée en votre nom a été annulée.
 
 Bonjour,
@@ -13,14 +12,15 @@ Le service n’a pas répondu à la demande dans le délai limite des {{ orienta
 Vous n’avez rien à faire : l’accompagnateur de la structure {{ orientation.service.structure.name }} a également été informé.
 
 Des questions ? Contactez la personne qui vous accompagne :
+
 - {{ orientation.sender.get_full_name }}
 - {{ orientation.sender.email }}
-
 {% if not orientation.sender_is_referent %}
+
 ou bien votre conseiller·e référent·e :
+
 - {{ orientation.referent_first_name|title }} {{ orientation.referent_last_name|upper }}
 - {{ orientation.referent_email }}
 - {{ orientation.referent_phone|format_phone }}
 {% endif %}
-
 {% endblock body %}

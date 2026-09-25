@@ -1,7 +1,6 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_text_body.md" %}
 {% load format_filters %}
 {% block body %}
-
 {{ orientation.beneficiary.get_full_name }} a été orienté vers le service « {{ orientation.service.name }} ».
 
 Bonjour,
@@ -9,6 +8,7 @@ Bonjour,
 {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} a orienté {{ orientation.beneficiary.get_full_name }} vers le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
 
 Pour toute question concernant le traitement de la demande, veuillez contacter le référent du service :
+
 {% if orientation.service.contact_full_name %}- {{ orientation.service.contact_full_name }}{% endif %}
 {% if orientation.service.contact_email %}- {{ orientation.service.contact_email }}{% endif %}{% if orientation.service.contact_phone %}
 - {{ orientation.service.contact_phone|format_phone }}{% endif %}
@@ -17,5 +17,4 @@ La structure {{ orientation.service.structure.name }} va traiter la demande et y
 
 Une relance automatique par mail lui sera adressée au bout de {{ reminder_one_delay_days }} et {{ reminder_two_delay_days }} jours sans acceptation ou refus de sa part.
 En cas d’absence de réponse dans un délai de {{ orientation.PENDING_EXPIRATION_PERIOD_DAYS }} jours, cette demande sera automatiquement annulée.
-
 {% endblock body %}

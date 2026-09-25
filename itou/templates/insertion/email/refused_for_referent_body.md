@@ -1,6 +1,5 @@
-{% extends "layout/base_email_text_body.txt" %}
+{% extends "layout/base_email_text_body.md" %}
 {% block body %}
-
 La demande d’orientation pour {{ orientation.beneficiary.get_full_name }} a été refusée.
 
 Bonjour,
@@ -8,12 +7,13 @@ Bonjour,
 La structure {{ orientation.service.structure.name }} n’a pas pu donner suite à votre demande d’orientation pour {{ orientation.beneficiary.get_full_name }} sur le service {{ orientation.service.name }}.
 
 La ou les raisons spécifiques évoquées sont les suivantes :
+
 {% for reason in reasons %}- {{ reason }}
 {% endfor %}
+
 {% if orientation.refusal_details %}La structure vous informe également de :
 {{ orientation.refusal_details }}{% endif %}
 
 Vous souhaitez faire une nouvelle recherche pour trouver un service adapté au besoin de votre bénéficiaire ? Relancer la recherche :
 {{ orientation.new_service_search_url }}
-
 {% endblock body %}
