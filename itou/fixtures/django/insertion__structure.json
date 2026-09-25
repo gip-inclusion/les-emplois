@@ -14,7 +14,9 @@
       "opening_hours": "9.00 à 12.00 - 14.00 à 17.00",
       "phone": "0100000000",
       "post_code": "34000",
-      "reseaux_porteurs": [14],
+      "reseaux_porteurs": [
+        14
+      ],
       "siret": "",
       "source": 229,
       "source_link": "https://www.agefiph.fr/occitanie",
@@ -40,7 +42,9 @@
       "opening_hours": "Mo 08:00-12:00,13:00-17:00;Tu 08:00-12:00,13:00-17:00;We 08:00-12:00,13:00-17:00;Th 08:00-12:00,13:00-17:00;Fr 08:00-12:00,13:00-17:00",
       "phone": "0100000000",
       "post_code": "25200",
-      "reseaux_porteurs": [99],
+      "reseaux_porteurs": [
+        99
+      ],
       "siret": "37931209300014",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ctre-formation-appre",
@@ -66,7 +70,10 @@
       "opening_hours": "",
       "phone": "0100000000",
       "post_code": "64160",
-      "reseaux_porteurs": [16, 88],
+      "reseaux_porteurs": [
+        16,
+        88
+      ],
       "siret": "43183636000039",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/association-transiti",
@@ -118,7 +125,9 @@
       "opening_hours": "Mo 09:00-18:00;Tu 09:00-18:00;We 09:00-18:00;Th 09:00-18:00;Fr 09:00-17:00",
       "phone": "0100000000",
       "post_code": "34000",
-      "reseaux_porteurs": [12],
+      "reseaux_porteurs": [
+        12
+      ],
       "siret": "35221687302944",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ass-pour-droit-a-l-i-sfka",
@@ -144,7 +153,11 @@
       "opening_hours": "",
       "phone": "",
       "post_code": "64000",
-      "reseaux_porteurs": [16, 39, 69],
+      "reseaux_porteurs": [
+        16,
+        39,
+        69
+      ],
       "siret": "20006725400017",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ca-pau-bearn-pyrenee",
@@ -196,7 +209,9 @@
       "opening_hours": "Mo-Fr 09:00-12:30,14:00-17:30; Th 14:00-17:30",
       "phone": "0100000000",
       "post_code": "64121",
-      "reseaux_porteurs": [39],
+      "reseaux_porteurs": [
+        39
+      ],
       "siret": "",
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_32e65fb4-ac9a-49c9-9c8a-b267006fdc25__dora_dora--0c1f1dd9-f5e9-47d7-ac74-56067ad00ba2/details",
@@ -222,7 +237,9 @@
       "opening_hours": "Mo-Th 09:00-12:30,14:00-17:30; Tu off",
       "phone": "0100000000",
       "post_code": "34070",
-      "reseaux_porteurs": [39],
+      "reseaux_porteurs": [
+        39
+      ],
       "siret": "",
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_41706857-c31b-435e-8ea9-122f56ac2c5c/details",
@@ -248,7 +265,9 @@
       "opening_hours": "9.00 à 12.00 - 14.00 à 17.00",
       "phone": "0100000000",
       "post_code": "33100",
-      "reseaux_porteurs": [14],
+      "reseaux_porteurs": [
+        14
+      ],
       "siret": "",
       "source": 229,
       "source_link": "https://www.agefiph.fr/nouvelle-aquitaine",
@@ -300,7 +319,9 @@
       "opening_hours": "",
       "phone": "",
       "post_code": "57070",
-      "reseaux_porteurs": [31],
+      "reseaux_porteurs": [
+        31
+      ],
       "siret": "77561872100143",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ass-dinformation-et-",
@@ -326,7 +347,10 @@
       "opening_hours": "\"Les ateliers numériques sont accessibles le mardi de 14h à 17h30 à Verny et le jeudi de 8h30 à 12h30 à Rémilly\"",
       "phone": "",
       "post_code": "57420",
-      "reseaux_porteurs": [13, 69],
+      "reseaux_porteurs": [
+        13,
+        69
+      ],
       "siret": "20003990700056",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/cc-du-sud-messin",
@@ -378,7 +402,9 @@
       "opening_hours": "Mo 09:00-18:00;Tu 09:00-18:00;We 09:00-18:00;Th 09:00-18:00;Fr 09:00-17:00",
       "phone": "0100000000",
       "post_code": "57070",
-      "reseaux_porteurs": [12],
+      "reseaux_porteurs": [
+        12
+      ],
       "siret": "35221687301490",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ass-pour-droit-a-l-i-rdkx",
@@ -404,7 +430,11 @@
       "opening_hours": "Mo 08:30-17:00;Tu 08:30-17:00;We 08:30-17:00;Th 08:30-17:00;Fr 08:30-16:30",
       "phone": "0100000000",
       "post_code": "33000",
-      "reseaux_porteurs": [19, 53, 99],
+      "reseaux_porteurs": [
+        19,
+        53,
+        99
+      ],
       "siret": "30016423300052",
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/structures/ass-formation-educat",
@@ -430,7 +460,9 @@
       "opening_hours": "Mo-Fr 08:00-12:00,13:00-16:00",
       "phone": "0100000000",
       "post_code": "57570",
-      "reseaux_porteurs": [39],
+      "reseaux_porteurs": [
+        39
+      ],
       "siret": "",
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_a01902e8-1e9d-493d-94b6-c9936dec6818/details",

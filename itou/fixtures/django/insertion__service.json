@@ -35,20 +35,34 @@
       "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        6
+      ],
       "mobilizations_details": "",
       "name": "Aide technique en compensation du handicap",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
-      "publics": [124],
+      "publics": [
+        124
+      ],
       "publics_details": "",
-      "receptions": [131],
+      "receptions": [
+        131
+      ],
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-technique-en-compensation-du-handicap",
       "structure": 1,
-      "thematics": [157, 178, 183, 193],
+      "thematics": [
+        157,
+        178,
+        183,
+        193
+      ],
       "uid": "agefiph--52c4c68b-33d3-4ff1-916c-28c835025597-a74474c3-81c1-4a55-8bb8-e031a37d0313",
       "updated_on": "2025-09-30"
     },
@@ -83,28 +97,51 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
-      "mobilization_modes_beneficiaries": [211, 213, 215],
+      "mobilization_modes_beneficiaries": [
+        211,
+        213,
+        215
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220],
+      "mobilization_modes_professionals": [
+        216,
+        220
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        6
+      ],
       "mobilizations_details": "",
       "name": "CléA numérique",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/adrec-clea-numerique-ojwn",
       "structure": 4,
-      "thematics": [181, 184, 199],
+      "thematics": [
+        181,
+        184,
+        199
+      ],
       "uid": "dora--0c7c0b07-a5f4-4151-9483-69a360c12164",
       "updated_on": "2026-05-04"
     },
@@ -139,28 +176,44 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 133,
-      "mobilization_modes_beneficiaries": [211, 217],
+      "mobilization_modes_beneficiaries": [
+        211,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [208],
+      "mobilization_modes_professionals": [
+        208
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "Mêmes modalités que pour les bénéficiaires",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [5],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        5
+      ],
       "mobilizations_details": "",
       "name": "Médiation numérique",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64150",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/association-transiti-mediation-numerique",
       "structure": 3,
-      "thematics": [181],
+      "thematics": [
+        181
+      ],
       "uid": "dora--5b4dd8b4-ae7d-4217-9722-ccdae05eef71",
       "updated_on": "2026-03-04"
     },
@@ -195,28 +248,58 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [208, 216, 220, 222],
+      "mobilization_modes_professionals": [
+        208,
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "Inscription possible via Aude ou OUIFORM",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Dispositif de Formation Linguistique",
       "opening_hours": "",
       "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ctre-formation-appre-dispositif-de-format-jysj",
       "structure": 2,
-      "thematics": [143, 146, 166, 167, 184, 186, 188, 198],
+      "thematics": [
+        143,
+        146,
+        166,
+        167,
+        184,
+        186,
+        188,
+        198
+      ],
       "uid": "dora--5e016094-532b-44e8-8f38-8c7cf56971be",
       "updated_on": "2025-04-24"
     },
@@ -251,28 +334,52 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [211, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        211,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220],
+      "mobilization_modes_professionals": [
+        216,
+        220
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Français Langue Étrangère",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ecloson-francais-langue-etra",
       "structure": 7,
-      "thematics": [167, 199, 205, 206],
+      "thematics": [
+        167,
+        199,
+        205,
+        206
+      ],
       "uid": "dora--79a21517-55e2-4803-894c-ac2f67e90003",
       "updated_on": "2026-05-04"
     },
@@ -307,28 +414,54 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
-      "mobilization_modes_beneficiaries": [215, 221, 223],
+      "mobilization_modes_beneficiaries": [
+        215,
+        221,
+        223
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1ywqSWxyoM1BE3BL6kCjGrS_fNEnfw1cWllV_-0951jBPlTmnXXq17BGrtFW8IjPBhe7AAszF_",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "Téléphoner au 01 00 00 00 00",
-      "mobilization_modes_professionals": [208, 216, 218, 220],
+      "mobilization_modes_professionals": [
+        208,
+        216,
+        218,
+        220
+      ],
       "mobilization_modes_professionals_external_form_link": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1ywqSWxyoM1BE3BL6kCjGrS_fNEnfw1cWllV_-0951jBPlTmnXXq17BGrtFW8IjPBhe7AAszF_",
       "mobilization_modes_professionals_external_form_link_text": "Prendre rendez-vous",
       "mobilization_modes_professionals_other": "Téléphoner au 01 00 00 00 00",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        6
+      ],
       "mobilizations_details": "Téléphoner au 01 00 00 00 00 Téléphoner au 01 00 00 00 00",
       "name": "Microcrédit Mobilité",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-pour-droit-a-l-i-sfka-",
       "structure": 5,
-      "thematics": [152, 175, 176, 178, 180],
+      "thematics": [
+        152,
+        175,
+        176,
+        178,
+        180
+      ],
       "uid": "dora--96558663-2eab-4a1f-8389-af2fea730879",
       "updated_on": "2026-04-03"
     },
@@ -363,28 +496,50 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
-      "mobilization_modes_beneficiaries": [215, 217],
+      "mobilization_modes_beneficiaries": [
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220, 222],
+      "mobilization_modes_professionals": [
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Plateforme d'évaluation linguistique, d'orientation et de suivi de l'agglomération de Pau",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64000",
-      "publics": [119, 127],
+      "publics": [
+        119,
+        127
+      ],
       "publics_details": "Personnes arrivées récemment en France, Demandeur d'emploi",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ca-pau-bearn-pyrenee-plateforme-devaluati",
       "structure": 6,
-      "thematics": [147, 167],
+      "thematics": [
+        147,
+        167
+      ],
       "uid": "dora--9816bf7c-eddf-45c5-a20a-d0526fe141af",
       "updated_on": "2026-01-07"
     },
@@ -419,28 +574,54 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [208, 216, 220, 222],
+      "mobilization_modes_professionals": [
+        208,
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "Inscription possible via Aude ou OUIFORM",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Dispositif de Formation Linguistique (DFL)",
       "opening_hours": "",
       "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ctre-formation-appre-dispositif-de-format-eyvm",
       "structure": 2,
-      "thematics": [146, 167, 184, 186],
+      "thematics": [
+        146,
+        167,
+        184,
+        186
+      ],
       "uid": "dora--a6bcdca3-136a-4211-aeee-e5deb5da51c1",
       "updated_on": "2025-04-24"
     },
@@ -475,28 +656,54 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
-      "mobilization_modes_beneficiaries": [223],
+      "mobilization_modes_beneficiaries": [
+        223
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "Parlez-en avec votre conseiller Emploi pour bénéficier d'un positionnement.",
-      "mobilization_modes_professionals": [208, 216, 224],
+      "mobilization_modes_professionals": [
+        208,
+        216,
+        224
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "Pour les Conseillers France Travail, mobilisez en priorité le service 'Diagnostic et accompagnement à la mobilité (AAP FT), s'il vous est accessible.",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        6
+      ],
       "mobilizations_details": "Parlez-en avec votre conseiller Emploi pour bénéficier d'un positionnement. Pour les Conseillers France Travail, mobilisez en priorité le service 'Diagnostic et accompagnement à la mobilité (AAP FT), s'il vous est accessible.",
       "name": "Plateforme Mobilité - Transition",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64150",
-      "publics": [117, 118, 119, 120],
+      "publics": [
+        117,
+        118,
+        119,
+        120
+      ],
       "publics_details": "Demandeur d’emploi bénéficiaire des minimas sociaux, Demandeur d’emploi non indemnisé, Demandeur d’emploi en contrat aidé, Etudiant en contrat d'alternance (apprentissage / professionalisation), Bénéficiaires de l'Allocation de Solidarité Spécifique (ASS), Demandeur d'emploi avec un projet de créateur/reprise d'entreprise, Demandeur d'emploi, Demandeur d'emploi indemnisé",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/association-transiti-plateforme-mobilite-",
       "structure": 3,
-      "thematics": [176, 177, 178, 179, 180],
+      "thematics": [
+        176,
+        177,
+        178,
+        179,
+        180
+      ],
       "uid": "dora--d7b8be12-7d85-4f49-943b-72886fed9521",
       "updated_on": "2026-04-02"
     },
@@ -539,20 +746,40 @@
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5
+      ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
       "opening_hours": "Mo-Fr 09:00-12:30,14:00-17:30; Th 14:00-17:30",
       "opening_hours_text": "",
       "post_code": "64121",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "Étudiants, Familles et/ou enfants, Femmes, Jeunes, Seniors",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_32e65fb4-ac9a-49c9-9c8a-b267006fdc25__dora_dora--0c1f1dd9-f5e9-47d7-ac74-56067ad00ba2/details",
       "structure": 8,
-      "thematics": [146, 163, 181, 182, 183, 184, 186, 189],
+      "thematics": [
+        146,
+        163,
+        181,
+        182,
+        183,
+        184,
+        186,
+        189
+      ],
       "uid": "mediation-numerique--Coop-numérique_32e65fb4-ac9a-49c9-9c8a-b267006fdc25__dora_dora--0c1f1dd9-f5e9-47d7-ac74-56067ad00ba2",
       "updated_on": "2026-07-07"
     },
@@ -595,20 +822,40 @@
       "mobilization_modes_professionals_external_form_link": "https://bookings.cloud.microsoft/book/laposte1807545@booking.legroupelaposte.fr/?ismsaljsauthenabled",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5
+      ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
       "opening_hours": "Mo-Th 09:00-12:30,14:00-17:30; Tu off",
       "opening_hours_text": "",
       "post_code": "34070",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "Étudiants, Familles et/ou enfants, Femmes, Jeunes, Seniors",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_41706857-c31b-435e-8ea9-122f56ac2c5c/details",
       "structure": 9,
-      "thematics": [146, 163, 181, 182, 183, 184, 186, 189],
+      "thematics": [
+        146,
+        163,
+        181,
+        182,
+        183,
+        184,
+        186,
+        189
+      ],
       "uid": "mediation-numerique--Coop-numérique_41706857-c31b-435e-8ea9-122f56ac2c5c",
       "updated_on": "2026-07-07"
     },
@@ -651,20 +898,34 @@
       "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        6
+      ],
       "mobilizations_details": "",
       "name": "Aide aux déplacements",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
-      "publics": [124],
+      "publics": [
+        124
+      ],
       "publics_details": "",
-      "receptions": [131],
+      "receptions": [
+        131
+      ],
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-aux-deplacements",
       "structure": 10,
-      "thematics": [193, 178, 157, 183],
+      "thematics": [
+        157,
+        178,
+        183,
+        193
+      ],
       "uid": "agefiph--1cf38c63-1c5d-49d9-9a39-819376029870-135084a2-2380-4313-98be-40021890fb2f",
       "updated_on": "2025-10-13"
     },
@@ -707,20 +968,34 @@
       "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        6
+      ],
       "mobilizations_details": "",
       "name": "Aide humaine en compensation du handicap",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
-      "publics": [124],
+      "publics": [
+        124
+      ],
       "publics_details": "",
-      "receptions": [131],
+      "receptions": [
+        131
+      ],
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-humaine-en-compensation-du-handicap",
       "structure": 10,
-      "thematics": [193, 178, 157, 183],
+      "thematics": [
+        157,
+        178,
+        183,
+        193
+      ],
       "uid": "agefiph--1cf38c63-1c5d-49d9-9a39-819376029870-14d98da5-b582-4beb-9fa4-dda2bb6666ba",
       "updated_on": "2025-09-30"
     },
@@ -755,28 +1030,53 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
-      "mobilization_modes_beneficiaries": [217, 223],
+      "mobilization_modes_beneficiaries": [
+        217,
+        223
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "Téléphoner au 09 69 32 81 10.",
-      "mobilization_modes_professionals": [208, 216, 220, 222],
+      "mobilization_modes_professionals": [
+        208,
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "Téléphoner au 09 69 32 81 10.",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        5,
+        6
+      ],
       "mobilizations_details": "Téléphoner au 09 69 32 81 10. Téléphoner au 09 69 32 81 10.",
       "name": "Microcrédit Mobilité",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "57070",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-pour-droit-a-l-i-rdkx-",
       "structure": 15,
-      "thematics": [152, 180, 176, 175],
+      "thematics": [
+        152,
+        175,
+        176,
+        180
+      ],
       "uid": "dora--119f710d-1209-4071-baee-ac80406a952d",
       "updated_on": "2026-08-20"
     },
@@ -811,28 +1111,52 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220, 222],
+      "mobilization_modes_professionals": [
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Auto école sociale et solidaire En route pour travailler",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
-      "publics": [118, 119],
+      "publics": [
+        118,
+        119
+      ],
       "publics_details": "Bénéficiaire du Revenu de Solidarité Active (RSA), Demandeur d'emploi",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/aim-actions-inter-me-auto-ecole-sociale-e",
       "structure": 14,
-      "thematics": [177, 180],
+      "thematics": [
+        177,
+        180
+      ],
       "uid": "dora--22e2a25c-ee9e-4606-9236-757417322c5b",
       "updated_on": "2026-06-15"
     },
@@ -867,28 +1191,53 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [211, 213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        211,
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220, 222, 224],
+      "mobilization_modes_professionals": [
+        216,
+        220,
+        222,
+        224
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "HSP SOCLE 2025-2027",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33000",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-formation-educat-hsp-socle-2025-2027",
       "structure": 16,
-      "thematics": [166, 167],
+      "thematics": [
+        166,
+        167
+      ],
       "uid": "dora--6c59123d-927d-4aa1-95ea-713ef70c2a31",
       "updated_on": "2026-01-15"
     },
@@ -923,28 +1272,59 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
-      "mobilization_modes_beneficiaries": [211, 213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        211,
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220],
+      "mobilization_modes_professionals": [
+        216,
+        220
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "BRIDGE",
       "opening_hours": "",
       "opening_hours_text": "lundi, mardi, jeudi, vendredi journée et mercredi matin",
       "post_code": "57070",
-      "publics": [117, 118, 119, 123, 127],
+      "publics": [
+        117,
+        118,
+        119,
+        123,
+        127
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-dinformation-et--bridge",
       "structure": 12,
-      "thematics": [167, 203, 204, 206, 207, 191],
+      "thematics": [
+        167,
+        191,
+        203,
+        204,
+        206,
+        207
+      ],
       "uid": "dora--707735ac-8759-4eb0-b0fb-30eeeacf603c",
       "updated_on": "2026-08-18"
     },
@@ -979,28 +1359,65 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
-      "mobilization_modes_beneficiaries": [213, 215, 217],
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
       "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [216, 220, 222],
+      "mobilization_modes_professionals": [
+        216,
+        220,
+        222
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
       "mobilizations_details": "",
       "name": "Aide aux démarches administratives et aide au numérique",
       "opening_hours": "",
       "opening_hours_text": "du mardi au samedi. Du mardi au jeudi : 9h30-12h 14h-17h30 vendredi : 9h30-12h 14h-16h30 samedi : 9h30-12h30",
       "post_code": "33300",
-      "publics": [117, 118, 119, 120, 121, 122, 123, 124, 129],
+      "publics": [
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        129
+      ],
       "publics_details": "",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/la-fourmiliere-du-gr-aide-aux-demarches-a",
       "structure": 11,
-      "thematics": [146, 147, 148, 149, 150, 181, 182, 184],
+      "thematics": [
+        146,
+        147,
+        148,
+        149,
+        150,
+        181,
+        182,
+        184
+      ],
       "uid": "dora--a089f66a-7122-4ec7-8a16-d50c9f1ffb5c",
       "updated_on": "2026-08-18"
     },
@@ -1035,28 +1452,58 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 135,
-      "mobilization_modes_beneficiaries": [215, 217, 223],
+      "mobilization_modes_beneficiaries": [
+        215,
+        217,
+        223
+      ],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
       "mobilization_modes_beneficiaries_other": "Prendre rendez vous au 07 56 38 54 10",
-      "mobilization_modes_professionals": [208, 216],
+      "mobilization_modes_professionals": [
+        208,
+        216
+      ],
       "mobilization_modes_professionals_external_form_link": "",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "Mêmes modalités que pour les bénéficiaires",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 5, 6],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        5,
+        6
+      ],
       "mobilizations_details": "Prendre rendez vous au 07 56 38 54 10 Mêmes modalités que pour les bénéficiaires",
       "name": "Médiation numérique",
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "57420",
-      "publics": [121, 122, 123, 124, 129],
+      "publics": [
+        121,
+        122,
+        123,
+        124,
+        129
+      ],
       "publics_details": "Personnes en situation de handicap, Familles avec enfants, Seniors (+65 ans), Jeunes (16-26 ans), Femmes",
-      "receptions": [132],
+      "receptions": [
+        132
+      ],
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/cc-du-sud-messin-mediation-numerique",
       "structure": 13,
-      "thematics": [193, 163, 143, 146, 182, 183, 184],
+      "thematics": [
+        143,
+        146,
+        163,
+        182,
+        183,
+        184,
+        193
+      ],
       "uid": "dora--f075da67-4a22-4a25-be24-03924d95dac0",
       "updated_on": "2026-04-22"
     },
@@ -1099,20 +1546,41 @@
       "mobilization_modes_professionals_external_form_link": "https://rdv.anct.gouv.fr/prendre_rdv?departement=&public_link_organisation_id=2091",
       "mobilization_modes_professionals_external_form_link_text": "",
       "mobilization_modes_professionals_other": "",
-      "mobilization_publics": [7, 8],
-      "mobilizations": [3, 4, 5],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5
+      ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
       "opening_hours": "Mo-Fr 08:00-12:00,13:00-16:00",
       "opening_hours_text": "",
       "post_code": "57570",
-      "publics": [130],
+      "publics": [
+        130
+      ],
       "publics_details": "Étudiants, Familles et/ou enfants, Femmes, Jeunes, Seniors",
-      "receptions": [131, 132],
+      "receptions": [
+        131,
+        132
+      ],
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_a01902e8-1e9d-493d-94b6-c9936dec6818/details",
       "structure": 17,
-      "thematics": [163, 146, 181, 182, 183, 184, 186, 189],
+      "thematics": [
+        146,
+        163,
+        181,
+        182,
+        183,
+        184,
+        186,
+        189
+      ],
       "uid": "mediation-numerique--Coop-numérique_a01902e8-1e9d-493d-94b6-c9936dec6818",
       "updated_on": "2026-07-06"
     },
