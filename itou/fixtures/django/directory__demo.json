@@ -1,0 +1,68 @@
+[
+  {
+    "fields": {
+      "city": 14014
+    },
+    "model": "cities.directoryactivecity",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "annuaire.demo@example.com",
+      "first_name": "Camille",
+      "kind": "GUIDE",
+      "last_login": null,
+      "last_name": "Exemple",
+      "phone": "0100000000",
+      "source": "dora",
+      "source_id": "t4a-demo-contact",
+      "source_kind": "GUIDE",
+      "updated_at": "2026-09-29T00:00:00Z"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--t4a-demo-contact"
+  },
+  {
+    "fields": {
+      "accessibility": "",
+      "address_line_1": "3 Rue Félix Nadar",
+      "address_line_2": "",
+      "ban_api_resolved_address": null,
+      "city": "Tours",
+      "coords": "SRID=4326;POINT (0.68776 47.409305)",
+      "department": "37",
+      "description": "",
+      "email": "structure.annuaire.demo@example.com",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "insee_city": 14014,
+      "kind": "ML",
+      "name": "Mission locale de Tours (démo)",
+      "opening_hours": "",
+      "phone": "0100000001",
+      "post_code": "37100",
+      "siret": null,
+      "source": "dora",
+      "source_id": "t4a-demo-structure",
+      "source_kind": "ML",
+      "source_link": "",
+      "updated_at": "2026-09-29T00:00:00Z",
+      "website": ""
+    },
+    "model": "nexus.nexusstructure",
+    "pk": "dora--t4a-demo-structure"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "dora",
+      "source_id": "t4a-demo-membership",
+      "structure": "dora--t4a-demo-structure",
+      "updated_at": "2026-09-29T00:00:00Z",
+      "user": "dora--t4a-demo-contact"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--t4a-demo-membership"
+  }
+]
