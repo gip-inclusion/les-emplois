@@ -558,7 +558,7 @@ def transfer(request):
         try:
             job_application.transfer(user=request.user, target_company=target_company)
             transferred_ids.append(job_application.pk)
-        except (ValidationError, xwf_models.InvalidTransitionError):
+        except ValidationError, xwf_models.InvalidTransitionError:
             error_msg = (
                 f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être transférée"
             )
