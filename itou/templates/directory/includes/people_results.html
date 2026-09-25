@@ -1,0 +1,45 @@
+{% load str_filters %}
+
+<div id="people-search-results">
+    <h2 class="mb-3">Personne{{ results.paginator.count|pluralizefr }} ({{ results.paginator.count }})</h2>
+    <div class="row row-cols-1 row-cols-lg-2 g-3">
+        {% for person in results %}
+            <div class="col">
+                <article class="c-box c-box--results has-one-link-inside h-100 d-flex flex-column">
+                    <div class="c-box--results__body flex-grow-1">
+                        <h3 class="mb-1">{{ person.full_name }}</h3>
+                        <p class="text-disabled fs-lg mb-4">{{ person.kind_label }}</p>
+                        <hr>
+                        {% if person.main_organization.kind_label %}
+                            <p class="text-disabled fs-lg mb-1">{{ person.main_organization.kind_label }}</p>
+                        {% endif %}
+                        <p class="mb-1 fw-bold text-uppercase">{{ person.main_organization.name }}</p>
+                        <address class="mb-1 d-flex align-items-start">
+                            <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
+                            <span>{{ person.main_organization.address }}</span>
+                        </address>
+                        {% if person.other_organizations_count %}
+                            <p class="mb-0">Membre de {{ person.organizations|length }} structures</p>
+                        {% endif %}
+                    </div>
+                    <div class="c-box--results__footer">
+                        <a href="{% url 'directory:person_detail' key=person.key %}?back_url={{ request.get_full_path|urlencode }}"
+                           class="btn btn-ico btn-outline-primary btn-block stretched-link">
+                            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                            <span>Voir ses coordonnées</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div id="empty-personnes" class="c-box c-box--results">
+                    <div class="c-box--results__body">
+                        <p class="mb-0">Aucune personne ne correspond à votre recherche.</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% include "includes/pagination.html" with page=results boost=True boost_target="#people-search-results" boost_swap="outerHTML" request=request only %}
+</div>
