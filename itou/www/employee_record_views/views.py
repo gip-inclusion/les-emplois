@@ -48,7 +48,7 @@ from itou.www.utils.wizard import WizardView
 STEPS = [
     (
         1,
-        "Etat civil",
+        "État civil",
     ),
     (
         2,

@@ -57,7 +57,7 @@
                             <div class="col-6">
                                 <div class="mb-2">
                                     <span class="fw-semibold">PASS IAE expire dans {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}, le {{ approval.remainder_as_date|date:"d/m/Y" }}.</span>
-                                    A renouveler avant toute nouvelle embauche.
+                                    À renouveler avant toute nouvelle embauche.
                                 </div>
                                 <a href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                    {% matomo_event "test-synthese" "clic" "voir-pass-iae" %}>Voir le PASS IAE</a>
