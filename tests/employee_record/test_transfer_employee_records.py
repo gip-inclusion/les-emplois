@@ -132,7 +132,7 @@ def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_dir
     EmployeeRecordFactory(pk=1234, ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    assert len(list(sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir())) == command.MAX_UPLOADED_FILES
+    assert len(list(sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir())) == 1
 
     assert [
         re.sub(r"<EmployeeRecord: PK:1234 .+?>", "<EmployeeRecord pk=1234>", msg) for msg in caplog.messages

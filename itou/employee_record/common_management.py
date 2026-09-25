@@ -24,10 +24,6 @@ class IgnoreFile(Exception):
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
-    # Limit confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
-    # The file naming scheme also disallows creating more than one file in the same seconds.
-    MAX_UPLOADED_FILES = 1
-
     ATOMIC_HANDLE = False
     AUTO_TRIGGER_CONTEXT = False
 
@@ -62,20 +58,19 @@ class EmployeeRecordTransferCommand(BaseCommand):
         )
         parser.add_argument("--debug", dest="debug", action="store_true")
 
-    def upload_json_file(self, json_data, sftp: paramiko.SFTPClient, dry_run=False) -> str | None:
+    def upload_json_file(self, json_data, remote_path: str, sftp: paramiko.SFTPClient, dry_run=False) -> bool:
         """
-        Upload `json_data` (as byte array) to given SFTP connection `conn`.
-        Returns uploaded filename if ok, `None` otherwise.
+        Upload `json_data` (as byte array) to `remote_path` of given SFTP connection `conn`.
+        Returns `True` if ok, `False` otherwise.
         """
         # JSONRenderer produces *byte array* not strings
         json_bytes = JSONRenderer().render(json_data)
-        remote_path = EmployeeRecordBatch.get_remote_path()
 
         if dry_run:
             self.logger.info(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
             self.logger.info(f"Content: \n{json_bytes}")
 
-            return remote_path
+            return True
 
         # Using BytesIO objects allows to use them as files
         # Cool side effect: no temporary file needed
@@ -97,10 +92,9 @@ class EmployeeRecordTransferCommand(BaseCommand):
             )
         except Exception as ex:
             self.logger.error("Could not upload file: %s, reason: %s", remote_path, ex)
-            return None
+            return False
         self.logger.info("Successfully uploaded: %s", remote_path)
-
-        return remote_path
+        return True
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         raise NotImplementedError()

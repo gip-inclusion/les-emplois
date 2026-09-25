@@ -10,11 +10,15 @@ from itou.employee_record.common_management import EmployeeRecordTransferCommand
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import (
+    EmployeeRecord,
+    EmployeeRecordBatch,
+    EmployeeRecordTransitionLog,
+    EmployeeRecordUpdateNotification,
+)
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
-from itou.utils.iterators import chunks
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -29,8 +33,12 @@ class Command(EmployeeRecordTransferCommand):
         else:
             batch_data = EmployeeRecordBatchSerializer(raw_batch).data
 
+        remote_path = EmployeeRecordBatch.get_remote_path()
+        # Safety check to prevent 2 concurrent command runs to upload the same file in the same second
+        if EmployeeRecordTransitionLog.objects.filter(asp_batch_file=remote_path).exists():
+            raise RuntimeError(f"{remote_path} has already been used (and likely uploaded): abort")
         try:
-            remote_path = self.upload_json_file(batch_data, sftp, dry_run)
+            upload_success = self.upload_json_file(batch_data, remote_path, sftp, dry_run)
         except SerializationError as ex:
             self.logger.error(
                 "Employee records serialization error during upload, can't process.\n"
@@ -44,7 +52,7 @@ class Command(EmployeeRecordTransferCommand):
             # In any other case, bounce exception
             raise ex from Exception(f"Unhandled error during upload phase for batch: {raw_batch=}")
         else:
-            if not remote_path:
+            if not upload_success:
                 self.logger.warning("Could not upload file, exiting ...")
                 return
 
@@ -167,20 +175,25 @@ class Command(EmployeeRecordTransferCommand):
             "timezone": "UTC",
         },
     )
+    @transaction.atomic
     def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """
         Upload a file composed of all ready employee records
         """
-        self.logger.info("Starting UPLOAD of employee records")
-        employee_records_to_send = (
+        # Limit the records to MAX_EMPLOYEE_RECORDS and only send one batch/file:
+        # this is confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
+        # The file naming scheme also disallows creating more than one file in the same seconds.
+        batch = list(
             EmployeeRecord.objects.full_fetch()
             .filter(status=Status.READY, job_application__state=JobApplicationState.ACCEPTED)
             .order_by("updated_at", "pk")
+            .select_for_update(of=("self",), no_key=True)[: EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS]
         )
-        for batch in chunks(
-            employee_records_to_send, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
-        ):
-            self._upload_batch_file(sftp, batch, dry_run)
+        if not batch:
+            self.logger.info("No ready employee record found")
+            return
+        self.logger.info("Starting UPLOAD of %d employee record(s)", len(batch))
+        self._upload_batch_file(sftp, batch, dry_run)
 
     def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
