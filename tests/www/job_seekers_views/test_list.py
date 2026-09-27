@@ -1349,23 +1349,47 @@ def test_end_of_contracts_banners_for_siae(client):
     )
     response = client.get(url)
     assertContains(response, "Vous avez 1 salarié en fin de contrat")
+    assertContains(response, "<li>1 salarié termine son contrat dans les 30 prochains jours.</li>", html=True)
+    assertNotContains(response, "n’est plus en contrat")
     assertContains(response, "Afficher ce salarié")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
+    # Its contract has ended but its PASS IAE is still valid.
     job_seeker2 = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
         job_seeker=job_seeker2,
         company=company,
         start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
+        end_date=today - datetime.timedelta(days=20),
     )
+    ApprovalFactory(user=job_seeker2, start_at=today - datetime.timedelta(days=300), end_at=today)
     response = client.get(url)
     assertContains(response, "Vous avez 2 salariés en fin de contrat")
+    assertContains(
+        response, "<li>1 salarié n’est plus en contrat mais a encore un PASS\xa0IAE valide.</li>", html=True
+    )
+    assertContains(response, f"{url}?end_of_journey=on")
     assertContains(response, "Afficher ces salariés")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
+    for end_date in (today + datetime.timedelta(days=10), today - datetime.timedelta(days=10)):
+        other_job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=other_job_seeker,
+            company=company,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=end_date,
+        )
+        ApprovalFactory(user=other_job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today)
+    response = client.get(url)
+    assertContains(response, "Vous avez 4 salariés en fin de contrat")
+    assertContains(response, "<li>2 salariés terminent leur contrat dans les 30 prochains jours.</li>", html=True)
+    assertContains(
+        response, "<li>2 salariés ne sont plus en contrat mais ont encore un PASS\xa0IAE valide.</li>", html=True
+    )
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
+    response = client.get(url, {"end_of_journey": "on"})
     assertContains(response, "Suggérer une suite de parcours aux salariés")
     assertNotContains(response, "Afficher ces salariés")
 
