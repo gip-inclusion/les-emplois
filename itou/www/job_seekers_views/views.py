@@ -759,7 +759,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
         end_of_journey_filter_active = bool(
-            form.cleaned_data.get("approval_ending_soon") or form.cleaned_data.get("contract_ending_soon")
+            form.cleaned_data.get("approval_ending_soon")
+            or form.cleaned_data.get("contract_ending_soon")
+            or form.cleaned_data.get("end_of_journey")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
             queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
