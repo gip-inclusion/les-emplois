@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -791,14 +791,22 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
 
     # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
-    # end-of-journey filter is not active. A SIAE only counts its own contracts, a prescriber all of them.
-    contracts_ending_soon_count = 0
+    # end-of-journey filter is not active. A SIAE counts its employees at the end of their journey,
+    # a prescriber all the contracts ending soon.
+    contracts_ending_soon_count = last_contract_ended_count = 0
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
-        contracts_ending_soon_count = (
-            User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker"))
-            .has_contract_ending_soon(siae=request.current_organization if request.from_employer else None)
-            .count()
-        )
+        assigned_job_seekers = User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker"))
+        if request_from_siae:
+            end_of_journey_counts = assigned_job_seekers.with_end_of_journey(
+                siae=request.current_organization
+            ).aggregate(
+                ends_soon=Count("pk", filter=Q(contract_ending_soon=True)),
+                ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True)),
+            )
+            contracts_ending_soon_count = end_of_journey_counts["ends_soon"]
+            last_contract_ended_count = end_of_journey_counts["ended"]
+        else:
+            contracts_ending_soon_count = assigned_job_seekers.has_contract_ending_soon().count()
 
     # SIAE "suggest a next step" action (Tally). Offered on each row whose IAE contract with this SIAE ends
     # soon, mirroring the job seeker card banner. Hidden while the form id is not configured.
@@ -855,6 +863,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "show_end_of_contracts_banner": show_end_of_contracts_banner,
         "end_of_journey_filter_active": end_of_journey_filter_active,
         "contracts_ending_soon_count": contracts_ending_soon_count,
+        "last_contract_ended_count": last_contract_ended_count,
         "suggest_next_step_url": suggest_next_step_url,
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(request.current_organization).filter(status=Status.REJECTED).count()
