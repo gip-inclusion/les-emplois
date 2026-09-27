@@ -64,6 +64,8 @@ class FilterForm(forms.Form):
     # Fields only for authorized prescribers and IAE employers, set in __init__
     approval_ending_soon = None
     contract_ending_soon = None
+    # Field only for IAE employers, set in __init__
+    end_of_journey = None
 
     assignments = forms.ChoiceField(
         label="Statut des accompagnements",
@@ -105,6 +107,9 @@ class FilterForm(forms.Form):
                 required=False,
                 help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
+        if self.company:
+            # Reached from links only, it has no checkbox.
+            self.fields["end_of_journey"] = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
         if from_all_coworkers:
             self.fields["assignments"].widget.help_texts = {
@@ -199,6 +204,9 @@ class FilterForm(forms.Form):
             if contract_ending_soon:
                 queryset = queryset.has_contract_ending_soon(siae=self.company)
             filters.append(end_of_journey_filter)
+
+        if self.cleaned_data.get("end_of_journey"):
+            queryset = queryset.at_end_of_journey(siae=self.company)
 
         if self.cleaned_data.get("is_stalled"):
             queryset = queryset.filter(

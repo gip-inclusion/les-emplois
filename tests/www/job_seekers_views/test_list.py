@@ -1113,6 +1113,7 @@ def test_iae_filters_as_non_iae_actor(client, subtests):
         "approval expired": {"approval_expired": "on"},
         "no approval": {"no_approval": "on"},
         "approval expired or no approval": {"approval_expired": "on", "no_approval": "on"},
+        "end of journey": {"end_of_journey": "on"},
     }
     client.force_login(user)
 
@@ -1265,6 +1266,49 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
     response = client.get(url, {"contract_ending_soon": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_own]
+
+
+@freeze_time("2026-01-15")
+def test_filtered_by_end_of_journey_for_siae(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    twenty_days_ago = today - datetime.timedelta(days=20)
+    in_twenty_days = today + datetime.timedelta(days=20)
+
+    job_seeker_with_ended_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_jobapplication__to_company=company,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=twenty_days_ago,
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker_with_ended_contract, professional=employer, company=company)
+    job_seeker_with_contract_elsewhere = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_twenty_days,
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker_with_contract_elsewhere, professional=employer, company=company)
+
+    response = client.get(url, {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_with_ended_contract]
+
+
+def test_end_of_journey_filter_not_for_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
+    assertNotContains(response, 'name="end_of_journey"')
 
 
 @freeze_time("2026-01-15")
