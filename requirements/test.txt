@@ -683,9 +683,9 @@ cssbeautifier==2.0.3 \
     --hash=sha256:14650d9c8a47adcb80a7697a866a3921fe0332ef74a92e1039d09086aa0c5001 \
     --hash=sha256:2c2fd129342561029de86b1744efa231c9fafe26023dbc988a1deb0ca0f5c845
     # via djlint
-data-inclusion-schema==1.0.9 \
-    --hash=sha256:b624dda8d28eae29cfd3b28e522baa90b560e1f886ebbb1a9ac4613babef2f29 \
-    --hash=sha256:ddc5c84a5807ceeff9c6ca6e5fbfe736d5a7423fc9c0ac98efaf013fcd9fbb4a
+data-inclusion-schema==1.0.10 \
+    --hash=sha256:3e226d1944dec20185f3aa17bc3dac0cdd16ec39787bad76eecddf0fbe20b8ca \
+    --hash=sha256:46592527c4fb288da4b5e7cb1ab87b481d4fc816b066118ca135b90c2487828e
     # via -r base.txt
 django==6.0.8 \
     --hash=sha256:9b98b7e1902e0e575ea4f42c175fc9512784f7f2580898286aee3388b322219d \
