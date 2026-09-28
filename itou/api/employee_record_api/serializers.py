@@ -197,7 +197,7 @@ class _API_SituationSerializer(serializers.Serializer):
         # ASP inverted the meaning of this field on 2026-07-09. We
         # want to mirror it without breaking users of our API.
         # Clients must send an HTTP header to have the new behaviour.
-        # FIXME (dbaty): Between 2026-11-01 and 2026-11-15,
+        # FIXME (dbaty): Between 2027-01-01 and 2027-01-15,
         # permanently switch to the new behaviour by deleting the
         # whole method and define the field like this:
         #   salarieLangueFrancaise = serializers.BooleanField(

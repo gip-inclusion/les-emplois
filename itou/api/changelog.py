@@ -11,10 +11,10 @@ CHANGELOG = """
   `salarieLangueFrancaise` peut être inversée avec l'en-tête HTTP
   `X-API-salarieLangueFrancaise-like-asp`.
 
-  Entre le 01/11/2026 et le 15/11/2026, l'inversion du champ deviendra
+  Entre le 01/01/2027 et le 15/01/2027, l'inversion du champ deviendra
   définitive, que l'en-tête HTTP soit présent ou non.
 
-  **Les clients doivent être mis à jour avant le 01/11/2026** pour
+  **Les clients doivent être mis à jour avant le 01/01/2027** pour
   éviter un changement incompatible.
 
   Cf. la [note sur le champ
