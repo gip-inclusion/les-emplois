@@ -22,6 +22,17 @@
   
   '''
 # ---
+# name: test_available_transitions[MODIFICATION_REJECTED][actions]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+      <p>
+          Changer l'état de la fiche salarié :
+      </p>
+      <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+  </div>
+  
+  '''
+# ---
 # name: test_available_transitions[NEW][actions]
   '''
   <div class="submit-row" id="employee-record-transitions">

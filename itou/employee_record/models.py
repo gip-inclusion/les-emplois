@@ -41,6 +41,7 @@ class ASPExchangeInformation(models.Model):
     ASP_PROCESSING_SUCCESS_CODE = "0000"
     ASP_DUPLICATE_ERROR_CODE = "3436"
     ASP_UNIQUE_ID_MISMATCH_CODE = "3437"
+    ASP_UNKNOWN_APPROVAL_CODE = "3446"
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="code de traitement ASP", null=True)
@@ -99,6 +100,14 @@ class EmployeeRecordTransition(enum.StrEnum):
     UNARCHIVE_NEW = "unarchive_new"
     UNARCHIVE_PROCESSED = "unarchive_processed"
     UNARCHIVE_REJECTED = "unarchive_rejected"
+    UNARCHIVE_MODIFICATION_REJECTED = "unarchive_modification_rejected"
+
+    SCHEDULE_MODIFICATION = "schedule_modification"
+    WAIT_FOR_MODIFICATION_ASP_RESPONSE = "wait_for_modification_asp_response"
+    PROCESS_MODIFICATION = "process_modification"
+    REJECT_MODIFICATION = "reject_modification"
+    RETRY_MODIFICATION = "retry_modification"
+    RECREATE = "recreate"
 
     @classmethod
     def without_asp_exchange(cls):
@@ -115,8 +124,15 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     states = Status.choices
     initial_state = Status.NEW
 
-    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
-    CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
+    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED, Status.MODIFICATION_REJECTED]
+    CAN_BE_ARCHIVED_STATES = [
+        Status.NEW,
+        Status.READY,
+        Status.REJECTED,
+        Status.PROCESSED,
+        Status.DISABLED,
+        Status.MODIFICATION_REJECTED,
+    ]
     transitions = (
         (
             EmployeeRecordTransition.READY,
@@ -132,6 +148,17 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
         (EmployeeRecordTransition.UNARCHIVE_NEW, Status.ARCHIVED, Status.NEW),
         (EmployeeRecordTransition.UNARCHIVE_PROCESSED, Status.ARCHIVED, Status.PROCESSED),
         (EmployeeRecordTransition.UNARCHIVE_REJECTED, Status.ARCHIVED, Status.REJECTED),
+        (EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED, Status.ARCHIVED, Status.MODIFICATION_REJECTED),
+        (EmployeeRecordTransition.SCHEDULE_MODIFICATION, Status.PROCESSED, Status.MODIFICATION_PENDING),
+        (
+            EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+            Status.MODIFICATION_PENDING,
+            Status.MODIFICATION_SENT,
+        ),
+        (EmployeeRecordTransition.REJECT_MODIFICATION, Status.MODIFICATION_SENT, Status.MODIFICATION_REJECTED),
+        (EmployeeRecordTransition.PROCESS_MODIFICATION, Status.MODIFICATION_SENT, Status.PROCESSED),
+        (EmployeeRecordTransition.RETRY_MODIFICATION, Status.MODIFICATION_REJECTED, Status.MODIFICATION_PENDING),
+        (EmployeeRecordTransition.RECREATE, Status.MODIFICATION_REJECTED, Status.READY),
     )
     log_model = "employee_record.EmployeeRecordTransitionLog"
 
@@ -256,7 +283,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         help_text="Typiquement les dates du PASS IAE lié",
         null=True,
     )
-    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut", max_length=10)
+    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut")
 
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id
@@ -381,6 +408,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
 
+    def _warn_unexpected_transition_use(self, transition_name):
+        # TODO(xfernandez): drop this method when transitions are not unexpected anymore
+        logger.error("Unexpected transition=%s used for employee_record pk=%d", transition_name, self.pk)
+
     # Business methods
 
     @xwf_models.transition()
@@ -411,12 +442,45 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
+    def wait_for_modification_asp_response(self, *, file, line_number, archive):
+        """
+        An employee record is sent to ASP for an update via a JSON file,
+        The filename is stored for further feedback processing (also done via a file)
+        """
+        self._warn_unexpected_transition_use("wait_for_modification_asp_response")
+        self.set_asp_batch_information(file, line_number, archive)
+
+    @xwf_models.transition()
     def reject(self, *, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
         """
         self.clean()
         self.set_asp_processing_information(code, label, archive)
+
+    @xwf_models.transition()
+    def reject_modification(self, *, code, label, archive):
+        """
+        Update status after an ASP rejection of the update of the employee record
+        """
+        self._warn_unexpected_transition_use("reject_modification")
+        self.set_asp_processing_information(code, label, archive)
+
+    @xwf_models.transition()
+    def unarchive_modification_rejected(self):
+        self._warn_unexpected_transition_use("unarchive_modification_rejected")
+
+    @xwf_models.transition()
+    def schedule_modification(self, *, user=None):
+        self._warn_unexpected_transition_use("schedule_modification")
+
+    @xwf_models.transition()
+    def retry_modification(self, *, user=None):
+        self._warn_unexpected_transition_use("retry_modification")
+
+    @xwf_models.transition()
+    def recreate(self):
+        self._warn_unexpected_transition_use("recreate")
 
     @xwf_models.transition()
     def process(self, *, code, label, archive, as_duplicate=False):
@@ -430,6 +494,13 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
         if not as_duplicate and archive and self.has_watched_data_updated_at_set():
+            _check_and_remove_watched_data_updated_at(self, archive)
+
+    @xwf_models.transition()
+    def process_modification(self, *, code, label, archive):
+        self._warn_unexpected_transition_use("process_modification")
+        self.set_asp_processing_information(code, label, archive)
+        if archive and self.has_watched_data_updated_at_set():
             _check_and_remove_watched_data_updated_at(self, archive)
 
     @xwf_models.transition()
@@ -449,6 +520,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         # Remove proof of processing after delay
         self.archived_json = None
 
+    @xworkflows.transition_check(EmployeeRecordTransition.RECREATE)
+    def check_recreate(self):
+        return self.asp_processing_code == EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE
+
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_NEW)
     def check_unarchive_new(self):
         return not self.asp_processing_code
@@ -457,13 +532,20 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     def check_unarchive_processed(self):
         return self.asp_processing_code in [self.ASP_PROCESSING_SUCCESS_CODE, self.ASP_DUPLICATE_ERROR_CODE]
 
-    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
-    def check_unarchive_rejected(self):
+    def _asp_processing_code_in_error(self):
         return bool(
             self.asp_processing_code
             and self.asp_processing_code != self.ASP_DUPLICATE_ERROR_CODE
             and self.asp_processing_code[:2] in ["32", "33", "34"]
         )
+
+    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
+    def check_unarchive_rejected(self):
+        return self._asp_processing_code_in_error()
+
+    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED)
+    def check_unarchive_update_rejected(self):
+        return self._asp_processing_code_in_error()
 
     def unarchive(self):
         for transition_name in [
