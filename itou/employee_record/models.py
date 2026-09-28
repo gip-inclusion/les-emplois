@@ -519,25 +519,41 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             and self.asp_processing_code[:2] in ["32", "33", "34"]
         )
 
+    def _last_rejected_status(self):
+        last_statuses = (
+            self.logs.filter(from_state__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
+            .order_by("-timestamp")
+            .values_list("from_state", flat=True)[:1]
+        )
+        return last_statuses[0] if last_statuses else None
+
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
     def check_unarchive_rejected(self):
-        return self._asp_processing_code_in_error()
+        return self._asp_processing_code_in_error() and self._last_rejected_status() == Status.REJECTED
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED)
-    def check_unarchive_update_rejected(self):
-        return self._asp_processing_code_in_error()
+    def check_unarchive_modification_rejected(self):
+        return self._asp_processing_code_in_error() and self._last_rejected_status() == Status.MODIFICATION_REJECTED
 
     def unarchive(self):
-        for transition_name in [
-            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
-            EmployeeRecordTransition.UNARCHIVE_REJECTED,
-            EmployeeRecordTransition.UNARCHIVE_NEW,
-        ]:
-            transition = getattr(self, transition_name)
-            if transition.is_available():
-                # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
-                # we might want to automatically go to MODIFICATION_PENDING
-                return transition()
+        if self.unarchive_new.is_available():
+            return self.unarchive_new()
+        if self.unarchive_processed.is_available():
+            self.unarchive_processed()
+            if self.has_watched_data_updated_at_set():
+                # No need to show users the PROCESSED status if we already know
+                # it will automatically change to MODIFICATION_PENDING.
+                self.schedule_modification()
+            return
+        if self._asp_processing_code_in_error():
+            # It can be either REJECTED or MODIFICATION_REJECTED
+            match self._last_rejected_status():
+                case Status.REJECTED:
+                    return self.unarchive_rejected()
+                case Status.MODIFICATION_REJECTED:
+                    return self.unarchive_modification_rejected()
+                case _:
+                    logger.error("Archived employee_record=%d seems to have an inconsistent history", self.pk)
 
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
