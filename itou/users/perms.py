@@ -9,3 +9,7 @@ def can_register_mobilization_event(request):
 def add_user_can_view_personal_information(objects, can_view, user_attr="job_seeker"):
     for obj in objects:
         obj.user_can_view_personal_information = can_view(getattr(obj, user_attr))
+
+
+def can_fill_pro_support_report(request):
+    return bool(request.from_employer and request.from_iae_actor)
