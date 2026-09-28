@@ -57,7 +57,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.notifications import JobSeekerCreatedByProxyNotification
+from itou.users.notifications import JobSeekerCreatedByProxyNotification, ProSupportReportCreatedNotification
 from itou.utils import iso_standards
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
@@ -1907,6 +1907,13 @@ class ProSupportReport(models.Model):
         on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="+",
     )
+    notified_prescriber = models.ForeignKey(
+        User,
+        verbose_name="prescripteur prévenu",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
     contract = models.ForeignKey(
         Contract,
@@ -1963,6 +1970,24 @@ class ProSupportReport(models.Model):
 
     def __str__(self):
         return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
+
+    def notify_authorized_prescriber(self):
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker_id=self.job_seeker_id,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at", "-pk")
+            .first()
+        )
+        if assignment:
+            self.notified_prescriber = assignment.professional
+            self.save(update_fields=["notified_prescriber"])
+            ProSupportReportCreatedNotification(
+                assignment.professional, assignment.prescriber_organization, report=self
+            ).send()
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

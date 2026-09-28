@@ -452,6 +452,7 @@ PILOTAGE_INSTITUTION_EMAIL_CONTACT = os.getenv(
     "PILOTAGE_INSTITUTION_EMAIL_CONTACT", "pilotage+institution@inclusion.gouv.fr"
 )
 API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api.emplois@inclusion.gouv.fr")
+PRO_SUPPORT_REPORT_REPLY_TO_EMAIL = os.getenv("PRO_SUPPORT_REPORT_REPLY_TO_EMAIL", "sam@inclusion.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
 # Sentry

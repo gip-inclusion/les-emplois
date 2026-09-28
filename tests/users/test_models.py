@@ -1756,6 +1756,37 @@ class TestProSupportReport:
         with pytest.raises(IntegrityError, match=constraint):
             ProSupportReportFactory(**kwargs)
 
+    def test_notify_authorized_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+
+        def assignment(days_ago, **kwargs):
+            return JobSeekerAssignmentFactory(
+                job_seeker=report.job_seeker,
+                last_action_at=timezone.now() - datetime.timedelta(days=days_ago),
+                **kwargs,
+            )
+
+        # Created first so that the order cannot come from the primary key.
+        latest = assignment(5, prescriber_organization=PrescriberOrganizationFactory(authorized=True), ended=True)
+        assignment(10, prescriber_organization=PrescriberOrganizationFactory(authorized=True))
+        # More recent, but not an authorized prescriber.
+        assignment(1, prescriber_organization=PrescriberOrganizationFactory())
+        assignment(1, company=report.company, professional=report.author)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert [email.to for email in mailoutbox] == [[latest.professional.email]]
+        report.refresh_from_db()
+        assert report.notified_prescriber == latest.professional
+
+    def test_notify_authorized_prescriber_without_one(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.notified_prescriber is None
+
     def test_unique_per_contract(self):
         report = ProSupportReportFactory()
         with pytest.raises(IntegrityError, match="unique_prosupportreport_per_contract"):

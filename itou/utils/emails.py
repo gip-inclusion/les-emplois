@@ -33,7 +33,9 @@ def get_email_text_template(template, context):
     return remove_extra_line_breaks(get_template(template).render(context).strip())
 
 
-def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
+def get_email_message(
+    to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None, reply_to=None
+):
     subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
     subject = textwrap.shorten(
@@ -44,6 +46,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         to=to,
         cc=cc,
         bcc=bcc,
+        reply_to=reply_to,
         subject=subject,
         body=get_email_text_template(body, context),
     )

@@ -59,11 +59,14 @@ def create_url(job_seeker):
     ids=["contract_ends_soon_with_solution", "contract_ends_soon_hired_elsewhere", "contract_ended_without_solution"],
 )
 def test_create_pro_support_report_for_employer(
-    client, membership, end_date, hired_elsewhere, situation, has_solution, answer
+    client, mailoutbox, membership, end_date, hired_elsewhere, situation, has_solution, answer
 ):
     contract = end_of_journey_contract(membership.company, end_date)
     if hired_elsewhere:
         ContractFactory(job_seeker=contract.job_seeker, start_date=timezone.localdate())
+    advisor = JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker, prescriber_organization=PrescriberOrganizationFactory(authorized=True)
+    ).professional
     client.force_login(membership.user)
 
     response = client.get(create_url(contract.job_seeker))
@@ -99,6 +102,8 @@ def test_create_pro_support_report_for_employer(
     # Only the question matching the answer is kept.
     assert report.solution == answer.get("solution", "")
     assert report.orientation == answer.get("orientation", "")
+    # The authorized prescriber is notified.
+    assert [email.to for email in mailoutbox] == [[advisor.email]]
 
     # Sent reports cannot be modified.
     response = client.get(create_url(contract.job_seeker))

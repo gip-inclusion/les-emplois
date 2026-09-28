@@ -1,0 +1,21 @@
+# serializer version: 1
+# name: test_pro_support_report_created[body]
+  '''
+  Bonjour Pierre,
+  
+  La structure d’insertion ACME Inc. vous envoie un bilan de fin d’accompagnement pour un salarié en fin de contrat de travail que vous accompagnez. Ce bilan a été rempli par Jean MICHEL.
+  
+  Retrouvez toutes les informations sur l’usager et consultez le bilan en cliquant sur le lien ci-dessous :
+  http://localhost:8000/job-seekers/pro-support-report/6a2d3b1e-5f0c-4d8e-9b7a-1c2e3f4a5b6c
+  
+  Nouveau : les structures d’insertion peuvent désormais remplir un bilan d’accompagnement lorsque le contrat d’un salarié se termine ou vient de se terminer.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_pro_support_report_created[subject]
+  '[TEST] La structure d’insertion ACME Inc. vous partage un bilan de fin d’accompagnement'
+# ---

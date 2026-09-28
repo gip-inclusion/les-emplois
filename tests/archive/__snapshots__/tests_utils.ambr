@@ -217,6 +217,11 @@
       'model': 'users.ProSupportReport',
     }),
     dict({
+      'field': 'notified_prescriber',
+      'hidden': True,
+      'model': 'users.ProSupportReport',
+    }),
+    dict({
       'field': 'created_by',
       'hidden': False,
       'model': 'users.User',
