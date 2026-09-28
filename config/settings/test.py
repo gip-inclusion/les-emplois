@@ -98,7 +98,7 @@ BREVO_API_URL = "https://mailer.test.com"
 API_GEIQ_LABEL_BASE_URL = None
 API_GEIQ_LABEL_TOKEN = None
 
-# Nexus metabase db
+# Nexus
 # ---------------------------------------
 NEXUS_ALLOWED_REDIRECT_HOSTS = ["emplois.fr", "emplois.com"]
 PDI_JWT_KEY = {"k": "aTR4ZnR1WlpYYmphbFdtaXVlVjB3alljNjhrWXpfYSE", "kty": "oct"}
