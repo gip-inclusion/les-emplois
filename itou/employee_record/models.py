@@ -528,17 +528,27 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         return self._asp_processing_code_in_error()
 
     def unarchive(self):
-        for transition_name in [
-            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
-            EmployeeRecordTransition.UNARCHIVE_REJECTED,
-            EmployeeRecordTransition.UNARCHIVE_NEW,
-        ]:
-            transition = getattr(self, transition_name)
-            if transition.is_available():
-                # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
-                # we might want to automatically go to MODIFICATION_PENDING
-                return transition()
-
+        if self.unarchive_new.is_available():
+            return self.unarchive_new()
+        if self.unarchive_processed.is_available():
+            self.unarchive_processed()
+            if self.has_watched_data_updated_at_set():
+                # No need to show users the PROCESSED status if we already know
+                # it will automatically change to MODIFICATION_PENDING.
+                self.schedule_modification()
+            return
+        if self._asp_processing_code_in_error():
+            # It can be either REJECTED or MODIFICATION_REJECTED
+            if (
+                last_reject_log := self.logs.filter(from_state__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
+                .order_by("-timestamp")
+                .first()
+            ):
+                match last_reject_log.from_state:
+                    case Status.REJECTED:
+                        return self.unarchive_rejected()
+                    case Status.MODIFICATION_REJECTED:
+                        return self.unarchive_modification_rejected()
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
 
