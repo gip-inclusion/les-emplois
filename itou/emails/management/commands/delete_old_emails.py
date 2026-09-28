@@ -8,6 +8,9 @@ from itou.emails.models import Email
 from itou.utils.command import BaseCommand
 
 
+CUTOFF_DAYS = 62
+
+
 class Command(BaseCommand):
     ATOMIC_HANDLE = True
 
@@ -16,6 +19,6 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, **options):
-        qs = Email.objects.filter(created_at__lt=timezone.now() - timedelta(days=62))
+        qs = Email.objects.filter(created_at__lt=timezone.now() - timedelta(days=CUTOFF_DAYS))
         count, _details = qs.delete()
         self.logger.info(f"Deleted {count} email{pluralize(count)}")

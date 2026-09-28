@@ -11,6 +11,7 @@ from django.urls import path
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
+from itou.emails.management.commands.delete_old_emails import CUTOFF_DAYS
 from itou.emails.models import Email
 from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
@@ -26,7 +27,14 @@ class EmailStatusFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        filter_q = Q(esp_response__isnull=True) | Q(esp_response__Messages__contains=[{"Status": "error"}])
+        filter_q = (
+            Q(esp_response__isnull=True)
+            # Brevo returns a "messageId" on success, and a "code" on error.
+            | Q(esp_response__has_key="code")
+            # TODO: Drop this Mailjet fallback when all emails sent by Mailjet
+            # are purged from the database (circa December 2026).
+            | Q(esp_response__has_key="Messages", esp_response__Messages__contains=[{"Status": "error"}])
+        )
         if self.value() == "0":
             return queryset.filter(filter_q)
         elif self.value() == "1":
@@ -66,25 +74,42 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
     @admin.display(description="transmis au fournisseur d’e-mail", boolean=True)
     def sent_to_esp(self, obj):
         if obj.esp_response:
-            return all(msg["Status"] == "success" for msg in obj.esp_response["Messages"])
+            try:
+                # TODO: Drop this Mailjet fallback when all emails sent by Mailjet
+                mailjet_response = obj.esp_response["Messages"]
+            except KeyError:
+                return "messageId" in obj.esp_response
+            else:
+                return all(msg["Status"] == "success" for msg in mailjet_response)
         return False
 
     def details(self, obj):
         if obj.esp_response:
-            [message] = obj.esp_response["Messages"]
-            if message["Status"] == "success":
-                context = {"email_statuses": {"To": [], "Cc": [], "Bcc": []}}
-                for section in context["email_statuses"]:
-                    context["email_statuses"][section] = [
-                        {
-                            "id": recipient["MessageID"],
-                            "email": recipient["Email"],
-                        }
-                        for recipient in message.get(section, [])
-                    ]
-                return loader.render_to_string("admin/emails/mailjet_status.html", context)
-            return format_html("<pre><code>{}</code></pre>", pformat(message["Errors"], width=120))
-        return ""
+            # Brevo message.
+            message_id = obj.esp_response.get("messageId")
+            if message_id:
+                return loader.render_to_string("admin/emails/brevo_status.html", {"message_id": message_id})
+            # TODO: Drop this Mailjet fallback when all emails sent by Mailjet
+            # are purged from the database (circa December 2026).
+            try:
+                [message] = obj.esp_response["Messages"]
+            except KeyError:
+                pass  # Brevo error has key "code" at the top-level, handled below.
+            else:
+                if message["Status"] == "success":
+                    context = {"email_statuses": {"To": [], "Cc": [], "Bcc": []}}
+                    for section in context["email_statuses"]:
+                        context["email_statuses"][section] = [
+                            {
+                                "id": recipient["MessageID"],
+                                "email": recipient["Email"],
+                            }
+                            for recipient in message.get(section, [])
+                        ]
+                    return loader.render_to_string("admin/emails/mailjet_status.html", context)
+                return format_html("<pre><code>{}</code></pre>", pformat(message["Errors"], width=120))
+            # END TODO.
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.esp_response, width=120))
 
     def get_urls(self):
         urls = super().get_urls()
@@ -96,12 +121,37 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
             wrapper.model_admin = self
             return update_wrapper(wrapper, view)
 
-        view_email_url = path(
+        view_brevo_email_url = path(
+            "<str:message_id>/brevo.json",
+            wrap(self.brevo_view),
+            name=f"{self.opts.app_label}_{self.opts.model_name}_brevo",
+        )
+        # TODO: Drop this Mailjet fallback when all emails sent by Mailjet are
+        # purged from the database (circa December 2026).
+        view_mailjet_email_url = path(
             "<int:message_id>/mailjet.json",
             wrap(self.mailjet_view),
             name=f"{self.opts.app_label}_{self.opts.model_name}_mailjet",
         )
-        return [*urls, view_email_url]
+        return [*urls, view_brevo_email_url, view_mailjet_email_url]
+
+    def brevo_view(self, request, message_id, *args, **kwargs):
+        # Proxy Brevo API to avoid giving API credentials to clients.
+        # Middlewares processing the response expect a Django response.
+        return JsonResponse(
+            httpx.get(
+                "https://api.brevo.com/v3/smtp/statistics/events",
+                params={
+                    "messageId": message_id,
+                    # The endpoint defaults to showing stats from the past 30
+                    # days, but emails may be older.
+                    "days": CUTOFF_DAYS,
+                },
+                headers={"api-key": settings.ANYMAIL["BREVO_API_KEY"]},
+            )
+            .raise_for_status()
+            .json()
+        )
 
     def mailjet_view(self, request, message_id, *args, **kwargs):
         # Proxy Mailjet API to avoid giving API credentials to clients.
@@ -109,7 +159,7 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
         return JsonResponse(
             httpx.get(
                 f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}",
-                auth=(settings.ANYMAIL["MAILJET_API_KEY"], settings.ANYMAIL["MAILJET_SECRET_KEY"]),
+                auth=(settings.MAILJET_API_KEY, settings.MAILJET_SECRET_KEY),
             )
             .raise_for_status()
             .json()
