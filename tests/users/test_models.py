@@ -202,6 +202,32 @@ class TestQuerySet:
         assert job_seekers_qs.get(pk=contract_ended.pk).contract_ending_soon is False
         assert job_seekers_qs.get(pk=contract_ended.pk).last_contract_ended_with_valid_approval is True
 
+    def test_with_last_contract_pro_support_report(self):
+        report = ProSupportReportFactory()
+        job_seeker_without_report = ContractFactory(company=report.company).job_seeker
+
+        job_seekers_qs = User.objects.with_last_contract_pro_support_report(
+            siae=report.company
+        ).with_last_contract_end_date(siae=report.company)
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == report.contract.end_date
+        assert job_seekers_qs.get(pk=job_seeker_without_report.pk).last_contract_has_pro_support_report is False
+
+        # A newer contract with another company does not change the SIAE last contract.
+        ContractFactory(
+            job_seeker=report.job_seeker, start_date=report.contract.start_date + datetime.timedelta(days=1)
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+
+        # A newer contract with the SIAE has no report yet.
+        newer_contract = ContractFactory(
+            job_seeker=report.job_seeker,
+            company=report.company,
+            start_date=report.contract.start_date + datetime.timedelta(days=2),
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is False
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == newer_contract.end_date
+
 
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
