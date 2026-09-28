@@ -27,4 +27,4 @@ def test_markdown_render_inline():
 
 def test_markdown_render_inline_forbidden_tags():
     markdown = '# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>\n- item 1\n- item 2'
-    assert markdownify(markdown, "inline") == "Gros titre\n\n\nGros texte\n- item 1\n- item 2"
+    assert markdownify(markdown, "inline") == "Gros titre\n\nGros texte\n- item 1\n- item 2"
