@@ -182,10 +182,10 @@ En résumé :
 2. **Sans** cet en-tête, une valeur `true` pour ce champ signifie que
    le salarié maîtrise la langue française.
 
-Le comportement avec en-tête deviendra standard entre le 01/11/2026 et
-le 15/11/2026. Les clients doivent donc être **modifiés avant le
-01/11/2026** pour envoyer l'en-tête **et** prendre en charge le
-nouveau comportement. À partir du 15/11/2026, l'en-tête pourra être
+Le comportement avec en-tête deviendra standard entre le 01/01/2027 et
+le 15/01/2027. Les clients doivent donc être **modifiés avant le
+01/01/2027** pour envoyer l'en-tête **et** prendre en charge le
+nouveau comportement. À partir du 15/01/2027, l'en-tête pourra être
 supprimée des requêtes, puisque l'API n'aura plus qu'un seul
 comportement possible.
 """
