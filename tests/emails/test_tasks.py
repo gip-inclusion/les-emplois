@@ -13,6 +13,7 @@ class TestAsyncEmailBackend:
         recipients = [Faker("email", locale="fr_FR") for _ in range(75)]
         message = EmailMessage(
             from_email="unit-test@tests.com",
+            reply_to=["reply-to@tests.com"],
             to=recipients,
             cc=["cc@tests.com"],
             bcc=["bcc@tests.com"],
@@ -33,6 +34,7 @@ class TestAsyncEmailBackend:
             assert email.cc == ["cc@tests.com"]
             assert email.bcc == ["bcc@tests.com"]
             assert email.from_email == "unit-test@tests.com"
+            assert email.reply_to == ["reply-to@tests.com"]
             assert email.subject == "subject"
             assert email.body == "body"
 
