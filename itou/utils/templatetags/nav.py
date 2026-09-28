@@ -225,7 +225,7 @@ NAV_ENTRIES = {
         matomo_event_option="structure-presentation",
     ),
     "employer-jobs": NavItem(
-        label="Fiches de postes",
+        label="Fiches de poste",
         target=reverse("companies_views:job_description_list"),
         active_view_names=["companies_views:job_description_list"],
         matomo_event_category="offcanvasNav",
