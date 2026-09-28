@@ -19,7 +19,7 @@ logger = logging.getLogger("itou.emails")
 
 # Mailjet max number of recipients (CC, BCC, TO)
 _MAILJET_MAX_RECIPIENTS = 50
-_EMAIL_KEYS = ("from_email", "cc", "bcc", "subject", "body")
+_EMAIL_KEYS = ("from_email", "reply_to", "cc", "bcc", "subject", "body")
 
 
 def sanitize_mailjet_recipients(email_message):
