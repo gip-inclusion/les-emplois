@@ -38,7 +38,11 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, ProSupportReport, User
-from itou.users.perms import can_fill_pro_support_report, can_orient_towards_insertion_service
+from itou.users.perms import (
+    can_fill_pro_support_report,
+    can_orient_towards_insertion_service,
+    can_view_pro_support_report,
+)
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.emails import redact_email_address
@@ -234,11 +238,22 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                             company_email, self.object.get_full_name()
                         )
 
+        # The latest report the user can view takes the place of the end-of-contract banner.
+        pro_support_report = None
+        if context["can_view_personal_information"]:
+            pro_support_reports = self.object.pro_support_reports.select_related("company").order_by("-created_at")
+            if self.request.from_employer:
+                pro_support_reports = pro_support_reports.filter(company=self.request.current_organization)
+            pro_support_report = pro_support_reports.first()
+            if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
+                pro_support_report = None
+
         return context | {
             "approval": self.approval,
             "approval_expires_soon": self.approval and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS,
             "contract_ending_soon_date": contract_ending_soon_date,
             "pro_support_request_mailto": pro_support_request_mailto,
+            "pro_support_report": pro_support_report,
             "suggest_next_step_url": suggest_next_step_url,
             "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -607,6 +622,30 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),
+        "matomo_custom_title": "Bilan d’accompagnement",
+    }
+    return render(request, template_name, context)
+
+
+@readonly_view
+@check_request(lambda request: request.from_prescriber or request.from_employer)
+def pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report.html"):
+    report = get_object_or_404(
+        ProSupportReport.objects.select_related("job_seeker", "company", "author"), public_id=public_id
+    )
+    # The report is only shown to those who can see who it is about.
+    if not (
+        can_view_pro_support_report(request, report) and can_view_personal_information(request, report.job_seeker)
+    ):
+        raise Http404
+    context = {
+        "report": report,
+        "contract_has_ended": report.contract_end_date < timezone.localdate(),
+        "back_url": get_safe_url(
+            request,
+            "back_url",
+            fallback_url=reverse("job_seekers_views:details", args=(report.job_seeker.public_id,)),
+        ),
         "matomo_custom_title": "Bilan d’accompagnement",
     }
     return render(request, template_name, context)

@@ -1944,3 +1944,6 @@ class ProSupportReport(models.Model):
 
     def __str__(self):
         return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
+
+    def get_barriers_display(self):
+        return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]
