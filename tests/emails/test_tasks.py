@@ -14,6 +14,8 @@ class TestAsyncEmailBackend:
         message = EmailMessage(
             from_email="unit-test@tests.com",
             to=recipients,
+            cc=["cc@tests.com"],
+            bcc=["bcc@tests.com"],
             subject="subject",
             body="body",
         )
@@ -28,6 +30,8 @@ class TestAsyncEmailBackend:
         assert len(email1.to) == 50
         assert len(email2.to) == 25
         for email in [email1, email2]:
+            assert email.cc == ["cc@tests.com"]
+            assert email.bcc == ["bcc@tests.com"]
             assert email.from_email == "unit-test@tests.com"
             assert email.subject == "subject"
             assert email.body == "body"
