@@ -42,7 +42,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="fiches-de-postes" href="/company/job_description_list">
-                                  Fiches de postes
+                                  Fiches de poste
                               </a>
                           </li>
                           <li class="nav-item">
