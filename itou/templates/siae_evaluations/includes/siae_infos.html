@@ -1,7 +1,7 @@
 {% load str_filters %}
 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-{{ evaluated_siae.pk }}">
     <div class="c-box--results__summary flex-grow-1">
-        <i class="ri-community-line" aria-hidden="true"></i>
+        <i class="{{ evaluated_siae.siae.icon }}" aria-hidden="true"></i>
         <div>
             <span>{{ evaluated_siae.siae.kind }} - {{ evaluated_siae.siae.get_kind_display }}</span>
             <h3>{{ evaluated_siae }}</h3>
