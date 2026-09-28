@@ -4,7 +4,7 @@
             <div class="c-box--results__header">
                 <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-start">
                     <div class="c-box--results__summary">
-                        <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+                        <i class="{{ prescriber_org.icon }}" aria-hidden="true"></i>
                         <div>
                             <span>{{ prescriber_org.get_kind_display }}
                                 {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}

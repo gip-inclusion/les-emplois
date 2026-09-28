@@ -7,7 +7,7 @@
             data-bs-target="#collapseBoxOrganization"
             aria-expanded="{{ show|default:False|yesno:'true,false' }}"
             aria-controls="collapseBoxOrganization">
-        <i class="ri-community-line" aria-hidden="true"></i>
+        <i class="{{ organization.icon }}" aria-hidden="true"></i>
         <div>
             <span data-bs-toggle="tooltip"
                   data-bs-title="{{ organization.get_kind_display }}">{{ organization.kind }}</span>

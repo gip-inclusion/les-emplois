@@ -61,7 +61,7 @@
                         <li class="d-flex justify-content-start align-items-center">
                             <a href="{% url 'companies_views:card' company_pk=job_application.to_company.pk %}"
                                class="btn-link btn-ico">
-                                <i class="ri-community-line ri-lg fw-normal" aria-hidden="true"></i>
+                                <i class="{{ job_application.to_company.icon }} ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>{{ job_application.to_company.display_name }}</span>
                             </a>
                         </li>
