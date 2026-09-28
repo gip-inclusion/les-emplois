@@ -134,15 +134,18 @@ class UserQuerySet(models.QuerySet):
     def with_contract_ending_soon(self, siae=None):
         return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
 
+    def last_contract_pk_lookup(self):
+        last_contract = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk"))).order_by("-start_date", "-pk")
+        return Subquery(last_contract.values("pk")[:1])
+
     def last_contract_ended_with_valid_approval_lookup(self, siae):
         from itou.approvals.models import Approval
 
         # Looked up among all companies: an employee hired elsewhere since has found a solution.
-        last_contract = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk"))).order_by("-start_date", "-pk")
         return Q(
             Exists(
                 Contract.objects.filter(
-                    pk=Subquery(last_contract.values("pk")[:1]), company=siae, end_date__lt=timezone.localdate()
+                    pk=self.last_contract_pk_lookup(), company=siae, end_date__lt=timezone.localdate()
                 )
             ),
             Exists(Approval.objects.filter(user=OuterRef("pk")).valid()),
