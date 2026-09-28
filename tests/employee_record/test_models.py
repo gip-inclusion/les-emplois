@@ -244,21 +244,52 @@ class TestEmployeeRecordModel:
 
     def test_unarchive(self, faker, subtests):
         specs = {
-            None: Status.NEW,
-            "0000": Status.PROCESSED,
-            faker.numerify("31##"): Status.ARCHIVED,
-            faker.numerify("32##"): Status.REJECTED,
-            faker.numerify("33##"): Status.REJECTED,
-            faker.numerify("340#"): Status.REJECTED,
-            "3436": Status.PROCESSED,
-            faker.numerify("35##"): Status.ARCHIVED,
+            (None, None): Status.NEW,
+            ("0000", None): Status.PROCESSED,
+            (faker.numerify("31##"), None): Status.ARCHIVED,
+            (faker.numerify("32##"), (Status.REJECTED,)): Status.REJECTED,
+            (
+                faker.numerify("33##"),
+                (
+                    Status.UPDATE_REJECTED,
+                    Status.REJECTED,
+                ),
+            ): Status.REJECTED,
+            (faker.numerify("340#"), (Status.REJECTED,)): Status.REJECTED,
+            (faker.numerify("32##"), (Status.UPDATE_REJECTED,)): Status.UPDATE_REJECTED,
+            (faker.numerify("33##"), (Status.UPDATE_REJECTED,)): Status.UPDATE_REJECTED,
+            (faker.numerify("340#"), (Status.REJECTED, Status.UPDATE_REJECTED)): Status.UPDATE_REJECTED,
+            ("3436", None): Status.PROCESSED,
+            (faker.numerify("35##"), None): Status.ARCHIVED,
         }
 
-        for code, expected_status in specs.items():
+        for (code, old_transition_from), expected_status in specs.items():
             with subtests.test(code=code):
                 employee_record = BareEmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=code)
+                if old_transition_from is not None:
+                    for old_state in old_transition_from:
+                        employee_record.logs.create(
+                            from_state=old_state,
+                            to_state=Status.ARCHIVED,
+                            transition=EmployeeRecordTransition.ARCHIVE,
+                        )
                 employee_record.unarchive()
                 assert employee_record.status == expected_status
+
+    def test_unarchive_with_watched_data_updated_at(self):
+        employee_record = BareEmployeeRecordFactory(
+            status=Status.ARCHIVED,
+            asp_processing_code=EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            watched_data_updated_at=timezone.now(),
+        )
+        employee_record.unarchive()
+        employee_record.refresh_from_db()
+        assert employee_record.status == Status.UPDATE_PENDING
+        # Check that 2 transitions were triggered
+        assert list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True)) == [
+            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
+            EmployeeRecordTransition.PLAN_UPDATE,
+        ]
 
     @pytest.mark.parametrize(
         "code,available_transitions",
@@ -1021,12 +1052,7 @@ def test_transition_log(faker):
         employee_record = EmployeeRecordWithProfileFactory(status=Status.NEW, archivable=True)
         for transition_name, transition_kwargs in specs:
             tested_transitions.add(transition_name)
-            # XXX: special case for unarchive_update_rejected for now
-            transition_name = (
-                "unarchive"
-                if (transition_name.startswith("unarchive_") and transition_name != "unarchive_update_rejected")
-                else transition_name
-            )
+            transition_name = "unarchive" if transition_name.startswith("unarchive_") else transition_name
             getattr(employee_record, transition_name)(**transition_kwargs)
 
         assert employee_record.logs.count() == len(specs)
