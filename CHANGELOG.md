@@ -12,7 +12,6 @@
 - [Admin : Corriger la recherche des villes par code postal](https://github.com/gip-inclusion/les-emplois/pull/8805)
 - [Candidature : Amélioration du tracking sur la liste des candidatures](https://github.com/gip-inclusion/les-emplois/pull/8882)
 - [Employeur : Correction du menu de gauche pour les OPCS et GEIQ](https://github.com/gip-inclusion/les-emplois/pull/8895)
-- [Insertion : Permettre la synchronisation forcée](https://github.com/gip-inclusion/les-emplois/pull/8859)
 
 ### Supprimé
 
