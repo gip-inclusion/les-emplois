@@ -948,7 +948,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 89,
+    'num_queries': 91,
     'queries': list([
       dict({
         'origin': list([
@@ -1149,6 +1149,11 @@
                              (SELECT %s AS "a"
                               FROM "users_jobseekerassignment" U0
                               WHERE U0."professional_id" = ("users_user"."id")
+                              LIMIT 1)
+                           OR EXISTS
+                             (SELECT %s AS "a"
+                              FROM "users_prosupportreport" U0
+                              WHERE U0."author_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
@@ -1964,6 +1969,43 @@
                                                                   %s,
                                                                   %s)
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "users_prosupportreport"."id",
+                 "users_prosupportreport"."public_id",
+                 "users_prosupportreport"."created_at",
+                 "users_prosupportreport"."job_seeker_id",
+                 "users_prosupportreport"."company_id",
+                 "users_prosupportreport"."author_id",
+                 "users_prosupportreport"."contract_id",
+                 "users_prosupportreport"."contract_end_date",
+                 "users_prosupportreport"."barriers",
+                 "users_prosupportreport"."other_barrier",
+                 "users_prosupportreport"."autonomy",
+                 "users_prosupportreport"."solution",
+                 "users_prosupportreport"."orientation"
+          FROM "users_prosupportreport"
+          WHERE "users_prosupportreport"."author_id" IN (%s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3296,6 +3338,30 @@
                                                                 %s,
                                                                 %s,
                                                                 %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_prosupportreport"
+          WHERE "users_prosupportreport"."job_seeker_id" IN (%s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s)
         ''',
       }),
       dict({

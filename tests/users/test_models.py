@@ -34,6 +34,7 @@ from itou.users.enums import (
     JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
+    ProSupportReportSolution,
     Title,
     UserKind,
 )
@@ -56,6 +57,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
     ProfessionalFactory,
+    ProSupportReportFactory,
     UserFactory,
 )
 from tests.utils.testing import normalize_fields_history
@@ -1707,3 +1709,28 @@ class TestJobSeekerAssignment:
             prescriber_organization=PrescriberOrganizationFactory(), assigned_to_unknown_advisor=True
         )
         assert assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+
+
+class TestProSupportReport:
+    @pytest.mark.parametrize(
+        "kwargs,constraint",
+        [
+            pytest.param(
+                {"solution": ProSupportReportSolution.TRAINING},
+                "prosupportreport_solution_or_orientation",
+                id="solution_and_orientation",
+            ),
+            pytest.param(
+                {"orientation": ""}, "prosupportreport_solution_or_orientation", id="no_solution_nor_orientation"
+            ),
+            pytest.param({"autonomy": 6}, "prosupportreport_autonomy_range", id="autonomy_out_of_range"),
+        ],
+    )
+    def test_constraints(self, kwargs, constraint):
+        with pytest.raises(IntegrityError, match=constraint):
+            ProSupportReportFactory(**kwargs)
+
+    def test_unique_per_contract(self):
+        report = ProSupportReportFactory()
+        with pytest.raises(IntegrityError, match="unique_prosupportreport_per_contract"):
+            ProSupportReportFactory(contract=report.contract)

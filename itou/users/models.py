@@ -9,6 +9,7 @@ from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
@@ -49,6 +50,10 @@ from itou.users.enums import (
     JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
     Title,
     UserKind,
 )
@@ -1854,3 +1859,88 @@ class JobSeekerAssignment(models.Model):
     @property
     def is_active(self):
         return self.ended_at is None
+
+
+class ProSupportReport(models.Model):
+    """
+    The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
+    """
+
+    public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    job_seeker = models.ForeignKey(
+        User,
+        verbose_name="salarié",
+        on_delete=models.CASCADE,
+        related_name="pro_support_reports",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    author = models.ForeignKey(
+        User,
+        verbose_name="auteur",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+    # Contracts missing from the ASP data are deleted: the end date is kept on the report.
+    contract = models.ForeignKey(
+        Contract,
+        verbose_name="contrat",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    contract_end_date = models.DateField(verbose_name="date de fin du contrat")
+
+    barriers = ArrayField(
+        verbose_name="freins périphériques",
+        base_field=models.CharField(choices=ProSupportReportBarrier.choices),
+        blank=True,
+    )
+    other_barrier = models.TextField(verbose_name="autres freins identifiés", blank=True, default="")
+    autonomy = models.PositiveSmallIntegerField(
+        verbose_name="autonomie dans la recherche d’emploi",
+        choices=ProSupportReportAutonomy.choices,
+    )
+    solution = models.CharField(
+        verbose_name="solution envisagée",
+        choices=ProSupportReportSolution.choices,
+        blank=True,
+        default="",
+    )
+    orientation = models.CharField(
+        verbose_name="orientation la plus adaptée",
+        choices=ProSupportReportOrientation.choices,
+        blank=True,
+        default="",
+    )
+
+    class Meta:
+        verbose_name = "bilan d’accompagnement"
+        verbose_name_plural = "bilans d’accompagnement"
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_%(class)s_per_contract",
+                fields=["contract"],
+                violation_error_message="Un bilan d’accompagnement existe déjà pour ce contrat.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_autonomy_range",
+                condition=Q(autonomy__range=(1, 5)),
+                violation_error_message="L’autonomie est notée de 1 à 5.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_solution_or_orientation",
+                condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
+                violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
