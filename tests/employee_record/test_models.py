@@ -895,6 +895,23 @@ def test_transition_log(faker):
                     "archive": faker.pydict(value_types=[int, str]),
                 },
             ),
+            (EmployeeRecordTransition.SCHEDULE_MODIFICATION, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS_MODIFICATION,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
             (EmployeeRecordTransition.DISABLE, {}),
             (EmployeeRecordTransition.ENABLE, {"user": ProfessionalFactory()}),
             (EmployeeRecordTransition.ARCHIVE, {}),
@@ -925,12 +942,112 @@ def test_transition_log(faker):
             (EmployeeRecordTransition.ARCHIVE, {}),
             (EmployeeRecordTransition.UNARCHIVE_NEW, {}),
         ],
+        [
+            (EmployeeRecordTransition.READY, {"user": ProfessionalFactory()}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.SCHEDULE_MODIFICATION, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.REJECT_MODIFICATION,
+                {
+                    "code": "3446",
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.RECREATE,
+                {},
+            ),
+            (
+                EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.SCHEDULE_MODIFICATION, {}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.REJECT_MODIFICATION,
+                {
+                    "code": faker.numerify("33##"),
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (EmployeeRecordTransition.ARCHIVE, {}),
+            (EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED, {}),
+            (EmployeeRecordTransition.RETRY_MODIFICATION, {"user": ProfessionalFactory()}),
+            (
+                EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+                {
+                    "file": faker.asp_batch_filename(),
+                    "line_number": faker.pyint(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+            (
+                EmployeeRecordTransition.PROCESS_MODIFICATION,
+                {
+                    "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                    "label": faker.sentence(),
+                    "archive": faker.pydict(value_types=[int, str]),
+                },
+            ),
+        ],
     ]
     for specs in lifecycle_specs:
         employee_record = EmployeeRecordWithProfileFactory(status=Status.NEW, archivable=True)
         for transition_name, transition_kwargs in specs:
             tested_transitions.add(transition_name)
-            transition_name = "unarchive" if transition_name.startswith("unarchive_") else transition_name
+            # XXX: special case for unarchive_update_rejected for now
+            transition_name = (
+                "unarchive"
+                if (
+                    transition_name.startswith("unarchive_")
+                    and transition_name != EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED
+                )
+                else transition_name
+            )
             getattr(employee_record, transition_name)(**transition_kwargs)
 
         assert employee_record.logs.count() == len(specs)
