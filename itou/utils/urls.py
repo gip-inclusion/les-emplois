@@ -123,15 +123,7 @@ def get_zendesk_form_url(request=None):
     return url
 
 
-def markdown_url_set_target_blank(attrs, new=False):
-    attrs[(None, "target")] = "_blank"
-    attrs[(None, "rel")] = "noopener"
-    attrs[(None, "aria-label")] = "Ouverture dans un nouvel onglet"
-    return attrs
-
-
-def markdown_url_set_protocol(attrs, new=False):
-    if href := attrs.get((None, "href")):
+def markdown_url_set_protocol(node):
+    if href := node.attrs.get("href"):
         if not (href.startswith("http") or href.startswith("mailto")):
-            attrs[(None, "href")] = "https://" + href
-    return attrs
+            node.attrs["href"] = "https://" + href

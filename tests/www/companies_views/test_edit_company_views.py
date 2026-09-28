@@ -57,7 +57,7 @@ def test_edit(client, mocker):
         response,
         (
             "<p><em>Lorem ipsum</em></p>\n<ul>\n<li>list 1</li>\n<li>list 2</li>\n</ul>"
-            "\n<ol>\n<li>list 1</li>\n<li>list 2</li>\n</ol>\n\nGros titre"
+            "\n<ol>\n<li>list 1</li>\n<li>list 2</li>\n</ol>\nGros titre"
         ),
     )
     assertContains(

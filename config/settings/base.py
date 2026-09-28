@@ -12,13 +12,15 @@ import re
 from botocore.config import Config
 from django.utils.csp import CSP
 from dotenv import load_dotenv
+from justhtml.transforms import SetAttrs
+from justhtml.transforms.spec import Edit
 
 import itou
 import itou.api.changelog
 from config.sentry import sentry_init
 from itou.utils.brand import product_name
 from itou.utils.enums import ItouEnvironment
-from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
+from itou.utils.urls import markdown_url_set_protocol
 
 
 load_dotenv()
@@ -673,19 +675,39 @@ REQUESTS_TIMEOUT = 5  # in seconds
 MARKDOWNIFY = {
     "default": {
         "WHITELIST_TAGS": ["a", "p", "ul", "ol", "li", "em", "strong", "br"],
+        "WHITELIST_ATTRS": {"a": {"href", "target", "aria-label", "rel"}},
         "MARKDOWN_EXTENSIONS": ["nl2br", "sane_lists"],
         "LINKIFY_TEXT": {
             "PARSE_URLS": True,
-            "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
-            "PARSE_EMAIL": True,
+            "TRANSFORMS": [
+                SetAttrs(
+                    "a",
+                    attributes={
+                        "target": "_blank",
+                        "rel": "noopener",
+                        "aria-label": "Ouverture dans un nouvel onglet",
+                    },
+                ),
+                Edit("a", markdown_url_set_protocol),
+            ],
         },
     },
     "inline": {
         "WHITELIST_TAGS": ["a", "em", "strong", "br"],
+        "WHITELIST_ATTRS": {"a": {"href", "target", "aria-label", "rel"}},
         "LINKIFY_TEXT": {
             "PARSE_URLS": True,
-            "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
-            "PARSE_EMAIL": True,
+            "TRANSFORMS": [
+                SetAttrs(
+                    "a",
+                    attributes={
+                        "target": "_blank",
+                        "rel": "noopener",
+                        "aria-label": "Ouverture dans un nouvel onglet",
+                    },
+                ),
+                Edit("a", markdown_url_set_protocol),
+            ],
         },
     },
 }
