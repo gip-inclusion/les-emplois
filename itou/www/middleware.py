@@ -162,6 +162,10 @@ def _get_redirect_url(request):
         # end up at "new.domain/otp/verify" and it will look like the
         # user has been disconnected (which they are not).
         return None
+    if request.path == reverse("france_connect:sector_identifier"):
+        # We are not sure that France Connect would follow the
+        # redirection. Be defensive and don't redirect.
+        return None
     if request.method != "GET":
         # Don't redirect POST, DELETE, etc.: if the user visits the
         # old domain _before_ we enable the redirection for them, then
