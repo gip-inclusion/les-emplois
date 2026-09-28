@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-09-28
+
+### Ajouté
+
+- [Candidature : Empêcher les prescripteurs habilités de candidater pour une entreprise dont ils sont membre](https://github.com/gip-inclusion/les-emplois/pull/8851)
+- [Insertion : Ajout d’une API qui retourne le nombre d’orientations par structure](https://github.com/gip-inclusion/les-emplois/pull/8858)
+
+### Modifié
+
+- [Admin : Corriger la recherche des villes par code postal](https://github.com/gip-inclusion/les-emplois/pull/8805)
+- [Candidature : Amélioration du tracking sur la liste des candidatures](https://github.com/gip-inclusion/les-emplois/pull/8882)
+- [Employeur : Correction du menu de gauche pour les OPCS et GEIQ](https://github.com/gip-inclusion/les-emplois/pull/8895)
+- [Insertion : Permettre la synchronisation forcée](https://github.com/gip-inclusion/les-emplois/pull/8859)
+
+### Supprimé
+
+- [Fiche salarié : Suppression de la route `/api/v1/employee-record-notifications/`](https://github.com/gip-inclusion/les-emplois/pull/8796)
+
 ## 2026-09-21
 
 ### Ajouté
