@@ -647,11 +647,19 @@ def test_create_fc_user_with_already_existing_fc_email_fails():
         fc_user_data.create_or_update_user()
 
 
-def test_sector_identifier(client, settings):
+@pytest.mark.parametrize(
+    "host",
+    [
+        "emplois.inclusion.beta.gouv.fr",
+        "plateforme.inclusion.gouv.fr",
+    ],
+)
+def test_sector_identifier(client, settings, host):
     settings.ALLOWED_HOSTS = ["emplois.inclusion.beta.gouv.fr", "plateforme.inclusion.gouv.fr"]
+    settings.REDIRECT_TO_NEW_DOMAIN = True
     response = client.get(
         reverse("france_connect:sector_identifier"),
-        headers={"Host": "plateforme.inclusion.gouv.fr"},
+        HTTP_HOST=host,
         secure=True,
     )
     assert response.content == (
