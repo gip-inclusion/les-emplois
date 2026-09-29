@@ -481,9 +481,11 @@ def random_user_kind_factory(**kwargs):
     factory = None
     if identity_provider := kwargs.get("identity_provider"):
         if identity_provider == IdentityProvider.PRO_CONNECT:
-            factory = random.choice([PrescriberFactory, EmployerFactory])
+            factory = random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])
         elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]:
             factory = JobSeekerFactory
+        elif identity_provider == IdentityProvider.DJANGO:
+            factory = random.choice([JobSeekerFactory, ItouStaffFactory])
     if factory is None:
         factory = random.choice(
             [ItouStaffFactory, JobSeekerFactory, PrescriberFactory, EmployerFactory, LaborInspectorFactory]
