@@ -14,12 +14,12 @@ def admin_accounts_tag():
     return [
         {
             "title": "Super-utilisateur",
-            "email": "admin@test.com",
+            "email": "demo.emplois+admin@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "Itou admin",
-            "email": "itouadmin@example.com",
+            "email": "demo.emplois+itouadmin@inclusion.gouv.fr",
             "action_url": action_url,
         },
     ]

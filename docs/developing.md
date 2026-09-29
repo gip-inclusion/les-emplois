@@ -51,7 +51,7 @@ psql  # connects directly to the itou database
 Parmi les comptes créées en peuplant la base de données pour le développement en local se trouve un compte superutilisateur :
 
 - **nom d'utilisateur** : admin
-- **email** : admin@test.com
+- **email** : demo.emplois+admin@inclusion.gouv.fr
 - **mot de passe** : password
 
 Ces identifiants sont utilisables pour se connecter à la console d'administration de Django en local : [http://localhost:8000/admin](http://localhost:8000/admin).
