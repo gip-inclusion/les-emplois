@@ -20,6 +20,13 @@ def bypass_terms_acceptance(view_func):
     return view_func
 
 
+def terms_acceptance_required(user):
+    """Tell whether the user has to go through the terms acceptance page."""
+    if getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False):
+        return False
+    return user.is_authenticated and user.must_accept_terms
+
+
 def _get_terms_templates_dir():
     terms_dir = Path(settings.APPS_DIR) / "templates" / "static" / "legal" / "terms" / "versions"
     if not terms_dir.exists():

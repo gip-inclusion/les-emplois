@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
+from itou.utils.legal_terms import terms_acceptance_required
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
 
 
@@ -104,11 +105,9 @@ class TermsAcceptanceMiddleware:
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False):
-            return None  # setting to globally disable this check
         if not getattr(view_func, "login_required", True):
             return None  # don't enforce terms acceptance for public endpoints
-        if not request.user.is_authenticated or not request.user.must_accept_terms:
+        if not request.user.is_authenticated or not terms_acceptance_required(request.user):
             return None
         if request.method == "POST" or request.htmx:
             return None  # avoid a brutal redirection for HTMX requests or form submissions
