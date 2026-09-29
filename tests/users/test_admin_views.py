@@ -681,7 +681,7 @@ class TestDeactivateView:
         admin_user = get_user(admin_client)
         user.refresh_from_db()
         assert user.is_active is False
-        assert user.username == "old_0e8bee68-6c4b-48bb-850c-0dea09915d94"
+        assert user.username == f"old_{user.pk}_0e8bee68-6c4b-48bb-850c-0dea09915d94"
         assert user.email == "user@example.com_old"
         assert not EmailAddress.objects.filter(user=user).exists()
         for membership in memberships:
