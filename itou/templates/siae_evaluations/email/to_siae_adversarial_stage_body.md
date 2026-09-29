@@ -2,11 +2,11 @@
 {% block body %}
 Bonjour,
 
-La {{evaluation_campaign.institution.name}} a vérifié tous les justificatifs que vous avez transmis dans le cadre du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{evaluation_campaign.evaluated_period_start_at|date:"d E Y"}} et le {{evaluation_campaign.evaluated_period_end_at|date:"d E Y"}}.
+La {{ evaluation_campaign.institution.name }} a vérifié tous les justificatifs que vous avez transmis dans le cadre du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{ evaluation_campaign.evaluated_period_start_at|date:"d E Y" }} et le {{ evaluation_campaign.evaluated_period_end_at|date:"d E Y" }}.
 
-Suite à cette vérification, un ou plusieurs justificatifs sont attendus par la {{evaluation_campaign.institution.name}}.
+Suite à cette vérification, un ou plusieurs justificatifs sont attendus par la {{ evaluation_campaign.institution.name }}.
 
-Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{siae.id}} à la rubrique “Campagne en cours”.
+Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{ siae.id }} à la rubrique “Campagne en cours”.
 
 Une ou plusieurs de vos auto-prescriptions nécessitent la transmission de nouveaux justificatifs.
 

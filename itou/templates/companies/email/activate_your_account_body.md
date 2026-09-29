@@ -2,7 +2,7 @@
 {% block body %}
 Bonjour,
 
-Le compte de votre {{siae.kind}} SIRET {{siae.siret}} vient d’être créé sur {% brand %} !
+Le compte de votre {{ siae.kind }} SIRET {{ siae.siret }} vient d’être créé sur {% brand %} !
 
 Pour activer le compte de l’entreprise, pouvoir embaucher, obtenir des PASS IAE et créer vos fiches salarié, activez votre compte en cliquant ici {{ signup_url }}
 

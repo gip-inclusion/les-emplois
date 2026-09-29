@@ -2,7 +2,7 @@
 {% block body %}
 Bonjour,
 
-La procédure de transmission des justificatifs dans le cadre du contrôle a posteriori sur les embauches réalisées en auto-prescription embauches réalisées entre le {{evaluated_period_start_at|date:"d E Y"}} et le {{evaluated_period_end_at|date:"d E Y"}}, est ouverte pour les SIAE.
+La procédure de transmission des justificatifs dans le cadre du contrôle a posteriori sur les embauches réalisées en auto-prescription embauches réalisées entre le {{ evaluated_period_start_at|date:"d E Y" }} et le {{ evaluated_period_end_at|date:"d E Y" }}, est ouverte pour les SIAE.
 
 Vous pouvez consulter la liste des SIAE qui ont été aléatoirement sélectionnées pour cette campagne de contrôle. Cette liste a été établie sur la base du taux de SIAE à contrôler que vous aviez préalablement validé.
 

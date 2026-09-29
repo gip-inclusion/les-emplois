@@ -2,7 +2,7 @@
 {% block body %}
 Bonjour,
 
-Votre structure {{ siae.kind }} ID {{siae.id}} {{ siae.name }} (SIRET : {{ siae.convention.siret_signature }}) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées en auto-prescription du {{campaign.evaluated_period_start_at|date:"d E Y"}} au {{campaign.evaluated_period_end_at|date:"d E Y"}}.
+Votre structure {{ siae.kind }} ID {{ siae.id }} {{ siae.name }} (SIRET : {{ siae.convention.siret_signature }}) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées en auto-prescription du {{ campaign.evaluated_period_start_at|date:"d E Y" }} au {{ campaign.evaluated_period_end_at|date:"d E Y" }}.
 
 Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez enregistrés lors de ces embauches.
 

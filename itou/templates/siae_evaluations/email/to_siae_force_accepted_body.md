@@ -6,7 +6,7 @@ La campagne de contrôle a posteriori sur les embauches réalisées en auto-pres
 
 La {{ evaluation_campaign.institution.name }} n’a pas étudié la conformité des justificatifs que vous avez transmis dans le délai imparti. Par conséquent, vos auto-prescriptions sont considérées comme conformes.
 
-Cette campagne de contrôle est terminée pour votre SIAE {{ siae.kind }} {{ siae.name }} ID-{{siae.id}}.
+Cette campagne de contrôle est terminée pour votre SIAE {{ siae.kind }} {{ siae.name }} ID-{{ siae.id }}.
 
 Cordialement,
 {% endblock %}
