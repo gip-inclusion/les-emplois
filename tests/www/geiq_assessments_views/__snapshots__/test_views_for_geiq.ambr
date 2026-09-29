@@ -1296,7 +1296,6 @@
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_submission[body of mail sent to institution members]
   '''
-  Bonjour,
   
   La structure `Un Joli GEIQ` a transmis son bilan d’exécution sur le site de La plateforme de l’inclusion.
   

@@ -995,12 +995,18 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         with freeze_time("2024-05-30"):
-            self.employer_1 = CompanyMembershipFactory(user__email="employer1@test.local", company__name="Company 1")
+            self.employer_1 = CompanyMembershipFactory(
+                user__for_snapshot=True,
+                user__email="employer1@test.local",
+                company__name="Company 1",
+            )
             self.prescriber_1 = PrescriberMembershipFactory(
+                user__for_snapshot=True,
                 organization__name="Organization 1",
                 organization__created_at=timezone.now() - relativedelta(months=3),
             )
             self.labor_inspector_1 = InstitutionMembershipFactory(
+                user__for_snapshot=True,
                 institution__name="Institution 1",
                 institution__created_at=timezone.now() - relativedelta(months=3, days=-1),
             )

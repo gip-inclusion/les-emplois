@@ -150,7 +150,11 @@ class TestMembers:
     def test_deactivate_user(self, caplog, client, mailoutbox, snapshot):
         institution = InstitutionFactory(name="DDETS 14")
         admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
-        guest_membership = InstitutionMembershipFactory(institution=institution, is_admin=False)
+        guest_membership = InstitutionMembershipFactory(
+            institution=institution,
+            is_admin=False,
+            user__for_snapshot=True,
+        )
         guest = guest_membership.user
 
         received_invitation = LaborInspectorInvitationFactory(email=guest.email, institution=institution)

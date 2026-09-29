@@ -1,5 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour,
+
 Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur {% brand %} !
 
 **Organisation** :

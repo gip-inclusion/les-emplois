@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 L’employeur {{ prolongation_request.declared_by_siae.display_name }} a sollicité un prescripteur habilité de l’organisation {{ prolongation_request.prescriber_organization.display_name }}  pour demander une prolongation de votre PASS IAE.
 

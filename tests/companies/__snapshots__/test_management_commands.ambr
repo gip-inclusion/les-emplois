@@ -589,7 +589,7 @@
 # ---
 # name: test_deactivate_old_job_description[email body]
   '''
-  Bonjour,
+  Bonjour Jean MICHEL,
   
   Nous vous informons que votre fiche de poste intitulée Agent / Agente cariste de livraison ferroviaire à Vannes - 56 au sein de la structure EI ACME Inc. a été dépubliée automatiquement, car elle n’a pas été mise à jour depuis plus de 3 mois.
   
@@ -1105,7 +1105,6 @@
 # ---
 # name: test_deactivate_spontaneous_jobapps[email body]
   '''
-  Bonjour,
   
   Nous vous informons que la réception des candidatures spontanées pour la structure EI Black Mesa a été suspendue automatiquement, car ce mode de recrutement n’a pas été actualisé depuis plus de 3 mois.
   

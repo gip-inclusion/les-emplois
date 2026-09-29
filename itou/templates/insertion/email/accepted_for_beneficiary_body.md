@@ -3,7 +3,7 @@
 {% block body %}
 Votre demande a été acceptée ! 🎉
 
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Nous avons le plaisir de vous informer que la structure {{ orientation.service.structure.name }} a validé la demande réalisée par {{ orientation.sender.get_full_name }} ({{ orientation.sender_organization.display_name }}) concernant votre positionnement sur {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
 

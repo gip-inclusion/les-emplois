@@ -62,6 +62,18 @@ def get_session_name(session, session_kind, ignore=()):
     return None
 
 
+def assert_bonjour(mailoutbox):
+    bonjour_re = re.compile(r"^Bonjour", re.MULTILINE)
+    for mail in mailoutbox:
+        assert bonjour_re.search(mail.body)
+
+
+def remove_greetings(body):
+    greetings, message = body.split("\n", maxsplit=1)
+    assert greetings.startswith("Bonjour")
+    return message
+
+
 def pretty_indented(soup, indent=4):
     if isinstance(soup, str):
         soup = BeautifulSoup(soup, "html5lib")

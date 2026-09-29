@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Nous vous informons que votre fiche de poste intitulée {{ job_description.display_name }} à {{ job_description.display_location }} au sein de la structure {{ structure.kind }} {{ structure.display_name }} a été dépubliée automatiquement, car elle n’a pas été mise à jour depuis plus de 3 mois.
 

@@ -1,6 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
 
 La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} envoyée par {{ job_application.sender.get_inverted_full_name }} chez {{ job_application.to_company.display_name }} n'a malheureusement pas pu aboutir.
 

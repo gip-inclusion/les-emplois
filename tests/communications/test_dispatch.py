@@ -1,4 +1,6 @@
+import copy
 import re
+from pathlib import Path
 
 import pytest
 
@@ -214,6 +216,12 @@ class TestBaseNotification:
 
 
 class TestEmailNotification:
+    @pytest.fixture(autouse=True)
+    def template_directory(self, settings):
+        [template_engine] = copy.deepcopy(settings.TEMPLATES)
+        template_engine["DIRS"].insert(0, str(Path(__file__).parent / "templates"))
+        settings.TEMPLATES = [template_engine]
+
     @pytest.fixture
     def email_notification(self):
         @notifications_registry.register
@@ -221,7 +229,7 @@ class TestEmailNotification:
             name = "Manageable"
             category = "Manageable"
             subject_template = "layout/base_email_text_subject.txt"
-            body_template = "layout/base_email_text_body.md"
+            body_template = "body.md"
 
         yield FakeEmailNotification
         notifications_registry.unregister(FakeEmailNotification)

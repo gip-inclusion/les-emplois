@@ -1,5 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour,
+
 Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier.
 
 **Organisation** :

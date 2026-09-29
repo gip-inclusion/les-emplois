@@ -45,7 +45,7 @@ from itou.utils.storage.s3 import (  # noqa: E402
     s3_client,
 )
 from tests.utils.htmx.testing import HtmxClient  # noqa: E402
-from tests.utils.testing import ItouClient  # noqa: E402
+from tests.utils.testing import ItouClient, assert_bonjour  # noqa: E402
 
 
 def pytest_addoption(parser):
@@ -893,3 +893,9 @@ def detect_typography_rules():
         return result
 
     Template.render = render
+
+
+@pytest.fixture()
+def mailoutbox(mailoutbox):
+    yield mailoutbox
+    assert_bonjour(mailoutbox)

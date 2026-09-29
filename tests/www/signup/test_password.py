@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertRedirects
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_greetings
 
 
 class TestPasswordReset:
@@ -36,9 +36,9 @@ class TestPasswordReset:
         [email] = mailoutbox
         assert "Réinitialisation de votre mot de passe" in email.subject
         # http://testserver/accounts/password/reset/key/10i-csd61p-5e1867fba060dbbcb8e24f9dd29ee30b/
-        assert re.sub(r"(reset/key/)[A-Za-z0-9\-]+/", r"\1[Reset password key]", email.body) == snapshot(
-            name="password_reset_key_message"
-        )
+        assert remove_greetings(
+            re.sub(r"(reset/key/)[A-Za-z0-9\-]+/", r"\1[Reset password key]", email.body)
+        ) == snapshot(name="password_reset_key_message")
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
         assert len(email.to) == 1
         assert email.to[0] == user.email

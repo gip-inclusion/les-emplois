@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Le contrôle du bilan d’exécution de la structure `{{ assessment.label_geiq_name }}` a été réalisé par {{ assessment.reviewed_by.get_full_name }} de la {{ assessment.reviewed_by_institution.name }}.
 

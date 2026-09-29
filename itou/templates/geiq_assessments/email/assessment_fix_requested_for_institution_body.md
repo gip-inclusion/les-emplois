@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 La {{ institution.name }} a demandé une correction du bilan d’exécution.
 

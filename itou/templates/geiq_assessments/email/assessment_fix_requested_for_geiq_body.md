@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 La {{ institution.name }} vous a renvoyé votre bilan d’exécution afin que vous puissiez y apporter les corrections nécessaires.
 

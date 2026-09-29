@@ -38,6 +38,7 @@ from tests.utils.testing import (
     default_storage_ls_files,
     parse_response_to_soup,
     pretty_indented,
+    remove_greetings,
 )
 
 
@@ -712,7 +713,7 @@ class TestAssessmentDetailsForGEIQView:
             f"[TEST] Transmission du bilan d’exécution par la structure {assessment.label_geiq_name}" == email.subject
         )
         assert email.to[0] == ddets_membership.user.email
-        assert email.body == snapshot(name="body of mail sent to institution members")
+        assert remove_greetings(email.body) == snapshot(name="body of mail sent to institution members")
 
         response = client.get(details_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(

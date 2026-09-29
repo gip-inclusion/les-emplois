@@ -66,6 +66,7 @@ from tests.utils.testing import (
     get_session_name,
     parse_response_to_soup,
     pretty_indented,
+    remove_greetings,
 )
 from tests.www.eligibility_views.utils import (
     CERTIFICATION_ERROR_BADGE_HTML,
@@ -1512,7 +1513,7 @@ class TestProcessViews:
         assert mail_to_job_seeker.body == snapshot(name="add_to_pool_email_to_job_seeker_body")
         assert mail_to_prescriber.to == [job_application.sender.email]
         assert mail_to_prescriber.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
-        assert mail_to_prescriber.body == snapshot(name="add_to_pool_email_to_proxy_body")
+        assert remove_greetings(mail_to_prescriber.body) == snapshot(name="add_to_pool_email_to_proxy_body")
 
     def test_add_to_pool_from_job_seeker(self, client, snapshot, mailoutbox):
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_ADDED_TO_POOL_STATES)
@@ -1580,7 +1581,7 @@ class TestProcessViews:
         assert mail_to_job_seeker.body == snapshot(name="add_to_pool_email_to_job_seeker_body")
         assert mail_to_other_employer.to == [job_application.sender.email]
         assert mail_to_other_employer.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
-        assert mail_to_other_employer.body == snapshot(name="add_to_pool_email_to_proxy_body")
+        assert remove_greetings(mail_to_other_employer.body) == snapshot(name="add_to_pool_email_to_proxy_body")
 
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_postpone_from_prescriber(self, is_authorized_prescriber, client, snapshot, mailoutbox):
@@ -1621,7 +1622,7 @@ class TestProcessViews:
         assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
         assert mail_to_prescriber.to == [job_application.sender.email]
         assert mail_to_prescriber.subject == snapshot(name="postpone_email_to_proxy_subject")
-        assert mail_to_prescriber.body == snapshot(name="postpone_email_to_proxy_body")
+        assert remove_greetings(mail_to_prescriber.body) == snapshot(name="postpone_email_to_proxy_body")
 
     def test_postpone_from_job_seeker(self, client, snapshot, mailoutbox):
         """Ensure that the `postpone` transition is triggered."""
@@ -1689,7 +1690,7 @@ class TestProcessViews:
         assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
         assert mail_to_other_employer.to == [job_application.sender.email]
         assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
-        assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
+        assert remove_greetings(mail_to_other_employer.body) == snapshot(name="postpone_email_to_proxy_body")
 
     def test_postpone_missing_answer(self, client):
         company = CompanyFactory(with_membership=True)

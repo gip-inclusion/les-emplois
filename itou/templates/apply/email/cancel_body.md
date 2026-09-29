@@ -4,6 +4,8 @@
 {% load str_filters %}
 {% block body %}
 {% enums "job_applications" "SenderKind" as SenderKind %}
+Bonjour {{ user.get_full_name }},
+
 Embauche annulée
 
 Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} a bien été annulée.

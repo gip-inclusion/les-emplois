@@ -1,4 +1,6 @@
 {% autoescape off %}
+Bonjour {{ user.get_full_name }},
+
 Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
 Afin de finaliser votre inscription, cliquez sur le lien suivant :

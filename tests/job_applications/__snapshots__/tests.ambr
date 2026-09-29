@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-False][job_seeker_email]
   '''
+  Bonjour Jane DOE,
+  
   Votre candidature chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
@@ -17,6 +19,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-False][prescriber_email]
   '''
+  Bonjour Pierre DUPONT,
+  
   La candidature de D… J… envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   **Motif de refus non transmis à l’usager** :
@@ -39,6 +43,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-True][job_seeker_email]
   '''
+  Bonjour Jane DOE,
+  
   Votre candidature chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
@@ -55,6 +61,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-True][prescriber_email]
   '''
+  Bonjour Pierre DUPONT,
+  
   La candidature de DOE Jane envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   **Motif de refus non transmis à l’usager** :
@@ -81,6 +89,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-False][job_seeker_email]
   '''
+  Bonjour Jane DOE,
+  
   Votre candidature chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
@@ -101,6 +111,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-False][prescriber_email]
   '''
+  Bonjour Pierre DUPONT,
+  
   La candidature de D… J… envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   **Motif de refus transmis à l’usager** :
@@ -123,6 +135,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-True][job_seeker_email]
   '''
+  Bonjour Jane DOE,
+  
   Votre candidature chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
@@ -143,6 +157,8 @@
 # ---
 # name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-True][prescriber_email]
   '''
+  Bonjour Pierre DUPONT,
+  
   La candidature de DOE Jane envoyée par DUPONT Pierre chez ACME Inc. n'a malheureusement pas pu aboutir.
   
   **Motif de refus transmis à l’usager** :

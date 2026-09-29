@@ -3,7 +3,7 @@
 {% block body %}
 Une orientation effectuée en votre nom a été annulée.
 
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} a envoyé une demande d’orientation en votre nom, auprès du service {{ orientation.service.name }}, le {{ orientation.created_at|date:"d/m/Y" }}.
 

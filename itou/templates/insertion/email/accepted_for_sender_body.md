@@ -4,7 +4,7 @@
 {% block body %}
 Votre demande d’orientation pour {{ orientation.beneficiary.get_full_name|mask_unless:orientation.sender_can_view_personal_information }} été acceptée ! 🎉
 
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Votre demande concernant {{ orientation.beneficiary.get_full_name|mask_unless:orientation.sender_can_view_personal_information }} à été validée par la structure {{ orientation.service.structure.name }} pour le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
 

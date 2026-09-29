@@ -1,4 +1,6 @@
 {% autoescape off %}
+Bonjour {{ user.get_full_name }},
+
 Nous avons bien enregistré votre demande de modification d'adresse e-mail.
 
 Afin de finaliser ce changement, cliquez sur le lien suivant :

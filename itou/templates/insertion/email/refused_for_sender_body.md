@@ -3,7 +3,7 @@
 {% block body %}
 Votre demande d’orientation pour {{ orientation.beneficiary.get_full_name|mask_unless:orientation.sender_can_view_personal_information }} a été refusée.
 
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 La structure {{ orientation.service.structure.name }} n’a pas pu donner suite à votre demande d’orientation pour {{ orientation.beneficiary.get_full_name|mask_unless:orientation.sender_can_view_personal_information }} sur le service {{ orientation.service.name }}.
 

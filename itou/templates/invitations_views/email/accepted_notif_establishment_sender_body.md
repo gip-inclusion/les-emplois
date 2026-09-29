@@ -1,5 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
+
 {{ first_name|title }} {{ last_name|upper }} est désormais membre de la structure {{ establishment_name }}.
 
 # Détails

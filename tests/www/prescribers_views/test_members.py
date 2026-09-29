@@ -165,12 +165,10 @@ class TestUserMembershipDeactivation:
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        organization = PrescriberOrganizationWith2MembershipFactory(name="Mission locale", email="ml@mailinator.com")
-        admin = organization.members.filter(prescribermembership__is_admin=True).first()
-        guest = organization.members.filter(prescribermembership__is_admin=False).first()
-
-        memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
+        organization = PrescriberOrganizationFactory(name="Mission locale", email="ml@mailinator.com")
+        admin = PrescriberMembershipFactory(organization=organization).user
+        membership = PrescriberMembershipFactory(organization=organization, is_admin=False, user__for_snapshot=True)
+        guest = membership.user
 
         received_invitation = PrescriberWithOrgInvitationFactory(email=guest.email, organization=organization)
         sent_invitation = PrescriberWithOrgInvitationFactory(sender=guest, organization=organization)

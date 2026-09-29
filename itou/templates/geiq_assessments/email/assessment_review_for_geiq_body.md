@@ -2,7 +2,7 @@
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Votre bilan d’exécution a été contrôlé par les services de l’État.
 
