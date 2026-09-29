@@ -11,6 +11,7 @@
              aria-label="Pagination"
              {% if boost|default:False %}hx-boost="true"{% endif %}
              {% if boost_target|default:False %}hx-target="{{ boost_target }}"{% endif %}
+             {% if boost_swap|default:False %}hx-swap="{{ boost_swap }}"{% endif %}
              {% if boost_indicator|default:False %}hx-indicator="{{ boost_indicator }}"{% endif %}
              {% if extra_attributes|default:"" %}{{ extra_attributes }}{% endif %}>
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}

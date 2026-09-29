@@ -1,0 +1,102 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}{{ person.full_name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ person.full_name }}</h1>
+            <p class="mb-0">{{ person.kind_label }} • {{ person.main_organization.name }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            {% include "directory/includes/beta_notice.html" %}
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <h2>Coordonnées partagées</h2>
+                    <div class="d-grid gap-3 mb-4">
+                        {% if person.phone %}
+                            <button type="button"
+                                    class="btn btn-outline-primary text-start"
+                                    hx-get="{% url 'directory:reveal_contact' key=person.key field='phone' %}"
+                                    hx-swap="outerHTML">Afficher le téléphone</button>
+                        {% else %}
+                            <p class="mb-0"><strong>Téléphone :</strong> Non renseigné</p>
+                        {% endif %}
+                        {% if person.email %}
+                            <button type="button"
+                                    class="btn btn-outline-primary text-start"
+                                    hx-get="{% url 'directory:reveal_contact' key=person.key field='email' %}"
+                                    hx-swap="outerHTML">Afficher l'adresse e-mail</button>
+                        {% endif %}
+                    </div>
+
+                    <h2>Structure</h2>
+                    <div id="struct-details" class="c-box mb-4">
+                        <div class="c-box__body">
+                            {% if person.main_organization.kind_label %}
+                                <span class="badge rounded-pill bg-info-lighter text-info">{{ person.main_organization.kind_label }}</span>
+                            {% endif %}
+                            <h3 class="mt-2">{{ person.main_organization.name }}</h3>
+                            {% if person.main_organization.address %}
+                                <address>{{ person.main_organization.address }}</address>
+                            {% endif %}
+                            {% if person.main_organization.phone %}
+                                <button type="button"
+                                        class="btn btn-outline-primary text-start mb-2"
+                                        hx-get="{% url 'directory:reveal_contact' key=person.key field='phone' %}?org={{ person.main_organization.key|urlencode }}"
+                                        hx-swap="outerHTML">Afficher le téléphone de la structure</button>
+                            {% endif %}
+                            {% if person.main_organization.email %}
+                                <button type="button"
+                                        class="btn btn-outline-primary text-start mb-2"
+                                        hx-get="{% url 'directory:reveal_contact' key=person.key field='email' %}?org={{ person.main_organization.key|urlencode }}"
+                                        hx-swap="outerHTML">Afficher l'adresse e-mail de la structure</button>
+                            {% endif %}
+                            {% if person.main_organization.website %}
+                                <p>
+                                    <a href="{{ person.main_organization.website }}"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="has-external-link">Site internet</a>
+                                </p>
+                            {% endif %}
+                            {% if person.main_organization.card_url %}
+                                <a href="{{ person.main_organization.card_url }}"
+                                   class="btn btn-outline-primary">Voir la fiche structure</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h2>Envoyer un message</h2>
+                    <p>Votre message sera transmis par e-mail. La personne pourra vous répondre directement.</p>
+                    <form id="contact-form" method="post" action="{% url 'directory:send_message' key=person.key %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="back_url" value="{{ back_url }}">
+                        {% bootstrap_form contact_form alert_error_type="all" %}
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/htmx_compat.js' %}"></script>
+    <script src="{% static 'js/directory.js' %}"></script>
+    {% include "directory/includes/feedback.html" %}
+{% endblock %}
