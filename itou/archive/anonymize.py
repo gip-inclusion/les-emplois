@@ -105,5 +105,10 @@ def anonymize_professionals_without_deletion(users):
         coords=None,
         insee_city=None,
     )
+
+    for user in users:
+        user.username = user.deactivated_username
+    User.objects.bulk_update(users, ["username"])
+
     text = f"{timezone.localtime().replace(microsecond=0)} - Désactivation/archivage de l'utilisateur"
     bulk_add_support_remark_to_objs(users, text)
