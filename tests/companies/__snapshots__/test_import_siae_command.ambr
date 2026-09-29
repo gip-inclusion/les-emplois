@@ -8,53 +8,55 @@
           'check_whether_signup_is_possible_for_all_siaes[companies/management/commands/_import_siae/siae.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT "companies_company"."id",
-                          "companies_company"."address_line_1",
-                          "companies_company"."address_line_2",
-                          "companies_company"."post_code",
-                          "companies_company"."city",
-                          "companies_company"."department",
-                          "companies_company"."coords",
-                          "companies_company"."geocoding_score",
-                          "companies_company"."geocoding_updated_at",
-                          "companies_company"."ban_api_resolved_address",
-                          "companies_company"."insee_city_id",
-                          "companies_company"."name",
-                          "companies_company"."created_at",
-                          "companies_company"."updated_at",
-                          "companies_company"."uid",
-                          "companies_company"."active_members_email_reminder_last_sent_at",
-                          "companies_company"."automatic_geocoding_update",
-                          "companies_company"."siret",
-                          "companies_company"."naf",
-                          "companies_company"."kind",
-                          "companies_company"."brand",
-                          "companies_company"."phone",
-                          "companies_company"."email",
-                          "companies_company"."auth_email",
-                          "companies_company"."website",
-                          "companies_company"."description",
-                          "companies_company"."provided_support",
-                          "companies_company"."source",
-                          "companies_company"."created_by_id",
-                          "companies_company"."block_job_applications",
-                          "companies_company"."job_applications_blocked_at",
-                          "companies_company"."spontaneous_applications_open_since",
-                          "companies_company"."convention_id",
-                          "companies_company"."job_app_score",
-                          "companies_company"."is_searchable",
-                          "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND "companies_company"."auth_email" = %s
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_companymembership" U1
-                             WHERE (U1."is_active"
-                                    AND U1."company_id" = ("companies_company"."id"))
-                             LIMIT 1)))
+          SELECT COUNT(*)
+          FROM
+            (SELECT DISTINCT "companies_company"."id" AS "col1",
+                             "companies_company"."address_line_1" AS "col2",
+                             "companies_company"."address_line_2" AS "col3",
+                             "companies_company"."post_code" AS "col4",
+                             "companies_company"."city" AS "col5",
+                             "companies_company"."department" AS "col6",
+                             "companies_company"."coords" AS "col7",
+                             "companies_company"."geocoding_score" AS "col8",
+                             "companies_company"."geocoding_updated_at" AS "col9",
+                             "companies_company"."ban_api_resolved_address" AS "col10",
+                             "companies_company"."insee_city_id" AS "col11",
+                             "companies_company"."name" AS "col12",
+                             "companies_company"."created_at" AS "col13",
+                             "companies_company"."updated_at" AS "col14",
+                             "companies_company"."uid" AS "col15",
+                             "companies_company"."active_members_email_reminder_last_sent_at" AS "col16",
+                             "companies_company"."automatic_geocoding_update" AS "col17",
+                             "companies_company"."siret" AS "col18",
+                             "companies_company"."naf" AS "col19",
+                             "companies_company"."kind" AS "col20",
+                             "companies_company"."brand" AS "col21",
+                             "companies_company"."phone" AS "col22",
+                             "companies_company"."email" AS "col23",
+                             "companies_company"."auth_email" AS "col24",
+                             "companies_company"."website" AS "col25",
+                             "companies_company"."description" AS "col26",
+                             "companies_company"."provided_support" AS "col27",
+                             "companies_company"."source" AS "col28",
+                             "companies_company"."created_by_id" AS "col29",
+                             "companies_company"."block_job_applications" AS "col30",
+                             "companies_company"."job_applications_blocked_at" AS "col31",
+                             "companies_company"."spontaneous_applications_open_since" AS "col32",
+                             "companies_company"."convention_id" AS "col33",
+                             "companies_company"."job_app_score" AS "col34",
+                             "companies_company"."is_searchable" AS "col35",
+                             "companies_company"."rdv_solidarites_id" AS "col36"
+             FROM "companies_company"
+             WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
+                    AND "companies_company"."auth_email" = %s
+                    AND NOT (EXISTS
+                               (SELECT %s AS "a"
+                                FROM "companies_companymembership" U1
+                                WHERE (U1."is_active"
+                                       AND U1."company_id" = ("companies_company"."id"))
+                                LIMIT 1)))) subquery
         ''',
       }),
     ]),
@@ -69,53 +71,55 @@
           'check_whether_signup_is_possible_for_all_siaes[companies/management/commands/_import_siae/siae.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT "companies_company"."id",
-                          "companies_company"."address_line_1",
-                          "companies_company"."address_line_2",
-                          "companies_company"."post_code",
-                          "companies_company"."city",
-                          "companies_company"."department",
-                          "companies_company"."coords",
-                          "companies_company"."geocoding_score",
-                          "companies_company"."geocoding_updated_at",
-                          "companies_company"."ban_api_resolved_address",
-                          "companies_company"."insee_city_id",
-                          "companies_company"."name",
-                          "companies_company"."created_at",
-                          "companies_company"."updated_at",
-                          "companies_company"."uid",
-                          "companies_company"."active_members_email_reminder_last_sent_at",
-                          "companies_company"."automatic_geocoding_update",
-                          "companies_company"."siret",
-                          "companies_company"."naf",
-                          "companies_company"."kind",
-                          "companies_company"."brand",
-                          "companies_company"."phone",
-                          "companies_company"."email",
-                          "companies_company"."auth_email",
-                          "companies_company"."website",
-                          "companies_company"."description",
-                          "companies_company"."provided_support",
-                          "companies_company"."source",
-                          "companies_company"."created_by_id",
-                          "companies_company"."block_job_applications",
-                          "companies_company"."job_applications_blocked_at",
-                          "companies_company"."spontaneous_applications_open_since",
-                          "companies_company"."convention_id",
-                          "companies_company"."job_app_score",
-                          "companies_company"."is_searchable",
-                          "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND "companies_company"."auth_email" = %s
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_companymembership" U1
-                             WHERE (U1."is_active"
-                                    AND U1."company_id" = ("companies_company"."id"))
-                             LIMIT 1)))
+          SELECT COUNT(*)
+          FROM
+            (SELECT DISTINCT "companies_company"."id" AS "col1",
+                             "companies_company"."address_line_1" AS "col2",
+                             "companies_company"."address_line_2" AS "col3",
+                             "companies_company"."post_code" AS "col4",
+                             "companies_company"."city" AS "col5",
+                             "companies_company"."department" AS "col6",
+                             "companies_company"."coords" AS "col7",
+                             "companies_company"."geocoding_score" AS "col8",
+                             "companies_company"."geocoding_updated_at" AS "col9",
+                             "companies_company"."ban_api_resolved_address" AS "col10",
+                             "companies_company"."insee_city_id" AS "col11",
+                             "companies_company"."name" AS "col12",
+                             "companies_company"."created_at" AS "col13",
+                             "companies_company"."updated_at" AS "col14",
+                             "companies_company"."uid" AS "col15",
+                             "companies_company"."active_members_email_reminder_last_sent_at" AS "col16",
+                             "companies_company"."automatic_geocoding_update" AS "col17",
+                             "companies_company"."siret" AS "col18",
+                             "companies_company"."naf" AS "col19",
+                             "companies_company"."kind" AS "col20",
+                             "companies_company"."brand" AS "col21",
+                             "companies_company"."phone" AS "col22",
+                             "companies_company"."email" AS "col23",
+                             "companies_company"."auth_email" AS "col24",
+                             "companies_company"."website" AS "col25",
+                             "companies_company"."description" AS "col26",
+                             "companies_company"."provided_support" AS "col27",
+                             "companies_company"."source" AS "col28",
+                             "companies_company"."created_by_id" AS "col29",
+                             "companies_company"."block_job_applications" AS "col30",
+                             "companies_company"."job_applications_blocked_at" AS "col31",
+                             "companies_company"."spontaneous_applications_open_since" AS "col32",
+                             "companies_company"."convention_id" AS "col33",
+                             "companies_company"."job_app_score" AS "col34",
+                             "companies_company"."is_searchable" AS "col35",
+                             "companies_company"."rdv_solidarites_id" AS "col36"
+             FROM "companies_company"
+             WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
+                    AND "companies_company"."auth_email" = %s
+                    AND NOT (EXISTS
+                               (SELECT %s AS "a"
+                                FROM "companies_companymembership" U1
+                                WHERE (U1."is_active"
+                                       AND U1."company_id" = ("companies_company"."id"))
+                                LIMIT 1)))) subquery
         ''',
       }),
     ]),
@@ -130,53 +134,55 @@
           'check_whether_signup_is_possible_for_all_siaes[companies/management/commands/_import_siae/siae.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT "companies_company"."id",
-                          "companies_company"."address_line_1",
-                          "companies_company"."address_line_2",
-                          "companies_company"."post_code",
-                          "companies_company"."city",
-                          "companies_company"."department",
-                          "companies_company"."coords",
-                          "companies_company"."geocoding_score",
-                          "companies_company"."geocoding_updated_at",
-                          "companies_company"."ban_api_resolved_address",
-                          "companies_company"."insee_city_id",
-                          "companies_company"."name",
-                          "companies_company"."created_at",
-                          "companies_company"."updated_at",
-                          "companies_company"."uid",
-                          "companies_company"."active_members_email_reminder_last_sent_at",
-                          "companies_company"."automatic_geocoding_update",
-                          "companies_company"."siret",
-                          "companies_company"."naf",
-                          "companies_company"."kind",
-                          "companies_company"."brand",
-                          "companies_company"."phone",
-                          "companies_company"."email",
-                          "companies_company"."auth_email",
-                          "companies_company"."website",
-                          "companies_company"."description",
-                          "companies_company"."provided_support",
-                          "companies_company"."source",
-                          "companies_company"."created_by_id",
-                          "companies_company"."block_job_applications",
-                          "companies_company"."job_applications_blocked_at",
-                          "companies_company"."spontaneous_applications_open_since",
-                          "companies_company"."convention_id",
-                          "companies_company"."job_app_score",
-                          "companies_company"."is_searchable",
-                          "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND "companies_company"."auth_email" = %s
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_companymembership" U1
-                             WHERE (U1."is_active"
-                                    AND U1."company_id" = ("companies_company"."id"))
-                             LIMIT 1)))
+          SELECT COUNT(*)
+          FROM
+            (SELECT DISTINCT "companies_company"."id" AS "col1",
+                             "companies_company"."address_line_1" AS "col2",
+                             "companies_company"."address_line_2" AS "col3",
+                             "companies_company"."post_code" AS "col4",
+                             "companies_company"."city" AS "col5",
+                             "companies_company"."department" AS "col6",
+                             "companies_company"."coords" AS "col7",
+                             "companies_company"."geocoding_score" AS "col8",
+                             "companies_company"."geocoding_updated_at" AS "col9",
+                             "companies_company"."ban_api_resolved_address" AS "col10",
+                             "companies_company"."insee_city_id" AS "col11",
+                             "companies_company"."name" AS "col12",
+                             "companies_company"."created_at" AS "col13",
+                             "companies_company"."updated_at" AS "col14",
+                             "companies_company"."uid" AS "col15",
+                             "companies_company"."active_members_email_reminder_last_sent_at" AS "col16",
+                             "companies_company"."automatic_geocoding_update" AS "col17",
+                             "companies_company"."siret" AS "col18",
+                             "companies_company"."naf" AS "col19",
+                             "companies_company"."kind" AS "col20",
+                             "companies_company"."brand" AS "col21",
+                             "companies_company"."phone" AS "col22",
+                             "companies_company"."email" AS "col23",
+                             "companies_company"."auth_email" AS "col24",
+                             "companies_company"."website" AS "col25",
+                             "companies_company"."description" AS "col26",
+                             "companies_company"."provided_support" AS "col27",
+                             "companies_company"."source" AS "col28",
+                             "companies_company"."created_by_id" AS "col29",
+                             "companies_company"."block_job_applications" AS "col30",
+                             "companies_company"."job_applications_blocked_at" AS "col31",
+                             "companies_company"."spontaneous_applications_open_since" AS "col32",
+                             "companies_company"."convention_id" AS "col33",
+                             "companies_company"."job_app_score" AS "col34",
+                             "companies_company"."is_searchable" AS "col35",
+                             "companies_company"."rdv_solidarites_id" AS "col36"
+             FROM "companies_company"
+             WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
+                    AND "companies_company"."auth_email" = %s
+                    AND NOT (EXISTS
+                               (SELECT %s AS "a"
+                                FROM "companies_companymembership" U1
+                                WHERE (U1."is_active"
+                                       AND U1."company_id" = ("companies_company"."id"))
+                                LIMIT 1)))) subquery
         ''',
       }),
     ]),
@@ -191,53 +197,55 @@
           'check_whether_signup_is_possible_for_all_siaes[companies/management/commands/_import_siae/siae.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT "companies_company"."id",
-                          "companies_company"."address_line_1",
-                          "companies_company"."address_line_2",
-                          "companies_company"."post_code",
-                          "companies_company"."city",
-                          "companies_company"."department",
-                          "companies_company"."coords",
-                          "companies_company"."geocoding_score",
-                          "companies_company"."geocoding_updated_at",
-                          "companies_company"."ban_api_resolved_address",
-                          "companies_company"."insee_city_id",
-                          "companies_company"."name",
-                          "companies_company"."created_at",
-                          "companies_company"."updated_at",
-                          "companies_company"."uid",
-                          "companies_company"."active_members_email_reminder_last_sent_at",
-                          "companies_company"."automatic_geocoding_update",
-                          "companies_company"."siret",
-                          "companies_company"."naf",
-                          "companies_company"."kind",
-                          "companies_company"."brand",
-                          "companies_company"."phone",
-                          "companies_company"."email",
-                          "companies_company"."auth_email",
-                          "companies_company"."website",
-                          "companies_company"."description",
-                          "companies_company"."provided_support",
-                          "companies_company"."source",
-                          "companies_company"."created_by_id",
-                          "companies_company"."block_job_applications",
-                          "companies_company"."job_applications_blocked_at",
-                          "companies_company"."spontaneous_applications_open_since",
-                          "companies_company"."convention_id",
-                          "companies_company"."job_app_score",
-                          "companies_company"."is_searchable",
-                          "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND "companies_company"."auth_email" = %s
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_companymembership" U1
-                             WHERE (U1."is_active"
-                                    AND U1."company_id" = ("companies_company"."id"))
-                             LIMIT 1)))
+          SELECT COUNT(*)
+          FROM
+            (SELECT DISTINCT "companies_company"."id" AS "col1",
+                             "companies_company"."address_line_1" AS "col2",
+                             "companies_company"."address_line_2" AS "col3",
+                             "companies_company"."post_code" AS "col4",
+                             "companies_company"."city" AS "col5",
+                             "companies_company"."department" AS "col6",
+                             "companies_company"."coords" AS "col7",
+                             "companies_company"."geocoding_score" AS "col8",
+                             "companies_company"."geocoding_updated_at" AS "col9",
+                             "companies_company"."ban_api_resolved_address" AS "col10",
+                             "companies_company"."insee_city_id" AS "col11",
+                             "companies_company"."name" AS "col12",
+                             "companies_company"."created_at" AS "col13",
+                             "companies_company"."updated_at" AS "col14",
+                             "companies_company"."uid" AS "col15",
+                             "companies_company"."active_members_email_reminder_last_sent_at" AS "col16",
+                             "companies_company"."automatic_geocoding_update" AS "col17",
+                             "companies_company"."siret" AS "col18",
+                             "companies_company"."naf" AS "col19",
+                             "companies_company"."kind" AS "col20",
+                             "companies_company"."brand" AS "col21",
+                             "companies_company"."phone" AS "col22",
+                             "companies_company"."email" AS "col23",
+                             "companies_company"."auth_email" AS "col24",
+                             "companies_company"."website" AS "col25",
+                             "companies_company"."description" AS "col26",
+                             "companies_company"."provided_support" AS "col27",
+                             "companies_company"."source" AS "col28",
+                             "companies_company"."created_by_id" AS "col29",
+                             "companies_company"."block_job_applications" AS "col30",
+                             "companies_company"."job_applications_blocked_at" AS "col31",
+                             "companies_company"."spontaneous_applications_open_since" AS "col32",
+                             "companies_company"."convention_id" AS "col33",
+                             "companies_company"."job_app_score" AS "col34",
+                             "companies_company"."is_searchable" AS "col35",
+                             "companies_company"."rdv_solidarites_id" AS "col36"
+             FROM "companies_company"
+             WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
+                    AND "companies_company"."auth_email" = %s
+                    AND NOT (EXISTS
+                               (SELECT %s AS "a"
+                                FROM "companies_companymembership" U1
+                                WHERE (U1."is_active"
+                                       AND U1."company_id" = ("companies_company"."id"))
+                                LIMIT 1)))) subquery
         ''',
       }),
     ]),
@@ -252,53 +260,55 @@
           'check_whether_signup_is_possible_for_all_siaes[companies/management/commands/_import_siae/siae.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT "companies_company"."id",
-                          "companies_company"."address_line_1",
-                          "companies_company"."address_line_2",
-                          "companies_company"."post_code",
-                          "companies_company"."city",
-                          "companies_company"."department",
-                          "companies_company"."coords",
-                          "companies_company"."geocoding_score",
-                          "companies_company"."geocoding_updated_at",
-                          "companies_company"."ban_api_resolved_address",
-                          "companies_company"."insee_city_id",
-                          "companies_company"."name",
-                          "companies_company"."created_at",
-                          "companies_company"."updated_at",
-                          "companies_company"."uid",
-                          "companies_company"."active_members_email_reminder_last_sent_at",
-                          "companies_company"."automatic_geocoding_update",
-                          "companies_company"."siret",
-                          "companies_company"."naf",
-                          "companies_company"."kind",
-                          "companies_company"."brand",
-                          "companies_company"."phone",
-                          "companies_company"."email",
-                          "companies_company"."auth_email",
-                          "companies_company"."website",
-                          "companies_company"."description",
-                          "companies_company"."provided_support",
-                          "companies_company"."source",
-                          "companies_company"."created_by_id",
-                          "companies_company"."block_job_applications",
-                          "companies_company"."job_applications_blocked_at",
-                          "companies_company"."spontaneous_applications_open_since",
-                          "companies_company"."convention_id",
-                          "companies_company"."job_app_score",
-                          "companies_company"."is_searchable",
-                          "companies_company"."rdv_solidarites_id"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND "companies_company"."auth_email" = %s
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_companymembership" U1
-                             WHERE (U1."is_active"
-                                    AND U1."company_id" = ("companies_company"."id"))
-                             LIMIT 1)))
+          SELECT COUNT(*)
+          FROM
+            (SELECT DISTINCT "companies_company"."id" AS "col1",
+                             "companies_company"."address_line_1" AS "col2",
+                             "companies_company"."address_line_2" AS "col3",
+                             "companies_company"."post_code" AS "col4",
+                             "companies_company"."city" AS "col5",
+                             "companies_company"."department" AS "col6",
+                             "companies_company"."coords" AS "col7",
+                             "companies_company"."geocoding_score" AS "col8",
+                             "companies_company"."geocoding_updated_at" AS "col9",
+                             "companies_company"."ban_api_resolved_address" AS "col10",
+                             "companies_company"."insee_city_id" AS "col11",
+                             "companies_company"."name" AS "col12",
+                             "companies_company"."created_at" AS "col13",
+                             "companies_company"."updated_at" AS "col14",
+                             "companies_company"."uid" AS "col15",
+                             "companies_company"."active_members_email_reminder_last_sent_at" AS "col16",
+                             "companies_company"."automatic_geocoding_update" AS "col17",
+                             "companies_company"."siret" AS "col18",
+                             "companies_company"."naf" AS "col19",
+                             "companies_company"."kind" AS "col20",
+                             "companies_company"."brand" AS "col21",
+                             "companies_company"."phone" AS "col22",
+                             "companies_company"."email" AS "col23",
+                             "companies_company"."auth_email" AS "col24",
+                             "companies_company"."website" AS "col25",
+                             "companies_company"."description" AS "col26",
+                             "companies_company"."provided_support" AS "col27",
+                             "companies_company"."source" AS "col28",
+                             "companies_company"."created_by_id" AS "col29",
+                             "companies_company"."block_job_applications" AS "col30",
+                             "companies_company"."job_applications_blocked_at" AS "col31",
+                             "companies_company"."spontaneous_applications_open_since" AS "col32",
+                             "companies_company"."convention_id" AS "col33",
+                             "companies_company"."job_app_score" AS "col34",
+                             "companies_company"."is_searchable" AS "col35",
+                             "companies_company"."rdv_solidarites_id" AS "col36"
+             FROM "companies_company"
+             WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
+                    AND "companies_company"."auth_email" = %s
+                    AND NOT (EXISTS
+                               (SELECT %s AS "a"
+                                FROM "companies_companymembership" U1
+                                WHERE (U1."is_active"
+                                       AND U1."company_id" = ("companies_company"."id"))
+                                LIMIT 1)))) subquery
         ''',
       }),
     ]),
