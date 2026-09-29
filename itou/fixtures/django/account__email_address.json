@@ -1,7 +1,7 @@
 [
   {
     "fields": {
-      "email": "admin@test.com",
+      "email": "demo.emplois+admin@inclusion.gouv.fr",
       "primary": true,
       "user": 1,
       "verified": true
@@ -311,7 +311,7 @@
   },
   {
     "fields": {
-      "email": "itouadmin@example.com",
+      "email": "demo.emplois+itouadmin@inclusion.gouv.fr",
       "primary": true,
       "user": 148,
       "verified": true
