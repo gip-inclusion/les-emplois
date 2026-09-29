@@ -83,6 +83,7 @@ class Migration(migrations.Migration):
                     name="OrientationWorkflow",
                     states=[
                         "OUVERTE",
+                        "ÉTUDE",
                         "VALIDÉE",
                         "EXPIRÉE",
                         "REFUSÉE",

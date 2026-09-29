@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_expire_orientations[sql]
   dict({
-    'num_queries': 24,
+    'num_queries': 44,
     'queries': list([
       dict({
         'origin': list([
@@ -59,6 +59,13 @@
                  "insertion_orientation"."last_reminder_email_sent_at",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
+          
+            (SELECT U0."timestamp" AS "timestamp"
+             FROM "insertion_orientationtransitionlog" U0
+             WHERE (U0."orientation_id" = ("insertion_orientation"."id")
+                    AND U0."transition" = %s)
+             ORDER BY 1 DESC
+             LIMIT 1) AS "last_process_log_timestamp",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -271,11 +278,502 @@
           LEFT OUTER JOIN "companies_company" ON ("insertion_orientation"."sender_company_id" = "companies_company"."id")
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
-          WHERE ("insertion_orientation"."created_at" <= %s
-                 AND "insertion_orientation"."status" = %s)
+          WHERE (("insertion_orientation"."created_at" <= %s
+                  AND "insertion_orientation"."status" = %s)
+                 OR (
+                       (SELECT U0."timestamp" AS "timestamp"
+                        FROM "insertion_orientationtransitionlog" U0
+                        WHERE (U0."orientation_id" = ("insertion_orientation"."id")
+                               AND U0."transition" = %s)
+                        ORDER BY 1 DESC
+                        LIMIT 1) <= %s
+                     AND "insertion_orientation"."status" = %s)
+                 OR ("insertion_orientation"."created_at" <= %s
+                     AND
+                       (SELECT U0."timestamp" AS "timestamp"
+                        FROM "insertion_orientationtransitionlog" U0
+                        WHERE (U0."orientation_id" = ("insertion_orientation"."id")
+                               AND U0."transition" = %s)
+                        ORDER BY 1 DESC
+                        LIMIT 1) IS NULL
+                     AND "insertion_orientation"."status" = %s))
           ORDER BY "insertion_orientation"."updated_at" ASC,
                    "insertion_orientation"."id" ASC
           LIMIT 100
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "insertion_orientationprocesslink" ("id",
+                                                          "orientation_id",
+                                                          "created_at",
+                                                          "first_opened_at")
+          VALUES (%s, %s, %s, %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ExpiredOrientationForBeneficiary.should_send[communications/dispatch/base.py]',
+          'ExpiredOrientationForBeneficiary.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" IS NULL
+                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ExpiredOrientationForBeneficiary.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ExpiredOrientationForSender.should_send[communications/dispatch/base.py]',
+          'ExpiredOrientationForSender.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" IS NULL
+                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ExpiredOrientationForSender.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.save[<site-packages>/django/db/models/base.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_orientation"
+          SET "beneficiary_id" = %s,
+              "sender_id" = %s,
+              "sender_kind" = %s,
+              "sender_prescriber_organization_id" = %s,
+              "sender_company_id" = NULL,
+              "service_id" = %s,
+              "beneficiary_contact_preferences" = %s::varchar(10)[],
+              "beneficiary_other_contact_method" = %s,
+              "beneficiary_availability" = NULL,
+              "requirements" = %s::varchar(480)[],
+              "situation" = %s::varchar(480)[],
+              "situation_other" = %s,
+              "referent_last_name" = %s,
+              "referent_first_name" = %s,
+              "referent_phone" = %s,
+              "referent_email" = %s,
+              "orientation_reasons" = %s,
+              "refusal_reasons" = %s::varchar(30)[],
+              "refusal_details" = %s,
+              "status" = %s,
+              "processing_date" = NULL,
+              "duration_weekly_hours" = NULL,
+              "duration_weeks" = NULL,
+              "data_protection_commitment" = %s,
+              "last_reminder_email_sent_at" = NULL,
+              "created_at" = %s,
+              "updated_at" = %s
+          WHERE "insertion_orientation"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OrientationTransitionLog.save[<site-packages>/django/db/models/base.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "insertion_orientationtransitionlog" ("transition",
+                                                            "from_state",
+                                                            "to_state",
+                                                            "timestamp",
+                                                            "orientation_id")
+          VALUES (%s, %s, %s, %s, %s) RETURNING "insertion_orientationtransitionlog"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.delete_documents[insertion/models.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_orientation_documents"
+          WHERE "insertion_orientation_documents"."orientation_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OrientationProcessLink.save[<site-packages>/django/db/models/base.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "insertion_orientationprocesslink" ("id",
+                                                          "orientation_id",
+                                                          "created_at",
+                                                          "first_opened_at")
+          VALUES (%s, %s, %s, %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ExpiredOrientationForBeneficiary.should_send[communications/dispatch/base.py]',
+          'ExpiredOrientationForBeneficiary.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" IS NULL
+                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ExpiredOrientationForBeneficiary.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ExpiredOrientationForSender.should_send[communications/dispatch/base.py]',
+          'ExpiredOrientationForSender.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" IS NULL
+                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ExpiredOrientationForSender.send[communications/dispatch/email.py]',
+          'Orientation.expire[insertion/models.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Orientation.save[<site-packages>/django/db/models/base.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_orientation"
+          SET "beneficiary_id" = %s,
+              "sender_id" = %s,
+              "sender_kind" = %s,
+              "sender_prescriber_organization_id" = %s,
+              "sender_company_id" = NULL,
+              "service_id" = %s,
+              "beneficiary_contact_preferences" = %s::varchar(10)[],
+              "beneficiary_other_contact_method" = %s,
+              "beneficiary_availability" = NULL,
+              "requirements" = %s::varchar(480)[],
+              "situation" = %s::varchar(480)[],
+              "situation_other" = %s,
+              "referent_last_name" = %s,
+              "referent_first_name" = %s,
+              "referent_phone" = %s,
+              "referent_email" = %s,
+              "orientation_reasons" = %s,
+              "refusal_reasons" = %s::varchar(30)[],
+              "refusal_details" = %s,
+              "status" = %s,
+              "processing_date" = NULL,
+              "duration_weekly_hours" = NULL,
+              "duration_weeks" = NULL,
+              "data_protection_commitment" = %s,
+              "last_reminder_email_sent_at" = NULL,
+              "created_at" = %s,
+              "updated_at" = %s
+          WHERE "insertion_orientation"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OrientationTransitionLog.save[<site-packages>/django/db/models/base.py]',
+          'Command.handle[insertion/management/commands/expire_orientations.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "insertion_orientationtransitionlog" ("transition",
+                                                            "from_state",
+                                                            "to_state",
+                                                            "timestamp",
+                                                            "orientation_id")
+          VALUES (%s, %s, %s, %s, %s) RETURNING "insertion_orientationtransitionlog"."id"
         ''',
       }),
       dict({
