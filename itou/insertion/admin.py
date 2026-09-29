@@ -314,7 +314,7 @@ class OrientationAdmin(ItouModelAdmin):
             },
         ),
         (
-            "Bénéficiaire",
+            "Usager",
             {
                 "fields": [
                     "beneficiary_contact_preferences",
