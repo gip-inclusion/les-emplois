@@ -51,10 +51,10 @@ class NexusUser(NexusModelMixin, models.Model):
 
     first_name = models.CharField(verbose_name="prénom")
     last_name = models.CharField(verbose_name="nom")
-    # We use the Email to fetch a user activaed services : use an index to speed up the requests
+    # We use the Email to fetch a user activated services : use an index to speed up the requests
     email = CIEmailField("adresse e-mail", db_index=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
-    last_login = models.DateTimeField(verbose_name="date de denière connexion", null=True)
+    last_login = models.DateTimeField(verbose_name="date de dernière connexion", null=True)
     auth = models.CharField(verbose_name="mode de connexion", choices=Auth.choices)
     kind = models.CharField(verbose_name="type d'utilisateur", choices=NexusUserKind.choices, blank=True)
 

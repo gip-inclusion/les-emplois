@@ -86,7 +86,7 @@ def get_column_from_field(field, name, *, comment=None, field_type=None):
     return {
         "name": name,
         "type": field_type or get_field_type_from_field(field),
-        "comment": comment or str(field.verbose_name),  # Force str() to handle _() lazyness
+        "comment": comment or str(field.verbose_name),  # Force str() to handle _() laziness
         "fn": attrgetter(f"{field.name}_id" if isinstance(field, ForeignKey) else field.name),
     }
 
