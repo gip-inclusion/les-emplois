@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                         ),
                         blank=True,
                         default=list,
-                        verbose_name="préférences de contact du bénéficiaire",
+                        verbose_name="préférences de contact de l’usager",
                     ),
                 ),
                 (
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         blank=True,
                         max_length=280,
-                        verbose_name="autre méthode de contact du bénéficiaire",
+                        verbose_name="autre méthode de contact de l’usager",
                     ),
                 ),
                 (
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                     models.DateField(
                         blank=True,
                         null=True,
-                        verbose_name="disponibilité du bénéficiaire",
+                        verbose_name="disponibilité de l’usager",
                     ),
                 ),
                 (
@@ -164,7 +164,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.RESTRICT,
                         related_name="orientations",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="bénéficiaire",
+                        verbose_name="usager",
                     ),
                 ),
                 (

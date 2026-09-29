@@ -56,7 +56,7 @@ TABLE.add_columns(
         {
             "name": "beneficiary_id",
             "type": "integer",
-            "comment": "ID C1 du bénéficiaire de l’éventuelle orientation",
+            "comment": "ID C1 de l’usager de l’éventuelle orientation",
             "fn": lambda o: o.orientation.beneficiary_id if o.orientation_id else None,
         },
     ]
