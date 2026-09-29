@@ -565,20 +565,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         # if a new account with the freed `sub` is deactivated in turn.
         return f"old_{self.pk}_{self.username}"
 
-    def can_be_reactivated(self):
-        if self.is_active:  # Already active
-            return False
-
-        if not self.is_professional:  # Limit to professionals
-            return False
-        if self.username and self.has_sso_provider:  # Login will be possible after reactivation
-            # Target the users deactivated by the anonymization process as we can
-            # easily "revert" the changes, and the account can be self-recovered.
-            if self.upcoming_deletion_notified_at and not self.email:
-                return True
-
-        return False
-
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
 
