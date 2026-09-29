@@ -49,9 +49,11 @@ class TestPreLogin:
         assert response.status_code == 200
         assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
 
-    def test_pre_login_redirects_to_existing_user(self, client):
+    @pytest.mark.parametrize("with_next", [True, False])
+    def test_pre_login_redirects_to_existing_user(self, client, with_next):
         user = random_user_kind_factory()
-        url = reverse("account_login")
+        query = {"next": "/next_url"} if with_next else {}
+        url = reverse("account_login", query=query)
         response = client.get(url)
         assert response.status_code == 200
 
@@ -59,31 +61,18 @@ class TestPreLogin:
         response = client.post(url, data=form_data)
         expected_url = reverse(
             "login:existing_user",
-            query={"back_url": url},
+            query={"back_url": url} | query,
         )
         assertRedirects(response, expected_url)
         assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
 
-    def test_pre_login_redirects_to_existing_user_with_next(self, client):
-        user = random_user_kind_factory()
-        next_url = "/next_url"
-        url = reverse("account_login", query={"next": next_url})
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {"email": user.email}
-        response = client.post(url, data=form_data)
-        expected_url = reverse(
-            "login:existing_user",
-            query={"back_url": url, "next": next_url},
-        )
-        assertRedirects(response, expected_url)
-        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
-
-    def test_pre_login_redirects_to_pro_connect(self, client, pro_connect):
-        # This only works when ProConnect is configured
+    @pytest.mark.parametrize("with_next", [True, False])
+    def test_pre_login_redirects_to_pro_connect(self, client, pro_connect, with_next):
+        # This only works when ProConnect is configured and for ProConnect users
         user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
-        url = reverse("account_login")
+        next_url = "/next_url"
+        query = {"next": next_url} if with_next else {}
+        url = reverse("account_login", query=query)
         response = client.get(url)
         assert response.status_code == 200
 
@@ -93,24 +82,8 @@ class TestPreLogin:
             "previous_url": url,
             "user_email": user.email,
         }
-        pro_connect_url = add_url_params(pro_connect.authorize_url, params)
-        assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
-
-    def test_pre_login_redirects_to_pro_connect_with_next(self, client, pro_connect):
-        # This only works when ProConnect is configured
-        user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
-        next_url = "/next_url"
-        url = reverse("account_login", query={"next": next_url})
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {"email": user.email}
-        response = client.post(url, data=form_data)
-        params = {
-            "previous_url": url,
-            "user_email": user.email,
-            "next_url": next_url,
-        }
+        if with_next:
+            params["next_url"] = next_url
         pro_connect_url = add_url_params(pro_connect.authorize_url, params)
         assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
 
