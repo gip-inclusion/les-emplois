@@ -234,7 +234,7 @@ class OrganizationAbstract(models.Model):
         Tell a member he is no longer an administrator.
         """
         to = [user.email]
-        context = {"structure": self}
+        context = {"structure": self, "user": user}
         subject = "common/emails/remove_admin_email_subject.txt"
         body = "common/emails/remove_admin_email_body.md"
         return get_email_message(to, context, subject, body)
@@ -244,7 +244,7 @@ class OrganizationAbstract(models.Model):
         Tell a user he is no longer a member of this organization.
         """
         to = [user.email]
-        context = {"structure": self}
+        context = {"structure": self, "user": user}
         subject = "common/emails/member_deactivation_email_subject.txt"
         body = "common/emails/member_deactivation_email_body.md"
         return get_email_message(to, context, subject, body)

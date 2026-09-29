@@ -1,6 +1,8 @@
 {% autoescape off %}
 
 {% if forward_from_user|default:False %}
+Bonjour {{ user.get_full_name }},
+
 Vous recevez cet e-mail parce que l'utilisateur {{ forward_from_user.get_full_name }} ({{ forward_from_user.email }}) ne fait plus partie de votre {{ structure_label }}.
 
 -----

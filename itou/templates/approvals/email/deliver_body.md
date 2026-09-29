@@ -1,5 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
 
 {% if job_application.to_company.is_subject_to_iae_rules %}
 Merci d'avoir confirmé l'embauche d'un usager sur {% brand %}. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :

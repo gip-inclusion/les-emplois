@@ -22,6 +22,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import JobSeekerAssignmentFactory
+from tests.utils.testing import remove_greetings
 
 
 class TestMoveCompanyData:
@@ -457,7 +458,7 @@ def test_deactivate_spontaneous_jobapps(snapshot, mailoutbox, django_capture_on_
     )
     mail = next(mail for mail in mailoutbox if mail.to == [company.members.first().email])
     assert mail.subject == snapshot(name="email subject")
-    assert mail.body == snapshot(name="email body")
+    assert remove_greetings(mail.body) == snapshot(name="email body")
 
 
 def test_deactivate_spontaneous_jobapps_batch_size(mocker, caplog, settings):

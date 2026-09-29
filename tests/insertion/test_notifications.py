@@ -115,7 +115,7 @@ def test_accepted_orientation_for_referent(snapshot):
     ids=["from_employer", "from_authorized_prescriber", "from_unauthorized_prescriber"],
 )
 def test_accepted_orientation_for_sender(membership_factory, snapshot):
-    membership = membership_factory(user__first_name="Jeanne")
+    membership = membership_factory(user__first_name="Jeanne", user__for_snapshot=True)
     sender_prescriber_organization = membership.organization if isinstance(membership, PrescriberMembership) else None
     sender_company = membership.company if isinstance(membership, CompanyMembership) else None
     sender_kind = SenderKind.PRESCRIBER if sender_prescriber_organization else SenderKind.EMPLOYER
@@ -182,7 +182,7 @@ def test_refused_orientation_for_referent(snapshot):
     ids=["from_employer", "from_authorized_prescriber", "from_unauthorized_prescriber"],
 )
 def test_refused_orientation_for_sender(snapshot, membership_factory):
-    membership = membership_factory()
+    membership = membership_factory(user__for_snapshot=True)
     sender_prescriber_organization = membership.organization if isinstance(membership, PrescriberMembership) else None
     sender_company = membership.company if isinstance(membership, CompanyMembership) else None
     sender_kind = SenderKind.PRESCRIBER if sender_prescriber_organization else SenderKind.EMPLOYER
@@ -244,7 +244,7 @@ def test_expired_orientation_for_referent(snapshot):
     ids=["from_employer", "from_authorized_prescriber", "from_unauthorized_prescriber"],
 )
 def test_expired_orientation_for_sender(snapshot, membership_factory):
-    membership = membership_factory()
+    membership = membership_factory(user__for_snapshot=True)
     sender_prescriber_organization = membership.organization if isinstance(membership, PrescriberMembership) else None
     sender_company = membership.company if isinstance(membership, CompanyMembership) else None
     sender_kind = SenderKind.PRESCRIBER if sender_prescriber_organization else SenderKind.EMPLOYER

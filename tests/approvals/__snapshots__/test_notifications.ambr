@@ -115,7 +115,7 @@
 # ---
 # name: test_prolongation_request_denied_employer[body]
   '''
-  Bonjour,
+  Bonjour Jean MICHEL,
   
   L’organisation Pres. Org. a refusé votre demande de prolongation du PASS IAE.
   
@@ -152,7 +152,7 @@
 # ---
 # name: test_prolongation_request_denied_jobseeker[body with Afpa]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   L’employeur ACME Inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
   
@@ -184,7 +184,7 @@
 # ---
 # name: test_prolongation_request_denied_jobseeker[body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   L’employeur ACME Inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
   
@@ -216,7 +216,7 @@
 # ---
 # name: test_prolongation_request_granted_employer[body]
   '''
-  Bonjour,
+  Bonjour Jean MICHEL,
   
   L’organisation Pres. Org. a accepté votre demande de prolongation du PASS IAE.
   
@@ -238,7 +238,7 @@
 # ---
 # name: test_prolongation_request_granted_jobseeker[body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   L’employeur ACME Inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
   

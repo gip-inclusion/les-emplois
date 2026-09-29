@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour {{ user.get_full_name }}
+Bonjour {{ user.get_full_name }},
 
 L'espace de travail de votre structure {{ structure.name }} ({{ structure.kind }}) sur {% brand %} ne disposait plus d'administrateur actif. Nous vous avons donc attribué automatiquement ce rôle afin d'en assurer la gestion.
 

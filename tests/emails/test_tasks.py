@@ -18,7 +18,7 @@ class TestAsyncEmailBackend:
             cc=["cc@tests.com"],
             bcc=["bcc@tests.com"],
             subject="subject",
-            body="body",
+            body="Bonjour",
         )
 
         backend = AsyncEmailBackend()
@@ -36,7 +36,7 @@ class TestAsyncEmailBackend:
             assert email.from_email == "unit-test@tests.com"
             assert email.reply_to == ["reply-to@tests.com"]
             assert email.subject == "subject"
-            assert email.body == "body"
+            assert email.body == "Bonjour"
 
 
 @pytest.fixture

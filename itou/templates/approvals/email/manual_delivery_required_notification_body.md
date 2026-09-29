@@ -1,5 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour,
+
 Nouvelle embauche sur Itou.
 
 Informations pour l'obtention d'un PASS IAE suite à l'embauche de l’usager via {% brand %} :

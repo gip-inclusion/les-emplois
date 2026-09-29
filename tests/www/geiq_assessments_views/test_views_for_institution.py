@@ -24,7 +24,7 @@ from tests.geiq_assessments.factories import AssessmentCampaignFactory, Assessme
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_greetings
 
 
 class TestListAssessmentsView:
@@ -1121,7 +1121,7 @@ class TestAssessmentDetailsForInstitutionView:
                 f"[TEST] Validation du bilan d’exécution de la structure {assessment.label_geiq_name}" == email.subject
             )
             assert email.to[0] == dreets_membership.user.email
-            assert email.body == snapshot(name="body of mail sent to DREETS members")
+            assert remove_greetings(email.body) == snapshot(name="body of mail sent to DREETS members")
             mailoutbox.clear()
 
         with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
@@ -1255,7 +1255,7 @@ class TestAssessmentDetailsForInstitutionView:
             email = mailoutbox[1]
             assert f"[TEST] Bilan d’exécution à corriger - {assessment.label_geiq_name}" == email.subject
             assert email.to[0] == ddets_membership.user.email
-            assert email.body == snapshot(name="body of mail sent to DDETS user")
+            assert remove_greetings(email.body) == snapshot(name="body of mail sent to DDETS user")
             assert email.cc == []
 
         # DREETS review

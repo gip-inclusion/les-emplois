@@ -56,7 +56,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     ProfessionalFactory,
 )
-from tests.utils.testing import excel_date_format, get_request, get_rows_from_streaming_response
+from tests.utils.testing import excel_date_format, get_request, get_rows_from_streaming_response, remove_greetings
 
 
 def assertIn(subtext, whole_text):
@@ -1662,9 +1662,9 @@ class TestJobApplicationNotifications:
 
         assert "annulée" in prescriber_email.body
         if is_authorized_prescriber:
-            assert mailoutbox[1].body == employer_email.body
+            assert remove_greetings(mailoutbox[1].body) == remove_greetings(employer_email.body)
         else:
-            assert mailoutbox[1].body != employer_email.body
+            assert remove_greetings(mailoutbox[1].body) != remove_greetings(employer_email.body)
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
         assertion(job_application.job_seeker.get_inverted_full_name(), prescriber_email.body)
         assertion(job_application.job_seeker.first_name.title(), prescriber_email.body)

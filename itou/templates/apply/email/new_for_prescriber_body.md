@@ -2,6 +2,8 @@
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
+
 La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_company.display_name }} ({{ job_application.to_company.kind }}) localisée à {{ job_application.to_company.city }} !
 
 **Usager** :

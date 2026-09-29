@@ -1,5 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour,
+
 Un nouvel utilisateur souhaite rejoindre votre structure sur {% brand %} !
 
 Organisation :

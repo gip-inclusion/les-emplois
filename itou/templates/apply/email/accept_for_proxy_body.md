@@ -1,6 +1,8 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
+
 Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}, adressée par {{ job_application.sender.get_inverted_full_name }}, a été acceptée par {{ job_application.to_company.display_name }}.
 
 - Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}

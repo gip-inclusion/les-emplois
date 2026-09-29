@@ -4,6 +4,8 @@
 {% load str_filters %}
 {% block body %}
 {% enums "job_applications" "SenderKind" as SenderKind %}
+Bonjour {{ user.get_full_name }},
+
 Vous avez reçu une nouvelle candidature !
 
 **Usager** :

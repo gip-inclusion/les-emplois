@@ -2,6 +2,8 @@
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
+
 {% if job_application.is_sent_by_proxy %}
 {{ job_application.sender.get_inverted_full_name }} a envoyé votre candidature chez {{ job_application.to_company.display_name }}.
 Vous et {{ job_application.sender.get_inverted_full_name }} serez tous les deux informés de l'avancement de cette candidature.

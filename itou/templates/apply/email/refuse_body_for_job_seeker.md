@@ -1,5 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
 
 Votre candidature chez {{ job_application.to_company.display_name }} n'a malheureusement pas pu aboutir.
 

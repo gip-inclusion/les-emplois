@@ -1,6 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
+Bonjour {{ user.get_full_name }},
 
 Candidature transférée
 

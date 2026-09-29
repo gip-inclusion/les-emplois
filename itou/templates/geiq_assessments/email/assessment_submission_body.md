@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 La structure `{{ assessment.label_geiq_name }}` a transmis son bilan d’exécution sur le site {% brand "de" %}.
 

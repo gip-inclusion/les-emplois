@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Suite à votre candidature au sein de la structure {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }}, l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
 

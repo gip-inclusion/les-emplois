@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 Nous vous informons que la réception des candidatures spontanées pour la structure {{ structure.kind }} {{ structure.display_name }} a été suspendue automatiquement, car ce mode de recrutement n’a pas été actualisé depuis plus de 3 mois.
 

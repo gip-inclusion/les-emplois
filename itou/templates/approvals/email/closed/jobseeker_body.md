@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 {{ structure.display_name }} a clôturé votre PASS IAE n° {{ approval.number_with_spaces }}, après examen de votre situation au regard de l’emploi et des actions d’accompagnement et de formation conduites dans le cadre de votre parcours.
 

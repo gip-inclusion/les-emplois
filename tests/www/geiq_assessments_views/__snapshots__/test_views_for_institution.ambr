@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_ask_for_geiq_fix[body of mail sent to GEIQ members]
   '''
-  Bonjour,
+  Bonjour Paul MARTIN,
   
   La DDETS 29 vous a renvoyé votre bilan d’exécution afin que vous puissiez y apporter les corrections nécessaires.
   
@@ -23,7 +23,6 @@
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to DREETS members]
   '''
-  Bonjour,
   
   Le contrôle du bilan d’exécution de la structure `Un Joli GEIQ` a été réalisé par Julia MARTIN de la DDETS 29.
   
@@ -49,7 +48,7 @@
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to GEIQ members]
   '''
-  Bonjour,
+  Bonjour Paul MARTIN,
   
   Votre bilan d’exécution a été contrôlé par les services de l’État.
   
@@ -83,7 +82,6 @@
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_review_dreets_ask_for_institution_fix_and_dreets_review[body of mail sent to DDETS user]
   '''
-  Bonjour,
   
   La DREETS Bretagne a demandé une correction du bilan d’exécution.
   
@@ -2296,7 +2294,7 @@
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_dreets_ask_for_geiq_fix[body of mail sent to GEIQ members]
   '''
-  Bonjour,
+  Bonjour Paul MARTIN,
   
   La DREETS 29 vous a renvoyé votre bilan d’exécution afin que vous puissiez y apporter les corrections nécessaires.
   

@@ -1145,7 +1145,7 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
@@ -1164,7 +1164,6 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de DOE Jane au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
@@ -1187,7 +1186,7 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
@@ -1206,7 +1205,7 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
@@ -1221,7 +1220,6 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de D… J… au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
@@ -1240,7 +1238,7 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
@@ -1255,7 +1253,6 @@
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de DOE Jane au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
@@ -5860,7 +5857,7 @@
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
@@ -5879,7 +5876,6 @@
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de DOE Jane au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
@@ -5902,7 +5898,7 @@
 # ---
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
@@ -5921,7 +5917,7 @@
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
@@ -5940,7 +5936,6 @@
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de D… J… au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
@@ -5963,7 +5958,7 @@
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_job_seeker_body]
   '''
-  Bonjour,
+  Bonjour Jane DOE,
   
   Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
@@ -5982,7 +5977,6 @@
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_proxy_body]
   '''
-  Bonjour,
   
   La candidature de DOE Jane au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   

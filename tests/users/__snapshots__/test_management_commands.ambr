@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAutoAttributeCompanyAdmins.test_email_content[auto_admin_attribution email body]
   '''
-  Bonjour Jean MICHEL
+  Bonjour Jean MICHEL,
   
   L'espace de travail de votre structure ACME Inc. (EI) sur La plateforme de l’inclusion ne disposait plus d'administrateur actif. Nous vous avons donc attribué automatiquement ce rôle afin d'en assurer la gestion.
   
@@ -294,7 +294,7 @@
 # ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[company]
   '''
-  Bonjour,
+  Bonjour Jean MICHEL,
   
   En tant qu’administrateur de l’organisation Company 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
   
@@ -316,7 +316,7 @@
 # ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[institution]
   '''
-  Bonjour,
+  Bonjour Jeanne D'ORLÉANS,
   
   En tant qu’administrateur de l’organisation Institution 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
   
@@ -338,7 +338,7 @@
 # ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[prescriber_organization]
   '''
-  Bonjour,
+  Bonjour Pierre DUPONT,
   
   En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
   
@@ -360,7 +360,7 @@
 # ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_one_admin
   '''
-  Bonjour,
+  Bonjour Pierre DUPONT,
   
   En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
   
@@ -382,7 +382,7 @@
 # ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_two_admins
   '''
-  Bonjour,
+  Bonjour Pierre DUPONT,
   
   En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
   

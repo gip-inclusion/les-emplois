@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 L’organisation {{ prolongation_request.prescriber_organization.display_name }} a refusé votre demande de prolongation du PASS IAE.
 

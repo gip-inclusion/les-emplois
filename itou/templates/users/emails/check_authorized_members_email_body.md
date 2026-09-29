@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.md" %}
 {% block body %}
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 En tant qu’administrateur de l’organisation {{ structure.name }}, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
 

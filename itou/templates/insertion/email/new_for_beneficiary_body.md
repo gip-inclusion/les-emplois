@@ -2,7 +2,7 @@
 {% block body %}
 Une orientation a été effectuée en votre nom.
 
-Bonjour,
+Bonjour {{ user.get_full_name }},
 
 {{ orientation.sender.get_full_name }} de la structure {{ orientation.sender_organization.display_name }} a réalisé une prescription en votre nom, pour le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %}, ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}.
 

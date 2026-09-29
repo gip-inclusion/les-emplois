@@ -157,13 +157,11 @@ class TestUserMembershipDeactivation:
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        company = CompanyWith2MembershipsFactory(
-            name="Les petits paniers", email="petitspaniers@mailinator.com", kind=CompanyKind.EI
-        )
-        admin = company.members.filter(companymembership__is_admin=True).first()
-        guest = company.members.filter(companymembership__is_admin=False).first()
+        company = CompanyFactory(name="Les petits paniers", email="petitspaniers@mailinator.com", kind=CompanyKind.EI)
+        admin = CompanyMembershipFactory(company=company).user
+        membership = CompanyMembershipFactory(company=company, is_admin=False, user__for_snapshot=True)
+        guest = membership.user
 
-        membership = guest.companymembership_set.first()
         assert guest not in company.active_admin_members
         assert admin in company.active_admin_members
 
