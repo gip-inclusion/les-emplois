@@ -4,7 +4,7 @@
 {% block body %}
 Votre demande a bien été transmise !
 
-Bonjour {{ orientation.sender.first_name}},
+Bonjour {{ orientation.sender.first_name }},
 
 Votre demande d’orientation pour le service {{ orientation.service.name }}{% if orientation.service.address_on_one_line %} ayant lieu au : {{ orientation.service.address_on_one_line }}{% endif %}, portée par la structure {{ orientation.service.structure.name }} a été transmise !
 

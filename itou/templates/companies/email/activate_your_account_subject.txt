@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-Activez le compte de votre {{siae.kind}} {{siae.name}} sur {% brand %}
+Activez le compte de votre {{ siae.kind }} {{ siae.name }} sur {% brand %}
 {% endblock %}
