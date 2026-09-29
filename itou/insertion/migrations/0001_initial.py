@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                             ("FEE", "Frais"),
                             ("FUNDING_LABEL", "Label de financement"),
                             ("MOBILIZATION", "Mode de mobilisation"),
-                            ("MOBILIZATION_BENEFICIARY", "Mode de mobilisation bénéficiaires"),
+                            ("MOBILIZATION_BENEFICIARY", "Mode de mobilisation usagers"),
                             ("MOBILIZATION_PUBLIC", "Personne mobilisatrices"),
                             ("MOBILIZATION_PROFESSIONAL", "Mode de mobilisation professionnels"),
                             ("NETWORK", "Réseau porteur"),
@@ -283,7 +283,7 @@ class Migration(migrations.Migration):
                         limit_choices_to={"kind": "MOBILIZATION_BENEFICIARY", "source": "DORA"},
                         related_name="+",
                         to="insertion.genericreferenceitem",
-                        verbose_name="comment mobiliser la solution en tant que bénéficiaire",
+                        verbose_name="comment mobiliser la solution en tant qu’usager",
                     ),
                 ),
                 (
@@ -292,7 +292,7 @@ class Migration(migrations.Migration):
                         limit_choices_to={"kind": "MOBILIZATION_PROFESSIONAL", "source": "DORA"},
                         related_name="+",
                         to="insertion.genericreferenceitem",
-                        verbose_name="comment orienter un bénéficiaire en tant qu’accompagnateur",
+                        verbose_name="comment orienter un usager en tant qu’accompagnateur",
                     ),
                 ),
                 (

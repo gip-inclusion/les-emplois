@@ -20,6 +20,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"09\", \"11\", \"12\", \"30\", \"31\", \"32\", \"34\", \"46\", \"48\", \"65\", \"66\", \"81\", \"82\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -27,6 +28,7 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 134,
+      "lien_mobilisation": "https://form.fillout.com/t/exemple-orientation",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -44,6 +46,7 @@
       ],
       "mobilizations_details": "",
       "name": "Aide technique en compensation du handicap",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
@@ -64,7 +67,8 @@
         193
       ],
       "uid": "agefiph--52c4c68b-33d3-4ff1-916c-28c835025597-a74474c3-81c1-4a55-8bb8-e031a37d0313",
-      "updated_on": "2025-09-30"
+      "updated_on": "2025-09-30",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 1
@@ -90,6 +94,7 @@
       "description_short": "Le Socle de connaissances et de compétences (CléA) est constitué de l'ensemble des connaissances et des compétences qu'il est utile pour un individu de maîtriser afin de favoriser son accès à la formation professionnelle et son insertion professionnelle.",
       "dora_synced_at": "2026-07-06T07:36:19.131Z",
       "eligibility_zones": "[\"34172\"]",
+      "extra": null,
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
       "funding_labels": [],
@@ -97,6 +102,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         211,
         213,
@@ -123,6 +129,7 @@
       ],
       "mobilizations_details": "",
       "name": "CléA numérique",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
@@ -143,7 +150,8 @@
         199
       ],
       "uid": "dora--0c7c0b07-a5f4-4151-9483-69a360c12164",
-      "updated_on": "2026-05-04"
+      "updated_on": "2026-05-04",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 2
@@ -169,6 +177,7 @@
       "description_short": "ASSOCIATION TRANSITION propose des services : accéder à des services en ligne",
       "dora_synced_at": "2026-07-06T07:37:57.277Z",
       "eligibility_zones": "[\"64\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -176,6 +185,7 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 133,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         211,
         217
@@ -198,6 +208,7 @@
       ],
       "mobilizations_details": "",
       "name": "Médiation numérique",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64150",
@@ -215,7 +226,8 @@
         181
       ],
       "uid": "dora--5b4dd8b4-ae7d-4217-9722-ccdae05eef71",
-      "updated_on": "2026-03-04"
+      "updated_on": "2026-03-04",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 3
@@ -241,6 +253,7 @@
       "description_short": "En difficulté avec la lecture ou l'écriture ? Besoin d'aide pour le numérique ? Le DFL permet de s'inscrire dans un parcours de formation en vue de s'insérer professionnellement ou de sécuriser les parcours professionnels des personnes  en situation d'illettrisme",
       "dora_synced_at": "2026-07-06T07:38:01.652Z",
       "eligibility_zones": "[\"200069052\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -248,6 +261,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         213,
         215,
@@ -277,6 +291,7 @@
       ],
       "mobilizations_details": "",
       "name": "Dispositif de Formation Linguistique",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
@@ -301,7 +316,8 @@
         198
       ],
       "uid": "dora--5e016094-532b-44e8-8f38-8c7cf56971be",
-      "updated_on": "2025-04-24"
+      "updated_on": "2025-04-24",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 4
@@ -327,6 +343,7 @@
       "description_short": "Le FLE vise à rendre les apprenants compétents et confiants dans leur utilisation du français, tout en leur permettant de s'intégrer dans des contextes francophones variés.",
       "dora_synced_at": "2026-07-06T07:38:34.831Z",
       "eligibility_zones": "[\"34172\"]",
+      "extra": null,
       "fee": 2,
       "fee_details": "Taux horaire : 12€",
       "funding_labels": [],
@@ -334,6 +351,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         211,
         215,
@@ -360,6 +378,7 @@
       ],
       "mobilizations_details": "",
       "name": "Français Langue Étrangère",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
@@ -381,7 +400,8 @@
         206
       ],
       "uid": "dora--79a21517-55e2-4803-894c-ac2f67e90003",
-      "updated_on": "2026-05-04"
+      "updated_on": "2026-05-04",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 5
@@ -407,6 +427,7 @@
       "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
       "dora_synced_at": "2026-07-06T07:39:08.388Z",
       "eligibility_zones": "[\"34\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "funding_labels": [],
@@ -414,6 +435,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         215,
         221,
@@ -441,6 +463,7 @@
       ],
       "mobilizations_details": "Téléphoner au 01 00 00 00 00 Téléphoner au 01 00 00 00 00",
       "name": "Microcrédit Mobilité",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "34000",
@@ -463,7 +486,8 @@
         180
       ],
       "uid": "dora--96558663-2eab-4a1f-8389-af2fea730879",
-      "updated_on": "2026-04-03"
+      "updated_on": "2026-04-03",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 6
@@ -489,6 +513,7 @@
       "description_short": "La Plateforme d’évaluation linguistique, d’orientation et de suivi de l’agglomération de Pau accueille les non francophones de plus de 16 ans, qui présentent des difficultés au niveau de la maîtrise de la langue française.",
       "dora_synced_at": "2026-07-06T07:39:10.440Z",
       "eligibility_zones": "[\"200067254\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -496,6 +521,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         215,
         217
@@ -522,6 +548,7 @@
       ],
       "mobilizations_details": "",
       "name": "Plateforme d'évaluation linguistique, d'orientation et de suivi de l'agglomération de Pau",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64000",
@@ -541,7 +568,8 @@
         167
       ],
       "uid": "dora--9816bf7c-eddf-45c5-a20a-d0526fe141af",
-      "updated_on": "2026-01-07"
+      "updated_on": "2026-01-07",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 7
@@ -567,6 +595,7 @@
       "description_short": "En difficulté avec la lecture ou l'écriture ? Besoin d'aide pour le numérique ? Le DFL permet de s'inscrire dans un parcours de formation en vue de s'insérer professionnellement ou de sécuriser les parcours professionnels des personnes  en difficultés avec les savoirs de base",
       "dora_synced_at": "2026-07-06T07:39:28.953Z",
       "eligibility_zones": "[\"200069052\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -574,6 +603,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         213,
         215,
@@ -603,6 +633,7 @@
       ],
       "mobilizations_details": "",
       "name": "Dispositif de Formation Linguistique (DFL)",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
@@ -623,7 +654,8 @@
         186
       ],
       "uid": "dora--a6bcdca3-136a-4211-aeee-e5deb5da51c1",
-      "updated_on": "2025-04-24"
+      "updated_on": "2025-04-24",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 8
@@ -649,6 +681,7 @@
       "description_short": "La Plateforme Mobilité Transition propose aux personnes en parcours d’insertion un accompagnement pour lever les freins à l’emploi liés à la mobilité. (ateliers, entretiens individuels ou collectifs)",
       "dora_synced_at": "2026-07-06T07:42:31.596Z",
       "eligibility_zones": "[\"64\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -656,6 +689,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         223
       ],
@@ -680,6 +714,7 @@
       ],
       "mobilizations_details": "Parlez-en avec votre conseiller Emploi pour bénéficier d'un positionnement. Pour les Conseillers France Travail, mobilisez en priorité le service 'Diagnostic et accompagnement à la mobilité (AAP FT), s'il vous est accessible.",
       "name": "Plateforme Mobilité - Transition",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "64150",
@@ -705,7 +740,8 @@
         180
       ],
       "uid": "dora--d7b8be12-7d85-4f49-943b-72886fed9521",
-      "updated_on": "2026-04-02"
+      "updated_on": "2026-04-02",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 9
@@ -731,6 +767,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"64\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -738,6 +775,7 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 135,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -757,6 +795,7 @@
       ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
+      "nombre_semaines": null,
       "opening_hours": "Mo-Fr 09:00-12:30,14:00-17:30; Th 14:00-17:30",
       "opening_hours_text": "",
       "post_code": "64121",
@@ -781,7 +820,8 @@
         189
       ],
       "uid": "mediation-numerique--Coop-numérique_32e65fb4-ac9a-49c9-9c8a-b267006fdc25__dora_dora--0c1f1dd9-f5e9-47d7-ac74-56067ad00ba2",
-      "updated_on": "2026-07-07"
+      "updated_on": "2026-07-07",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 10
@@ -807,6 +847,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"34\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -814,6 +855,7 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 136,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -833,6 +875,7 @@
       ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
+      "nombre_semaines": null,
       "opening_hours": "Mo-Th 09:00-12:30,14:00-17:30; Tu off",
       "opening_hours_text": "",
       "post_code": "34070",
@@ -857,7 +900,8 @@
         189
       ],
       "uid": "mediation-numerique--Coop-numérique_41706857-c31b-435e-8ea9-122f56ac2c5c",
-      "updated_on": "2026-07-07"
+      "updated_on": "2026-07-07",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 11
@@ -883,6 +927,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -890,6 +935,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -907,6 +953,7 @@
       ],
       "mobilizations_details": "",
       "name": "Aide aux déplacements",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
@@ -927,7 +974,8 @@
         193
       ],
       "uid": "agefiph--1cf38c63-1c5d-49d9-9a39-819376029870-135084a2-2380-4313-98be-40021890fb2f",
-      "updated_on": "2025-10-13"
+      "updated_on": "2025-10-13",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 12
@@ -953,6 +1001,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -960,6 +1009,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -977,6 +1027,7 @@
       ],
       "mobilizations_details": "",
       "name": "Aide humaine en compensation du handicap",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
@@ -997,7 +1048,8 @@
         193
       ],
       "uid": "agefiph--1cf38c63-1c5d-49d9-9a39-819376029870-14d98da5-b582-4beb-9fa4-dda2bb6666ba",
-      "updated_on": "2025-09-30"
+      "updated_on": "2025-09-30",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 13
@@ -1023,6 +1075,7 @@
       "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
       "dora_synced_at": "2026-08-21T02:53:39.061Z",
       "eligibility_zones": "[\"57\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "funding_labels": [],
@@ -1030,6 +1083,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 134,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         217,
         223
@@ -1057,6 +1111,7 @@
       ],
       "mobilizations_details": "Téléphoner au 09 69 32 81 10. Téléphoner au 09 69 32 81 10.",
       "name": "Microcrédit Mobilité",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "57070",
@@ -1078,7 +1133,8 @@
         180
       ],
       "uid": "dora--119f710d-1209-4071-baee-ac80406a952d",
-      "updated_on": "2026-08-20"
+      "updated_on": "2026-08-20",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 14
@@ -1104,6 +1160,7 @@
       "description_short": "Formation adaptée aux difficultés individuelles rencontrées par chaque apprenant dans son apprentissage du code de la route et de la conduite et dans son accès à un emploi ou à une formation.",
       "dora_synced_at": "2026-07-06T07:36:45.717Z",
       "eligibility_zones": "[\"243300316\"]",
+      "extra": null,
       "fee": 2,
       "fee_details": "ll y a un reste à charge pour le stagiaire (à calculer selon le projet sur lequel il intègre)",
       "funding_labels": [],
@@ -1111,6 +1168,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         213,
         215,
@@ -1139,6 +1197,7 @@
       ],
       "mobilizations_details": "",
       "name": "Auto école sociale et solidaire En route pour travailler",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33100",
@@ -1158,7 +1217,8 @@
         180
       ],
       "uid": "dora--22e2a25c-ee9e-4606-9236-757417322c5b",
-      "updated_on": "2026-06-15"
+      "updated_on": "2026-06-15",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 15
@@ -1184,6 +1244,7 @@
       "description_short": "Itinéraire 1 : ECLA / Ecrire, Compter, Lire, Apprendre\n:Itinéraire 2 :Français pour les Langues Etrangères\nItinéraire 3: Parcours remise à niveau Numérique\nItinéraire 4 : Parcours Passerelle : remise à niveau\n: Mathématiuq Français, anglais, espagnol...",
       "dora_synced_at": "2026-07-06T07:38:19.226Z",
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1191,6 +1252,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         211,
         213,
@@ -1221,6 +1283,7 @@
       ],
       "mobilizations_details": "",
       "name": "HSP SOCLE 2025-2027",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "33000",
@@ -1239,7 +1302,8 @@
         167
       ],
       "uid": "dora--6c59123d-927d-4aa1-95ea-713ef70c2a31",
-      "updated_on": "2026-01-15"
+      "updated_on": "2026-01-15",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 16
@@ -1265,6 +1329,7 @@
       "description_short": "Le programme BRIDGE est une offre de formation vers l'emploi qui propose une rémunération ainsi qu'une protection sociale. Il s’adresse aux personnes réfugiées ou régularisées, qui résident en Moselle et qui présentent un niveau de langue A2 minimum à l'oral et a l'écrit.",
       "dora_synced_at": "2026-08-21T02:53:55.098Z",
       "eligibility_zones": "[\"57\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1272,6 +1337,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 137,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         211,
         213,
@@ -1300,6 +1366,7 @@
       ],
       "mobilizations_details": "",
       "name": "BRIDGE",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "lundi, mardi, jeudi, vendredi journée et mercredi matin",
       "post_code": "57070",
@@ -1326,7 +1393,8 @@
         207
       ],
       "uid": "dora--707735ac-8759-4eb0-b0fb-30eeeacf603c",
-      "updated_on": "2026-08-18"
+      "updated_on": "2026-08-18",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 17
@@ -1352,6 +1420,7 @@
       "description_short": "Aide aux démarches administratives et au numérique pour tous sans rendez-vous. Nous traitons : accès aux droits, logement, prestations sociales, transports, école...\nNon traité : juridique, retraite, droits des étrangers.",
       "dora_synced_at": "2026-08-21T02:54:03.903Z",
       "eligibility_zones": "[\"33063\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1359,6 +1428,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 133,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         213,
         215,
@@ -1387,6 +1457,7 @@
       ],
       "mobilizations_details": "",
       "name": "Aide aux démarches administratives et aide au numérique",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "du mardi au samedi. Du mardi au jeudi : 9h30-12h 14h-17h30 vendredi : 9h30-12h 14h-16h30 samedi : 9h30-12h30",
       "post_code": "33300",
@@ -1419,7 +1490,8 @@
         184
       ],
       "uid": "dora--a089f66a-7122-4ec7-8a16-d50c9f1ffb5c",
-      "updated_on": "2026-08-18"
+      "updated_on": "2026-08-18",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 18
@@ -1445,6 +1517,7 @@
       "description_short": "CC DU SUD MESSIN propose des services : autre, accéder à une connexion internet, accéder à du matériel, approfondir ma culture numérique, prendre en main un smartphone ou une tablette, utiliser le numérique au quotidien, créer avec le numérique, accompagner les démarches de sant…",
       "dora_synced_at": "2026-07-06T07:43:05.682Z",
       "eligibility_zones": "[\"57\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1452,6 +1525,7 @@
       "is_active": true,
       "is_orientable_with_form": true,
       "kind": 135,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [
         215,
         217,
@@ -1478,6 +1552,7 @@
       ],
       "mobilizations_details": "Prendre rendez vous au 07 56 38 54 10 Mêmes modalités que pour les bénéficiaires",
       "name": "Médiation numérique",
+      "nombre_semaines": null,
       "opening_hours": "",
       "opening_hours_text": "",
       "post_code": "57420",
@@ -1505,7 +1580,8 @@
         193
       ],
       "uid": "dora--f075da67-4a22-4a25-be24-03924d95dac0",
-      "updated_on": "2026-04-22"
+      "updated_on": "2026-04-22",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 19
@@ -1531,6 +1607,7 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"57\"]",
+      "extra": null,
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1538,6 +1615,7 @@
       "is_active": true,
       "is_orientable_with_form": false,
       "kind": 136,
+      "lien_mobilisation": "",
       "mobilization_modes_beneficiaries": [],
       "mobilization_modes_beneficiaries_external_form_link": "",
       "mobilization_modes_beneficiaries_external_form_link_text": "",
@@ -1557,6 +1635,7 @@
       ],
       "mobilizations_details": "",
       "name": "Service d'accompagnement au numérique",
+      "nombre_semaines": null,
       "opening_hours": "Mo-Fr 08:00-12:00,13:00-16:00",
       "opening_hours_text": "",
       "post_code": "57570",
@@ -1582,9 +1661,106 @@
         189
       ],
       "uid": "mediation-numerique--Coop-numérique_a01902e8-1e9d-493d-94b6-c9936dec6818",
-      "updated_on": "2026-07-06"
+      "updated_on": "2026-07-06",
+      "volume_horaire_hebdomadaire": null
     },
     "model": "insertion.service",
     "pk": 20
+  },
+  {
+    "fields": {
+      "access_conditions_di": "Être âgé de 16 à 25 ans révolus, ou avoir moins de 30 ans en cas de reconnaissance de la qualité de travailleur handicapé.\nNe pas être étudiant et ne pas suivre une formation.\nPièce d'identité en cours de validité.\nCurriculum vitae.\nJustificatif de domicile de moins de 3 mois.\n\n* Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte)\n* Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00\n\nVous êtes travailleur social, professionnel ou structure d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)",
+      "access_conditions_dora": "[\"Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte)\", \"Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00\", \"Vous êtes travailleur social, professionnel ou structure d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)\"]",
+      "address_line_1": "Place de l'Europe",
+      "address_line_2": "Locaux de la MIFE Belfort",
+      "average_orientation_response_delay_days": null,
+      "city": "Belfort",
+      "contact_email": "cej@mission-locale.fake",
+      "contact_full_name": "Camille Martin",
+      "contact_is_public": true,
+      "contact_phone": "+33123456789",
+      "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
+      "created_at": "2026-06-15T09:16:29.343Z",
+      "credentials": "[\"Pièce d'identité en cours de validité\", \"Curriculum vitae\", \"Justificatif de domicile de moins de 3 mois\"]",
+      "credentials_documents": "[\"production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf\"]",
+      "credentials_online_form": "",
+      "description": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi.\n\nIl s'agit d'un programme intensif d’accompagnement de 15 à 20 heures par semaine minimum.\n\n- avec une **mise en activité systématique et régulière du premier au dernier jour**, pendant une période pouvant aller jusqu’à 12 mois (et jusqu’à 18 mois sous conditions).\n\n- des points réguliers avec la mission locale, des ateliers collectifs et des démarches personnelles\n\n- une **allocation** mensuelle sous condition de revenus, d’assiduité et d’acceptation des offres d’activité reçues.\n\n\n<!-- -->\n\n**Plusieurs solutions** peuvent être proposées pendant les parcours comme par exemple :\n\n- Une formation qualifiante ou préqualifiante ;\n\n- Une mission d’utilité sociale (ex. : service civique) ;\n\n- Des mises en situation en emploi (ex. : stages ou immersions en entreprise) ;\n\n- Une alternance (ex. : contrat d’apprentissage ou de professionnalisation).\n\n- Un contrat de travail de moins de 6 mois, un contrat \"aidé\" ou un contrat dans une structure de l'IAE\n\n\n<!-- -->\n\n**Un référent unique tout au long du parcours **\n\nChaque jeune est accompagné par un conseiller qui reste son référent tout au long du parcours.\n\n**Une application** facilite les échanges avec le conseiller mission locale et le jeune accompagné.\n\n**Des droits pour les jeunes bénéficiaires et des devoirs**\n\nLe Contrat d’Engagement Jeune fonctionne à une condition : être motivé, accepter les formations, les stages, les emplois qui sont proposés. Le dispositif est suspendu en cas de refus du bénéficiaire.\n\n**Le Contrat d’Engagement Jeune mobilise les entreprises** pour favoriser les découvertes de métiers, les immersions dans un collectif de travail et la formation en alternance.\n\n",
+      "description_short": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi. Il s'agit d'un programme intensif d’accompagnement dans le projet professionnel et l'emploi.",
+      "dora_synced_at": "2026-06-15T09:16:29.343Z",
+      "eligibility_zones": "[\"90\"]",
+      "extra": {
+        "forms": [
+          {
+            "name": "Dossier d'inscription au CEJ",
+            "url": "https://example.com/dossier-inscription-cej.pdf"
+          }
+        ],
+        "funding_labels": [
+          "France Travail",
+          "Conseil départemental"
+        ],
+        "online_form": "https://example.com/formulaire-inscription-cej"
+      },
+      "fee": 1,
+      "fee_details": "Service entièrement pris en charge, sans avance de frais.",
+      "funding_labels": [],
+      "insee_city": 34249,
+      "is_active": true,
+      "is_orientable_with_form": true,
+      "kind": 134,
+      "lien_mobilisation": "",
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217,
+        221
+      ],
+      "mobilization_modes_beneficiaries_external_form_link": "https://missionslocales.com/contact/",
+      "mobilization_modes_beneficiaries_external_form_link_text": "Nous contacter",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals": [
+        216,
+        218,
+        220,
+        222
+      ],
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5
+      ],
+      "mobilizations_details": "Orientation en ligne, par courriel, téléphone ou accueil physique.",
+      "name": "CEJ - Contrat d'Engagement Jeune",
+      "nombre_semaines": 52,
+      "opening_hours": "Mo-Fr 09:00-12:00,14:00-17:00; PH off",
+      "opening_hours_text": "Du lundi au vendredi de 9 h à 12 h et de 14 h à 17 h.",
+      "post_code": "90000",
+      "publics": [
+        123
+      ],
+      "publics_details": "Public moins de 26 ans, Jeunes (16-26 ans)",
+      "receptions": [
+        131,
+        132
+      ],
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/mission-locale",
+      "structure": 2,
+      "thematics": [
+        186
+      ],
+      "uid": "dora--869e04c8-4be3-43cf-923b-f59e0300fafe",
+      "updated_on": "2026-02-09",
+      "volume_horaire_hebdomadaire": 20.0
+    },
+    "model": "insertion.service",
+    "pk": 21
   }
 ]

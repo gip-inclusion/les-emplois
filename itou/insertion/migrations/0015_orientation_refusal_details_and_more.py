@@ -46,25 +46,25 @@ class Migration(migrations.Migration):
             field=django.contrib.postgres.fields.ArrayField(
                 base_field=models.CharField(
                     choices=[
-                        ("not_reachable", "Bénéficiaire non joignable"),
+                        ("not_reachable", "Usager non joignable"),
                         (
                             "did_not_come_to_interview",
-                            "Bénéficiaire ne s’étant pas présenté à l’entretien",
+                            "Usager ne s’étant pas présenté à l’entretien",
                         ),
                         (
                             "hired_elsewhere",
-                            "Bénéficiaire indisponible\u202f: en emploi",
+                            "Usager indisponible\u202f: en emploi",
                         ),
-                        ("training", "Bénéficiaire indisponible\u202f: en formation"),
+                        ("training", "Usager indisponible\u202f: en formation"),
                         (
                             "not_eligible",
-                            "Bénéficiaire non éligible (ne répond pas aux pré-requis)",
+                            "Usager non éligible (ne répond pas aux pré-requis)",
                         ),
-                        ("not_mobile", "Bénéficiaire non mobile"),
-                        ("not_interested", "Bénéficiaire non intéressé"),
+                        ("not_mobile", "Usager non mobile"),
+                        ("not_interested", "Usager non intéressé"),
                         (
                             "incompatible",
-                            "Un ou plusieurs freins périphériques empêchent le bénéficiaire de poursuivre",
+                            "Un ou plusieurs freins périphériques empêchent l’usager de poursuivre",
                         ),
                         ("session_full", "Session complète"),
                         ("duplicate", "Orientation en doublon"),
