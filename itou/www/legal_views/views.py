@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.http import Http404, HttpResponseRedirect
@@ -8,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.utils.legal_terms import get_terms_version, get_terms_versions
+from itou.utils.legal_terms import get_terms_version, get_terms_versions, terms_acceptance_required
 from itou.utils.urls import get_safe_url
 
 
@@ -18,8 +17,7 @@ logger = logging.getLogger(__name__)
 @login_not_required
 def legal_terms(request, template_name="static/legal/terms/base.html"):
     user = request.user
-    enforce_terms_acceptance = not getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False)
-    require_acceptance = enforce_terms_acceptance and user.is_authenticated and user.must_accept_terms
+    require_acceptance = terms_acceptance_required(user)
     next_url = get_safe_url(request, param_name="next", fallback_url=reverse("dashboard:index"))
     all_versions = get_terms_versions()
     latest_terms = all_versions[0]
