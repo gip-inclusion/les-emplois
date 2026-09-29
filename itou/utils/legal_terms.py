@@ -21,8 +21,11 @@ def bypass_terms_acceptance(view_func):
 
 
 def terms_acceptance_required(user):
-    """Tell whether the user has to go through the terms acceptance page."""
-    if getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False):
+    """Tell whether the user has to go through the terms acceptance page.
+
+    An admin impersonating a user must never accept the terms in their name.
+    """
+    if getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False) or getattr(user, "is_hijacked", False):
         return False
     return user.is_authenticated and user.must_accept_terms
 
