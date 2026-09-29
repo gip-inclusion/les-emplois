@@ -303,7 +303,7 @@ class TestStructures:
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")
-    ORIENT_BTN_LABEL = "Orienter votre bénéficiaire en ligne"
+    ORIENT_BTN_LABEL = "Orienter votre usager en ligne"
     DISPLAY_SERVICE_CONTACT_BTN = """
     <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
             data-bs-target="#service-contact-modal" data-emplois-mobilization-kind="service_contact"

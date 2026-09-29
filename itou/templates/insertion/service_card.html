@@ -45,11 +45,11 @@
                                 <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_ORIENTATION }}"
                                    href="{{ start_orientation_url }}"
-                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre bénéficiaire en ligne</span> </a>
+                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre usager en ligne</span> </a>
                             {% else %}
                                 <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                                    href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre bénéficiaire en ligne</span> </a>
+                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre usager en ligne</span> </a>
                             {% endif %}
                         </div>
                     {% endif %}

@@ -378,7 +378,7 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     # DORA's mobilization fields
     mobilization_modes_beneficiaries = models.ManyToManyField(
-        verbose_name="comment mobiliser la solution en tant que bénéficiaire",
+        verbose_name="comment mobiliser la solution en tant qu’usager",
         to=GenericReferenceItem,
         limit_choices_to={
             "source": GenericReferenceItemSource.DORA,
@@ -395,7 +395,7 @@ class Service(GeolocatedAddressMixin, models.Model):
     )
     mobilization_modes_beneficiaries_other = models.CharField(verbose_name="autre", blank=True)
     mobilization_modes_professionals = models.ManyToManyField(
-        verbose_name="comment orienter un bénéficiaire en tant qu’accompagnateur",
+        verbose_name="comment orienter un usager en tant qu’accompagnateur",
         to=GenericReferenceItem,
         limit_choices_to={
             "source": GenericReferenceItemSource.DORA,
@@ -643,7 +643,7 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
 
     beneficiary = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="bénéficiaire",
+        verbose_name="usager",
         on_delete=models.RESTRICT,
         related_name="orientations",
     )
@@ -686,17 +686,17 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     # Populated later via wizard extensions.
     beneficiary_contact_preferences = ArrayField(
         models.CharField(max_length=10, choices=BeneficiaryContactPreference.choices),
-        verbose_name="préférences de contact du bénéficiaire",
+        verbose_name="préférences de contact de l’usager",
         default=list,
         blank=True,
     )
     beneficiary_other_contact_method = models.CharField(
-        verbose_name="autre méthode de contact du bénéficiaire",
+        verbose_name="autre méthode de contact de l’usager",
         max_length=280,
         blank=True,
     )
     beneficiary_availability = models.DateField(
-        verbose_name="disponibilité du bénéficiaire",
+        verbose_name="disponibilité de l’usager",
         null=True,
         blank=True,
     )

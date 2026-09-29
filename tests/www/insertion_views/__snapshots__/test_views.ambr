@@ -3121,7 +3121,7 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
-                                          Orienter votre bénéficiaire en ligne
+                                          Orienter votre usager en ligne
                                       </span>
                                   </a>
                               </div>
@@ -3285,7 +3285,7 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
-                                          Orienter votre bénéficiaire en ligne
+                                          Orienter votre usager en ligne
                                       </span>
                                   </a>
                               </div>
@@ -3454,7 +3454,7 @@
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
                   <span>
-                      Orienter votre bénéficiaire en ligne
+                      Orienter votre usager en ligne
                   </span>
               </a>
           </div>
@@ -3519,7 +3519,7 @@
                               <div class="form-group col-12 col-lg-auto">
                                   <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
                                       <span>
-                                          Orienter votre bénéficiaire en ligne
+                                          Orienter votre usager en ligne
                                       </span>
                                   </a>
                               </div>
@@ -3814,7 +3814,7 @@
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center has-external-link" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
-                      Orienter votre bénéficiaire en ligne
+                      Orienter votre usager en ligne
                   </span>
               </a>
           </div>
@@ -3855,7 +3855,7 @@
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-not-orientable-uid/start/">
                   <span>
-                      Orienter votre bénéficiaire en ligne
+                      Orienter votre usager en ligne
                   </span>
               </a>
           </div>
@@ -3891,7 +3891,7 @@
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center has-external-link" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
-                      Orienter votre bénéficiaire en ligne
+                      Orienter votre usager en ligne
                   </span>
               </a>
           </div>
