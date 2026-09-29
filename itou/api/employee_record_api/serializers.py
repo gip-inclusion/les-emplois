@@ -88,7 +88,7 @@ class _API_PersonSerializer(serializers.Serializer):
 
     civilite = serializers.ChoiceField(choices=Title.choices, source="job_application.job_seeker.title")
     nomUsage = serializers.SerializerMethodField()
-    nomNaissance = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.birth_name")
+    nomNaissance = serializers.SerializerMethodField()
     prenom = serializers.SerializerMethodField()
     dateNaissance = serializers.DateField(
         format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
@@ -112,6 +112,11 @@ class _API_PersonSerializer(serializers.Serializer):
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         job_seeker = obj.job_application.job_seeker
         return unidecode(job_seeker.get_last_name_for_display()).upper()
+
+    def get_nomNaissance(self, obj: EmployeeRecord) -> str:
+        # See employee_record.serializers._PersonSerializer
+        job_seeker = obj.job_application.job_seeker
+        return job_seeker.jobseeker_profile.birth_name or None
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.first_name).upper()
