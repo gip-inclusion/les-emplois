@@ -285,15 +285,8 @@ def manage_staff_created_siaes():
 
 
 def check_whether_signup_is_possible_for_all_siaes():
-    errors = 0
-
-    no_signup_siaes = Company.objects.filter(auth_email="").exclude(memberships__is_active=True).distinct()
-    for siae in no_signup_siaes:
-        print(
-            f"ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
-            f"kind={siae.kind} dpt={siae.department} source={siae.source} "
-            f"created_by={siae.created_by} siae.email={siae.email}"
-        )
-        errors += 1
-
-    return errors
+    # the returned value is used to make the function easier to test
+    count = Company.objects.filter(auth_email="").exclude(memberships__is_active=True).distinct().count()
+    if count:
+        print(f"WARNING: signup is impossible for {count} siaes. For now we don't do anything about it.")
+    return count
