@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -17,6 +18,8 @@ logger = logging.getLogger(__name__)
 @login_not_required
 def legal_terms(request, template_name="static/legal/terms/base.html"):
     user = request.user
+    if request.method == "POST" and getattr(user, "is_hijacked", False):
+        raise PermissionDenied("Seul l’utilisateur peut accepter les Conditions Générales d’Utilisation.")
     require_acceptance = terms_acceptance_required(user)
     next_url = get_safe_url(request, param_name="next", fallback_url=reverse("dashboard:index"))
     all_versions = get_terms_versions()

@@ -2,9 +2,10 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django_otp.oath import TOTP
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.users.enums import IdentityProvider
+from itou.utils.legal_terms import get_terms_versions
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -13,6 +14,7 @@ from tests.users.factories import (
     PrescriberFactory,
     ProfessionalFactory,
 )
+from tests.www.legal_views.test_legal_terms import CGU_FORM_BTN
 
 
 class TestUserHijack:
@@ -123,6 +125,27 @@ class TestUserHijack:
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
         assertRedirects(response, initial_url, fetch_redirect_response=False)
+
+    def test_hijacker_does_not_answer_blocking_pages_in_the_name_of_the_user(self, client):
+        hijacked = EmployerFactory(terms_accepted_at=None)
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+        client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk})
+
+        # The terms page is not displayed
+        response = client.get(reverse("dashboard:index"))
+        assertTemplateUsed(response, "dashboard/dashboard.html")
+
+        # The terms page is readable, but they can't be accepted
+        response = client.get(reverse("legal-terms"))
+        assertNotContains(response, CGU_FORM_BTN)
+        response = client.post(
+            reverse("legal-terms"),
+            data={"next": reverse("dashboard:index"), "terms_slug": get_terms_versions()[0].slug},
+        )
+        assertContains(
+            response, "Seul l’utilisateur peut accepter les Conditions Générales d’Utilisation.", status_code=403
+        )
 
     def test_keep_otp_after_hijack(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
