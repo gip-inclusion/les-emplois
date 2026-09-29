@@ -510,8 +510,10 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
             job_application.answer = form.cleaned_data["answer"]
             job_application.add_to_pool(user=request.user)
             toast_title = "Candidature ajoutée au vivier"
-            toast_message = f"La candidature de {job_application.job_seeker.get_inverted_full_name()} "
-            "a bien été ajoutée au vivier."
+            toast_message = (
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} "
+                "a bien été ajoutée au vivier."
+            )
 
             messages.success(request, f"{toast_title}||{toast_message}", extra_tags="toast")
         except xwf_models.InvalidTransitionError:
