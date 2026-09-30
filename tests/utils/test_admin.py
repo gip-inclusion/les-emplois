@@ -1,19 +1,24 @@
+import datetime
 import glob
 import importlib
 import os.path
 
 import factory
+import pytest
 from allauth.account.models import EmailAddress
 from django.apps import apps
 from django.conf import settings
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import site as admin_site
 from django.contrib.auth import get_user, models as auth_models
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from itou.antivirus.models import Scan
 from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
+from itou.approvals.models import Approval, ApprovalQuerySet
 from itou.asp.models import Department
 from itou.cities.models import DirectoryActiveCity
 from itou.companies.models import SiaeACIConvergencePHC
@@ -23,6 +28,12 @@ from itou.insertion import models as insertion_models
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.models import NirModificationRequest
+from itou.utils.admin import (
+    EfficientDateHierarchyAdminMixin,
+    EfficientDateHierarchyQuerySetMixin,
+    with_efficient_date_hierarchy,
+)
+from tests.approvals.factories import ApprovalFactory
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import SiaeFinancialAnnexFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -202,3 +213,64 @@ def test_all_admin(admin_client, mocker, subtests):
                 url = reverse(f"admin:{app_label}_{model_name}_change", args=(obj.pk,))
                 response = admin_client.get(url)
                 assert response.status_code == 200
+
+
+class TestEfficientDateHierarchy:
+    CREATED_AT_LIST = [
+        datetime.datetime(2022, 6, 15, 10, 0),
+        # Nothing in 2023
+        datetime.datetime(2024, 12, 31, 23, 30),
+        datetime.datetime(2025, 1, 1, 0, 30),  # Still 2024 in UTC (periods must be computed in local time)
+        datetime.datetime(2026, 1, 20, 9, 0),
+        # Nothing in Feb-Jun 2026
+        datetime.datetime(2026, 7, 8, 12, 0),
+        datetime.datetime(2026, 7, 16, 0, 15),  # Still July 15th in UTC (periods must be computed in local time)
+        # Nothing in Aug-Sept 2026
+        datetime.datetime(2026, 10, 12, 10, 0),
+    ]
+
+    @pytest.fixture(autouse=True)
+    def approvals_over_time(self):
+        for created_at in self.CREATED_AT_LIST:
+            created_at = timezone.make_aware(created_at)
+            ApprovalFactory(created_at=created_at, start_at=created_at.date(), origin_pe_approval=True)
+
+    @pytest.mark.parametrize("order", ["ASC", "DESC"])
+    @pytest.mark.parametrize(
+        "kind,lookups,expected",
+        [
+            ("year", {}, [2022, 2024, 2025, 2026]),
+            ("month", {"year": 2026}, [1, 7, 10]),
+            ("day", {"year": 2026, "month": 7}, [8, 16]),
+        ],
+        ids=["year", "month", "day"],
+    )
+    @pytest.mark.parametrize(
+        "method,field_name", [("datetimes", "created_at"), ("dates", "start_at")], ids=["datetimes", "dates"]
+    )
+    def test_periods(self, method, field_name, kind, lookups, expected, order):
+        queryset = Approval.objects.filter(**{f"{field_name}__{lookup}": value for lookup, value in lookups.items()})
+
+        periods = getattr(with_efficient_date_hierarchy(queryset), method)(field_name, kind, order=order)
+
+        assert [getattr(period, kind) for period in periods] == (expected[::-1] if order == "DESC" else expected)
+        assert periods == list(getattr(queryset, method)(field_name, kind, order=order))
+
+    def test_num_queries(self, django_assert_num_queries):
+        queryset = with_efficient_date_hierarchy(Approval.objects.all())
+
+        with django_assert_num_queries(1):  # MIN and MAX only, there is no row
+            assert queryset.filter(start_at__year=2030).dates("start_at", "year") == []
+        with django_assert_num_queries(2):  # MIN and MAX, then a single query checking all the periods
+            assert [period.year for period in queryset.dates("start_at", "year")] == [2022, 2024, 2025, 2026]
+
+    def test_admin_mixin(self):
+        class EfficientApprovalAdmin(EfficientDateHierarchyAdminMixin, ModelAdmin):
+            pass
+
+        queryset = EfficientApprovalAdmin(Approval, admin_site).get_queryset(RequestFactory().get("/"))
+
+        assert isinstance(queryset, EfficientDateHierarchyQuerySetMixin)
+        # The model's QuerySet methods are kept (they are used by list filters), and chaining keeps the mixin
+        assert isinstance(queryset, ApprovalQuerySet)
+        assert isinstance(queryset.valid(), EfficientDateHierarchyQuerySetMixin)

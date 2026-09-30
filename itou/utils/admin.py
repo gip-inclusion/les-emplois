@@ -1,6 +1,8 @@
+import datetime
 from collections import namedtuple
-from functools import partial
+from functools import cache, partial
 
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
@@ -380,3 +382,88 @@ class ChooseFieldsToTransfer(forms.Form):
     def __init__(self, *args, fields_choices, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["fields_to_transfer"].choices = fields_choices
+
+
+class EfficientDateHierarchyQuerySetMixin:
+    """
+    The admin date_hierarchy lists periods with a SELECT DISTINCT DATE_TRUNC(...) which reads every row
+    Instead, fetch MIN and MAX of the field (which only reads the index when the field is indexed), generate the
+    periods between, then keep the non-empty ones with a single query made of a LIMIT 1 subquery per period
+    """
+
+    INTERVALS = {
+        "year": relativedelta(years=1),
+        "month": relativedelta(months=1),
+        "day": relativedelta(days=1),
+    }
+
+    def dates(self, field_name, kind, order="ASC"):
+        if kind not in self.INTERVALS:
+            return super().dates(field_name, kind, order=order)
+        return self._non_empty_periods(field_name, kind, order)
+
+    def datetimes(self, field_name, kind, order="ASC", tzinfo=None):
+        if kind not in self.INTERVALS:
+            return super().datetimes(field_name, kind, order=order, tzinfo=tzinfo)
+        return self._non_empty_periods(field_name, kind, order, tzinfo=tzinfo)
+
+    def _non_empty_periods(self, field_name, kind, order, tzinfo=None):
+        bounds = self.aggregate(lower=models.Min(field_name), upper=models.Max(field_name))
+        if bounds["lower"] is None:
+            return []
+
+        start = bounds["lower"]
+        if isinstance(start, datetime.datetime):
+            # Like Django, periods start at midnight in the local time zone
+            start = timezone.localtime(start, tzinfo).replace(hour=0, minute=0, second=0, microsecond=0)
+        if kind in ("year", "month"):
+            start = start.replace(day=1)
+        if kind == "year":
+            start = start.replace(month=1)
+
+        step = self.INTERVALS[kind]
+        periods = []
+        while start <= bounds["upper"]:
+            periods.append(start)
+            start += step
+
+        existence_checks = [
+            self.filter(**{f"{field_name}__gte": period, f"{field_name}__lt": period + step})
+            .order_by()
+            .annotate(period_index=models.Value(index))
+            .values_list("period_index", flat=True)[:1]
+            for index, period in enumerate(periods)
+        ]
+        non_empty_indexes = set(existence_checks[0].union(*existence_checks[1:], all=True))
+        periods = [period for index, period in enumerate(periods) if index in non_empty_indexes]
+        return periods[::-1] if order == "DESC" else periods
+
+
+@cache
+def _efficient_date_hierarchy_queryset_class(queryset_class):
+    if issubclass(queryset_class, EfficientDateHierarchyQuerySetMixin):
+        return queryset_class
+    return type(
+        f"EfficientDateHierarchy{queryset_class.__name__}",
+        (EfficientDateHierarchyQuerySetMixin, queryset_class),
+        {"__module__": __name__},
+    )
+
+
+def with_efficient_date_hierarchy(queryset):
+    """
+    Keep the model's QuerySet class (and its methods, used by list filters for example), only adding the mixin
+    """
+
+    queryset = queryset.all()  # Copy
+    queryset.__class__ = _efficient_date_hierarchy_queryset_class(type(queryset))
+    return queryset
+
+
+class EfficientDateHierarchyAdminMixin:
+    """
+    To use on admins of large tables with a date_hierarchy, whose field must be indexed
+    """
+
+    def get_queryset(self, request):
+        return with_efficient_date_hierarchy(super().get_queryset(request))
