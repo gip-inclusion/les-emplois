@@ -255,7 +255,7 @@ class TestDashboardView:
 
         # No contract ending soon yet: the entry is shown without a badge.
         response = client.get(url)
-        assertContains(response, "Fins de contrat de travail")
+        assertContains(response, "Fins de contrats")
         assert response.context["contracts_ending_soon_count"] == 0
 
         # A job seeker followed by the prescriber, whose contract ends in 20 days, is counted whatever the SIAE.
@@ -288,7 +288,7 @@ class TestDashboardView:
         organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
         organization.save()
         response = client.get(url)
-        assertNotContains(response, "Fins de contrat de travail")
+        assertNotContains(response, "Fins de contrats")
         assert response.context["contracts_ending_soon_count"] is None
 
     def test_dashboard_applications_to_process(self, client):
