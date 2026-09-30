@@ -1,6 +1,7 @@
 import re
 
 import xworkflows
+from django.db import transaction
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 
@@ -120,6 +121,10 @@ class Command(BaseCommand):
                     "Could not automatically make employee_record=%s ready - exc=%s", employee_record.pk, exc
                 )
 
+    def _plan_updates(self):
+        with transaction.atomic():
+            EmployeeRecord.objects.plan_updates()
+
     @dry_runnable
     def handle(self, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
@@ -127,5 +132,6 @@ class Command(BaseCommand):
         self._check_approvals()
         self._check_missed_notifications()
         self._handle_3437_errors()
+        self._plan_updates()
 
         self.logger.info("Employee records sanitizing done. Have a great day!")
