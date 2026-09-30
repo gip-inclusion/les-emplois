@@ -583,6 +583,7 @@ class MobilizationEvent(models.Model):
         related_name="mobilization_events",
     )
     created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    service_answered_at = models.DateTimeField(verbose_name="date de réponse du service", null=True)
 
     objects = MobilizationEventManager()
 
@@ -598,10 +599,18 @@ class MobilizationEvent(models.Model):
                         MobilizationEventKind.SERVICE_ORIENTATION,
                         MobilizationEventKind.SERVICE_CONTACT,
                         MobilizationEventKind.SERVICE_EXT_LINK,
+                        MobilizationEventKind.SEND_EMAIL_TO_SERVICE,
                     ],
                     service__isnull=False,
                 )
                 | models.Q(kind=MobilizationEventKind.STRUCTURE_CONTACT, service__isnull=True),
+            ),
+            models.CheckConstraint(
+                name="send_email_to_service_and_answered_at_coherence",
+                condition=models.Q(
+                    service_answered_at__isnull=True,
+                )
+                | models.Q(kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE, service_answered_at__isnull=False),
             ),
             models.CheckConstraint(
                 name="authenticated_user_has_organization",

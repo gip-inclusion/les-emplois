@@ -1,5 +1,7 @@
 {% load format_filters %}
-<a aria-label="Contact par mail" class="text-break" href="mailto:{{ service.contact_email }}
+{% load enums %}
+{% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
+<a aria-label="Contact par mail" class="text-break"{% if can_orient_towards_insertion_service and job_seeker %}data-emplois-mobilization-kind="{{ MobilizationEventKind.SEND_EMAIL_TO_SERVICE }}"{% endif %} href="mailto:{{ service.contact_email }}
 {% if can_orient_towards_insertion_service and job_seeker %}
   ?subject={{ request.user.get_full_name|urlencode }} de la structure {{ request.current_organization.display_name|urlencode }} souhaite vous adresser un bénéficiaire&body=
   Bonjour,%0D%0A%0D%0AJe souhaiterais orienter un usager vers votre service {{ service.name|urlencode }}.
