@@ -602,4 +602,7 @@ class SiaeFinancialAnnexAdmin(ReadonlyMixin, ItouModelAdmin):
 @admin.register(models.Contract)
 class ContractAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("pk", "job_seeker", "company", "start_date", "end_date")
+    list_select_related = ("job_seeker", "company")
+
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
