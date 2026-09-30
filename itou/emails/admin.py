@@ -13,6 +13,7 @@ from django.utils.text import Truncator
 
 from itou.emails.models import Email
 from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
+from itou.utils.pagination import FuzzyCountPaginator
 
 
 class EmailStatusFilter(admin.SimpleListFilter):
@@ -47,6 +48,7 @@ class EmailAdmin(ReadonlyMixin, ItouModelAdmin):
     search_fields = ["to", "cc", "bcc", "subject"]
     readonly_fields = ["sent_to_esp", "details"]
     show_full_result_count = False
+    paginator = FuzzyCountPaginator
 
     def has_add_permission(self, obj=None):
         return False

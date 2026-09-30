@@ -59,6 +59,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_organization_view_link,
 )
+from itou.utils.pagination import FuzzyCountPaginator
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import is_france_travail_id_format
 from itou.utils.views import with_triggers_context
@@ -322,6 +323,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         css = {"all": ("css/itou-admin.css",)}
 
     show_full_result_count = False
+    paginator = FuzzyCountPaginator
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
     form = UserAdminForm
@@ -1071,6 +1073,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
     list_select_related = ("user",)
 
     show_full_result_count = False
+    paginator = FuzzyCountPaginator
 
     fieldsets = (
         (
@@ -1221,6 +1224,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
 
 
 class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
+    paginator = FuzzyCountPaginator
     inlines = (PkSupportRemarkInline,)
 
 
@@ -1291,6 +1295,8 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "company",
     )
     ordering = ("-updated_at",)
+
+    paginator = FuzzyCountPaginator
 
     @admin.display(description="usager")
     def job_seeker_display(self, obj):
