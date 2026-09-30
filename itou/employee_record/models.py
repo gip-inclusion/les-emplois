@@ -402,10 +402,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
 
-    def _warn_unexpected_transition_use(self, transition_name):
-        # TODO(xfernandez): drop this method when transitions are not unexpected anymore
-        logger.error("Unexpected transition=%s used for employee_record pk=%d", transition_name, self.pk)
-
     # Business methods
 
     @xwf_models.transition()
@@ -441,7 +437,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         An employee record is sent to ASP for an update via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
         """
-        self._warn_unexpected_transition_use("wait_for_asp_response_for_update")
         self.clean()
         self.set_asp_batch_information(file, line_number, archive)
 
@@ -458,25 +453,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         Update status after an ASP rejection of the update of the employee record
         """
-        self._warn_unexpected_transition_use("reject_for_update")
         self.clean()
         self.set_asp_processing_information(code, label, archive)
-
-    @xwf_models.transition()
-    def unarchive_update_rejected(self):
-        self._warn_unexpected_transition_use("unarchive_update_rejected")
-
-    @xwf_models.transition()
-    def plan_update(self, *, user=None):
-        self._warn_unexpected_transition_use("plan_update")
-
-    @xwf_models.transition()
-    def retry_update(self, *, user=None):
-        self._warn_unexpected_transition_use("unarchive_update_rejected")
-
-    @xwf_models.transition()
-    def recreate(self):
-        self._warn_unexpected_transition_use("recreate")
 
     @xwf_models.transition()
     def process(self, *, code, label, archive, as_duplicate=False):
