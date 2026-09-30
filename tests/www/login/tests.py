@@ -34,6 +34,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
     ProfessionalFactory,
+    random_pro_user_factory,
     random_user_kind_factory,
 )
 from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented, reload_module
@@ -50,8 +51,11 @@ class TestPreLogin:
         assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
 
     @pytest.mark.parametrize("with_next", [True, False])
-    def test_pre_login_redirects_to_existing_user(self, client, with_next):
-        user = random_user_kind_factory()
+    @pytest.mark.parametrize(
+        "identity_provider", [IdentityProvider.DJANGO, IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]
+    )
+    def test_pre_login_redirects_to_existing_user(self, client, with_next, identity_provider):
+        user = random_user_kind_factory(identity_provider=identity_provider)
         query = {"next": "/next_url"} if with_next else {}
         url = reverse("account_login", query=query)
         response = client.get(url)
@@ -86,6 +90,24 @@ class TestPreLogin:
             params["next_url"] = next_url
         pro_connect_url = add_url_params(pro_connect.authorize_url, params)
         assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
+
+    def test_pre_login_pro_connect_disabled(self, client, settings):
+        # This only happens on dev, review or staging environments
+        settings.FORCE_PRO_CONNECT_LOGIN = False
+        settings.PRO_CONNECT_BASE_URL = False
+        user = random_pro_user_factory()
+        url = reverse("account_login")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {"email": user.email}
+        response = client.post(url, data=form_data)
+        expected_url = reverse(
+            "login:existing_user",
+            query={"back_url": url},
+        )
+        assertRedirects(response, expected_url)
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
 
     def test_pre_login_email_unknown(self, client, snapshot):
         url = reverse("account_login")
