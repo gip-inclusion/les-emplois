@@ -115,7 +115,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "ordering": ["-created_at"],
+                "ordering": ["-pk"],
                 "verbose_name": "fiche salarié",
                 "verbose_name_plural": "fiches salarié",
                 "constraints": [
@@ -193,7 +193,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "notification de changement de la fiche salarié",
                 "verbose_name_plural": "notifications de changement de la fiche salarié",
-                "ordering": ["-created_at"],
+                "ordering": ["-pk"],
                 "constraints": [
                     models.UniqueConstraint(
                         condition=models.Q(("asp_batch_file__isnull", False)),

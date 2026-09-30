@@ -2227,7 +2227,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -2257,7 +2257,7 @@
                  "employee_record_employeerecord"."processed_as_duplicate"
           FROM "employee_record_employeerecord"
           WHERE "employee_record_employeerecord"."job_application_id" = %s
-          ORDER BY "employee_record_employeerecord"."created_at" DESC
+          ORDER BY "employee_record_employeerecord"."id" DESC
         ''',
       }),
       dict({
@@ -2486,7 +2486,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
-          ORDER BY "approvals_approval"."created_at" ASC
+          ORDER BY "approvals_approval"."id" ASC
           LIMIT 1
         ''',
       }),
@@ -3836,7 +3836,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -3866,7 +3866,7 @@
                  "employee_record_employeerecord"."processed_as_duplicate"
           FROM "employee_record_employeerecord"
           WHERE "employee_record_employeerecord"."job_application_id" = %s
-          ORDER BY "employee_record_employeerecord"."created_at" DESC
+          ORDER BY "employee_record_employeerecord"."id" DESC
         ''',
       }),
       dict({
@@ -4095,7 +4095,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
-          ORDER BY "approvals_approval"."created_at" ASC
+          ORDER BY "approvals_approval"."id" ASC
           LIMIT 1
         ''',
       }),
@@ -5112,7 +5112,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -5469,7 +5469,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
-          ORDER BY "approvals_approval"."created_at" ASC
+          ORDER BY "approvals_approval"."id" ASC
           LIMIT 1
         ''',
       }),

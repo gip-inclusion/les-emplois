@@ -141,6 +141,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "expires_at",
     )
     list_display_links = ("pk", "job_seeker")
+    list_select_related = ("job_seeker", "author")
     raw_id_fields = (
         "job_seeker",
         "author",
@@ -158,6 +159,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "author_kind",
     )
 
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     @admin.display(boolean=True, description="en cours de validité")

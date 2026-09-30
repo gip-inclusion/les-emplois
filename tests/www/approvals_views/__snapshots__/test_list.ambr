@@ -559,7 +559,7 @@
                                         AND U0."to_company_id" = %s)
                                  ORDER BY 1 DESC
                                  LIMIT 1), "approvals_approval"."end_at") < %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
           LIMIT 6
         ''',
       }),
@@ -1155,7 +1155,7 @@
                                         AND U0."to_company_id" = %s)
                                  ORDER BY 1 DESC
                                  LIMIT 1), "approvals_approval"."end_at") >= %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
           LIMIT 9
         ''',
       }),
@@ -1690,7 +1690,7 @@
                       AND U0."state" = %s
                       AND U0."to_company_id" = %s)
                LIMIT 1)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
           LIMIT 2
         ''',
       }),

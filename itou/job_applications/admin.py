@@ -103,6 +103,7 @@ class EmployeeRecordInline(ReadonlyMixin, ItouStackedInline):
 class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     form = JobApplicationAdminForm
     list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
+    list_select_related = ("job_seeker",)
     show_full_result_count = False
     raw_id_fields = (
         "job_seeker",
@@ -402,4 +403,5 @@ class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username", "job_application__pk")
+    show_full_result_count = False
     paginator = FuzzyCountPaginator

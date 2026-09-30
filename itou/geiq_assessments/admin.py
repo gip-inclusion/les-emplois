@@ -256,6 +256,7 @@ class EmployeeContractAdmin(ReadonlyMixin, ItouModelAdmin):
         "end_at",
         "planned_end_at",
     ]
+    list_select_related = ("employee",)
 
 
 @admin.register(models.EmployeePrequalification)
@@ -266,3 +267,4 @@ class EmployeePrequalificationAdmin(ReadonlyMixin, ItouModelAdmin):
         "start_at",
         "end_at",
     ]
+    list_select_related = ("employee",)
