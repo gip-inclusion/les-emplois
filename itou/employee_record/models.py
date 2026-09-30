@@ -411,10 +411,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
 
-    def _warn_unexpected_transition_use(self, transition_name):
-        # TODO(xfernandez): drop this method when transitions are not unexpected anymore
-        logger.error("Unexpected transition=%s used for employee_record pk=%d", transition_name, self.pk)
-
     # Business methods
 
     @xwf_models.transition()
@@ -450,7 +446,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         An employee record is sent to ASP for an update via a JSON file,
         The filename is stored for further feedback processing (also done via a file)
         """
-        self._warn_unexpected_transition_use("wait_for_modification_asp_response")
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
@@ -466,24 +461,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         Update status after an ASP rejection of the update of the employee record
         """
-        self._warn_unexpected_transition_use("reject_modification")
         self.set_asp_processing_information(code, label, archive)
-
-    @xwf_models.transition()
-    def unarchive_modification_rejected(self):
-        self._warn_unexpected_transition_use("unarchive_modification_rejected")
-
-    @xwf_models.transition()
-    def schedule_modification(self, *, user=None):
-        self._warn_unexpected_transition_use("schedule_modification")
-
-    @xwf_models.transition()
-    def retry_modification(self, *, user=None):
-        self._warn_unexpected_transition_use("retry_modification")
-
-    @xwf_models.transition()
-    def recreate(self):
-        self._warn_unexpected_transition_use("recreate")
 
     @xwf_models.transition()
     def process(self, *, code, label, archive, as_duplicate=False):
@@ -501,7 +479,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     @xwf_models.transition()
     def process_modification(self, *, code, label, archive):
-        self._warn_unexpected_transition_use("process_modification")
         self.set_asp_processing_information(code, label, archive)
         if archive and self.has_watched_data_updated_at_set():
             _check_and_remove_watched_data_updated_at(self, archive)
