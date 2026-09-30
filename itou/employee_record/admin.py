@@ -390,6 +390,7 @@ class EmployeeRecordUpdateNotificationAdmin(ReadonlyMixin, ASPExchangeInformatio
         "asp_batch_file",
     ]
 
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     fieldsets = (

@@ -17,6 +17,7 @@ from itou.job_applications.models import ACCEPTED_ONLY_FIELDS
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.models import User
 from itou.utils.admin import (
+    EfficientDateHierarchyQuerySet,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
@@ -103,6 +104,7 @@ class EmployeeRecordInline(ReadonlyMixin, ItouStackedInline):
 class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     form = JobApplicationAdminForm
     list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
+    list_select_related = ("job_seeker",)
     show_full_result_count = False
     raw_id_fields = (
         "job_seeker",
@@ -402,4 +404,9 @@ class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username", "job_application__pk")
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return EfficientDateHierarchyQuerySet(model=qs.model, query=qs.query, using=qs.db)

@@ -30,6 +30,7 @@ class ScanAdmin(ItouModelAdmin):
     fields = ["clamav_completed_at", "clamav_signature", "infected", "comment"]
     list_filter = [SuspiciousFilter, "infected", "clamav_completed_at"]
     search_fields = ["file__id", "clamav_signature"]
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     @admin.display(boolean=True, description="à vérifier", ordering="suspicious")

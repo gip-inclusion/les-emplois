@@ -1224,6 +1224,8 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
 
 
 class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
+    list_select_related = ("user",)
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
     inlines = (PkSupportRemarkInline,)
 
@@ -1296,6 +1298,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
     )
     ordering = ("-updated_at",)
 
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     @admin.display(description="usager")
@@ -1313,6 +1316,18 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         if obj.company:
             return f"{Truncator(obj.company.name).chars(30)} (entr.)"
         return "-"
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                "job_seeker",
+                "professional",
+                "prescriber_organization",
+                "company",
+            )
+        )
 
 
 admin.site.unregister(EmailAddress)

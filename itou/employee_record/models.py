@@ -309,6 +309,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "fiche salarié"
         verbose_name_plural = "fiches salarié"
+        indexes = [models.Index(fields=["created_at"])]
         constraints = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
                 fields=["asp_measure", "siret", "approval_number"],
@@ -760,6 +761,7 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "notification de changement de la fiche salarié"
         verbose_name_plural = "notifications de changement de la fiche salarié"
+        indexes = [models.Index(fields=["created_at"])]
         constraints = ASPExchangeInformation.Meta.constraints + [
             # Only allow 1 NEW notification, this is used by the trigger's INSERT ON CONFLICT
             models.UniqueConstraint(

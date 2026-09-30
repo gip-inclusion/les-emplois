@@ -1,6 +1,7 @@
 from collections import namedtuple
 from functools import partial
 
+from dateutil.rrule import DAILY, MONTHLY, YEARLY, rrule
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
@@ -380,3 +381,32 @@ class ChooseFieldsToTransfer(forms.Form):
     def __init__(self, *args, fields_choices, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["fields_to_transfer"].choices = fields_choices
+
+
+class EfficientDateHierarchyQuerySet(models.QuerySet):
+    """
+    The admin date_hierarchy lists periods with a SELECT DISTINCT DATE_TRUNC(...) which reads every row
+    Generate them between MIN and MAX instead, which only reads the index
+    Caveat: a period without any row may be listed (but the purpose is to use this on large tables)
+    """
+
+    FREQUENCIES = {"year": YEARLY, "month": MONTHLY, "day": DAILY}
+
+    def datetimes(self, field_name, kind, order="ASC", tzinfo=None):
+        if kind not in self.FREQUENCIES:
+            return super().datetimes(field_name, kind, order=order, tzinfo=tzinfo)
+
+        bounds = self.aggregate(lower=models.Min(field_name), upper=models.Max(field_name))
+        if bounds["lower"] is None:
+            return []
+
+        lower_bound = timezone.localtime(bounds["lower"], tzinfo)
+        upper_bound = timezone.localtime(bounds["upper"], tzinfo)
+        lower_bound = lower_bound.replace(hour=0, minute=0, second=0, microsecond=0)
+        if kind in ("year", "month"):
+            lower_bound = lower_bound.replace(day=1)
+        if kind == "year":
+            lower_bound = lower_bound.replace(month=1)
+
+        periods = list(rrule(self.FREQUENCIES[kind], dtstart=lower_bound, until=upper_bound))
+        return periods[::-1] if order == "DESC" else periods

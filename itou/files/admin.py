@@ -13,6 +13,7 @@ class FileAdmin(ReadonlyMixin, ItouModelAdmin):
 
     fields = ["key", "link", "last_modified"]
 
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     @admin.display(description="lien")

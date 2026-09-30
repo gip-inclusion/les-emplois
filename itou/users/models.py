@@ -1741,6 +1741,7 @@ class JobSeekerAssignment(models.Model):
         verbose_name = "affectation usager"
         verbose_name_plural = "affectations usagers"
         ordering = ["-updated_at"]
+        indexes = [models.Index(fields=["updated_at"])]
         constraints = [
             # NB: the clean way would be to add condition=Q(ended_at=None) instead of
             # putting ended_at in fields, but this is not compatible with the bulk_create
