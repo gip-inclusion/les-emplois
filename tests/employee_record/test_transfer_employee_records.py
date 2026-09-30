@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 from itoutils.django.testing import assertSnapshotQueries
 
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecordBatch
+from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordTransition
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.admin import get_admin_url
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
@@ -237,13 +237,20 @@ def test_duplicates_automatic_processing(sftp_directory):
     call_command("transfer_employee_records", upload=True, download=False, preflight=False, wet_run=True)
     process_incoming_file(sftp_directory, "3436", "Duplicate")
 
+    assert list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True)) == [
+        EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+    ]
     call_command("transfer_employee_records", upload=False, download=True, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
-    assert employee_record.status == Status.PROCESSED
+    assert employee_record.status == Status.MODIFICATION_PENDING
+    assert list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True)) == [
+        EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+        EmployeeRecordTransition.PROCESS,
+        EmployeeRecordTransition.SCHEDULE_MODIFICATION,
+    ]
     assert employee_record.asp_processing_code == "3436"
     assert employee_record.archived_json.get("libelleTraitement") == "Duplicate"
     assert employee_record.processed_as_duplicate is True
-    assert employee_record.has_watched_data_updated_at_set()
 
 
 @pytest.mark.usefixtures("mocked_sftp")
