@@ -35,7 +35,7 @@ from slippers.templatetags.slippers import AttrsNode
 
 
 # Rewrite before importing itou code.
-pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
+pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
