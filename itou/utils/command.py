@@ -22,5 +22,7 @@ class TriggerContextMixin:
 
 
 class BaseCommand(LoggedCommandMixin, AtomicHandleMixin, TriggerContextMixin, base.BaseCommand):
+    requires_system_checks = ()
+
     def handle(self, *args, **options):
         raise NotImplementedError()

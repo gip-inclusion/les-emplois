@@ -1,5 +1,5 @@
 from django import template
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.text import slugify
 
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -71,12 +71,12 @@ NAV_ENTRIES = {
     "home": NavItem(
         label="Accueil",
         icon="ri-home-line",
-        target=reverse("dashboard:index"),
+        target=reverse_lazy("dashboard:index"),
         active_view_names=["dashboard:index", "dashboard:index_stats", "home:hp"],
     ),
     "employers-search": NavItem(
         label="Un emploi inclusif",
-        target=reverse("search:employers_results"),
+        target=reverse_lazy("search:employers_results"),
         active_view_names=[
             "search:employers_home",
             "search:employers_results",
@@ -85,19 +85,19 @@ NAV_ENTRIES = {
     ),
     "prescribers-search": NavItem(
         label="Un accompagnement",
-        target=reverse("search:prescribers_results"),
+        target=reverse_lazy("search:prescribers_results"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),
     "services-search": NavItem(
         label="Un service d'insertion",
-        target=reverse("search:services_results"),
+        target=reverse_lazy("search:services_results"),
         active_view_names=["search:services_home", "search:services_results"],
     ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
         label="Mes candidatures",
         icon="ri-draft-line",
-        target=reverse("apply:list_for_job_seeker"),
+        target=reverse_lazy("apply:list_for_job_seeker"),
         active_view_names=["apply:list_for_job_seeker"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -106,7 +106,7 @@ NAV_ENTRIES = {
     # Prescribers.
     "prescriber-jobseekers-user": NavItem(
         label="Usagers accompagnés",
-        target=reverse("job_seekers_views:list"),
+        target=reverse_lazy("job_seekers_views:list"),
         active_view_names=["job_seekers_views:list", "job_seekers_views:list_organization"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -114,13 +114,13 @@ NAV_ENTRIES = {
     ),
     "prescriber-approval-prolongations": NavItem(
         label="Prolongations de PASS\xa0IAE",
-        target=reverse("approvals:prolongation_requests_list", query={"only_pending": "on"}),
+        target=reverse_lazy("approvals:prolongation_requests_list", query={"only_pending": "on"}),
         active_view_names=["approvals:prolongation_requests_list"],
     ),
     "prescriber-job-apps": NavItem(
         label="Candidatures vers des emplois",
         icon="ri-draft-line",
-        target=reverse("apply:list_prescriptions"),
+        target=reverse_lazy("apply:list_prescriptions"),
         active_view_names=["apply:list_prescriptions", "apply:list_prescriptions_exports"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -128,7 +128,7 @@ NAV_ENTRIES = {
     ),
     "prescriber-orientations": NavItem(
         label="Orientations vers des services",
-        target=reverse("insertion_views:orientations_list"),
+        target=reverse_lazy("insertion_views:orientations_list"),
         active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details_for_sender"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -136,7 +136,7 @@ NAV_ENTRIES = {
     ),
     "prescriber-overview": NavItem(
         label="Fiche de présentation",
-        target=reverse("prescribers_views:overview"),
+        target=reverse_lazy("prescribers_views:overview"),
         active_view_names=["prescribers_views:overview"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -144,7 +144,7 @@ NAV_ENTRIES = {
     ),
     "prescriber-edit-organization": NavItem(
         label="Modifier les informations",
-        target=reverse("prescribers_views:edit_organization"),
+        target=reverse_lazy("prescribers_views:edit_organization"),
         active_view_names=["prescribers_views:edit_organization"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -152,7 +152,7 @@ NAV_ENTRIES = {
     ),
     "prescriber-members": NavItem(
         label="Collaborateurs",
-        target=reverse("prescribers_views:members"),
+        target=reverse_lazy("prescribers_views:members"),
         active_view_names=["prescribers_views:members"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -160,7 +160,7 @@ NAV_ENTRIES = {
     ),
     "prescriber-accredited-organizations": NavItem(
         label="Organisations conventionnées",
-        target=reverse("prescribers_views:list_accredited_organizations"),
+        target=reverse_lazy("prescribers_views:list_accredited_organizations"),
         active_view_names=["prescribers_views:list_accredited_organizations"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -170,7 +170,7 @@ NAV_ENTRIES = {
     "employer-job-apps": NavItem(
         label="Demandes reçues",
         icon="ri-mail-download-line",
-        target=reverse("apply:list_for_siae"),
+        target=reverse_lazy("apply:list_for_siae"),
         active_view_names=["apply:list_for_siae", "apply:list_for_siae_exports"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -178,7 +178,7 @@ NAV_ENTRIES = {
     ),
     "employer-job-apps-sent": NavItem(
         label="Candidatures vers des emplois",
-        target=reverse("apply:list_prescriptions"),
+        target=reverse_lazy("apply:list_prescriptions"),
         active_view_names=["apply:list_prescriptions", "apply:list_prescriptions_exports"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -186,7 +186,7 @@ NAV_ENTRIES = {
     ),
     "employer-orientations": NavItem(
         label="Orientations vers des services",
-        target=reverse("insertion_views:orientations_list"),
+        target=reverse_lazy("insertion_views:orientations_list"),
         active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details_for_sender"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -194,7 +194,7 @@ NAV_ENTRIES = {
     ),
     "employer-assignments": NavItem(
         label="Usagers accompagnés",
-        target=reverse("job_seekers_views:list_organization"),
+        target=reverse_lazy("job_seekers_views:list_organization"),
         active_view_names=["job_seekers_views:list_organization"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -202,7 +202,7 @@ NAV_ENTRIES = {
     ),
     "employer-approvals": NavItem(
         label="PASS IAE",
-        target=reverse("approvals:list"),
+        target=reverse_lazy("approvals:list"),
         active_view_names=["approvals:list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -210,7 +210,7 @@ NAV_ENTRIES = {
     ),
     "employer-employee-records": NavItem(
         label="Fiches salarié ASP",
-        target=f"{reverse('employee_record_views:list')}",
+        target=reverse_lazy("employee_record_views:list"),
         active_view_names=["employee_record_views:list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -218,7 +218,7 @@ NAV_ENTRIES = {
     ),
     "employer-company": NavItem(
         label="Fiche de présentation",
-        target=reverse("companies_views:overview"),
+        target=reverse_lazy("companies_views:overview"),
         active_view_names=["companies_views:overview"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -226,7 +226,7 @@ NAV_ENTRIES = {
     ),
     "employer-jobs": NavItem(
         label="Fiches de poste",
-        target=reverse("companies_views:job_description_list"),
+        target=reverse_lazy("companies_views:job_description_list"),
         active_view_names=["companies_views:job_description_list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -234,7 +234,7 @@ NAV_ENTRIES = {
     ),
     "employer-members": NavItem(
         label="Collaborateurs",
-        target=reverse("companies_views:members"),
+        target=reverse_lazy("companies_views:members"),
         active_view_names=["companies_views:members"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -242,7 +242,7 @@ NAV_ENTRIES = {
     ),
     "employer-financial-annexes": NavItem(
         label="Annexes financières",
-        target=reverse("companies_views:show_financial_annexes"),
+        target=reverse_lazy("companies_views:show_financial_annexes"),
         active_view_names=["companies_views:show_financial_annexes"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -251,7 +251,7 @@ NAV_ENTRIES = {
     "employer-geiq-assessments": NavItem(
         label="Bilan d’exécution",
         icon="ri-list-check-3",
-        target=reverse("geiq_assessments_views:list_for_geiq"),
+        target=reverse_lazy("geiq_assessments_views:list_for_geiq"),
         active_view_names=[
             "geiq_assessments_views:list_for_geiq",
             "geiq_assessments_views:create",
@@ -270,7 +270,7 @@ NAV_ENTRIES = {
     # Labor inspectors.
     "labor-inspector-members": NavItem(
         label="Collaborateurs",
-        target=reverse("institutions_views:members"),
+        target=reverse_lazy("institutions_views:members"),
         active_view_names=["institutions_views:members"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
@@ -279,7 +279,7 @@ NAV_ENTRIES = {
     "labor-inspector-geiq-assessments": NavItem(
         label="Bilans d’exécution GEIQ",
         icon="ri-list-check-3",
-        target=reverse("geiq_assessments_views:list_for_institution"),
+        target=reverse_lazy("geiq_assessments_views:list_for_institution"),
         active_view_names=[
             "geiq_assessments_views:details_for_institution",
             "geiq_assessments_views:list_for_institution",
