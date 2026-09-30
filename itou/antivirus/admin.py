@@ -3,6 +3,7 @@ from django.db.models import Case, F, Q, When
 
 from itou.antivirus.models import Scan
 from itou.utils.admin import ItouModelAdmin
+from itou.utils.pagination import FuzzyCountPaginator
 
 
 class SuspiciousFilter(admin.SimpleListFilter):
@@ -29,6 +30,7 @@ class ScanAdmin(ItouModelAdmin):
     fields = ["clamav_completed_at", "clamav_signature", "infected", "comment"]
     list_filter = [SuspiciousFilter, "infected", "clamav_completed_at"]
     search_fields = ["file__id", "clamav_signature"]
+    paginator = FuzzyCountPaginator
 
     @admin.display(boolean=True, description="à vérifier", ordering="suspicious")
     def suspicious(self, obj):

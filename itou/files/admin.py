@@ -3,6 +3,7 @@ from django.utils.html import format_html
 
 from itou.files.models import File
 from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
+from itou.utils.pagination import FuzzyCountPaginator
 
 
 @admin.register(File)
@@ -11,6 +12,8 @@ class FileAdmin(ReadonlyMixin, ItouModelAdmin):
     readonly_fields = ["key", "link", "last_modified"]
 
     fields = ["key", "link", "last_modified"]
+
+    paginator = FuzzyCountPaginator
 
     @admin.display(description="lien")
     def link(self, obj):

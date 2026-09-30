@@ -26,6 +26,7 @@ from itou.utils.admin import (
     UUIDSupportRemarkInline,
     get_admin_view_link,
 )
+from itou.utils.pagination import FuzzyCountPaginator
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -149,6 +150,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "contract_type_details",
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline, EmployeeRecordInline)
+    paginator = FuzzyCountPaginator
 
     fieldsets = [
         (
@@ -400,3 +402,4 @@ class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username", "job_application__pk")
+    paginator = FuzzyCountPaginator
