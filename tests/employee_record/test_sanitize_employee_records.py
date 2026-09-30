@@ -1,5 +1,6 @@
 import datetime
 import io
+import random
 import re
 
 import pytest
@@ -171,3 +172,30 @@ def test_handle_3437_errors():
         assert untouched_er.status == models.Status.REJECTED
         untouched_er.job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert untouched_er.job_application.job_seeker.jobseeker_profile.asp_uid == previous_asp_uid[untouched_er.pk]
+
+
+def test_schedule_modifications():
+    processed_employee_record_without_flag = factories.EmployeeRecordFactory(
+        status=models.Status.PROCESSED,
+    )
+    processed_employee_record_with_flag = factories.EmployeeRecordFactory(
+        status=models.Status.PROCESSED,
+        watched_data_updated_at=timezone.now(),
+    )
+    other_status = random.choice(
+        [status for status in models.Status if status not in (Status.PROCESSED, Status.ARCHIVED)]
+    )
+    not_processed_employee_record_with_flag = factories.EmployeeRecordFactory(
+        status=other_status,
+        watched_data_updated_at=timezone.now(),
+    )
+    call_command("sanitize_employee_records", wet_run=True)
+
+    processed_employee_record_without_flag.refresh_from_db()
+    assert processed_employee_record_without_flag.status == Status.PROCESSED
+
+    processed_employee_record_with_flag.refresh_from_db()
+    assert processed_employee_record_with_flag.status == Status.MODIFICATION_PENDING
+
+    not_processed_employee_record_with_flag.refresh_from_db()
+    assert not_processed_employee_record_with_flag.status == other_status

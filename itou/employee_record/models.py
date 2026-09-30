@@ -241,6 +241,14 @@ class EmployeeRecordManager(models.Manager.from_queryset(EmployeeRecordQuerySet)
             super().get_queryset().defer("watched_data_updated_at")  # Deferred to prevent accidental UPDATE
         )
 
+    def schedule_modifications(self):
+        for employee_record in (
+            self.get_queryset()
+            .filter(watched_data_updated_at__isnull=False, status=Status.PROCESSED)
+            .select_for_update(of=("self",), no_key=True)
+        ):
+            employee_record.schedule_modification()
+
 
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
