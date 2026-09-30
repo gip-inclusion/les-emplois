@@ -1,6 +1,5 @@
 import random
 from unittest.mock import patch
-from urllib.parse import urlencode
 
 import pytest
 import respx
@@ -29,10 +28,8 @@ from tests.openid_connect.ft_connect.tests import (
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     HASHED_DEFAULT_PASSWORD,
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    PrescriberFactory,
     ProfessionalFactory,
     random_pro_user_factory,
     random_user_kind_factory,
@@ -403,27 +400,3 @@ class TestExistingUserLogin:
             follow=True,
         )
         assertContains(response, "vos gestionnaires de mots de passe")
-
-
-def test_pro_connect_activation_view(client, pro_connect):
-    user = random.choice([PrescriberFactory, EmployerFactory])(identity_provider=IdentityProvider.DJANGO)
-    client.force_login(user)
-
-    url = reverse("dashboard:activate_pro_connect_account")
-    response = client.get(url)
-    # Check the href link
-    params = {
-        "previous_url": url,
-        "user_email": user.email,
-    }
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')
-
-    next_url = "/test_join"
-    url = f"{reverse('dashboard:activate_pro_connect_account')}?{urlencode({'next': next_url})}"
-    response = client.get(url)
-    # Check the href link
-    params["previous_url"] = url
-    params["next_url"] = next_url
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')
