@@ -11,6 +11,8 @@ import threading
 import uuid
 from functools import reduce
 
+import factory.random
+
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
 import pandas  # noqa F401
@@ -33,6 +35,8 @@ from factory import Faker
 from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
+
+factory.random.reseed_random("La plateforme de l’inclusion")
 
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
