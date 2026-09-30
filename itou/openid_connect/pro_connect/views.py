@@ -169,11 +169,14 @@ def _get_token(request, code):
     # Contains access_token, token_type, expires_in, id_token
     if response.status_code != 200:
         if response.status_code == 400:
+            try:
+                content = response.json()
+            except (json.decoder.JSONDecodeError, UnicodeDecodeError):
+                content = response.text
             logger.warning(
                 "Bad request in pro_connect_callback",
                 extra={
-                    "error": request.GET.get("error"),
-                    "error_description": request.GET.get("error_description"),
+                    "error": content,
                 },
             )
         return None, _redirect_to_login_page_on_error(error_msg="Impossible to get token.", request=request)

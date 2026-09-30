@@ -4,7 +4,9 @@ from operator import itemgetter
 from unittest import mock
 from urllib.parse import quote, urlencode
 
+import httpx
 import pytest
+import respx
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.messages import Message
@@ -12,7 +14,7 @@ from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import crypto, timezone
 from django_otp.oath import TOTP
 from freezegun import freeze_time
 from itoutils.urls import add_url_params
@@ -557,6 +559,28 @@ class TestProConnectCallbackView:
         assert User.objects.count() == 0
         assert get_user(client).is_authenticated is False
         assert "ProConnect id_token nonce mismatch" in caplog.messages
+
+    @pytest.mark.parametrize(
+        "error_kwargs",
+        [
+            pytest.param({"json": {"details": "Bad request"}}, id="json"),
+            pytest.param({"text": "Bad request"}, id="text"),
+        ],
+    )
+    @pytest.mark.usefixtures("pro_connect")
+    def test_bad_request_log(self, caplog, client, error_kwargs):
+        respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(400, **error_kwargs))
+        nonce = crypto.get_random_string(length=12)
+        state = ProConnectState.save_state(data={}, nonce=nonce)
+        response = client.get(reverse("pro_connect:callback"), data={"code": "123", "state": state})
+        assertRedirects(response, reverse("search:home"))
+        found = 0
+        for record in caplog.records:
+            if record.message == "Bad request in pro_connect_callback":
+                found += 1
+                [error_content] = error_kwargs.values()
+                assert record.error == error_content
+        assert found == 1
 
 
 class TestProConnectLogin:
