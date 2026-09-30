@@ -1,7 +1,6 @@
 import paramiko
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from sentry_sdk.crons import monitor
 
@@ -124,12 +123,8 @@ class Command(EmployeeRecordTransferCommand):
                             archive=raw_employee_record,
                             as_duplicate=True,
                         )
-                        if not employee_record.has_watched_data_updated_at_set():
-                            # XXX: make sure an update will be sent
-                            now = timezone.now()
-                            EmployeeRecord.objects.filter(pk=employee_record.pk).update(
-                                watched_data_updated_at=now, updated_at=now
-                            )
+                        # Directly schedule the modification to make sure the approval dates are correct
+                        employee_record.schedule_modification()
                         continue
 
                     employee_record.reject(code=processing_code, label=processing_label, archive=raw_employee_record)
