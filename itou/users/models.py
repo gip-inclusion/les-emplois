@@ -7,6 +7,7 @@ from collections import Counter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import GinIndex, OpClass
@@ -1463,6 +1464,12 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         self.hexa_commune = None
 
         self.save()
+
+    @property
+    def age(self):
+        if not self.birthdate:
+            return None
+        return relativedelta(timezone.localdate(), self.birthdate).years
 
     @property
     def is_employed(self):

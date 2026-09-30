@@ -815,6 +815,20 @@ class TestJobSeekerProfileModel:
 
         # Birth place / birth country are checked in User tests
 
+    @pytest.mark.parametrize(
+        "birthdate,expected_age",
+        [
+            (None, None),
+            (datetime.date(2005, 12, 31), 20),
+            (datetime.date(2006, 1, 1), 20),
+            (datetime.date(2006, 1, 2), 19),
+        ],
+    )
+    def test_age(self, birthdate, expected_age):
+        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=birthdate)
+        with freezegun.freeze_time(datetime.date(2026, 1, 1)):
+            assert job_seeker.jobseeker_profile.age == expected_age
+
     def test_job_seeker_previous_employer(self):
         """
         Check coherence of the `is_employed` field,
