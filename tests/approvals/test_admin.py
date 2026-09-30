@@ -147,6 +147,18 @@ class TestApprovalAdmin:
             count=1,
         )
 
+    @freeze_time("2026-10-12")
+    def test_changelist_date_hierarchy_with_queryset_method_filter(self, admin_client):
+        # IsValidFilter calls ApprovalQuerySet.valid() on the queryset given to the date_hierarchy
+        ApprovalFactory(start_at=date(2025, 3, 5), end_at=date(2027, 3, 4))
+        ApprovalFactory(start_at=date(2025, 6, 1), end_at=date(2025, 6, 30))  # Expired
+
+        response = admin_client.get(
+            reverse("admin:approvals_approval_changelist"), {"is_valid": "yes", "start_at__year": "2025"}
+        )
+        assertContains(response, "Mars 2025")
+        assertNotContains(response, "Juin 2025")
+
     def test_send_approvals_to_pe_stats(self, admin_client):
         ApprovalFactory(pe_notification_status="notification_error")
         CancelledApprovalFactory(pe_notification_status="notification_should_retry")
