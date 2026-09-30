@@ -1196,6 +1196,8 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
 
 
 class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
+    list_select_related = ("user",)
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
     inlines = (PkSupportRemarkInline,)
 
@@ -1249,6 +1251,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
     ]
     list_display_links = ("job_seeker_display",)
     list_filter = ("last_action_kind", "assigned_to_unknown_advisor")
+    list_select_related = ("job_seeker", "professional", "prescriber_organization", "company")
     search_fields = (
         "job_seeker__first_name",
         "job_seeker__last_name",
@@ -1266,8 +1269,9 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "prescriber_organization",
         "company",
     )
-    ordering = ("-updated_at",)
+    ordering = ("-pk",)
 
+    show_full_result_count = False
     paginator = FuzzyCountPaginator
 
     @admin.display(description="usager")

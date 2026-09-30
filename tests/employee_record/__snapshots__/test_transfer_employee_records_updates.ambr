@@ -112,7 +112,7 @@
           INNER JOIN "employee_record_employeerecord" ON ("employee_record_employeerecordupdatenotification"."employee_record_id" = "employee_record_employeerecord"."id")
           WHERE ("employee_record_employeerecordupdatenotification"."asp_batch_file" = %s
                  AND "employee_record_employeerecordupdatenotification"."asp_batch_line_number" = %s)
-          ORDER BY "employee_record_employeerecordupdatenotification"."created_at" DESC
+          ORDER BY "employee_record_employeerecordupdatenotification"."id" DESC
           LIMIT 1
         ''',
       }),

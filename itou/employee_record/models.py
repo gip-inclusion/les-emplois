@@ -76,7 +76,7 @@ class ASPExchangeInformation(models.Model):
                 condition=Q(asp_batch_file__isnull=False),
             )
         ]
-        ordering = ["-created_at"]
+        ordering = ["-pk"]
 
     def set_asp_batch_information(self, file, line_number, archive):
         self.asp_batch_file = file

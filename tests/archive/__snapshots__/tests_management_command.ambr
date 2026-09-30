@@ -2334,7 +2334,7 @@
                                                    %s,
                                                    %s,
                                                    %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -2359,7 +2359,7 @@
                                                          %s,
                                                          %s,
                                                          %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({

@@ -313,7 +313,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "PASS\xa0IAE",
                 "verbose_name_plural": "PASS\xa0IAE",
-                "ordering": ["-created_at"],
+                "ordering": ["-pk"],
                 "permissions": [
                     ("export_ft_api_rejections", "Can export PASS IAE rejected by FT's API"),
                     ("handle_manual_approval_requests", "Can handle manual PASS IAE requests"),
@@ -1258,7 +1258,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "PASS\xa0IAE annulé",
                 "verbose_name_plural": "PASS\xa0IAE annulés",
-                "ordering": ["-created_at"],
+                "ordering": ["-pk"],
             },
         ),
         migrations.AddConstraint(

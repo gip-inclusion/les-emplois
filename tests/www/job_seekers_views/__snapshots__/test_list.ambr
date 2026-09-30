@@ -2486,7 +2486,7 @@
                                                    %s,
                                                    %s,
                                                    %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -3659,7 +3659,7 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s,
                                                    %s)
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({

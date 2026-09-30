@@ -815,7 +815,7 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -7657,7 +7657,7 @@
           SELECT "approvals_approval"."user_id" AS "user_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."origin" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({

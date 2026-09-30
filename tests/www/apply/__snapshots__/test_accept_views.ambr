@@ -486,7 +486,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -1481,7 +1481,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -2582,7 +2582,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({
@@ -3375,7 +3375,7 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          ORDER BY "approvals_approval"."id" DESC
         ''',
       }),
       dict({

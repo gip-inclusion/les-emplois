@@ -297,7 +297,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     class Meta:
         verbose_name = "PASS IAE annulé"
         verbose_name_plural = "PASS IAE annulés"
-        ordering = ["-created_at"]
+        ordering = ["-pk"]
         constraints = CommonApprovalMixin.Meta.constraints
 
     def __str__(self):
@@ -469,7 +469,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     class Meta:
         verbose_name = "PASS IAE"
         verbose_name_plural = "PASS IAE"
-        ordering = ["-created_at"]
+        ordering = ["-pk"]
         constraints = CommonApprovalMixin.Meta.constraints + [
             models.CheckConstraint(
                 name="approval_eligibility_diagnosis",
