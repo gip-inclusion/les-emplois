@@ -24,6 +24,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.utils import NIR_RE
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
+    EfficientDateHierarchyAdminMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
@@ -183,7 +184,9 @@ class StartDateFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Approval)
-class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin):
+class ApprovalAdmin(
+    EfficientDateHierarchyAdminMixin, InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin
+):
     change_form_template = "admin/approvals/change_approval_form.html"
     form = ApprovalAdminForm
     list_display = (
@@ -481,7 +484,9 @@ class FromProlongationRequest(admin.SimpleListFilter):
 
 
 @admin.register(models.Suspension)
-class SuspensionAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin):
+class SuspensionAdmin(
+    EfficientDateHierarchyAdminMixin, InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin
+):
     list_display = (
         "pk",
         "approval",
@@ -679,7 +684,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.Prolongation)
-class ProlongationAdmin(InconsistencyCheckMixin, ProlongationCommonAdmin):
+class ProlongationAdmin(EfficientDateHierarchyAdminMixin, InconsistencyCheckMixin, ProlongationCommonAdmin):
     list_display = (
         "pk",
         "approval",

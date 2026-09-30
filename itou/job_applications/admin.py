@@ -17,6 +17,7 @@ from itou.job_applications.models import ACCEPTED_ONLY_FIELDS
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.models import User
 from itou.utils.admin import (
+    EfficientDateHierarchyAdminMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
@@ -394,7 +395,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
 
 @admin.register(models.JobApplicationTransitionLog)
-class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
+class JobApplicationTransitionLogAdmin(EfficientDateHierarchyAdminMixin, TransitionLogMixin, ItouModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
