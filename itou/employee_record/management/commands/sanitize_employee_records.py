@@ -66,11 +66,15 @@ class Command(BaseCommand):
             "%d/%d employee records were unarchived", unarchive_count, len(employee_record_with_missing_notification)
         )
 
+    def _schedule_modifications(self):
+        EmployeeRecord.objects.schedule_modifications()
+
     @dry_runnable
     def handle(self, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
 
         self._check_approvals()
         self._check_missed_notifications()
+        self._schedule_modifications()
 
         self.logger.info("Employee records sanitizing done. Have a great day!")
