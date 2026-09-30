@@ -1,8 +1,9 @@
-import json
 from itertools import batched
 
 from django.contrib.auth.hashers import make_password
 from django.db import migrations
+
+from itou.utils.triggers.migration import TriggerContextMigration
 
 
 def harmonize_deactivated_users(apps, schema_editor):
@@ -15,11 +16,6 @@ def harmonize_deactivated_users(apps, schema_editor):
     EmailAddress = apps.get_model("account", "EmailAddress")
     ItouTOTPDevice = apps.get_model("otp", "ItouTOTPDevice")
     ItouStaticDevice = apps.get_model("otp", "ItouStaticDevice")
-
-    schema_editor.execute(
-        "SELECT set_config('itou.context', %s, true)",
-        [json.dumps({"migration": "users.0063_harmonize_deactivated_users"})],
-    )
 
     users = User.objects.filter(is_active=False)
     total = users.count()
@@ -70,7 +66,7 @@ def harmonize_deactivated_users(apps, schema_editor):
     print(f"Deleted {nb_deleted} assignments without organization or company of deactivated professionals")
 
 
-class Migration(migrations.Migration):
+class Migration(TriggerContextMigration):
     dependencies = [
         ("otp", "0004_remove_itoutotpdevice_unique_name_per_user_and_more"),
         ("users", "0062_remove_jobseekerprofile_ft_gps_id"),
