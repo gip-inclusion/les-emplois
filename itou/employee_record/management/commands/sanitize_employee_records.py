@@ -83,6 +83,9 @@ class Command(BaseCommand):
             # This command is called every hour: we don't want to send a new email every hour
             employee_record.handle_3437_error(send_email_for_duplicate=False)
 
+    def _schedule_modifications(self):
+        EmployeeRecord.objects.schedule_modifications()
+
     @dry_runnable
     def handle(self, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
@@ -90,5 +93,6 @@ class Command(BaseCommand):
         self._check_approvals()
         self._check_missed_notifications()
         self._handle_3437_errors()
+        self._schedule_modifications()
 
         self.logger.info("Employee records sanitizing done. Have a great day!")
