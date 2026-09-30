@@ -17,6 +17,7 @@ from itou.job_applications.models import ACCEPTED_ONLY_FIELDS
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.models import User
 from itou.utils.admin import (
+    EfficientDateHierarchyQuerySet,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
@@ -405,3 +406,7 @@ class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
     search_fields = ("transition", "user__username", "job_application__pk")
     show_full_result_count = False
     paginator = FuzzyCountPaginator
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return EfficientDateHierarchyQuerySet(model=qs.model, query=qs.query, using=qs.db)
