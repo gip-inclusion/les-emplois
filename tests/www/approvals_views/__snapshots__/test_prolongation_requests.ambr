@@ -924,7 +924,9 @@
       }),
       dict({
         'origin': list([
-          'IfNode[approvals/prolongation_requests/list.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IncludeNode[approvals/prolongation_requests/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[approvals/prolongation_requests/list.html]',
           'prolongation_requests_list[www/approvals_views/views.py]',
@@ -1320,7 +1322,9 @@
       }),
       dict({
         'origin': list([
-          'IfNode[approvals/prolongation_requests/list.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IncludeNode[approvals/prolongation_requests/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[approvals/prolongation_requests/list.html]',
           'prolongation_requests_list[www/approvals_views/views.py]',

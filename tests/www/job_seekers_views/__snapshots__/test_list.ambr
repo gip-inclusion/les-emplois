@@ -2649,8 +2649,9 @@
       }),
       dict({
         'origin': list([
-          'IfNode[job_seekers_views/list.html]',
-          'IfNode[job_seekers_views/list.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IncludeNode[job_seekers_views/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
@@ -3796,8 +3797,9 @@
       }),
       dict({
         'origin': list([
-          'IfNode[job_seekers_views/list.html]',
-          'IfNode[job_seekers_views/list.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IfNode[job_seekers_views/includes/assignments_nav_tabs.html]',
+          'IncludeNode[job_seekers_views/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
