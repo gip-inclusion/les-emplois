@@ -1374,7 +1374,7 @@ class TestCreateEmployeeRecordStep5ForEITI(TestCreateEmployeeRecordStep5):
         assertContains(response, self.EITI_CONTRIBUTIONS_LABEL)
 
 
-class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
+class TestResubmitRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
     """
     Check if update and resubmission is possible after employee record rejection
     """
