@@ -12,6 +12,8 @@ import re
 from botocore.config import Config
 from django.utils.csp import CSP
 from dotenv import load_dotenv
+from redis.backoff import ExponentialBackoff
+from redis.retry import Retry
 
 import itou
 import itou.api.changelog
@@ -589,6 +591,7 @@ HUEY = {
         "port": os.environ["REDIS_PORT"],
         "password": os.environ["REDIS_PASSWORD"],
         "db": os.environ["REDIS_DB"],
+        "retry": Retry(ExponentialBackoff(), 2),
     },
     "consumer": {
         "workers": 2,
