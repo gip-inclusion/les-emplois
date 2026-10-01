@@ -1,9 +1,8 @@
 [
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
   "*/5 0-21 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
+  "*/6 * * * * $ROOT/clevercloud/run_management_command.sh migrate_employee_record_update_notifications --include-last-rejected --wet-run",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
-  "*/6 0-6 * * * $ROOT/clevercloud/run_management_command.sh migrate_employee_record_update_notifications --wet-run",
-  "*/6 18-23 * * * $ROOT/clevercloud/run_management_command.sh migrate_employee_record_update_notifications --wet-run",
   "*/20 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_ft_offers --wet-run",
