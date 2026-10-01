@@ -7,7 +7,7 @@ from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
-from django.db.models import Case, F, Prefetch, Q, When
+from django.db.models import Case, Exists, F, OuterRef, Prefetch, Q, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -393,6 +393,7 @@ def search_services_results(request, template_name="search/services/results.html
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)
     services = Service.objects.none()
+    display_funding_labels_filter = False
 
     suppress_category_error = False
     if form.is_valid():
@@ -410,6 +411,28 @@ def search_services_results(request, template_name="search/services/results.html
             reception=reception,
             service_types=form.cleaned_data["services"],
         ).select_related("structure", "source")
+
+        # We only make available (for the user to choose from) the funding
+        # labels appearing in the search results.
+        funding_labels_field = form.fields["funding_labels"]
+        available_funding_label_ids = list(
+            funding_labels_field.queryset.filter(
+                pk__in=Service.funding_labels.through.objects.filter(service__in=services.values("pk")).values(
+                    "genericreferenceitem_id"
+                )
+            ).values_list("pk", flat=True)
+        )
+        funding_labels_field.queryset = funding_labels_field.queryset.filter(pk__in=available_funding_label_ids)
+        display_funding_labels_filter = bool(available_funding_label_ids)
+        if funding_labels := form.cleaned_data["funding_labels"]:
+            services = services.filter(
+                Exists(
+                    Service.funding_labels.through.objects.filter(
+                        service=OuterRef("pk"),
+                        genericreferenceitem__in=funding_labels,
+                    )
+                )
+            )
     elif len(form.errors) == 1:
         try:
             # When searching for a job seeker (param job_seeker_public_id), the
@@ -437,6 +460,7 @@ def search_services_results(request, template_name="search/services/results.html
         "city": city,
         "category": category,
         "suppress_category_error": suppress_category_error,
+        "display_funding_labels_filter": display_funding_labels_filter,
         "results": results,
         "detail_query_string": urlencode(detail_query),
         **banner_context,
