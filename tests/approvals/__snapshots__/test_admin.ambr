@@ -31,7 +31,7 @@
   Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
   http://localhost:8000/search/prescribers
   
-  ---
+  -- 
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   La plateforme de l’inclusion
   http://localhost:8000/
