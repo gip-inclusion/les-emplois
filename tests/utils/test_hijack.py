@@ -144,4 +144,4 @@ class TestUserHijack:
         assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk}, follow=True)
-        assertRedirects(response, reverse("dashboard:index"))
+        assertRedirects(response, reverse("home:hp"))
