@@ -20,6 +20,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.utils.templatetags.format_filters import format_approval_number
@@ -367,6 +368,19 @@ class TestSiaeJobApplicationListView:
             job_application__job_seeker__last_name="Calavera",
             job_application__approval__number=approval_number,
         )
+        # Make sure cancelled job applications are not picked up
+        cancelled_jobapp = JobApplicationFactory(
+            sent_by_employer=True,
+            job_seeker__first_name="Sophie",
+            job_seeker__last_name="Fonfec",
+            to_company=self.siae,
+            sender_company=self.siae,
+            state=JobApplicationState.CANCELLED,
+        )
+        EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            job_application=cancelled_jobapp,
+        )
         client.force_login(self.user)
         response = client.get(self.url(evaluated_siae))
         approval_number_html = format_approval_number(approval_number)
@@ -389,6 +403,7 @@ class TestSiaeJobApplicationListView:
             html=True,
             count=1,
         )
+        assertNotContains(response, "FONFEC Sophie")
 
     def test_content_with_selected_criteria(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)

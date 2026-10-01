@@ -14,6 +14,7 @@ from django.views.generic.detail import SingleObjectMixin
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.institutions.models import Institution
+from itou.job_applications.enums import JobApplicationState
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
@@ -637,6 +638,7 @@ def siae_job_applications_list(
 
     evaluated_job_applications = (
         EvaluatedJobApplication.objects.filter(evaluated_siae=evaluated_siae)
+        .exclude(job_application__state=JobApplicationState.CANCELLED)
         .select_related(
             "evaluated_siae__evaluation_campaign__calendar",
             "evaluated_siae__siae",
