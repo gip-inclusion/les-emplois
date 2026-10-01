@@ -1,3 +1,4 @@
+
 ---
 {% if itou_environment != "PROD" %}[{{ itou_environment }}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{ itou_environment }}]{% endif %}{% if display_gdpr|default:False %}
 {% brand %} est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.

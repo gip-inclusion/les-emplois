@@ -25,5 +25,4 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de l’usager v
 
 Délivrer un PASS IAE dans l'admin :
 {{ admin_manually_add_approval_url }}
-
 {% endblock body %}
