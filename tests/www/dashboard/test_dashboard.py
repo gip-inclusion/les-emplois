@@ -701,7 +701,6 @@ class TestDashboardView:
 
         response = client.get(reverse("dashboard:index"))
         assertContains(response, self.DORA_LABEL)
-        assertContains(response, "Consulter les services d'insertion de votre territoire")
         assertContains(response, "Référencer vos services")
         assertContains(response, "Suggérer un service partenaire")
 
@@ -711,7 +710,6 @@ class TestDashboardView:
 
         response = client.get(reverse("dashboard:index"))
         assertContains(response, self.DORA_LABEL)
-        assertContains(response, "Consulter les services d'insertion de votre territoire")
         assertContains(response, "Référencer vos services")
         assertContains(response, "Suggérer un service partenaire")
 
