@@ -207,6 +207,13 @@ class PrescriberSearchForm(forms.Form):
         return distance
 
 
+class ResultsDependentMultipleChoiceField(forms.MultipleChoiceField):
+    """Choices are set by the view."""
+
+    def valid_value(self, value):
+        return True
+
+
 class ServiceSearchForm(forms.Form):
     RECEPTION_ALL_VALUE = "tous"
 
@@ -248,6 +255,11 @@ class ServiceSearchForm(forms.Form):
     services = forms.MultipleChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.TypeService],
         label="Type de service",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    funding_labels = ResultsDependentMultipleChoiceField(
+        label="Financé par",
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )

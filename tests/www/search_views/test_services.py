@@ -1,7 +1,10 @@
+from urllib.parse import urlencode
+
 import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.www.search_views.forms import ServiceSearchForm
@@ -19,6 +22,11 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 
 
 CATEGORY = data_inclusion_v1.Categorie.MOBILITE
+
+
+SAVOIE = "Conseil départemental de la Savoie"
+ESSONNE = "Conseil départemental de l'Essonne"
+VIENNE = "Conseil départemental de la Vienne"
 
 
 class TestSearchServices:
@@ -165,3 +173,150 @@ class TestSearchServices:
 
         response = client.get(self.URL, {"city": vannes.slug, "category": CATEGORY})
         assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+
+    def test_funding_labels_filter(self, client, snapshot):
+        FUNDING_LABEL_FILTER = "#services-funding-labels-filter"
+        vannes = create_city_vannes()
+
+        unfunded = ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": None})
+        params = {"city": vannes.slug, "category": CATEGORY}
+        response = client.get(self.URL, params)
+        assertContains(response, "1 résultat")
+        assertNotContains(response, "Financé par")
+
+        savoie_service = ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [SAVOIE]})
+        savoie_essonne_service = ServiceFactory(
+            coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [SAVOIE, ESSONNE]}
+        )
+        # Must not be part of the results (remote only).
+        remote = ServiceFactory(
+            coordinates=vannes.coords,
+            city="Vannes",
+            eligibility_zones=["france"],
+            extra={"funding_labels": [VIENNE]},
+        )
+        remote.receptions.set([RemoteReceptionFactory()])
+
+        def available_choices(response):
+            soup = parse_response_to_soup(response, selector=FUNDING_LABEL_FILTER)
+            return {
+                checkbox["value"]: "checked" in checkbox.attrs
+                for checkbox in soup.find_all("input", attrs={"type": "checkbox", "name": "funding_labels"})
+            }
+
+        response = client.get(self.URL, params)
+        assertContains(response, "3 résultats")
+        assertContains(response, "Financé par")
+        assert available_choices(response) == {ESSONNE: False, SAVOIE: False}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(self.URL, params | {"funding_labels": [ESSONNE]})
+        assertContains(response, "1 résultat")
+        assertContains(response, savoie_essonne_service.name)
+        assertNotContains(response, unfunded.name)
+        # Other labels remain available.
+        assert available_choices(response) == {ESSONNE: True, SAVOIE: False}
+
+        response = client.get(self.URL, params | {"funding_labels": [ESSONNE, SAVOIE]})
+        assertContains(response, "2 résultats")
+        assertContains(response, savoie_service.name)
+        assertContains(response, savoie_essonne_service.name)
+
+        response = client.get(
+            self.URL, params | {"reception": ServiceSearchForm.RECEPTION_ALL_VALUE, "funding_labels": [VIENNE]}
+        )
+        assertContains(response, "1 résultat")
+        assertContains(response, remote.name)
+        assert available_choices(response) == {ESSONNE: False, SAVOIE: False, VIENNE: True}
+
+        response = client.get(self.URL, params | {"funding_labels": ["unknown"]})
+        assertContains(response, "3 résultats")
+        assert available_choices(response) == {ESSONNE: False, SAVOIE: False}
+
+    def test_htmx_reload_funding_labels_filter(self, client, htmx_client):
+        vannes = create_city_vannes()
+        ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(
+            coordinates=vannes.coords,
+            city="Vannes",
+            eligibility_zones=["france"],
+            extra={"funding_labels": [VIENNE]},
+        )
+        remote.receptions.set([RemoteReceptionFactory()])
+
+        params = {"city": vannes.slug, "category": CATEGORY}
+        simulated_page = parse_response_to_soup(
+            client.get(self.URL, params | {"reception": IN_PERSON_RECEPTION_VALUE})
+        )
+        assert simulated_page.find("input", attrs={"name": "funding_labels"}) is None
+        [radio_input] = simulated_page.find_all(
+            "input", attrs={"type": "radio", "name": "reception", "value": REMOTE_RECEPTION_VALUE}
+        )
+        radio_input["checked"] = ""
+        [radio_input] = simulated_page.find_all(
+            "input", attrs={"type": "radio", "name": "reception", "value": IN_PERSON_RECEPTION_VALUE}
+        )
+        del radio_input.attrs["checked"]
+        update_page_with_htmx(
+            simulated_page,
+            f"form[hx-get='{self.URL}']",
+            htmx_client.get(self.URL, params | {"reception": REMOTE_RECEPTION_VALUE}),
+        )
+
+        fresh_page = parse_response_to_soup(client.get(self.URL, params | {"reception": REMOTE_RECEPTION_VALUE}))
+        assert fresh_page.find("input", attrs={"name": "funding_labels"}) is not None
+        assertSoupEqual(simulated_page, fresh_page)
+
+    def test_selected_funding_labels_absent_from_results_are_ignored(self, client):
+        vannes = create_city_vannes()
+        unfunded = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(
+            coordinates=vannes.coords,
+            city="Vannes",
+            eligibility_zones=["france"],
+            extra={"funding_labels": [VIENNE]},
+        )
+        remote.receptions.set([RemoteReceptionFactory()])
+        params = {"city": vannes.slug, "category": CATEGORY, "reception": IN_PERSON_RECEPTION_VALUE}
+
+        # The remote service is not part of (in person) results so the funding
+        # label selected beforehand must not hide all the results.
+        response = client.get(self.URL, params | {"funding_labels": [VIENNE]})
+        assertContains(response, "1 résultat")
+        assertContains(response, unfunded.name)
+        assertNotContains(response, "Financé par")
+
+        # Selected labels still appearing in the results remain applied.
+        savoie_service = ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [SAVOIE]})
+        response = client.get(self.URL, params | {"funding_labels": [SAVOIE, VIENNE]})
+        assertContains(response, "1 résultat")
+        assertContains(response, savoie_service.name)
+        assertNotContains(response, unfunded.name)
+        soup = parse_response_to_soup(response, selector="#services-funding-labels-filter")
+        [checkbox] = soup.find_all("input", attrs={"type": "checkbox", "name": "funding_labels"})
+        assert checkbox["value"] == SAVOIE
+        assert "checked" in checkbox.attrs
+
+    def test_htmx_funding_labels_filter_not_swapped_when_only_funding_labels_change(self, client, htmx_client):
+        FUNDING_LABEL_FILTER = "#services-funding-labels-filter"
+        vannes = create_city_vannes()
+        ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [VIENNE]})
+        params = {"city": vannes.slug, "category": CATEGORY, "reception": IN_PERSON_RECEPTION_VALUE}
+
+        def get(current_params, params):
+            current_url = f"http://testserver{self.URL}?{urlencode(current_params, doseq=True)}"
+            return htmx_client.get(self.URL, params, headers={"HX-Current-URL": current_url})
+
+        # Otherwise, the dropdown would be closed everytime the user (un)selects something.
+        response = get(params, params | {"funding_labels": [VIENNE]})
+        assertContains(response, "1 résultat")
+        assertNotContains(response, FUNDING_LABEL_FILTER[1:])
+        response = get(params | {"funding_labels": [VIENNE]}, params | {"page": "1"})
+        assertNotContains(response, FUNDING_LABEL_FILTER[1:])
+
+        response = get(params, params | {"reception": REMOTE_RECEPTION_VALUE})
+        assertContains(response, FUNDING_LABEL_FILTER[1:])
+        response = get({"city": vannes.slug}, params)
+        assertContains(response, FUNDING_LABEL_FILTER[1:])
+        response = htmx_client.get(self.URL, params)  # No HX-Current-URL header.
+        assertContains(response, FUNDING_LABEL_FILTER[1:])
