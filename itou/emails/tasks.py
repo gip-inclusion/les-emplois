@@ -1,4 +1,5 @@
 import logging
+import warnings
 from itertools import batched
 
 import sentry_sdk
@@ -13,6 +14,7 @@ from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
 from itou.utils.emails import generate_html_alternative
+from itou.utils.enums import ItouEnvironment
 
 
 logger = logging.getLogger("itou.emails")
@@ -148,7 +150,7 @@ class AsyncEmailBackend(BaseEmailBackend):
             raise ProgrammingError("Sending email requires an active database transaction.")
         emails_count = 0
         for message in email_messages:
-            has_html_alternative = any(alt.mimetype for alt in message.alternatives)
+            has_html_alternative = "text/html" in (alt.mimetype for alt in message.alternatives)
             log_warning = not has_html_alternative
             if not has_html_alternative:
                 # Plain-text emails sent by third-party libraries (django-allauth).
@@ -162,7 +164,21 @@ class AsyncEmailBackend(BaseEmailBackend):
                     logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
                     continue
                 if log_warning:
-                    logging.warning(
+                    if settings.ITOU_ENVIRONMENT == ItouEnvironment.TEST:
+                        if email.subject not in {
+                            # allauth
+                            "[TEST] Confirmez votre adresse e-mail",
+                            "[TEST] Réinitialisation de votre mot de passe",
+                            "[TEST] E-mail de réinitialisation du mot de passe",
+                            # test_send_messages_warns_when_generating_html_body
+                            "test_send_messages_warns_when_generating_html_body",
+                        }:
+                            warnings.warn(f"{email.subject}", UserWarning)
+                    # The django-allauth project sends plain-text emails, with
+                    # no HTML alternatives. Brevo requires an HTML body,
+                    # otherwise it tries to convert the plain text to HTML,
+                    # doing worse than generate_html_alternative.
+                    logger.warning(
                         f"Generated HTML alternative for message {email.pk=}, "
                         "provide it to avoid fragile automatic generation."
                     )

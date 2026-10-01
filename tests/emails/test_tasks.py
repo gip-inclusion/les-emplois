@@ -46,12 +46,12 @@ class TestAsyncEmailBackend:
             assert alternative.content == html
 
     def test_send_messages_warns_when_generating_html_body(
-        self, caplog, django_capture_on_commit_callbacks, mailoutbox, settings
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox
     ):
         message = EmailMultiAlternatives(
             from_email="unit-test@tests.com",
             to=["recipient@tests.com"],
-            subject="subject",
+            subject="test_send_messages_warns_when_generating_html_body",
             body="Bonjour",
         )
 
@@ -76,7 +76,7 @@ class TestAsyncEmailBackend:
         assert email.bcc == []
         assert email.from_email == "unit-test@tests.com"
         assert email.reply_to == []
-        assert email.subject == "subject"
+        assert email.subject == "test_send_messages_warns_when_generating_html_body"
         assert email.body_text == "Bonjour"
         assert email.body_html == html_body
 
@@ -87,7 +87,7 @@ class TestAsyncEmailBackend:
         assert email.bcc == []
         assert email.from_email == "unit-test@tests.com"
         assert email.reply_to == []
-        assert email.subject == "subject"
+        assert email.subject == "test_send_messages_warns_when_generating_html_body"
         assert email.body == "Bonjour"
         [alternative] = email.alternatives
         assert alternative.mimetype == "text/html"

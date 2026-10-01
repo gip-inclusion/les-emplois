@@ -30,7 +30,7 @@ class Email(models.Model):
     def from_email_message(email_message):
         [html_alternative] = email_message.alternatives
         if html_alternative.mimetype != "text/html":
-            raise ValueError("Unsupported {content_type=}")
+            raise ValueError(f"Unsupported {html_alternative.mimetype=}")
         return Email(
             from_email=email_message.from_email,
             reply_to=email_message.reply_to,
