@@ -252,6 +252,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.SENT, 0), "bg-emploi-lightest text-info"),
         (employee_record_badges.get(Status.REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.PROCESSED, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_PENDING, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_SENT, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-info"),
     ]
 
