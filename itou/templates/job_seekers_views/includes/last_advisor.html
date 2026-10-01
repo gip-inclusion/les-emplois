@@ -144,8 +144,10 @@
                         {% endif %}
                     </div>
                 {% endif %}
-                {% if last_user_assignment != assignment and not last_user_assignment.is_active %}
-                    <div class="c-box--accompagnateur__detail">{% partial create-assignment-link %}</div>
+                {% if request.from_employer or request.from_prescriber %}
+                    {% if last_user_assignment != assignment and not last_user_assignment.is_active %}
+                        <div class="c-box--accompagnateur__detail">{% partial create-assignment-link %}</div>
+                    {% endif %}
                 {% endif %}
             {% elif request.from_employer or request.from_prescriber %}
                 <div class="c-box--accompagnateur__detail">{% partial create-assignment-link %}</div>
