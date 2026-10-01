@@ -1,1 +1,3 @@
-E-mail de réinitialisation du mot de passe 
+{% autoescape off %}
+{% if itou_environment != "PROD" %}[{{ itou_environment }}] {% endif %}E-mail de réinitialisation du mot de passe
+{% endautoescape %}

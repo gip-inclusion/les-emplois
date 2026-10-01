@@ -70,7 +70,7 @@ class TestPasswordReset:
 
         # Check sent email.
         [email] = mailoutbox
-        assert "E-mail de réinitialisation du mot de passe" in email.subject
+        assert "[TEST] E-mail de réinitialisation du mot de passe" == email.subject
         assert email.body == snapshot(name="unknown_account_message")
 
     def test_password_reset_user_creation(self, client, snapshot):
