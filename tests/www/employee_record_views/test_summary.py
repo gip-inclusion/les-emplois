@@ -228,10 +228,10 @@ class TestSummaryEmployeeRecords:
             asp_batch_file="RIAE_FS_20210701120000.json",
             status=NotificationStatus.PROCESSED,
         )
-        EmployeeRecordUpdateNotificationFactory(
+        EmployeeRecordTransitionLogFactory(
             employee_record=self.employee_record,
+            transition=EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
             asp_batch_file="RIAE_FS_20241021110000.json",
-            status=NotificationStatus.PROCESSED,
         )
         EmployeeRecordTransitionLogFactory(
             employee_record=self.employee_record,
