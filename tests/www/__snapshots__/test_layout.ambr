@@ -323,50 +323,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" data-matomo-action="mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="dropdown-item dropdown-item__profil">
-                      <span>
-                          <strong>
-                              John D.
-                          </strong>
-                          <br/>
-                          <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">
-                              john.doe@example.com
-                          </span>
-                      </span>
-                      <a class="btn btn-block btn-outline-primary" data-matomo-action="acceder-mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/portal/homepage" target="_blank">
-                          Accéder à mon portail
-                      </a>
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
-                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/" target="_blank">
-                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
-                      <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-timer-flash-line">
-                          </i>
-                          Activable en 1 clic
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="/portal/service/mon-recap" target="_blank">
-                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
-                  </a>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">
@@ -1303,50 +1259,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" data-matomo-action="mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="dropdown-item dropdown-item__profil">
-                      <span>
-                          <strong>
-                              John D.
-                          </strong>
-                          <br/>
-                          <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">
-                              john.doe@example.com
-                          </span>
-                      </span>
-                      <a class="btn btn-block btn-outline-primary" data-matomo-action="acceder-mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/portal/homepage" target="_blank">
-                          Accéder à mon portail
-                      </a>
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
-                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/" target="_blank">
-                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
-                      <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-timer-flash-line">
-                          </i>
-                          Activable en 1 clic
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="/portal/service/mon-recap" target="_blank">
-                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
-                  </a>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">
@@ -1675,50 +1587,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" data-matomo-action="mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="dropdown-item dropdown-item__profil">
-                      <span>
-                          <strong>
-                              John D.
-                          </strong>
-                          <br/>
-                          <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">
-                              john.doe@example.com
-                          </span>
-                      </span>
-                      <a class="btn btn-block btn-outline-primary" data-matomo-action="acceder-mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/portal/homepage" target="_blank">
-                          Accéder à mon portail
-                      </a>
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
-                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/" target="_blank">
-                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
-                      <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-timer-flash-line">
-                          </i>
-                          Activable en 1 clic
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="/portal/service/mon-recap" target="_blank">
-                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
-                  </a>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">
@@ -2352,65 +2220,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" data-matomo-action="mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="dropdown-item dropdown-item__profil">
-                      <span>
-                          <strong>
-                              James B.
-                          </strong>
-                          <br/>
-                          <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">
-                              james.bond@test.local
-                          </span>
-                      </span>
-                      <a class="btn btn-block btn-outline-primary" data-matomo-action="acceder-mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/portal/homepage" target="_blank">
-                          Accéder à mon portail
-                      </a>
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
-                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/login/" target="_blank">
-                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
-                      <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer" target="_blank">
-                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
-                  <div class="dropdown-divider">
-                  </div>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">
@@ -2669,50 +2478,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" data-matomo-action="mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="dropdown-item dropdown-item__profil">
-                      <span>
-                          <strong>
-                              James B.
-                          </strong>
-                          <br/>
-                          <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">
-                              james.bond@test.local
-                          </span>
-                      </span>
-                      <a class="btn btn-block btn-outline-primary" data-matomo-action="acceder-mon-portail" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/portal/homepage" target="_blank">
-                          Accéder à mon portail
-                      </a>
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <div class="dropdown-divider">
-                  </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
-                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/" target="_blank">
-                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
-                      <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-timer-flash-line">
-                          </i>
-                          Activable en 1 clic
-                      </span>
-                  </a>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="/portal/service/mon-recap" target="_blank">
-                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
-                  </a>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">
@@ -2971,42 +2736,6 @@
                   </li>
               </ul>
           </nav>
-          <div class="dropup dropup-center dropdown-nexus">
-              <button aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-block bg-white dropdown-toggle" data-bs-toggle="dropdown" id="dropdownNexusMenuButton" type="button">
-                  <span>
-                      Mon portail
-                  </span>
-              </button>
-              <div aria-labelledby="dropdownNexusMenuButton" class="dropdown-menu w-100">
-                  <div class="mx-4 mt-3 text-center">
-                      <img alt="Nexus - La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-nexus-dropdown.svg" width="133"/>
-                  </div>
-                  <div class="mx-4 my-3 fs-sm lh-sm">
-                      <p class="fs-base mb-2">
-                          <strong>
-                              Découvrez votre nouveau portail unifié !
-                          </strong>
-                      </p>
-                      <p>
-                          Accédez bientôt à l’ensemble de votre offre et de vos informations.
-                      </p>
-                      <hr/>
-                      <p>
-                          Pour accéder à votre portail, vous devez avoir un compte ProConnect.
-                      </p>
-                  </div>
-                  <div class="mx-4 mb-3">
-                      <div class="text-center">
-                          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?previous_url=%2Fdashboard%2Factivate-pro-connect-account&next_url=%2Fportal%2Fhomepage">
-                          </a>
-                          <br/>
-                          <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">
-                              En savoir plus
-                          </a>
-                      </div>
-                  </div>
-              </div>
-          </div>
           <div class="dropup dropup-center">
               <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-account-circle-line">

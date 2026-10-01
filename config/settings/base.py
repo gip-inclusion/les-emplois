@@ -168,7 +168,6 @@ MIDDLEWARE = [
     "itou.www.middleware.RedirectToNewDomainMiddleware",
     "itou.www.middleware.RateLimitMiddleware",
     "itou.nexus.middleware.AutoLoginMiddleware",
-    "itou.nexus.middleware.DropDownMiddleware",
     "itou.utils.triggers.middleware.fields_history",
     # Final logger
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
