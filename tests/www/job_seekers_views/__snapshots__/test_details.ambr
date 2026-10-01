@@ -6514,7 +6514,7 @@
 # ---
 # name: test_job_application_tab[authorized prescriber][SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -6687,58 +6687,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -7379,7 +7327,7 @@
 # ---
 # name: test_job_application_tab[prescriber][SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -7552,58 +7500,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8284,7 +8180,7 @@
 # ---
 # name: test_job_application_tab_as_siae[SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -8543,58 +8439,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -9292,7 +9136,7 @@
 # ---
 # name: test_job_application_tab_shows_external_application_to_authorized_prescriber[SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -9465,58 +9309,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -12373,7 +12165,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -12546,58 +12338,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -13852,7 +13592,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 25,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -14025,58 +13765,6 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

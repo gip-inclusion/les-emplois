@@ -1,19 +1,9 @@
-import pytest
 from django.urls import reverse
 from itoutils.django.nexus.token import generate_auto_login_token
 from pytest_django.asserts import assertRedirects
 
-from itou.nexus.enums import Service
 from itou.users.enums import IdentityProvider
-from tests.companies.factories import CompanyMembershipFactory
-from tests.users.factories import (
-    EmployerFactory,
-    ItouStaffFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    ProfessionalFactory,
-    random_pro_user_factory,
-)
+from tests.users.factories import EmployerFactory, ProfessionalFactory, random_pro_user_factory
 
 
 class TestAutoLoginMiddleware:
@@ -85,39 +75,3 @@ class TestAutoLoginMiddleware:
             fetch_redirect_response=False,
         )
         assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
-
-
-class TestDropDownMiddleware:
-    def test_context(self, client):
-        user = ProfessionalFactory()
-        CompanyMembershipFactory(user=user)
-        client.force_login(user)
-        response = client.get(reverse("dashboard:index"))
-        assert response.wsgi_request.nexus_dropdown == {
-            "proconnect": True,
-            "activated_services": [Service.EMPLOIS],
-        }
-
-    def test_nexus_page(self, client):
-        user = ProfessionalFactory()
-        CompanyMembershipFactory(user=user)
-        client.force_login(user)
-        response = client.get(reverse("nexus:homepage"))
-        assert response.wsgi_request.nexus_dropdown == {}
-
-    @pytest.mark.parametrize("factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
-    def test_wrong_user_kind(self, client, factory):
-        user = factory()
-        client.force_login(user)
-        response = client.get(reverse("dashboard:index"))
-        assert response.wsgi_request.nexus_dropdown == {}
-
-    def test_not_using_pro_connect(self, client):
-        user = ProfessionalFactory(identity_provider=IdentityProvider.DJANGO)
-        client.force_login(user)
-        response = client.get(reverse("nexus:index"))
-        assert response.wsgi_request.nexus_dropdown == {}
-
-    def test_unauthenticated_user(self, client):
-        response = client.get(reverse("dashboard:index"))
-        assert response.wsgi_request.nexus_dropdown == {}
