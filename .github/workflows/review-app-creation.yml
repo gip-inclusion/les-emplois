@@ -95,7 +95,7 @@ jobs:
           echo "Waiting for POSTGRESQL_ADDON_DIRECT_HOST/PORT env variables to be available"
           sleep 1
         done
-        scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
+        $CLEVER_CLI deploy --branch "$BRANCH" --alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
       run: gh pr comment ${{ github.event.pull_request.number }} --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
@@ -140,4 +140,4 @@ jobs:
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
-      run: scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
+      run: $CLEVER_CLI --branch "$BRANCH" --alias "$REVIEW_APP_NAME"
