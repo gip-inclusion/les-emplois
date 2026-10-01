@@ -69,7 +69,11 @@
       "created_at": "2026-07-06T07:36:19.131Z",
       "description": "Se former et obtenir la certification CléA Numérique par la validation de 4 compétences :\n\nIdentifier son environnement numérique, accéder, utiliser les outils de son environnement pour trouver l’information recherchée ;\n\nCollecter les informations relatives à une activité professionnelle dans un environnement numérique, échanger de l’information ;\n\nRéaliser, contribuer à une production commune à partir d’outils de travail collaboratif ;\n\nPartager les bonnes pratiques, veillez à la protection de ses outils, identifier les risques de malveillance et mettre les moyens de s’en prémunir ;\n\nProtéger son e-réputation et celle de son entreprise.",
       "eligibility_zones": "[\"34172\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Vienne"
+        ]
+      },
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
       "insee_city": 13019,
@@ -127,7 +131,12 @@
       "created_at": "2026-07-06T07:37:57.277Z",
       "description": "ASSOCIATION TRANSITION propose des services : numérique, réaliser des démarches administratives avec un accompagnement.",
       "eligibility_zones": "[\"64\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Drôme",
+          "Région Réunion"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "insee_city": 25274,
@@ -243,7 +252,12 @@
       "created_at": "2026-07-06T07:38:34.831Z",
       "description": "- Apprendre les bases de la communication écrite\n\n- Mise au point sur l’expression écrite française\n\n- Retranscrire les graphies méconnues de la langue d’origine\n\n- Exprimer son identité personnelle et familiale, donner de ses nouvelles\n\n- Remplir des documents\n\n- Noter une information de type factuel (date, heure, lieu) dans un texte\n\n- Utiliser les normes de présentation et formules de politesse\n\n- Organiser les paragraphes et exprimer une progression dans un texte (d’abord,puis…)\n\n- Correspondre pour exprimer son accord, son refus, réclamer, remercier, donner des renseignements de façon minimale\n\n- Améliorer la compréhension écrite, maîtriser la lecture silencieuse\n\n- Comprendre les graphies méconnues de la langue d’origine\n\n- Identifier les différents écrits de la vie quotidienne\n\n- Lire les consignes des documents administratifs\n\n- Rechercher une information de type factuel (date, heure, lieu) dans un texte\n\n- Maîtriser les bases de la communication orale en français\n\n\n<!-- -->\n\nLe parcours débutant de la formation FLE dure 120 heures. Nous vous invitons à le choisir si vous avez actuellement un niveau A1/A2 afin d’obtenir un niveau B1/B2.\n\nLe parcours avancé de la formation FLE dure 60 heures. Nous vous invitons à le choisir si vous avez actuellement un niveau B1/B2 afin d’obtenir un niveau C1/C2.",
       "eligibility_zones": "[\"34172\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Vienne",
+          "Conseil départemental de la Drôme"
+        ]
+      },
       "fee": 2,
       "fee_details": "Taux horaire : 12€",
       "insee_city": 13019,
@@ -302,7 +316,12 @@
       "created_at": "2026-07-06T07:39:08.388Z",
       "description": "CONDITIONS D’ÉLIGIBILITÉ<br>\n\nDispositif fait pour les personnes dont l'accès au crédit bancaire classique est rendu difficile par une situation économique ou sociale fragile. L’Adie propose un prêt mobilité aux personnes ayant besoin d’un microcrédit pour faciliter leurs déplacements dans le cadre de leur projet professionnel.\\*\\*\n\nDESCRIPTIF : Montant : jusqu’à 8 000€<br>\n\nDurée : jusqu’à 42 mois<br>\n\nGarantie : une personne de votre entourage caution solidaire pour la moitié du montant emprunté ou dépôt de garantie pour 25 % de la somme empruntée<br>\n\nFinancement de tout type de besoin : l’achat, la réparation ou la location d’un véhicule, permis de conduire, formation professionnelle, etc.",
       "eligibility_zones": "[\"34\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie",
+          "Conseil Départemental de l'Essonne"
+        ]
+      },
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "insee_city": 13019,
@@ -539,7 +558,11 @@
       "created_at": "2026-06-22T15:56:16.976Z",
       "description": "Le centre social Alexis Peyret dispose d’un espace dédié à l’accès aux droits et à l’inclusion numérique, ouvert à tous les publics.Il comprend un espace numérique proposant : des accompagnements individuels pour les usages des outils et services numériques (prise en main, e-mails, démarches en ligne, etc.) ; un soutien aux démarches administratives en ligne hors bouquet de services France Services ; des ateliers collectifs autour de thématiques variées telles que la parentalité numérique, la prévention des usages à risque, les outils du quotidien, la découverte de l’intelligence artificielle, la création numérique ou encore la cybersécurité ; un accès libre à du matériel informatique et à une connexion Internet.Le centre accueille également un espace France Services, permettant un accompagnement de proximité pour les démarches administratives du quotidien auprès de 12 opérateurs partenaires (emploi, retraite, santé, famille, impôts, etc.).",
       "eligibility_zones": "[\"64\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Région Réunion"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "insee_city": 25382,
@@ -663,7 +686,11 @@
       "created_at": "2026-06-22T15:43:43.385Z",
       "description": "L'aide a pour objectif de vous permettre d'être autonome dans vos déplacements en lien avec l'emploi. Elle peut prendre en charge les frais dus à votre handicap.\n\nL'aide vient en complément de la Prestation de compensation du handicap (PCH) attribuée par la Maison départementale des personnes handicapées (MDPH) et des autres financements que vous pourriez avoir.\n\nL'aide permet de participer au financement :\n\n* d'aménagement d'un véhicule pour conduire en tenant compte du handicap,\n* de frais de transport tels taxi, VTC, transport adapté ou indemnités kilométriques, pour toute personne n'ayant pas de véhicule personnel et dans l'impossibilité de prendre les transports en commun du fait de son handicap.\n\n**Attention** : L'aide ne peut pas servir à acheter une voiture ou tout autre type de véhicule (scooter, vélo...).\nAide d’un montant de : 12000 € maximum / 12 mois",
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "insee_city": 12374,
@@ -775,7 +802,11 @@
       "created_at": "2026-07-06T07:36:24.718Z",
       "description": "CONDITIONS D’ÉLIGIBILITÉ<br>\n\nDispositif fait pour les personnes dont l'accès au crédit bancaire classique est rendu difficile par une situation économique ou sociale fragile. L’Adie propose un prêt mobilité aux personnes ayant besoin d’un microcrédit pour faciliter leurs déplacements dans le cadre de leur projet professionnel.\\*\\*\n\nDESCRIPTIF : Montant : jusqu’à 6 000€<br>\n\nDurée : jusqu’à 42 mois<br>\n\nGarantie : une personne de votre entourage caution solidaire pour la moitié du montant emprunté ou dépôt de garantie pour 25 % de la somme empruntée<br>\n\nFinancement de tout type de besoin : l’achat, la réparation ou la location d’un véhicule, permis de conduire, formation professionnelle, etc.",
       "eligibility_zones": "[\"57\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie"
+        ]
+      },
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "insee_city": 21213,
@@ -834,7 +865,11 @@
       "created_at": "2026-07-06T07:36:45.717Z",
       "description": "Le manque d’autonomie peut constituer un frein dans l’accès à certains emplois, notamment ceux qui exigent une forte mobilité géographique. AERT et AIM visent à assurer une formation adaptée aux difficultés individuelles rencontrées par chaque apprenant dans son apprentissage du code de la route et de la conduite et dans son accès à un emploi ou à une formation.",
       "eligibility_zones": "[\"243300316\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de l’Aveyron"
+        ]
+      },
       "fee": 2,
       "fee_details": "ll y a un reste à charge pour le stagiaire (à calculer selon le projet sur lequel il intègre)",
       "insee_city": 12374,
@@ -892,7 +927,11 @@
       "created_at": "2026-07-06T07:38:19.226Z",
       "description": "Itinéraire 1 :Public en situation d'illettrisme et personne scolarisée en français d'un niveau A2 à l'Oral Développer des compétences fonctionnelles pour lavie courante.\n\nItinéraire 2 :Personnes étrangères ayant été scolarisées ou non dans leur pays d'origine dont la maitrise du français est insuffisante pour s'insérer durablement sur le marché du travail ou aux personnes étrangères scolarisées en français dans son pays d'origine et n'attestant pas un niveau A2 à l'oral.\n\nItinéraire 3 : Personnes en situation 12 ou souhaitant développer ses compétences numériques\n\nItinéraire 4 : Ces modules s'adressent à des personnes en recherche d'emploi ayant besoin de renforcer leurs acquis en français et mathématiques pouvant justifier d'un niveau supérieur au degré 4 ANLCI et/ou devant acquérir ou améliorer les bases d'une langue étrangère en situation pratique",
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Charente-Maritime"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "insee_city": 12374,
@@ -1014,7 +1053,11 @@
       "created_at": "2026-07-06T07:39:22.482Z",
       "description": "La Fourmilière du Grand Parc, entreprise à but d'emploi (EBE, statut associatif) propose dans son pôle Le Comptoir une aide aux démarches administratives et au numérique, pour tous et toutes, sans rendez-vous du mardi au vendredi. Nous traitons les démarches du quotidien : accès aux droits, logement, prestations sociales, transports, école…\n\nNous redirigeons vers d'autres structures pour les démarches que nous ne pouvons pas traiter nous-mêmes : ce qui relève du juridique, les démarches liées à la retraite, et aux droits des étrangers, la création de CV.",
       "eligibility_zones": "[\"33063\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental des Bouches-du-Rhône"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "insee_city": 12374,

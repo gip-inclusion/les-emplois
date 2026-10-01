@@ -1,0 +1,7 @@
+<div id="services-funding-labels-filter"
+     {% if not display_funding_labels_filter %}class="d-none"{% endif %}
+     {% if request.htmx and not request.htmx.boosted %} hx-swap-oob="true"{% endif %}>
+    {% if display_funding_labels_filter %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.funding_labels only %}
+    {% endif %}
+</div>
