@@ -419,7 +419,15 @@
               </li>
               <li>
                   <small>
-                      Nom
+                      Nom de naissance
+                  </small>
+                  <strong>
+                      Smith
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Nom d’usage
                   </small>
                   <strong>
                       Doe

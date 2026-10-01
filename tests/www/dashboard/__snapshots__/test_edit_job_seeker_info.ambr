@@ -498,6 +498,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -991,6 +992,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1259,7 +1261,40 @@
   
   '''
 # ---
-# name: TestEditJobSeekerInfo.test_fields_readonly_with_identity_certified_by_api_particulier[modal]
+# name: TestEditJobSeekerInfo.test_fields_readonly_with_identity_certified_by_api_particulier[birth_name][modal]
+  '''
+  <div aria-labelledby="ask_for_confirmation_label" aria-modal="true" class="modal" id="ask_for_confirmation_modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="ask_for_confirmation_label">
+                      Confirmer les modifications ?
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Vous êtes sur le point de mettre à jour les données personnelles de ce candidat.
+                      <br/>
+                      En cliquant sur confirmer, un e-mail de notification lui sera automatiquement envoyé pour l'informer de la mise à jour de ses données.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <a class="btn btn-outline-primary" href="/dashboard/" role="button">
+                      Annuler
+                  </a>
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
+                      Continuer
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestEditJobSeekerInfo.test_fields_readonly_with_identity_certified_by_api_particulier[last_name][modal]
   '''
   <div aria-labelledby="ask_for_confirmation_label" aria-modal="true" class="modal" id="ask_for_confirmation_modal" role="dialog" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
