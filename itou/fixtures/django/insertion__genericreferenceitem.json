@@ -2762,7 +2762,7 @@
   {
     "fields": {
       "created_at": "2026-06-15T09:12:50.734Z",
-      "description": "Service public numérique de recensement de l’offre d’insertion développé par la Plateforme de l’inclusion. Contient leurs structures et services inclusifs sur de nombreuses thématiques.",
+      "description": "Service public numérique de recensement de l’offre d’insertion développé par La plateforme de l’inclusion. Contient leurs structures et services inclusifs sur de nombreuses thématiques.",
       "kind": "SOURCE",
       "label": "DORA",
       "source": "DATA_INCLUSION",

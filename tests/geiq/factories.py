@@ -238,7 +238,7 @@ class SalarieLabelDataFactory(factory.DictFactory):
                 {"id": 29, "libelle": "Problème de mobilité", "libelle_abr": "PM", "niveau": 2},
                 {
                     "id": 30,
-                    "libelle": "Est prescrit via la Plateforme de l’inclusion par un prescripteur habilité",
+                    "libelle": "Est prescrit via La plateforme de l’inclusion par un prescripteur habilité",
                     "libelle_abr": "Prescrit",
                     "niveau": 1,
                 },

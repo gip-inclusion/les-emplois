@@ -11,6 +11,6 @@ Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce me
 
 ---
 Le saviez-vous ?
-Le formulaire d’orientation DORA est maintenant intégré à la Plateforme de l’inclusion. Cela permet aux prescripteurs et orienteurs de gérer au même endroit les candidatures en IAE, GEIQ, OPCS, et les orientations vers des services d’insertion.
+Le formulaire d’orientation DORA est maintenant intégré à La plateforme de l’inclusion. Cela permet aux prescripteurs et orienteurs de gérer au même endroit les candidatures en IAE, GEIQ, OPCS, et les orientations vers des services d’insertion.
 DORA reste l’annuaire de référence pour toute offre de service d'insertion.
 {% endblock body %}
