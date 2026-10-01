@@ -99,7 +99,7 @@ def test_available_transitions(snapshot, client, status):
 
 @pytest.mark.parametrize(
     "code,previous_state",
-    [("", None), ("0000", None), ("32##", Status.REJECTED), ("3436", None)],
+    [("", None), ("0000", None), ("32##", Status.REJECTED), ("32##", Status.MODIFICATION_REJECTED), ("3436", None)],
 )
 def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code, previous_state):
     employee_record = factories.EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
