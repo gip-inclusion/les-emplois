@@ -15,6 +15,9 @@ class Status(models.TextChoices):
     SENT = "SENT", "Envoyée"
     REJECTED = "REJECTED", "En erreur"
     PROCESSED = "PROCESSED", "Intégrée"
+    UPDATE_PENDING = "UPDATE_PENDING", "Mise à jour planifiée"
+    UPDATE_SENT = "UPDATE_SENT", "Mise à jour envoyée"
+    UPDATE_REJECTED = "UPDATE_REJECTED", "Mise à jour en erreur"
     DISABLED = "DISABLED", "Désactivée"
     ARCHIVED = "ARCHIVED", "Archivée"
 
