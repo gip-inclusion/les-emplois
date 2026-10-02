@@ -10,7 +10,6 @@ from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
-from tests.employee_record.factories import EmployeeRecordFactory
 from tests.users.factories import ItouStaffFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -136,7 +135,7 @@ def test_available_transitions(snapshot, client, status):
     ro_user = ItouStaffFactory(is_superuser=False)
     ro_user.user_permissions.add(Permission.objects.get(codename="view_employeerecord"))
 
-    employee_record = EmployeeRecordFactory(status=status)
+    employee_record = factories.EmployeeRecordFactory(status=status)
     url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk])
 
     for user in [superuser, rw_user]:
@@ -156,7 +155,7 @@ def test_available_transitions(snapshot, client, status):
 
 @pytest.mark.parametrize("code", ["", "0000", "32##", "3436"])
 def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code):
-    employee_record = EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
+    employee_record = factories.EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
 
     response = admin_client.get(reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk]))
     assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()
