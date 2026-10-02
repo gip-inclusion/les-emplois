@@ -1098,9 +1098,9 @@ huey==3.4.0 \
     --hash=sha256:ac9b02e741f13da4092ea19bcaafc73669e97d3153914d2fed2868df144f6dfa \
     --hash=sha256:d0580762397744026f83baae5f2b97a62474a62b8565ac75bbafefe72f9c784f
     # via -r test.txt
-identify==2.6.19 \
-    --hash=sha256:20e6a87f786f768c092a721ad107fc9df0eb89347be9396cadf3f4abbd1fb78a \
-    --hash=sha256:6be5020c38fcb07da56c53733538a3081ea5aa70d36a156f83044bfbf9173842
+identify==2.6.20 \
+    --hash=sha256:6a16b69b93187244e0548cbfd25b3e4a6f9a7a2ad784625c3bec2b8d27b81aaa \
+    --hash=sha256:ad729860a923858d26917c2f4fb0a1d83d27a75b1e090c06440c573f048f3285
     # via pre-commit
 idna==3.20 \
     --hash=sha256:a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44 \
