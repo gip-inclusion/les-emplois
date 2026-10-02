@@ -30,7 +30,7 @@
                 {% endfragment %}
                 {% fragment as content %}
                     {% if employee_record.asp_processing_code == "3308" %}
-                        <p class="mb-0">Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.</p>
+                        <p class="mb-0">La commune de naissance sélectionnée ne correspond pas au code commune indiqué sur le numéro de sécurité sociale du salarié.</p>
                         <p class="mb-0">Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.</p>
                         <p class="mb-0">Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.</p>
                         <small>(Erreur {{ employee_record.asp_processing_code }})</small>
