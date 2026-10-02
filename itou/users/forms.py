@@ -43,6 +43,7 @@ class JobSeekerProfileFieldsMixin:
 
         if commit and update_fields:
             user.jobseeker_profile.save(update_fields=update_fields)
+        return user
 
     @property
     def cleaned_data_from_profile_fields(self):
