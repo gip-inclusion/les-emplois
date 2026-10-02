@@ -252,7 +252,7 @@ class TestModel:
             "last_name": "Doe",
             "phone": "0610101010",
         }
-        with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
+        with mock.patch("django.core.mail.EmailMultiAlternatives.send", mock_send_email):
             user = User.create_job_seeker_by_proxy(
                 proxy_user, acting_organization=PrescriberOrganizationFactory(for_snapshot=True), **user_data
             )

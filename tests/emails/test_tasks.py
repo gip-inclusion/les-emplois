@@ -1,5 +1,7 @@
+import textwrap
+
 import pytest
-from django.core.mail.message import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from factory import Faker
 from requests.exceptions import ConnectTimeout
 
@@ -11,7 +13,7 @@ class TestAsyncEmailBackend:
     def test_send_messages_splits_recipients(self, django_capture_on_commit_callbacks, mailoutbox):
         # 2 emails are needed; one with 50 the other with 25
         recipients = [Faker("email", locale="fr_FR") for _ in range(75)]
-        message = EmailMessage(
+        message = EmailMultiAlternatives(
             from_email="unit-test@tests.com",
             reply_to=["reply-to@tests.com"],
             to=recipients,
@@ -20,6 +22,8 @@ class TestAsyncEmailBackend:
             subject="subject",
             body="Bonjour",
         )
+        html = "<html><body>Bonjour"
+        message.attach_alternative(html, "text/html")
 
         backend = AsyncEmailBackend()
         # Huey runs in immediate mode.
@@ -37,6 +41,57 @@ class TestAsyncEmailBackend:
             assert email.reply_to == ["reply-to@tests.com"]
             assert email.subject == "subject"
             assert email.body == "Bonjour"
+            [alternative] = email.alternatives
+            assert alternative.mimetype == "text/html"
+            assert alternative.content == html
+
+    def test_send_messages_warns_when_generating_html_body(
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox
+    ):
+        message = EmailMultiAlternatives(
+            from_email="unit-test@tests.com",
+            to=["recipient@tests.com"],
+            subject="test_send_messages_warns_when_generating_html_body",
+            body="Bonjour",
+        )
+
+        backend = AsyncEmailBackend()
+        # Huey runs in immediate mode.
+        with django_capture_on_commit_callbacks(execute=True):
+            sent = backend.send_messages([message])
+
+        html_body = textwrap.dedent("""\
+            <!doctype html>
+            <html lang="fr">
+            <head><meta charset="utf-8"></head>
+            <body><p>Bonjour</p>
+        """)
+        email = Email.objects.get()
+        assert caplog.messages == [
+            f"Generated HTML alternative for message email.pk={email.pk}, "
+            "provide it to avoid fragile automatic generation."
+        ]
+        assert email.to == ["recipient@tests.com"]
+        assert email.cc == []
+        assert email.bcc == []
+        assert email.from_email == "unit-test@tests.com"
+        assert email.reply_to == []
+        assert email.subject == "test_send_messages_warns_when_generating_html_body"
+        assert email.body_text == "Bonjour"
+        assert email.body_html == html_body
+
+        assert sent == 1
+        [email] = mailoutbox
+        assert email.to == ["recipient@tests.com"]
+        assert email.cc == []
+        assert email.bcc == []
+        assert email.from_email == "unit-test@tests.com"
+        assert email.reply_to == []
+        assert email.subject == "test_send_messages_warns_when_generating_html_body"
+        assert email.body == "Bonjour"
+        [alternative] = email.alternatives
+        assert alternative.mimetype == "text/html"
+        assert alternative.content == html_body
 
 
 @pytest.fixture
@@ -56,13 +111,20 @@ class TestAsyncSendMessage:
 
     @staticmethod
     def assert_fields_unchanged(email, fresh_email):
-        for attr in ("to", "cc", "bcc", "subject", "body_text", "from_email", "reply_to", "created_at"):
+        for attr in ("to", "cc", "bcc", "subject", "body_text", "body_html", "from_email", "reply_to", "created_at"):
             assert getattr(email, attr) == getattr(fresh_email, attr)
 
     def test_send_ok(
         self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock, success_response
     ):
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=success_response)
         with django_capture_on_commit_callbacks(execute=True):
             _async_send_message(email.pk)
@@ -80,7 +142,14 @@ class TestAsyncSendMessage:
         requests_mock,
     ):
         """An exception is raised, to make Huey retry the task."""
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error_response)
         with django_capture_on_commit_callbacks(execute=True):
             _async_send_message(email.pk)
@@ -99,7 +168,14 @@ class TestAsyncSendMessage:
         requests_mock,
     ):
         # https://dev.mailjet.com/email/guides/send-api-v31/#send-in-bulk
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error_response)
         sentry_mock = mocker.patch("itou.emails.tasks.sentry_sdk.capture_message")
         with django_capture_on_commit_callbacks(execute=True):
@@ -120,7 +196,14 @@ class TestAsyncSendMessage:
         self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
     ):
         # https://dev.mailjet.com/email/guides/send-api-v31/#send-in-bulk
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
             exc=ConnectTimeout,
@@ -133,7 +216,14 @@ class TestAsyncSendMessage:
     def test_mailjet_unavailable_json_response(
         self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
     ):
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         error = {"error": "Server unavailable"}
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error)
         with django_capture_on_commit_callbacks(execute=True):
@@ -145,7 +235,14 @@ class TestAsyncSendMessage:
     def test_mailjet_unavailable_html_response(
         self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
     ):
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         error_text = "<html><h1>503 Maintenance</h1></html>"
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
@@ -158,7 +255,14 @@ class TestAsyncSendMessage:
         assert email.esp_response is None
 
     def test_task_failure(self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock):
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
             exc=Exception("Test"),
@@ -169,7 +273,14 @@ class TestAsyncSendMessage:
         assert self.HUEY_TEXT in caplog.text
 
     def test_django_settings(self, caplog, django_capture_on_commit_callbacks):
-        email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
+        email = Email.objects.create(
+            to=["you@test.local"],
+            cc=[],
+            bcc=[],
+            subject="Hi",
+            body_text="Hello",
+            body_html="<html><body>Bonjour",
+        )
         with django_capture_on_commit_callbacks(execute=True):
             _async_send_message(email.pk)
         # No retries of the task.

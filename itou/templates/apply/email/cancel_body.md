@@ -51,6 +51,5 @@ L’usager lui même.
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}{% if job_application.sender and job_application.sender.email %}
 - {{ job_application.sender.email }}{% endif %}{% if job_application.sender and job_application.sender.phone %}
 - {{ job_application.sender.phone|format_phone }}{% endif %}
-
 {% endif %}
 {% endblock body %}
