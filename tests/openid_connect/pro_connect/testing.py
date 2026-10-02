@@ -5,7 +5,7 @@ import httpx
 import jwt
 import respx
 from dateutil.relativedelta import relativedelta
-from django.test import override_settings
+from django.conf import settings
 from django.urls import reverse
 from django.utils import crypto, timezone
 from itoutils.urls import add_url_params
@@ -14,15 +14,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.openid_connect.pro_connect import constants
 from itou.users.enums import IdentityProvider
 from itou.utils.urls import get_url_param_value
-from tests.utils.testing import reload_module
 
-
-TEST_SETTINGS = {
-    "PRO_CONNECT_BASE_URL": "https://pro.connect.fake",
-    "PRO_CONNECT_CLIENT_ID": "PC_CLIENT_ID_123",
-    "PRO_CONNECT_CLIENT_SECRET": "PC_CLIENT_SECRET_QUUUUUUUUUUUUUX",
-    "PRO_CONNECT_FT_IDP_HINT": "xxxxxx",
-}
 
 OIDC_USERINFO = {
     "given_name": "Michel",
@@ -40,7 +32,7 @@ OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
 
 ID_TOKEN_DATA = {
     "sub": OIDC_USERINFO["sub"],
-    "aud": TEST_SETTINGS["PRO_CONNECT_CLIENT_ID"],
+    "aud": settings.PRO_CONNECT_CLIENT_ID,
     "acr": "https://proconnect.gouv.fr/assurance/consistency-checked",
     "amr": ["pwd"],
     # There are other attributes, but they are not needed.
@@ -50,7 +42,7 @@ ID_TOKEN_DATA = {
 def _encode_id_token(id_token_data):
     return jwt.encode(
         payload=id_token_data,
-        key=TEST_SETTINGS["PRO_CONNECT_CLIENT_SECRET"],
+        key=settings.PRO_CONNECT_CLIENT_SECRET,
         algorithm="HS256",
     )
 
@@ -151,24 +143,12 @@ def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_
     return response
 
 
-class pro_connect_setup:
+class ProConnectSetup:
     oidc_userinfo = OIDC_USERINFO
     oidc_userinfo_with_safir = OIDC_USERINFO_FT_WITH_SAFIR
     identity_provider = IdentityProvider.PRO_CONNECT
     session_key = constants.PRO_CONNECT_SESSION_KEY
     id_token = None  # Set when calling mock_oauth_dance and used in assert_and_mock_forced_logout
-
-    def __init__(self):
-        self.context_managers = [override_settings(**TEST_SETTINGS), reload_module(constants)]
-
-    def __enter__(self):
-        for context_manager in self.context_managers:
-            context_manager.__enter__()
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        for context_manager in self.context_managers:
-            context_manager.__exit__(*args, **kwargs)
 
     def assertContainsButton(self, response):
         assertContains(response, 'class="proconnect-button"')

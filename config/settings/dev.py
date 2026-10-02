@@ -95,7 +95,13 @@ SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/ne
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 
-FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
 
 OVERVIEW_TAB_TEST_DEPARTMENT = "13"
+
+# Allow to disable ProConnect on dev environnments
+PRO_CONNECT_BASE_URL = os.getenv("PRO_CONNECT_BASE_URL")
+PRO_CONNECT_CLIENT_ID = os.getenv("PRO_CONNECT_CLIENT_ID")
+PRO_CONNECT_CLIENT_SECRET = os.getenv("PRO_CONNECT_CLIENT_SECRET")
+PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
+FORCE_PROCONNECT_LOGIN = bool(PRO_CONNECT_BASE_URL)

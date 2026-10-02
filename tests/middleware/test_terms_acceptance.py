@@ -56,12 +56,10 @@ def test_middleware_allows_static_public_pages(client, url_name, expected_conten
     [
         "dashboard:edit_user_info",
         "dashboard:edit_user_notifications",
-        "dashboard:edit_user_email",
     ],
 )
 def test_account_pages_are_still_accessible(client, url_name, settings):
-    settings.FORCE_PROCONNECT_LOGIN = False
-    user = EmployerFactory(identity_provider="DJANGO" if "email" in url_name else "PC", terms_accepted_at=None)
+    user = EmployerFactory(terms_accepted_at=None)
     client.force_login(user)
     response = client.get(reverse(url_name))
     assert response.status_code == 200

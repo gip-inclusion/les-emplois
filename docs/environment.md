@@ -64,10 +64,10 @@ export CLEVER_SECRET=VOTRE_SECRET
 
 ### ProConnect
 
-`FORCE_PROCONNECT_LOGIN` : Obliger les employeurs et prescripteurs à utiliser ProConnect
-
-D’autres variables d’environnement permettent de configurer la connexion avec
+Des variables d’environnement permettent de configurer la connexion avec
 ProConnect, elles sont préfixées par `PRO_CONNECT_`.
+Lorsque ProConnect est configuré, la connexion avec le SSO est obligatoire
+pour tous les professionnels.
 
 #### Mailjet
 

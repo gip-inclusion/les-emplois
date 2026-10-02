@@ -516,6 +516,7 @@ PRO_CONNECT_BASE_URL = os.getenv("PRO_CONNECT_BASE_URL")
 PRO_CONNECT_CLIENT_ID = os.getenv("PRO_CONNECT_CLIENT_ID")
 PRO_CONNECT_CLIENT_SECRET = os.getenv("PRO_CONNECT_CLIENT_SECRET")
 PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
+FORCE_PROCONNECT_LOGIN = bool(PRO_CONNECT_BASE_URL)
 # List of ProConnect identity providers that implement MFA but do not
 # inform ProConnect about it through the `amr` claim.
 PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
@@ -788,8 +789,6 @@ SECURE_CSP = {
         "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
     ],
 }
-
-FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"
 

@@ -192,31 +192,27 @@ class ItouCurrentOrganizationMiddleware:
             if any(skip_remaining_checks_conditions):
                 return self.get_response(request)
 
-            # Force ProConnect
-            if (
-                user.identity_provider != IdentityProvider.PRO_CONNECT
-                and (request.from_employer or request.from_prescriber or request.from_institution)
-                and not request.path.startswith(
-                    "/dashboard/activate-pro-connect-account"
-                )  # Allow to access ProConnect activation view
-                and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
-                and (
-                    settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
-                    # FT users should really use their own SSO
-                    or user.email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)  # Temp enforcement
-                    or user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX)  # Temp enforcement
-                )
-            ):
-                # Add request.path as next param ?
-                return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
-
             # FIXME: This will soon be removed along with Nexus views
             # Nexus : Allow views without organization
             if user.is_professional and request.path.startswith("/portal"):
                 return self.get_response(request)
 
             # Without an organization a pro cannot access the service
+            # Display this page before ProConnect activation page
+            # so that users with no organization don't open support tickets
             if logout_warning is not None:
                 return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
+
+            # Force ProConnect
+            if (
+                user.identity_provider != IdentityProvider.PRO_CONNECT
+                and request.user.is_professional
+                and not request.path.startswith(
+                    "/dashboard/activate-pro-connect-account"
+                )  # Allow to access ProConnect activation view
+                and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
+                and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
+            ):
+                return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
         return self.get_response(request)
