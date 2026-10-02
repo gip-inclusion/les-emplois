@@ -92,7 +92,9 @@
       "eligibility_zones": "[\"34172\"]",
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
-      "funding_labels": [],
+      "funding_labels": [
+        212
+      ],
       "insee_city": 13019,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -329,7 +331,10 @@
       "eligibility_zones": "[\"34172\"]",
       "fee": 2,
       "fee_details": "Taux horaire : 12€",
-      "funding_labels": [],
+      "funding_labels": [
+        212,
+        227
+      ],
       "insee_city": 13019,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -409,7 +414,10 @@
       "eligibility_zones": "[\"34\"]",
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
-      "funding_labels": [],
+      "funding_labels": [
+        209,
+        210
+      ],
       "insee_city": 13019,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -1025,7 +1033,9 @@
       "eligibility_zones": "[\"57\"]",
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
-      "funding_labels": [],
+      "funding_labels": [
+        209
+      ],
       "insee_city": 21213,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -1106,7 +1116,9 @@
       "eligibility_zones": "[\"243300316\"]",
       "fee": 2,
       "fee_details": "ll y a un reste à charge pour le stagiaire (à calculer selon le projet sur lequel il intègre)",
-      "funding_labels": [],
+      "funding_labels": [
+        226
+      ],
       "insee_city": 12374,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -1186,7 +1198,9 @@
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
+      "funding_labels": [
+        225
+      ],
       "insee_city": 12374,
       "is_active": true,
       "is_orientable_with_form": true,
@@ -1354,7 +1368,9 @@
       "eligibility_zones": "[\"33063\"]",
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
+      "funding_labels": [
+        219
+      ],
       "insee_city": 12374,
       "is_active": true,
       "is_orientable_with_form": true,

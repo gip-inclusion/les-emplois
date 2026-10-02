@@ -81,4 +81,5 @@
 
 {% if request.htmx and not request.htmx.boosted %}
     {% include "search/services/includes/summary.html" %}
+    {% include "search/services/includes/funding_labels_filter.html" %}
 {% endif %}

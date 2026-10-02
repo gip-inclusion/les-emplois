@@ -14,6 +14,8 @@ from itou.common_apps.address.departments import (
     format_district,
 )
 from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
+from itou.insertion.enums import GenericReferenceItemKind, GenericReferenceItemSource
+from itou.insertion.models import GenericReferenceItem
 from itou.jobs.models import ROME_DOMAINS
 from itou.prescribers.enums import PrescriberOrganizationCategory
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
@@ -248,6 +250,18 @@ class ServiceSearchForm(forms.Form):
     services = forms.MultipleChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.TypeService],
         label="Type de service",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    funding_labels = forms.ModelMultipleChoiceField(
+        # Ultimately, choices will be restricted (by the view) to the funding
+        # labels of the services appearing in the search results.
+        queryset=GenericReferenceItem.objects.filter(
+            source=GenericReferenceItemSource.DORA,
+            kind=GenericReferenceItemKind.FUNDING_LABEL,
+        ).order_by("label"),
+        to_field_name="value",
+        label="Financé par",
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )
