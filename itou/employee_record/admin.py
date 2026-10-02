@@ -293,7 +293,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                 siret=obj.siret,
                 pk=obj.job_application.to_company.canonical_company.pk,
             )
-        except (companies_models.Company.DoesNotExist, companies_models.Company.MultipleObjectsReturned):
+        except companies_models.Company.DoesNotExist, companies_models.Company.MultipleObjectsReturned:
             return obj.siret
         else:
             return get_organization_view_link(asp_company, display_attr="display_name")

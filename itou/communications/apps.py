@@ -43,7 +43,7 @@ def sync_notifications(notification_record_model):
             notification_record_model.objects.exclude(
                 pk__in=[notification_record.pk for notification_record in active_notification_records]
             ).update(is_obsolete=True)
-    except (OperationalError, ProgrammingError):
+    except OperationalError, ProgrammingError:
         if settings.DEBUG:
             # Ignore if database/table are not created yet
             return

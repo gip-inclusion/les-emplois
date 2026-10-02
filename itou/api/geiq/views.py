@@ -27,7 +27,7 @@ class GeiqApiAuthentication(authentication.TokenAuthentication):
         try:
             api_token = self.model.objects.prefetch_related("companies").get(key=key)
             return (GeiqApiAnonymousUser(), api_token)
-        except (ValidationError, self.model.DoesNotExist):
+        except ValidationError, self.model.DoesNotExist:
             raise exceptions.AuthenticationFailed("Invalid token.")
 
 
