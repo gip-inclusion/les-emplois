@@ -1,0 +1,100 @@
+# serializer version: 1
+# name: TestBrevoInboundParsing.test_inbound_parsing_service_answer[SQL queries]
+  dict({
+    'num_queries': 5,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'BrevoTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_brevotoken"."id",
+                 "api_brevotoken"."key",
+                 "api_brevotoken"."purpose",
+                 "api_brevotoken"."created_at"
+          FROM "api_brevotoken"
+          WHERE "api_brevotoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'handle_service_answer_email[api/inbound_parsing/views.py]',
+          'BrevoInboundParsingView.post[api/inbound_parsing/views.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_mobilizationemail"."id",
+                 "insertion_mobilizationemail"."inbound_parsing_key",
+                 "insertion_mobilizationemail"."service_id",
+                 "insertion_mobilizationemail"."mobilization_event_id",
+                 "insertion_mobilizationemail"."sender_id",
+                 "insertion_mobilizationemail"."sender_prescriber_organization_id",
+                 "insertion_mobilizationemail"."sender_company_id",
+                 "insertion_mobilizationemail"."sent_at",
+                 "insertion_mobilizationemail"."answered_at",
+                 "insertion_service"."id",
+                 "insertion_service"."address_line_1",
+                 "insertion_service"."address_line_2",
+                 "insertion_service"."post_code",
+                 "insertion_service"."city",
+                 "insertion_service"."insee_city_id",
+                 "insertion_service"."coordinates",
+                 "insertion_service"."uid",
+                 "insertion_service"."source_id",
+                 "insertion_service"."source_link",
+                 "insertion_service"."structure_id",
+                 "insertion_service"."name",
+                 "insertion_service"."description",
+                 "insertion_service"."kind_id",
+                 "insertion_service"."fee_id",
+                 "insertion_service"."fee_details",
+                 "insertion_service"."publics_details",
+                 "insertion_service"."access_conditions_di",
+                 "insertion_service"."eligibility_zones",
+                 "insertion_service"."mobilizations_details",
+                 "insertion_service"."lien_mobilisation",
+                 "insertion_service"."opening_hours",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
+                 "insertion_service"."contact_full_name",
+                 "insertion_service"."contact_email",
+                 "insertion_service"."contact_phone",
+                 "insertion_service"."average_orientation_response_delay_days",
+                 "insertion_service"."updated_on",
+                 "insertion_service"."is_active",
+                 "insertion_service"."created_at",
+                 "insertion_service"."updated_at",
+                 "insertion_service"."extra"
+          FROM "insertion_mobilizationemail"
+          INNER JOIN "insertion_service" ON ("insertion_mobilizationemail"."service_id" = "insertion_service"."id")
+          WHERE "insertion_mobilizationemail"."inbound_parsing_key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MobilizationEmail.save[<site-packages>/django/db/models/base.py]',
+          'handle_service_answer_email[api/inbound_parsing/views.py]',
+          'BrevoInboundParsingView.post[api/inbound_parsing/views.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_mobilizationemail"
+          SET "answered_at" = %s
+          WHERE "insertion_mobilizationemail"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
