@@ -2,6 +2,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.db import IntegrityError, transaction
+from django.utils import timezone
 
 from itou.insertion.enums import MobilizationEventKind
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEvent, Service
@@ -290,6 +291,43 @@ class TestMobilizationEvent:
         MobilizationEventFactory(
             kind=MobilizationEventKind.SERVICE_EXT_LINK, service=service, service_external_link="https://site.fake"
         )
+
+    def test_kind_and_inbound_key_coherence(self):
+        service = ServiceFactory()
+
+        for inbound_key in ["", None]:
+            with transaction.atomic():
+                with pytest.raises(IntegrityError, match=r".*kind_and_inbound_key_coherence.*"):
+                    MobilizationEventFactory(
+                        kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE, service=service, inbound_key=inbound_key
+                    )
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*kind_and_inbound_key_coherence.*"):
+                MobilizationEventFactory(
+                    kind=MobilizationEventKind.SERVICE_CONTACT, service=service, inbound_key="random"
+                )
+        MobilizationEventFactory(
+            kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE, service=service, inbound_key="random"
+        )
+
+    def test_kind_and_answered_at_coherence(self):
+        service = ServiceFactory()
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*kind_and_service_answered_at_coherence.*"):
+                MobilizationEventFactory(
+                    kind=MobilizationEventKind.SERVICE_CONTACT,
+                    service=service,
+                    service_answered_at=timezone.now(),
+                )
+
+        for idx, service_answered_at in enumerate([timezone.now(), None]):
+            MobilizationEventFactory(
+                kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE,
+                service=service,
+                inbound_key="random" + str(idx),
+                service_answered_at=service_answered_at,
+            )
 
     @pytest.mark.parametrize(
         "user_factory,organization_factory",

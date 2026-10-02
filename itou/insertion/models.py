@@ -581,6 +581,8 @@ class MobilizationEvent(models.Model):
         related_name="mobilization_events",
     )
     created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    inbound_key = models.CharField(verbose_name="identifiant d’inbound parsing", blank=True, null=True, unique=True)
+    service_answered_at = models.DateTimeField(verbose_name="date de réponse du service", null=True)
 
     objects = MobilizationEventManager()
 
@@ -596,10 +598,26 @@ class MobilizationEvent(models.Model):
                         MobilizationEventKind.SERVICE_ORIENTATION,
                         MobilizationEventKind.SERVICE_CONTACT,
                         MobilizationEventKind.SERVICE_EXT_LINK,
+                        MobilizationEventKind.SEND_EMAIL_TO_SERVICE,
                     ],
                     service__isnull=False,
                 )
                 | models.Q(kind=MobilizationEventKind.STRUCTURE_CONTACT, service__isnull=True),
+            ),
+            models.CheckConstraint(
+                name="kind_and_inbound_key_coherence",
+                condition=(
+                    ~models.Q(kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE) & models.Q(inbound_key__isnull=True)
+                )
+                | (
+                    models.Q(kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE, inbound_key__isnull=False)
+                    & ~models.Q(inbound_key="")
+                ),
+            ),
+            models.CheckConstraint(
+                name="kind_and_service_answered_at_coherence",
+                condition=models.Q(service_answered_at__isnull=True)
+                | models.Q(kind=MobilizationEventKind.SEND_EMAIL_TO_SERVICE, service_answered_at__isnull=False),
             ),
             models.CheckConstraint(
                 name="service_external_link_coherence",

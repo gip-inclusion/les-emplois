@@ -8396,6 +8396,8 @@
                  "insertion_mobilizationevent"."service_external_link",
                  "insertion_mobilizationevent"."orientation_id",
                  "insertion_mobilizationevent"."created_at",
+                 "insertion_mobilizationevent"."inbound_key",
+                 "insertion_mobilizationevent"."service_answered_at",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",

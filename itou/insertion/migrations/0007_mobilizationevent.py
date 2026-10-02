@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
                                 "structure_contact",
                                 "Affichage des informations de contact de la structure",
                             ),
+                            ("send_email_service", "Envoi d’un email à un service"),
                         ],
                         verbose_name="type",
                     ),
