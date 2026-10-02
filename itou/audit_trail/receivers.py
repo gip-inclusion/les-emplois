@@ -8,8 +8,11 @@ from itou.otp.utils import require_otp
 def _get_login_data(request):
     data = {}
 
-    if PRO_CONNECT_SESSION_KEY in request.session:
+    if pro_connect_session := request.session.get(PRO_CONNECT_SESSION_KEY):
         data["idp"] = "ProConnect"
+        for key in "acr", "amr", "pro_connect_idp_id":
+            if value := pro_connect_session.get(key):
+                data[key] = value
 
     if FRANCETRAVAIL_CONNECT_SESSION_TOKEN in request.session:
         data["idp"] = "FranceTravail"

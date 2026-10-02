@@ -939,7 +939,12 @@ class TestProConnectMapChannel:
         pro_connect.mock_oauth_dance(client)
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
-        assert trail.data == {"idp": "ProConnect"}
+        assert trail.data == {
+            "idp": "ProConnect",
+            "amr": ["pwd"],
+            "acr": "https://proconnect.gouv.fr/assurance/consistency-checked",
+            "pro_connect_idp_id": "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7",
+        }
         assert trail.browser_id
 
 
