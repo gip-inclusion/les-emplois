@@ -9,13 +9,14 @@ from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -49,10 +50,14 @@ from itou.users.enums import (
     JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
     Title,
     UserKind,
 )
-from itou.users.notifications import JobSeekerCreatedByProxyNotification
+from itou.users.notifications import JobSeekerCreatedByProxyNotification, ProSupportReportCreatedNotification
 from itou.utils import iso_standards
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
@@ -128,6 +133,50 @@ class UserQuerySet(models.QuerySet):
 
     def with_contract_ending_soon(self, siae=None):
         return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
+
+    def last_contract_pk_lookup(self, siae=None):
+        contracts = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk")))
+        if siae:
+            contracts = contracts.filter(company=siae)
+        return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
+
+    def last_contract_ended_with_valid_approval_lookup(self, siae):
+        from itou.approvals.models import Approval
+
+        # Looked up among all companies: an employee hired elsewhere since has found a solution.
+        return Q(
+            Exists(
+                Contract.objects.filter(
+                    pk=self.last_contract_pk_lookup(), company=siae, end_date__lt=timezone.localdate()
+                )
+            ),
+            Exists(Approval.objects.filter(user=OuterRef("pk")).valid()),
+        )
+
+    def at_end_of_journey(self, siae):
+        return self.filter(
+            Q(self.contract_ending_soon_lookup(siae)) | self.last_contract_ended_with_valid_approval_lookup(siae)
+        )
+
+    def with_end_of_journey(self, siae):
+        return self.annotate(
+            contract_ending_soon=self.contract_ending_soon_lookup(siae),
+            last_contract_ended_with_valid_approval=self.last_contract_ended_with_valid_approval_lookup(siae),
+        )
+
+    def with_last_contract_end_date(self, siae):
+        return self.annotate(
+            last_contract_end_date=Subquery(
+                Contract.objects.filter(pk=self.last_contract_pk_lookup(siae=siae)).values("end_date")
+            )
+        )
+
+    def with_last_contract_pro_support_report(self, siae):
+        return self.annotate(
+            last_contract_has_pro_support_report=Exists(
+                ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
+            )
+        )
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
@@ -1829,3 +1878,116 @@ class JobSeekerAssignment(models.Model):
     @property
     def is_active(self):
         return self.ended_at is None
+
+
+class ProSupportReport(models.Model):
+    """
+    The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
+    """
+
+    public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    job_seeker = models.ForeignKey(
+        User,
+        verbose_name="salarié",
+        on_delete=models.CASCADE,
+        related_name="pro_support_reports",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    author = models.ForeignKey(
+        User,
+        verbose_name="auteur",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+    notified_prescriber = models.ForeignKey(
+        User,
+        verbose_name="prescripteur prévenu",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    # Contracts missing from the ASP data are deleted: the end date is kept on the report.
+    contract = models.ForeignKey(
+        Contract,
+        verbose_name="contrat",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    contract_end_date = models.DateField(verbose_name="date de fin du contrat")
+
+    barriers = ArrayField(
+        verbose_name="freins périphériques",
+        base_field=models.CharField(choices=ProSupportReportBarrier.choices),
+        blank=True,
+    )
+    other_barrier = models.TextField(verbose_name="autres freins identifiés", blank=True, default="")
+    autonomy = models.PositiveSmallIntegerField(
+        verbose_name="autonomie dans la recherche d’emploi",
+        choices=ProSupportReportAutonomy.choices,
+    )
+    solution = models.CharField(
+        verbose_name="solution envisagée",
+        choices=ProSupportReportSolution.choices,
+        blank=True,
+        default="",
+    )
+    orientation = models.CharField(
+        verbose_name="orientation la plus adaptée",
+        choices=ProSupportReportOrientation.choices,
+        blank=True,
+        default="",
+    )
+
+    class Meta:
+        verbose_name = "bilan d’accompagnement"
+        verbose_name_plural = "bilans d’accompagnement"
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_%(class)s_per_contract",
+                fields=["contract"],
+                violation_error_message="Un bilan d’accompagnement existe déjà pour ce contrat.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_autonomy_range",
+                condition=Q(autonomy__range=(1, 5)),
+                violation_error_message="L’autonomie est notée de 1 à 5.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_solution_or_orientation",
+                condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
+                violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
+
+    def notify_authorized_prescriber(self):
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker_id=self.job_seeker_id,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at", "-pk")
+            .first()
+        )
+        if assignment:
+            self.notified_prescriber = assignment.professional
+            self.save(update_fields=["notified_prescriber"])
+            ProSupportReportCreatedNotification(
+                assignment.professional, assignment.prescriber_organization, report=self
+            ).send()
+
+    def get_barriers_display(self):
+        return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

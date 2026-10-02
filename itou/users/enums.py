@@ -88,3 +88,36 @@ class JobSeekerAssignmentDisplayMode(enum.StrEnum):
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
     # - https://github.com/django/django/pull/12304
     do_not_call_in_templates = enum.nonmember(True)
+
+
+class ProSupportReportBarrier(models.TextChoices):
+    HEALTH = "HEALTH", "Santé"
+    MOBILITY = "MOBILITY", "Mobilité"
+    FAMILY = "FAMILY", "Situation personnelle ou familiale"
+    FINANCIAL = "FINANCIAL", "Situation financière"
+    DIGITAL = "DIGITAL", "Situation numérique"
+    LEGAL = "LEGAL", "Situation administrative ou juridique"
+    LITERACY = "LITERACY", "Situation en français ou en calcul"
+
+
+class ProSupportReportAutonomy(models.IntegerChoices):
+    STEP_BY_STEP = 1, "Il a besoin d’être accompagné à chaque étape (rédaction du CV, identification d’offres…)."
+    REGULAR_SUPPORT = 2, "Il a besoin d’un appui régulier pour mener ses démarches à terme."
+    OCCASIONAL_SUPPORT = 3, "Il mène la plupart des démarches seul, mais sollicite un accompagnement ponctuel."
+    SUPPORT_IF_BLOCKED = 4, "Il est autonome et sollicite l’accompagnement seulement en cas de blocage."
+    AUTONOMOUS = 5, "Il est autonome (recherche, candidature, entretien) sans besoin d’accompagnement."
+
+
+class ProSupportReportSolution(models.TextChoices):
+    RENEWAL = "RENEWAL", "Contrat renouvelé dans notre structure"
+    LASTING_JOB = "LASTING_JOB", "Emploi durable (CDD de plus de 6 mois, CDI, création d’entreprise)"
+    TRANSITIONAL_JOB = "TRANSITIONAL_JOB", "Emploi transitoire (CDD de moins de 6 mois)"
+    TRAINING = "TRAINING", "Entrée en formation"
+    OTHER = "OTHER", "Autre"
+
+
+class ProSupportReportOrientation(models.TextChoices):
+    SOCIAL = "SOCIAL", "Sociale"
+    SOCIO_PROFESSIONAL = "SOCIO_PROFESSIONAL", "Socio-professionnelle"
+    PROFESSIONAL = "PROFESSIONAL", "Professionnelle"
+    TO_BE_DEFINED = "TO_BE_DEFINED", "À définir avec le prescripteur"

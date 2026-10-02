@@ -14,13 +14,22 @@ from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
-from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
+from itou.users.enums import (
+    AssignmentEndReason,
+    LackOfPoleEmploiId,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
+    UserKind,
+)
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import (
     JobSeekerAssignment,
     JobSeekerProfile,
     JobSeekerProfileQuerySet,
     NirModificationRequest,
+    ProSupportReport,
     User,
 )
 from itou.utils import constants as global_constants
@@ -64,6 +73,8 @@ class FilterForm(forms.Form):
     # Fields only for authorized prescribers and IAE employers, set in __init__
     approval_ending_soon = None
     contract_ending_soon = None
+    # Field only for IAE employers, set in __init__
+    end_of_journey = None
 
     assignments = forms.ChoiceField(
         label="Statut des accompagnements",
@@ -105,6 +116,9 @@ class FilterForm(forms.Form):
                 required=False,
                 help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
+        if self.company:
+            # Reached from links only, it has no checkbox.
+            self.fields["end_of_journey"] = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
         if from_all_coworkers:
             self.fields["assignments"].widget.help_texts = {
@@ -199,6 +213,9 @@ class FilterForm(forms.Form):
             if contract_ending_soon:
                 queryset = queryset.has_contract_ending_soon(siae=self.company)
             filters.append(end_of_journey_filter)
+
+        if self.cleaned_data.get("end_of_journey"):
+            queryset = queryset.at_end_of_journey(siae=self.company)
 
         if self.cleaned_data.get("is_stalled"):
             queryset = queryset.filter(
@@ -616,3 +633,72 @@ class JobSeekerAssignmentForm(forms.ModelForm):
                 assignment.ended_at = None
                 assignment.end_reason = None
         assignment.save()
+
+
+class ProSupportReportForm(forms.ModelForm):
+    barriers = forms.MultipleChoiceField(
+        label="Le salarié a-t-il des freins périphériques identifiés ?",
+        help_text="Ne cochez rien si aucun frein n’a été identifié.",
+        choices=ProSupportReportBarrier.choices,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    autonomy = forms.TypedChoiceField(
+        label="Ce salarié est-il autonome dans ses démarches de recherche d’emploi ?",
+        choices=[(autonomy.value, f"{autonomy.value} : {autonomy.label}") for autonomy in ProSupportReportAutonomy],
+        coerce=int,
+        widget=forms.RadioSelect,
+    )
+    has_solution = forms.ChoiceField(
+        label="Une solution est-elle déjà prévue pour le salarié après la fin de son contrat ?",
+        help_text=(
+            "Il s’agit de la suite du parcours une fois le contrat terminé : emploi, formation, renouvellement… "
+            "Répondez « Non » si rien n’est encore prévu."
+        ),
+        choices=(("True", "Oui, une solution est prévue"), ("False", "Non, rien n’est prévu à ce jour")),
+        widget=forms.RadioSelect,
+    )
+    solution = forms.ChoiceField(
+        label="Quelle solution est envisagée ?",
+        choices=ProSupportReportSolution.choices,
+        required=False,
+        widget=forms.RadioSelect,
+    )
+    orientation = forms.ChoiceField(
+        label="Quelle orientation serait la plus adaptée ?",
+        choices=ProSupportReportOrientation.choices,
+        required=False,
+        widget=forms.RadioSelect,
+    )
+
+    class Meta:
+        model = ProSupportReport
+        fields = ["barriers", "other_barrier", "autonomy", "solution", "orientation"]
+        labels = {
+            "other_barrier": "Autres freins identifiés",
+        }
+        widgets = {
+            "other_barrier": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def __init__(self, hx_get_url, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only the question matching the answer is displayed.
+        self.fields["solution"].required = self.data.get("has_solution") == "True"
+        self.fields["orientation"].required = self.data.get("has_solution") == "False"
+        self.fields["has_solution"].widget.attrs.update(
+            {
+                "hx-trigger": "change",
+                "hx-get": hx_get_url,
+                "hx-target": "#pro-support-report-next-step",
+                "hx-select": "#pro-support-report-next-step",
+                "hx-swap": "outerHTML",
+            }
+        )
+
+    def clean(self):
+        super().clean()
+        if self.cleaned_data.get("has_solution") == "True":
+            self.cleaned_data["orientation"] = ""
+        else:
+            self.cleaned_data["solution"] = ""

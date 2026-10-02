@@ -34,6 +34,7 @@ from itou.users.enums import (
     JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
+    ProSupportReportSolution,
     Title,
     UserKind,
 )
@@ -56,6 +57,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
     ProfessionalFactory,
+    ProSupportReportFactory,
     UserFactory,
 )
 from tests.utils.testing import normalize_fields_history
@@ -137,6 +139,94 @@ class TestQuerySet:
         assert job_seekers_qs.get(pk=job_seeker.pk).contract_ending_soon is True
         assert job_seekers_qs.get(pk=job_seeker2.pk).contract_ending_soon is False
         assert job_seekers_qs.get(pk=job_seeker3.pk).contract_ending_soon is False
+
+    @freezegun.freeze_time("2026-09-22")
+    def test_at_end_of_journey(self):
+        company = CompanyFactory()
+        today = timezone.localdate()
+
+        def employee(end_date, *, contract_company=company, approval_end_at=None):
+            job_seeker = ContractFactory(
+                company=contract_company,
+                start_date=(end_date or today) - datetime.timedelta(days=200),
+                end_date=end_date,
+            ).job_seeker
+            if approval_end_at:
+                ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=600), end_at=approval_end_at)
+            return job_seeker
+
+        contract_ends_soon = employee(today + datetime.timedelta(days=30))
+        contract_ended = employee(today - datetime.timedelta(days=1), approval_end_at=today)
+        contract_ended_long_ago = employee(
+            today - datetime.timedelta(days=540), approval_end_at=today + datetime.timedelta(days=30)
+        )
+        # Not at the end of their journey.
+        employee(today + datetime.timedelta(days=31))
+        employee(None)
+        employee(today - datetime.timedelta(days=10), approval_end_at=today - datetime.timedelta(days=1))
+        employee(today - datetime.timedelta(days=10))
+        employee(today + datetime.timedelta(days=20), contract_company=CompanyFactory())
+        hired_elsewhere = employee(
+            today - datetime.timedelta(days=10), approval_end_at=today + datetime.timedelta(days=100)
+        )
+        ContractFactory(
+            job_seeker=hired_elsewhere,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+        # A contract with the SIAE ending soon counts, even if another one has started elsewhere.
+        contract_ends_soon_hired_elsewhere = employee(today + datetime.timedelta(days=10))
+        ContractFactory(
+            job_seeker=contract_ends_soon_hired_elsewhere,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+        hired_by_unknown_company = employee(
+            today - datetime.timedelta(days=10), approval_end_at=today + datetime.timedelta(days=100)
+        )
+        ContractFactory(
+            job_seeker=hired_by_unknown_company,
+            company=None,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+
+        assertQuerySetEqual(
+            User.objects.at_end_of_journey(siae=company),
+            [contract_ends_soon, contract_ends_soon_hired_elsewhere, contract_ended, contract_ended_long_ago],
+            ordered=False,
+        )
+        job_seekers_qs = User.objects.with_end_of_journey(siae=company)
+        assert job_seekers_qs.get(pk=contract_ends_soon.pk).contract_ending_soon is True
+        assert job_seekers_qs.get(pk=contract_ends_soon.pk).last_contract_ended_with_valid_approval is False
+        assert job_seekers_qs.get(pk=contract_ended.pk).contract_ending_soon is False
+        assert job_seekers_qs.get(pk=contract_ended.pk).last_contract_ended_with_valid_approval is True
+
+    def test_with_last_contract_pro_support_report(self):
+        report = ProSupportReportFactory()
+        job_seeker_without_report = ContractFactory(company=report.company).job_seeker
+
+        job_seekers_qs = User.objects.with_last_contract_pro_support_report(
+            siae=report.company
+        ).with_last_contract_end_date(siae=report.company)
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == report.contract.end_date
+        assert job_seekers_qs.get(pk=job_seeker_without_report.pk).last_contract_has_pro_support_report is False
+
+        # A newer contract with another company does not change the SIAE last contract.
+        ContractFactory(
+            job_seeker=report.job_seeker, start_date=report.contract.start_date + datetime.timedelta(days=1)
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+
+        # A newer contract with the SIAE has no report yet.
+        newer_contract = ContractFactory(
+            job_seeker=report.job_seeker,
+            company=report.company,
+            start_date=report.contract.start_date + datetime.timedelta(days=2),
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is False
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == newer_contract.end_date
 
 
 class TestManager:
@@ -1645,3 +1735,59 @@ class TestJobSeekerAssignment:
             prescriber_organization=PrescriberOrganizationFactory(), assigned_to_unknown_advisor=True
         )
         assert assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+
+
+class TestProSupportReport:
+    @pytest.mark.parametrize(
+        "kwargs,constraint",
+        [
+            pytest.param(
+                {"solution": ProSupportReportSolution.TRAINING},
+                "prosupportreport_solution_or_orientation",
+                id="solution_and_orientation",
+            ),
+            pytest.param(
+                {"orientation": ""}, "prosupportreport_solution_or_orientation", id="no_solution_nor_orientation"
+            ),
+            pytest.param({"autonomy": 6}, "prosupportreport_autonomy_range", id="autonomy_out_of_range"),
+        ],
+    )
+    def test_constraints(self, kwargs, constraint):
+        with pytest.raises(IntegrityError, match=constraint):
+            ProSupportReportFactory(**kwargs)
+
+    def test_notify_authorized_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+
+        def assignment(days_ago, **kwargs):
+            return JobSeekerAssignmentFactory(
+                job_seeker=report.job_seeker,
+                last_action_at=timezone.now() - datetime.timedelta(days=days_ago),
+                **kwargs,
+            )
+
+        # Created first so that the order cannot come from the primary key.
+        latest = assignment(5, prescriber_organization=PrescriberOrganizationFactory(authorized=True), ended=True)
+        assignment(10, prescriber_organization=PrescriberOrganizationFactory(authorized=True))
+        # More recent, but not an authorized prescriber.
+        assignment(1, prescriber_organization=PrescriberOrganizationFactory())
+        assignment(1, company=report.company, professional=report.author)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert [email.to for email in mailoutbox] == [[latest.professional.email]]
+        report.refresh_from_db()
+        assert report.notified_prescriber == latest.professional
+
+    def test_notify_authorized_prescriber_without_one(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.notified_prescriber is None
+
+    def test_unique_per_contract(self):
+        report = ProSupportReportFactory()
+        with pytest.raises(IntegrityError, match="unique_prosupportreport_per_contract"):
+            ProSupportReportFactory(contract=report.contract)

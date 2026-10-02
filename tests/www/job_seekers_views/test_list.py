@@ -41,6 +41,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
     ProfessionalFactory,
+    ProSupportReportFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
@@ -1113,6 +1114,7 @@ def test_iae_filters_as_non_iae_actor(client, subtests):
         "approval expired": {"approval_expired": "on"},
         "no approval": {"no_approval": "on"},
         "approval expired or no approval": {"approval_expired": "on", "no_approval": "on"},
+        "end of journey": {"end_of_journey": "on"},
     }
     client.force_login(user)
 
@@ -1268,7 +1270,52 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
-@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
+def test_filtered_by_end_of_journey_for_siae(client, snapshot):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+
+    contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=contract_ended,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today - datetime.timedelta(days=20),
+    )
+    ApprovalFactory(user=contract_ended, start_at=today - datetime.timedelta(days=300), end_at=today)
+    other_company_contract = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=other_company_contract,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
+    response = client.get(url, {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [contract_ended]
+    # Kept when another filter is changed.
+    assertContains(
+        response, '<input type="hidden" name="end_of_journey" value="on" id="id_end_of_journey">', html=True
+    )
+
+    with assertSnapshotQueries(snapshot):
+        client.get(url, {"end_of_journey": "on"})
+
+
+def test_end_of_journey_filter_not_for_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
+    assertNotContains(response, 'name="end_of_journey"')
+
+
+@freeze_time("2026-01-15")
 def test_end_of_contracts_banners_for_siae(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
@@ -1290,7 +1337,7 @@ def test_end_of_contracts_banners_for_siae(client):
     response = client.get(url)
     assertNotContains(response, "Afficher ce salarié")
     assertNotContains(response, "Afficher ces salariés")
-    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+    assertNotContains(response, "Remplir le bilan d’accompagnement de vos salariés")
 
     # A job seeker with a contract ending soon: discovery banner on the unfiltered list.
     job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
@@ -1302,24 +1349,48 @@ def test_end_of_contracts_banners_for_siae(client):
     )
     response = client.get(url)
     assertContains(response, "Vous avez 1 salarié en fin de contrat")
+    assertContains(response, "<li>1 salarié termine son contrat dans les 30 prochains jours.</li>", html=True)
+    assertNotContains(response, "n’est plus en contrat")
     assertContains(response, "Afficher ce salarié")
-    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+    assertNotContains(response, "Remplir le bilan d’accompagnement de vos salariés")
 
+    # Its contract has ended but its PASS IAE is still valid.
     job_seeker2 = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
         job_seeker=job_seeker2,
         company=company,
         start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
+        end_date=today - datetime.timedelta(days=20),
     )
+    ApprovalFactory(user=job_seeker2, start_at=today - datetime.timedelta(days=300), end_at=today)
     response = client.get(url)
     assertContains(response, "Vous avez 2 salariés en fin de contrat")
+    assertContains(
+        response, "<li>1 salarié n’est plus en contrat mais a encore un PASS\xa0IAE valide.</li>", html=True
+    )
+    assertContains(response, f"{url}?end_of_journey=on")
     assertContains(response, "Afficher ces salariés")
-    assertNotContains(response, "Suggérer une suite de parcours aux salariés")
+    assertNotContains(response, "Remplir le bilan d’accompagnement de vos salariés")
+
+    for end_date in (today + datetime.timedelta(days=10), today - datetime.timedelta(days=10)):
+        other_job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=other_job_seeker,
+            company=company,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=end_date,
+        )
+        ApprovalFactory(user=other_job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today)
+    response = client.get(url)
+    assertContains(response, "Vous avez 4 salariés en fin de contrat")
+    assertContains(response, "<li>2 salariés terminent leur contrat dans les 30 prochains jours.</li>", html=True)
+    assertContains(
+        response, "<li>2 salariés ne sont plus en contrat mais ont encore un PASS\xa0IAE valide.</li>", html=True
+    )
 
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
-    assertContains(response, "Suggérer une suite de parcours aux salariés")
+    response = client.get(url, {"end_of_journey": "on"})
+    assertContains(response, "Remplir le bilan d’accompagnement de vos salariés")
     assertNotContains(response, "Afficher ces salariés")
 
 
@@ -1385,62 +1456,73 @@ def test_end_of_contracts_banners_for_prescriber(client):
 
 
 @freeze_time("2026-01-15")
-@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
-def test_suggest_next_step_action_in_list(client):
+def test_create_pro_support_report_action_in_list_for_employer(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
-    employer = membership.user
-    client.force_login(employer)
-    url = reverse("job_seekers_views:list_organization")
+    client.force_login(membership.user)
     today = datetime.date(2026, 1, 15)
-    ending_soon = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    ContractFactory(
-        job_seeker=ending_soon,
-        company=company,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
-    )
-    # A job seeker with no contract ending soon: no action on their row.
-    JobSeekerAssignmentFactory(professional=employer, company=company)
 
-    # Unfiltered: the action is offered on the row of the job seeker ending soon (mirroring the card banner),
-    # exactly once, and it links to the Tally form pre-filled with the responding employer's identifiers.
-    tally_url = f"https://tally.example/r/wSUGGEST?iduser={employer.pk}&kindcompany={company.kind}"
-    response = client.get(url)
-    assertContains(response, "Suggérer une suite de parcours")
-    assertContains(response, tally_url, count=1)
+    def create_contract(end_date, approval_end_at=None):
+        job_seeker = JobSeekerAssignmentFactory(professional=membership.user, company=company).job_seeker
+        if approval_end_at:
+            ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=300), end_at=approval_end_at)
+        return ContractFactory(
+            job_seeker=job_seeker, company=company, start_date=today - datetime.timedelta(days=200), end_date=end_date
+        )
 
-    # With the end-of-journey filter active, only the job seeker ending soon remains, still with the action.
-    response = client.get(url, {"contract_ending_soon": "on"})
-    assertContains(response, tally_url, count=1)
+    contract_ends_soon = create_contract(today + datetime.timedelta(days=20))
+    contract_ended = create_contract(today - datetime.timedelta(days=20), approval_end_at=today)
+    ProSupportReportFactory(contract=create_contract(today + datetime.timedelta(days=20)))
+    create_contract(today + datetime.timedelta(days=31))
+    create_contract(today - datetime.timedelta(days=20), approval_end_at=today - datetime.timedelta(days=1))
+
+    response = client.get(reverse("job_seekers_views:list_organization"))
+    for contract in (contract_ends_soon, contract_ended):
+        create_url = reverse(
+            "job_seekers_views:create_pro_support_report", kwargs={"public_id": contract.job_seeker.public_id}
+        )
+        assertContains(response, f"{create_url}?back_url=", count=1)
+    assertContains(response, "Remplir le bilan</a>", count=2)
 
 
 @freeze_time("2026-01-15")
-@override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
-def test_suggest_next_step_banner_on_job_seeker_card(client):
+@pytest.mark.parametrize(
+    "end_date,title,text",
+    [
+        (
+            datetime.date(2026, 2, 4),
+            "Le contrat arrive bientôt à échéance",
+            "Le contrat de ce salarié arrive à échéance le 04/02/2026.",
+        ),
+        (
+            datetime.date(2026, 1, 5),
+            "Le contrat de travail a pris fin",
+            "Le contrat de ce salarié a pris fin le 05/01/2026, mais son PASS IAE est encore valide.",
+        ),
+    ],
+    ids=["contract_ends_soon", "contract_ended"],
+)
+def test_create_pro_support_report_banner_on_job_seeker_card_for_employer(client, snapshot, end_date, title, text):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
-    company = membership.company
-    employer = membership.user
-    client.force_login(employer)
-    today = datetime.date(2026, 1, 15)
-    job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    # We rely on the current valid approval's dates to retrieve the last contract
-    ApprovalFactory(
-        user=job_seeker,
-        start_at=today - datetime.timedelta(days=200),
-        end_at=today + datetime.timedelta(days=20),
-    )
-    ContractFactory(
-        job_seeker=job_seeker,
-        company=company,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
+    client.force_login(membership.user)
+    contract = ContractFactory(company=membership.company, start_date=datetime.date(2025, 6, 1), end_date=end_date)
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date, end_at=datetime.date(2026, 6, 1))
+    details_url = reverse("job_seekers_views:details", kwargs={"public_id": contract.job_seeker.public_id})
+    create_url = reverse(
+        "job_seekers_views:create_pro_support_report", kwargs={"public_id": contract.job_seeker.public_id}
     )
 
-    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-    assertContains(response, "Le contrat arrive bientôt à échéance")
-    assertContains(response, "04/02/2026")
-    assertContains(response, f"https://tally.example/r/wSUGGEST?iduser={employer.pk}&kindcompany={company.kind}")
+    with assertSnapshotQueries(snapshot):
+        response = client.get(details_url)
+    assertContains(response, title)
+    assertContains(response, text)
+    assertContains(response, f'href="{create_url}"')
+
+    # Once sent, the report replaces the banner.
+    ProSupportReportFactory(contract=contract)
+    response = client.get(details_url)
+    assertNotContains(response, title)
+    assertContains(response, "Bilan d’accompagnement disponible")
 
 
 @freeze_time("2026-01-15")
@@ -1484,6 +1566,7 @@ def test_pro_support_request_banner_on_job_seeker_card(client):
     assertContains(response, "Demander un bilan d’accompagnement")
     assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
     assertContains(response, "Jean%20DUPONT%20arrive")
+    assertNotContains(response, "Remplir le bilan")
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
@@ -2062,6 +2145,7 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
     assertContains(response, mailto_label)
     assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
     assertContains(response, "Jean%20DUPONT%20arrive")
+    assertNotContains(response, "Remplir le bilan")
 
 
 @freeze_time("2026-01-15")

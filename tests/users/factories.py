@@ -18,6 +18,9 @@ from itou.users.enums import (
     AssignmentEndReason,
     IdentityProvider,
     JobSeekerAssignmentDisplayMode,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
     Title,
     UserKind,
 )
@@ -558,3 +561,24 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
                 case _:
                     raise ValueError(f"Invalid display_mode={extracted}")
             obj.save()
+
+
+class ProSupportReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.ProSupportReport
+
+    class Params:
+        for_snapshot = factory.Trait(
+            public_id="6a2d3b1e-5f0c-4d8e-9b7a-1c2e3f4a5b6c",
+            contract__company__for_snapshot=True,
+            author__for_snapshot=True,
+        )
+
+    contract = factory.SubFactory("tests.companies.factories.ContractFactory")
+    job_seeker = factory.SelfAttribute("contract.job_seeker")
+    company = factory.SelfAttribute("contract.company")
+    author = factory.SubFactory(EmployerFactory)
+    contract_end_date = factory.SelfAttribute("contract.end_date")
+    barriers = factory.List([ProSupportReportBarrier.MOBILITY])
+    autonomy = ProSupportReportAutonomy.OCCASIONAL_SUPPORT
+    orientation = ProSupportReportOrientation.SOCIO_PROFESSIONAL

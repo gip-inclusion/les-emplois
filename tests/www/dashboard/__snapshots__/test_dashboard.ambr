@@ -357,13 +357,31 @@
                     FROM "users_jobseekerassignment" U0
                     WHERE (U0."company_id" = %s
                            AND U0."ended_at" IS NULL))
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" BETWEEN %s AND %s
-                           AND U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."company_id" = %s)
-                    LIMIT 1))
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_contract" U0
+                         WHERE (U0."end_date" BETWEEN %s AND %s
+                                AND U0."job_seeker_id" = ("users_user"."id")
+                                AND U0."company_id" = %s)
+                         LIMIT 1)
+                      OR (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "companies_contract" V0
+                             WHERE (V0."company_id" = %s
+                                    AND V0."end_date" < %s
+                                    AND V0."id" =
+                                      (SELECT U0."id" AS "pk"
+                                       FROM "companies_contract" U0
+                                       WHERE U0."job_seeker_id" = ("users_user"."id")
+                                       ORDER BY U0."start_date" DESC, 1 DESC
+                                       LIMIT 1))
+                             LIMIT 1)
+                          AND EXISTS
+                            (SELECT %s AS "a"
+                             FROM "approvals_approval" U0
+                             WHERE (U0."user_id" = ("users_user"."id")
+                                    AND U0."end_at" >= %s)
+                             LIMIT 1))))
         ''',
       }),
       dict({

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 from itou.communications import NotificationCategory, registry as notifications_registry
@@ -97,3 +98,24 @@ class NewAPITokenNotification(EmailNotification):
     subject_template = "account/email/email_new_API_token_subject.txt"
     body_template = "account/email/email_new_API_token_body.md"
     can_be_disabled = False
+
+
+@notifications_registry.register
+class ProSupportReportCreatedNotification(ProfessionalNotification, EmailNotification):
+    """Notification sent to the authorized prescriber of an employee when their SIAE fills a pro support report"""
+
+    name = "Bilan d’accompagnement partagé par une SIAE"
+    category = NotificationCategory.IAE_PASS
+    can_be_disabled = False
+    subject_template = "users/emails/pro_support_report_created_subject.txt"
+    body_template = "users/emails/pro_support_report_created_body.md"
+
+    def get_build_extra(self):
+        return {"reply_to": [settings.PRO_SUPPORT_REPORT_REPLY_TO_EMAIL]}
+
+    def get_context(self):
+        context = super().get_context()
+        context["report_url"] = get_absolute_url(
+            reverse("job_seekers_views:pro_support_report", kwargs={"public_id": context["report"].public_id})
+        )
+        return context
