@@ -52,6 +52,8 @@ class ProConnectUserData(OIDConnectUserData):
             organization.add_or_activate_membership(user)
 
 
+# TODO from 2026-12-01: drop this table. It existed for statistics
+# reasons only, those values are now stored in the audit trail.
 class ProConnectAuthentication(models.Model):
     """A _temporary_ append-only model that stores metadata about each
     authentication made through ProConnect.

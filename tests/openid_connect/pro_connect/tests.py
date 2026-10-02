@@ -31,7 +31,6 @@ from itou.openid_connect.models import InvalidKindException, RegisterForbiddenEx
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
-    ProConnectAuthentication,
     ProConnectState,
     ProConnectUserData,
 )
@@ -317,14 +316,6 @@ class TestProConnectCallbackView:
         assert user.has_sso_provider
         assert user.kind == UserKind.PROFESSIONAL
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
-
-    def test_callback_record_authentication(self, client, pro_connect):
-        pro_connect.mock_oauth_dance(client)
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        record = ProConnectAuthentication.objects.get()
-        assert record.user_public_id == user.public_id
-        assert record.amr == ["pwd"]
-        assert record.idp_id == "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7"
 
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
@@ -939,7 +930,12 @@ class TestProConnectMapChannel:
         pro_connect.mock_oauth_dance(client)
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
-        assert trail.data == {"idp": "ProConnect"}
+        assert trail.data == {
+            "idp": "ProConnect",
+            "amr": ["pwd"],
+            "acr": "https://proconnect.gouv.fr/assurance/consistency-checked",
+            "provider_idp_id": "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7",
+        }
         assert trail.browser_id
 
 
