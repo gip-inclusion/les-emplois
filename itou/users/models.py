@@ -15,7 +15,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -128,6 +128,31 @@ class UserQuerySet(models.QuerySet):
 
     def with_contract_ending_soon(self, siae=None):
         return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
+
+    def last_contract_ended_with_valid_approval_lookup(self, siae):
+        from itou.approvals.models import Approval
+
+        # Looked up among all companies: an employee hired elsewhere since has found a solution.
+        last_contract = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk"))).order_by("-start_date", "-pk")
+        return Q(
+            Exists(
+                Contract.objects.filter(
+                    pk=Subquery(last_contract.values("pk")[:1]), company=siae, end_date__lt=timezone.localdate()
+                )
+            ),
+            Exists(Approval.objects.filter(user=OuterRef("pk")).valid()),
+        )
+
+    def at_end_of_journey(self, siae):
+        return self.filter(
+            Q(self.contract_ending_soon_lookup(siae)) | self.last_contract_ended_with_valid_approval_lookup(siae)
+        )
+
+    def with_end_of_journey(self, siae):
+        return self.annotate(
+            contract_ending_soon=self.contract_ending_soon_lookup(siae),
+            last_contract_ended_with_valid_approval=self.last_contract_ended_with_valid_approval_lookup(siae),
+        )
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):

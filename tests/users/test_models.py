@@ -138,6 +138,68 @@ class TestQuerySet:
         assert job_seekers_qs.get(pk=job_seeker2.pk).contract_ending_soon is False
         assert job_seekers_qs.get(pk=job_seeker3.pk).contract_ending_soon is False
 
+    @freezegun.freeze_time("2026-09-22")
+    def test_at_end_of_journey(self):
+        company = CompanyFactory()
+        today = timezone.localdate()
+
+        def employee(end_date, *, contract_company=company, approval_end_at=None):
+            job_seeker = ContractFactory(
+                company=contract_company,
+                start_date=(end_date or today) - datetime.timedelta(days=200),
+                end_date=end_date,
+            ).job_seeker
+            if approval_end_at:
+                ApprovalFactory(user=job_seeker, start_at=today - datetime.timedelta(days=600), end_at=approval_end_at)
+            return job_seeker
+
+        contract_ends_soon = employee(today + datetime.timedelta(days=30))
+        contract_ended = employee(today - datetime.timedelta(days=1), approval_end_at=today)
+        contract_ended_long_ago = employee(
+            today - datetime.timedelta(days=540), approval_end_at=today + datetime.timedelta(days=30)
+        )
+        # Not at the end of their journey.
+        employee(today + datetime.timedelta(days=31))
+        employee(None)
+        employee(today - datetime.timedelta(days=10), approval_end_at=today - datetime.timedelta(days=1))
+        employee(today - datetime.timedelta(days=10))
+        employee(today + datetime.timedelta(days=20), contract_company=CompanyFactory())
+        hired_elsewhere = employee(
+            today - datetime.timedelta(days=10), approval_end_at=today + datetime.timedelta(days=100)
+        )
+        ContractFactory(
+            job_seeker=hired_elsewhere,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+        # A contract with the SIAE ending soon counts, even if another one has started elsewhere.
+        contract_ends_soon_hired_elsewhere = employee(today + datetime.timedelta(days=10))
+        ContractFactory(
+            job_seeker=contract_ends_soon_hired_elsewhere,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+        hired_by_unknown_company = employee(
+            today - datetime.timedelta(days=10), approval_end_at=today + datetime.timedelta(days=100)
+        )
+        ContractFactory(
+            job_seeker=hired_by_unknown_company,
+            company=None,
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=100),
+        )
+
+        assertQuerySetEqual(
+            User.objects.at_end_of_journey(siae=company),
+            [contract_ends_soon, contract_ends_soon_hired_elsewhere, contract_ended, contract_ended_long_ago],
+            ordered=False,
+        )
+        job_seekers_qs = User.objects.with_end_of_journey(siae=company)
+        assert job_seekers_qs.get(pk=contract_ends_soon.pk).contract_ending_soon is True
+        assert job_seekers_qs.get(pk=contract_ends_soon.pk).last_contract_ended_with_valid_approval is False
+        assert job_seekers_qs.get(pk=contract_ended.pk).contract_ending_soon is False
+        assert job_seekers_qs.get(pk=contract_ended.pk).last_contract_ended_with_valid_approval is True
+
 
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):

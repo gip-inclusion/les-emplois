@@ -1113,6 +1113,7 @@ def test_iae_filters_as_non_iae_actor(client, subtests):
         "approval expired": {"approval_expired": "on"},
         "no approval": {"no_approval": "on"},
         "approval expired or no approval": {"approval_expired": "on", "no_approval": "on"},
+        "end of journey": {"end_of_journey": "on"},
     }
     client.force_login(user)
 
@@ -1268,6 +1269,52 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
+def test_filtered_by_end_of_journey_for_siae(client, snapshot):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    employer = membership.user
+    client.force_login(employer)
+    url = reverse("job_seekers_views:list_organization")
+    today = datetime.date(2026, 1, 15)
+
+    contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=contract_ended,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today - datetime.timedelta(days=20),
+    )
+    ApprovalFactory(user=contract_ended, start_at=today - datetime.timedelta(days=300), end_at=today)
+    other_company_contract = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+    ContractFactory(
+        job_seeker=other_company_contract,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=20),
+    )
+
+    response = client.get(url, {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [contract_ended]
+    # Kept when another filter is changed.
+    assertContains(
+        response, '<input type="hidden" name="end_of_journey" value="on" id="id_end_of_journey">', html=True
+    )
+
+    with assertSnapshotQueries(snapshot):
+        client.get(url, {"end_of_journey": "on"})
+
+
+def test_end_of_journey_filter_not_for_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
+    assertNotContains(response, 'name="end_of_journey"')
+
+
+@freeze_time("2026-01-15")
 @override_settings(TALLY_URL="https://tally.example", TALLY_SUGGEST_NEXT_STEP_FORM_ID="wSUGGEST")
 def test_end_of_contracts_banners_for_siae(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
@@ -1302,23 +1349,47 @@ def test_end_of_contracts_banners_for_siae(client):
     )
     response = client.get(url)
     assertContains(response, "Vous avez 1 salarié en fin de contrat")
+    assertContains(response, "<li>1 salarié termine son contrat dans les 30 prochains jours.</li>", html=True)
+    assertNotContains(response, "n’est plus en contrat")
     assertContains(response, "Afficher ce salarié")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
+    # Its contract has ended but its PASS IAE is still valid.
     job_seeker2 = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
     ContractFactory(
         job_seeker=job_seeker2,
         company=company,
         start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
+        end_date=today - datetime.timedelta(days=20),
     )
+    ApprovalFactory(user=job_seeker2, start_at=today - datetime.timedelta(days=300), end_at=today)
     response = client.get(url)
     assertContains(response, "Vous avez 2 salariés en fin de contrat")
+    assertContains(
+        response, "<li>1 salarié n’est plus en contrat mais a encore un PASS\xa0IAE valide.</li>", html=True
+    )
+    assertContains(response, f"{url}?end_of_journey=on")
     assertContains(response, "Afficher ces salariés")
     assertNotContains(response, "Suggérer une suite de parcours aux salariés")
 
+    for end_date in (today + datetime.timedelta(days=10), today - datetime.timedelta(days=10)):
+        other_job_seeker = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
+        ContractFactory(
+            job_seeker=other_job_seeker,
+            company=company,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=end_date,
+        )
+        ApprovalFactory(user=other_job_seeker, start_at=today - datetime.timedelta(days=300), end_at=today)
+    response = client.get(url)
+    assertContains(response, "Vous avez 4 salariés en fin de contrat")
+    assertContains(response, "<li>2 salariés terminent leur contrat dans les 30 prochains jours.</li>", html=True)
+    assertContains(
+        response, "<li>2 salariés ne sont plus en contrat mais ont encore un PASS\xa0IAE valide.</li>", html=True
+    )
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
+    response = client.get(url, {"end_of_journey": "on"})
     assertContains(response, "Suggérer une suite de parcours aux salariés")
     assertNotContains(response, "Afficher ces salariés")
 
