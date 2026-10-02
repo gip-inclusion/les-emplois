@@ -124,8 +124,13 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
 
     @admin.display(description="traitement ASP")
     def asp_processing_display(self, obj):
-        if obj.asp_processing_code or self.asp_processing_label:
-            return f"{obj.asp_processing_code}/{obj.asp_processing_label}"
+        if obj.asp_processing_code:
+            asp_processing_label = obj.asp_processing_label
+            if obj.asp_processing_code == "3308":
+                asp_processing_label = (
+                    "Le champ Commune de Naissance doit être en cohérence avec le code commune indiqué sur le NIR"
+                )
+            return f"{obj.asp_processing_code}/{asp_processing_label}"
         return self.get_empty_value_display()
 
 

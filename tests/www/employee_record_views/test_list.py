@@ -395,7 +395,10 @@ class TestListEmployeeRecords:
             (
                 "3308",
                 "Le champ Commune de Naissance doit être en cohérence avec le champ Département de Naissance",
-                "Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département",
+                (
+                    "La commune de naissance sélectionnée ne correspond pas au code "
+                    "commune indiqué sur le numéro de sécurité sociale du salarié."
+                ),
             ),
             (
                 "3417",

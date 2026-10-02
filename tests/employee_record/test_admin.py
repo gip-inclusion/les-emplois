@@ -159,3 +159,26 @@ def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code
 
     response = admin_client.get(reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk]))
     assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()
+
+
+@pytest.mark.parametrize(
+    "err_code, err_message, expected",
+    (
+        (
+            "3308",
+            "error message",
+            "3308/Le champ Commune de Naissance doit être en cohérence avec le code commune indiqué sur le NIR",
+        ),
+        (
+            "3436",
+            "error message",
+            "3436/error message",
+        ),
+    ),
+)
+def test_asp_processing_display(admin_client, err_code, err_message, expected):
+    employee_record = factories.EmployeeRecordWithProfileFactory(status=Status.SENT)
+    employee_record_view_url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk])
+    employee_record.reject(code=err_code, label=err_message, archive={})
+    response = admin_client.get(employee_record_view_url)
+    assertContains(response, expected)
