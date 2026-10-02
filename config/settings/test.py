@@ -115,3 +115,8 @@ GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
 OVERVIEW_TAB_TEST_DEPARTMENT = None
+
+
+# Inbound parsing
+# ------------------------------------------------------------------------------
+INBOUND_PARSING_SUBDOMAIN = "reply.inclusion.gouv.fr"
