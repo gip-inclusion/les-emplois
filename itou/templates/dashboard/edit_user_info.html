@@ -60,24 +60,6 @@
                                     </ul>
                                     <hr class="my-4">
                                     {% bootstrap_form_errors form type="all" %}
-                                {% elif ic_account_url %}
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            Prénom : <strong>{{ user.first_name|title }}</strong>
-                                        </li>
-                                        <li>
-                                            Nom : <strong>{{ user.last_name|upper }}</strong>
-                                        </li>
-                                        <li>
-                                            Adresse e-mail : <strong>{{ user.email }}</strong>
-                                        </li>
-                                    </ul>
-                                    <a class="btn btn-outline-primary btn-ico" href="{{ ic_account_url }}">
-                                        <i class="ri-pencil-line me-2" aria-hidden="true"></i>
-                                        <span>Modifier ces informations</span>
-                                    </a>
-                                    <hr class="my-4">
-                                    {% bootstrap_form_errors form type="all" %}
                                 {% else %}
                                     {% bootstrap_form_errors form type="all" %}
                                     {% bootstrap_field form.first_name %}
