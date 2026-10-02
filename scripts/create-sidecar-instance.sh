@@ -42,7 +42,7 @@ clever service link-addon c1-redis --alias "$APP_NAME"
 clever service link-addon c1-s3 --alias "$APP_NAME"
 
 git fetch
-./scripts/clever-deploy --app-alias "$APP_NAME" --branch origin/main
+clever deploy --alias "$APP_NAME" --branch origin/main
 
 cat << EOF
 
