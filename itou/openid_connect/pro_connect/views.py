@@ -244,8 +244,8 @@ def pro_connect_callback(request):
         return _redirect_to_login_page_on_error(error_msg="ProConnect unable to decode id_token ", request=request)
     if id_token_data.get("nonce") != pro_connect_state.nonce:
         return _redirect_to_login_page_on_error(error_msg="ProConnect id_token nonce mismatch", request=request)
-
-    request.session[constants.PRO_CONNECT_SESSION_KEY] = {"token": token_data["id_token"]}
+    amr = id_token_data.get("amr") or ()
+    acr = id_token_data.get("acr")
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
@@ -254,6 +254,7 @@ def pro_connect_callback(request):
     user_data, error_redirection = _get_user_info(request, access_token)
     if error_redirection:
         return error_redirection
+    idp_id = user_data.get("idp_id", "")
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from ProConnect, we need that to match a user later on.
@@ -325,6 +326,15 @@ def pro_connect_callback(request):
         )
         return HttpResponseRedirect(pro_connect_state.data["previous_url"])
 
+    request.session[constants.PRO_CONNECT_SESSION_KEY] = {
+        # "token" is stored for logout purposes:
+        "token": token_data["id_token"],
+        # idp_id, amr, and acr are stored for the audit trail:
+        "pro_connect_idp_id": idp_id,
+        "amr": amr,
+        "acr": acr,
+    }
+
     code_safir_pole_emploi = user_data.get("custom", {}).get("structureTravail")
     # Only handle user creation for the moment, not updates.
     if is_successful and user.is_professional and code_safir_pole_emploi:
@@ -352,25 +362,11 @@ def pro_connect_callback(request):
         next_url = f"{reverse('pro_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
 
-    amr = ()
-    idp_id = None
-    try:
-        amr = id_token_data.get("amr") or ()
-        idp_id = user_data.get("idp_id", "")
-        ProConnectAuthentication.objects.create(
-            user_public_id=user.public_id,
-            amr=amr,
-            idp_id=idp_id,
-        )
-    except Exception:
-        logger.exception(
-            "Could not record ProConnect authentication",
-            extra={
-                "user_public_id": user.public_id,
-                "amr": amr,
-                "idp_id": idp_id,
-            },
-        )
+    ProConnectAuthentication.objects.create(
+        user_public_id=user.public_id,
+        amr=amr,
+        idp_id=idp_id,
+    )
 
     if not amr:
         # According to ProConnect documentation, the AMR should be
