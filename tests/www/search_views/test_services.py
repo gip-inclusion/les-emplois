@@ -30,7 +30,7 @@ class TestSearchServices:
         response = client.get(reverse("search:services_home"))
         assertContains(
             response,
-            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;type=insertion"',
+            'data-plateforme-accueil="https://plateforme.accueil.fr?host=localhost%3A8000&amp;no_forms=1&amp;type=insertion"',
         )
 
     def test_home_connected(self, client):
