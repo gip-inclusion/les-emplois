@@ -114,6 +114,10 @@ GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
 OVERVIEW_TAB_TEST_DEPARTMENT = None
 
+# Inbound parsing
+# ------------------------------------------------------------------------------
+INBOUND_PARSING_SUBDOMAIN = "reply.inclusion.gouv.fr"
+
 # Force pro connect in all tests
 PRO_CONNECT_BASE_URL = "https://pro.connect.fake"
 PRO_CONNECT_CLIENT_ID = "PC_CLIENT_ID_123"
