@@ -232,6 +232,14 @@ class EmployeeRecordManager(models.Manager.from_queryset(EmployeeRecordQuerySet)
             super().get_queryset().defer("watched_data_updated_at")  # Deferred to prevent accidental UPDATE
         )
 
+    def plan_updates(self):
+        for employee_record in (
+            self.get_queryset()
+            .filter(watched_data_updated_at__isnull=False, status=Status.PROCESSED)
+            .select_for_update(of=("self",), no_key=True)
+        ):
+            employee_record.plan_update()
+
 
 def _check_and_remove_watched_data_updated_at(employee_record, archive):
     # A lock on EmployeeRecord is needed here to prevent concurrent write and thus
@@ -402,10 +410,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
 
-    def _warn_unexpected_transition_use(self, transition_name):
-        # TODO(xfernandez): drop this method when transitions are not unexpected anymore
-        logger.error("Unexpected transition=%s used for employee_record pk=%d", transition_name, self.pk)
-
     # Business methods
 
     @xwf_models.transition()
@@ -441,7 +445,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         An employee record is sent to ASP for an update via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
         """
-        self._warn_unexpected_transition_use("wait_for_asp_response_for_update")
         self.clean()
         self.set_asp_batch_information(file, line_number, archive)
 
@@ -458,25 +461,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         Update status after an ASP rejection of the update of the employee record
         """
-        self._warn_unexpected_transition_use("reject_for_update")
         self.clean()
         self.set_asp_processing_information(code, label, archive)
-
-    @xwf_models.transition()
-    def unarchive_update_rejected(self):
-        self._warn_unexpected_transition_use("unarchive_update_rejected")
-
-    @xwf_models.transition()
-    def plan_update(self, *, user=None):
-        self._warn_unexpected_transition_use("plan_update")
-
-    @xwf_models.transition()
-    def retry_update(self, *, user=None):
-        self._warn_unexpected_transition_use("unarchive_update_rejected")
-
-    @xwf_models.transition()
-    def recreate(self):
-        self._warn_unexpected_transition_use("recreate")
 
     @xwf_models.transition()
     def process(self, *, code, label, archive, as_duplicate=False):
@@ -537,17 +523,27 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         return self._asp_processing_code_in_error()
 
     def unarchive(self):
-        for transition_name in [
-            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
-            EmployeeRecordTransition.UNARCHIVE_REJECTED,
-            EmployeeRecordTransition.UNARCHIVE_NEW,
-        ]:
-            transition = getattr(self, transition_name)
-            if transition.is_available():
-                # XXX: if self.has_watched_data_updated_at_set() and UNARCHIVE_PROCESSED
-                # we might want to automatically go to PENDING_UPDATE
-                return transition()
-
+        if self.unarchive_new.is_available():
+            return self.unarchive_new()
+        if self.unarchive_processed.is_available():
+            self.unarchive_processed()
+            if self.has_watched_data_updated_at_set():
+                # No need to show users the PROCESSED status if we already know
+                # it will automatically change to UPDATE_PENDING.
+                self.plan_update()
+            return
+        if self._asp_processing_code_in_error():
+            # It can be either REJECTED or UPDATE_REJECTED
+            if (
+                last_reject_log := self.logs.filter(from_state__in=(Status.REJECTED, Status.UPDATE_REJECTED))
+                .order_by("-timestamp")
+                .first()
+            ):
+                match last_reject_log.from_state:
+                    case Status.REJECTED:
+                        return self.unarchive_rejected()
+                    case Status.UPDATE_REJECTED:
+                        return self.unarchive_update_rejected()
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
 

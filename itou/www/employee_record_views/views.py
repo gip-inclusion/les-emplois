@@ -252,6 +252,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.SENT, 0), "bg-emploi-lightest text-info"),
         (employee_record_badges.get(Status.REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.PROCESSED, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_PENDING, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_SENT, 0), "bg-emploi-lightest text-info"),
+        (employee_record_badges.get(Status.UPDATE_REJECTED, 0), "bg-warning"),
         (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-info"),
     ]
 
@@ -571,7 +574,13 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         employee_record.job_application.job_seeker.last_checked_at = timezone.now()
         employee_record.job_application.job_seeker.save(update_fields=["last_checked_at"])
 
-        employee_record.ready(user=request.user)
+        if employee_record.ready.is_available():
+            employee_record.ready(user=request.user)
+        elif employee_record.retry_update.is_available():
+            employee_record.retry_update(user=request.user)
+        else:
+            raise PermissionDenied
+
         toast_title = (
             "La fiche salarié a été renvoyée"
             if previous_status == Status.PROCESSED

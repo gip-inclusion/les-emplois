@@ -20,7 +20,7 @@ def tunnel_step_is_allowed(job_application):
     if not employee_record:
         return True
 
-    return employee_record.ready.is_available()
+    return employee_record.ready.is_available() or employee_record.retry_update.is_available()
 
 
 def can_create_employee_record(request, job_application_id) -> JobApplication:
