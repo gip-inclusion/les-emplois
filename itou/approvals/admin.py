@@ -33,6 +33,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_organization_view_link,
 )
+from itou.utils.pagination import FuzzyCountPaginator
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -221,6 +222,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
         "updated_at",
     )
     show_full_result_count = False
+    paginator = FuzzyCountPaginator
     fieldsets = (
         (
             "Informations",

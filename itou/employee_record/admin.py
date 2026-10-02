@@ -18,6 +18,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_organization_view_link,
 )
+from itou.utils.pagination import FuzzyCountPaginator
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -217,6 +218,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "approval_data_sent",
     )
     show_full_result_count = False
+    paginator = FuzzyCountPaginator
 
     fieldsets = (
         (
@@ -392,6 +394,8 @@ class EmployeeRecordUpdateNotificationAdmin(ReadonlyMixin, ASPExchangeInformatio
         "employee_record__approval_number",
         "asp_batch_file",
     ]
+
+    paginator = FuzzyCountPaginator
 
     fieldsets = (
         (
