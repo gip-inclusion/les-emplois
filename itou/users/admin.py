@@ -456,7 +456,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
     @admin.display(description="appareils enrôlés pour la 2FA interne")
     def internal_2fa_devices(self, obj):
-        count = ItouTOTPDevice.objects.filter(user=obj, disabled_at=None).count()
+        count = ItouTOTPDevice.objects.active().filter(user=obj).count()
         if not count:
             return "aucun appareil actif"
         url = reverse(

@@ -13,7 +13,7 @@ STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 def get_user_devices(user):
     return sorted(
-        ItouTOTPDevice.objects.filter(user=user, disabled_at=None),
+        ItouTOTPDevice.objects.active().filter(user=user),
         key=lambda device: device.name,
     )
 
@@ -32,7 +32,8 @@ def verify_token_for_user(user, otp_token):
     """
     with transaction.atomic():
         devices = (
-            ItouTOTPDevice.objects.filter(user=user, disabled_at=None)
+            ItouTOTPDevice.objects.active()
+            .filter(user=user)
             .select_for_update()
             .order_by("name")  # deterministic lock order
         )
@@ -75,7 +76,7 @@ def user_is_concerned_by_otp(user):
     if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
         return True
 
-    if user.is_professional and _require_otp_for_pro(user):
+    if user.is_professional and require_otp_for_pro(user):
         return True
 
     return False
@@ -102,7 +103,7 @@ def user_can_enroll_otp_device(user):
 
 def user_can_manage_otp_devices(user):
     """Same as `user_can_enroll_otp_device`, plus at least one device to see, use or delete."""
-    return user_can_enroll_otp_device(user) and ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists()
+    return user_can_enroll_otp_device(user) and ItouTOTPDevice.objects.active().filter(user=user).exists()
 
 
 def require_otp(user):
@@ -119,15 +120,18 @@ def require_otp(user):
     return user_is_concerned_by_otp(user)
 
 
-def _require_otp_for_pro(user):
+def require_otp_for_pro(user):
     assert user.is_professional
     if not settings.REQUIRE_MFA_FOR_PROS:
         return False
     # We tested the enrollment flow on some users who were not yet in
     # the targeted batches that we check below. If they have enrolled
     # a device, we should require them to use it.
-    if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+    if ItouTOTPDevice.objects.active().filter(user=user).exists():
         return True
+
+    # We set up a very small pool in June when we started our own 2FA
+    # implementation.
     org_ids = set(
         PrescriberMembership.objects.active().filter(user_id=user.id).values_list("organization_id", flat=True)
     )
@@ -136,7 +140,17 @@ def _require_otp_for_pro(user):
     company_ids = set(CompanyMembership.objects.active().filter(user_id=user.id).values_list("company_id", flat=True))
     if company_ids & settings.REQUIRE_MFA_ON_COMPANY_IDS:
         return True
-    return False
+
+    # And now we start rolling out on more users.
+    all_ids = org_ids | company_ids
+    if not all_ids:
+        # ItouCurrentOrganizationMiddleware logs out the user if they
+        # do not have any membership, no need to enforce MFA.
+        return False
+    # Use the id of companies/organizations (and not the user id) so
+    # that colleagues of the same company/org can help each other.
+    base_id = min(all_ids)
+    return settings.REQUIRE_MFA_FOR_PROS_BATCH > base_id % 10
 
 
 def create_placeholder_for_external_totp_device(user):
