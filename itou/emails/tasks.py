@@ -147,7 +147,7 @@ class AsyncEmailBackend(BaseEmailBackend):
         emails_count = 0
         for message in email_messages:
             for mjemail in sanitize_mailjet_recipients(message):
-                # Send each email in a separate task, so that Huey retry mecanism only
+                # Send each email in a separate task, so that Huey retry mechanism only
                 # retries the failed email.
                 email = Email.from_email_message(mjemail)
                 email.save()

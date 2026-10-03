@@ -7,7 +7,7 @@ def collect_analytics_data(before, client=None):
         client = DatadogApiClient()
     # Calling the API this way causes many Too Many Requests error and increases total time treatment
     # (less than a minute) but it makes code shorter and easily understandable.
-    # As treatment time is not critical, let's just let Tenacty handle retries until a sucessful reponse arrives.
+    # As treatment time is not critical, let's just let Tenacity handle retries until a successful response arrives.
     return {
         models.DatumCode.API_TOTAL_CALLS: client.count_daily_logs(before),
         models.DatumCode.API_TOTAL_UV: client.count_daily_unique_users(before),

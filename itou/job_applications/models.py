@@ -421,7 +421,7 @@ class JobApplicationQuerySet(models.QuerySet):
             qs = qs.with_eligibility_diagnosis_criterion(int(criterion))
 
         # Many job applications from AI exports share the exact same `created_at` value thus we secondarily order
-        # by pk to prevent flakyness in the resulting pagination (a same job application appearing both on page 1
+        # by pk to prevent flakiness in the resulting pagination (a same job application appearing both on page 1
         # and page 2). Note that pk is a hash and not the usual incrementing integer, thus ordering by it does not
         # make any other sense than being deterministic for pagination purposes.
         return qs.order_by("-created_at", "pk")
