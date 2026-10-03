@@ -344,6 +344,13 @@ def pro_connect_callback(request):
     amr = ()
     idp_id = None
 
+    # FIXME: DEBUG ONLY
+    # La doc de ProConnect dit de vérifier le retour pour comparer
+    # avec les ACR demandés (et renvoyer une erreur 403 en cas de
+    # mismatch)
+    # https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification#4-validation-c%C3%B4t%C3%A9-serveur-obligatoire
+    logger.info("acr: %s", id_token_data.get("acr"))
+
     try:
         amr = id_token_data.get("amr") or ()
         idp_id = user_data.get("idp_id", "")
