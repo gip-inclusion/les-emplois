@@ -191,6 +191,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         object_id_field="structure_pk",
         related_query_name="prescriber_organization",
     )
+    is_searchable = models.BooleanField(verbose_name="peut apparaître dans la recherche", default=True)
 
     objects = PrescriberOrganizationManager.from_queryset(PrescriberOrganizationQuerySet)()
 
