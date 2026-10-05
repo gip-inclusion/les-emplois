@@ -2,8 +2,8 @@
 {% load enums %}
 {% comment %}
   Options:
-    user: User(kind=JOB_SEEKER) the job seeker being modified
-    viewing_self: bool whether the job seeker is editing their own profile
+    user: User being modified, either a job seeker or a professional logged in with ProConnect
+    viewing_self: bool whether the user is editing their own profile (always True for professionals)
 {% endcomment %}
 {% enums "users" "IdentityProvider" as IdentityProvider %}
 {% if user.is_job_seeker %}
@@ -40,7 +40,23 @@
             Vos informations d’identité viennent de {{ IdentityProvider.PRO_CONNECT.label }}
         {% endfragment %}
         {% fragment as content %}
-            Pour les modifier, rendez-vous directement sur <a href="https://www.proconnect.gouv.fr/" class="has-external-link">Pro Connect</a>. Les changements seront automatiquement répercutés ici lors de votre prochaine connexion.
+            <p class="mb-0">
+                Pour les modifier, rendez-vous directement sur votre compte
+                <a href="https://identite.proconnect.gouv.fr/personal-information"
+                   target="_blank"
+                   class="has-external-link"
+                   rel="noopener"
+                   aria-label="Votre compte {{ IdentityProvider.PRO_CONNECT.label }} (ouverture dans un nouvel onglet)">
+                {{ IdentityProvider.PRO_CONNECT.label }}</a>
+                . Les changements seront automatiquement répercutés ici lors de votre prochaine connexion.
+                En cas de difficultés, rapprochez-vous de
+                <a href="https://proconnect.crisp.help/fr/"
+                   target="_blank"
+                   class="has-external-link"
+                   rel="noopener"
+                   aria-label="Service d’aide de {{ IdentityProvider.PRO_CONNECT.label }} (ouverture dans un nouvel onglet)">leur service d’aide</a>.
+                Une fois modifiées, vos informations seront mises à jour à votre prochaine connexion.
+            </p>
         {% endfragment %}
     {% endcomponent_alert %}
 {% endif %}

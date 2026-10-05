@@ -18,7 +18,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    {% include "dashboard/includes/edit_job_seeker_sso_alert.html" with user=request.user viewing_self=True only %}
+                    {% include "dashboard/includes/edit_user_sso_alert.html" with user=request.user viewing_self=True only %}
                     <div class="c-form">
                         <h2 class="h3">Informations personnelles</h2>
                         {% if request.user.is_job_seeker and not request.user.title %}
@@ -58,16 +58,6 @@
                                             Adresse e-mail : <strong>{{ user.email }}</strong>
                                         </li>
                                     </ul>
-                                    {% component_alert content=content variant="info" icon=False %}
-                                        {% fragment as content %}
-                                            <p>
-                                                Ces informations doivent être modifiées sur votre compte <a href="https://identite.proconnect.gouv.fr/personal-information" target="_blank" class="has-external-link" rel="noopener" aria-label="Votre compte ProConnect (ouverture dans un nouvel onglet)">ProConnect</a>.
-                                                <br>
-                                                En cas de difficultés, veuillez vous rapprocher de <a href="https://proconnect.crisp.help/fr/" target="_blank" class="has-external-link" rel="noopener" aria-label="Service d'aide de ProConnect (ouverture dans un nouvel onglet)">leur service d’aide</a>.
-                                            </p>
-                                            <p class="mb-0">Une fois modifiées, vos informations seront mises à jour à votre prochaine connexion.</p>
-                                        {% endfragment %}
-                                    {% endcomponent_alert %}
                                     <hr class="my-4">
                                     {% bootstrap_form_errors form type="all" %}
                                 {% elif ic_account_url %}

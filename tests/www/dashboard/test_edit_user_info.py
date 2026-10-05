@@ -801,7 +801,7 @@ class TestEditUserInfoView:
         assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
         assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
         assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-        assertContains(response, "Ces informations doivent être modifiées sur votre compte ")
+        assertContains(response, "Vos informations d’identité viennent de ProConnect", count=1)
 
         post_data = {
             "email": "notbob@notsaintclair.com",
@@ -885,10 +885,15 @@ class TestEditUserInfoView:
                 "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
             ),
             IdentityProvider.PRO_CONNECT: (
-                "Pour les modifier, rendez-vous directement sur "
-                '<a href="https://www.proconnect.gouv.fr/" '
-                'class="has-external-link">Pro Connect</a>. '
-                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+                "Pour les modifier, rendez-vous directement sur votre compte "
+                '<a href="https://identite.proconnect.gouv.fr/personal-information" target="_blank" '
+                'class="has-external-link" rel="noopener" '
+                'aria-label="Votre compte ProConnect (ouverture dans un nouvel onglet)"> ProConnect</a> . '
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion. "
+                "En cas de difficultés, rapprochez-vous de "
+                '<a href="https://proconnect.crisp.help/fr/" target="_blank" class="has-external-link" rel="noopener" '
+                'aria-label="Service d’aide de ProConnect (ouverture dans un nouvel onglet)">leur service d’aide</a>. '
+                "Une fois modifiées, vos informations seront mises à jour à votre prochaine connexion."
             ),
         }
 
@@ -899,4 +904,6 @@ class TestEditUserInfoView:
         response = client.get(url)
 
         assertContains(response, f"Vos informations d’identité viennent de {identity_provider.label}")
-        assertContains(response, ALERT_COMPONENT[identity_provider])
+        # djlint wraps long tags over several lines
+        normalized_content = " ".join(response.content.decode().split())
+        assert ALERT_COMPONENT[identity_provider] in normalized_content
