@@ -246,13 +246,13 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         for row in EmployeeRecord.objects.for_company(siae).values("status").annotate(cnt=Count("status"))
     }
     # Set count of each status for badge display
+    STATUS_BADGE_CLASSES = {Status.NEW: "bg-info", Status.REJECTED: "bg-warning"}
     status_badges = [
-        (employee_record_badges.get(Status.NEW, 0), "bg-info"),
-        (employee_record_badges.get(Status.READY, 0), "bg-emploi-lightest text-info"),
-        (employee_record_badges.get(Status.SENT, 0), "bg-emploi-lightest text-info"),
-        (employee_record_badges.get(Status.REJECTED, 0), "bg-warning"),
-        (employee_record_badges.get(Status.PROCESSED, 0), "bg-emploi-lightest text-info"),
-        (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-info"),
+        (
+            employee_record_badges.get(value, 0),
+            STATUS_BADGE_CLASSES.get(value, "bg-emploi-lightest text-info"),
+        )
+        for value, _label in form.fields["status"].choices
     ]
 
     employee_record_order_by = {
