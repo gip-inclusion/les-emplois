@@ -434,7 +434,6 @@ class Command(BaseCommand):
         service.contact_phone = dora_data["contact_phone"]
         service.contact_email = dora_data["contact_email"]
 
-        service.average_orientation_response_delay_days = dora_data["average_orientation_response_delay_days"]
         service.dora_synced_at = timezone.now()
 
     def _fill_service_related_fields_from_data(self, service, data, dora_services, is_creation):

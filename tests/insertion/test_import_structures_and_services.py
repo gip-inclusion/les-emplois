@@ -93,6 +93,10 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert Service.objects.get(uid="dora--blacklisted-service").is_orientable_with_form is False
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").is_orientable_with_form is True
     assert Service.objects.get(uid="dora--allowed-service-structure-no-email").is_orientable_with_form is True
+    assert (
+        Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").average_orientation_response_delay_days
+        is None
+    )
 
     assert (
         Service.objects.get(uid="mission-locale--with-mobilization-link").lien_mobilisation
