@@ -149,8 +149,7 @@ class UserQuerySet(models.QuerySet):
         )
 
     def with_end_of_journey(self, siae):
-        return self.annotate(
-            contract_ending_soon=self.contract_ending_soon_lookup(siae),
+        return self.with_contract_ending_soon(siae).annotate(
             last_contract_ended_with_valid_approval=self.last_contract_ended_with_valid_approval_lookup(siae),
         )
 
