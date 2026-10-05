@@ -140,4 +140,4 @@ jobs:
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
-      run: $CLEVER_CLI --branch "$BRANCH" --alias "$REVIEW_APP_NAME"
+      run: $CLEVER_CLI deploy --branch "$BRANCH" --alias "$REVIEW_APP_NAME" --force
