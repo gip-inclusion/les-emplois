@@ -339,6 +339,9 @@ class Command(BaseCommand):
 
         structure.opening_hours = data["horaires_accueil"] or ""
 
+        structure.accessibilite_lieu = data["accessibilite_lieu"] or ""
+        self._void_if_max_len(structure, "accessibilite_lieu")
+
         self._fill_geolocation_from_api_data(structure, data)
 
         structure.updated_on = data["date_maj"]
@@ -553,14 +556,17 @@ class Command(BaseCommand):
 
         service.eligibility_zones = data["zone_eligibilite"] or []
 
-        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
-        self._void_if_max_len(service, "mobilization_modes_professionals_external_form_link")
+        service.lien_mobilisation = data["lien_mobilisation"] or ""
+        self._void_if_max_len(service, "lien_mobilisation")
 
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""
         )  # service.mobilizations is a ManyToManyField
 
         service.opening_hours = data["horaires_accueil"] or ""
+
+        service.volume_horaire_hebdomadaire = data.get("volume_horaire_hebdomadaire") or None
+        service.nombre_semaines = data.get("nombre_semaines") or None
 
         service.contact_full_name = data["contact_nom_prenom"] or ""
         service.contact_email = data["courriel"] or ""
@@ -570,6 +576,9 @@ class Command(BaseCommand):
 
         self._fill_geolocation_from_api_data(service, data)
         self._fill_service_from_dora_api_data(service, dora_services)
+
+        # Producer-specific blob; see Service.extra for the expected DORA shape.
+        service.extra = data.get("extra")
 
         service.updated_on = data["date_maj"]
 
@@ -584,7 +593,9 @@ class Command(BaseCommand):
 
         differ = diff.CollectionDiffer(
             Service.include_inactive.all(),
-            DataInclusionApiItemsIterator(di_client.services, page_size=1000, params={"sources": sources}),
+            DataInclusionApiItemsIterator(
+                di_client.services, page_size=1000, params={"sources": sources, "extra": True}
+            ),
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
