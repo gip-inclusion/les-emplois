@@ -1,5 +1,6 @@
 import datetime
 import logging
+import math
 import secrets
 import uuid
 
@@ -11,10 +12,11 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import BooleanField, Exists, OuterRef, Q, Value
+from django.db.models import Avg, BooleanField, Exists, F, OuterRef, Q, Value
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
+from xworkflows import after_transition, before_transition
 
 import itou.insertion.notifications as orientation_notifications
 from itou.companies.models import Company
@@ -847,6 +849,26 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         if (city_slug := self.beneficiary.city_slug) and self.sender_can_view_personal_information:
             query["city"] = city_slug
         return get_absolute_url(reverse("search:services_results", query=query))
+
+    @before_transition(OrientationTransition.ACCEPT, OrientationTransition.REFUSE)
+    def set_processing_date(self, *args, **kwargs):
+        self.processing_date = timezone.now()
+
+    @after_transition(OrientationTransition.ACCEPT, OrientationTransition.REFUSE)
+    def update_service_average_orientation_response_delay(self, *args, **kwargs):
+        service = self.service
+        orientations = service.orientations.filter(
+            status__in=[OrientationStatus.ACCEPTED, OrientationStatus.REFUSED],
+            processing_date__isnull=False,
+        )
+        avg_response_delay = orientations.aggregate(avg=Avg(F("processing_date") - F("created_at")))["avg"]
+        if avg_response_delay is None:
+            average_days = None
+        else:
+            # Ceil: 1.49 days (~36h) must not display as "dans les 24h".
+            average_days = math.ceil(avg_response_delay.total_seconds() / (60 * 60 * 24))
+
+        Service.include_inactive.filter(pk=service.pk).update(average_orientation_response_delay_days=average_days)
 
     # Transitions
     @xwf_models.transition()

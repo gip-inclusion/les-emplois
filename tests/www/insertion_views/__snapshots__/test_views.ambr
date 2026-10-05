@@ -3508,6 +3508,13 @@
                           <h2 class="h3">
                               Type de service
                           </h2>
+                          <p class="fs-sm text-success">
+                              <i aria-hidden="true" class="ri-time-line">
+                              </i>
+                              <strong>
+                                  Réponse au formulaire : sous 3 jours
+                              </strong>
+                          </p>
                           <ul class="list-data">
                               <li>
                                   <small>

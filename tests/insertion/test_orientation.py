@@ -189,14 +189,14 @@ def test_sender_can_view_personal_information(membership_factory, expected):
 
 @pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
 def test_transition_accept(sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
-    orientation = OrientationFactory(
-        status=OrientationStatus.PENDING, service__contact_email="service.contact@email.fake"
-    )
-    if sender_is_referent:
-        orientation.referent_email = orientation.sender.email
-        orientation.save()
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
+        orientation = OrientationFactory(
+            status=OrientationStatus.PENDING, service__contact_email="service.contact@email.fake"
+        )
+        if sender_is_referent:
+            orientation.referent_email = orientation.sender.email
+            orientation.save()
         with django_capture_on_commit_callbacks(execute=True):
             orientation.accept()
 
@@ -209,6 +209,9 @@ def test_transition_accept(sender_is_referent, mailoutbox, django_capture_on_com
     )
     assert log.orientation.status == OrientationStatus.ACCEPTED
     assert log.orientation.updated_at == timestamp
+    assert log.orientation.processing_date == timestamp
+    log.orientation.service.refresh_from_db()
+    assert log.orientation.service.average_orientation_response_delay_days == 0
 
     assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
 
@@ -223,17 +226,57 @@ def test_transition_accept(sender_is_referent, mailoutbox, django_capture_on_com
     assert sender_email.to == [orientation.sender.email]
 
 
+def test_average_orientation_response_delay_uses_accepted_and_refused_only(django_capture_on_commit_callbacks):
+    created_at = datetime.datetime(2026, 8, 1, 12, 0, tzinfo=datetime.UTC)
+    service = ServiceFactory()
+    OrientationFactory(
+        service=service,
+        status=OrientationStatus.EXPIRED,
+        created_at=created_at,
+        processing_date=created_at + datetime.timedelta(days=30),
+    )
+    accepted = OrientationFactory(service=service, status=OrientationStatus.PENDING, created_at=created_at)
+    refused = OrientationFactory(service=service, status=OrientationStatus.PENDING, created_at=created_at)
+
+    with freeze_time(created_at + datetime.timedelta(days=2)):
+        with django_capture_on_commit_callbacks(execute=True):
+            accepted.accept()
+    with freeze_time(created_at + datetime.timedelta(days=4)):
+        with django_capture_on_commit_callbacks(execute=True):
+            with transaction.atomic():
+                refused.refusal_reasons = [OrientationRefusalReason.NOT_ELIGIBLE]
+                refused.refusal_details = "Quelques détails…"
+                refused.refuse()
+
+    service.refresh_from_db()
+    assert service.average_orientation_response_delay_days == 3
+
+
+def test_average_orientation_response_delay_rounds_up(django_capture_on_commit_callbacks):
+    created_at = datetime.datetime(2026, 8, 1, 12, 0, tzinfo=datetime.UTC)
+    service = ServiceFactory()
+    orientation = OrientationFactory(service=service, status=OrientationStatus.PENDING, created_at=created_at)
+
+    delay = datetime.timedelta(days=1, seconds=int(0.49 * 24 * 60 * 60))
+    with freeze_time(created_at + delay):
+        with django_capture_on_commit_callbacks(execute=True):
+            orientation.accept()
+
+    service.refresh_from_db()
+    assert service.average_orientation_response_delay_days == 2
+
+
 @pytest.mark.parametrize("sender_is_referent", [True, False], ids=["sender_is_referent", "sender_is_not_referent"])
 def test_transition_refuse(sender_is_referent, mailoutbox, django_capture_on_commit_callbacks):
-    orientation = OrientationFactory(
-        status=OrientationStatus.PENDING, service__contact_email="service.contact@email.fake"
-    )
-    orientation.documents.set([FileFactory()])
-    if sender_is_referent:
-        orientation.referent_email = orientation.sender.email
-        orientation.save()
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
+        orientation = OrientationFactory(
+            status=OrientationStatus.PENDING, service__contact_email="service.contact@email.fake"
+        )
+        orientation.documents.set([FileFactory()])
+        if sender_is_referent:
+            orientation.referent_email = orientation.sender.email
+            orientation.save()
         with django_capture_on_commit_callbacks(execute=True):
             with transaction.atomic():
                 orientation.refusal_reasons = [OrientationRefusalReason.NOT_ELIGIBLE]
@@ -249,6 +292,9 @@ def test_transition_refuse(sender_is_referent, mailoutbox, django_capture_on_com
     )
     assert log.orientation.status == OrientationStatus.REFUSED
     assert log.orientation.updated_at == timestamp
+    assert log.orientation.processing_date == timestamp
+    log.orientation.service.refresh_from_db()
+    assert log.orientation.service.average_orientation_response_delay_days == 0
 
     assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
 
@@ -288,6 +334,7 @@ def test_transition_expire(sender_is_referent, mailoutbox, django_capture_on_com
     )
     assert log.orientation.status == OrientationStatus.EXPIRED
     assert log.orientation.updated_at == timestamp
+    assert log.orientation.processing_date is None
 
     assert OrientationProcessLink.objects.filter(created_at=timestamp).exists()
 

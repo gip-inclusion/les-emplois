@@ -576,6 +576,15 @@ class TestServices:
         ]
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
+    def test_detail_response_delay_shown_only_with_active_form(self, client):
+        label = "Réponse au formulaire"
+        user = PrescriberFactory()
+        client.force_login(user)
+        shown = ServiceFactory(is_orientable_with_form=True, average_orientation_response_delay_days=3)
+        hidden = ServiceFactory(is_orientable_with_form=False, average_orientation_response_delay_days=3)
+        assertContains(client.get(self.get_service_url(shown)), label)
+        assertNotContains(client.get(self.get_service_url(hidden)), label)
+
     def test_detail_with_external_orientation_link(self, client, snapshot):
         user = PrescriberFactory()
         test_link = "https://test.example.com"

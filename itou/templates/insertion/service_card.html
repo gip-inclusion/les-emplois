@@ -137,6 +137,9 @@
                     </div>
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Type de service</h2>
+                        {% if service.is_orientable_with_form and service.average_orientation_response_delay_days is not None %}
+                            {% include "insertion/includes/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
+                        {% endif %}
                         <ul class="list-data">
                             {% if formatted_categories %}
                                 <li>
