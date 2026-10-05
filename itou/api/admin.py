@@ -1,7 +1,7 @@
 from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
-from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
+from itou.api.models import BrevoToken, CompanyToken, DepartmentToken, ServiceToken
 from itou.utils.admin import ItouModelAdmin
 
 
@@ -9,6 +9,27 @@ from itou.utils.admin import ItouModelAdmin
 # Avoids listing all users when updating auth token via admin
 # See: https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication
 TokenAdmin.raw_id_fields = ("user",)
+
+
+@admin.register(BrevoToken)
+class BrevoTokenAdmin(ItouModelAdmin):
+    list_display = ["purpose", "created_at"]
+    ordering = ["-created_at"]
+    readonly_fields = ["key", "created_at"]
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return (
+                (
+                    None,
+                    {
+                        "classes": ("wide",),
+                        "fields": ("purpose",),
+                    },
+                ),
+            )
+        else:
+            return super().get_fieldsets(request, obj=obj)
 
 
 @admin.register(CompanyToken)

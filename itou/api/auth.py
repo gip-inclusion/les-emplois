@@ -10,6 +10,18 @@ class ServiceAccount(AnonymousUser):
         return True
 
 
+class BrevoTokenAuthentication(authentication.TokenAuthentication):
+    model = models.BrevoToken
+
+    def authenticate_credentials(self, key):
+        try:
+            api_token = self.model.objects.get(key=key)
+            return (ServiceAccount(), api_token)
+        except self.model.DoesNotExist:
+            # Do not raise AuthenticationFailed to allow other authentication to succeed
+            return None
+
+
 class DepartmentTokenAuthentication(authentication.TokenAuthentication):
     model = models.DepartmentToken
 
