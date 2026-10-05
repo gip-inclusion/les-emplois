@@ -69,7 +69,8 @@ def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=T
                 "crv": "P-256",
                 "x": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.x, 32)).decode().rstrip("="),
                 "y": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.y, 32)).decode().rstrip("="),
-            }
+            },
+            {"kty": "RSA", "alg": "RS156"},  # The endpoint has 2 keys, one EC and one RSA. Do the same in our tests.
         ]
     }
     respx.get(constants.FRANCE_CONNECT_ENDPOINT_JWKS).mock(return_value=httpx.Response(200, json=jwk_json))
