@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## 2026-10-05
+
+### Ajouté
+
+- [Annuaire pro : Permettre aux professionnels de masquer leur profil](https://github.com/gip-inclusion/les-emplois/pull/8911)
+- [Candidature : Dépublier les fiches de poste et fermer les candidatures spontanées lors d’un refus "Pas de recrutement en cours"](https://github.com/gip-inclusion/les-emplois/pull/8896)
+- [Empêcher des candidats multiples d’utiliser le même PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/6539)
+- [Insertion : Envoyer des rappels par mail aux structures pour traiter les orientations](https://github.com/gip-inclusion/les-emplois/pull/8741)
+- [Insertion : Expiration automatique des orientations](https://github.com/gip-inclusion/les-emplois/pull/8703)
+- [Insertion : Page de pilotage d’une orientation (2/2 : actions)](https://github.com/gip-inclusion/les-emplois/pull/8559)
+- [Insertion : Suppression automatique des pièces-jointes des orientations](https://github.com/gip-inclusion/les-emplois/pull/8795)
+- [Insertion : Traitement des orientations dans la plateforme](https://github.com/gip-inclusion/les-emplois/pull/8570)
+- [Interface : Nouvel onglet "Orientations" sur la fiche usager](https://github.com/gip-inclusion/les-emplois/pull/8902)
+
+### Modifié
+
+- [Connexion : Permet à un utilisateur désactivé de se créer un nouveau compte](https://github.com/gip-inclusion/les-emplois/pull/8839)
+- [Connexion : Rendre obligatoire ProConnect](https://github.com/gip-inclusion/les-emplois/pull/8931)
+- [Insertion : Enregistrer les iMER provenant des usagers](https://github.com/gip-inclusion/les-emplois/pull/8891)
+- [Interface : Affichage des candidatures en vue tableau sur le profil d'un usager](https://github.com/gip-inclusion/les-emplois/pull/8876)
+- [Interface : Changement de wording pour les erreurs 3308](https://github.com/gip-inclusion/les-emplois/pull/8954)
+- [Interface : Remplacement du mot "Candidat" par "Usager" sur toute la plateforme](https://github.com/gip-inclusion/les-emplois/pull/8822)
+- [Interface : Renommage et réorganisation des items du menu "Candidatures envoyees" et "Candidatures reçue"](https://github.com/gip-inclusion/les-emplois/pull/8783)
+- [Marque : Changement de l'url par défaut des liens générés](https://github.com/gip-inclusion/les-emplois/pull/8715)
+
+### Supprimé
+
+- [Insertion : Suppression du POST vers DORA lors de la soumission d’une orientation](https://github.com/gip-inclusion/les-emplois/pull/8586)
+- [Interface : Suppression du menu déroulant Nexus](https://github.com/gip-inclusion/les-emplois/pull/8939)
+
 ## 2026-09-28
 
 ### Ajouté
