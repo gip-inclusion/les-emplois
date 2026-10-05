@@ -39,6 +39,12 @@ class TestCardView:
         response = client.get(url)
         assert_previous_step(response, reverse("dashboard:index"))
 
+        prescriber_org.is_searchable = False
+        prescriber_org.save()
+
+        response = client.get(url)
+        assert response.status_code == 404
+
     def test_card_subtitle_ft(self, client):
         prescriber_org = PrescriberOrganizationFactory(authorized=True, kind=PrescriberOrganizationKind.FT)
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
