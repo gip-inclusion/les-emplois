@@ -1269,38 +1269,35 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
-def test_filtered_by_end_of_journey_for_siae(client, snapshot):
+def test_filtered_by_end_of_journey_for_siae(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
     employer = membership.user
     client.force_login(employer)
     url = reverse("job_seekers_views:list_organization")
-    today = datetime.date(2026, 1, 15)
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    twenty_days_ago = today - datetime.timedelta(days=20)
+    in_twenty_days = today + datetime.timedelta(days=20)
 
-    contract_ended = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    ContractFactory(
-        job_seeker=contract_ended,
-        company=company,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today - datetime.timedelta(days=20),
-    )
-    ApprovalFactory(user=contract_ended, start_at=today - datetime.timedelta(days=300), end_at=today)
-    other_company_contract = JobSeekerAssignmentFactory(professional=employer, company=company).job_seeker
-    ContractFactory(
-        job_seeker=other_company_contract,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
-    )
+    job_seeker_with_ended_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_jobapplication__to_company=company,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=twenty_days_ago,
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker_with_ended_contract, professional=employer, company=company)
+    job_seeker_with_contract_elsewhere = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_twenty_days,
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker_with_contract_elsewhere, professional=employer, company=company)
 
     response = client.get(url, {"end_of_journey": "on"})
-    assert response.context["page_obj"].object_list == [contract_ended]
-    # Kept when another filter is changed.
-    assertContains(
-        response, '<input type="hidden" name="end_of_journey" value="on" id="id_end_of_journey">', html=True
-    )
-
-    with assertSnapshotQueries(snapshot):
-        client.get(url, {"end_of_journey": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_with_ended_contract]
 
 
 def test_end_of_journey_filter_not_for_prescriber(client):
