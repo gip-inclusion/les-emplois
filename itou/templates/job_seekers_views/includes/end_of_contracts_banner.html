@@ -22,15 +22,11 @@
                         {% endfragment %}
                         {% fragment as content %}
                             <ul class="mb-0">
-                                {% if contracts_ending_soon_count == 1 %}
-                                    <li>1 salarié termine son contrat dans les 30 prochains jours.</li>
-                                {% elif contracts_ending_soon_count %}
-                                    <li>{{ contracts_ending_soon_count }} salariés terminent leur contrat dans les 30 prochains jours.</li>
+                                {% if contracts_ending_soon_count %}
+                                    <li>{{ contracts_ending_soon_count }} {{ contracts_ending_soon_count|pluralizefr:"salarié termine son contrat,salariés terminent leur contrat" }} dans les 30 prochains jours.</li>
                                 {% endif %}
-                                {% if last_contract_ended_count == 1 %}
-                                    <li>1 salarié n’est plus en contrat mais a encore un PASS IAE valide.</li>
-                                {% elif last_contract_ended_count %}
-                                    <li>{{ last_contract_ended_count }} salariés ne sont plus en contrat mais ont encore un PASS IAE valide.</li>
+                                {% if last_contract_ended_count %}
+                                    <li>{{ last_contract_ended_count }} {{ last_contract_ended_count|pluralizefr:"salarié n’est plus en contrat mais a,salariés ne sont plus en contrat mais ont" }} encore un PASS IAE valide.</li>
                                 {% endif %}
                             </ul>
                         {% endfragment %}
