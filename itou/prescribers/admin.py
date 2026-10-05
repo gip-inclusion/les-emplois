@@ -149,6 +149,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                     "authorization_status",
                     "authorization_updated_at",
                     "authorization_updated_by",
+                    "is_searchable",
                 )
             },
         ),
