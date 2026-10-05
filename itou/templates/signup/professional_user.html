@@ -29,6 +29,21 @@
 
 {% block content %}
     <section class="s-section mb-5">
-        <div class="s-section__container container">{% include "pro_connect/includes/description.html" %}</div>
+        <div class="s-section__container container">
+            {% include "pro_connect/includes/description.html" %}
+
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" collapse_id="proConnect_siret" %}
+                        {% fragment as c_info__summary %}
+                            L’inscription via ProConnect nécessite un SIRET.
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
+                            Votre organisation n’en dispose pas ? <a href="{{ ITOU_CONTACT_FORM_URL }}" target="_blank" rel="noopener" class="has-external-link">Contactez notre support technique</a> pour être accompagné dans la création de votre compte.
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                </div>
+            </div>
+        </div>
     </section>
 {% endblock %}
