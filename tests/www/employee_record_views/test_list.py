@@ -151,17 +151,9 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": Status.READY})
         assertContains(response, approval_number_for_ready)
 
-        blocked_statuses = {
-            # ARCHIVED is a reserved status
-            Status.ARCHIVED,
-            # TODO(xfernandez): remove modification statuses when they are usable
-            Status.MODIFICATION_PENDING,
-            Status.MODIFICATION_REJECTED,
-            Status.MODIFICATION_SENT,
-        }
         for status in no_results_statuses:
             response = client.get(self.URL, data={"status": status})
-            if status in blocked_statuses:
+            if status is Status.ARCHIVED:  # ARCHIVED is a reserved status
                 assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
             else:
                 assertNotContains(response, approval_number_for_new)
@@ -175,7 +167,7 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": list(no_results_statuses)})  # ARCHIVED is still reserved
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
-        response = client.get(self.URL, data={"status": list(no_results_statuses - blocked_statuses)})
+        response = client.get(self.URL, data={"status": list(no_results_statuses - {Status.ARCHIVED})})
         assertNotContains(response, approval_number_for_new)
         assertNotContains(response, approval_number_for_ready)
 
@@ -328,19 +320,7 @@ class TestListEmployeeRecords:
         Any status except PROCESSED
         """
         client.force_login(self.user)
-        status = random.choice(
-            list(
-                set(Status)
-                - {
-                    Status.PROCESSED,
-                    Status.ARCHIVED,
-                    # TODO(xfernandez): include modification statuses when they are usable
-                    Status.MODIFICATION_PENDING,
-                    Status.MODIFICATION_REJECTED,
-                    Status.MODIFICATION_SENT,
-                }
-            )
-        )
+        status = random.choice(list(set(Status) - {Status.PROCESSED, Status.ARCHIVED}))
 
         self.employee_record.status = status
         self.company.siret = "10000000000001"
@@ -355,18 +335,7 @@ class TestListEmployeeRecords:
 
     def test_no_alert_when_siret_has_not_changed(self, client):
         client.force_login(self.user)
-        status = random.choice(
-            list(
-                set(Status)
-                - {
-                    Status.ARCHIVED,
-                    # TODO(xfernandez): remove modification statuses when they are usable
-                    Status.MODIFICATION_PENDING,
-                    Status.MODIFICATION_REJECTED,
-                    Status.MODIFICATION_SENT,
-                }
-            )
-        )
+        status = random.choice(list(set(Status) - {Status.ARCHIVED}))
 
         self.employee_record.status = status
         self.employee_record.save()
