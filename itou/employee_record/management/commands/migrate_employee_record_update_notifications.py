@@ -16,6 +16,12 @@ from itou.utils.command import BaseCommand
 
 
 def create_logs(employee_record, notification):
+    # 3 processed EmployeeRecordUpdateNotification lack an asp_batch_file: fallback to updated_at
+    wait_for_asp_timestamp = (
+        EmployeeRecordBatch.datetime_from_asp_batch_file(notification.asp_batch_file)
+        if notification.asp_batch_file
+        else notification.updated_at
+    )
     logs = [
         EmployeeRecordTransitionLog(
             employee_record=employee_record,
@@ -28,7 +34,7 @@ def create_logs(employee_record, notification):
         ),
         EmployeeRecordTransitionLog(
             employee_record=employee_record,
-            timestamp=EmployeeRecordBatch.datetime_from_asp_batch_file(notification.asp_batch_file),
+            timestamp=wait_for_asp_timestamp,
             from_state=Status.MODIFICATION_PENDING,
             to_state=Status.MODIFICATION_SENT,
             transition=EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
