@@ -82,8 +82,8 @@ class Command(EmployeeRecordTransferCommand):
         for idx, employee_record in enumerate(batch["lignesTelechargement"], 1):
             # UPDATE notifications are sent in specific files and are not mixed
             # with "standard" employee records (CREATION).
-            if employee_record.get("typeMouvement") != MovementType.UPDATE:
-                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.UPDATE}")
+            if employee_record.get("typeMouvement") != MovementType.MODIFICATION:
+                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.MODIFICATION}")
 
             line_number = employee_record["numLigne"]
             processing_code = employee_record["codeTraitement"]

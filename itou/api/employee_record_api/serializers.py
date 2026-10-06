@@ -245,7 +245,7 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
 
 class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(default=MovementType.UPDATE, read_only=True)  # Required
+    typeMouvement = serializers.CharField(default=MovementType.MODIFICATION, read_only=True)  # Required
     siret = serializers.CharField(source="employee_record.siret")
     mesure = serializers.CharField(source="employee_record.asp_measure")
 

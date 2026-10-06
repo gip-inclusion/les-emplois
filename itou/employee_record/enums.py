@@ -36,4 +36,4 @@ class NotificationStatus(models.TextChoices):
 
 class MovementType(models.TextChoices):
     CREATION = "C", "Création"
-    UPDATE = "M", "Modification"
+    MODIFICATION = "M", "Modification"
