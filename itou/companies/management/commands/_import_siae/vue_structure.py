@@ -81,10 +81,13 @@ def get_vue_structure_df():
         validate_siret(row.siret)
         validate_siret(row.siret_signature)
         validate_naf(row.naf)
-        assert " " not in row.auth_email, f"row {idx + 1} has email with space"
-        assert "@" in row.auth_email, f"row {idx + 1} has email without '@'"
+        assert " " not in row.auth_email, (
+            f"row {idx + 1} of fluxIAE_Structure has email with space: {row.auth_email!r}"
+        )
+        assert "@" in row.auth_email, f"row {idx + 1} of fluxIAE_Structure has email without '@': {row.auth_email!r}"
         assert row.siret[:9] == row.siret_signature[:9], (
-            f"row {idx + 1} has inconsistent SIREN {row.siret[:9]} and SIREN signature {row.siret_signature[:9]}"
+            f"row {idx + 1} of fluxIAE_Structure has inconsistent SIREN {row.siret[:9]} "
+            f"and SIREN signature {row.siret_signature[:9]}"
         )
 
     return df
