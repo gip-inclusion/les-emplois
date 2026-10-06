@@ -15,7 +15,7 @@ class QPV(models.Model):
     """
     QPV: Quartier de la Politique de la Ville
     Source: https://sig.ville.gouv.fr/atlas/QP
-    Last update: 2022
+    Last update: 2024
     """
 
     code = models.CharField(verbose_name="code", max_length=8)
