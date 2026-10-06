@@ -352,6 +352,60 @@ def test_stats_dgefp_iae_showroom_sends_department_code_to_metabase(
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
+    "institution_kind,view_name,expected_region",
+    [
+        (InstitutionKind.FFGEIQ, "stats_ffgeiq_execution_assessment", None),
+        (InstitutionKind.DGEFP_GEIQ, "stats_dgefp_geiq_execution_assessment", None),
+        (InstitutionKind.DREETS_GEIQ, "stats_dreets_geiq_execution_assessment", "Bretagne"),
+    ],
+)
+def test_stats_geiq_execution_assessment_log_visit(client, institution_kind, view_name, expected_region):
+    institution = InstitutionFactory(kind=institution_kind, department="22", with_membership=True)
+    user = institution.members.get()
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    response = client.get(reverse("stats:redirect", kwargs={"dashboard_name": "execution_assessment"}), follow=True)
+    assert response.status_code == 200
+    assert response.redirect_chain == [(reverse(f"stats:{view_name}"), 302)]
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            None,
+            expected_region,
+            None,
+            None,
+            institution.pk,
+            "labor_inspector",
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=UTC),
+        ),
+    )
+
+
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
+@pytest.mark.parametrize(
+    "institution_kind,view_name",
+    [
+        (InstitutionKind.DGEFP_GEIQ, "stats_ffgeiq_execution_assessment"),
+        (InstitutionKind.FFGEIQ, "stats_dreets_geiq_execution_assessment"),
+        (InstitutionKind.DDETS_GEIQ, "stats_dgefp_geiq_execution_assessment"),
+    ],
+)
+def test_stats_geiq_execution_assessment_forbidden_for_other_kinds(client, institution_kind, view_name):
+    institution = InstitutionFactory(kind=institution_kind, with_membership=True)
+    client.force_login(institution.members.get())
+
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 403
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
+@pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dihal_")],
 )

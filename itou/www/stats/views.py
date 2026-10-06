@@ -832,6 +832,29 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
     )
 
 
+GEIQ_EXECUTION_ASSESSMENT_PAGE_TITLE = "Résultats des campagnes de bilans d’exécution"
+
+
+@check_request(utils.can_view_stats_ffgeiq)
+def stats_ffgeiq_execution_assessment(request):
+    return render_stats(request=request, context={"page_title": GEIQ_EXECUTION_ASSESSMENT_PAGE_TITLE})
+
+
+@check_request(utils.can_view_stats_dgefp_geiq)
+def stats_dgefp_geiq_execution_assessment(request):
+    return render_stats(request=request, context={"page_title": GEIQ_EXECUTION_ASSESSMENT_PAGE_TITLE})
+
+
+@check_request(utils.can_view_stats_dreets_geiq)
+def stats_dreets_geiq_execution_assessment(request):
+    region = request.current_organization.region
+    return render_stats(
+        request=request,
+        context={"page_title": f"{GEIQ_EXECUTION_ASSESSMENT_PAGE_TITLE} ({region})", "region": region},
+        params={mb.REGION_FILTER_KEY: region},
+    )
+
+
 @check_request(utils.can_view_stats_dihal)
 def stats_dihal_state(request):
     context = {
