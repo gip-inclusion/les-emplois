@@ -92,7 +92,7 @@ class StructureAdmin(InsertionAdmin):
 class ServiceAdmin(InsertionAdmin):
     list_display = ["pk", "name", "structure_link", "source", "kind", "city", "is_active", "updated_at"]
     list_display_links = ["pk", "name"]
-    list_filter = ["source", "kind", "is_orientable_with_form", "contact_is_public", "is_active"]
+    list_filter = ["source", "kind", "contact_is_public", "is_active"]
     list_select_related = ["structure", "source", "kind"]
     show_full_result_count = False
     date_hierarchy = "updated_on"
@@ -101,7 +101,7 @@ class ServiceAdmin(InsertionAdmin):
     extra_readonly_fields = ["structure_link", "extra_formatted"]
     fieldsets = [
         ("Identification", {"fields": ["uid", "name", "structure_link", "source", "source_link"]}),
-        ("Présentation", {"fields": ["description_short", "description", "kind", "thematics"]}),
+        ("Présentation", {"fields": ["description", "kind", "thematics"]}),
         (
             "Publics & accès",
             {
@@ -109,7 +109,6 @@ class ServiceAdmin(InsertionAdmin):
                     "publics",
                     "publics_details",
                     "access_conditions_di",
-                    "access_conditions_dora",
                     "eligibility_zones",
                     "receptions",
                     "fee",
@@ -118,26 +117,9 @@ class ServiceAdmin(InsertionAdmin):
             },
         ),
         (
-            "Mobilisation (data·inclusion)",
+            "Mobilisation",
             {"fields": ["mobilizations", "mobilizations_details", "lien_mobilisation", "mobilization_publics"]},
         ),
-        (
-            "Mobilisation (DORA)",
-            {
-                "fields": [
-                    "mobilization_modes_beneficiaries",
-                    "mobilization_modes_beneficiaries_external_form_link",
-                    "mobilization_modes_beneficiaries_external_form_link_text",
-                    "mobilization_modes_beneficiaries_other",
-                    "mobilization_modes_professionals",
-                    "mobilization_modes_professionals_external_form_link",
-                    "mobilization_modes_professionals_external_form_link_text",
-                    "mobilization_modes_professionals_other",
-                    "funding_labels",
-                ]
-            },
-        ),
-        ("Justificatifs", {"fields": ["credentials", "credentials_documents", "credentials_online_form"]}),
         (
             "Adresse",
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
@@ -148,15 +130,14 @@ class ServiceAdmin(InsertionAdmin):
             {
                 "fields": [
                     "opening_hours",
-                    "opening_hours_text",
                     "volume_horaire_hebdomadaire",
                     "nombre_semaines",
                 ]
             },
         ),
-        ("Orientation", {"fields": ["is_orientable_with_form", "average_orientation_response_delay_days"]}),
+        ("Orientation", {"fields": ["average_orientation_response_delay_days"]}),
         ("État", {"fields": ["is_active"]}),
-        ("Dates", {"fields": ["dora_synced_at", "updated_on", "created_at", "updated_at"]}),
+        ("Dates", {"fields": ["updated_on", "created_at", "updated_at"]}),
         ("Données complémentaires", {"fields": ["extra_formatted"]}),
     ]
 

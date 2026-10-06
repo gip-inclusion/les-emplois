@@ -2,7 +2,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "119 Avenue Jacques Cartier",
       "address_line_2": "Immeuble Antalya - Zac Antigone - CS 19008",
       "average_orientation_response_delay_days": null,
@@ -13,30 +12,15 @@
       "contact_phone": "",
       "coordinates": "SRID=4326;POINT (3.892163 43.607056)",
       "created_at": "2026-06-22T15:43:45.648Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "L'aide permet de financer l'achat, la location ou la réparation de matériel nécessaire à la compensation du handicap.\n\nL'aide vient en complément de la Prestation compensation du handicap (PCH) attribuée par la Maison départementale des personnes handicapées (MDPH) et des autres financements que vous pourriez avoir.\n\nL'aide permet de financer par exemple :\n\n* Une synthèse vocale pour une personne déficiente visuelle.\n* La différence de coût entre un écran d'ordinateur de taille ordinaire et un grand écran nécessaire du fait du handicap.\n\nSi le besoin concerne une adaptation du poste de travail, la solution à mobiliser est l'aide à [l'adaptation des situations de travail](/aide-financiere/aide-ladaptation-des-situations-de-travail).\n\nSi le besoin concerne une adaptation de la formation, la solution à mobiliser est l'aide à [l'adaptation des situations de formation](/aide-financiere/aide-ladaptation-des-situations-de-formation).\nAide d’un montant de : 5250 € maximum",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"09\", \"11\", \"12\", \"30\", \"31\", \"32\", \"34\", \"46\", \"48\", \"65\", \"66\", \"81\", \"82\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 13019,
       "is_active": true,
-      "is_orientable_with_form": false,
       "kind": 134,
       "lien_mobilisation": "https://form.fillout.com/t/exemple-orientation",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -48,7 +32,6 @@
       "name": "Aide technique en compensation du handicap",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "34000",
       "publics": [
         124
@@ -76,7 +59,6 @@
   {
     "fields": {
       "access_conditions_di": "Maitriser l'écriture, la lecture",
-      "access_conditions_dora": "[]",
       "address_line_1": "890 Avenue Jean Mermoz",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -87,37 +69,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (3.891327 43.610196)",
       "created_at": "2026-07-06T07:36:19.131Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Se former et obtenir la certification CléA Numérique par la validation de 4 compétences :\n\nIdentifier son environnement numérique, accéder, utiliser les outils de son environnement pour trouver l’information recherchée ;\n\nCollecter les informations relatives à une activité professionnelle dans un environnement numérique, échanger de l’information ;\n\nRéaliser, contribuer à une production commune à partir d’outils de travail collaboratif ;\n\nPartager les bonnes pratiques, veillez à la protection de ses outils, identifier les risques de malveillance et mettre les moyens de s’en prémunir ;\n\nProtéger son e-réputation et celle de son entreprise.",
-      "description_short": "Le Socle de connaissances et de compétences (CléA) est constitué de l'ensemble des connaissances et des compétences qu'il est utile pour un individu de maîtriser afin de favoriser son accès à la formation professionnelle et son insertion professionnelle.",
-      "dora_synced_at": "2026-07-06T07:36:19.131Z",
       "eligibility_zones": "[\"34172\"]",
       "extra": null,
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
-      "funding_labels": [],
       "insee_city": 13019,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 133,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        211,
-        213,
-        215
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -131,7 +91,6 @@
       "name": "CléA numérique",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "34000",
       "publics": [
         130
@@ -159,7 +118,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "Avenue De Monein",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -170,35 +128,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.625973 43.365891)",
       "created_at": "2026-07-06T07:37:57.277Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "ASSOCIATION TRANSITION propose des services : numérique, réaliser des démarches administratives avec un accompagnement.",
-      "description_short": "ASSOCIATION TRANSITION propose des services : accéder à des services en ligne",
-      "dora_synced_at": "2026-07-06T07:37:57.277Z",
       "eligibility_zones": "[\"64\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 25274,
       "is_active": true,
-      "is_orientable_with_form": false,
       "kind": 133,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        211,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        208
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "Mêmes modalités que pour les bénéficiaires",
       "mobilization_publics": [
         7,
         8
@@ -210,7 +148,6 @@
       "name": "Médiation numérique",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "64150",
       "publics": [
         130
@@ -235,7 +172,6 @@
   {
     "fields": {
       "access_conditions_di": "Attestation de sécurité sociale\\nAvis de situation France Travail pour les personnes inscrites\\nPièce d'identité\\nRelevé d'identité Bancaire",
-      "access_conditions_dora": "[]",
       "address_line_1": "Rue du Général Gambiez",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -246,39 +182,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.85638 47.652329)",
       "created_at": "2026-07-06T07:38:01.652Z",
-      "credentials": "[\"Relevé d'identité Bancaire\", \"Pièce d'identité\", \"Attestation de sécurité sociale\", \"Avis de situation France Travail pour les personnes inscrites\"]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Le Dispositif de Formation Linguistique (DFL), financé par la région Bourgogne FC, permet aux personnes en situation d'illettrisme, **qui ont été scolarisées en langue française et qui ont de grandes difficultés pour lire, écrire, calculer et utiliser le numérique,** d'augmenter leurs compétences de base et numérique mais également de reprendre confiance en soi, de gagner en autonomie et de valoriser leurs acquis personnels et professionnels.\n\nFormation à mi-temps, alternant temps individuels et collectifs.\n\nLe parcours de formation est individualisé suite à une phase de positionnement, du projet professionnel et de la situation de la personne.\n\nLe bénéficiaire est accompagné tout au long de son parcours par un référent de parcours, garant du déroulement et de l'adaptation du parcours au besoin du bénéficiaire.",
-      "description_short": "En difficulté avec la lecture ou l'écriture ? Besoin d'aide pour le numérique ? Le DFL permet de s'inscrire dans un parcours de formation en vue de s'insérer professionnellement ou de sécuriser les parcours professionnels des personnes  en situation d'illettrisme",
-      "dora_synced_at": "2026-07-06T07:38:01.652Z",
       "eligibility_zones": "[\"200069052\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 34249,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        208,
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "Inscription possible via Aude ou OUIFORM",
       "mobilization_publics": [
         7,
         8
@@ -293,7 +205,6 @@
       "name": "Dispositif de Formation Linguistique",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
       "publics": [
         130
@@ -325,7 +236,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "890 Avenue Jean Mermoz",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -336,37 +246,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (3.891327 43.610196)",
       "created_at": "2026-07-06T07:38:34.831Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "- Apprendre les bases de la communication écrite\n\n- Mise au point sur l’expression écrite française\n\n- Retranscrire les graphies méconnues de la langue d’origine\n\n- Exprimer son identité personnelle et familiale, donner de ses nouvelles\n\n- Remplir des documents\n\n- Noter une information de type factuel (date, heure, lieu) dans un texte\n\n- Utiliser les normes de présentation et formules de politesse\n\n- Organiser les paragraphes et exprimer une progression dans un texte (d’abord,puis…)\n\n- Correspondre pour exprimer son accord, son refus, réclamer, remercier, donner des renseignements de façon minimale\n\n- Améliorer la compréhension écrite, maîtriser la lecture silencieuse\n\n- Comprendre les graphies méconnues de la langue d’origine\n\n- Identifier les différents écrits de la vie quotidienne\n\n- Lire les consignes des documents administratifs\n\n- Rechercher une information de type factuel (date, heure, lieu) dans un texte\n\n- Maîtriser les bases de la communication orale en français\n\n\n<!-- -->\n\nLe parcours débutant de la formation FLE dure 120 heures. Nous vous invitons à le choisir si vous avez actuellement un niveau A1/A2 afin d’obtenir un niveau B1/B2.\n\nLe parcours avancé de la formation FLE dure 60 heures. Nous vous invitons à le choisir si vous avez actuellement un niveau B1/B2 afin d’obtenir un niveau C1/C2.",
-      "description_short": "Le FLE vise à rendre les apprenants compétents et confiants dans leur utilisation du français, tout en leur permettant de s'intégrer dans des contextes francophones variés.",
-      "dora_synced_at": "2026-07-06T07:38:34.831Z",
       "eligibility_zones": "[\"34172\"]",
       "extra": null,
       "fee": 2,
       "fee_details": "Taux horaire : 12€",
-      "funding_labels": [],
       "insee_city": 13019,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        211,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -380,7 +268,6 @@
       "name": "Français Langue Étrangère",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "34000",
       "publics": [
         130
@@ -409,7 +296,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[\"Exclu.e du système bancaire classique (faible revenu ou situation professionnelle fragile)\", \"Personnes n'ayant pas accès au crédit bancaire classique\"]",
       "address_line_1": "2 Rue de la Merci",
       "address_line_2": "",
       "average_orientation_response_delay_days": 11,
@@ -420,39 +306,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (3.871506 43.61027)",
       "created_at": "2026-07-06T07:39:08.388Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "CONDITIONS D’ÉLIGIBILITÉ<br>\n\nDispositif fait pour les personnes dont l'accès au crédit bancaire classique est rendu difficile par une situation économique ou sociale fragile. L’Adie propose un prêt mobilité aux personnes ayant besoin d’un microcrédit pour faciliter leurs déplacements dans le cadre de leur projet professionnel.\\*\\*\n\nDESCRIPTIF : Montant : jusqu’à 8 000€<br>\n\nDurée : jusqu’à 42 mois<br>\n\nGarantie : une personne de votre entourage caution solidaire pour la moitié du montant emprunté ou dépôt de garantie pour 25 % de la somme empruntée<br>\n\nFinancement de tout type de besoin : l’achat, la réparation ou la location d’un véhicule, permis de conduire, formation professionnelle, etc.",
-      "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
-      "dora_synced_at": "2026-07-06T07:39:08.388Z",
       "eligibility_zones": "[\"34\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
-      "funding_labels": [],
       "insee_city": 13019,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        215,
-        221,
-        223
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1ywqSWxyoM1BE3BL6kCjGrS_fNEnfw1cWllV_-0951jBPlTmnXXq17BGrtFW8IjPBhe7AAszF_",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "Téléphoner au 01 00 00 00 00",
-      "mobilization_modes_professionals": [
-        208,
-        216,
-        218,
-        220
-      ],
-      "mobilization_modes_professionals_external_form_link": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1ywqSWxyoM1BE3BL6kCjGrS_fNEnfw1cWllV_-0951jBPlTmnXXq17BGrtFW8IjPBhe7AAszF_",
-      "mobilization_modes_professionals_external_form_link_text": "Prendre rendez-vous",
-      "mobilization_modes_professionals_other": "Téléphoner au 01 00 00 00 00",
       "mobilization_publics": [
         7,
         8
@@ -465,7 +327,6 @@
       "name": "Microcrédit Mobilité",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "34000",
       "publics": [
         130
@@ -495,7 +356,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "3 Place Laherrère",
       "address_line_2": "",
       "average_orientation_response_delay_days": 80,
@@ -506,37 +366,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.360898 43.308647)",
       "created_at": "2026-07-06T07:39:10.440Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "La Plateforme d’évaluation linguistique, d’orientation et de suivi de l’agglomération de Pau accueille les non francophones de plus de 16 ans, qui effectuent une démarche spontanée ou qui sont prescrits par un professionnel de l’accompagnement, et susceptibles de présenter des difficultés au niveau de la maîtrise de la langue française. C'est à dire comprendre, parler, lire et écrire la langue française.\n\nMandatée par la Direction Départementale de l’Emploi, du Travail et des Solidarités (DDETS) pour porter ce dispositif, la Communauté d’agglomération Pau Béarn Pyrénées a choisi l’association AJIR pour le déployer sur son territoire.\n\nLes missions de cette plateforme sont :\n\n\\- Assurer un accueil permanent sans délai\n\n\\- Evaluer les compétences linguistiques\n\n\\- Proposer un parcours individuel adapté au projet de la personne, à dominante linguistique ou à visée socioprofessionnelle\n\n\\- Mobiliser les partenaires adéquats pour permettre à chacun d’organiser son parcours de formation\n\n\\- Assurer un suivi après chaque parcours de formation en réalisant une évaluation intermédiaire pour mesurer la progression des acquis linguistiques\n\n\\- Préconiser un nouveau parcours de formation\n\n\\- Mettre en relation avec les relais adéquats pour l’élaboration d’un accompagnement à l’insertion socioprofessionnelle\n\nLa plateforme se doit également d’assurer une fonction d’observatoire :\n\n\\- Quantifier objectivement l’ensemble des besoins\n\n\\- Recenser, inventorier, analyser la spécificité de l’ensemble des réponses existantes\n\n\\- Objectiver les écarts entre l’offre et la demande, mettre à jour les manques, les doublons, ou au contraire les complémentarités possibles\n\nContact :\n\nAJIR – Plateforme langagière\n\n01 00 00 00 00\n\n[demo.emplois+service@inclusion.gouv.fr](<mailto:demo.emplois+service@inclusion.gouv.fr>)",
-      "description_short": "La Plateforme d’évaluation linguistique, d’orientation et de suivi de l’agglomération de Pau accueille les non francophones de plus de 16 ans, qui présentent des difficultés au niveau de la maîtrise de la langue française.",
-      "dora_synced_at": "2026-07-06T07:39:10.440Z",
       "eligibility_zones": "[\"200067254\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 25309,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 133,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -550,7 +388,6 @@
       "name": "Plateforme d'évaluation linguistique, d'orientation et de suivi de l'agglomération de Pau",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "64000",
       "publics": [
         119,
@@ -577,7 +414,6 @@
   {
     "fields": {
       "access_conditions_di": "Attestation de sécurité sociale\\nAvis de situation France Travail pour les personnes inscrites\\nPièce d'identité\\nRelevé d'identité Bancaire",
-      "access_conditions_dora": "[]",
       "address_line_1": "Rue du Général Gambiez",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -588,39 +424,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.85638 47.652329)",
       "created_at": "2026-07-06T07:39:28.953Z",
-      "credentials": "[\"Relevé d'identité Bancaire\", \"Pièce d'identité\", \"Attestation de sécurité sociale\", \"Avis de situation France Travail pour les personnes inscrites\"]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Le Dispositif de Formation Linguistique (DFL), financé par la région Bourgogne FC, permet aux personnes, **qui ont été scolarisées en langue française et qui ont de grandes difficultés pour lire, écrire, calculer et utiliser le numérique,** d'augmenter leurs compétences de base et numérique mais également de reprendre confiance en soi, de gagner en autonomie et de valoriser leurs acquis personnels et professionnels.\n\nFormation à mi-temps, alternant temps individuels et collectifs.\n\nLe parcours de formation est individualisé suite à une phase de positionnement, du projet professionnel et de la situation de la personne.\n\nLe bénéficiaire est accompagné tout au long de son parcours par un référent de parcours, garant du déroulement et de l'adaptation du parcours au besoin du bénéficiaire.",
-      "description_short": "En difficulté avec la lecture ou l'écriture ? Besoin d'aide pour le numérique ? Le DFL permet de s'inscrire dans un parcours de formation en vue de s'insérer professionnellement ou de sécuriser les parcours professionnels des personnes  en difficultés avec les savoirs de base",
-      "dora_synced_at": "2026-07-06T07:39:28.953Z",
       "eligibility_zones": "[\"200069052\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 34249,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        208,
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "Inscription possible via Aude ou OUIFORM",
       "mobilization_publics": [
         7,
         8
@@ -635,7 +447,6 @@
       "name": "Dispositif de Formation Linguistique (DFL)",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "En entrées et sorties permanentes - 9h hebdomadaire minimum - 18h maximum par séance de 3h - Emploi du temps individualisé",
       "post_code": "90000",
       "publics": [
         130
@@ -663,7 +474,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[\"Etre adressé.e par un prescripteur partenaire\"]",
       "address_line_1": "Avenue De Monein",
       "address_line_2": "Avenue de Monein",
       "average_orientation_response_delay_days": null,
@@ -674,36 +484,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.625973 43.365891)",
       "created_at": "2026-07-06T07:42:31.596Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Les demandeurs d’emploi sont exposés à des difficultés multiples qui peuvent affecter sensiblement d’intervention leur mobilité géographique : contraintes financières (peu de ressources + gestion du budget mobilité), manque d’équipement et de solutions alternatives, difficultés à se saisir des offres de service existantes, difficultés à se projeter sur un territoire inhabituel…\n\nLa Plateforme Mobilité Transition propose aux personnes en parcours d’insertion un accompagnement pour lever les freins à l’emploi liés à la mobilité. Selon les besoins, cet accompagnement individuel peut-être enrichi d'ateliers collectifs.\n\nLa Plateforme Mobilité facilite l’accès aux solutions de mobilité du territoire et/ou permet d’acquérir de nouvelles compétences liées à la mobilité.",
-      "description_short": "La Plateforme Mobilité Transition propose aux personnes en parcours d’insertion un accompagnement pour lever les freins à l’emploi liés à la mobilité. (ateliers, entretiens individuels ou collectifs)",
-      "dora_synced_at": "2026-07-06T07:42:31.596Z",
       "eligibility_zones": "[\"64\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 25274,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        223
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "Parlez-en avec votre conseiller Emploi pour bénéficier d'un positionnement.",
-      "mobilization_modes_professionals": [
-        208,
-        216,
-        224
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "Pour les Conseillers France Travail, mobilisez en priorité le service 'Diagnostic et accompagnement à la mobilité (AAP FT), s'il vous est accessible.",
       "mobilization_publics": [
         7,
         8
@@ -716,7 +505,6 @@
       "name": "Plateforme Mobilité - Transition",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "64150",
       "publics": [
         117,
@@ -749,7 +537,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "2 Rue Aristide Finco",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -760,30 +547,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.375576 43.376359)",
       "created_at": "2026-06-22T15:56:16.976Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Le centre social Alexis Peyret dispose d’un espace dédié à l’accès aux droits et à l’inclusion numérique, ouvert à tous les publics.Il comprend un espace numérique proposant : des accompagnements individuels pour les usages des outils et services numériques (prise en main, e-mails, démarches en ligne, etc.) ; un soutien aux démarches administratives en ligne hors bouquet de services France Services ; des ateliers collectifs autour de thématiques variées telles que la parentalité numérique, la prévention des usages à risque, les outils du quotidien, la découverte de l’intelligence artificielle, la création numérique ou encore la cybersécurité ; un accès libre à du matériel informatique et à une connexion Internet.Le centre accueille également un espace France Services, permettant un accompagnement de proximité pour les démarches administratives du quotidien auprès de 12 opérateurs partenaires (emploi, retraite, santé, famille, impôts, etc.).",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"64\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 25382,
       "is_active": true,
-      "is_orientable_with_form": false,
       "kind": 135,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -797,7 +569,6 @@
       "name": "Service d'accompagnement au numérique",
       "nombre_semaines": null,
       "opening_hours": "Mo-Fr 09:00-12:30,14:00-17:30; Th 14:00-17:30",
-      "opening_hours_text": "",
       "post_code": "64121",
       "publics": [
         130
@@ -829,7 +600,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "110 Rue du Lavandin",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -840,30 +610,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (3.851081 43.600386)",
       "created_at": "2026-06-22T15:56:24.801Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "salle informatique disposant d'un conseiller numérique formé , aide, formation individuelle et collective",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"34\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 13019,
       "is_active": true,
-      "is_orientable_with_form": false,
       "kind": 136,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "https://bookings.cloud.microsoft/book/laposte1807545@booking.legroupelaposte.fr/?ismsaljsauthenabled",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -877,7 +632,6 @@
       "name": "Service d'accompagnement au numérique",
       "nombre_semaines": null,
       "opening_hours": "Mo-Th 09:00-12:30,14:00-17:30; Tu off",
-      "opening_hours_text": "",
       "post_code": "34070",
       "publics": [
         130
@@ -909,7 +663,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "13 Rue Jean Paul Alaux",
       "address_line_2": "Millenium 2 ZAC Coeur de Bastide - CS 61404",
       "average_orientation_response_delay_days": null,
@@ -920,30 +673,15 @@
       "contact_phone": "",
       "coordinates": "SRID=4326;POINT (-0.562473 44.843292)",
       "created_at": "2026-06-22T15:43:43.385Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "L'aide a pour objectif de vous permettre d'être autonome dans vos déplacements en lien avec l'emploi. Elle peut prendre en charge les frais dus à votre handicap.\n\nL'aide vient en complément de la Prestation de compensation du handicap (PCH) attribuée par la Maison départementale des personnes handicapées (MDPH) et des autres financements que vous pourriez avoir.\n\nL'aide permet de participer au financement :\n\n* d'aménagement d'un véhicule pour conduire en tenant compte du handicap,\n* de frais de transport tels taxi, VTC, transport adapté ou indemnités kilométriques, pour toute personne n'ayant pas de véhicule personnel et dans l'impossibilité de prendre les transports en commun du fait de son handicap.\n\n**Attention** : L'aide ne peut pas servir à acheter une voiture ou tout autre type de véhicule (scooter, vélo...).\nAide d’un montant de : 12000 € maximum / 12 mois",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 12374,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -955,7 +693,6 @@
       "name": "Aide aux déplacements",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "33100",
       "publics": [
         124
@@ -983,7 +720,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "13 Rue Jean Paul Alaux",
       "address_line_2": "Millenium 2 ZAC Coeur de Bastide - CS 61404",
       "average_orientation_response_delay_days": null,
@@ -994,30 +730,15 @@
       "contact_phone": "",
       "coordinates": "SRID=4326;POINT (-0.562473 44.843292)",
       "created_at": "2026-06-22T15:43:43.394Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "L'aide permet de participer au financement de l'intervention d'une personne qui réalisera un geste professionnel à votre place.\n\nL'aide vient en complément de la Prestation de compensation du handicap (PCH) attribuée par la Maison départementale des personnes handicapées (MDPH) et des autres financements que vous pourriez avoir.  \nL'aide permet de financer, par exemple, l'intervention d'un traducteur en langue des signes (LSF) pour une personne sourde.\n\nSi le besoin concerne une personne qui travaille, la solution à mobiliser est [l'aide à l'adaptation des situations de travail](/aide-financiere/aide-ladaptation-des-situations-de-travail).\n\nSi le besoin concerne une adaptation de la formation, la solution à mobiliser est [l'aide à l'adaptation des situations de formation](/aide-financiere/aide-ladaptation-des-situations-de-formation).\nAide d’un montant de : 4200 € maximum",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 12374,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "https://www.agefiph.fr/aides-handicap/depot-demande",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1029,7 +750,6 @@
       "name": "Aide humaine en compensation du handicap",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "33100",
       "publics": [
         124
@@ -1057,7 +777,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[\"Exclu.e du système bancaire classique (faible revenu ou situation professionnelle fragile)\", \"Personnes n'ayant pas accès au crédit bancaire classique\"]",
       "address_line_1": "11 Rue Claude Chappe",
       "address_line_2": "",
       "average_orientation_response_delay_days": 49,
@@ -1068,38 +787,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.224649 49.104805)",
       "created_at": "2026-07-06T07:36:24.718Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "CONDITIONS D’ÉLIGIBILITÉ<br>\n\nDispositif fait pour les personnes dont l'accès au crédit bancaire classique est rendu difficile par une situation économique ou sociale fragile. L’Adie propose un prêt mobilité aux personnes ayant besoin d’un microcrédit pour faciliter leurs déplacements dans le cadre de leur projet professionnel.\\*\\*\n\nDESCRIPTIF : Montant : jusqu’à 6 000€<br>\n\nDurée : jusqu’à 42 mois<br>\n\nGarantie : une personne de votre entourage caution solidaire pour la moitié du montant emprunté ou dépôt de garantie pour 25 % de la somme empruntée<br>\n\nFinancement de tout type de besoin : l’achat, la réparation ou la location d’un véhicule, permis de conduire, formation professionnelle, etc.",
-      "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
-      "dora_synced_at": "2026-08-21T02:53:39.061Z",
       "eligibility_zones": "[\"57\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
-      "funding_labels": [],
       "insee_city": 21213,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        217,
-        223
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "Téléphoner au 09 69 32 81 10.",
-      "mobilization_modes_professionals": [
-        208,
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "Téléphoner au 09 69 32 81 10.",
       "mobilization_publics": [
         7,
         8
@@ -1113,7 +809,6 @@
       "name": "Microcrédit Mobilité",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "57070",
       "publics": [
         130
@@ -1142,7 +837,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[\"Résident QPV / ZFRR\"]",
       "address_line_1": "23 Rue Calvimont",
       "address_line_2": "",
       "average_orientation_response_delay_days": 665,
@@ -1153,38 +847,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.558113 44.839905)",
       "created_at": "2026-07-06T07:36:45.717Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Le manque d’autonomie peut constituer un frein dans l’accès à certains emplois, notamment ceux qui exigent une forte mobilité géographique. AERT et AIM visent à assurer une formation adaptée aux difficultés individuelles rencontrées par chaque apprenant dans son apprentissage du code de la route et de la conduite et dans son accès à un emploi ou à une formation.",
-      "description_short": "Formation adaptée aux difficultés individuelles rencontrées par chaque apprenant dans son apprentissage du code de la route et de la conduite et dans son accès à un emploi ou à une formation.",
-      "dora_synced_at": "2026-07-06T07:36:45.717Z",
       "eligibility_zones": "[\"243300316\"]",
       "extra": null,
       "fee": 2,
       "fee_details": "ll y a un reste à charge pour le stagiaire (à calculer selon le projet sur lequel il intègre)",
-      "funding_labels": [],
       "insee_city": 12374,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1199,7 +870,6 @@
       "name": "Auto école sociale et solidaire En route pour travailler",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "33100",
       "publics": [
         118,
@@ -1226,7 +896,6 @@
   {
     "fields": {
       "access_conditions_di": "Pièce d'identite en cours de validité\\nRelevé d'identité Bancaire",
-      "access_conditions_dora": "[]",
       "address_line_1": "40 Rue de Marseille",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -1237,40 +906,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.596387 44.844273)",
       "created_at": "2026-07-06T07:38:19.226Z",
-      "credentials": "[\"Pièce d'identite en cours de validité\", \"Relevé d'identité Bancaire\"]",
-      "credentials_documents": "[\"production/dea00ed6-87de-4a57-9e53-f6cf2207cb3c/Présentation_HSP_socle_LOT_20_-_2025_2027.pdf\"]",
-      "credentials_online_form": "",
       "description": "Itinéraire 1 :Public en situation d'illettrisme et personne scolarisée en français d'un niveau A2 à l'Oral Développer des compétences fonctionnelles pour lavie courante.\n\nItinéraire 2 :Personnes étrangères ayant été scolarisées ou non dans leur pays d'origine dont la maitrise du français est insuffisante pour s'insérer durablement sur le marché du travail ou aux personnes étrangères scolarisées en français dans son pays d'origine et n'attestant pas un niveau A2 à l'oral.\n\nItinéraire 3 : Personnes en situation 12 ou souhaitant développer ses compétences numériques\n\nItinéraire 4 : Ces modules s'adressent à des personnes en recherche d'emploi ayant besoin de renforcer leurs acquis en français et mathématiques pouvant justifier d'un niveau supérieur au degré 4 ANLCI et/ou devant acquérir ou améliorer les bases d'une langue étrangère en situation pratique",
-      "description_short": "Itinéraire 1 : ECLA / Ecrire, Compter, Lire, Apprendre\n:Itinéraire 2 :Français pour les Langues Etrangères\nItinéraire 3: Parcours remise à niveau Numérique\nItinéraire 4 : Parcours Passerelle : remise à niveau\n: Mathématiuq Français, anglais, espagnol...",
-      "dora_synced_at": "2026-07-06T07:38:19.226Z",
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 12374,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        211,
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220,
-        222,
-        224
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1285,7 +929,6 @@
       "name": "HSP SOCLE 2025-2027",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "33000",
       "publics": [
         130
@@ -1311,7 +954,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "18 Rue de Stoxey",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -1322,38 +964,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.195985 49.120516)",
       "created_at": "2026-08-21T02:53:55.098Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Le programme BRIDGE repose sur un parcours d’accompagnement de 13 semaines, alternant la consolidation des compétences linguistiques en français et le renforcement ou l’acquisition de compétences professionnelles, notamment par des immersions en entreprises.\n\nLe parcours intègre :\n\n\\- des immersions professionnelles,\n\n\\- des visites d’entreprises,\n\n\\-des présentations d'entreprises in situ\n\nIl s’inscrit dans une logique partenariale de co-accompagnement avec les acteurs du Réseau Pour l’Emploi (France Travail, missions locales, Conseil départemental,...)\n\nLa nature de l’accompagnement est :\n\n\\- Individuelle, afin de travailler le projet professionnel, lever les freins à l'emploi et sécuriser les parcours ;\n\n\\- Collective, pour favoriser les échanges, la dynamique de groupe et l’apprentissage des codes du monde du travail.\n\nLes stagiaires sont accompagnés par des conseillers en insertion professionnelle, des formateurs en FLE et des travailleurs sociaux le cas échéant.",
-      "description_short": "Le programme BRIDGE est une offre de formation vers l'emploi qui propose une rémunération ainsi qu'une protection sociale. Il s’adresse aux personnes réfugiées ou régularisées, qui résident en Moselle et qui présentent un niveau de langue A2 minimum à l'oral et a l'écrit.",
-      "dora_synced_at": "2026-08-21T02:53:55.098Z",
       "eligibility_zones": "[\"57\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 21213,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 137,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        211,
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1368,7 +987,6 @@
       "name": "BRIDGE",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "lundi, mardi, jeudi, vendredi journée et mercredi matin",
       "post_code": "57070",
       "publics": [
         117,
@@ -1402,7 +1020,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "38 Rue Robert Schuman",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -1413,38 +1030,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (-0.584659 44.857937)",
       "created_at": "2026-07-06T07:39:22.482Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "La Fourmilière du Grand Parc, entreprise à but d'emploi (EBE, statut associatif) propose dans son pôle Le Comptoir une aide aux démarches administratives et au numérique, pour tous et toutes, sans rendez-vous du mardi au vendredi. Nous traitons les démarches du quotidien : accès aux droits, logement, prestations sociales, transports, école…\n\nNous redirigeons vers d'autres structures pour les démarches que nous ne pouvons pas traiter nous-mêmes : ce qui relève du juridique, les démarches liées à la retraite, et aux droits des étrangers, la création de CV.",
-      "description_short": "Aide aux démarches administratives et au numérique pour tous sans rendez-vous. Nous traitons : accès aux droits, logement, prestations sociales, transports, école...\nNon traité : juridique, retraite, droits des étrangers.",
-      "dora_synced_at": "2026-08-21T02:54:03.903Z",
       "eligibility_zones": "[\"33063\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 12374,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 133,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        213,
-        215,
-        217
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1459,7 +1053,6 @@
       "name": "Aide aux démarches administratives et aide au numérique",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "du mardi au samedi. Du mardi au jeudi : 9h30-12h 14h-17h30 vendredi : 9h30-12h 14h-16h30 samedi : 9h30-12h30",
       "post_code": "33300",
       "publics": [
         117,
@@ -1499,7 +1092,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "9 Rue du Château",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -1510,37 +1102,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.203401 49.007648)",
       "created_at": "2026-07-06T07:43:05.682Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "CC DU SUD MESSIN propose des services : autre, accéder à une connexion internet, accéder à du matériel, approfondir ma culture numérique, prendre en main un smartphone ou une tablette, utiliser le numérique au quotidien, créer avec le numérique, accompagner les démarches de sant…",
-      "description_short": "CC DU SUD MESSIN propose des services : autre, accéder à une connexion internet, accéder à du matériel, approfondir ma culture numérique, prendre en main un smartphone ou une tablette, utiliser le numérique au quotidien, créer avec le numérique, accompagner les démarches de sant…",
-      "dora_synced_at": "2026-07-06T07:43:05.682Z",
       "eligibility_zones": "[\"57\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 21449,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 135,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        215,
-        217,
-        223
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "Prendre rendez vous au 07 56 38 54 10",
-      "mobilization_modes_professionals": [
-        208,
-        216
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "Mêmes modalités que pour les bénéficiaires",
       "mobilization_publics": [
         7,
         8
@@ -1554,7 +1124,6 @@
       "name": "Médiation numérique",
       "nombre_semaines": null,
       "opening_hours": "",
-      "opening_hours_text": "",
       "post_code": "57420",
       "publics": [
         121,
@@ -1589,7 +1158,6 @@
   {
     "fields": {
       "access_conditions_di": "",
-      "access_conditions_dora": "[]",
       "address_line_1": "Rue des Bleuets",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -1600,30 +1168,15 @@
       "contact_phone": "0100000000",
       "coordinates": "SRID=4326;POINT (6.195251 49.436435)",
       "created_at": "2026-06-22T15:56:52.687Z",
-      "credentials": "[]",
-      "credentials_documents": "[]",
-      "credentials_online_form": "",
       "description": "Aide à inclusion numériqueFormations NumériquesRendez-vous individuel ou en groupe jusqu'à 12 personnes",
-      "description_short": "",
-      "dora_synced_at": null,
       "eligibility_zones": "[\"57\"]",
       "extra": null,
       "fee": 1,
       "fee_details": "",
-      "funding_labels": [],
       "insee_city": 20875,
       "is_active": true,
-      "is_orientable_with_form": false,
       "kind": 136,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [],
-      "mobilization_modes_beneficiaries_external_form_link": "",
-      "mobilization_modes_beneficiaries_external_form_link_text": "",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [],
-      "mobilization_modes_professionals_external_form_link": "https://rdv.anct.gouv.fr/prendre_rdv?departement=&public_link_organisation_id=2091",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1637,7 +1190,6 @@
       "name": "Service d'accompagnement au numérique",
       "nombre_semaines": null,
       "opening_hours": "Mo-Fr 08:00-12:00,13:00-16:00",
-      "opening_hours_text": "",
       "post_code": "57570",
       "publics": [
         130
@@ -1670,7 +1222,6 @@
   {
     "fields": {
       "access_conditions_di": "Être âgé de 16 à 25 ans révolus, ou avoir moins de 30 ans en cas de reconnaissance de la qualité de travailleur handicapé.\nNe pas être étudiant et ne pas suivre une formation.\nPièce d'identité en cours de validité.\nCurriculum vitae.\nJustificatif de domicile de moins de 3 mois.\n\n* Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte)\n* Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00\n\nVous êtes travailleur social, professionnel ou structure d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)",
-      "access_conditions_dora": "[\"Lien pour s'inscrire à une activité Découverte : [https://form.fillout.com/t/exemple-decouverte](https://form.fillout.com/t/exemple-decouverte)\", \"Pour toutes questions : [contact@exemple.org](mailto:contact@exemple.org) ou 06 00 00 00 00\", \"Vous êtes travailleur social, professionnel ou structure d'accompagnement ? Contactez-nous ou utilisez le formulaire d'orientation dédié : [https://form.fillout.com/t/exemple-orientation](https://form.fillout.com/t/exemple-orientation)\"]",
       "address_line_1": "Place de l'Europe",
       "address_line_2": "Locaux de la MIFE Belfort",
       "average_orientation_response_delay_days": null,
@@ -1681,12 +1232,7 @@
       "contact_phone": "+33123456789",
       "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
       "created_at": "2026-06-15T09:16:29.343Z",
-      "credentials": "[\"Pièce d'identité en cours de validité\", \"Curriculum vitae\", \"Justificatif de domicile de moins de 3 mois\"]",
-      "credentials_documents": "[\"production/eed8a0d4-238d-4921-a133-f5895e79fafb/flyer_CEJ_2025.pdf\"]",
-      "credentials_online_form": "",
       "description": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi.\n\nIl s'agit d'un programme intensif d’accompagnement de 15 à 20 heures par semaine minimum.\n\n- avec une **mise en activité systématique et régulière du premier au dernier jour**, pendant une période pouvant aller jusqu’à 12 mois (et jusqu’à 18 mois sous conditions).\n\n- des points réguliers avec la mission locale, des ateliers collectifs et des démarches personnelles\n\n- une **allocation** mensuelle sous condition de revenus, d’assiduité et d’acceptation des offres d’activité reçues.\n\n\n<!-- -->\n\n**Plusieurs solutions** peuvent être proposées pendant les parcours comme par exemple :\n\n- Une formation qualifiante ou préqualifiante ;\n\n- Une mission d’utilité sociale (ex. : service civique) ;\n\n- Des mises en situation en emploi (ex. : stages ou immersions en entreprise) ;\n\n- Une alternance (ex. : contrat d’apprentissage ou de professionnalisation).\n\n- Un contrat de travail de moins de 6 mois, un contrat \"aidé\" ou un contrat dans une structure de l'IAE\n\n\n<!-- -->\n\n**Un référent unique tout au long du parcours **\n\nChaque jeune est accompagné par un conseiller qui reste son référent tout au long du parcours.\n\n**Une application** facilite les échanges avec le conseiller mission locale et le jeune accompagné.\n\n**Des droits pour les jeunes bénéficiaires et des devoirs**\n\nLe Contrat d’Engagement Jeune fonctionne à une condition : être motivé, accepter les formations, les stages, les emplois qui sont proposés. Le dispositif est suspendu en cas de refus du bénéficiaire.\n\n**Le Contrat d’Engagement Jeune mobilise les entreprises** pour favoriser les découvertes de métiers, les immersions dans un collectif de travail et la formation en alternance.\n\n",
-      "description_short": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi. Il s'agit d'un programme intensif d’accompagnement dans le projet professionnel et l'emploi.",
-      "dora_synced_at": "2026-06-15T09:16:29.343Z",
       "eligibility_zones": "[\"90\"]",
       "extra": {
         "forms": [
@@ -1703,30 +1249,10 @@
       },
       "fee": 1,
       "fee_details": "Service entièrement pris en charge, sans avance de frais.",
-      "funding_labels": [],
       "insee_city": 34249,
       "is_active": true,
-      "is_orientable_with_form": true,
       "kind": 134,
       "lien_mobilisation": "",
-      "mobilization_modes_beneficiaries": [
-        213,
-        215,
-        217,
-        221
-      ],
-      "mobilization_modes_beneficiaries_external_form_link": "https://missionslocales.com/contact/",
-      "mobilization_modes_beneficiaries_external_form_link_text": "Nous contacter",
-      "mobilization_modes_beneficiaries_other": "",
-      "mobilization_modes_professionals": [
-        216,
-        218,
-        220,
-        222
-      ],
-      "mobilization_modes_professionals_external_form_link": "",
-      "mobilization_modes_professionals_external_form_link_text": "",
-      "mobilization_modes_professionals_other": "",
       "mobilization_publics": [
         7,
         8
@@ -1740,7 +1266,6 @@
       "name": "CEJ - Contrat d'Engagement Jeune",
       "nombre_semaines": 52,
       "opening_hours": "Mo-Fr 09:00-12:00,14:00-17:00; PH off",
-      "opening_hours_text": "Du lundi au vendredi de 9 h à 12 h et de 14 h à 17 h.",
       "post_code": "90000",
       "publics": [
         123

@@ -53,7 +53,6 @@ def test_orientation_wizard_happy_path(client, snapshot, mailoutbox):
         uid="test-orientation-wizard-uid",
         name="Service orientation wizard",
         updated_on="2025-01-15",
-        is_orientable_with_form=True,
         source__value="dora",
         structure__uid="test-structure-orientation-wizard-uid",
         structure__name="Structure orientation wizard",
@@ -179,7 +178,6 @@ def test_documents_step_credential_documents(client):
     prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
-        is_orientable_with_form=True,
         extra={
             "forms": [
                 {
@@ -248,7 +246,6 @@ def test_documents_step_credential_documents(client):
 
 def test_start_requires_login(client):
     service = ServiceFactory(
-        is_orientable_with_form=True,
         structure__name="Structure orientation wizard",
     )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
@@ -265,7 +262,7 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
     source_value = "source-name"
     if is_blacklisted:
         settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
-    service = ServiceFactory(is_orientable_with_form=True, source__value=source_value)
+    service = ServiceFactory(source__value=source_value)
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
     client.force_login(prescriber)
 
@@ -273,16 +270,9 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
     assert response.status_code == status_code
 
 
-@pytest.mark.parametrize(
-    "service_kwargs",
-    [
-        pytest.param({"contact_email": ""}, id="missing_contact_email"),
-        pytest.param({"is_orientable_with_form": False}, id="not_orientable_with_dora_form"),
-    ],
-)
-def test_start_without_mobilization_link_uses_wizard(client, service_kwargs):
+def test_start_without_mobilization_link_uses_wizard(client):
     prescriber = PrescriberFactory()
-    service = ServiceFactory(**service_kwargs)
+    service = ServiceFactory(contact_email="")
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
     client.force_login(prescriber)
 
@@ -295,7 +285,6 @@ def test_start_orientation_redirects_when_external_link_preferred(client, settin
     source_value = "blacklisted-source"
     settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
     service = ServiceFactory(
-        is_orientable_with_form=False,
         source__value=source_value,
         lien_mobilisation="https://test.example.com",
     )
@@ -314,7 +303,7 @@ def test_orientation_select_job_seeker_with_non_orientable_di_sources(client, se
     source_value = "source-name"
     if is_blacklisted:
         settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
-    service = ServiceFactory(is_orientable_with_form=False, source__value=source_value)
+    service = ServiceFactory(source__value=source_value)
     select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
     client.force_login(prescriber)
 
@@ -326,7 +315,6 @@ def test_orientation_select_job_seeker_with_non_orientable_di_sources(client, se
 def test_orientation_select_job_seeker_redirects_when_external_link_preferred(client):
     prescriber = PrescriberFactory()
     service = ServiceFactory(
-        is_orientable_with_form=True,
         source__value="other",
         lien_mobilisation="https://test.example.com",
     )
@@ -343,7 +331,6 @@ def test_session_isolation_between_users(client):
     prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
     service = ServiceFactory(
-        is_orientable_with_form=True,
         structure__name="Structure orientation wizard",
     )
     intruder = PrescriberFactory()
@@ -366,7 +353,7 @@ def test_session_isolation_between_users(client):
 def test_orientation_wizard_shows_banner_and_generic_title(client):
     prescriber = PrescriberMembershipFactory(organization__authorized=True).user
     job_seeker = JobSeekerFactory(first_name="Jane", last_name="Doe")
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -391,7 +378,6 @@ def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snap
         uid="test-orientation-incomplete-uid",
         name="Service orientation incomplete",
         updated_on="2025-01-15",
-        is_orientable_with_form=True,
         structure__uid="test-structure-orientation-incomplete-uid",
         structure__name="Structure orientation wizard",
         structure__updated_on="2025-01-15",
@@ -435,7 +421,6 @@ def test_orientation_wizard_happy_path_as_employer(client, mailoutbox):
     )
     JobSeekerAssignmentFactory(professional=user, company=organization, job_seeker=job_seeker)
     service = ServiceFactory(
-        is_orientable_with_form=True,
         structure__name="Structure orientation employeur",
         contact_email="service.contact@email.fake",
     )
@@ -516,7 +501,7 @@ def test_orientation_wizard_success_toast_personal_information(client, mocker, a
         created_by=prescriber if created_by else None,
     )
     JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -565,7 +550,7 @@ def test_orientation_wizard_links_latest_unlinked_mobilization_event(client):
     organization = membership.organization
     job_seeker = JobSeekerFactory(first_name="Jean", last_name="Dupont", email="usager@example.org")
     JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -605,7 +590,7 @@ def test_orientation_wizard_links_latest_unlinked_mobilization_event(client):
         older_event = MobilizationEventFactory(service=service, structure=service.structure, **event_kwargs)
     latest_event = MobilizationEventFactory(service=service, structure=service.structure, **event_kwargs)
     # An iMER for another service must not be linked.
-    other_service = ServiceFactory(is_orientable_with_form=True)
+    other_service = ServiceFactory()
     other_event = MobilizationEventFactory(service=other_service, structure=other_service.structure, **event_kwargs)
 
     client.post(documents_url, {"gdpr_consent": "on"})
@@ -625,7 +610,6 @@ def test_orientation_wizard_no_email_if_sender_is_referent(client, mailoutbox):
     job_seeker = JobSeekerFactory()
     JobSeekerAssignmentFactory(professional=user, company=organization, job_seeker=job_seeker)
     service = ServiceFactory(
-        is_orientable_with_form=True,
         structure__name="Structure orientation employeur",
         contact_email="service.contact@email.fake",
     )
@@ -671,7 +655,7 @@ def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(
     coworker = CompanyMembershipFactory(company=company).user
     job_seeker = JobSeekerFactory(first_name="Jean", last_name="Dupont")
     JobSeekerAssignmentFactory(professional=coworker, company=company, job_seeker=job_seeker)
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     select_job_seeker_url = reverse(
         "insertion_views:orientation_select_job_seeker",
         kwargs={"service_uid": service.uid},
@@ -691,7 +675,7 @@ def test_conformity_step_allows_missing_beneficiary_phone(client):
         phone="",
         email="test@example.org",
     )
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -713,7 +697,7 @@ def test_conformity_step_allows_missing_beneficiary_phone(client):
 def test_orientation_banner_quitter_ignores_back_url(client):
     prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory()
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     service_detail_url = (
         reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
         + f"?job_seeker_public_id={job_seeker.public_id}&back_url=/search/services/results"
@@ -728,7 +712,7 @@ def test_orientation_banner_quitter_ignores_back_url(client):
 def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
     prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory()
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
     client.force_login(prescriber)
@@ -748,7 +732,6 @@ def test_no_error_when_special_chars_in_uid(client):
     """Check that reset url and redirection to orientation_select_job_seeker have encoded uids"""
     prescriber = PrescriberFactory()
     service = ServiceFactory(
-        is_orientable_with_form=True,
         structure__name="Structure orientation wizard",
         uid="fredo--97416_13643-activités / ateliers",  # real case
     )
@@ -767,7 +750,7 @@ def test_no_error_when_special_chars_in_uid(client):
 
 def test_orientation_create_job_seeker_starts_with_search_by_email(client):
     prescriber = PrescriberFactory()
-    service = ServiceFactory(is_orientable_with_form=True)
+    service = ServiceFactory()
     create_job_seeker_url = reverse(
         "job_seekers_views:get_or_create_start",
         query={
