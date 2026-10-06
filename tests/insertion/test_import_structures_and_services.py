@@ -16,7 +16,7 @@ from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactor
 
 
 @pytest.fixture(name="apis_mocks")
-def apis_mocks_fixture(settings, respx_mock):
+def apis_mocks_fixture(respx_mock):
     mocks_dir = pathlib.Path(__file__).parent.joinpath("api_mocks")
 
     # data·inclusion API
@@ -24,15 +24,6 @@ def apis_mocks_fixture(settings, respx_mock):
     for file in di_mocks_dir.glob("**/*.json"):
         api_path = str(file.relative_to(di_mocks_dir)).replace(".json", "")
         respx_mock.get(f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/{api_path}").respond(
-            200, json=json.loads(file.read_text())
-        )
-
-    # DORA API
-    settings.DORA_API_BASE_URL = "https://dora-api"
-    dora_mocks_dir = mocks_dir.joinpath("dora")
-    for file in dora_mocks_dir.glob("**/*.json"):
-        api_path = str(file.relative_to(dora_mocks_dir)).replace(".json", "")
-        respx_mock.get(f"{settings.DORA_API_BASE_URL}/api/emplois/{api_path}/").respond(
             200, json=json.loads(file.read_text())
         )
 
@@ -68,9 +59,6 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         transform=attrgetter("uid"),
         ordered=False,
     )
-    assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").dora_synced_at is not None
-    assert Service.objects.get(uid="emplois-de-linclusion--null").dora_synced_at is None
-
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").extra == {
         "funding_labels": ["France Travail", "Conseil départemental"],
     }
@@ -88,11 +76,6 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     )
     assert Structure.objects.get(uid="emplois-de-linclusion--null").accessibilite_lieu == ""
 
-    assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").is_orientable_with_form is False
-    assert Service.objects.get(uid="mission-locale--with-mobilization-link").is_orientable_with_form is False
-    assert Service.objects.get(uid="dora--blacklisted-service").is_orientable_with_form is False
-    assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").is_orientable_with_form is True
-    assert Service.objects.get(uid="dora--allowed-service-structure-no-email").is_orientable_with_form is True
     assert (
         Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").average_orientation_response_delay_days
         is None

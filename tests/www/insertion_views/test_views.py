@@ -430,10 +430,6 @@ class TestServices:
             source__value="dora",
             source__label="Dora",
             source_link="https://dora.inclusion.gouv.fr/services/test-service-uid",
-            # dora-only fields — should appear
-            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
-            credentials=["Pièce d'identité en cours de validité"],
-            # DI-only field — should NOT appear
             access_conditions_di="Ne doit pas apparaître pour dora",
             structure__uid="test-structure-uid",
             structure__name="Ma structure de test",
@@ -452,12 +448,7 @@ class TestServices:
             updated_on="2025-01-15",
             source__value="other",
             source__label="Other",
-            # DI-only field — should appear
             access_conditions_di="Être orienté par un prescripteur\\nAvoir 18 ans",
-            # dora-only fields — should NOT appear
-            mobilization_modes_professionals_other="Ne doit pas apparaître pour data·inclusion",
-            access_conditions_dora=["Ne doit pas apparaître pour data·inclusion"],
-            credentials=["Ne doit pas apparaître pour data·inclusion"],
             structure__uid="test-structure-uid",
             structure__name="Ma structure de test",
             structure__updated_on="2025-01-15",
@@ -505,18 +496,14 @@ class TestServices:
             name="Service complet",
             updated_on="2025-06-01",
             description="## Description complète\n\nAvec du **markdown**.",
-            description_short="Résumé court du service.",
             source=source,
             source_link="https://dora.inclusion.gouv.fr/services/test",
             fee=fee,
             fee_details="Sous conditions de ressources.",
             publics_details="Toute personne majeure.",
-            access_conditions_dora=["Être orienté par un prescripteur."],
             mobilizations_details="Contacter le service par téléphone.",
             contact_email="contact@service.fr",
             contact_phone="01 23 45 67 89",
-            is_orientable_with_form=True,
-            average_orientation_response_delay_days=3,
             volume_horaire_hebdomadaire=21,
             nombre_semaines=16,
             opening_hours="Mo-Fr 09:00-17:00; PH off",
@@ -576,14 +563,22 @@ class TestServices:
         ]
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
-    def test_detail_response_delay_shown_only_with_active_form(self, client):
+    def test_detail_response_delay_shown_only_for_internal_orientation_form(self, client, settings):
         label = "Réponse au formulaire"
-        user = PrescriberFactory()
-        client.force_login(user)
-        shown = ServiceFactory(is_orientable_with_form=True, average_orientation_response_delay_days=3)
-        hidden = ServiceFactory(is_orientable_with_form=False, average_orientation_response_delay_days=3)
+        settings.NON_ORIENTABLE_DI_SOURCES = ["blacklisted-source"]
+        client.force_login(PrescriberFactory())
+        shown = ServiceFactory(average_orientation_response_delay_days=3)
+        hidden_source = ServiceFactory(
+            source__value="blacklisted-source",
+            average_orientation_response_delay_days=3,
+        )
+        hidden_link = ServiceFactory(
+            lien_mobilisation="https://test.example.com",
+            average_orientation_response_delay_days=3,
+        )
         assertContains(client.get(self.get_service_url(shown)), label)
-        assertNotContains(client.get(self.get_service_url(hidden)), label)
+        assertNotContains(client.get(self.get_service_url(hidden_source)), label)
+        assertNotContains(client.get(self.get_service_url(hidden_link)), label)
 
     def test_detail_with_external_orientation_link(self, client, snapshot):
         user = PrescriberFactory()
@@ -592,7 +587,6 @@ class TestServices:
             uid="test-external-uid",
             name="Service avec lien externe",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             lien_mobilisation="https://test.example.com",
             structure__uid="test-structure-external-uid",
             structure__updated_on="2025-01-15",
@@ -673,7 +667,6 @@ class TestServices:
             uid="test-external-no-text-uid",
             name="Service avec lien externe sans intitulé",
             updated_on="2025-01-15",
-            is_orientable_with_form=False,
             lien_mobilisation=external_link,
             structure__uid="test-structure-external-no-text-uid",
             structure__updated_on="2025-01-15",
@@ -690,7 +683,6 @@ class TestServices:
             uid="test-orientable-ext-uid",
             name="DI service orientable avec lien externe",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             lien_mobilisation=external_link,
             structure__uid="test-structure-orientable-ext-uid",
             structure__updated_on="2025-01-15",
@@ -708,7 +700,6 @@ class TestServices:
             uid="test-orientable-uid",
             name="Service orientable",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             structure__uid="test-structure-orientable-uid",
             structure__updated_on="2025-01-15",
         )
@@ -727,7 +718,6 @@ class TestServices:
         service = ServiceFactory(
             uid="test-orientable-job-seeker-uid",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             structure__uid="test-structure-orientable-job-seeker-uid",
             structure__updated_on="2025-01-15",
         )
@@ -746,7 +736,6 @@ class TestServices:
             uid="test-orientable-uid",
             name="Service orientable",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             structure__uid="test-structure-orientable-uid",
             structure__updated_on="2025-01-15",
         )
@@ -761,7 +750,6 @@ class TestServices:
             uid="test-not-orientable-uid",
             name="Service orientable via le formulaire interne",
             updated_on="2025-01-15",
-            is_orientable_with_form=False,
             contact_email="",
             source__value="dora",
             structure__uid="test-structure-not-orientable-uid",
@@ -774,9 +762,7 @@ class TestServices:
 
     def test_detail_without_mobilization_link_uses_wizard_without_contact_email(self, client):
         user = PrescriberFactory()
-        service = ServiceFactory(
-            is_orientable_with_form=True, contact_email="", contact_full_name="Ludwig B.", contact_phone="3949"
-        )
+        service = ServiceFactory(contact_email="", contact_full_name="Ludwig B.", contact_phone="3949")
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertContains(response, self.ORIENT_BTN_LABEL)
@@ -789,7 +775,6 @@ class TestServices:
             uid="test-orientable-uid",
             name="Service non orientable",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             source__value=blacklisted_source,
             contact_full_name="",
             contact_email="",
@@ -809,7 +794,6 @@ class TestServices:
             uid="test-orientable-uid",
             name="Service non orientable",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             lien_mobilisation=external_link,
             source__value=blacklisted_source,
         )
@@ -823,7 +807,6 @@ class TestServices:
         service = ServiceFactory(
             uid="test-no-contact-uid",
             updated_on="2025-01-15",
-            is_orientable_with_form=False,
             contact_full_name="",
             contact_email="",
             contact_phone="",
@@ -940,7 +923,6 @@ class TestServices:
         service = ServiceFactory(
             uid="test-wizard-uid",
             updated_on="2025-01-15",
-            is_orientable_with_form=True,
             structure__uid="test-structure-wizard-uid",
             structure__updated_on="2025-01-15",
         )
@@ -1071,44 +1053,6 @@ class TestServices:
         assert self.format_categories(service) == [
             ("Créer une entreprise", "Définir son projet, Développer son entreprise"),
         ]
-
-    def test_other_field_not_shown_without_autre_mode(self, client):
-        mode_phone = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            value="telephonique",
-            label="Par téléphone",
-        )
-        service = ServiceFactory(
-            uid="other-hidden-no-autre",
-            updated_on="2025-01-15",
-            source__value="dora",
-            mobilization_modes_professionals_other="Ce texte ne doit pas apparaître",
-            structure__uid="structure-other-hidden-no-autre",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_professionals.add(mode_phone)
-        response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Ce texte ne doit pas apparaître")
-
-    def test_beneficiaries_other_field_not_shown_without_autre_mode(self, client):
-        mode_presentiel = GenericReferenceItemFactory(
-            source=GenericReferenceItemSource.DORA,
-            kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            value="en-presentiel",
-            label="En présentiel",
-        )
-        service = ServiceFactory(
-            uid="ben-other-hidden",
-            updated_on="2025-01-15",
-            source__value="dora",
-            mobilization_modes_beneficiaries_other="Ce texte beneficiaire ne doit pas apparaitre",
-            structure__uid="structure-ben-other-hidden",
-            structure__updated_on="2025-01-15",
-        )
-        service.mobilization_modes_beneficiaries.add(mode_presentiel)
-        response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Ce texte beneficiaire ne doit pas apparaitre")
 
     @pytest.mark.parametrize(
         "user_factory,assertion",
@@ -1334,7 +1278,6 @@ class TestOrientationDetailsForSender:
             uid="test-service-uid",
             name="Service complet",
             source__value="dora",
-            access_conditions_dora=["Être orienté par un prescripteur."],
             mobilizations_details="Contacter le service par téléphone.",
         )
 

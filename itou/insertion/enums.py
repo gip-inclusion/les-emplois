@@ -10,11 +10,8 @@ class GenericReferenceItemSource(models.TextChoices):
 
 class GenericReferenceItemKind(models.TextChoices):
     FEE = "FEE", "Frais"
-    FUNDING_LABEL = "FUNDING_LABEL", "Label de financement"
     MOBILIZATION = "MOBILIZATION", "Mode de mobilisation"
-    MOBILIZATION_BENEFICIARY = "MOBILIZATION_BENEFICIARY", "Mode de mobilisation usagers"
     MOBILIZATION_PUBLIC = "MOBILIZATION_PUBLIC", "Personne mobilisatrices"
-    MOBILIZATION_PROFESSIONAL = "MOBILIZATION_PROFESSIONAL", "Mode de mobilisation professionnels"
     NETWORK = "NETWORK", "Réseau porteur"
     PUBLIC = "PUBLIC", "Public"
     RECEPTION = "RECEPTION", "Mode d'accueil"

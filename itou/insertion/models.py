@@ -48,7 +48,7 @@ SERVICE_SEARCH_RADIUS_KM = 50
 
 
 class GeolocatedAddressMixin(models.Model):
-    """Address fields for objects imported from data·inclusion and DORA.
+    """Address fields for objects imported from data·inclusion.
 
     Deliberately kept separate from `common_apps.address.AddressMixin`: imported objects
     are already geocoded upstream and never go through our BAN geocoding pipeline.
@@ -286,7 +286,6 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     name = models.CharField(verbose_name="nom")
     description = models.TextField(verbose_name="description complète")
-    description_short = models.TextField(verbose_name="description courte", blank=True)
 
     kind = models.ForeignKey(
         verbose_name="type de service",
@@ -332,12 +331,6 @@ class Service(GeolocatedAddressMixin, models.Model):
     publics_details = models.TextField(verbose_name="publics visés - précisions", blank=True)
 
     access_conditions_di = models.TextField(verbose_name="critères d’admission (data·inclusion)", blank=True)
-    access_conditions_dora = ArrayField(
-        verbose_name="critères d’admission (DORA)",
-        base_field=models.CharField(),
-        default=list,
-        blank=True,
-    )
 
     eligibility_zones = ArrayField(
         verbose_name="zones d’éligibilité",
@@ -378,69 +371,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
 
-    # DORA's mobilization fields
-    mobilization_modes_beneficiaries = models.ManyToManyField(
-        verbose_name="comment mobiliser la solution en tant qu’usager",
-        to=GenericReferenceItem,
-        limit_choices_to={
-            "source": GenericReferenceItemSource.DORA,
-            "kind": GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-        },
-        related_name="+",
-    )
-    mobilization_modes_beneficiaries_external_form_link = models.URLField(
-        verbose_name="lien vers le formulaire externe", blank=True, max_length=2000
-    )
-    mobilization_modes_beneficiaries_external_form_link_text = models.CharField(
-        verbose_name="l’intitulé du lien vers le formulaire externe",
-        blank=True,
-    )
-    mobilization_modes_beneficiaries_other = models.CharField(verbose_name="autre", blank=True)
-    mobilization_modes_professionals = models.ManyToManyField(
-        verbose_name="comment orienter un usager en tant qu’accompagnateur",
-        to=GenericReferenceItem,
-        limit_choices_to={
-            "source": GenericReferenceItemSource.DORA,
-            "kind": GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-        },
-        related_name="+",
-    )
-    mobilization_modes_professionals_external_form_link = models.URLField(
-        verbose_name="lien vers le formulaire externe", blank=True, max_length=2000
-    )
-    mobilization_modes_professionals_external_form_link_text = models.CharField(
-        verbose_name="l’intitulé du lien vers le formulaire externe",
-        blank=True,
-    )
-    mobilization_modes_professionals_other = models.CharField(verbose_name="autre", blank=True)
-
-    credentials = ArrayField(
-        verbose_name="justificatifs à fournir",
-        base_field=models.CharField(),
-        default=list,
-        blank=True,
-    )
-    credentials_documents = ArrayField(
-        verbose_name="documents justificatifs à compléter",
-        base_field=models.CharField(max_length=1024),  # See File().key for `max_length` rational
-        default=list,
-        blank=True,
-    )
-    credentials_online_form = models.URLField(
-        verbose_name="formulaire en ligne à compléter",
-        blank=True,
-        # No `max_length` to use Django's default just like DORA
-    )
-
-    funding_labels = models.ManyToManyField(
-        verbose_name="labels de financement",
-        to=GenericReferenceItem,
-        limit_choices_to={"source": GenericReferenceItemSource.DORA, "kind": GenericReferenceItemKind.FUNDING_LABEL},
-        related_name="+",
-    )
-
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
-    opening_hours_text = models.CharField(verbose_name="horaires d'accueil (texte libre)", blank=True)
     volume_horaire_hebdomadaire = models.FloatField(verbose_name="volume horaire hebdomadaire", null=True, blank=True)
     nombre_semaines = models.PositiveIntegerField(verbose_name="nombre de semaines", null=True, blank=True)
 
@@ -449,12 +380,9 @@ class Service(GeolocatedAddressMixin, models.Model):
     contact_phone = models.CharField(verbose_name="téléphone du contact", max_length=20, blank=True)
     contact_is_public = models.BooleanField(verbose_name="informations du contact publiques", default=True)
 
-    is_orientable_with_form = models.BooleanField(verbose_name="formulaire d'orientation actif", default=True)
     average_orientation_response_delay_days = models.PositiveIntegerField(
         verbose_name="temps moyen de réponse aux orientations (jour)", null=True
     )
-
-    dora_synced_at = models.DateTimeField(verbose_name="date de synchronisation DORA", null=True, blank=True)
 
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
 
@@ -505,13 +433,6 @@ class Service(GeolocatedAddressMixin, models.Model):
         if self.contact_email:
             modes.append(EMAIL)
         return modes
-
-    # FIXME(vperron): this method is now completely unused, remove it along with
-    # any "legacy" DORA fields in the services and structures models and their related uses.
-    def generate_credential_documents_info(self) -> list[tuple[str, str]]:
-        return [
-            (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
-        ]
 
     def generate_extra_credential_documents_info(self) -> list[tuple[str, str]]:
         if not self.extra:

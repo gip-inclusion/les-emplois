@@ -3,14 +3,11 @@ import enum
 import functools
 
 from django.conf import settings
-from django.db.models.functions import Substr
-from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 
 from itou.cities.models import City
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.insertion.models import (
-    SOURCE_DORA_VALUE,
     GenericReferenceItem,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
@@ -19,7 +16,6 @@ from itou.insertion.models import (
 )
 from itou.utils import constants as global_constants, diff
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiItemsIterator
-from itou.utils.apis.dora import DoraAPIClient, DoraApiItemsIterator
 from itou.utils.command import BaseCommand
 from itou.utils.db import lock_timeout
 
@@ -30,122 +26,10 @@ class ArgumentData(enum.StrEnum):
     SERVICES = "services"
 
 
-ORIENTATION_SIRENE_BLACKLIST = [
-    # CAF
-    "303336192",
-    "314307828",
-    "314560822",
-    "314635368",
-    "315190751",
-    "327398152",
-    "380980300",
-    "380992255",
-    "381002534",
-    "381016534",
-    "381050996",
-    "381067784",
-    "381202282",
-    "534037254",
-    "534089529",
-    "534092499",
-    "534155403",
-    "534172481",
-    "534175179",
-    "534214051",
-    "534216080",
-    "534224282",
-    "534224613",
-    "534738778",
-    "535326656",
-    "535363071",
-    "775021801",
-    "775103955",
-    "775189038",
-    "775347875",
-    "775369598",
-    "775513708",
-    "775548555",
-    "775549371",
-    "775555642",
-    "775558364",
-    "775561343",
-    "775562531",
-    "775564669",
-    "775573397",
-    "775613227",
-    "775613995",
-    "775615529",
-    "775622335",
-    "775624588",
-    "775627383",
-    "775629256",
-    "775634264",
-    "775640238",
-    "775653330",
-    "775710791",
-    "775714124",
-    "775716202",
-    "775717333",
-    "775915085",
-    "776115255",
-    "776531576",
-    "776656209",
-    "776744005",
-    "776950446",
-    "776986671",
-    "777053125",
-    "777169046",
-    "777187691",
-    "777306184",
-    "777461336",
-    "777749375",
-    "777907700",
-    "777927138",
-    "777998881",
-    "778073189",
-    "778213348",
-    "778274613",
-    "778297242",
-    "778422832",
-    "778477737",
-    "778542837",
-    "778600130",
-    "778649525",
-    "778714964",
-    "778868497",
-    "778953844",
-    "779145598",
-    "779311224",
-    "780004032",
-    "780254702",
-    "780349759",
-    "780428975",
-    "780808010",
-    "780860292",
-    "781172366",
-    "781459599",
-    "781847488",
-    "782099121",
-    "782152888",
-    "782437586",
-    "782620520",
-    "782993133",
-    "783169196",
-    "783382344",
-    "783806110",
-    "783911951",
-    "784971343",
-    "786019554",
-    "786338871",
-    "786448050",
-    "831358262",
-]
-
-
 class Command(BaseCommand):
     ATOMIC_HANDLE = True
 
-    help = "Import data·inclusion/DORA structures and services"
+    help = "Import data·inclusion structures and services"
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
@@ -211,45 +95,6 @@ class Command(BaseCommand):
                     diff_item.current_item.delete()
 
             self.logger.info(differ.summary_label())
-
-        GenericReferenceItem.objects.bulk_create(to_create)
-
-    def import_dora_reference_data(self, client):
-        self.logger.info("Importing DORA references data")
-        to_create = []
-        dora_kind_mapping = {
-            "beneficiary_access_mode": GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            "coach_orientation_mode": GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            "funding_label": GenericReferenceItemKind.FUNDING_LABEL,
-        }
-
-        differ = diff.CollectionDiffer(
-            GenericReferenceItem.objects.filter(source=GenericReferenceItemSource.DORA),
-            client.reference_data(),
-            ["kind", "value"],
-            watched_data={"label": "label"},
-            comparative_data_converters={"kind": dora_kind_mapping.get},
-        )
-        for diff_item in differ:
-            self.logger.info(diff_item.label())
-
-            if diff_item.kind is diff.DiffItemKind.ADDED:
-                to_create.append(
-                    GenericReferenceItem(
-                        source=GenericReferenceItemSource.DORA,
-                        kind=dora_kind_mapping[diff_item.comparative_item["kind"]],
-                        value=diff_item.comparative_item["value"],
-                        label=diff_item.comparative_item["label"],
-                    )
-                )
-            elif diff_item.kind is diff.DiffItemKind.UPDATED:
-                for current_item_attr, data_diff in diff_item.data.items():
-                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
-                diff_item.current_item.save(update_fields={*diff_item.data.keys(), "updated_at"})
-            elif diff_item.kind is diff.DiffItemKind.REMOVED:
-                diff_item.current_item.delete()
-
-        self.logger.info(differ.summary_label())
 
         GenericReferenceItem.objects.bulk_create(to_create)
 
@@ -346,18 +191,6 @@ class Command(BaseCommand):
 
         structure.updated_on = data["date_maj"]
 
-    def _fill_structure_related_fields_from_data(self, structure, data, is_creation):
-        objs = self.get_reference_set_from_data(
-            data,
-            "reseaux_porteurs",
-            GenericReferenceItemSource.DATA_INCLUSION,
-            GenericReferenceItemKind.NETWORK,
-        )
-        if is_creation:
-            structure.reseaux_porteurs.add(*objs)
-        else:
-            structure.reseaux_porteurs.set(objs)
-
     def import_structures(self, client, sources, *, force_update=False):
         self.logger.info("Importing structures")
 
@@ -373,150 +206,33 @@ class Command(BaseCommand):
         for diff_item in differ:
             self.logger.info(diff_item.label())
 
-            if diff_item.kind is diff.DiffItemKind.ADDED:
-                structure = Structure()
-                self._fill_structure_from_api_data(structure, diff_item.comparative_item)
-                structure.save()
-                self._fill_structure_related_fields_from_data(structure, diff_item.comparative_item, is_creation=True)
-            elif diff_item.kind is diff.DiffItemKind.UPDATED:
-                self._fill_structure_from_api_data(diff_item.current_item, diff_item.comparative_item)
-                diff_item.current_item.save()
-                self._fill_structure_related_fields_from_data(
-                    diff_item.current_item, diff_item.comparative_item, is_creation=False
-                )
-            elif diff_item.kind is diff.DiffItemKind.REMOVED:
+            if diff_item.kind is diff.DiffItemKind.REMOVED:
                 removed_uids.append(diff_item.key[0])
+                continue
+
+            if diff_item.kind is diff.DiffItemKind.UPDATED:
+                structure = diff_item.current_item
+            else:
+                structure = Structure()
+            self._fill_structure_from_api_data(structure, diff_item.comparative_item)
+            structure.save()
+            networks = self.get_reference_set_from_data(
+                diff_item.comparative_item,
+                "reseaux_porteurs",
+                GenericReferenceItemSource.DATA_INCLUSION,
+                GenericReferenceItemKind.NETWORK,
+            )
+            if diff_item.kind is diff.DiffItemKind.ADDED:
+                structure.reseaux_porteurs.add(*networks)
+            else:
+                structure.reseaux_porteurs.set(networks)
 
         Structure.include_inactive.filter(is_active=True, uid__in=removed_uids).update(is_active=False)
         Structure.include_inactive.filter(is_active=False).exclude(uid__in=removed_uids).update(is_active=True)
 
         self.logger.info(differ.summary_label())
 
-    def _fill_service_from_dora_api_data(self, service, dora_services):
-        dora_data = dora_services.get(service.uid)
-
-        if service.source.value != SOURCE_DORA_VALUE or not dora_data:
-            if service.source.value == SOURCE_DORA_VALUE:
-                self.logger.warning("Service uid=%s was not returned by the DORA API", service.uid)
-            service.dora_synced_at = None
-            return
-
-        service.is_orientable_with_form = dora_data["is_orientable_with_form"]
-
-        service.description_short = dora_data["short_desc"]
-
-        service.access_conditions_dora = dora_data["access_conditions"]
-
-        service.mobilization_modes_beneficiaries_external_form_link = dora_data[
-            "beneficiaries_access_modes_external_form_link"
-        ]
-        service.mobilization_modes_beneficiaries_external_form_link_text = dora_data[
-            "beneficiaries_access_modes_external_form_link_text"
-        ]
-        service.mobilization_modes_beneficiaries_other = dora_data["beneficiaries_access_modes_other"]
-        service.mobilization_modes_professionals_external_form_link = dora_data[
-            "coach_orientation_modes_external_form_link"
-        ]
-        service.mobilization_modes_professionals_external_form_link_text = dora_data[
-            "coach_orientation_modes_external_form_link_text"
-        ]
-        service.mobilization_modes_professionals_other = dora_data["coach_orientation_modes_other"]
-
-        service.credentials = dora_data["credentials"]
-        service.credentials_documents = dora_data["forms"]
-        service.credentials_online_form = dora_data["online_form"]
-
-        # TODO: Try to parse it as a OSM opening hours to fill `.opening_hours`
-        service.opening_hours_text = dora_data["recurrence"]
-
-        service.contact_is_public = dora_data["is_contact_info_public"]
-        service.contact_full_name = dora_data["contact_name"]
-        service.contact_phone = dora_data["contact_phone"]
-        service.contact_email = dora_data["contact_email"]
-
-        service.dora_synced_at = timezone.now()
-
-    def _fill_service_related_fields_from_data(self, service, data, dora_services, is_creation):
-        def do_m2m_operation(attr, objs):
-            """Heavily reduce queries numbers when creating new object.
-
-            I would have used .set() but most ManyRelatedManager operations clear
-            the prefetch cache so we can't rely on it and have to make that kind of things"""
-            m2m_manager = getattr(service, attr)
-            if is_creation:
-                m2m_manager.add(*objs)
-            else:
-                m2m_manager.set(objs)
-
-        do_m2m_operation(
-            "thematics",
-            self.get_reference_set_from_data(
-                data, "thematiques", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.THEMATIC
-            ),
-        )
-        do_m2m_operation(
-            "publics",
-            self.get_reference_set_from_data(
-                data, "publics", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.PUBLIC
-            ),
-        )
-        do_m2m_operation(
-            "receptions",
-            self.get_reference_set_from_data(
-                data, "modes_accueil", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.RECEPTION
-            ),
-        )
-        do_m2m_operation(
-            "mobilizations",
-            self.get_reference_set_from_data(
-                data,
-                "modes_mobilisation",
-                GenericReferenceItemSource.DATA_INCLUSION,
-                GenericReferenceItemKind.MOBILIZATION,
-            ),
-        )
-        do_m2m_operation(
-            "mobilization_publics",
-            self.get_reference_set_from_data(
-                data,
-                "mobilisable_par",
-                GenericReferenceItemSource.DATA_INCLUSION,
-                GenericReferenceItemKind.MOBILIZATION_PUBLIC,
-            ),
-        )
-        dora_data = dora_services.get(service.uid)
-        if service.source.value != SOURCE_DORA_VALUE or not dora_data:
-            return
-
-        do_m2m_operation(
-            "funding_labels",
-            self.get_reference_set_from_data(
-                dora_data,
-                "funding_labels",
-                GenericReferenceItemSource.DORA,
-                GenericReferenceItemKind.FUNDING_LABEL,
-            ),
-        )
-        do_m2m_operation(
-            "mobilization_modes_beneficiaries",
-            self.get_reference_set_from_data(
-                dora_data,
-                "beneficiaries_access_modes",
-                GenericReferenceItemSource.DORA,
-                GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-            ),
-        )
-        do_m2m_operation(
-            "mobilization_modes_professionals",
-            self.get_reference_set_from_data(
-                dora_data,
-                "coach_orientation_modes",
-                GenericReferenceItemSource.DORA,
-                GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-            ),
-        )
-
-    def _fill_and_save_service_from_api_data(self, obj, data, dora_services, structures):
+    def _fill_and_save_service_from_api_data(self, obj, data, structures):
         service, is_creation = (obj, False) if obj is not None else (Service(), True)
         # Fill non ManyToManyField
         service.uid = data["id"]
@@ -574,7 +290,6 @@ class Command(BaseCommand):
         self._void_if_max_len(service, "contact_phone")
 
         self._fill_geolocation_from_api_data(service, data)
-        self._fill_service_from_dora_api_data(service, dora_services)
 
         # Producer-specific blob; see Service.extra for the expected DORA shape.
         service.extra = data.get("extra")
@@ -583,11 +298,24 @@ class Command(BaseCommand):
 
         service.save()  # Save to have a PK for ManyToManyField fields
 
-        self._fill_service_related_fields_from_data(service, data, dora_services, is_creation)  # Fill ManyToManyField
+        # .add() on creation avoids the extra SELECT that .set() does to diff existing rows.
+        related_fields = [
+            ("thematics", "thematiques", GenericReferenceItemKind.THEMATIC),
+            ("publics", "publics", GenericReferenceItemKind.PUBLIC),
+            ("receptions", "modes_accueil", GenericReferenceItemKind.RECEPTION),
+            ("mobilizations", "modes_mobilisation", GenericReferenceItemKind.MOBILIZATION),
+            ("mobilization_publics", "mobilisable_par", GenericReferenceItemKind.MOBILIZATION_PUBLIC),
+        ]
+        for attr, key, kind in related_fields:
+            objs = self.get_reference_set_from_data(data, key, GenericReferenceItemSource.DATA_INCLUSION, kind)
+            relation = getattr(service, attr)
+            if is_creation:
+                relation.add(*objs)
+            else:
+                relation.set(objs)
 
-    def import_services(self, di_client, dora_client, sources, *, force_update=False):
+    def import_services(self, di_client, sources, *, force_update=False):
         self.logger.info("Importing services")
-        dora_services = {"dora--" + item["id"]: item for item in DoraApiItemsIterator(dora_client.emplois_services)}
         structures = Structure.include_inactive.only("uid").in_bulk(field_name="uid")
 
         differ = diff.CollectionDiffer(
@@ -604,55 +332,20 @@ class Command(BaseCommand):
         for diff_item in differ:
             self.logger.info(diff_item.label())
 
-            if diff_item.kind is diff.DiffItemKind.ADDED:
-                self._fill_and_save_service_from_api_data(
-                    None,
-                    diff_item.comparative_item,
-                    dora_services,
-                    structures,
-                )
-            elif diff_item.kind is diff.DiffItemKind.UPDATED:
-                self._fill_and_save_service_from_api_data(
-                    diff_item.current_item,
-                    diff_item.comparative_item,
-                    dora_services,
-                    structures,
-                )
-            elif diff_item.kind is diff.DiffItemKind.REMOVED:
+            if diff_item.kind is diff.DiffItemKind.REMOVED:
                 removed_uids.append(diff_item.key[0])
+                continue
+
+            self._fill_and_save_service_from_api_data(
+                diff_item.current_item if diff_item.kind is diff.DiffItemKind.UPDATED else None,
+                diff_item.comparative_item,
+                structures,
+            )
 
         Service.include_inactive.filter(is_active=True, uid__in=removed_uids).update(is_active=False)
         Service.include_inactive.filter(is_active=False).exclude(uid__in=removed_uids).update(is_active=True)
 
         self.logger.info(differ.summary_label())
-
-    def import_disabled_structures(self, non_orientable_structures):
-        self.logger.info("Import disabled structures from DORA")
-
-        blacklisted_structures = (
-            Structure.objects.annotate(siren=Substr("siret", 1, 9))
-            .filter(siren__in=ORIENTATION_SIRENE_BLACKLIST)
-            .values_list("uid", flat=True)
-        )
-
-        di_structures_without_email = (
-            Structure.objects.exclude(source__value="dora").filter(email="").values_list("uid", flat=True)
-        )
-
-        all_disabled_structures = (
-            non_orientable_structures | set(blacklisted_structures) | set(di_structures_without_email)
-        )
-
-        updated_services = Service.objects.filter(
-            structure__uid__in=all_disabled_structures,
-            is_orientable_with_form=True,
-        ).update(is_orientable_with_form=False)
-
-        self.logger.info(
-            "Change 'is_orientable_with_form' ('True' -> 'False') for count=%d services based on count=%d structures",
-            updated_services,
-            len(all_disabled_structures),
-        )
 
     @dry_runnable
     def handle(self, *args, data, force_update=False, **options):
@@ -662,11 +355,9 @@ class Command(BaseCommand):
                 global_constants.API_DATA_INCLUSION_BASE_URL,
                 settings.API_DATA_INCLUSION_TOKEN,
             ) as di_client,
-            DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN) as dora_client,
         ):
             if ArgumentData.REFERENCES in data:
                 self.import_data_inclusion_reference_data(di_client)
-                self.import_dora_reference_data(dora_client)
                 self.import_sources(di_client)
 
             if ArgumentData.STRUCTURES in data or ArgumentData.SERVICES in data:
@@ -679,9 +370,4 @@ class Command(BaseCommand):
                 self.import_structures(di_client, sources_except_emplois, force_update=force_update)
 
             if ArgumentData.SERVICES in data:
-                self.import_services(di_client, dora_client, sources_except_emplois, force_update=force_update)
-
-            if ArgumentData.STRUCTURES in data or ArgumentData.SERVICES in data:
-                # Some data·inclusion services are non orientable with DORA's form.
-                non_orientable_structures = dora_client.disabled_dora_form_di_structures()
-                self.import_disabled_structures(non_orientable_structures)
+                self.import_services(di_client, sources_except_emplois, force_update=force_update)
