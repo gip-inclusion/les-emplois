@@ -417,9 +417,7 @@
                             <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
                                 <div class="d-flex align-items-start overflow-hidden me-2">
                                     <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                    <a href="mailto:{{ service.contact_email }}"
-                                       aria-label="Contact par mail"
-                                       class="text-break">{{ service.contact_email }}</a>
+                                    {% include "insertion/includes/service_mailto.html" with job_seeker=job_seeker can_orient_towards_insertion_service=can_orient_towards_insertion_service can_view_personal_information=can_view_personal_information service=service request=request inbound_key=inbound_key inbound_parsing_email=inbound_parsing_email only %}
                                 </div>
                                 {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
                                 {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}

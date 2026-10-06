@@ -21,6 +21,7 @@ from django.views.generic.edit import FormView
 from itoutils.django.decoupage_administratif.admin_division_parsing import get_division_label
 from rest_framework import status
 
+from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.files.models import File, save_file
 from itou.insertion import models as insertion_models
@@ -40,6 +41,7 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_register_mobilization_event,
 )
+from itou.utils.apis.inbound_parsing import generate_email, generate_key
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -160,6 +162,7 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
             self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
         )
         can_view_modal = has_contact_to_display and user_is_authorized
+        inbound_parsing_key = generate_key()
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)
@@ -179,6 +182,8 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
                 "formatted_categories": self.format_categories(),
                 "can_view_modal": can_view_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
+                "inbound_parsing_key": inbound_parsing_key,
+                "inbound_parsing_email": generate_email(InboundParsingKind.SERVICE_ANSWER, inbound_parsing_key),
             }
         )
 

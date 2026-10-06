@@ -1,0 +1,29 @@
+{% load format_filters %}
+{% load enums %}
+{% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
+<a aria-label="Contact par mail" class="text-break"{% if can_orient_towards_insertion_service and job_seeker %}data-emplois-mobilization-kind="{{ MobilizationEventKind.SEND_EMAIL_TO_SERVICE }}"{% endif %} href="mailto:{{ service.contact_email }}
+{% if can_orient_towards_insertion_service and job_seeker %}
+?reply-to={{ request.user.email }}&subject={{ request.user.get_full_name|urlencode }} de la structure {{ request.current_organization.display_name|urlencode }} souhaite vous adresser un bénéficiaire&body=
+  Bonjour,%0D%0A%0D%0AJe souhaiterais orienter un usager vers votre service {{ service.name|urlencode }}.
+
+  {% if job_seeker.jobseeker_profile.age or job_seeker.jobseeker_profile.city %}
+    Celui-ci{% if job_seeker.jobseeker_profile.age %} a {{ job_seeker.jobseeker_profile.age }} ans{% endif %}
+    {% if job_seeker.jobseeker_profile.age and job_seeker.jobseeker_profile.city %} et {% endif %}
+    {% if job_seeker.city %} habite à {{ job_seeker.city }}{% if job_seeker.department %} ({{ job_seeker.department }}){% endif %}{% endif %}.
+  {% endif %}%0D%0A%0D%0A
+
+  Mes coordonnées :%0D%0A
+  - Email : {{ request.user.email }}%0D%0A
+  {% if request.user.phone %}
+  - Téléphone : {{ request.user.phone|format_phone }}%0D%0A
+  {% endif %}%0D%0A
+
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.%0D%0A%0D%0A
+
+  [Votre message ici]%0D%0A%0D%0A
+
+  Cordialement,%0D%0A
+  {{ request.user.get_full_name }}%0D%0A
+  {{ request.current_organization.display_name }}
+{% endif %}
+"> {{ service.contact_email }}</a>
