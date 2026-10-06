@@ -200,7 +200,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         assert data is not None
         assert data.get("siret") == employee_record.siret
         assert data.get("mesure") == employee_record.asp_measure
-        assert data.get("typeMouvement") == MovementType.UPDATE
+        assert data.get("typeMouvement") == MovementType.MODIFICATION
 
         personal_data = data.get("personnePhysique")
 
@@ -252,7 +252,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
             with subtests.test(idx):
                 assert element.get("numLigne") == idx
                 assert element.get("siret") is not None
-                assert element.get("typeMouvement") == MovementType.UPDATE
+                assert element.get("typeMouvement") == MovementType.MODIFICATION
 
 
 @pytest.mark.parametrize(

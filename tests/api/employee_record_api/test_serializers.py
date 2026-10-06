@@ -189,7 +189,7 @@ def test_oeth_employee(kind):
     ["serializer", "expected_movement_type"],
     [
         (EmployeeRecordAPISerializer, MovementType.CREATION),
-        (EmployeeRecordUpdateNotificationAPISerializer, MovementType.UPDATE),
+        (EmployeeRecordUpdateNotificationAPISerializer, MovementType.MODIFICATION),
     ],
 )
 def test_serializer(serializer, expected_movement_type):
