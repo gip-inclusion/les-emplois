@@ -12,6 +12,8 @@ import re
 from botocore.config import Config
 from django.utils.csp import CSP
 from dotenv import load_dotenv
+from redis.backoff import ExponentialBackoff
+from redis.retry import Retry
 
 import itou
 import itou.api.changelog
@@ -584,7 +586,13 @@ HUEY = {
     "name": os.getenv("HUEY_QUEUE_NAME", DATABASES["default"]["NAME"]) or "huey",
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{redis_url}/?db={redis_db}",
+    "connection": {
+        "host": os.environ["REDIS_HOST"],
+        "port": os.environ["REDIS_PORT"],
+        "password": os.environ["REDIS_PASSWORD"],
+        "db": os.environ["REDIS_DB"],
+        "retry": Retry(ExponentialBackoff(), 2),
+    },
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
