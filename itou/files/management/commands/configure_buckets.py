@@ -1,5 +1,4 @@
 import json
-import logging
 from urllib.parse import urljoin
 
 import httpx
@@ -8,9 +7,6 @@ from django.conf import settings
 from itou.utils.command import BaseCommand
 from itou.utils.enums import ItouEnvironment
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, dora_s3_client, s3_client
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -53,7 +49,7 @@ class Command(BaseCommand):
 
         expected_length = 2
         if (detected_length := len(buckets)) < expected_length:
-            logger.warning(f"Expected {expected_length} configurations but only {detected_length} found.")
+            self.logger.warning(f"Expected {expected_length} configurations but only {detected_length} found.")
         return buckets
 
     def handle(self, *args, autoexpire=False, **options):
