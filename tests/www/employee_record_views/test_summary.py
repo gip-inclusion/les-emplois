@@ -293,8 +293,11 @@ class TestSummaryEmployeeRecords:
         [
             Status.NEW,
             Status.READY,
+            Status.MODIFICATION_PENDING,
             Status.SENT,
+            Status.MODIFICATION_SENT,
             Status.REJECTED,
+            Status.MODIFICATION_REJECTED,
             Status.DISABLED,
             Status.ARCHIVED,
             Status.PROCESSED,
