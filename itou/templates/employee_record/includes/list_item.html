@@ -25,7 +25,7 @@
     <hr class="m-0">
     <div class="c-box--results__body">
         {# ASP error #}
-        {% if employee_record.status == Status.REJECTED %}
+        {% if employee_record.status == Status.REJECTED or employee_record.status == Status.MODIFICATION_REJECTED %}
             {% component_alert title=title content=content variant="warning" %}
                 {% fragment as title %}
                     Informations sur l'erreur de traitement :
@@ -138,7 +138,7 @@
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
                        aria-label="Compléter la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Compléter</a>
-                {% elif employee_record.status == Status.REJECTED %}
+                {% elif employee_record.status == Status.REJECTED or employee_record.status == Status.MODIFICATION_REJECTED %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
                        aria-label="Modifier la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Modifier</a>
