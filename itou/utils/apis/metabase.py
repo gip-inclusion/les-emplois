@@ -260,6 +260,18 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "mOoDva",
     },
     #
+    # Institution stats - FFGEIQ & DGEFP GEIQ - nation level + DREETS GEIQ - region level.
+    #
+    "stats_ffgeiq_execution_assessment": {
+        "dashboard_id": 681,
+    },
+    "stats_dgefp_geiq_execution_assessment": {
+        "dashboard_id": 681,
+    },
+    "stats_dreets_geiq_execution_assessment": {
+        "dashboard_id": 681,
+    },
+    #
     # Institution stats - DIHAL - nation level.
     #
     "stats_dihal_state": {

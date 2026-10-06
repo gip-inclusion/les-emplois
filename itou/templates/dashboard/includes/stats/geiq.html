@@ -1,0 +1,27 @@
+{% load components %}
+
+<section class="s-section mb-3 mb-md-4">
+    <div class="s-section__container">
+        <div class="row row-cols-1 row-cols-md-2">
+            <div class="col mb-3 mb-md-4">
+                <h3>Mes données</h3>
+                <div class="d-flex flex-column row-gap-3 row-gap-md-4">
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Bilans d’exécution
+                        {% endfragment %}
+                        {% fragment as list %}
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "execution_assessment" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Résultats des campagnes de bilans d’exécution</span>
+                                </a>
+                            </li>
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
+                </div>
+            </div>
+            {% include "dashboard/includes/stats/_institution_public_links.html" %}
+        </div>
+    </div>
+</section>

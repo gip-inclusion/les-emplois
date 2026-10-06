@@ -66,6 +66,8 @@
                                 {% include "dashboard/includes/stats/sd_iae.html" %}
                             {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
                                 {% include "dashboard/includes/stats/dgefp.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.GEIQ %}
+                                {% include "dashboard/includes/stats/geiq.html" %}
                             {% endif %}
                         </div>
                     </div>
