@@ -22,6 +22,11 @@ def create_logs(employee_record, notification):
         if notification.asp_batch_file
         else notification.updated_at
     )
+    final_timestamp = notification.updated_at
+    if final_timestamp < wait_for_asp_timestamp:
+        # For old update notifications, updated_at wasn't properly updated when the object was modified.
+        # For those, use wait_for_asp_timestamp timestamp (with a small delta to ensure ordering)
+        final_timestamp = wait_for_asp_timestamp + datetime.timedelta(milliseconds=1)
     logs = [
         EmployeeRecordTransitionLog(
             employee_record=employee_record,
@@ -42,7 +47,7 @@ def create_logs(employee_record, notification):
         ),
         EmployeeRecordTransitionLog(
             employee_record=employee_record,
-            timestamp=notification.updated_at,
+            timestamp=final_timestamp,
             from_state=Status.MODIFICATION_SENT,
             # This to_state is likely inconsistent with the other transitions, but simplify things
             to_state=(
@@ -90,7 +95,7 @@ class Command(BaseCommand):
         failsafe_cache = caches["failsafe"]
         cache_key = f"migrate_employee_record_update_notifications-{include_last_rejected}-last_record_pk"
         last_run_pk = failsafe_cache.get(cache_key) or 0
-        self.logger.info("Starting migrating employee records - starting at pk=%d", last_run_pk)
+        self.logger.info("Starting migrating employee records - starting at pk=%d - v3", last_run_pk)
 
         logs_to_create = []
         notification_ids_to_delete = []
