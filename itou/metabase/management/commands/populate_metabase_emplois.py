@@ -85,7 +85,7 @@ logger = logging.getLogger(__name__)
 
 
 def log_retry_attempt(retry_state):
-    logging.info("Attempt failed with outcome=%s", retry_state.outcome)
+    logger.info("Attempt failed with outcome=%s", retry_state.outcome)
 
 
 def first_transition_timestamps():
@@ -722,6 +722,7 @@ class Command(BaseCommand):
         try:
             self.populate(mode)
         except Exception:
+            self.logger.exception("Exception during populate_metabase_emplois")
             send_slack_message(
                 ":red_circle: échec de la mise à jour de données Metabase",
                 url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
