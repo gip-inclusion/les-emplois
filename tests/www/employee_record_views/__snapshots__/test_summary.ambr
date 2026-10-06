@@ -66,6 +66,109 @@
   
   '''
 # ---
+# name: TestSummaryEmployeeRecords.test_action_bar[MODIFICATION_PENDING]
+  '''
+  <div class="s-title-02__col col-12">
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+      <div class="c-title">
+          <div class="c-title__main">
+              <h1>
+                  Fiche salarié ASP : MATA Lauren
+                  <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
+                      Mise à jour planifiée depuis le 29/04/2025 13:11
+                  </span>
+              </h1>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestSummaryEmployeeRecords.test_action_bar[MODIFICATION_REJECTED]
+  '''
+  <div class="s-title-02__col col-12">
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+      <div class="c-title">
+          <div class="c-title__main">
+              <h1>
+                  Fiche salarié ASP : MATA Lauren
+                  <span class="badge rounded-pill badge-base text-nowrap bg-danger">
+                      Retour en erreur de la mise à jour le 29/04/2025 13:11
+                  </span>
+              </h1>
+          </div>
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/create/[Pk of JobApplication]?from_status=MODIFICATION_REJECTED">
+                      <i aria-hidden="true" class="ri-pencil-line font-weight-medium">
+                      </i>
+                      <span>
+                          Modifier
+                      </span>
+                  </a>
+              </div>
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
+                      </i>
+                      <span>
+                          Désactiver la fiche salariée
+                      </span>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestSummaryEmployeeRecords.test_action_bar[MODIFICATION_SENT]
+  '''
+  <div class="s-title-02__col col-12">
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+      <div class="c-title">
+          <div class="c-title__main">
+              <h1>
+                  Fiche salarié ASP : MATA Lauren
+                  <span class="badge rounded-pill badge-base text-nowrap bg-warning">
+                      Mise à jour envoyée à l'ASP le 29/04/2025 13:11
+                  </span>
+              </h1>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestSummaryEmployeeRecords.test_action_bar[NEW]
   '''
   <div class="s-title-02__col col-12">
