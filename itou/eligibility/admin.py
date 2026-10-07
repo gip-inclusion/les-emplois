@@ -70,7 +70,7 @@ class ApprovalInline(ReadonlyMixin, ItouTabularInline):
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
-        return obj.is_valid()
+        return obj.is_valid
 
 
 class JobApplicationInline(ReadonlyMixin, ItouTabularInline):

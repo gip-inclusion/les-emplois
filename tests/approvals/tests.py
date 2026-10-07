@@ -142,28 +142,28 @@ class TestApprovalModel:
         end_at = timezone.localdate() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
+        assert approval.is_valid
         assert not approval.is_in_waiting_period
 
         # End is today.
         end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
+        assert approval.is_valid
         assert not approval.is_in_waiting_period
 
         # End is yesterday.
         end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert not approval.is_valid()
+        assert not approval.is_valid
         assert approval.is_in_waiting_period
 
         # Ended since more than WAITING_PERIOD_YEARS.
         end_at = timezone.localdate() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert not approval.is_valid()
+        assert not approval.is_valid
         assert not approval.is_in_waiting_period
 
     def test_clean(self):
@@ -233,25 +233,25 @@ class TestApprovalModel:
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
+        assert approval.is_valid
 
         # End today.
         end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
+        assert approval.is_valid
 
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert not approval.is_valid()
+        assert not approval.is_valid
 
         # Ended yesterday.
         end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        assert not approval.is_valid()
+        assert not approval.is_valid
 
     def test_number_with_spaces(self):
         approval = ApprovalFactory(number="XXXXX0000001")

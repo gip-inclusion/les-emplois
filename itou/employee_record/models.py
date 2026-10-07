@@ -513,7 +513,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             logger.error("Employee record without approval: %s - THIS SHOULD NOT HAPPEN", self)
             return False
         # We only archive an employee record when the job seeker's approval is expired and can no longer be prolonged
-        return not self.job_application.approval.is_valid() and not self.job_application.approval.can_be_prolonged
+        return not self.job_application.approval.is_valid and not self.job_application.approval.can_be_prolonged
 
     @xwf_models.transition()
     def archive(self, *, user=None):

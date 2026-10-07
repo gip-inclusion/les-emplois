@@ -697,7 +697,7 @@ class TestEmployeeRecordLifeCycle:
         approval = self.employee_record.job_application.approval
 
         # Can't archive while the approval is valid
-        assert approval.is_valid()
+        assert approval.is_valid
         with pytest.raises(xworkflows.ForbiddenTransition):
             self.employee_record.archive()
 
@@ -705,7 +705,7 @@ class TestEmployeeRecordLifeCycle:
         approval.start_at = timezone.localdate() - timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
         approval.end_at = timezone.localdate() - relativedelta(months=7)
         approval.save()
-        assert not approval.is_valid()
+        assert not approval.is_valid
         assert not approval.can_be_prolonged
 
         self.employee_record.archive()

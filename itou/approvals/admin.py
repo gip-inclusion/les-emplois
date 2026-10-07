@@ -409,7 +409,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
-        return obj.is_valid()
+        return obj.is_valid
 
     @admin.display(description="date de naissance")
     def birthdate(self, obj):

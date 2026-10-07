@@ -589,7 +589,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
         if not approvals:
             return None
-        valid_approvals = [approval for approval in approvals if approval.is_valid()]
+        valid_approvals = [approval for approval in approvals if approval.is_valid]
         if valid_approvals:
             return valid_approvals[0]
 
@@ -606,11 +606,11 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
     @property
     def has_valid_approval(self):
-        return self.latest_approval and self.latest_approval.is_valid()
+        return self.latest_approval and self.latest_approval.is_valid
 
     @property
     def has_latest_approval_in_waiting_period(self):
-        return self.latest_approval and not self.latest_approval.is_valid()
+        return self.latest_approval and not self.latest_approval.is_valid
 
     def new_approval_blocked_by_waiting_period(self, siae, sender_prescriber_organization):
         """
