@@ -219,5 +219,31 @@
     },
     "model": "prescribers.prescribermembership",
     "pk": 18
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-31T09:24:00.313Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2025-07-31T09:24:00.313Z",
+      "organization": 1014,
+      "updated_by": null,
+      "user": 149
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-31T09:24:00.313Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2025-07-31T09:24:00.313Z",
+      "organization": 1,
+      "updated_by": null,
+      "user": 151
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 20
   }
 ]
