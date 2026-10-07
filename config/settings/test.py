@@ -84,8 +84,6 @@ if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405
 
-FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
-
 REQUIRE_OTP_FOR_STAFF = False
 REQUIRE_MFA_FOR_PROS = False
 REQUIRE_MFA_ON_COMPANY_IDS = set()
