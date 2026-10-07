@@ -1,20 +1,22 @@
-{% if employee_record.status == "NEW" %}
+{% load enums %}
+{% enums "employee_record" "Status" as Status %}
+{% if employee_record.status == Status.NEW %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi">Nouvelle à compléter</span>
-{% elif employee_record.status == "SENT" %}
+{% elif employee_record.status == Status.SENT %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-warning">Envoyée à l'ASP le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
-{% elif employee_record.status == "REJECTED" %}
+{% elif employee_record.status == Status.REJECTED %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-danger">Retour en erreur le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
-{% elif employee_record.status == "PROCESSED" %}
+{% elif employee_record.status == Status.PROCESSED %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-success">
         Intégrée par l'ASP le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
     </span>
-{% elif employee_record.status == "READY" %}
+{% elif employee_record.status == Status.READY %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-secondary">Complétée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}</span>
-{% elif employee_record.status == "DISABLED" %}
+{% elif employee_record.status == Status.DISABLED %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Désactivée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
     </span>
-{% elif employee_record.status == "ARCHIVED" %}
+{% elif employee_record.status == Status.ARCHIVED %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Archivée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
     </span>
