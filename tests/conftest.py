@@ -397,8 +397,9 @@ def unknown_variable_template_error(monkeypatch, request):
 
     def stricter_resolve(self, context, ignore_failures=False):
         if self.is_var and self.var.lookups is not None:
-            seen_variables.add(self.var.lookups[0])
-            if self.var.lookups[0] not in context and self.var.lookups[0] not in ignore_list:
+            variable_name = self.var.lookups[0]
+            seen_variables.add(variable_name)
+            if variable_name not in context and variable_name not in ignore_list:
                 ignore_failures = False
         return origin_resolve(self, context, ignore_failures)
 
