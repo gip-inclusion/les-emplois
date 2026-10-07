@@ -136,9 +136,9 @@ class TestNotifyInactiveJobseekersManagementCommand:
         EvaluatedJobApplicationFactory(
             job_application__job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_application__created_at=timezone.now() - INACTIVITY_PERIOD,
-            job_application__eligibility_diagnosis__expires_at=timezone.localdate() - INACTIVITY_PERIOD,
+            job_application__eligibility_diagnosis__expires_at=timezone.localdate(timezone.now() - INACTIVITY_PERIOD),
             job_application__approval__start_at=timezone.localdate() - relativedelta(years=3),
-            job_application__approval__end_at=timezone.localdate() - INACTIVITY_PERIOD,
+            job_application__approval__end_at=timezone.localdate(timezone.now() - INACTIVITY_PERIOD),
         )
 
         # professional_without_recent_activity
@@ -201,8 +201,10 @@ class TestNotifyInactiveJobseekersManagementCommand:
             [mail] = mailoutbox
             assert [user.email] == mail.to
             assert mail.subject == snapshot(name="inactive_jobseeker_email_subject")
-            fmt_inactive_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
-            fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
+            fmt_inactive_since = timezone.localdate(user.upcoming_deletion_notified_at - INACTIVITY_PERIOD).strftime(
+                "%d/%m/%Y"
+            )
+            fmt_end_of_grace = timezone.localdate(user.upcoming_deletion_notified_at + GRACE_PERIOD).strftime(
                 "%d/%m/%Y"
             )
             body = mail.body.replace(fmt_inactive_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
@@ -211,7 +213,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             assert not mailoutbox
 
     def test_notify_inactive_jobseekers_on_approval_expiration_date(self):
-        inactivity_threshold = timezone.localdate() - INACTIVITY_PERIOD
+        inactivity_threshold = timezone.localdate(timezone.now() - INACTIVITY_PERIOD)
         long_time_ago = timezone.localdate() - relativedelta(years=3)
         approval_kwargs = {
             "user__joined_days_ago": DAYS_OF_INACTIVITY,
@@ -250,7 +252,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
         )
 
     def test_notify_inactive_jobseekers_on_eligibility_diagnosis_expiration_date(self):
-        inactivity_threshold = timezone.localdate() - INACTIVITY_PERIOD
+        inactivity_threshold = timezone.localdate(timezone.now() - INACTIVITY_PERIOD)
         eligibility_kwargs = {
             "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
             "from_prescriber": True,
@@ -497,7 +499,7 @@ class TestAnonymizeJobseekersManagementCommand:
             user__joined_days_ago=DAYS_OF_INACTIVITY,
             user__notified_days_ago=1,
             expired=True,
-            end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
+            end_at=timezone.localdate(timezone.now() - INACTIVITY_PERIOD) + relativedelta(days=1),
         )
 
         recent_eligibility_diagnosis_of_notified_jobseeker = IAEEligibilityDiagnosisFactory(
@@ -1236,8 +1238,10 @@ class TestNotifyInactiveProfessionalsManagementCommand:
             [mail] = mailoutbox
             assert [user.email] == mail.to
             assert mail.subject == snapshot(name="inactive_professional_email_subject")
-            fmt_inactivity_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
-            fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
+            fmt_inactivity_since = timezone.localdate(
+                updated_user.upcoming_deletion_notified_at - INACTIVITY_PERIOD
+            ).strftime("%d/%m/%Y")
+            fmt_end_of_grace = timezone.localdate(updated_user.upcoming_deletion_notified_at + GRACE_PERIOD).strftime(
                 "%d/%m/%Y"
             )
             body = mail.body.replace(fmt_inactivity_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
