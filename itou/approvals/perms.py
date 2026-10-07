@@ -15,7 +15,7 @@ def can_view_approval_details(request, approval):
     """
     To display an approval details, one must either be:
     - the approval job seeker
-    - an authorized prescriber whose job seekers list contains the approval's job seeker
+    - a prescriber whose job seekers list contains the approval's job seeker
     - an employer with a sent or received job_application
     """
     if request.from_employer:
@@ -29,12 +29,11 @@ def can_view_approval_details(request, approval):
             return PERMS_READ
         if approval.user.job_applications.prescriptions_of(request.user, request.current_organization).exists():
             return PERMS_READ
-    elif request.from_prescriber:
-        if (
-            request.from_authorized_prescriber
-            and User.objects.assigned_job_seeker_ids(request.user, request.current_organization).exists()
-        ):
-            return PERMS_READ
+    elif (
+        request.from_prescriber
+        and User.objects.assigned_job_seeker_ids(request.user, request.current_organization).exists()
+    ):
+        return PERMS_READ
     elif request.user.is_job_seeker:
         if approval.user == request.user:
             return PERMS_READ

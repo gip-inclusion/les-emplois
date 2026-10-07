@@ -15,7 +15,6 @@ from itou.approvals.enums import (
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -59,19 +58,9 @@ class TestApprovalDetailView:
         # No contract tab
         assertNotContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
-    def test_non_authorized_prescriber_access(self, client):
+    def test_prescriber_access(self, client):
         job_application = JobApplicationFactory(
             sent_by_prescriber=True, with_approval=True, with_job_seeker_assignment=True
-        )
-        url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
-
-        client.force_login(job_application.sender)
-        response = client.get(url)
-        assert response.status_code == 403
-
-    def test_authorized_prescriber_access(self, client):
-        job_application = JobApplicationFactory(
-            with_approval=True, sent_by_authorized_prescriber=True, with_job_seeker_assignment=True
         )
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
@@ -566,18 +555,15 @@ class TestContractView:
             LaborInspectorFactory(),
             JobSeekerFactory(),  # random job seeker
             approval.user,  # The approval job seeker
-            job_application.sender,  # non authorized prescriber linked to the approval's job seeker
-            PrescriberFactory(membership__organization__authorized=True),  # random authorized prescriber
+            PrescriberFactory(),  # random prescriber
             EmployerFactory(),  # random employer
         ]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == 403
 
-        # Make the linked prescriber authorized
-        job_application.sender_prescriber_organization.kind = PrescriberOrganizationKind.FT
-        job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.VALIDATED
-        job_application.sender_prescriber_organization.save()
+        # Employers who received an application from the job seeker and prescribers
+        # who have the job seeker in their job seekers list can view the PASS detail view
         for user in [
             job_application.sender,  # authorized prescriber linked to the approval's job seeker
             job_application.to_company.members.first(),  # linked employer

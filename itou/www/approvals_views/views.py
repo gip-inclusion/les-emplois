@@ -170,7 +170,7 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
     active_tab = None
 
     def can_view_contracts(self):
-        return self.request.from_authorized_prescriber or self.request.from_employer
+        return self.request.from_iae_actor
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -215,7 +215,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
 
     def test_func(self):
         # More checks are performed in get_context_data method
-        return self.request.from_prescriber or self.request.from_employer or self.request.user.is_job_seeker
+        return self.request.from_iae_actor or self.request.user.is_job_seeker
 
     def get_prolongation_and_requests(self, approval):
         def _format_for_template(user, org):
