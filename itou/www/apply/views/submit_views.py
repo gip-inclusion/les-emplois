@@ -69,7 +69,7 @@ def _check_job_seeker_approval(request, job_seeker, siae):
         raise PermissionDenied(error)
 
     approval = job_seeker.latest_approval
-    if approval and approval.is_valid():
+    if approval and approval.is_valid:
         # Ensure that an existing approval can be unsuspended.
         if approval.is_suspended and not approval.can_be_unsuspended:
             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY

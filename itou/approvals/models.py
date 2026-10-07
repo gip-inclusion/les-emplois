@@ -604,6 +604,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
         super().clean()
 
+    @property
     def is_valid(self):
         return timezone.localdate() <= self.end_at
 
@@ -708,7 +709,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @property
     def state(self):
-        if not self.is_valid():
+        if not self.is_valid:
             return enums.ApprovalStatus.EXPIRED
         if self.is_suspended:
             return enums.ApprovalStatus.SUSPENDED

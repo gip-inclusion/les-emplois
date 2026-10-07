@@ -447,7 +447,7 @@ def get_jobseeker_overview_data(request, job_seeker):
         in [settings.OVERVIEW_TAB_TEST_DEPARTMENT, settings.OVERVIEW_TAB_CONTROL_DEPARTMENT]
     ):
         approval = job_seeker.latest_approval
-        if approval and approval.is_valid() and approval.remainder.days > 90 and not approval.is_suspended:
+        if approval and approval.is_valid and approval.remainder.days > 90 and not approval.is_suspended:
             contract = get_contracts(approval).first()
             if contract and contract.has_ended:
                 job_apps = (

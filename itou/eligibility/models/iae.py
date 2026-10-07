@@ -209,7 +209,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     @property
     def considered_to_expire_at(self):
         latest_approval = self.approval_set.last()
-        if latest_approval and latest_approval.is_valid():
+        if latest_approval and latest_approval.is_valid:
             return latest_approval.end_at
         return self.expires_at
 
