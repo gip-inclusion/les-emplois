@@ -384,7 +384,13 @@ class TestJobDescriptionCardView:
         assertContains(response, escape(job_description.display_name))
         assertContains(response, escape(company.display_name))
         OPEN_POSITION_TEXT = "1234 postes ouverts au recrutement"
-        assertContains(response, OPEN_POSITION_TEXT)
+        assertContains(response, OPEN_POSITION_TEXT, html=True)
+
+        job_description.open_positions = 0
+        job_description.save()
+        response = client.get(url)
+        assertContains(response, "Aucun poste ouvert")
+        assertNotContains(response, OPEN_POSITION_TEXT)
 
         job_description.is_active = False
         job_description.save()
