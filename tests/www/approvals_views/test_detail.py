@@ -13,7 +13,6 @@ from itou.approvals.enums import (
     ProlongationRequestStatus,
 )
 from itou.approvals.models import Approval
-from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
@@ -22,10 +21,10 @@ from tests.approvals.factories import (
     ProlongationRequestFactory,
     SuspensionFactory,
 )
-from tests.companies.factories import CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -55,8 +54,7 @@ class TestApprovalDetailView:
 
         client.force_login(approval.user)
         response = client.get(url)
-        # No contract tab
-        assertNotContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
+        assert response.status_code == 200
 
     def test_prescriber_access(self, client):
         job_application = JobApplicationFactory(
@@ -66,10 +64,7 @@ class TestApprovalDetailView:
 
         client.force_login(job_application.sender)
         response = client.get(url)
-        # has contract tab
-        assertContains(
-            response, reverse("approvals:contracts", kwargs={"public_id": job_application.approval.public_id})
-        )
+        assert response.status_code == 200
 
     def test_employer_access(self, client):
         job_application = JobApplicationFactory(
@@ -90,8 +85,6 @@ class TestApprovalDetailView:
         assertContains(response, format_approval_number(job_application.approval.number))
         assertContains(response, PROLONG_BUTTON_LABEL, html=True)
         assertContains(response, SUSPEND_BUTTON_LABEL, html=True)
-        # has contract tab
-        assertContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
         # No accepted job application, but still a job application
         job_application.state = JobApplicationState.REFUSED
@@ -537,100 +530,6 @@ class TestApprovalDetailView:
             check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
 
-class TestContractView:
-    def test_anonymous_user(self, client):
-        approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
-        url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
-        response = client.get(url)
-        assertRedirects(response, reverse("account_login") + f"?next={url}")
-
-    def test_no_access(self, client):
-        job_application = JobApplicationFactory(
-            sent_by_prescriber=True, with_approval=True, with_job_seeker_assignment=True
-        )
-        approval = job_application.approval
-        url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
-
-        for user in [
-            LaborInspectorFactory(),
-            JobSeekerFactory(),  # random job seeker
-            approval.user,  # The approval job seeker
-            PrescriberFactory(),  # random prescriber
-            EmployerFactory(),  # random employer
-        ]:
-            client.force_login(user)
-            response = client.get(url)
-            assert response.status_code == 403
-
-        # Employers who received an application from the job seeker and prescribers
-        # who have the job seeker in their job seekers list can view the PASS detail view
-        for user in [
-            job_application.sender,  # authorized prescriber linked to the approval's job seeker
-            job_application.to_company.members.first(),  # linked employer
-        ]:
-            client.force_login(user)
-            response = client.get(url)
-            assert response.status_code == 200
-
-    @freeze_time("2025-08-07")
-    def test_view(self, client, snapshot):
-        job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
-            for_snapshot=True,
-            with_approval=True,
-            approval__start_at="2025-01-01",
-            approval__end_at="2025-05-31",
-        )
-        approval = job_application.approval
-        company = job_application.to_company
-
-        # Not displayed contracts
-        ContractFactory(start_date="2025-01-02")  # Contract on another job seeker
-        ContractFactory(job_seeker=approval.user, start_date="2024-12-01", end_date="2024-12-31")  # Before approval
-        ContractFactory(job_seeker=approval.user, start_date="2025-06-01", end_date="2025-06-30")  # After approval
-
-        # Displayed contracts
-        ContractFactory(
-            company__name="Tif'any",
-            job_seeker=approval.user,
-            start_date="2025-01-01",
-            end_date="2025-08-07",
-            company__kind=CompanyKind.EI,
-        )  # Fully inside approval validity
-        ContractFactory(
-            company__name="Tralal’Hair",
-            job_seeker=approval.user,
-            start_date="2025-02-01",
-            end_date=None,
-            company__kind=CompanyKind.EI,
-        )  # start date inside approval validity
-        ContractFactory(
-            company__name="Faudra Tif Hair",
-            job_seeker=approval.user,
-            start_date="2024-10-01",
-            end_date="2025-01-10",
-            company__kind=CompanyKind.EI,
-        )  # end date inside approval validity
-        ContractFactory(
-            company__name="Inter Planet Hair",
-            job_seeker=approval.user,
-            start_date="2024-10-01",
-            end_date="2025-06-30",
-            company__kind=CompanyKind.EI,
-        )  # approval inside contract dates
-
-        client.force_login(company.members.first())
-        response = client.get(reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
-        assert (
-            pretty_indented(
-                parse_response_to_soup(
-                    response, "#main", replace_in_attr=[("href", str(approval.public_id), "[Public ID of Approval]")]
-                )
-            )
-            == snapshot
-        )
-
-
 @freeze_time("2023-04-26")
 def test_remove_approval_button(client, snapshot):
     REMOVAL_BUTTON_ID = "approval-deletion-link"
@@ -669,7 +568,6 @@ def test_remove_approval_button(client, snapshot):
     client.force_login(membership.user)
 
     details_url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
-    contracts_url = reverse("approvals:contracts", kwargs={"public_id": job_application.approval.public_id})
 
     # suspension still active, more than 1 year old, starting after the accepted job application
     suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
@@ -681,7 +579,6 @@ def test_remove_approval_button(client, snapshot):
         response, selector=f"#{REMOVAL_BUTTON_ID}", replace_in_attr=public_id_replacement
     )
     assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
-    assertContains(client.get(contracts_url), REMOVAL_BUTTON_ID)
 
     # suspension now is inactive
     suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
@@ -692,7 +589,6 @@ def test_remove_approval_button(client, snapshot):
         response, selector=f"#{REMOVAL_BUTTON_ID}", replace_in_attr=public_id_replacement
     )
     assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
-    assertContains(client.get(contracts_url), REMOVAL_BUTTON_ID)
 
     # An accepted job application exists after suspension end
     JobApplicationFactory(
@@ -704,8 +600,6 @@ def test_remove_approval_button(client, snapshot):
         hiring_start_at=suspension.end_at + datetime.timedelta(days=2),
     )
     response = client.get(details_url)
-    assertNotContains(response, REMOVAL_BUTTON_ID)
-    response = client.get(contracts_url)
     assertNotContains(response, REMOVAL_BUTTON_ID)
 
 
