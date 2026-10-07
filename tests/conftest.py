@@ -2,6 +2,7 @@ import collections
 import contextlib
 import copy
 import datetime
+import enum
 import inspect
 import io
 import json
@@ -399,8 +400,16 @@ def unknown_variable_template_error(monkeypatch, request):
         if self.is_var and self.var.lookups is not None:
             variable_name = self.var.lookups[0]
             seen_variables.add(variable_name)
-            if variable_name not in context and variable_name not in ignore_list:
-                ignore_failures = False
+            if ignore_failures and variable_name not in ignore_list:
+                if variable_name not in context:
+                    ignore_failures = False
+                elif variable_name != "csrf_token":
+                    # Inspecting the csrf_token variable triggers SQL queries related to the session
+                    # Let's avoid that
+                    variable = context[variable_name]
+                    # For enum variables we want to be strict to detect mispelled attributes
+                    if inspect.isclass(variable) and issubclass(variable, enum.Enum):
+                        ignore_failures = False
         return origin_resolve(self, context, ignore_failures)
 
     monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
