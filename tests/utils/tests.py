@@ -17,6 +17,7 @@ from django.contrib.admin import site
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
@@ -1884,6 +1885,17 @@ def test_invalid_variable_in_template():
     assert (
         Template("{% load default_if_invalid %}{{ invalid_variable|default_if_invalid:'' }}").render(Context({})) == ""
     )
+
+    class SomeEnum(models.TextChoices):
+        EXISTING_KEY = "EXISTING_KEY", "Clef existante"
+
+    # This should fail
+    with pytest.raises(
+        pytest.fail.Exception, match="Undefined template variable 'enum.nonexisting_key' in '<unknown source>'"
+    ):
+        Template("{% if key == enum.nonexisting_key %}HOP{% endif %}").render(
+            Context({"key": SomeEnum.EXISTING_KEY, "enum": SomeEnum})
+        )
 
 
 @pytest.mark.parametrize(
