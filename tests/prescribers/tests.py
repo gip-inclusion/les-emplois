@@ -356,97 +356,6 @@ class TestPrescriberOrganizationModel:
         with pytest.raises(ValidationError):
             org.add_or_activate_membership(non_professional)
 
-    @pytest.mark.parametrize("wet_run", [True, False])
-    def test_merge_two_organizations(self, wet_run):
-        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
-        organization_1 = job_application_1.sender_prescriber_organization
-
-        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
-        organization_2 = job_application_2.sender_prescriber_organization
-
-        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
-            from_prescriber=True, author_prescriber_organization=organization_1
-        )
-
-        orientation = OrientationFactory(
-            sender=job_application_1.sender, sender_prescriber_organization=organization_1
-        )
-
-        count_job_applications = job_applications_models.JobApplication.objects.count()
-        assert PrescriberOrganization.objects.count() == 2
-        assert count_job_applications == 2
-        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
-        assert count_job_applications == job_applications_models.JobApplication.objects.count()
-        geiq_diagnosis.refresh_from_db()
-        orientation.refresh_from_db()
-        if wet_run:
-            assert PrescriberOrganization.objects.count() == 1
-            assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
-            assert orientation.sender_prescriber_organization_id == organization_2.pk
-        else:
-            assert PrescriberOrganization.objects.count() == 2
-            assert geiq_diagnosis.author_prescriber_organization_id == organization_1.pk
-            assert orientation.sender_prescriber_organization_id == organization_1.pk
-
-    @pytest.mark.parametrize("wet_run", [True, False])
-    def test_merge_two_organizations_with_assignments(self, wet_run):
-        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
-        prescriber_1 = job_application_1.sender
-        organization_1 = job_application_1.sender_prescriber_organization
-
-        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
-        organization_2 = job_application_2.sender_prescriber_organization
-
-        # Assignment without similar assignment in the other organization: will be updated
-        assignment_1 = JobSeekerAssignmentFactory(
-            professional=prescriber_1,
-            prescriber_organization=organization_1,
-            last_action_kind=ActionKind.IAE_ELIGIBILITY,
-        )
-        # Assignment with a similar assignment in the other org but older: will be deleted
-        assignment_2 = JobSeekerAssignmentFactory(
-            professional=prescriber_1,
-            prescriber_organization=organization_1,
-            last_action_kind=ActionKind.CREATE,
-        )
-        assignment_2_to_org = JobSeekerAssignmentFactory(
-            job_seeker=assignment_2.job_seeker,
-            professional=assignment_2.professional,
-            prescriber_organization=organization_2,
-            last_action_kind=ActionKind.APPLY,
-        )
-        # Assignment with a similar assignment in the other org but more recent: will be kept
-        assignment_3_to_org = JobSeekerAssignmentFactory(
-            professional=prescriber_1,
-            prescriber_organization=organization_2,
-            last_action_kind=ActionKind.CREATE,
-        )
-        assignment_3 = JobSeekerAssignmentFactory(
-            job_seeker=assignment_3_to_org.job_seeker,
-            professional=assignment_3_to_org.professional,
-            prescriber_organization=organization_1,
-            last_action_kind=ActionKind.APPLY,
-        )
-
-        assert JobSeekerAssignment.objects.count() == 5
-        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
-        assignment_1.refresh_from_db()
-        assignment_2_to_org.refresh_from_db()
-        assignment_3.refresh_from_db()
-        if wet_run:
-            assert PrescriberOrganization.objects.count() == 1
-            assert JobSeekerAssignment.objects.count() == 3
-            assert assignment_1.prescriber_organization_id == organization_2.pk
-            assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
-            assert assignment_2_to_org.prescriber_organization_id == organization_2.pk
-            assert assignment_2_to_org.last_action_kind == ActionKind.APPLY
-            assert not JobSeekerAssignment.objects.filter(pk=assignment_3_to_org.pk).exists()
-            assert assignment_3.prescriber_organization_id == organization_2.pk
-            assert assignment_3.last_action_kind == ActionKind.APPLY
-        else:
-            assert PrescriberOrganization.objects.count() == 2
-            assert JobSeekerAssignment.objects.count() == 5
-
 
 class TestPrescriberOrganizationAdmin:
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
@@ -847,6 +756,99 @@ class TestPrescriberOrganizationAdmin:
         expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de « Autre »."
         assert len(response.context["errors"]) == 1
         assert response.context["errors"][0] == [expected_msg]
+
+
+class TestPrescriberManagementCommands:
+    @pytest.mark.parametrize("wet_run", [True, False])
+    def test_merge_two_organizations(self, wet_run):
+        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
+        organization_1 = job_application_1.sender_prescriber_organization
+
+        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
+        organization_2 = job_application_2.sender_prescriber_organization
+
+        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_prescriber=True, author_prescriber_organization=organization_1
+        )
+
+        orientation = OrientationFactory(
+            sender=job_application_1.sender, sender_prescriber_organization=organization_1
+        )
+
+        count_job_applications = job_applications_models.JobApplication.objects.count()
+        assert PrescriberOrganization.objects.count() == 2
+        assert count_job_applications == 2
+        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
+        assert count_job_applications == job_applications_models.JobApplication.objects.count()
+        geiq_diagnosis.refresh_from_db()
+        orientation.refresh_from_db()
+        if wet_run:
+            assert PrescriberOrganization.objects.count() == 1
+            assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
+            assert orientation.sender_prescriber_organization_id == organization_2.pk
+        else:
+            assert PrescriberOrganization.objects.count() == 2
+            assert geiq_diagnosis.author_prescriber_organization_id == organization_1.pk
+            assert orientation.sender_prescriber_organization_id == organization_1.pk
+
+    @pytest.mark.parametrize("wet_run", [True, False])
+    def test_merge_two_organizations_with_assignments(self, wet_run):
+        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
+        prescriber_1 = job_application_1.sender
+        organization_1 = job_application_1.sender_prescriber_organization
+
+        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
+        organization_2 = job_application_2.sender_prescriber_organization
+
+        # Assignment without similar assignment in the other organization: will be updated
+        assignment_1 = JobSeekerAssignmentFactory(
+            professional=prescriber_1,
+            prescriber_organization=organization_1,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        )
+        # Assignment with a similar assignment in the other org but older: will be deleted
+        assignment_2 = JobSeekerAssignmentFactory(
+            professional=prescriber_1,
+            prescriber_organization=organization_1,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_2_to_org = JobSeekerAssignmentFactory(
+            job_seeker=assignment_2.job_seeker,
+            professional=assignment_2.professional,
+            prescriber_organization=organization_2,
+            last_action_kind=ActionKind.APPLY,
+        )
+        # Assignment with a similar assignment in the other org but more recent: will be kept
+        assignment_3_to_org = JobSeekerAssignmentFactory(
+            professional=prescriber_1,
+            prescriber_organization=organization_2,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_3 = JobSeekerAssignmentFactory(
+            job_seeker=assignment_3_to_org.job_seeker,
+            professional=assignment_3_to_org.professional,
+            prescriber_organization=organization_1,
+            last_action_kind=ActionKind.APPLY,
+        )
+
+        assert JobSeekerAssignment.objects.count() == 5
+        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
+        assignment_1.refresh_from_db()
+        assignment_2_to_org.refresh_from_db()
+        assignment_3.refresh_from_db()
+        if wet_run:
+            assert PrescriberOrganization.objects.count() == 1
+            assert JobSeekerAssignment.objects.count() == 3
+            assert assignment_1.prescriber_organization_id == organization_2.pk
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+            assert assignment_2_to_org.prescriber_organization_id == organization_2.pk
+            assert assignment_2_to_org.last_action_kind == ActionKind.APPLY
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_3_to_org.pk).exists()
+            assert assignment_3.prescriber_organization_id == organization_2.pk
+            assert assignment_3.last_action_kind == ActionKind.APPLY
+        else:
+            assert PrescriberOrganization.objects.count() == 2
+            assert JobSeekerAssignment.objects.count() == 5
 
 
 @pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)
