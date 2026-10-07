@@ -1534,6 +1534,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Orientations
                               </a>
@@ -1805,6 +1810,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Orientations
                               </a>
@@ -1967,7 +1977,7 @@
   
   '''
 # ---
-# name: TestContracts.test_for_authorized_prescriber
+# name: TestContracts.test_for_iae_actor[PrescriberFactory]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -1978,6 +1988,218 @@
                   <div class="s-title-02__col col-12">
                       <div class="c-prevstep">
                           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  D… J…
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID de l'usager
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier l'ID de l'usager
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur l’usager" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-contracts" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fcontracts%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour cet usager
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Orientations
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <h2>
+                  Suivi des contrats IAE
+              </h2>
+              <div class="alert alert-info mb-3 mb-md-4" role="status">
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-2">
+                              <strong>
+                                  Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                              </strong>
+                          </p>
+                          <p class="mb-0">
+                              Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Tralal’Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Depuis le 01/02/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Tif'any
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/01/2025 au 07/08/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Faudra Tif Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/10/2024 au 10/01/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Inter Planet Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/10/2024 au 30/06/2028
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestContracts.test_for_iae_actor[user_factory1]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
                               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
                               </i>
                               <span>
@@ -2021,27 +2243,27 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Orientations
                               </a>
                           </li>
@@ -2978,7 +3200,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -3246,6 +3468,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Orientations
                               </a>
@@ -3446,6 +3673,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -4928,6 +5160,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Orientations
                               </a>
@@ -5271,7 +5508,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -5577,7 +5814,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -5983,7 +6220,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -6316,7 +6553,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -7214,6 +7451,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Orientations
                               </a>
@@ -7968,6 +8210,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -8966,7 +9213,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -10209,7 +10456,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -10569,6 +10816,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="orientations" href="/job-seekers/orientations/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Orientations
                               </a>
@@ -10860,6 +11112,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -11213,7 +11470,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -11868,7 +12125,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -13187,7 +13444,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">
@@ -14710,7 +14967,7 @@
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
+                                  Contrats IAE
                               </a>
                           </li>
                           <li class="nav-item">

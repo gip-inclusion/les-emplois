@@ -1236,16 +1236,21 @@ class TestCanViewExternalAction(TestCase):
 
 class TestContracts:
     @freeze_time("2025-08-07")
-    def test_for_authorized_prescriber(self, client, snapshot):
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            PrescriberFactory,
+            partial(EmployerFactory, membership__company__subject_to_iae_rules=True),
+        ],
+    )
+    def test_for_iae_actor(self, client, snapshot, user_factory):
         approval = ApprovalFactory(
             for_snapshot=True,
             start_at="2025-01-01",
             end_at="2026-12-31",
         )
         job_seeker = approval.user
-        authorized_prescriber = PrescriberFactory(
-            membership__organization__authorized=True,
-        )
+        user = user_factory()
 
         # Not displayed contracts
         ContractFactory(start_date="2025-01-02")  # Contract on another job seeker
@@ -1282,7 +1287,7 @@ class TestContracts:
             company__kind=CompanyKind.EI,
         )  # approval inside contract dates
 
-        client.force_login(authorized_prescriber)
+        client.force_login(user)
         response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
         assert (
             pretty_indented(
@@ -1296,10 +1301,11 @@ class TestContracts:
     def test_forbidden(self, client):
         job_seeker = JobSeekerFactory()
         for user, expected_status in [
+            (job_seeker, 403),
             (LaborInspectorFactory(), 403),
-            (PrescriberFactory(), 403),
-            (PrescriberFactory(membership__organization__authorized=True), 200),
-            (EmployerFactory(), 403),
+            (PrescriberFactory(), 200),
+            (EmployerFactory(membership__company__subject_to_iae_rules=True), 200),
+            (EmployerFactory(membership__company__not_subject_to_iae_rules=True), 403),
         ]:
             client.force_login(user)
             response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
@@ -1690,7 +1696,11 @@ class TestOrientationsTab:
                 membership__organization__name="France Travail - CHATELLERAULT",
                 membership__organization__authorized=True,
             ),
-            partial(EmployerFactory, membership__company__name="Mann Co."),
+            partial(
+                EmployerFactory,
+                membership__company__name="Mann Co.",
+                membership__company__subject_to_iae_rules=True,
+            ),
         ],
         ids=["prescriber", "authorized prescriber", "employer"],
     )

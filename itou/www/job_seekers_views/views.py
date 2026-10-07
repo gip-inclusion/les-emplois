@@ -308,17 +308,23 @@ class ContractsTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/contracts.html"
 
     def test_func(self):
-        return self.request.from_authorized_prescriber
+        return self.request.from_iae_actor
 
-    def get_contracts(self, request, approval):
-        if not request.from_authorized_prescriber or not approval:
-            return Contract.objects.none()
-        return get_contracts(approval)
+    def get_contracts(self):
+        """
+        Return contracts related to the current PASS IAE.
+        If the job seeker has an expired PASS or no PASS at all,
+        return all of their contracts in the past 2 years.
+        """
+        if self.approval_missing_or_expired:
+            two_years_ago = timezone.localdate() - relativedelta(years=2)
+            return Contract.objects.filter(end_date__gte=two_years_ago).order_by("-start_date")
+        return get_contracts(self.approval)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "approval": self.approval,
-            "contracts": self.get_contracts(self.request, self.approval),
+            "contracts": self.get_contracts(),
         }
 
 
