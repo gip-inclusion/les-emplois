@@ -451,7 +451,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     profile = job_seeker.jobseeker_profile
-    # We need to know if the user was registred, but the form will change the value of this instance
+    # We need to know if the user was registered, but the form will change the value of this instance
     # even if it's not valid.
     is_registered_to_pole_emploi = bool(profile.pole_emploi_id)
 

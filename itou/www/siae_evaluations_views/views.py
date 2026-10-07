@@ -548,7 +548,7 @@ def evaluated_job_application(
         "evaluated_job_application": evaluated_job_application,
         # note vincentporte: Can't find why additional queries are made to access `EvaluatedSiae` `state`
         # cached_property when iterating over `EvaluatedAdministrativeCriteria` in template.
-        # Tried to push `EvaluatedSiae` instance in context without benefical results. weird.
+        # Tried to push `EvaluatedSiae` instance in context without beneficial results. weird.
         "evaluated_siae": evaluated_siae,
         "can_edit_proof": review_in_progress,
         "form": form,

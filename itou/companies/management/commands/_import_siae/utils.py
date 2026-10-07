@@ -318,7 +318,7 @@ def get_fluxiae_df(
     #   it will break or require the `error_bad_lines=False` option to ignore all those rows
 
     # Thus we decide to always use the 'c' engine and implement the `skipfooter=1` option ourselves by counting
-    # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
+    # the rows in the CSV file beforehand instead. Always using the 'c' engine is proven to significantly reduce
     # the duration and frequency of the developer's headaches.
 
     with tempfile.TemporaryDirectory() as d:
@@ -354,7 +354,7 @@ def get_fluxiae_df(
             # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
             # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
             # as the parser will read many rows until the next `"` and consider all of them as part of the
-            # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
+            # initial mission_descriptif field value o_O. Let's just disable quoting altogether to avoid that.
             quoting=csv.QUOTE_NONE,
             nrows=nrows,
             **kwargs,

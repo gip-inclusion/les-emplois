@@ -318,7 +318,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         qs = super()._get_queryset_with_relations(request)
         # Re-add watched_data_updated_at as deferred
         # to allow response_change method to trigger transition
-        # (the defered fields list is emptied by ItouModelAdmin)
+        # (the deferred fields list is emptied by ItouModelAdmin)
         return qs.defer("watched_data_updated_at")
 
     def get_deleted_objects(self, objs, request):

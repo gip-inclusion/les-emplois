@@ -749,7 +749,7 @@ class EmployeeRecordBatch:
         return f"FILENAME={self.upload_filename}, NB_RECORDS={len(self.elements)}"
 
     def __repr__(self):
-        # String formating with {field_name=...} forms use __repr__ and not __str__
+        # String formatting with {field_name=...} forms use __repr__ and not __str__
         return f"{self.upload_filename=}, {len(self.elements)=}"
 
     @classmethod

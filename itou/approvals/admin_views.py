@@ -304,7 +304,7 @@ def _compute_send_approvals_to_pe_stats(model, list_url):
         errors_infos[endpoint]["infos"][exit_code] = {"value": count}
     # Prevent further defaulting to enable its use in Django template
     errors_infos.default_factory = None
-    # Adapt dictionnary value to add percentages
+    # Adapt dictionary value to add percentages
     for end_point, end_point_infos in errors_infos.items():
         end_point_url_params = {"pe_notification_status": "notification_error", "pe_notification_endpoint": end_point}
         for exit_code, exit_code_infos in end_point_infos["infos"].items():
