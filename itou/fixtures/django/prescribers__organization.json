@@ -33394,5 +33394,38 @@
     },
     "model": "prescribers.prescriberorganization",
     "pk": 1013
+  },
+  {
+    "fields": {
+      "active_members_email_reminder_last_sent_at": null,
+      "address_line_1": "127 RUE DE GRENELLE",
+      "address_line_2": "",
+      "authorization_status": "VALIDATED",
+      "authorization_updated_at": null,
+      "authorization_updated_by_id": null,
+      "automatic_geocoding_update": true,
+      "ban_api_resolved_address": null,
+      "city": "PARIS",
+      "code_safir_pole_emploi": null,
+      "coords": "SRID=4326;POINT (2.315879 48.857778)",
+      "created_at": "2026-06-18T10:31:14.805Z",
+      "created_by_id": null,
+      "department": "75",
+      "description": "",
+      "email": "",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "insee_city_id": null,
+      "is_brsa": false,
+      "kind": "CHRS",
+      "name": "PLATEFORME DE L'INCLUSION",
+      "phone": "",
+      "post_code": "75007",
+      "siret": "13003013300016",
+      "uid": "b157c8cd-b695-4e74-8252-6c23208f1a46",
+      "website": ""
+    },
+    "model": "prescribers.prescriberorganization",
+    "pk": 1014
   }
 ]
