@@ -137,8 +137,12 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
     def approval(self):
         # This object is only used in 2 tabs so we don't want to make the queries in all tabs
         if self.request.from_iae_actor:
-            return self.object.approvals.valid().prefetch_related("suspension_set").first()
+            return self.object.approvals.prefetch_related("suspension_set").order_by("-start_at").first()
         return None
+
+    @property
+    def approval_missing_or_expired(self):
+        return self.approval is None or self.approval.is_valid is False
 
     def get_context_data(self, **kwargs):
         fallback_back_url = (
@@ -197,7 +201,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                 # The job_seeker object already contains a lot of information: no need to re-retrieve it
                 iae_eligibility_diagnosis.job_seeker = self.object
 
-        if self.request.from_authorized_prescriber and self.approval is None:
+        if self.request.from_authorized_prescriber and self.approval_missing_or_expired:
             can_edit_iae_eligibility = True
 
         # Job seeker card banner, shown when an IAE contract ends within 30 days: the SIAE is offered the
@@ -235,6 +239,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 
         return context | {
             "approval": self.approval,
+            "approval_missing_or_expired": self.approval_missing_or_expired,
             "approval_expires_soon": self.approval and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS,
             "contract_ending_soon_date": contract_ending_soon_date,
             "pro_support_request_mailto": pro_support_request_mailto,

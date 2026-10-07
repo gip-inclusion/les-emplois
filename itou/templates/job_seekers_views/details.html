@@ -89,12 +89,12 @@
                                             </div>
                                             <div class="p-3 p-lg-4">
                                                 <p>
-                                                    {% if approval_expires_soon %}
-                                                        Le PASS IAE de cet usager arrive bientôt à expiration.
+                                                    {% if approval_missing_or_expired %}
+                                                        Cet usager n'a pas de PASS IAE aujourd'hui.
                                                         <br />
                                                         <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
-                                                    {% elif not approval %}
-                                                        Cet usager n'a pas de PASS IAE aujourd'hui.
+                                                    {% elif approval_expires_soon %}
+                                                        Le PASS IAE de cet usager arrive bientôt à expiration.
                                                         <br />
                                                         <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
                                                     {% else %}
