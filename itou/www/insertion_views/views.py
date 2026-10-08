@@ -221,7 +221,7 @@ def start_orientation(request, service_uid):
     service = get_object_or_404(insertion_models.Service.objects.select_related("source"), uid=service_uid)
     if service.should_mobilize_via_external_link:
         return HttpResponseRedirect(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
-    if service.from_non_orientable_di_source:
+    if not service.is_orientable_via_internal_form:
         raise Http404
     if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
         logger.info(
@@ -263,7 +263,7 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             return HttpResponseRedirect(
                 reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
             )
-        if self.service.from_non_orientable_di_source:
+        if not self.service.is_orientable_via_internal_form:
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
@@ -320,7 +320,7 @@ class OrientationWizardView(WizardView):
             ),
             uid=self.wizard_session.get("service_uid"),
         )
-        if self.service.should_mobilize_via_external_link or self.service.from_non_orientable_di_source:
+        if not self.service.is_orientable_via_internal_form:
             raise Http404
         self.job_seeker = get_object_or_404(
             User.objects.select_related("jobseeker_profile"),

@@ -32,7 +32,7 @@
         <div class="c-box c-box--action">
             <h2 class="visually-hidden">Actions rapides</h2>
             <div class="form-row align-items-center gx-3">
-                {% if service.lien_mobilisation or not service.from_non_orientable_di_source %}
+                {% if service.lien_mobilisation or service.is_orientable_via_internal_form %}
                     {% if can_orient_towards_insertion_service or not user.is_authenticated %}
                         <div class="form-group col-12 col-lg-auto">
                             {% url 'insertion_views:start_orientation' service_uid=service.uid as start_orientation_url %}
@@ -137,7 +137,7 @@
                     </div>
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h3">Type de service</h2>
-                        {% if not service.lien_mobilisation and not service.from_non_orientable_di_source and service.average_orientation_response_delay_days is not None %}
+                        {% if service.is_orientable_via_internal_form and service.average_orientation_response_delay_days is not None %}
                             {% include "insertion/includes/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
                         {% endif %}
                         <ul class="list-data">

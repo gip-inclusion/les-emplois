@@ -97,6 +97,22 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
     assert structure.address_on_one_line is None
 
 
+@pytest.mark.parametrize(
+    "lien_mobilisation, non_orientable_sources, expected",
+    [
+        ("", [], True),
+        ("https://ext.link", [], False),
+        ("", ["blacklisted-source"], False),
+        ("https://ext.link", ["blacklisted-source"], False),
+    ],
+)
+def test_is_orientable_via_internal_form(lien_mobilisation, non_orientable_sources, expected, settings):
+    settings.NON_ORIENTABLE_DI_SOURCES = non_orientable_sources
+    service = ServiceFactory(lien_mobilisation=lien_mobilisation, source__value="blacklisted-source")
+
+    assert service.is_orientable_via_internal_form is expected
+
+
 def test_lien_mobilisation_must_be_url():
     service = ServiceFactory.build(lien_mobilisation="not-a-url")
 
