@@ -1,6 +1,6 @@
 {% load components %}
 
-{% component_alert title=title content=content variant="info" dismissible=True extra_id="directory-beta-notice" extra_classes="d-none" %}
+{% component_alert title=title content=content variant="info" dismissible_once=True extra_id="directory-beta-notice" extra_classes="d-none" %}
     {% fragment as title %}
         Annuaire Pro en accès bêta restreint
     {% endfragment %}
