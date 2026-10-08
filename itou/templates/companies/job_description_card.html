@@ -37,8 +37,16 @@
         {% fragment as c_title__main %}
             <h1>
                 {{ job.display_name }}
-                {% if job.is_active %}
-                    <span class="badge badge-base rounded-pill bg-success">{{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement</span>
+                {% if job.is_active and job.open_positions %}
+                    <span class="badge badge-base rounded-pill bg-success">
+                        {{ job.open_positions }}
+                        {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }}
+                        au recrutement
+                    </span>
+                {% elif not job.open_positions %}
+                    <span class="badge badge-base rounded-pill bg-nuance-08 text-primary">Aucun poste ouvert</span>
+                {% else %}
+                    <span class="badge badge-base rounded-pill bg-nuance-08 text-primary">Recrutement fermé</span>
                 {% endif %}
             </h1>
         {% endfragment %}
