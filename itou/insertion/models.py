@@ -417,6 +417,10 @@ class Service(GeolocatedAddressMixin, models.Model):
         return bool(self.lien_mobilisation)
 
     @property
+    def is_orientable_via_internal_form(self) -> bool:
+        return not self.should_mobilize_via_external_link and not self.from_non_orientable_di_source
+
+    @property
     def display_mobilization_modes(self) -> list[str]:
         EXTERNAL_LINK = "Site web de la structure"
         INTERNAL_FORM = "Formulaire"
@@ -424,9 +428,9 @@ class Service(GeolocatedAddressMixin, models.Model):
         EMAIL = "Email"
 
         modes = []
-        if self.lien_mobilisation:
+        if self.should_mobilize_via_external_link:
             modes.append(EXTERNAL_LINK)
-        elif not self.from_non_orientable_di_source:
+        elif self.is_orientable_via_internal_form:
             modes.append(INTERNAL_FORM)
         if self.contact_phone:
             modes.append(TELEPHONE)
