@@ -468,7 +468,7 @@ class TestTransferCompanyData:
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "Candidatures reçues" in remark
         assert (
-            f"Désactivation entreprise avec désactivation des membres:\n  * companies.Company[{from_company.pk}]"
+            f"Désactivation structure avec désactivation des membres:\n  * companies.Company[{from_company.pk}]"
             in remark
         )
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
