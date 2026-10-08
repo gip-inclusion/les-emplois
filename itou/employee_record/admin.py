@@ -3,6 +3,7 @@ import itertools
 import xworkflows
 from django import forms
 from django.contrib import admin, messages
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
@@ -215,6 +216,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "company_data_sent",
         "user_data_sent",
         "approval_data_sent",
+        "has_watched_data_updated_at_set",
     )
     show_full_result_count = False
 
@@ -262,6 +264,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                     "user_data_sent",
                     "approval_data_sent",
                     "archived_json",
+                    "has_watched_data_updated_at_set",
                 )
             },
         ),
@@ -311,8 +314,19 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
             return "Intégrée par l'ASP"
         return self.get_empty_value_display()
 
+    @admin.display(description="Mise à jour nécessaire des dates du PASS IAE", boolean=True)
+    def has_watched_data_updated_at_set(self, obj):
+        return obj.has_watched_data_updated_at_set
+
     def has_add_permission(self, request):
         return False
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(has_watched_data_updated_at_set=Q(watched_data_updated_at__isnull=False))
+        )
 
     def _get_queryset_with_relations(self, request):
         qs = super()._get_queryset_with_relations(request)
