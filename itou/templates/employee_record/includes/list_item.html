@@ -1,6 +1,8 @@
 {% load components %}
+{% load enums %}
 {% load format_filters %}
 {% load job_seekers %}
+{% enums "employee_record" "Status" as Status %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
     <div class="c-box--results__header">
         <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
@@ -23,7 +25,7 @@
     <hr class="m-0">
     <div class="c-box--results__body">
         {# ASP error #}
-        {% if employee_record.status == "REJECTED" %}
+        {% if employee_record.status == Status.REJECTED %}
             {% component_alert title=title content=content variant="warning" %}
                 {% fragment as title %}
                     Informations sur l'erreur de traitement :
@@ -77,7 +79,7 @@
             {% endcomponent_alert %}
         {% endif %}
         {# SIRET has changed #}
-        {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
+        {% if employee_record.status == Status.PROCESSED and employee_record.has_siret_different_from_asp_source %}
             {% include "employee_record/includes/_siret_changed_alert.html" with dismissible=False only %}
         {% endif %}
         {# Actions #}
@@ -119,24 +121,24 @@
                     <a href="{% url "employee_record_views:disable" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
                        aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Désactiver la fiche salariée</a>
-                {% elif employee_record.status == "DISABLED" %}
+                {% elif employee_record.status == Status.DISABLED %}
                     <a href="{% url "employee_record_views:reactivate" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
                        aria-label="Réactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Réactiver</a>
                 {% endif %}
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?back_url={{ current_url|urlencode }}"
-                   class="btn {% if employee_record.status == "NEW" or employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
+                   class="btn {% if employee_record.status == Status.NEW or employee_record.status == Status.REJECTED or employee_record.status == Status.PROCESSED %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
                    aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Voir la fiche salarié</a>
-                {% if employee_record.status == "PROCESSED" %}
+                {% if employee_record.status == Status.PROCESSED %}
                     <div class="dropdown w-md-auto">
                         {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_classes="btn-primary w-100 w-md-auto dropdown-toggle" only %}
                     </div>
                 {% endif %}
-                {% if employee_record.status == "NEW" %}
+                {% if employee_record.status == Status.NEW %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
                        aria-label="Compléter la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Compléter</a>
-                {% elif employee_record.status == "REJECTED" %}
+                {% elif employee_record.status == Status.REJECTED %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
                        aria-label="Modifier la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Modifier</a>
