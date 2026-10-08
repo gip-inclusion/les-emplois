@@ -4,3 +4,6 @@
 # Dependabot PRs (requirements/) don't need CODEOWNERS review.
 # Only the current supportix is required to review these PRs.
 requirements/
+
+# CodeRabbit configuration doesn't need CODEOWNERS review.
+/.coderabbit.yaml
