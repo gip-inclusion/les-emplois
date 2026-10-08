@@ -123,24 +123,32 @@
                 </div>
                 <div class="col-8">
                     <div class="c-box">
-                        <h2 class="h3">Envoyer un message à {{ person.full_name }}</h2>
-                        <hr>
-                        <p class="text-muted fs-sm">
-                            <i class="ri-information-line" aria-hidden="true"></i>
-                            Ce formulaire est destiné aux échanges entre professionnels — veillons à ne pas nous sursolliciter.
-                            Pour orienter une personne, privilégiez les formulaires de candidature ou de prescription disponibles sur la plateforme.
-                        </p>
-                        <form id="contact-form"
-                              method="post"
-                              action="{% url 'directory:send_message' key=person.key %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="back_url" value="{{ back_url }}">
-                            {% bootstrap_form contact_form alert_error_type="all" %}
-                            <button type="submit" class="btn btn-primary">
-                                <i class="ri-send-plane-line" aria-hidden="true"></i>
-                                <span>Envoyer</span>
-                            </button>
-                        </form>
+                        {% if rate_limited_message %}
+                            {% component_alert content=content variant="danger" icon=False %}
+                                {% fragment as content %}
+                                    <p class="mb-0">{{ rate_limited_message }}</p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                        {% else %}
+                            <h2 class="h3">Envoyer un message à {{ person.full_name }}</h2>
+                            <hr>
+                            <p class="text-muted fs-sm">
+                                <i class="ri-information-line" aria-hidden="true"></i>
+                                Ce formulaire est destiné aux échanges entre professionnels — veillons à ne pas nous sursolliciter.
+                                Pour orienter une personne, privilégiez les formulaires de candidature ou de prescription disponibles sur la plateforme.
+                            </p>
+                            <form id="contact-form"
+                                  method="post"
+                                  action="{% url 'directory:send_message' key=person.key %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="back_url" value="{{ back_url }}">
+                                {% bootstrap_form contact_form alert_error_type="all" %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-send-plane-line" aria-hidden="true"></i>
+                                    <span>Envoyer</span>
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
