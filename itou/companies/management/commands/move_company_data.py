@@ -3,7 +3,8 @@ import argparse
 from django.db import transaction
 from itoutils.django.commands import dry_runnable
 
-from itou.companies import models as companies_models, transfer
+from itou.common_apps.organizations import transfer
+from itou.companies import models as companies_models
 from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.utils.command import BaseCommand
 
@@ -115,11 +116,11 @@ class Command(BaseCommand):
         elif preserve_to_company_data:
             fields_to_transfer = [
                 transfer_field
-                for transfer_field in transfer.TransferField
-                if not transfer.TRANSFER_SPECS[transfer_field].get("model_field")
+                for transfer_field in transfer.COMPANY_TRANSFER_FIELDS
+                if not transfer.COMPANY_TRANSFER_SPECS[transfer_field].get("model_field")
             ]
         else:
-            fields_to_transfer = list(transfer.TransferField)
+            fields_to_transfer = transfer.COMPANY_TRANSFER_FIELDS
 
         self.stdout.write(
             "MOVE {} OF company.id={} - {} {} - {}\n".format(
@@ -131,7 +132,7 @@ class Command(BaseCommand):
             )
         )
         for field_to_transfer in fields_to_transfer:
-            spec = transfer.TRANSFER_SPECS[field_to_transfer]
+            spec = transfer.COMPANY_TRANSFER_SPECS[field_to_transfer]
             if "model_field" in spec:
                 continue
             all_items_count = transfer.get_transfer_queryset(from_company, None, spec).count()
@@ -143,7 +144,7 @@ class Command(BaseCommand):
             f"INTO company.id={to_company.pk} - {to_company.kind} {to_company.siret} - {to_company.display_name}\n"
         )
         for field_to_transfer in fields_to_transfer:
-            spec = transfer.TRANSFER_SPECS[field_to_transfer]
+            spec = transfer.COMPANY_TRANSFER_SPECS[field_to_transfer]
             if "model_field" in spec:
                 continue
             all_items_count = transfer.get_transfer_queryset(to_company, None, spec).count()
@@ -153,15 +154,15 @@ class Command(BaseCommand):
         disable_from_company = not only_job_applications
         try:
             with transaction.atomic():
-                reporter = transfer.transfer_company_data(
+                reporter = transfer.transfer_org_data(
                     from_company,
                     to_company,
                     fields_to_transfer,
-                    disable_from_company=disable_from_company,
+                    disable_from_org=disable_from_company,
                     allow_asp_to_user_created_transfer=allow_asp_to_user_created_transfer,
                 )
                 for section, section_changes in reporter.changes.items():
-                    if transfer.TRANSFER_SPECS.get(section, {}).get("model_field"):
+                    if transfer.COMPANY_TRANSFER_SPECS.get(section, {}).get("model_field"):
                         self.stdout.write(
                             f"| {section.label}: {section_changes[0] if section_changes else 'Pas de changement'}"
                         )

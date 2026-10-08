@@ -12,8 +12,9 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.approvals.models import Approval
+from itou.common_apps.organizations import transfer
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
-from itou.companies import enums, models, transfer
+from itou.companies import enums, models
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanySource
 from itou.utils.admin import (
@@ -311,7 +312,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
 
         transfer_data = {}
         for transfer_field in transfer.TransferField:
-            spec = transfer.TRANSFER_SPECS[transfer_field]
+            spec = transfer.COMPANY_TRANSFER_SPECS[transfer_field]
             if model_field := spec.get("model_field"):
                 from_data = [getattr(from_company, model_field.name)]
             else:
@@ -338,8 +339,8 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                 )
         else:
             fields_choices = []
-            for transfer_field in transfer.TransferField:
-                spec = transfer.TRANSFER_SPECS[transfer_field]
+            for transfer_field in transfer.COMPANY_TRANSFER_FIELDS:
+                spec = transfer.COMPANY_TRANSFER_SPECS[transfer_field]
                 if model_field := spec.get("model_field"):
                     if transfer_data[transfer_field]["data"] == [getattr(to_company, model_field.name)]:
                         transfer_data[transfer_field]["data"] = None
@@ -362,11 +363,11 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                 fields_to_transfer = form.cleaned_data["fields_to_transfer"]
                 disable_from_company = form.cleaned_data["disable_from_company"]
                 try:
-                    reporter = transfer.transfer_company_data(
+                    reporter = transfer.transfer_org_data(
                         from_company,
                         to_company,
                         fields_to_transfer=fields_to_transfer,
-                        disable_from_company=disable_from_company,
+                        disable_from_org=disable_from_company,
                     )
                 except transfer.TransferError as e:
                     messages.error(request, e.args[0])
