@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
-from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 
@@ -11,8 +11,6 @@ SERVICE_MAPPING = {
     Service.EMPLOIS: "emplois-de-linclusion",
     Service.MARCHE: "le-marché",
     Service.DATA_INCLUSION: "data-inclusion",
-    Service.PILOTAGE: "pilotage",
-    Service.MON_RECAP: "mon-recap",
 }
 
 
@@ -36,8 +34,6 @@ def get_service_users(*, email=None, user=None):
     if user:
         user_data = serialize_user(user)
         service_users.append(build_user(user_data, Service.EMPLOIS))
-        for activated_service in user.activated_services.all():
-            service_users.append(build_user(user_data, activated_service.service))
 
     return service_users
 
@@ -193,8 +189,3 @@ def sync_structures(nexus_structures):
             unique_fields=["id"],
         )
     )
-
-
-# Activate pilotage
-def activate_pilotage(user):
-    ActivatedService.objects.activate(user=user, service=Service.PILOTAGE)

@@ -3,12 +3,8 @@ from functools import partial
 import pytest
 from django.urls import reverse
 
-from itou.nexus.enums import Service
-from itou.nexus.models import ActivatedService
-from itou.users.enums import IdentityProvider
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.nexus.factories import NexusUserFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -116,31 +112,3 @@ def test_nav_dropdown_with_multiple_org_types(snapshot, client):
     [switcher_offcanvas] = soup.select("div.dropdown-organization")
     set_org_id_for_snapshot(switcher_offcanvas)
     assert pretty_indented(switcher_offcanvas) == snapshot(name="multi organization structure switcher in offcanvas")
-
-
-@pytest.mark.parametrize("case", ["default", "no_proconnect", "all_activated"])
-def test_nexus_dropdown(snapshot, client, case, pro_connect):
-    user = ProfessionalFactory(
-        for_snapshot=True,
-        identity_provider=IdentityProvider.DJANGO if case == "no_proconnect" else IdentityProvider.PRO_CONNECT,
-    )
-    PrescriberMembershipFactory(
-        user=user,
-        organization__name="On vous aide",
-        organization__siret="01234567891010",
-    )
-    if case == "all_activated":
-        ActivatedService.objects.create(user=user, service=Service.PILOTAGE)
-        ActivatedService.objects.create(user=user, service=Service.MON_RECAP)
-        NexusUserFactory(email=user.email, source=Service.DORA)
-        NexusUserFactory(email=user.email, source=Service.MARCHE)
-    client.force_login(user)
-    response = client.get(reverse("home:hp"), follow=True)
-    soup = parse_response_to_soup(response)
-
-    [offcanvasNav] = soup.select("#offcanvasNav")
-    for a_tags in soup.find_all("a", attrs={"href": True}):
-        if a_tags["href"].startswith("/static/pdf/syntheseSecurite"):
-            a_tags["href"] = remove_static_hash(a_tags["href"])  # Normalize href for CI
-    set_org_id_for_snapshot(offcanvasNav)
-    assert pretty_indented(offcanvasNav) == snapshot

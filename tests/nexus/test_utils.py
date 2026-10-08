@@ -5,7 +5,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.nexus.enums import Auth, Service
-from itou.nexus.models import DEFAULT_VALID_SINCE, ActivatedService, NexusRessourceSyncStatus
+from itou.nexus.models import DEFAULT_VALID_SINCE, NexusRessourceSyncStatus
 from itou.nexus.utils import (
     build_user,
     complete_full_sync,
@@ -76,19 +76,6 @@ class TestGetServiceUsers:
         assert get_service_users(user=user) == expected
         assert get_service_users(email=user.email) == expected
 
-    def test_activated_services(self):
-        user = ProfessionalFactory()
-        activated_service = ActivatedService.objects.create(
-            user=user, service=random.choice([Service.PILOTAGE, Service.MON_RECAP])
-        )
-
-        expected = [
-            build_user(serialize_user(user), Service.EMPLOIS),
-            build_user(serialize_user(user), activated_service.service),
-        ]
-        assert get_service_users(user=user) == expected
-        assert get_service_users(email=user.email) == expected
-
     def test_nexus_user(self):
         nexus_user = NexusUserFactory()
 
@@ -107,10 +94,10 @@ class TestDropDownStatus:
         user = ProfessionalFactory(
             identity_provider=IdentityProvider.PRO_CONNECT if pc_on_emplois else IdentityProvider.DJANGO
         )
-        NexusUserFactory(email=user.email, auth=Auth.MAGIC_LINK, source=Service.DORA)
         NexusUserFactory(email=user.email, auth=Auth.DJANGO, source=Service.MARCHE)
-        if pc_on_service:
-            NexusUserFactory(email=user.email, auth=Auth.PRO_CONNECT, source=Service.PILOTAGE)
+        NexusUserFactory(
+            email=user.email, auth=Auth.PRO_CONNECT if pc_on_service else Auth.MAGIC_LINK, source=Service.DORA
+        )
 
         assert dropdown_status(user=user)["proconnect"] == (pc_on_emplois or pc_on_service)
         assert dropdown_status(email=user.email)["proconnect"] == (pc_on_emplois or pc_on_service)
@@ -121,15 +108,8 @@ class TestDropDownStatus:
         assert dropdown_status(user=user)["activated_services"] == expected
         assert dropdown_status(email=user.email)["activated_services"] == expected
 
-        activated_service = ActivatedService.objects.create(
-            user=user, service=random.choice([Service.PILOTAGE, Service.MON_RECAP])
-        )
-        expected = [Service.EMPLOIS, activated_service.service]
-        assert dropdown_status(user=user)["activated_services"] == expected
-        assert dropdown_status(email=user.email)["activated_services"] == expected
-
         nexus_user = NexusUserFactory(email=user.email, source=random.choice([Service.DORA, Service.MARCHE]))
-        expected = sorted([Service.EMPLOIS, activated_service.service, nexus_user.source])
+        expected = sorted([Service.EMPLOIS, nexus_user.source])
         assert dropdown_status(user=user)["activated_services"] == expected
         assert dropdown_status(email=user.email)["activated_services"] == expected
 

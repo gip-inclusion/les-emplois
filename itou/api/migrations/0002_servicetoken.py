@@ -25,8 +25,6 @@ class Migration(migrations.Migration):
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois de l’inclusion"),
                             ("le-marche", "Le marché de l’inclusion"),
-                            ("mon-recap", "Mon Récap"),
-                            ("pilotage", "Le pilotage de l’inclusion"),
                         ],
                         verbose_name="service",
                     ),

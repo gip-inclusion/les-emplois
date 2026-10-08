@@ -13,8 +13,6 @@ from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.companies.enums import CompanyKind, CompanySource
 from itou.institutions.enums import InstitutionKind
-from itou.nexus.enums import Service
-from itou.nexus.models import ActivatedService
 from itou.prescribers.enums import DGFT_SAFIR_CODE, PrescriberOrganizationKind
 from itou.utils.apis import metabase as mb
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
@@ -24,10 +22,6 @@ from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import ItouStaffFactory
-
-
-def has_activated_pilotage_in_nexus(user):
-    return ActivatedService.objects.filter(user=user, service=Service.PILOTAGE).exists()
 
 
 class TestStatsView:
@@ -100,8 +94,6 @@ def test_stats_ft_log_visit(client, view_name):
         ),
     )
 
-    assert has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -134,8 +126,6 @@ def test_stats_cd_log_visit(client, settings, view_name):
             datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
-
-    assert has_activated_pilotage_in_nexus(user)
 
 
 @freeze_time("2023-03-10")
@@ -175,8 +165,6 @@ def test_stats_siae_log_visit(client, settings, view_name):
         ),
     )
 
-    assert has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -211,8 +199,6 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
         ),
     )
 
-    assert not has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -246,8 +232,6 @@ def test_stats_ddets_log_log_visit(client, settings, view_name):
         ),
     )
 
-    assert not has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -280,8 +264,6 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
             datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
-
-    assert not has_activated_pilotage_in_nexus(user)
 
 
 @freeze_time("2023-03-10")
@@ -318,8 +300,6 @@ def test_stats_dgefp_iae_log_visit(client, view_name):
             datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
-
-    assert not has_activated_pilotage_in_nexus(user)
 
 
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="x" * 64)
@@ -380,8 +360,6 @@ def test_stats_dihal_log_visit(client, view_name):
         ),
     )
 
-    assert not has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -413,8 +391,6 @@ def test_stats_drihl_log_visit(client, view_name):
             datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
-
-    assert not has_activated_pilotage_in_nexus(user)
 
 
 @freeze_time("2023-03-10")
@@ -448,8 +424,6 @@ def test_stats_iae_network_log_visit(client, view_name):
         ),
     )
 
-    assert not has_activated_pilotage_in_nexus(user)
-
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
@@ -479,8 +453,6 @@ def test_stats_staff(client):
             datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
-
-    assert not has_activated_pilotage_in_nexus(user)
 
 
 @override_settings(

@@ -22,8 +22,6 @@ from itou.geiq_assessments.models import LabelInfos
 from itou.insertion import models as insertion_models
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
-from itou.nexus.enums import Service
-from itou.nexus.models import ActivatedService
 from itou.users.models import NirModificationRequest
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import SiaeFinancialAnnexFactory
@@ -112,7 +110,6 @@ def test_all_admin(admin_client, mocker, subtests):
         job_application=JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker),
         to_state=JobApplicationState.PROCESSING,
     )
-    ActivatedService.objects.create(user=ProfessionalFactory(), service=Service.PILOTAGE)
     # Insertion App
     source = insertion_models.GenericReferenceItem.objects.create(
         source=insertion_models.GenericReferenceItemSource.DATA_INCLUSION,
