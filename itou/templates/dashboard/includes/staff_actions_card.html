@@ -6,7 +6,7 @@
             {% fragment as title %}
                 Actions
             {% endfragment %}
-            {% if perms.users.merge_users or perms.companies.import_aci_convergence_phc or perms.users.import_fs_3437_from_asp %}
+            {% if perms.users.merge_users or perms.companies.import_aci_convergence_phc %}
                 {% fragment as list %}
                     {% if perms.users.merge_users %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
@@ -21,14 +21,6 @@
                             <a href="{% url 'itou_staff_views:import_aci_convergence_phc' %}" class="btn-link btn-ico">
                                 <i class="ri-upload-line ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>Import ACI Convergence / PHC</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if perms.users.import_fs_3437_from_asp %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'itou_staff_views:import_fs_3437_from_asp' %}" class="btn-link btn-ico">
-                                <i class="ri-upload-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Import du fichier FS 3437 de l’ASP</span>
                             </a>
                         </li>
                     {% endif %}
