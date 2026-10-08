@@ -1,6 +1,5 @@
 from email.header import decode_header, make_header
 
-from django.core.cache import caches
 from django.urls import reverse
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
@@ -83,16 +82,15 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
     assert "Objet injecté" not in mailoutbox[0].body
 
 
-def test_message_rate_limit_is_per_user(client, mailoutbox, mocker):
-    sender, _, _, person = get_target_person(client)
-    caches["failsafe"].delete(f"directory-message-throttle-{sender.pk}")
-    mocker.patch("itou.www.directory_views.views.MESSAGE_RATE_LIMIT", 1)
+def test_message_rate_limit(client, mailoutbox, mocker):
+    _, _, _, person = get_target_person(client)
+    mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "1/day")
     url = reverse("directory:send_message", kwargs={"key": person.key})
     data = {"subject": ContactSubject.MEETING, "body": "Bonjour", "back_url": ""}
 
     assert client.post(url, data).status_code == 302
     response = client.post(url, data)
 
-    assertContains(response, "Vous avez atteint la limite de 50 messages envoyés par jour.")
+    assertContains(response, "Vous avez atteint la limite de messages envoyés : un par jour.")
     assert ContactMessage.objects.count() == 1
     assert len(mailoutbox) == 1
