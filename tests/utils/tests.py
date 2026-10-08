@@ -40,7 +40,7 @@ from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.otp.middleware import OtpMiddleware
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.admin import add_support_remark_to_obj, bulk_add_support_remark_to_objs
@@ -718,26 +718,6 @@ class TestUtilsTemplateTags:
         expected = "/company/10/card"
         assert out_empty == expected
         assert out_none == expected
-
-    @pytest.mark.parametrize(
-        "user_factory,is_param_expected",
-        [
-            (functools.partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
-            (
-                functools.partial(ProfessionalFactory, identity_provider=IdentityProvider.PRO_CONNECT),
-                True,
-            ),
-        ],
-    )
-    def test_autologin_proconnect(self, user_factory, is_param_expected):
-        user = user_factory()
-        template = Template("{% load url_add_query %}{% autologin_proconnect url user %}")
-        url = "/test/"
-        out = template.render(Context({"url": url, "user": user}))
-        if is_param_expected:
-            assert out == reverse("nexus:auto_login", query={"next_url": url})
-        else:
-            assert out == url
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")

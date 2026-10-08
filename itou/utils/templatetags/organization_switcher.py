@@ -24,7 +24,7 @@ def organization_switcher(context, mode):
             "organizations": organizations,
             "show_company_switcher_menu": len(organizations) >= 2 or create_antenna_perm,
             "user": request.user,
-            "next_url": reverse("nexus:emplois") if mode == "nexus" else reverse("dashboard:index"),
+            "next_url": reverse("dashboard:index"),
         }
         if request.user.is_job_seeker:
             userkind_context = {

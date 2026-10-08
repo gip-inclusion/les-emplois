@@ -192,11 +192,6 @@ class ItouCurrentOrganizationMiddleware:
             if any(skip_remaining_checks_conditions):
                 return self.get_response(request)
 
-            # FIXME: This will soon be removed along with Nexus views
-            # Nexus : Allow views without organization
-            if user.is_professional and request.path.startswith("/portal"):
-                return self.get_response(request)
-
             # Without an organization a pro cannot access the service
             # Display this page before ProConnect activation page
             # so that users with no organization don't open support tickets
