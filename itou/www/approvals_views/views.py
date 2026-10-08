@@ -137,11 +137,11 @@ class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
         return ["approvals/includes/list_results.html" if self.request.htmx else "approvals/list.html"]
 
     def get_queryset(self):
-        form_filters = [self.form.get_approvals_qs_filter()]
+        form_filters = []
         if self.form.is_valid():
             form_filters += self.form.get_qs_filters()
 
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().visible_by_company(self.siae.pk)
         if self.form.cleaned_data.get("contract_status", ContractStatus.ALL) != ContractStatus.ALL:
             queryset = _add_contract_data(queryset, self.siae)
         return (

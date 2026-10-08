@@ -3,7 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Exists, OuterRef, Q, TextChoices
+from django.db.models import Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -24,8 +24,6 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.files.forms import ItouFileField
-from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -87,17 +85,8 @@ class ApprovalForm(forms.Form):
         super().__init__(data, *args, **kwargs)
         self.fields["job_seeker"].choices = self._get_choices_for_job_seekers()
 
-    def get_approvals_qs_filter(self):
-        return Exists(
-            JobApplication.objects.filter(
-                approval=OuterRef("pk"),
-                to_company_id=self.siae_pk,
-                state=JobApplicationState.ACCEPTED,
-            )
-        )
-
     def _get_choices_for_job_seekers(self):
-        approvals_qs = Approval.objects.filter(self.get_approvals_qs_filter())
+        approvals_qs = Approval.objects.visible_by_company(self.siae_pk)
         users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
             (user.pk, user.get_inverted_full_name())
