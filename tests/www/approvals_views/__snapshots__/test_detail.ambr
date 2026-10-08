@@ -1171,7 +1171,6 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -1194,7 +1193,6 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -3700,7 +3698,6 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -3723,7 +3720,6 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -5339,189 +5335,6 @@
           </table>
       </div>
   </div>
-  
-  '''
-# ---
-# name: TestContractView.test_view
-  '''
-  <main class="s-main" id="main" role="main">
-      <div aria-atomic="true" aria-live="polite" class="toast-container">
-      </div>
-      <section class="s-title-02">
-          <div class="s-title-02__container container">
-              <div class="s-title-02__row row">
-                  <div class="s-title-02__col col-12">
-                      <div class="c-prevstep">
-                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
-                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
-                              </i>
-                              <span>
-                                  Retour
-                              </span>
-                          </a>
-                      </div>
-                      <div class="c-title">
-                          <div class="c-title__main">
-                              <h1>
-                                  PASS IAE de DOE Jane
-                              </h1>
-                          </div>
-                          <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/approvals/display/[Public ID of Approval]" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Afficher l’attestation
-                                  </span>
-                              </a>
-                          </div>
-                      </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                          <li class="nav-item">
-                              <a class="nav-link" href="/approvals/details/[Public ID of Approval]?back_url=/dashboard/">
-                                  Vue d'ensemble
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link active" href="/approvals/contracts/[Public ID of Approval]?back_url=/dashboard/">
-                                  Suivi des contrats IAE
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-      </section>
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="s-section__col col-12">
-                      <h2>
-                          Suivi des contrats IAE
-                      </h2>
-                      <div class="alert alert-info mb-3 mb-md-4" role="status">
-                          <div class="row">
-                              <div class="col-auto pe-0">
-                                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
-                                  </i>
-                              </div>
-                              <div class="col">
-                                  <p class="mb-2">
-                                      <strong>
-                                          Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
-                                      </strong>
-                                  </p>
-                                  <p class="mb-0">
-                                      Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
-                                  </p>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="c-box c-box--results mb-3 mb-md-4">
-                          <div class="c-box--results__header">
-                              <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                  <div class="c-box--results__summary flex-grow-1">
-                                      <i aria-hidden="true" class="ri-community-line">
-                                      </i>
-                                      <div>
-                                          <span>
-                                              EI
-                                          </span>
-                                          <h3>
-                                              Tralal’Hair
-                                          </h3>
-                                      </div>
-                                  </div>
-                                  <div class="align-self-center">
-                                      <span>
-                                          <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
-                                          </i>
-                                          Depuis le 01/02/2025
-                                      </span>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="c-box c-box--results mb-3 mb-md-4">
-                          <div class="c-box--results__header">
-                              <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                  <div class="c-box--results__summary flex-grow-1">
-                                      <i aria-hidden="true" class="ri-community-line">
-                                      </i>
-                                      <div>
-                                          <span>
-                                              EI
-                                          </span>
-                                          <h3>
-                                              Tif'any
-                                          </h3>
-                                      </div>
-                                  </div>
-                                  <div class="align-self-center">
-                                      <span>
-                                          <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
-                                          </i>
-                                          Du 01/01/2025 au 07/08/2025
-                                      </span>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="c-box c-box--results mb-3 mb-md-4">
-                          <div class="c-box--results__header">
-                              <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                  <div class="c-box--results__summary flex-grow-1">
-                                      <i aria-hidden="true" class="ri-community-line">
-                                      </i>
-                                      <div>
-                                          <span>
-                                              EI
-                                          </span>
-                                          <h3>
-                                              Faudra Tif Hair
-                                          </h3>
-                                      </div>
-                                  </div>
-                                  <div class="align-self-center">
-                                      <span>
-                                          <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
-                                          </i>
-                                          Du 01/10/2024 au 10/01/2025
-                                      </span>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="c-box c-box--results mb-3 mb-md-4">
-                          <div class="c-box--results__header">
-                              <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                  <div class="c-box--results__summary flex-grow-1">
-                                      <i aria-hidden="true" class="ri-community-line">
-                                      </i>
-                                      <div>
-                                          <span>
-                                              EI
-                                          </span>
-                                          <h3>
-                                              Inter Planet Hair
-                                          </h3>
-                                      </div>
-                                  </div>
-                                  <div class="align-self-center">
-                                      <span>
-                                          <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
-                                          </i>
-                                          Du 01/10/2024 au 30/06/2025
-                                      </span>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-  </main>
   
   '''
 # ---

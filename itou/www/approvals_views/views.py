@@ -31,7 +31,7 @@ from itou.approvals.perms import (
     can_view_approval_details,
     prolongation_derogation_session_key,
 )
-from itou.approvals.utils import can_close_approval, close_approval, get_contracts, last_hire_was_made_by_siae
+from itou.approvals.utils import can_close_approval, close_approval, last_hire_was_made_by_siae
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -169,9 +169,6 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
     slug_url_kwarg = "public_id"
     active_tab = None
 
-    def can_view_contracts(self):
-        return self.request.from_iae_actor
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -181,7 +178,6 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
         if not permissions:
             raise PermissionDenied
         context["active_tab"] = self.active_tab
-        context["can_view_contracts"] = self.can_view_contracts()
         context["is_employer_with_accepted_application"] = permissions == PERMS_READ_AND_WRITE
         context["can_view_personal_information"] = can_view_personal_information(self.request, approval.user)
         context["matomo_custom_title"] = "Détail PASS IAE"
@@ -311,20 +307,6 @@ class ApprovalPrintableDisplay(ReadonlyViewMixin, ApprovalBaseViewMixin, Templat
                 "matomo_custom_title": "Attestation de délivrance d'agrément",
             }
         )
-        return context
-
-
-class ContractsView(BaseApprovalDetailView):
-    queryset = Approval.objects
-    template_name = "approvals/contracts.html"
-    active_tab = "contracts"
-
-    def test_func(self):
-        return self.can_view_contracts()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["contracts"] = get_contracts(self.object)
         return context
 
 
