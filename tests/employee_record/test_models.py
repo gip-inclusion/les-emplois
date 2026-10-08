@@ -292,23 +292,38 @@ class TestEmployeeRecordModel:
         ]
 
     @pytest.mark.parametrize(
-        "code,available_transitions",
+        "code,previous_states,available_transitions",
         [
-            (None, [EmployeeRecordTransition.UNARCHIVE_NEW]),
-            ("0000", [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
-            ("31", []),
-            ("32", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
-            ("33", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
-            ("34", [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
-            ("3436", [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
+            (None, [], [EmployeeRecordTransition.UNARCHIVE_NEW]),
+            ("0000", [], [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
+            ("31", [], []),
+            (
+                "32",
+                [Status.REJECTED, Status.MODIFICATION_REJECTED],
+                [EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED],
+            ),
+            ("33", [Status.MODIFICATION_REJECTED, Status.REJECTED], [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
+            ("34", [Status.REJECTED], [EmployeeRecordTransition.UNARCHIVE_REJECTED]),
+            ("34", [], []),  # This shouldn't happen in production
+            ("3436", [Status.REJECTED, Status.MODIFICATION_REJECTED], [EmployeeRecordTransition.UNARCHIVE_PROCESSED]),
         ],
     )
-    def test_available_unarchive_transitions(self, code, available_transitions):
+    def test_available_unarchive_transitions(self, code, previous_states, available_transitions):
         employee_record = BareEmployeeRecordFactory(asp_processing_code=code, status=Status.ARCHIVED)
+        for previous_state in previous_states:
+            employee_record.logs.create(
+                from_state=previous_state,
+                # This is likely inconsistent when previous_states length is >=2
+                # but shouldn't impact the test result
+                to_state=Status.ARCHIVED,
+                transition=EmployeeRecordTransition.ARCHIVE,
+            )
+
         for unarchive_transition in [
             EmployeeRecordTransition.UNARCHIVE_NEW,
             EmployeeRecordTransition.UNARCHIVE_PROCESSED,
             EmployeeRecordTransition.UNARCHIVE_REJECTED,
+            EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED,
         ]:
             assert getattr(employee_record, unarchive_transition).is_available() is (
                 unarchive_transition in available_transitions

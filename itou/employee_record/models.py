@@ -519,13 +519,21 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             and self.asp_processing_code[:2] in ["32", "33", "34"]
         )
 
+    def _last_rejected_status(self):
+        last_statuses = (
+            self.logs.filter(from_state__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
+            .order_by("-timestamp")
+            .values_list("from_state", flat=True)[:1]
+        )
+        return last_statuses[0] if last_statuses else None
+
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
     def check_unarchive_rejected(self):
-        return self._asp_processing_code_in_error()
+        return self._asp_processing_code_in_error() and self._last_rejected_status() == Status.REJECTED
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED)
-    def check_unarchive_update_rejected(self):
-        return self._asp_processing_code_in_error()
+    def check_unarchive_modification_rejected(self):
+        return self._asp_processing_code_in_error() and self._last_rejected_status() == Status.MODIFICATION_REJECTED
 
     def unarchive(self):
         if self.unarchive_new.is_available():
@@ -539,16 +547,14 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             return
         if self._asp_processing_code_in_error():
             # It can be either REJECTED or MODIFICATION_REJECTED
-            if (
-                last_reject_log := self.logs.filter(from_state__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
-                .order_by("-timestamp")
-                .first()
-            ):
-                match last_reject_log.from_state:
-                    case Status.REJECTED:
-                        return self.unarchive_rejected()
-                    case Status.MODIFICATION_REJECTED:
-                        return self.unarchive_modification_rejected()
+            match self._last_rejected_status():
+                case Status.REJECTED:
+                    return self.unarchive_rejected()
+                case Status.MODIFICATION_REJECTED:
+                    return self.unarchive_modification_rejected()
+                case _:
+                    logger.error("Archived employee_record=%d seems to have an inconsistent history", self.pk)
+
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
 
