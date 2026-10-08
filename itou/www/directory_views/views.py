@@ -3,12 +3,12 @@ from email.utils import formataddr
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.cache import caches
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from itoutils.urls import add_url_params
 
+from itou.api.throttling import FailSafeUserRateThrottle
 from itou.cities.cache import get_directory_active_city_ids
 from itou.directory.enums import ContactSubject
 from itou.directory.models import ContactMessage
@@ -135,12 +135,13 @@ def reveal_contact(request, key, field):
     )
 
 
-def _message_rate_limited(user):
-    cache = caches["failsafe"]
-    cache_key = f"directory-message-throttle-{user.pk}"
-    if cache.add(cache_key, 1, timeout=MESSAGE_RATE_LIMIT_PERIOD):
-        return False
-    return cache.incr(cache_key) > MESSAGE_RATE_LIMIT
+class MessageThrottle(FailSafeUserRateThrottle):
+    scope = "directory-message-user"
+    rate = "50/day"
+
+    @property
+    def limit_message(self):
+        return f"Vous avez atteint la limite de messages envoyés : {self.french_rate_limit(self.rate)}."
 
 
 @check_request(can_access_directory)
@@ -149,8 +150,9 @@ def send_message(request, key):
     person = _get_person(request, key)
     form = ContactMessageForm(request.POST)
     if form.is_valid():
-        if _message_rate_limited(request.user):
-            form.add_error(None, "Vous avez atteint la limite de 50 messages envoyés par jour.")
+        throttle = MessageThrottle()
+        if not throttle.allow_request(request, None):
+            form.add_error(None, throttle.limit_message)
         else:
             subject = form.cleaned_data["subject"]
             custom_subject = form.cleaned_data["custom_subject"]
