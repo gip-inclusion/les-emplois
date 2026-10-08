@@ -687,9 +687,9 @@ data-inclusion-schema==1.0.10 \
     --hash=sha256:3e226d1944dec20185f3aa17bc3dac0cdd16ec39787bad76eecddf0fbe20b8ca \
     --hash=sha256:46592527c4fb288da4b5e7cb1ab87b481d4fc816b066118ca135b90c2487828e
     # via -r base.in
-django==6.0.8 \
-    --hash=sha256:9b98b7e1902e0e575ea4f42c175fc9512784f7f2580898286aee3388b322219d \
-    --hash=sha256:cb0bd962d27fc866f3c514b20aae6a7df56ec80b488f9899da46d675cd051526
+django==6.0.9 \
+    --hash=sha256:5c6473d05bbea9c43359cc36701b5deec3c925f5311963786e1346544c1a68c0 \
+    --hash=sha256:8ce037c971f421cfb47d38c097ca233a8f6dd42d9e9501a37e02dd7d08c5cb3f
     # via
     #   -r base.in
     #   django-allauth
