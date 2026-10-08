@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="ContactMessage",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("recipient_id", models.CharField(verbose_name="identifiant Nexus du destinataire")),
+                ("recipient_id", models.CharField(verbose_name="identifiant du destinataire")),
                 (
                     "subject",
                     models.CharField(
