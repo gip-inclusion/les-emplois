@@ -1,17 +1,24 @@
+from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import IntegrityError, transaction
 from django.db.models import TextChoices
 from django.utils import timezone
 from psycopg.errors import UniqueViolation
 
+from itou.api import models as api_models
 from itou.approvals import models as approvals_models
+from itou.cities.models import City
+from itou.communications.models import NotificationSettings
 from itou.companies import enums as companies_enums, models as companies_models
 from itou.eligibility import models as eligibility_models
 from itou.employee_record import models as employee_record_models
 from itou.geiq_assessments import models as geiq_assessments_models
+from itou.insertion import models as insertion_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
+from itou.jobs import models as jobs_models
 from itou.prescribers import models as prescribers_models
+from itou.rdv_insertion import models as rdv_insertion_models
 from itou.siae_evaluations import models as siae_evaluations_models
 from itou.users import models as users_models
 from itou.users.utils import merge_job_seeker_assignments
@@ -273,9 +280,58 @@ PRESCRIBERORG_TRANSFER_SPECS = {
 
 
 # Consistency checks
+IGNORED_MODELS = {
+    companies_models.Company: {
+        api_models.CompanyToken,
+        companies_models.Contract,
+        companies_models.SiaeConvention,
+        geiq_assessments_models.Assessment,  # handled through `Assessment.companies.through`
+        insertion_models.MobilizationEvent,
+        insertion_models.Orientation,
+        jobs_models.Appellation,
+        job_applications_models.JobApplicationComment,
+        job_applications_models.JobApplicationTransitionLog,
+        rdv_insertion_models.Appointment,
+        rdv_insertion_models.InvitationRequest,
+        users_models.User,  # handled through `PrescriberMembership`
+        City,
+        NotificationSettings,
+    },
+    prescribers_models.PrescriberOrganization: {
+        insertion_models.MobilizationEvent,
+        insertion_models.Orientation,
+        users_models.User,  # handled through `PrescriberMembership`
+        City,
+        NotificationSettings,
+    },
+}
+
+
+def _model_sanity_check(model):
+    relation_models = {
+        m
+        for m in apps.get_models()
+        for field in m._meta.get_fields()
+        if field.is_relation and field.related_model is model
+    }
+    SPECS = COMPANY_TRANSFER_SPECS if model is companies_models.Company else PRESCRIBERORG_TRANSFER_SPECS
+    transferred_models = {spec["related_model"] for spec in SPECS.values() if spec.get("related_model")}
+    if model is companies_models.Company:
+        transferred_models -= {
+            employee_record_models.EmployeeRecord,  # already transferred through job applications
+            geiq_assessments_models.Assessment.companies.through,
+        }
+    assert not transferred_models & IGNORED_MODELS[model], transferred_models & IGNORED_MODELS[model]
+    assert relation_models == transferred_models | IGNORED_MODELS[model], relation_models ^ (
+        transferred_models | IGNORED_MODELS[model]
+    )
+
+
 assert (COMPANY_TRANSFER_FIELDS | PRESCRIBERORG_TRANSFER_FIELDS) == set(TransferField)
 assert set(COMPANY_TRANSFER_SPECS) == COMPANY_TRANSFER_FIELDS
 assert set(PRESCRIBERORG_TRANSFER_SPECS) == PRESCRIBERORG_TRANSFER_FIELDS
+_model_sanity_check(companies_models.Company)
+_model_sanity_check(prescribers_models.PrescriberOrganization)
 
 
 def get_transfer_queryset(from_company, to_company, spec):
