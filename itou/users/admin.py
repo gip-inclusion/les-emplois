@@ -9,7 +9,6 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
 from django.contrib.admin import models as admin_models
 from django.contrib.admin.options import InlineModelAdmin
-from django.contrib.admin.utils import display_for_value
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
@@ -446,13 +445,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def jobseeker_profile_link(self, obj):
         return get_admin_view_link(obj.jobseeker_profile) if obj.is_job_seeker else None
 
-    @admin.display(description="2FA obligatoire")
+    @admin.display(description="2FA obligatoire", boolean=True)
     def required_2fa(self, obj):
-        return display_for_value(
-            user_is_concerned_by_otp(obj),
-            empty_value_display="unused kwarg",
-            boolean=True,
-        )
+        return user_is_concerned_by_otp(obj)
 
     @admin.display(description="appareils enrôlés pour la 2FA interne")
     def internal_2fa_devices(self, obj):

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin.utils import display_for_value
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.otp.models import ItouTOTPDevice
@@ -17,13 +16,9 @@ class ItouTOTPDeviceAdmin(ReadonlyMixin, ItouModelAdmin):
         fields.insert(0, "created_at")
         return fields
 
-    @admin.display(description="activé")
+    @admin.display(description="activé", boolean=True)
     def enabled(self, obj):
-        return display_for_value(
-            obj.disabled_at is None,
-            empty_value_display="unused kwarg",
-            boolean=True,
-        )
+        return obj.disabled_at is None
 
 
 admin.site.unregister(TOTPDevice)
