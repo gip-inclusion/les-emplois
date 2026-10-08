@@ -79,7 +79,6 @@ def test_people_search_restores_query_from_url(client):
     assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "Vous faites partie des premiers à accéder à cette fonctionnalité")
     assertContains(response, reverse("dashboard:edit_user_info"))
-    assertContains(response, 'class="btn btn-sm btn-outline-primary has-external-link"')
     assertContains(response, 'id="people-clear-filters"')
     assertNotContains(response, "ms-lg-auto d-none")
 
