@@ -136,6 +136,34 @@ def can_view_stats_dgefp_iae(request):
     )
 
 
+def can_view_stats_ffgeiq(request):
+    return (
+        request.from_institution
+        and isinstance(request.current_organization, Institution)
+        and request.current_organization.kind == InstitutionKind.FFGEIQ
+    )
+
+
+def can_view_stats_dgefp_geiq(request):
+    return (
+        request.from_institution
+        and isinstance(request.current_organization, Institution)
+        and request.current_organization.kind == InstitutionKind.DGEFP_GEIQ
+    )
+
+
+def can_view_stats_dreets_geiq(request):
+    return (
+        request.from_institution
+        and isinstance(request.current_organization, Institution)
+        and request.current_organization.kind == InstitutionKind.DREETS_GEIQ
+    )
+
+
+def can_view_stats_geiq_execution_assessment(request):
+    return can_view_stats_ffgeiq(request) or can_view_stats_dgefp_geiq(request) or can_view_stats_dreets_geiq(request)
+
+
 def can_view_stats_dihal(request):
     return (
         request.from_institution

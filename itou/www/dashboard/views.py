@@ -72,6 +72,7 @@ class DashboardStatsLayoutKind(enum.StrEnum):
     PRESCRIBER_DEPT = "prescriber_dept"
     SD_IAE = "sd_iae"
     DGEFP = "dgefp"
+    GEIQ = "geiq"
 
     LEGACY = "legacy"
 
@@ -294,6 +295,8 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
             context["layout_kind"] = DashboardStatsLayoutKind.DGEFP
         elif stats_utils.can_view_stats_ddets_iae(request) or stats_utils.can_view_stats_dreets_iae(request):
             context["layout_kind"] = DashboardStatsLayoutKind.SD_IAE
+        elif stats_utils.can_view_stats_geiq_execution_assessment(request):
+            context["layout_kind"] = DashboardStatsLayoutKind.GEIQ
 
     if context["layout_kind"] is DashboardStatsLayoutKind.LEGACY:
         context.update(
