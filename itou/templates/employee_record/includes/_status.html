@@ -1,4 +1,5 @@
 {% load enums %}
+{% load should_not_happen %}
 {% enums "employee_record" "Status" as Status %}
 {% if employee_record.status == Status.NEW %}
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi">Nouvelle à compléter</span>
@@ -20,4 +21,6 @@
     <span class="badge rounded-pill {{ extra_classes|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Archivée le {{ employee_record.last_transition_timestamp|date:"SHORT_DATETIME_FORMAT" }}
     </span>
+{% else %}
+    {% should_not_happen "Unexpected status for employee record: '%s'" employee_record.status %}
 {% endif %}
