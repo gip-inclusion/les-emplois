@@ -212,6 +212,16 @@
       'model': 'users.NirModificationRequest',
     }),
     dict({
+      'field': 'author',
+      'hidden': True,
+      'model': 'users.ProSupportReport',
+    }),
+    dict({
+      'field': 'notified_prescriber',
+      'hidden': True,
+      'model': 'users.ProSupportReport',
+    }),
+    dict({
       'field': 'created_by',
       'hidden': False,
       'model': 'users.User',
@@ -334,6 +344,11 @@
       'field': 'user',
       'hidden': False,
       'model': 'users.JobSeekerProfile',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'users.ProSupportReport',
     }),
     dict({
       'field': 'user',

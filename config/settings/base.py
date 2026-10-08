@@ -452,6 +452,7 @@ PILOTAGE_INSTITUTION_EMAIL_CONTACT = os.getenv(
     "PILOTAGE_INSTITUTION_EMAIL_CONTACT", "pilotage+institution@inclusion.gouv.fr"
 )
 API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api.emplois@inclusion.gouv.fr")
+PRO_SUPPORT_REPORT_REPLY_TO_EMAIL = os.getenv("PRO_SUPPORT_REPORT_REPLY_TO_EMAIL", "sam@inclusion.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
 # Sentry
@@ -524,10 +525,6 @@ PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
 ]
 
 TALLY_URL = os.getenv("TALLY_URL")
-
-# Tally form id for the SIAE "suggest a next step" action (end of IAE contract). Empty until provided:
-# the action and the job seeker card banner stay hidden while it is not set.
-TALLY_SUGGEST_NEXT_STEP_FORM_ID = os.getenv("TALLY_SUGGEST_NEXT_STEP_FORM_ID")
 
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
