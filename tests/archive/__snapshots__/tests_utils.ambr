@@ -288,11 +288,6 @@
     dict({
       'field': 'user',
       'hidden': False,
-      'model': 'nexus.ActivatedService',
-    }),
-    dict({
-      'field': 'user',
-      'hidden': False,
       'model': 'otp.ItouStaticDevice',
     }),
     dict({

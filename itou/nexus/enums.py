@@ -11,8 +11,6 @@ class Service(models.TextChoices):
     # Label left untokenized: it is part of ServiceToken.service choices, so changing it needs a migration.
     EMPLOIS = "les-emplois", "les emplois de l’inclusion"
     MARCHE = "le-marche", "Le marché de l’inclusion"
-    MON_RECAP = "mon-recap", "Mon Récap"
-    PILOTAGE = "pilotage", "Le pilotage de l’inclusion"
 
     @classmethod
     def activable(cls):
@@ -21,22 +19,11 @@ class Service(models.TextChoices):
             cls.EMPLOIS,
             cls.DORA,
             cls.MARCHE,
-            cls.PILOTAGE,
-            cls.MON_RECAP,
         ]
 
     @classmethod
     def sync_source_choices(cls):
         return [(k, v) for k, v in cls.choices if k in [cls.DORA, cls.MARCHE]]
-
-    @classmethod
-    def internal_services(cls):
-        # Services managed in ActivatedServices. EMPLOIS will soon join them
-        return [cls.PILOTAGE, cls.MON_RECAP]
-
-    @classmethod
-    def internal_services_choices(cls):
-        return [(k, v) for k, v in cls.choices if k in cls.internal_services()]
 
 
 class Auth(models.TextChoices):
@@ -131,22 +118,16 @@ class NexusStructureKind(models.TextChoices):
     SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
 
 
-emplois_kind_mapping = {
-    UserKind.PROFESSIONAL: NexusUserKind.FACILITY_MANAGER,
-}
 USER_KIND_MAPPING = {
-    Service.EMPLOIS: emplois_kind_mapping,
+    Service.EMPLOIS: {
+        UserKind.PROFESSIONAL: NexusUserKind.FACILITY_MANAGER,
+    },
     Service.DORA: {
         "accompagnateur": NexusUserKind.GUIDE,
         "offreur": NexusUserKind.FACILITY_MANAGER,
         "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
         "autre": "",
         "": "",
-    },
-    Service.PILOTAGE: emplois_kind_mapping,
-    Service.MON_RECAP: {
-        # this service does not have a user kind
-        UserKind.PROFESSIONAL: "",
     },
     Service.MARCHE: {
         "SIAE": NexusUserKind.FACILITY_MANAGER,

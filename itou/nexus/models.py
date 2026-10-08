@@ -4,11 +4,9 @@ from citext import CIEmailField
 from django.db import models
 from django.db.models import F, OuterRef
 from django.db.models.functions import Coalesce
-from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.nexus.enums import Auth, NexusStructureKind, NexusUserKind, Role, Service
-from itou.users.models import User
 from itou.utils.validators import validate_siret
 
 
@@ -157,28 +155,3 @@ class NexusRessourceSyncStatus(models.Model):
 
     def __str__(self):
         return f"{self.service} - {self.valid_since}"
-
-
-class ActivatedServiceManager(models.Manager):
-    def activate(self, user, service):
-        ActivatedService.objects.bulk_create([ActivatedService(user=user, service=service)], ignore_conflicts=True)
-
-
-class ActivatedService(models.Model):
-    user = models.ForeignKey(
-        User,
-        verbose_name="utilisateur",
-        related_name="activated_services",
-        on_delete=models.CASCADE,
-    )
-    service = models.CharField(verbose_name="service", choices=Service.internal_services_choices())
-    created_at = models.DateTimeField(verbose_name="date d'activation", default=timezone.now)
-
-    objects = ActivatedServiceManager()
-
-    class Meta:
-        verbose_name = "service activé"
-        verbose_name_plural = "services activés"
-        constraints = [
-            models.UniqueConstraint(fields=["user", "service"], name="user_service_unique"),
-        ]
