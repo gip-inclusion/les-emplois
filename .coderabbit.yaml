@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+reviews:
+  allow_author_approval: false
+  high_level_summary: false
+  high_level_summary_in_walkthrough: true
+  high_level_summary_instructions: |-
+    Keep the summary short: 3 to 5 bullet points describing the functional or technical impact of the PR, without listing files one by one.
+  auto_title_instructions: &title_requirements |-
+    Le titre de PR doit être en français. L'anglais peut être toléré pour certains termes spécifiques rarement traduits. Le titre doit être au format "Catégorie : brève description", avec "Catégorie" à choisir dans la liste ci-dessous :
+
+    - API
+    - Accessibilité
+    - Accompagnements
+    - Admin
+    - Annexes financières
+    - Candidature
+    - Connexion
+    - Contrôle a posteriori
+    - Demandes de prolongation
+    - Demandeur d’emploi
+    - Employeur
+    - Fiche de poste
+    - Fiche entreprise
+    - Fiches salarié
+    - GEIQ
+    - Inscription
+    - Interface
+    - Insertion
+    - Notifications
+    - Page d’accueil
+    - PASS IAE
+    - Performances
+    - Pilotage
+    - Prescripteur
+    - Profil salarié
+    - Recherche employeur
+    - Recherche fiche de poste
+    - Recherche prescripteur
+    - Stabilité
+    - Statistiques
+    - Tableau de bord
+    - Tech
+    - Vie privée
+  review_status: false
+  review_details: false
+  review_progress: true
+  estimate_code_review_effort: true
+  sequence_diagrams: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  poem: false
+  enable_prompt_for_ai_agents: true
+  slop_detection:
+    include_all_authors: false
+    enabled: false
+  in_progress_fortune: false
+  # Generated or bulk data files: nothing actionable to review there
+  path_filters:
+    - "!CHANGELOG.md" # generated weekly by scripts/mkchangelog
+    - "!itou/static/img/**"
+    - "!itou/asp/reference/**" # ASP reference tables (CSV)
+  # Tools not listed here keep their default (enabled), e.g. ruff (configured in pyproject.toml), shellcheck, actionlint, zizmor, gitleaks, hadolint, yamllint, osvScanner, github-checks
+  tools:
+    # Python is linted by ruff only: these would flag rules the team doesn't enforce
+    flake8:
+      enabled: false
+    pylint:
+      enabled: false
+    # Templates are Django templates, formatted with djlint (not supported by CodeRabbit): htmlhint misreads template tags
+    htmlhint:
+      enabled: false
+    # Markdown files are mostly Django email templates (itou/templates/**/*.md) and hard-wrapped docs, with no markdownlint config
+    markdownlint:
+      enabled: false
+    # Docs and user-facing text are in French: grammar checks are mostly noise
+    languagetool:
+      enabled: false
+  # CodeRabbit only comments: it never pushes commits to a PR
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+    title:
+      requirements: *title_requirements
+    issue_assessment:
+      mode: "off"
+    description:
+      mode: "off"
+  auto_review:
+    # Opt-in: only PRs carrying this label are reviewed
+    labels:
+      - review-coderabbit
+    # Matched against the PR target branch: only the default branch is reviewed otherwise, this also covers stacked PRs
+    base_branches:
+      - ".*"
+    # Checked before labels: Dependabot PRs are never reviewed, even if labelled
+    ignore_usernames:
+      - "dependabot[bot]"
+knowledge_base:
+  # The CodeRabbit GitHub App must be installed on linked repositories, otherwise they're skipped with a warning.
+  linked_repositories:
+    - repository: "gip-inclusion/itou-theme"
+      instructions: |-
+        Theme based on Bootstrap 5.3, shared by les emplois and other inclusion services. It defines the CSS classes, components and `data-it-` JS behaviours available in templates: prefer them over new CSS classes or inline styles.
+    - repository: "gip-inclusion/itoutils"
+      instructions: |-
+        Shared Python/Django utilities, installed from PyPI as `itoutils` (version pinned in `requirements/`): test helpers (`itoutils.django.testing`), management command base classes (`itoutils.django.commands`), URL helpers (`itoutils.urls`)… Check for an existing helper there before suggesting new code.
+chat:
+  art: false
