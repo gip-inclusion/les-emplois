@@ -92,9 +92,11 @@ def _get_person(request, key):
 
 
 def _person_detail_context(request, person, contact_form=None):
+    throttle = MessageThrottle()
     return {
         "person": person,
         "contact_form": contact_form or ContactMessageForm(),
+        "rate_limited_message": throttle.limit_message if throttle.is_throttled(request, None) else None,
         "back_url": get_safe_url(
             request,
             "back_url",

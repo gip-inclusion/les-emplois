@@ -39,6 +39,13 @@ def test_person_detail_unknown_key(client):
     assert response.status_code == 404
 
 
+def test_person_detail_rate_limit(client, mocker):
+    _, _, _, person = get_target_person(client)
+    mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "0/day")
+    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+    assertContains(response, "Vous avez atteint la limite de messages envoyés : 0 par jour.")
+
+
 def test_reveal_contact(client):
     _, target, target_organization, person = get_target_person(client)
 
