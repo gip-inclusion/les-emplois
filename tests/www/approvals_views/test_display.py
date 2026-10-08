@@ -1,10 +1,13 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.utils import constants as global_constants
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 
 
 class TestDisplayApproval:
@@ -76,3 +79,44 @@ class TestDisplayApproval:
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         assertContains(response, "Imprimer ce PASS IAE")
         assertNotContains(response, self.WITH_DIAGNOSIS_STR)
+
+    @pytest.mark.parametrize(
+        "scenario,should_access",
+        [
+            ["this company", True],
+            ["another company", False],
+            ["this job seeker", False],
+            ["another job seeker", False],
+            ["a prescriber", False],
+        ],
+    )
+    def test_access(self, client, scenario, should_access):
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            sent_by_prescriber=True,
+            with_job_seeker_assignment=True,
+        )
+        approval = job_application.approval
+        if scenario == "this job seeker":
+            user = approval.user
+        elif scenario == "this company":
+            user = EmployerFactory(membership__company=job_application.to_company)
+        elif scenario == "another job seeker":
+            user = JobSeekerFactory()
+        elif scenario == "another company":
+            other_company = CompanyFactory(subject_to_iae_rules=True)
+            user = EmployerFactory(membership__company=other_company)
+        elif scenario == "a prescriber":
+            user = job_application.sender
+            assert user.prescribermembership_set.exists()
+        else:
+            raise ValueError(f"Unexpected {scenario=}")
+
+        client.force_login(user)
+        response = client.get(
+            reverse(
+                "approvals:display_printable_approval",
+                kwargs={"public_id": approval.public_id},
+            )
+        )
+        assert response.status_code == (200 if should_access else 404)
