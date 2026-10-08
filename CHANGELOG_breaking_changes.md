@@ -1,5 +1,13 @@
 # Journal des changements techniques majeurs
 
+# 2026-08-27
+
+- Mise à jour vers Python 3.14:
+    1. Reconstruire le _virtual env_ : `rm -r $VIRTUAL_ENV && make venv`
+    2. Mettre à jour ses recettes jetables après avoir `git rebase master`, en
+       éditant la valeur de la variable `CC_PYTHON_VERSION` en `3.14` dans
+       l’environnement de l’app sur la console CleverCloud.
+
 ## 2026-01-30
 
 - La branche master est renommée en main
