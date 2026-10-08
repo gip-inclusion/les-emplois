@@ -84,7 +84,6 @@ urlpatterns = [
     path("institutions/", include("itou.www.institutions_views.urls")),
     path("invitations/", include("itou.www.invitations_views.urls")),
     path("job-seekers/", include("itou.www.job_seekers_views.urls")),
-    path("portal/", include("itou.www.nexus.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("search/", include("itou.www.search_views.urls")),
     path("company/", include("itou.www.companies_views.urls")),

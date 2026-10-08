@@ -318,9 +318,6 @@ class TestServices:
     def get_service_url(self, service):
         return reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
 
-    def get_nexus_auto_login_url(self, service_url):
-        return reverse("nexus:auto_login", query={"next_url": service_url})
-
     @staticmethod
     def format_categories(service):
         view = ServiceDetailView()
@@ -946,7 +943,6 @@ class TestServices:
         action_box = str(parse_response_to_soup(response, ".c-box--action"))
         wizard_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
         assert wizard_url in action_box
-        assert reverse("nexus:auto_login") not in action_box
 
     def test_detail_credential_documents_empty(self, client):
         service = ServiceFactory(
