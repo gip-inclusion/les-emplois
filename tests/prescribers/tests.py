@@ -32,8 +32,9 @@ from itou.prescribers.enums import (
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User
+from tests.approvals.factories import ProlongationRequestFactory
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
-from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.insertion.factories import OrientationFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.job_applications import factories as job_applications_factories
@@ -42,7 +43,13 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import (
+    ItouStaffFactory,
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 
 
 class TestPrescriberOrganizationManager:
@@ -849,6 +856,91 @@ class TestPrescriberManagementCommands:
         else:
             assert PrescriberOrganization.objects.count() == 2
             assert JobSeekerAssignment.objects.count() == 5
+
+    @pytest.mark.parametrize("wet_run", [True, False])
+    @pytest.mark.parametrize("only_job_applications,preserve_to_org_data", [(True, False), (False, True)])
+    def test_move_prescriberorg_data(self, wet_run, only_job_applications, preserve_to_org_data):
+        prescriber_organization_1 = PrescriberOrganizationFactory(
+            name="Presc. Org. 1",
+            email="org_1@test.local",
+            description="Organisation prescriptrice 1",
+            phone="0600000060",
+            website="www.org_1.fr",
+        )
+        iae_diag = IAEEligibilityDiagnosisFactory(
+            author_prescriber_organization=prescriber_organization_1, author=PrescriberFactory()
+        )
+        geiq_diag = GEIQEligibilityDiagnosisFactory(
+            author_prescriber_organization=prescriber_organization_1, author=PrescriberFactory()
+        )
+        job_application = job_applications_factories.JobApplicationFactory(
+            sent_by_prescriber=True, sender_prescriber_organization=prescriber_organization_1
+        )
+        job_seeker_assignment = JobSeekerAssignmentFactory(prescriber_organization=prescriber_organization_1)
+        invitation = PrescriberWithOrgInvitationFactory(
+            organization=prescriber_organization_1, sender=PrescriberFactory()
+        )
+        prolongation_request = ProlongationRequestFactory(prescriber_organization=prescriber_organization_1)
+        prescriber_organization_2 = PrescriberOrganizationFactory(
+            name="Presc. Org. 2",
+            email="org_2@test.local",
+            description="Organisation prescriptrice 2",
+            phone="0700000070",
+            website="www.org_2.fr",
+        )
+
+        call_command(
+            "move_prescriberorg_data",
+            from_id=prescriber_organization_1.id,
+            to_id=prescriber_organization_2.id,
+            only_job_applications=only_job_applications,
+            preserve_to_org_data=preserve_to_org_data,
+            wet_run=wet_run,
+        )
+
+        prescriber_organization_1.refresh_from_db()
+        prescriber_organization_2.refresh_from_db()
+        iae_diag.refresh_from_db()
+        geiq_diag.refresh_from_db()
+        job_application.refresh_from_db()
+        job_seeker_assignment.refresh_from_db()
+        invitation.refresh_from_db()
+        prolongation_request.refresh_from_db()
+
+        if wet_run:
+            if only_job_applications:
+                assert iae_diag.author_prescriber_organization == prescriber_organization_1
+                assert geiq_diag.author_prescriber_organization == prescriber_organization_1
+                assert job_application.sender_prescriber_organization == prescriber_organization_2
+                assert job_seeker_assignment.prescriber_organization == prescriber_organization_1
+                assert invitation.organization == prescriber_organization_1
+                assert prolongation_request.prescriber_organization == prescriber_organization_1
+            else:
+                assert iae_diag.author_prescriber_organization == prescriber_organization_2
+                assert geiq_diag.author_prescriber_organization == prescriber_organization_2
+                assert job_application.sender_prescriber_organization == prescriber_organization_2
+                assert job_seeker_assignment.prescriber_organization == prescriber_organization_2
+                assert invitation.organization == prescriber_organization_2
+                assert prolongation_request.prescriber_organization == prescriber_organization_2
+                if preserve_to_org_data:
+                    assert prescriber_organization_2.name == "Presc. Org. 2"
+                    assert prescriber_organization_2.email == "org_2@test.local"
+                    assert prescriber_organization_2.description == "Organisation prescriptrice 2"
+                    assert prescriber_organization_2.phone == "0700000070"
+                    assert prescriber_organization_2.website == "www.org_2.fr"
+                else:
+                    assert prescriber_organization_2.name == "Presc. Org. 1"
+                    assert prescriber_organization_2.email == "org_1@test.local"
+                    assert prescriber_organization_2.description == "Organisation prescriptrice 1"
+                    assert prescriber_organization_2.phone == "0600000060"
+                    assert prescriber_organization_2.website == "www.org_1.fr"
+        else:
+            assert iae_diag.author_prescriber_organization == prescriber_organization_1
+            assert geiq_diag.author_prescriber_organization == prescriber_organization_1
+            assert job_application.sender_prescriber_organization == prescriber_organization_1
+            assert job_seeker_assignment.prescriber_organization == prescriber_organization_1
+            assert invitation.organization == prescriber_organization_1
+            assert prolongation_request.prescriber_organization == prescriber_organization_1
 
 
 @pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)
