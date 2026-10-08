@@ -3,10 +3,10 @@
 const subject = document.getElementById("id_subject");
 const customSubject = document.getElementById("id_custom_subject");
 if (subject && customSubject) {
-  const customSubjectContainer = customSubject.closest(".mb-3");
+  const customSubjectContainer = customSubject.closest(".form-group");
   const updateCustomSubject = () => {
     const visible = subject.value === "other";
-    customSubjectContainer.hidden = !visible;
+    customSubjectContainer.classList.toggle("d-none", !visible);
     customSubject.disabled = !visible;
   };
   subject.addEventListener("change", updateCustomSubject);
