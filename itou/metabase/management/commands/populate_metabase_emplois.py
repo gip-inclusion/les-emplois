@@ -717,18 +717,19 @@ class Command(BaseCommand):
             return
 
         send_slack_message(
-            ":rocket: lancement mise à jour de données Metabase", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
+            ":rocket: lancement de la synchro emplois x bdd commune (Metabase)",
+            url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
         )
         try:
             self.populate(mode)
         except Exception:
             self.logger.exception("Exception during populate_metabase_emplois")
             send_slack_message(
-                ":red_circle: échec de la mise à jour de données Metabase",
+                ":red_circle: échec de la synchro emplois x bdd commune (Metabase)",
                 url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
             )
         else:
             send_slack_message(
-                ":white_check_mark: succès de la mise à jour de données Metabase",
+                ":white_check_mark: succès de la synchro emplois x bdd commune (Metabase)",
                 url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
             )
