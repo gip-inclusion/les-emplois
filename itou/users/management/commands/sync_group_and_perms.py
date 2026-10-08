@@ -16,7 +16,6 @@ PERMS_EXPORT_FT_API_REJECTIONS = {"export_ft_api_rejections"}
 PERMS_EXPORT_JOB_APPLICATIONS_UNKNOWN_TO_FT = {"export_job_applications_unknown_to_ft"}
 PERMS_EXPORT_CTA = {"export_cta"}
 PERMS_IMPORT_ACI_CONVERGENCE_PHC = {"import_aci_convergence_phc"}
-PERMS_IMPORT_FS_3437_FROM_ASP = {"import_fs_3437_from_asp"}
 PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS = {"handle_manual_approval_requests"}
 PERMS_MERGE_USERS = {"merge_users"}
 
@@ -128,7 +127,7 @@ def get_permissions_dict():
         | PERMS_EXPORT_CTA
         | PERMS_MERGE_USERS
         | PERMS_DISABLE_PASSWORD_AUTH,
-        users_models.JobSeekerProfile: PERMS_EDIT | PERMS_DELETE | PERMS_IMPORT_FS_3437_FROM_ASP,
+        users_models.JobSeekerProfile: PERMS_EDIT | PERMS_DELETE,
         users_models.JobSeekerAssignment: PERMS_ALL,
         users_models.NirModificationRequest: PERMS_EDIT | PERMS_DELETE,
         utils_models.PkSupportRemark: PERMS_ADD,

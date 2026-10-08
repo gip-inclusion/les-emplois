@@ -1267,9 +1267,6 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 condition=Q(is_stalled=True),
             ),
         ]
-        permissions = [
-            ("import_fs_3437_from_asp", "Can import FS 3437 return file from ASP and update asp_uid field"),
-        ]
 
     def __str__(self):
         return f"JobSeekerProfile — pk={self.pk}"
