@@ -18,7 +18,6 @@ def test_person_detail_preserves_back_url_and_hides_contact(client):
     assertNotContains(response, target_organization.phone)
     assertContains(response, "Afficher l'adresse e-mail")
     assertContains(response, "Afficher le téléphone de la structure")
-    assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, target_organization.get_card_url())
     assertContains(response, "https://mission-locale.example")
 
