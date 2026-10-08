@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load enums %}
 {% load format_filters %}
 
 {% block title %}Fiche salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
@@ -9,6 +10,7 @@
 {% endblock %}
 
 {% block title_content %}
+    {% enums "employee_record" "Status" as Status %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>
@@ -18,20 +20,21 @@
         {% endfragment %}
     {% endcomponent_title %}
 
-    {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
+    {% if employee_record.status == Status.PROCESSED and employee_record.has_siret_different_from_asp_source %}
         {% include "employee_record/includes/_siret_changed_alert.html" with dismissible=True only %}
     {% endif %}
 {% endblock %}
 
 {% block title_extra %}
-    {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
+    {% enums "employee_record" "Status" as Status %}
+    {% if employee_record.status != Status.READY and employee_record.status != Status.SENT and employee_record.status != Status.ARCHIVED %}
         <div class="c-box c-box--action">
             <div class="form-row align-items-center gx-3">
-                {% if employee_record.status == "PROCESSED" %}
+                {% if employee_record.status == Status.PROCESSED %}
                     <div class="form-group col-12 col-lg-auto">
                         {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_classes="btn-lg btn-white btn-block w-lg-auto" only %}
                     </div>
-                {% elif employee_record.status == "NEW" %}
+                {% elif employee_record.status == Status.NEW %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW"
                            class="btn btn-lg btn-white btn-block btn-ico">
@@ -39,7 +42,7 @@
                             <span>Compléter</span>
                         </a>
                     </div>
-                {% elif employee_record.status == "REJECTED" %}
+                {% elif employee_record.status == Status.REJECTED %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED"
                            class="btn btn-lg btn-white btn-block btn-ico">
@@ -47,7 +50,7 @@
                             <span>Modifier</span>
                         </a>
                     </div>
-                {% elif employee_record.status == "DISABLED" %}
+                {% elif employee_record.status == Status.DISABLED %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:reactivate" employee_record.pk %}"
                            class="btn btn-lg btn-white btn-block btn-ico">
