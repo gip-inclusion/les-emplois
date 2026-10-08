@@ -14,6 +14,7 @@ from itou.utils.admin import (
     ReadonlyMixin,
     get_admin_view_link,
 )
+from itou.utils.pagination import FuzzyCountPaginator
 
 
 class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
@@ -156,6 +157,8 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         IsValidFilter,
         "author_kind",
     )
+
+    paginator = FuzzyCountPaginator
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):

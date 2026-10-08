@@ -28,6 +28,7 @@ from itou.utils.admin import (
 )
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.export import to_streaming_response
+from itou.utils.pagination import FuzzyCountPaginator
 
 
 logger = logging.getLogger(__name__)
@@ -601,3 +602,4 @@ class SiaeFinancialAnnexAdmin(ReadonlyMixin, ItouModelAdmin):
 @admin.register(models.Contract)
 class ContractAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("pk", "job_seeker", "company", "start_date", "end_date")
+    paginator = FuzzyCountPaginator
