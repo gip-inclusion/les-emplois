@@ -44,7 +44,7 @@ class CompanySearchForm(forms.Form):
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-ajax--delay": 250,
                 "data-minimum-input-length": 1,
-                "data-placeholder": "Rechercher un emploi inclusif autour de…",
+                "data-placeholder": "Ville ou code postal",
             }
         ),
     )
@@ -187,7 +187,7 @@ class PrescriberSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Rechercher un accompagnement autour de…",
+                "data-placeholder": "Ville ou code postal",
             }
         ),
     )
@@ -219,7 +219,7 @@ class ServiceSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Rechercher autour de…",
+                "data-placeholder": "Ville ou code postal",
             }
         ),
     )
@@ -229,7 +229,7 @@ class ServiceSearchForm(forms.Form):
         choices=[("", "Sélectionnez une thématique")] + [(c.value, c.label) for c in data_inclusion_v1.Categorie],
         label="Sélectionnez une thématique",
         widget=Select2Widget(
-            attrs={"data-placeholder": "Sélectionnez une thématique"},
+            attrs={"data-placeholder": "Thématique"},
         ),
     )
     thematics = forms.MultipleChoiceField(

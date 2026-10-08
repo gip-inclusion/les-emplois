@@ -1,4 +1,101 @@
 # serializer version: 1
+# name: TestSearchServices.test_home_anonymous
+  '''
+  <div aria-labelledby="services-tab" class="tab-pane active" id="profile" role="tabpanel" tabindex="0">
+   <div class="c-search">
+    <div class="c-search__bar">
+     <form action="/search/services/results" aria-label="Rechercher un service d'insertion" role="search">
+      <div class="c-search__bar__grid">
+       <div class="input-group input-group-lg flex-nowrap align-items-center">
+        <label class="input-group-text mb-0" for="id_services_city">
+         <span class="visually-hidden">
+          Ville
+         </span>
+         <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-tertiary">
+         </i>
+        </label>
+        <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Ville ou code postal" data-theme="bootstrap-5" id="id_services_city" lang="fr" name="city" required="">
+        </select>
+       </div>
+       <div class="input-group input-group-lg flex-nowrap align-items-center">
+        <label class="input-group-text input-group-text-compass mb-0" for="id_services_category">
+         <span class="visually-hidden">
+          Sélectionnez une thématique
+         </span>
+         <i aria-hidden="true" class="ri-compass-3-line fw-medium ri-xl text-tertiary">
+         </i>
+        </label>
+        <select class="django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Thématique" data-theme="bootstrap-5" id="id_services_category" lang="fr" name="category" required="">
+         <option selected="" value="">
+          Sélectionnez une thématique
+         </option>
+         <option value="choisir-un-metier">
+          Choisir un métier
+         </option>
+         <option value="creer-une-entreprise">
+          Créer une entreprise
+         </option>
+         <option value="difficultes-administratives-ou-juridiques">
+          Difficultés administratives ou juridiques
+         </option>
+         <option value="difficultes-financieres">
+          Difficultés financières
+         </option>
+         <option value="equipement-et-alimentation">
+          Équipement et alimentation
+         </option>
+         <option value="famille">
+          Famille
+         </option>
+         <option value="lecture-ecriture-calcul">
+          Lecture, écriture et calcul
+         </option>
+         <option value="logement-hebergement">
+          Logement et hébergement
+         </option>
+         <option value="mobilite">
+          Mobilité
+         </option>
+         <option value="numerique">
+          Numérique
+         </option>
+         <option value="preparer-sa-candidature">
+          Préparer sa candidature
+         </option>
+         <option value="remobilisation">
+          Remobilisation
+         </option>
+         <option value="sante">
+          Santé
+         </option>
+         <option value="se-former">
+          Se former
+         </option>
+         <option value="souvrir-a-linternational">
+          S’ouvrir à l’international
+         </option>
+         <option value="trouver-un-emploi">
+          Trouver un emploi
+         </option>
+        </select>
+       </div>
+       <div class="input-group input-group-lg">
+        <button aria-label="Rechercher un service d'insertion par ville ou code postal" class="btn btn-block btn-ico btn-primary js-search-button" type="submit">
+         <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
+         </i>
+         <span class="me-1">
+          Rechercher
+         </span>
+        </button>
+       </div>
+      </div>
+     </form>
+    </div>
+   </div>
+  </div>
+  
+  '''
+# ---
 # name: TestSearchServices.test_results_html
   '''
   <div id="services-search-results">

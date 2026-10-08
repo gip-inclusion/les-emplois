@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
-{% load components %}
-{% load django_bootstrap5 %}
+{% load enums %}
 {% load static %}
 
 {% block title %}
@@ -10,26 +9,125 @@
 {% block body_class %}p-home{% endblock %}
 
 {% block content %}
-    <section id="loading-error-fallback" class="s-section d-none">
-        <div class="s-section__container container">
-            <div class="s-section__row row">
-                <div class="s-section__col col-12">
-                    {% component_alert title=title content=content variant="info" %}
-                        {% fragment as title %}
-                            La page d’accueil fonctionne actuellement en mode dégradé.
-                        {% endfragment %}
-                        {% fragment as content %}
-                            <p class="mb-0">
-                                <a href="{% url "account_login" %}">Connectez-vous</a> pour utiliser toutes les fonctionnalités.
-                            </p>
-                        {% endfragment %}
-                    {% endcomponent_alert %}
+    <section class="s-home-search">
+        <div class="s-home-search__container container">
+            <div class="s-home-search__row row">
+                <div class="s-home-search__col col-12">
+                    <img class="s-home-search__visuel"
+                         src="{% static 'img/home/illustration-search.webp' %}"
+                         alt=""
+                         width="1305"
+                         height="870">
+                    <h1>
+                        Tous les emplois, les services d'insertion,
+                        <br class="d-none d-md-inline">
+                        et les accompagnateurs autour de vous
+                    </h1>
+                    <ul class="nav justify-content-center gap-2 mb-3"
+                        id="searchTab"
+                        role="tablist"
+                        aria-label="Type de recherche">
+                        {% enums "search" "SearchType" as SearchType %}
+                        <li class="nav-item" role="presentation">
+                            <button class="s-home-search__badge{% if search_type == SearchType.EMPLOYERS %} active{% endif %}"
+                                    id="company-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#home"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="home"
+                                    aria-selected="{% if search_type == SearchType.EMPLOYERS %}true{% else %}false{% endif %}"
+                                    tabindex="{% if search_type == SearchType.EMPLOYERS %}0{% else %}-1{% endif %}">
+                                <i class="ri-briefcase-line mr-1 d-none d-md-inline" aria-hidden="true"></i>
+                                <span class="d-none d-md-inline">Un emploi inclusif</span>
+                                <span class="d-md-none">Emploi inclusif</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="s-home-search__badge{% if search_type == SearchType.SERVICES %} active{% endif %}"
+                                    id="services-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#profile"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="profile"
+                                    aria-selected="{% if search_type == SearchType.SERVICES %}true{% else %}false{% endif %}"
+                                    tabindex="{% if search_type == SearchType.SERVICES %}0{% else %}-1{% endif %}">
+                                <i class="ri-compass-3-line me-1 d-none d-md-inline" aria-hidden="true"></i>
+                                <span class="d-none d-md-inline">Un service d'insertion</span>
+                                <span class="d-md-none">Service d'insertion</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="s-home-search__badge{% if search_type == SearchType.PRESCRIBERS %} active{% endif %}"
+                                    id="prescribers-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#messages"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="messages"
+                                    aria-selected="{% if search_type == SearchType.PRESCRIBERS %}true{% else %}false{% endif %}"
+                                    tabindex="{% if search_type == SearchType.PRESCRIBERS %}0{% else %}-1{% endif %}">
+                                <i class="ri-user-line me-1 d-none d-md-inline" aria-hidden="true"></i>
+                                <span class="d-none d-md-inline">Un accompagnement</span>
+                                <span class="d-md-none">Accompagnement</span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane{% if search_type == SearchType.EMPLOYERS %} active{% endif %}"
+                             id="home"
+                             role="tabpanel"
+                             aria-labelledby="company-tab"
+                             tabindex="0">
+                            <div class="c-search">
+                                <div class="c-search__bar">
+                                    <form action="{% url 'search:employers_results' %}"
+                                          role="search"
+                                          aria-label="Rechercher un emploi inclusif">
+                                        {% include "search/includes/siaes_search_form.html" with form=company_search_form is_home=True only %}
+                                        {% if job_seeker %}
+                                            <input type="hidden"
+                                                   name="job_seeker_public_id"
+                                                   value="{{ job_seeker.public_id }}">
+                                        {% endif %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane{% if search_type == SearchType.SERVICES %} active{% endif %}"
+                             id="profile"
+                             role="tabpanel"
+                             aria-labelledby="services-tab"
+                             tabindex="0">
+                            <div class="c-search">
+                                <div class="c-search__bar">
+                                    <form action="{% url 'search:services_results' %}"
+                                          role="search"
+                                          aria-label="Rechercher un service d'insertion">
+                                        {% include "search/includes/services_search_form.html" with form=services_search_form is_home=True only %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane{% if search_type == SearchType.PRESCRIBERS %} active{% endif %}"
+                             id="messages"
+                             role="tabpanel"
+                             aria-labelledby="prescribers-tab"
+                             tabindex="0">
+                            <div class="c-search">
+                                <div class="c-search__bar">
+                                    <form action="{% url 'search:prescribers_results' %}"
+                                          role="search"
+                                          aria-label="Rechercher un accompagnement">
+                                        {% include "search/includes/prescribers_search_form.html" with form=prescribers_search_form is_home=True only %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="s-home-search__note">Recherche libre et sans compte. Créez un compte pour postuler, orienter ou publier.</p>
                 </div>
-                <h2 class="mt-3">Rechercher un emploi inclusif</h2>
-                <form action="{% url 'search:employers_results' %}" role="search">
-                    {% bootstrap_field company_search_form.city alert_error_type="all" %}
-                    <button type="submit" class="btn btn-primary">Rechercher</button>
-                </form>
             </div>
         </div>
     </section>
