@@ -23,7 +23,7 @@ class SSOReadonlyMixin:
         if self.instance.has_sso_provider:
             # When users log in with a SSO, the fields populated by the provider should be
             # disabled (that’s a requirement on FranceConnect’s side).
-            disabled_fields = ["first_name", "last_name", "email", "birthdate", "title"]
+            disabled_fields = ["first_name", "last_name", "email", "birthdate", "title", "birth_name"]
             for name in self.fields.keys():
                 if name in disabled_fields:
                     self.fields[name].disabled = True
@@ -42,6 +42,7 @@ class EditJobSeekerInfoForm(
     """
 
     PROFILE_FIELDS = [
+        "birth_name",
         "birthdate",
         "birth_place",
         "birth_country",

@@ -75,6 +75,7 @@ class TestEditJobSeekerInfo:
             "email": job_seeker.email,
             "title": job_seeker.title,
             "first_name": job_seeker.first_name,
+            "birth_name": job_seeker.jobseeker_profile.birth_name,
             "last_name": job_seeker.last_name,
             "birthdate": job_seeker.jobseeker_profile.birthdate,
             "birth_place": job_seeker.jobseeker_profile.birth_place.pk,
@@ -100,6 +101,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_country": job_seeker.jobseeker_profile.birth_country,
@@ -139,6 +141,7 @@ class TestEditJobSeekerInfo:
             ban_api_resolved_address="12 rue Georges Bizet, 35000 Rennes",
             born_in_france=born_in_france,
             born_outside_france=(not born_in_france),
+            jobseeker_profile__birth_name="Smith",
             jobseeker_profile__birthdate=birthdate,
             jobseeker_profile__nir="290010101010125",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -163,6 +166,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "email": job_seeker.email,
             "title": job_seeker.title,
+            "birth_name": job_seeker.jobseeker_profile.birth_name,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "phone": job_seeker.phone,
@@ -193,6 +197,7 @@ class TestEditJobSeekerInfo:
             "email": job_seeker.email,
             "title": job_seeker.title,
             "first_name": "Odile",
+            "birth_name": "Hodéi-El",
             "last_name": "Deray",
             "phone": "0700000070",
             "ban_api_resolved_address": "23 avenue de Nantes, 86000 Poitiers",
@@ -240,6 +245,7 @@ class TestEditJobSeekerInfo:
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]
         assert job_seeker.city == post_data["city"]
+        assert job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
         assert job_seeker.jobseeker_profile.birthdate == birthdate
         assert job_seeker.jobseeker_profile.birth_place_id == post_data.get("birth_place")
         assert (
@@ -331,6 +337,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -406,6 +413,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -467,6 +475,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -595,7 +604,7 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_name_is_required(self, client):
+    def test_birth_name_is_required(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
@@ -635,11 +644,11 @@ class TestEditJobSeekerInfo:
             response,
             """
             <div class="form-group is-invalid form-group-required">
-            <label class="form-label" for="id_last_name">Nom</label>
-            <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
-                   aria-describedby="id_last_name_error"
-                    required aria-invalid="true" id="id_last_name">
-            <div id="id_last_name_error" class="w-100">
+            <label class="form-label" for="id_birth_name">Nom de naissance</label>
+            <input type="text" name="birth_name" maxlength="150" class="form-control is-invalid"
+                   aria-describedby="id_birth_name_error"
+                    required aria-invalid="true" id="id_birth_name">
+            <div id="id_birth_name_error" class="w-100">
              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
             </div>
             </div>
@@ -683,6 +692,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "title": "M",
             "first_name": "Manuel",
+            "birth_name": "Schafer",
             "last_name": "Calavera",
             "email": new_email,
             "birthdate": birthdate.isoformat(),
@@ -747,6 +757,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "title": "M",
             "first_name": "Manuel",
+            "birth_name": "Schafer",
             "last_name": "Calavera",
             "email": new_email,
             "birthdate": birthdate.isoformat(),
@@ -806,7 +817,10 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker, snapshot):
+    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
+    def test_fields_readonly_with_identity_certified_by_api_particulier(
+        self, client, mocker, snapshot, certified_name
+    ):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -821,6 +835,17 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="1234567A",
             criteria_certified=True,
             certifiable_by_api_particulier=True,
+            **(
+                {
+                    "eligibility_diagnosis__job_seeker__last_name": "",
+                    "eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name": "Initial Birth Name",
+                }
+                if certified_name == "birth_name"
+                else {
+                    "eligibility_diagnosis__job_seeker__last_name": "Initial Last Name",
+                    "eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name": "",
+                }
+            ),
         )
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 
@@ -845,6 +870,7 @@ class TestEditJobSeekerInfo:
             "title": "M",
             "first_name": "Manuel",
             "last_name": "Calavera",
+            "birth_name": "Schafer",
             "email": job_seeker.email,
             "birthdate": new_birthdate.isoformat(),
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -863,10 +889,16 @@ class TestEditJobSeekerInfo:
         response = client.post(url, data=post_data | {"confirm": 1})
         assertRedirects(response, reverse("dashboard:index"))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
-        for attr in ["title", "first_name", "last_name"]:
+        for attr in ["title", "first_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
         for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
+        if certified_name == "birth_name":
+            assert refreshed_job_seeker.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
+            assert refreshed_job_seeker.last_name == post_data["last_name"]
+        else:
+            assert refreshed_job_seeker.last_name == job_seeker.last_name
+            assert refreshed_job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
 
     @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
     def test_sso_fields_readonly(self, client, identity_provider, mocker):
@@ -896,6 +928,7 @@ class TestEditJobSeekerInfo:
             {
                 "title": "M",
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "email": job_seeker.email,
                 "birthdate": new_birthdate.isoformat(),
