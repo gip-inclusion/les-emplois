@@ -112,31 +112,6 @@ def person_detail(request, key, template_name="directory/person_detail.html"):
     return render(request, template_name, _person_detail_context(request, _get_person(request, key)))
 
 
-@check_request(can_access_directory)
-@readonly_view
-def reveal_contact(request, key, field):
-    person = _get_person(request, key)
-    if field not in {"email", "phone"}:
-        raise Http404
-    org_key = request.GET.get("org")
-    if org_key:
-        organization = next((item for item in person.organizations if item.key == org_key), None)
-        if not organization:
-            raise Http404
-        value = getattr(organization, field)
-        label = "Adresse e-mail de la structure" if field == "email" else "Téléphone de la structure"
-    else:
-        value = getattr(person, field)
-        label = "Adresse e-mail" if field == "email" else "Téléphone"
-    if not value:
-        raise Http404
-    return render(
-        request,
-        "directory/includes/contact_value.html",
-        {"label": label, "value": value},
-    )
-
-
 class MessageThrottle(FailSafeUserRateThrottle):
     scope = "directory-message-user"
     rate = "50/day"
