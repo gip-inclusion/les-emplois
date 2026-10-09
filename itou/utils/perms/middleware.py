@@ -189,6 +189,8 @@ class ItouCurrentOrganizationMiddleware:
                 # Allow to access both steps of accepting an invitation to join an organization
                 request.path.startswith("/signup/"),  # professional about to join an organization/company
                 request.path.startswith("/otp/"),  # Don't block otp views event without an organization or ProConnect
+                # Asked right after the signup, before joining an organization/company
+                request.path == reverse("dashboard:email_tracking_consent"),
             ]
             if any(skip_remaining_checks_conditions):
                 return self.get_response(request)

@@ -127,7 +127,7 @@ class TestUserHijack:
         assertRedirects(response, initial_url, fetch_redirect_response=False)
 
     def test_hijacker_does_not_answer_blocking_pages_in_the_name_of_the_user(self, client):
-        hijacked = EmployerFactory(terms_accepted_at=None)
+        hijacked = EmployerFactory(terms_accepted_at=None, email_tracking_consent_updated_at=None)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
         client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk})
@@ -146,6 +146,12 @@ class TestUserHijack:
         assertContains(
             response, "Seul l’utilisateur peut accepter les Conditions Générales d’Utilisation.", status_code=403
         )
+        # Nor can the email tracking consent be answered
+        response = client.post(reverse("dashboard:email_tracking_consent"), {"email_tracking_consent": "True"})
+        assert response.status_code == 403
+        hijacked.refresh_from_db()
+        assert hijacked.terms_accepted_at is None
+        assert hijacked.email_tracking_consent_updated_at is None
 
     def test_keep_otp_after_hijack(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
