@@ -1178,6 +1178,18 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             f"{obj._meta.object_name}(pk={obj.pk})"
         )
 
+    def has_delete_permission(self, request, obj=None):
+        """Disallow deletion of JobSeekerProfile from the JobSeekerProfile page.
+
+        This is to force admins to delete profiles through the
+        deletion of a User.
+
+        This is to avoid having User(kind="job_seeker") with no profile.
+        """
+        if obj is None:
+            return False
+        return request.path != reverse("admin:users_jobseekerprofile_change", args=(obj.pk,))
+
 
 class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
     inlines = (PkSupportRemarkInline,)

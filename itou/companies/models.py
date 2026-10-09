@@ -1093,6 +1093,9 @@ class SiaeConvention(models.Model):
     def siren_signature(self):
         return self.siret_signature[:9]
 
+    def __str__(self):
+        return f"Convention {['inactive', 'active'][self.is_active]} — pk={self.pk}"
+
 
 class SiaeFinancialAnnex(models.Model):
     """
