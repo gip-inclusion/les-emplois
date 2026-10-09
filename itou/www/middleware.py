@@ -137,7 +137,7 @@ class ComplianceMiddleware:
             "otp_views",
         ]:
             return None
-        if getattr(view_func, "_bypass_terms_acceptance", False):  # views can be decorated to be exempt from the check
+        if getattr(view_func, "_skip_compliance_checks", False):  # views can be decorated to be exempt from the check
             return None
         return HttpResponseRedirect(self.get_redirect_url(request))
 
