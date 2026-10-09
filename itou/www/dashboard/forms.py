@@ -17,6 +17,21 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
 
 
+def email_tracking_consent_field():
+    """Build the field asking users whether they consent to email open tracking (tracking pixel)."""
+    return forms.BooleanField(
+        required=False,
+        label=(
+            "J’accepte que La plateforme de l’inclusion mesure l’ouverture de mes e-mails "
+            "afin d’améliorer ses communications."
+        ),
+    )
+
+
+class EmailTrackingConsentForm(forms.Form):
+    email_tracking_consent = email_tracking_consent_field()
+
+
 class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
