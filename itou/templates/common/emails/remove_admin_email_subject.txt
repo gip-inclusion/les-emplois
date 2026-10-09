@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-[Désactivation] Vous n'êtes plus administrateur de {{ structure.display_name }}
-{% endblock %}
+{% block subject %}[Désactivation] Vous n'êtes plus administrateur de {{ structure.display_name }}{% endblock %}

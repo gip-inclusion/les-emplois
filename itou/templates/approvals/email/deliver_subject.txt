@@ -1,8 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-{% if job_application.to_company.is_subject_to_iae_rules %}
-PASS IAE pour {{ job_application.job_seeker.get_inverted_full_name }}
-{% else %}
-Confirmation de l'embauche
-{% endif %}
-{% endblock %}
+{% block subject %}{% if job_application.to_company.is_subject_to_iae_rules %}PASS IAE pour {{ job_application.job_seeker.get_inverted_full_name }}{% else %}Confirmation de l'embauche{% endif %}{% endblock %}

@@ -14,7 +14,6 @@ from django.urls import reverse
 from markdownify.templatetags.markdownify import markdownify
 
 from itou.utils import constants as global_constants
-from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import get_absolute_url
 
 
@@ -54,12 +53,8 @@ def get_email_message(
     email_context["itou_environment"] = settings.ITOU_ENVIRONMENT
     email_context["base_url"] = get_absolute_url()
     email_context["legal_privacy_url"] = get_absolute_url(reverse("legal-privacy"))
-
-    subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
-    subject = textwrap.shorten(
-        subject_prefix + get_email_text_template(subject, email_context), width=250, placeholder="..."
-    )
+    subject = textwrap.shorten(get_email_text_template(subject, email_context), width=250, placeholder="...")
     body_text = get_email_text_template(body, email_context)
     email = mail.EmailMultiAlternatives(
         from_email=from_email,

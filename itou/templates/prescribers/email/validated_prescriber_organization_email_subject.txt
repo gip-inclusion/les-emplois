@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-L'habilitation de votre organisation est vérifiée !
-{% endblock %}
+{% block subject %}L'habilitation de votre organisation est vérifiée !{% endblock %}
