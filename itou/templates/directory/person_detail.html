@@ -31,13 +31,11 @@
                             <div>
                                 <p class="fs-sm mb-1">Téléphone</p>
                                 {% if person.phone %}
-                                    <button type="button"
-                                            class="btn btn-link p-0 text-start"
-                                            hx-get="{% url 'directory:reveal_contact' key=person.key field='phone' %}"
-                                            hx-swap="outerHTML">
+                                    <button type="button" class="btn btn-link p-0 text-start js-reveal">
                                         <i class="ri-phone-line" aria-hidden="true"></i>
                                         <span>Afficher le téléphone</span>
                                     </button>
+                                    {% include "directory/includes/contact_value.html" with label="Téléphone" value=person.phone only %}
                                 {% else %}
                                     <p class="mb-0">Non renseigné</p>
                                 {% endif %}
@@ -45,13 +43,11 @@
                             <div>
                                 <p class="fs-sm mb-1">Courriel</p>
                                 {% if person.email %}
-                                    <button type="button"
-                                            class="btn btn-link p-0 text-start"
-                                            hx-get="{% url 'directory:reveal_contact' key=person.key field='email' %}"
-                                            hx-swap="outerHTML">
+                                    <button type="button" class="btn btn-link p-0 text-start js-reveal">
                                         <i class="ri-mail-line" aria-hidden="true"></i>
                                         <span>Afficher l'adresse e-mail</span>
                                     </button>
+                                    {% include "directory/includes/contact_value.html" with label="Adresse e-mail" value=person.email only %}
                                 {% endif %}
                             </div>
 
@@ -86,23 +82,21 @@
                             {% endif %}
                             {% if person.main_organization.phone %}
                                 <button type="button"
-                                        class="btn btn-link p-0 text-start mb-2 d-flex"
-                                        hx-get="{% url 'directory:reveal_contact' key=person.key field='phone' %}?org={{ person.main_organization.key|urlencode }}"
-                                        hx-swap="outerHTML"
+                                        class="btn btn-link p-0 text-start mb-2 d-flex js-reveal"
                                         aria-label="Afficher le téléphone de la structure">
                                     <i class="ri-phone-line" aria-hidden="true"></i>
                                     <span>Afficher le téléphone</span>
                                 </button>
+                                {% include "directory/includes/contact_value.html" with label="Téléphone de la structure" value=person.main_organization.phone only %}
                             {% endif %}
                             {% if person.main_organization.email %}
                                 <button type="button"
-                                        class="btn btn-link p-0 text-start mb-2 d-flex"
-                                        hx-get="{% url 'directory:reveal_contact' key=person.key field='email' %}?org={{ person.main_organization.key|urlencode }}"
-                                        hx-swap="outerHTML"
+                                        class="btn btn-link p-0 text-start mb-2 d-flex js-reveal"
                                         aria-label="Afficher l'adresse e-mail de la structure">
                                     <i class="ri-mail-line" aria-hidden="true"></i>
                                     <span>Afficher l'adresse e-mail</span>
                                 </button>
+                                {% include "directory/includes/contact_value.html" with label="Adresse e-mail de la structure" value=person.main_organization.email only %}
                             {% endif %}
                             {% if person.main_organization.website %}
                                 <p>
@@ -160,4 +154,14 @@
     <script src="{% static 'js/htmx_compat.js' %}"></script>
     <script src="{% static 'js/directory.js' %}"></script>
     {% include "directory/includes/feedback.html" %}
+    <script nonce="{{ csp_nonce }}">
+        htmx.onLoad(function(target) {
+            target.getElementsByClassName("js-reveal").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    btn.nextElementSibling.classList.remove("d-none");
+                    btn.classList.add("d-none");
+                });
+            });
+        });
+    </script>
 {% endblock %}
