@@ -1,4 +1,275 @@
 # serializer version: 1
+# name: TestSearchServices.test_funding_labels_filter[SQL queries]
+  dict({
+    'num_queries': 7,
+    'queries': list([
+      dict({
+        'origin': list([
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
+          FROM "cities_city"
+          WHERE "cities_city"."slug" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ServiceQuerySet.search[insertion/models.py]',
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_genericreferenceitem"."id" AS "id"
+          FROM "insertion_genericreferenceitem"
+          WHERE "insertion_genericreferenceitem"."value" IN (%s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'in_person_reception_ids[insertion/models.py]',
+          'ServiceQuerySet.search[insertion/models.py]',
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_genericreferenceitem"."id" AS "id"
+          FROM "insertion_genericreferenceitem"
+          WHERE "insertion_genericreferenceitem"."value" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT jsonb_array_elements_text(("insertion_service"."extra" -> %s)) AS "funding_label"
+          FROM "insertion_service"
+          WHERE ("insertion_service"."is_active"
+                 AND ("insertion_service"."extra" -> %s) @> %s
+                 AND "insertion_service"."id" IN
+                   (SELECT V0."id" AS "pk"
+                    FROM "insertion_service" V0
+                    INNER JOIN "insertion_service_receptions" V1 ON (V0."id" = V1."service_id")
+                    WHERE (V0."is_active"
+                           AND V0."coordinates" IS NOT NULL
+                           AND EXISTS
+                             (SELECT %s AS "a"
+                              FROM "insertion_service_thematics" U0
+                              WHERE (U0."genericreferenceitem_id" IN (%s)
+                                     AND U0."service_id" = (V0."id"))
+                              LIMIT 1)
+                           AND NOT (V0."city" = %s)
+                           AND ST_DWithin(V0."coordinates", %s, %s)
+                           AND V1."genericreferenceitem_id" IN (%s)
+                           AND (V0."eligibility_zones" && (ARRAY[%s,
+                                                                 %s,
+                                                                 %s])::varchar[]
+                                OR V0."eligibility_zones" = %s::varchar[]))))
+          ORDER BY 1 ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'pager[utils/pagination.py]',
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "insertion_service"
+          INNER JOIN "insertion_service_receptions" ON ("insertion_service"."id" = "insertion_service_receptions"."service_id")
+          WHERE ("insertion_service"."is_active"
+                 AND "insertion_service"."coordinates" IS NOT NULL
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "insertion_service_thematics" U0
+                    WHERE (U0."genericreferenceitem_id" IN (%s)
+                           AND U0."service_id" = ("insertion_service"."id"))
+                    LIMIT 1)
+                 AND NOT ("insertion_service"."city" = %s)
+                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
+                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
+                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
+                                                                        %s,
+                                                                        %s])::varchar[]
+                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
+                 AND ("insertion_service"."extra" -> %s) ? | %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'VariableNode[search/services/includes/form.html]',
+          'IncludeNode[search/services/results.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[search/services/results.html]',
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
+          FROM "cities_city"
+          WHERE "cities_city"."slug" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[search/services/includes/results.html]',
+          'IncludeNode[search/services/results.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[search/services/results.html]',
+          'search_services_results[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_service"."id",
+                 "insertion_service"."address_line_1",
+                 "insertion_service"."address_line_2",
+                 "insertion_service"."post_code",
+                 "insertion_service"."city",
+                 "insertion_service"."insee_city_id",
+                 "insertion_service"."coordinates",
+                 "insertion_service"."uid",
+                 "insertion_service"."source_id",
+                 "insertion_service"."source_link",
+                 "insertion_service"."structure_id",
+                 "insertion_service"."name",
+                 "insertion_service"."description",
+                 "insertion_service"."description_short",
+                 "insertion_service"."kind_id",
+                 "insertion_service"."fee_id",
+                 "insertion_service"."fee_details",
+                 "insertion_service"."publics_details",
+                 "insertion_service"."access_conditions_di",
+                 "insertion_service"."access_conditions_dora",
+                 "insertion_service"."eligibility_zones",
+                 "insertion_service"."mobilizations_details",
+                 "insertion_service"."lien_mobilisation",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",
+                 "insertion_service"."mobilization_modes_beneficiaries_other",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link_text",
+                 "insertion_service"."mobilization_modes_professionals_other",
+                 "insertion_service"."credentials",
+                 "insertion_service"."credentials_documents",
+                 "insertion_service"."credentials_online_form",
+                 "insertion_service"."opening_hours",
+                 "insertion_service"."opening_hours_text",
+                 "insertion_service"."volume_horaire_hebdomadaire",
+                 "insertion_service"."nombre_semaines",
+                 "insertion_service"."contact_full_name",
+                 "insertion_service"."contact_email",
+                 "insertion_service"."contact_phone",
+                 "insertion_service"."contact_is_public",
+                 "insertion_service"."is_orientable_with_form",
+                 "insertion_service"."average_orientation_response_delay_days",
+                 "insertion_service"."dora_synced_at",
+                 "insertion_service"."updated_on",
+                 "insertion_service"."is_active",
+                 "insertion_service"."created_at",
+                 "insertion_service"."updated_at",
+                 "insertion_service"."extra",
+                 (ST_Distance("insertion_service"."coordinates", %s) / %s) AS "distance",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "insertion_service_thematics" U0
+             WHERE (U0."genericreferenceitem_id" IN (%s)
+                    AND U0."service_id" = ("insertion_service"."id"))
+             LIMIT 1) AS "has_thematic",
+                 %s AS "is_in_person",
+                 %s AS "is_remote",
+                 T4."id",
+                 T4."source",
+                 T4."kind",
+                 T4."value",
+                 T4."label",
+                 T4."description",
+                 T4."created_at",
+                 T4."updated_at",
+                 "insertion_structure"."id",
+                 "insertion_structure"."address_line_1",
+                 "insertion_structure"."address_line_2",
+                 "insertion_structure"."post_code",
+                 "insertion_structure"."city",
+                 "insertion_structure"."insee_city_id",
+                 "insertion_structure"."coordinates",
+                 "insertion_structure"."uid",
+                 "insertion_structure"."source_id",
+                 "insertion_structure"."source_link",
+                 "insertion_structure"."siret",
+                 "insertion_structure"."name",
+                 "insertion_structure"."description",
+                 "insertion_structure"."website",
+                 "insertion_structure"."email",
+                 "insertion_structure"."phone",
+                 "insertion_structure"."opening_hours",
+                 "insertion_structure"."accessibilite_lieu",
+                 "insertion_structure"."updated_on",
+                 "insertion_structure"."is_active",
+                 "insertion_structure"."created_at",
+                 "insertion_structure"."updated_at"
+          FROM "insertion_service"
+          INNER JOIN "insertion_service_receptions" ON ("insertion_service"."id" = "insertion_service_receptions"."service_id")
+          INNER JOIN "insertion_genericreferenceitem" T4 ON ("insertion_service"."source_id" = T4."id")
+          INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
+          WHERE ("insertion_service"."is_active"
+                 AND "insertion_service"."coordinates" IS NOT NULL
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "insertion_service_thematics" U0
+                    WHERE (U0."genericreferenceitem_id" IN (%s)
+                           AND U0."service_id" = ("insertion_service"."id"))
+                    LIMIT 1)
+                 AND NOT ("insertion_service"."city" = %s)
+                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
+                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
+                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
+                                                                        %s,
+                                                                        %s])::varchar[]
+                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
+                 AND ("insertion_service"."extra" -> %s) ? | %s)
+          ORDER BY 49 ASC,
+                   "insertion_service"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+    ]),
+  })
+# ---
 # name: TestSearchServices.test_results_html
   '''
   <div id="services-search-results">

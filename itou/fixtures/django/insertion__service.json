@@ -94,7 +94,11 @@
       "description_short": "Le Socle de connaissances et de compétences (CléA) est constitué de l'ensemble des connaissances et des compétences qu'il est utile pour un individu de maîtriser afin de favoriser son accès à la formation professionnelle et son insertion professionnelle.",
       "dora_synced_at": "2026-07-06T07:36:19.131Z",
       "eligibility_zones": "[\"34172\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Vienne"
+        ]
+      },
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
       "funding_labels": [],
@@ -177,7 +181,12 @@
       "description_short": "ASSOCIATION TRANSITION propose des services : accéder à des services en ligne",
       "dora_synced_at": "2026-07-06T07:37:57.277Z",
       "eligibility_zones": "[\"64\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Drôme",
+          "Région Réunion"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -343,7 +352,12 @@
       "description_short": "Le FLE vise à rendre les apprenants compétents et confiants dans leur utilisation du français, tout en leur permettant de s'intégrer dans des contextes francophones variés.",
       "dora_synced_at": "2026-07-06T07:38:34.831Z",
       "eligibility_zones": "[\"34172\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Vienne",
+          "Conseil départemental de la Drôme"
+        ]
+      },
       "fee": 2,
       "fee_details": "Taux horaire : 12€",
       "funding_labels": [],
@@ -427,7 +441,12 @@
       "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
       "dora_synced_at": "2026-07-06T07:39:08.388Z",
       "eligibility_zones": "[\"34\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie",
+          "Conseil Départemental de l'Essonne"
+        ]
+      },
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "funding_labels": [],
@@ -767,7 +786,11 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"64\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Région Réunion"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -927,7 +950,11 @@
       "description_short": "",
       "dora_synced_at": null,
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1075,7 +1102,11 @@
       "description_short": "L'Adie propose un microcrédit mobilité aux personnes ayant besoin d’un financement pour faciliter leurs déplacements dans le cadre de leur projet professionnel.",
       "dora_synced_at": "2026-08-21T02:53:39.061Z",
       "eligibility_zones": "[\"57\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Savoie"
+        ]
+      },
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
       "funding_labels": [],
@@ -1160,7 +1191,11 @@
       "description_short": "Formation adaptée aux difficultés individuelles rencontrées par chaque apprenant dans son apprentissage du code de la route et de la conduite et dans son accès à un emploi ou à une formation.",
       "dora_synced_at": "2026-07-06T07:36:45.717Z",
       "eligibility_zones": "[\"243300316\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de l’Aveyron"
+        ]
+      },
       "fee": 2,
       "fee_details": "ll y a un reste à charge pour le stagiaire (à calculer selon le projet sur lequel il intègre)",
       "funding_labels": [],
@@ -1244,7 +1279,11 @@
       "description_short": "Itinéraire 1 : ECLA / Ecrire, Compter, Lire, Apprendre\n:Itinéraire 2 :Français pour les Langues Etrangères\nItinéraire 3: Parcours remise à niveau Numérique\nItinéraire 4 : Parcours Passerelle : remise à niveau\n: Mathématiuq Français, anglais, espagnol...",
       "dora_synced_at": "2026-07-06T07:38:19.226Z",
       "eligibility_zones": "[\"16\", \"17\", \"19\", \"23\", \"24\", \"33\", \"40\", \"47\", \"64\", \"79\", \"86\", \"87\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental de la Charente-Maritime"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],
@@ -1420,7 +1459,11 @@
       "description_short": "Aide aux démarches administratives et au numérique pour tous sans rendez-vous. Nous traitons : accès aux droits, logement, prestations sociales, transports, école...\nNon traité : juridique, retraite, droits des étrangers.",
       "dora_synced_at": "2026-08-21T02:54:03.903Z",
       "eligibility_zones": "[\"33063\"]",
-      "extra": null,
+      "extra": {
+        "funding_labels": [
+          "Conseil départemental des Bouches-du-Rhône"
+        ]
+      },
       "fee": 1,
       "fee_details": "",
       "funding_labels": [],

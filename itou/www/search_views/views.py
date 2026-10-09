@@ -1,14 +1,15 @@
 import logging
 import warnings
 from collections import defaultdict, namedtuple
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
-from django.db.models import Case, F, Prefetch, Q, When
-from django.http import HttpResponseRedirect
+from django.db.models import Case, CharField, F, Func, Prefetch, Q, When
+from django.db.models.fields.json import KeyTransform
+from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -387,12 +388,35 @@ def search_prescribers_results(request, template_name="search/prescribers_search
     )
 
 
+def _must_refresh_funding_labels_filter(request):
+    """
+    Whether the funding labels filter must be sent and updated.
+
+    Funding labels offered in the filter/dropdown only depend on the search
+    criteria. When only the selected funding labels or the page changed, it is
+    not updated, otherwise the dropdown would close after each (un)selection.
+    """
+    if not request.htmx or not request.htmx.current_url:
+        return True
+    current_url = urlsplit(request.htmx.current_url)
+
+    def search_params(querydict):
+        return {
+            key: sorted(values)
+            for key, values in querydict.lists()
+            if key not in {"funding_labels", "page"} and any(values)
+        }
+
+    return search_params(QueryDict(current_url.query)) != search_params(request.GET)
+
+
 @login_not_required
 @readonly_view
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)
     services = Service.objects.none()
+    display_funding_labels_filter = False
 
     suppress_category_error = False
     if form.is_valid():
@@ -410,6 +434,36 @@ def search_services_results(request, template_name="search/services/results.html
             reception=reception,
             service_types=form.cleaned_data["services"],
         ).select_related("structure", "source")
+
+        # We only make available (for the user to choose from) the funding
+        # labels appearing in the search results. Selected labels that no
+        # longer appear in the results (e.g. after changing the city) are
+        # ignored.
+        available_funding_labels = list(
+            Service.objects.filter(
+                pk__in=services.values("pk"),
+                # Only arrays contain an empty array.
+                extra__funding_labels__contains=[],
+            )
+            .annotate(
+                funding_label=Func(
+                    KeyTransform("funding_labels", "extra"),
+                    function="jsonb_array_elements_text",
+                    output_field=CharField(),
+                )
+            )
+            .values_list("funding_label", flat=True)
+            .distinct()
+            .order_by("funding_label")
+        )
+        form.fields["funding_labels"].choices = [(label, label) for label in available_funding_labels]
+        display_funding_labels_filter = bool(available_funding_labels)
+        if selected_funding_labels := [
+            funding_label
+            for funding_label in form.cleaned_data["funding_labels"]
+            if funding_label in available_funding_labels
+        ]:
+            services = services.filter(extra__funding_labels__has_any_keys=selected_funding_labels)
     elif len(form.errors) == 1:
         try:
             # When searching for a job seeker (param job_seeker_public_id), the
@@ -437,6 +491,8 @@ def search_services_results(request, template_name="search/services/results.html
         "city": city,
         "category": category,
         "suppress_category_error": suppress_category_error,
+        "display_funding_labels_filter": display_funding_labels_filter,
+        "refresh_funding_labels_filter": _must_refresh_funding_labels_filter(request),
         "results": results,
         "detail_query_string": urlencode(detail_query),
         **banner_context,
