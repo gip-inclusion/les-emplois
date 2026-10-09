@@ -1,7 +1,7 @@
 [project]
 name = "les-emplois"
 dynamic = ["version"]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 
 [tool.ruff]
 line-length = 119
@@ -21,7 +21,8 @@ select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
     "I",  # isort
-    "UP",  # pyupgrade
+    # TODO(xfernandez): uncomment UP when everything is OK with Python 3.14
+    # "UP",  # pyupgrade
     "TID",  # flake8-tidy-imports
 ]
 
