@@ -8,10 +8,10 @@
                 <article class="c-box c-box--results has-one-link-inside h-100 d-flex flex-column">
                     <div class="c-box--results__body flex-grow-1">
                         <h3 class="mb-1">{{ person.full_name }}</h3>
-                        <p class="text-disabled fs-lg mb-4">{{ person.kind_label }}</p>
+                        <p class="text-secondary fs-lg mb-4">{{ person.kind_label }}</p>
                         <hr>
                         {% if person.main_organization.kind_label %}
-                            <p class="text-disabled fs-lg mb-1">{{ person.main_organization.kind_label }}</p>
+                            <p class="text-tertiary fs-lg mb-1">{{ person.main_organization.kind_label }}</p>
                         {% endif %}
                         <p class="mb-1 fw-bold text-uppercase">{{ person.main_organization.name }}</p>
                         <address class="mb-1 d-flex align-items-start">
