@@ -21,7 +21,7 @@ from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.legal_terms import bypass_terms_acceptance
+from itou.utils.auth import skip_compliance_checks
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
     BaseEmployerInvitationFormSet,
@@ -93,7 +93,7 @@ def new_user(request, invitation_type, invitation_id):
     return render(request, "invitations_views/new_pro_connect_user.html", context=context)
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def join(request, invitation_type, invitation_id):
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
         messages.error(request, "Ce lien n'est plus valide.")
@@ -213,7 +213,7 @@ class InvitePrescriberView(BaseInviteUserView):
         return {"sender": self.request.user, "organization": self.organization}
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
     handle_invitation(invitation, request)
@@ -238,7 +238,7 @@ class InviteEmployerView(BaseInviteUserView):
         return {"sender": self.request.user, "company": self.organization}
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     handle_invitation(invitation, request)
@@ -263,7 +263,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
         return {"sender": self.request.user, "institution": self.organization}
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     handle_invitation(invitation, request)

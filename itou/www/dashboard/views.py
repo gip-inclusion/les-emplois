@@ -42,8 +42,7 @@ from itou.users.notifications import (
     NewAPITokenNotification,
 )
 from itou.utils import constants as global_constants
-from itou.utils.auth import check_request
-from itou.utils.legal_terms import bypass_terms_acceptance
+from itou.utils.auth import check_request, skip_compliance_checks
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
@@ -317,7 +316,7 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 @with_triggers_context()
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
@@ -332,7 +331,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, {"form": form})
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 @with_triggers_context
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
@@ -437,7 +436,7 @@ def switch_organization(request):
     return HttpResponseRedirect(next_url)
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if request.user.is_staff:
         raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
@@ -509,7 +508,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
     return render(request, template_name, context)
 
 
-@method_decorator(bypass_terms_acceptance, name="dispatch")
+@method_decorator(skip_compliance_checks, name="dispatch")
 class AccountMigrationView(TemplateView):
     template_name = "account/activate_pro_connect_account.html"
 

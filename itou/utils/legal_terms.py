@@ -10,16 +10,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 
 
-def bypass_terms_acceptance(view_func):
-    """Decorator marking a view as exempt from the terms acceptance check.
-
-    Works like Django's @login_not_required: sets an attribute on the view
-    function that TermsAcceptanceMiddleware inspects.
-    """
-    view_func._bypass_terms_acceptance = True
-    return view_func
-
-
 def terms_acceptance_required(user):
     """Tell whether the user has to go through the terms acceptance page.
 
