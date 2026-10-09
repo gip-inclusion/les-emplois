@@ -20,6 +20,8 @@ from itou.utils.command import BaseCommand
 
 
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
+# The command runs daily: the overlap makes up for a missed or failed run
+EMAIL_TRACKING_CONSENT_UPDATE_WINDOW = datetime.timedelta(days=2)
 
 
 def verified_email_or_sso(identity_providers):
@@ -35,19 +37,27 @@ def verified_email_or_sso(identity_providers):
     return has_verified_primary_email | Q(identity_provider__in=identity_providers)
 
 
-def has_siae_membership():
-    """Condition on users being members of an SIAE, as opposed to other kinds of companies."""
+def has_siae_membership(*, include_inactive=False):
+    """Condition on users being members of an SIAE, as opposed to other kinds of companies.
+
+    Memberships are deactivated rather than deleted, so `include_inactive` also matches former members.
+    """
+    memberships = CompanyMembership.include_inactive if include_inactive else CompanyMembership.objects
     return Exists(
-        CompanyMembership.objects.filter(
+        memberships.filter(
             user_id=OuterRef("pk"),
             company__kind__in=CompanyKind.siae_kinds(),
         )
     )
 
 
-def has_prescriber_membership(**filters):
-    """Condition on users being members of a prescriber organization, matching the given filters."""
-    return Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"), **filters))
+def has_prescriber_membership(*, include_inactive=False, **filters):
+    """Condition on users being members of a prescriber organization, matching the given filters.
+
+    Memberships are deactivated rather than deleted, so `include_inactive` also matches former members.
+    """
+    memberships = PrescriberMembership.include_inactive if include_inactive else PrescriberMembership.objects
+    return Exists(memberships.filter(user_id=OuterRef("pk"), **filters))
 
 
 def email_tracking_consent_attributes(user):
@@ -134,36 +144,56 @@ class Command(BaseCommand):
         ).order_by("pk")
         self.import_professionals(professionals)
         self.import_job_seekers(job_seekers)
+        # Imports are asynchronous, so this update doesn't depend on the daily import above. A user
+        # in both is sent twice with the same consent, which is harmless.
+        self.update_email_tracking_consents(professionals, job_seekers)
 
-    def import_users(self, name, users, list_id, serializer):
+    def import_users(self, name, users, list_id, serializer, *, update_existing_contacts=False):
         """Log the number of users, and import them into a Brevo list on a wet run."""
         users = list(users)
         self.logger.info("%s count: %d", name, len(users))
         if self.wet_run:
-            self.client.import_users(users, list_id, serializer)
+            self.client.import_users(users, list_id, serializer, update_existing_contacts=update_existing_contacts)
 
-    def import_professionals(self, professionals):
-        """Import the SIAE members into the employers list, and the prescriber members into the prescribers list."""
+    def import_professionals(
+        self, professionals, *, include_inactive_memberships=False, name_suffix="", update_existing_contacts=False
+    ):
+        """Import the SIAE members into the employers list, and the prescriber members into the prescribers list.
+
+        Professionals who are neither were never sent to Brevo, so they are left out.
+
+        Args:
+            professionals: Professionals to import.
+            include_inactive_memberships: also match former members, through their inactive memberships.
+            name_suffix: appended to the name of each group of users in the logs.
+            update_existing_contacts: see `BrevoClient.import_users()`.
+        """
         authorized_prescriber = has_prescriber_membership(
+            include_inactive=include_inactive_memberships,
             organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         self.import_users(
-            "SIAE users",
-            professionals.filter(has_siae_membership()),
+            f"SIAE users{name_suffix}",
+            professionals.filter(has_siae_membership(include_inactive=include_inactive_memberships)),
             BrevoListID.EMPLOYERS,
             employer_serializer,
+            update_existing_contacts=update_existing_contacts,
         )
         self.import_users(
-            "Prescribers",
+            f"Prescribers{name_suffix}",
             professionals.filter(authorized_prescriber),
             BrevoListID.PRESCRIBERS,
             authorized_prescriber_serializer,
+            update_existing_contacts=update_existing_contacts,
         )
         self.import_users(
-            "Orienteurs",
-            professionals.filter(has_prescriber_membership()).exclude(authorized_prescriber),
+            f"Orienteurs{name_suffix}",
+            professionals.filter(has_prescriber_membership(include_inactive=include_inactive_memberships)).exclude(
+                authorized_prescriber
+            ),
             BrevoListID.PRESCRIBERS,
             prescriber_serializer,
+            update_existing_contacts=update_existing_contacts,
         )
 
     def import_job_seekers(self, job_seekers):
@@ -195,3 +225,32 @@ class Command(BaseCommand):
             | autonomous_with_recent_diagnosis_and_no_accepted_application
         )
         self.import_users("Job seekers", job_seekers_to_import, BrevoListID.CANDIDATS, job_seeker_serializer)
+
+    def update_email_tracking_consents(self, professionals, job_seekers):
+        """Import the users who recently answered the email tracking consent, each in their Brevo list.
+
+        Importing them updates the contacts Brevo knows, and creates the others in that list. Each answer is sent by
+        every run within the update window.
+        """
+        recently_answered = Q(
+            email_tracking_consent_updated_at__gte=timezone.now() - EMAIL_TRACKING_CONSENT_UPDATE_WINDOW
+        )
+        name_suffix = " with a recent email tracking consent answer"
+        professionals = professionals.filter(recently_answered)
+        self.import_professionals(professionals, name_suffix=name_suffix, update_existing_contacts=True)
+        # Former members left their structure but remain in Brevo, in the list of their former structure.
+        # Someone now in a structure is only sent to the list of their current one.
+        former_members = professionals.exclude(has_siae_membership() | has_prescriber_membership())
+        self.import_professionals(
+            former_members,
+            include_inactive_memberships=True,
+            name_suffix=f" (former members){name_suffix}",
+            update_existing_contacts=True,
+        )
+        self.import_users(
+            f"Job seekers{name_suffix}",
+            job_seekers.filter(recently_answered),
+            BrevoListID.CANDIDATS,
+            job_seeker_serializer,
+            update_existing_contacts=True,
+        )
