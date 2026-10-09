@@ -138,6 +138,101 @@ class TestQuerySet:
         assert job_seekers_qs.get(pk=job_seeker2.pk).contract_ending_soon is False
         assert job_seekers_qs.get(pk=job_seeker3.pk).contract_ending_soon is False
 
+    @freezegun.freeze_time("2026-09-22")
+    def test_at_end_of_journey(self):
+        company = CompanyFactory()
+        today = timezone.localdate()
+        two_years_ago = today - relativedelta(years=2)
+        eighteen_months_ago = today - relativedelta(months=18)
+        ten_days_ago = today - datetime.timedelta(days=10)
+        five_days_ago = today - datetime.timedelta(days=5)
+        yesterday = today - datetime.timedelta(days=1)
+        in_ten_days = today + datetime.timedelta(days=10)
+        in_thirty_days = today + datetime.timedelta(days=30)
+        in_thirty_one_days = today + datetime.timedelta(days=31)
+        in_three_months = today + relativedelta(months=3)
+
+        def employee(contract_end_date, *, contract_company=company, **kwargs):
+            return ApprovalFactory(
+                with_jobapplication=True,
+                with_jobapplication__to_company=contract_company,
+                with_ongoing_contract=True,
+                with_ongoing_contract__start_date=two_years_ago,
+                with_ongoing_contract__end_date=contract_end_date,
+                **kwargs,
+            ).user
+
+        job_seeker_with_contract_ending_soon = employee(in_thirty_days)
+        # The PASS IAE is still valid on its last day.
+        job_seeker_with_ended_contract = employee(yesterday, start_at=two_years_ago, end_at=today)
+        job_seeker_with_contract_ended_long_ago = employee(eighteen_months_ago)
+        # A contract with the SIAE ending soon counts, even if another one has started elsewhere.
+        job_seeker_with_contract_ending_soon_hired_elsewhere = employee(in_ten_days)
+        ContractFactory(
+            job_seeker=job_seeker_with_contract_ending_soon_hired_elsewhere,
+            start_date=five_days_ago,
+            end_date=in_three_months,
+        )
+        # Not at the end of their journey.
+        employee(in_thirty_one_days)
+        employee(None)
+        employee(ten_days_ago, start_at=two_years_ago, end_at=yesterday)
+        ContractFactory(company=company, start_date=two_years_ago, end_date=ten_days_ago)
+        employee(in_ten_days, contract_company=CompanyFactory())
+        job_seeker_hired_elsewhere = employee(ten_days_ago)
+        ContractFactory(job_seeker=job_seeker_hired_elsewhere, start_date=five_days_ago, end_date=in_three_months)
+        job_seeker_hired_by_unknown_company = employee(ten_days_ago)
+        ContractFactory(
+            job_seeker=job_seeker_hired_by_unknown_company,
+            company=None,
+            start_date=five_days_ago,
+            end_date=in_three_months,
+        )
+
+        assertQuerySetEqual(
+            User.objects.at_end_of_journey(siae=company),
+            [
+                job_seeker_with_contract_ending_soon,
+                job_seeker_with_contract_ending_soon_hired_elsewhere,
+                job_seeker_with_ended_contract,
+                job_seeker_with_contract_ended_long_ago,
+            ],
+            ordered=False,
+        )
+
+    @freezegun.freeze_time("2026-09-22")
+    def test_with_end_of_journey(self):
+        company = CompanyFactory()
+        today = timezone.localdate()
+        two_years_ago = today - relativedelta(years=2)
+        yesterday = today - datetime.timedelta(days=1)
+        in_ten_days = today + datetime.timedelta(days=10)
+        in_three_months = today + relativedelta(months=3)
+
+        def employee(contract_end_date):
+            return ApprovalFactory(
+                with_jobapplication=True,
+                with_jobapplication__to_company=company,
+                with_ongoing_contract=True,
+                with_ongoing_contract__start_date=two_years_ago,
+                with_ongoing_contract__end_date=contract_end_date,
+            ).user
+
+        job_seeker_with_contract_ending_soon = employee(in_ten_days)
+        job_seeker_with_ended_contract = employee(yesterday)
+        job_seeker_with_ongoing_contract = employee(in_three_months)
+
+        job_seekers_qs = User.objects.with_end_of_journey(siae=company)
+        job_seeker = job_seekers_qs.get(pk=job_seeker_with_contract_ending_soon.pk)
+        assert job_seeker.contract_ending_soon is True
+        assert job_seeker.last_contract_ended_with_valid_approval is False
+        job_seeker = job_seekers_qs.get(pk=job_seeker_with_ended_contract.pk)
+        assert job_seeker.contract_ending_soon is False
+        assert job_seeker.last_contract_ended_with_valid_approval is True
+        job_seeker = job_seekers_qs.get(pk=job_seeker_with_ongoing_contract.pk)
+        assert job_seeker.contract_ending_soon is False
+        assert job_seeker.last_contract_ended_with_valid_approval is False
+
 
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):

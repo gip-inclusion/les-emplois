@@ -112,16 +112,16 @@ def _employer_dashboard_context(request):
         category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
         category["url"] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    contracts_ending_soon_count = None
+    end_of_journey_count = None
     if current_org.is_subject_to_iae_rules:
         siae_job_seekers = User.objects.filter(
             kind=UserKind.JOB_SEEKER,
             pk__in=JobSeekerAssignment.objects.filter(company=current_org, ended_at=None).values("job_seeker"),
         )
-        contracts_ending_soon_count = siae_job_seekers.has_contract_ending_soon(siae=current_org).count()
+        end_of_journey_count = siae_job_seekers.at_end_of_journey(siae=current_org).count()
 
     return {
-        "contracts_ending_soon_count": contracts_ending_soon_count,
+        "end_of_journey_count": end_of_journey_count,
         "active_campaigns": (
             EvaluatedSiae.objects.for_company(current_org)
             .in_progress()
