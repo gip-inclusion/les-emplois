@@ -10,6 +10,9 @@
           Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
       Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
       </p>
+      <p>
+          Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».
+      </p>
       <div class="form-group form-group-required">
           <label class="form-label">
               Acceptez-vous que La plateforme de l’inclusion mesure l’ouverture de vos e-mails afin d’améliorer ses communications ?
@@ -59,6 +62,9 @@
       <p>
           Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
       Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
+      </p>
+      <p>
+          Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».
       </p>
       <div class="form-group form-group-required">
           <label class="form-label">
