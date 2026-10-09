@@ -25,7 +25,7 @@
                   hx-swap="outerHTML"
                   hx-push-url="true"
                   hx-indicator="#people-search-results">
-                {% include "directory/includes/people_form.html" with form=form only %}
+                {% include "directory/includes/people_form.html" with request=request form=form only %}
             </form>
             <div class="mt-4">{% include "directory/includes/people_results.html" %}</div>
         </div>

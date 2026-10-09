@@ -10,11 +10,5 @@
 </div>
 <div class="btn-dropdown-filter-group">
     {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.types only %}
-    <a id="people-clear-filters"
-       href="{% url 'directory:people_results' %}"
-       class="btn btn-ico btn-dropdown-filter ms-lg-auto{% if form.has_changed %} d-none{% endif %}"
-       aria-label="Effacer les filtres actifs">
-        <i class="ri-eraser-line" aria-hidden="true"></i>
-        <span>Effacer</span>
-    </a>
+    {% include "directory/includes/people_list_reset_filters.html" with request=request show_reset=form.has_changed only %}
 </div>
