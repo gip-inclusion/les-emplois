@@ -95,8 +95,11 @@ def maintenance(get_response):
     return middleware
 
 
-class TermsAcceptanceMiddleware:
-    """Middleware to ensure that professionals have accepted the latest terms before accessing the app."""
+class ComplianceMiddleware:
+    """Base middleware redirecting authenticated users to a compliance page they must go through before using the app.
+
+    Subclasses define when the redirection is needed and where it leads.
+    """
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -104,10 +107,18 @@ class TermsAcceptanceMiddleware:
     def __call__(self, request):
         return self.get_response(request)
 
+    def must_redirect(self, request):
+        raise NotImplementedError
+
+    def get_redirect_url(self, request):
+        raise NotImplementedError
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         if not getattr(view_func, "login_required", True):
-            return None  # don't enforce terms acceptance for public endpoints
-        if not request.user.is_authenticated or not terms_acceptance_required(request.user):
+            return None  # don't block public endpoints
+        if not request.user.is_authenticated:
+            return None
+        if not self.must_redirect(request):
             return None
         if request.method == "POST" or request.htmx:
             return None  # avoid a brutal redirection for HTMX requests or form submissions
@@ -120,7 +131,7 @@ class TermsAcceptanceMiddleware:
             "logout",
             "itou.api",
             # Anyway, this should be only reachable by superusers and staff members... But we don't want
-            # professionals reaching these endpoints to first accept the terms and then get a 403/404
+            # professionals reaching these endpoints to first go through the compliance page and then get a 403/404
             "admin",
             "itou_staff_views",
             "otp_views",
@@ -128,8 +139,17 @@ class TermsAcceptanceMiddleware:
             return None
         if getattr(view_func, "_bypass_terms_acceptance", False):  # views can be decorated to be exempt from the check
             return None
-        url = reverse("legal-terms", query={"next": request.get_full_path()})
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(self.get_redirect_url(request))
+
+
+class TermsAcceptanceMiddleware(ComplianceMiddleware):
+    """Middleware to ensure that professionals have accepted the latest terms before accessing the app."""
+
+    def must_redirect(self, request):
+        return terms_acceptance_required(request.user)
+
+    def get_redirect_url(self, request):
+        return reverse("legal-terms", query={"next": request.get_full_path()})
 
 
 class RedirectToNewDomainMiddleware:
