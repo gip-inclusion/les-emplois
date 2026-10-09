@@ -1,6 +1,7 @@
 import logging
 import urllib.parse
 from functools import cached_property
+from textwrap import dedent
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -1346,13 +1347,23 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
                 last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
             ).first()
-            if existing_job_seeker and not self.form.data.get("confirm"):
-                # If an existing job seeker matches the info, a confirmation is required
-                context["confirmation_needed"] = True
-                context["redacted_existing_email"] = redact_email_address(existing_job_seeker.email)
-                context["email_to_create"] = self.job_seeker_session.get("user", {}).get("email", "")
+            if existing_job_seeker:
+                # If an existing job seeker matches the info, block its creation
+                redacted_existing_email = redact_email_address(existing_job_seeker.email)
+                context["job_seeker_already_exists"] = True
+                context["redacted_existing_email"] = redacted_existing_email
+                context["support_subject"] = "Utilisateur existant"
+                context["support_description"] = dedent(f"""
+                Bonjour,
 
-            if not context["confirmation_needed"]:
+                J’essaye de créer un compte pour un usager qui semble
+                déjà exister en base de donnée avec l’identifiant
+                **{existing_job_seeker.pk}**.
+
+                Cependant l’usager face à moi ne connaît pas l’adresse
+                email liée à ce compte.
+                """)
+            else:
                 self.job_seeker_session.set(
                     "user",
                     self.job_seeker_session.get("user", {}) | self.form.cleaned_data_without_profile_fields,
@@ -1367,7 +1378,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "confirmation_needed": False,
+            "job_seeker_already_exists": False,
             "form": self.form,
             "matomo_form_name": "apply-create-job-seeker-identity",
             "progress": "20",
@@ -1691,7 +1702,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "confirmation_needed": False,
+            "job_seeker_already_exists": False,
             "form": self.form,
             "matomo_form_name": "apply-update-job-seeker-identity",
             "readonly_form": not can_edit_personal_information(self.request, self.job_seeker),
