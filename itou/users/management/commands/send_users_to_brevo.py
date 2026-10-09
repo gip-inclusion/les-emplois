@@ -1,4 +1,5 @@
 import datetime
+from collections import namedtuple
 from zoneinfo import ZoneInfo
 
 from allauth.account.models import EmailAddress
@@ -20,6 +21,36 @@ from itou.utils.command import BaseCommand
 
 
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
+PROFESSIONAL_SSO_PROVIDERS = [IdentityProvider.PRO_CONNECT]
+JOB_SEEKER_SSO_PROVIDERS = [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]
+
+Audience = namedtuple("Audience", ["name", "users", "list_id", "serializer"])
+
+
+def has_verified_primary_email():
+    return Exists(
+        EmailAddress.objects.filter(
+            user_id=OuterRef("pk"),
+            email=OuterRef("email"),
+            primary=True,
+            verified=True,
+        )
+    )
+
+
+def verified_email_or_sso(identity_providers):
+    """Condition on users having a verified primary email, or an account from an SSO, which verifies emails itself."""
+    return has_verified_primary_email() | Q(identity_provider__in=identity_providers)
+
+
+def has_membership(membership_model, **filters):
+    """Condition on users having an active membership of the given model."""
+    return Exists(membership_model.objects.filter(user_id=OuterRef("pk"), **filters))
+
+
+def has_siae_membership():
+    """Condition on users being members of an SIAE, as opposed to other kinds of companies."""
+    return has_membership(CompanyMembership, company__kind__in=CompanyKind.siae_kinds())
 
 
 def professional_serializer(user, brevo_type):
@@ -59,6 +90,89 @@ def job_seeker_serializer(user):
     }
 
 
+def professional_audiences():
+    """Return the audiences of the professionals who are SIAE or prescriber members."""
+    professionals = User.objects.filter(
+        verified_email_or_sso(PROFESSIONAL_SSO_PROVIDERS),
+        kind=UserKind.PROFESSIONAL,
+        is_active=True,
+    ).order_by("email")
+    authorized_prescriber = has_membership(
+        PrescriberMembership,
+        organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+    )
+    return [
+        Audience(
+            "SIAE users",
+            professionals.filter(has_siae_membership()),
+            BrevoListID.EMPLOYERS,
+            employer_serializer,
+        ),
+        Audience(
+            "Prescribers",
+            professionals.filter(authorized_prescriber),
+            BrevoListID.PRESCRIBERS,
+            authorized_prescriber_serializer,
+        ),
+        Audience(
+            "Orienteurs",
+            professionals.filter(has_membership(PrescriberMembership)).exclude(authorized_prescriber),
+            BrevoListID.PRESCRIBERS,
+            prescriber_serializer,
+        ),
+    ]
+
+
+def job_seekers():
+    """Return the job seekers who may be sent to Brevo."""
+    return User.objects.filter(
+        verified_email_or_sso(JOB_SEEKER_SSO_PROVIDERS),
+        kind=UserKind.JOB_SEEKER,
+        is_active=True,
+    ).order_by("pk")
+
+
+def job_seekers_to_import():
+    """Return the job seekers of the daily import: recently joined, stalled, or autonomous and waiting for a job."""
+    midnight_today = datetime.datetime.combine(
+        timezone.localdate(),
+        datetime.time.min,
+        tzinfo=timezone.get_current_timezone(),
+    )
+    autonomous_with_recent_diagnosis_and_no_accepted_application = Q(
+        Exists(
+            EligibilityDiagnosis.objects.filter(
+                job_seeker_id=OuterRef("pk"),
+                author_kind=AuthorKind.PRESCRIBER,
+                created_at__gte=RECENT_DIAGNOSIS_THRESHOLD,
+            )
+        ),
+        ~Exists(
+            JobApplication.objects.filter(
+                job_seeker_id=OuterRef("pk"),
+                state=JobApplicationState.ACCEPTED,
+            )
+        ),
+        last_login__isnull=False,
+    )
+    return job_seekers().filter(
+        Q(
+            Q(date_joined__gte=midnight_today - datetime.timedelta(days=30)),
+            JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__"),
+            autonomous_with_recent_diagnosis_and_no_accepted_application,
+            _connector=Q.OR,
+        )
+    )
+
+
+def daily_audiences():
+    """Return the audiences of the daily import, meant for new contacts."""
+    return [
+        *professional_audiences(),
+        Audience("Job seekers", job_seekers_to_import(), BrevoListID.CANDIDATS, job_seeker_serializer),
+    ]
+
+
 class Command(BaseCommand):
     ATOMIC_HANDLE = False
     AUTO_TRIGGER_CONTEXT = False
@@ -84,113 +198,12 @@ class Command(BaseCommand):
     )
     def handle(self, *args, wet_run, **options):
         client = BrevoClient()
-        self.import_professionals(client, wet_run=wet_run)
-        self.import_job_seekers(client, wet_run=wet_run)
+        self.import_audiences(client, daily_audiences(), wet_run=wet_run)
 
-    def import_professionals(self, client, *, wet_run):
-        professional_qs = (
-            User.objects.filter(kind=UserKind.PROFESSIONAL)
-            .filter(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-                | Q(identity_provider=IdentityProvider.PRO_CONNECT),  # the SSO verifies emails on its own
-                is_active=True,
-            )
-            .order_by("email")
-        )
-        self.import_employers(client, professional_qs, wet_run=wet_run)
-        self.import_prescribers(client, professional_qs, wet_run=wet_run)
-
-    def import_employers(self, client, professional_qs, *, wet_run):
-        employers = list(
-            professional_qs.filter(
-                Exists(
-                    CompanyMembership.objects.filter(
-                        user_id=OuterRef("pk"),
-                        company__kind__in=CompanyKind.siae_kinds(),
-                    )
-                )
-            )
-        )
-        self.logger.info("SIAE users count: %d", len(employers))
-        if wet_run:
-            client.import_users(employers, BrevoListID.EMPLOYERS, employer_serializer)
-
-    def import_prescribers(self, client, professional_qs, *, wet_run):
-        all_prescribers = professional_qs.filter(Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"))))
-
-        authorized_prescriber_memberships = PrescriberMembership.objects.filter(
-            user_id=OuterRef("pk"),
-            organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-        )
-        authorized_prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
-
-        self.logger.info("Prescribers count: %d", len(authorized_prescribers))
-        if wet_run:
-            client.import_users(authorized_prescribers, BrevoListID.PRESCRIBERS, authorized_prescriber_serializer)
-
-        orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
-        self.logger.info("Orienteurs count: %d", len(orienteurs))
-        if wet_run:
-            client.import_users(orienteurs, BrevoListID.PRESCRIBERS, prescriber_serializer)
-
-    def import_job_seekers(self, client, *, wet_run):
-        job_seekers = User.objects.filter(
-            Q(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-            )
-            | Q(
-                identity_provider__in=[
-                    IdentityProvider.FRANCE_CONNECT,
-                    IdentityProvider.FT_CONNECT,
-                ]
-            ),
-            kind=UserKind.JOB_SEEKER,
-            is_active=True,
-        ).order_by("pk")
-
-        midnight_today = datetime.datetime.combine(
-            timezone.localdate(),
-            datetime.time.min,
-            tzinfo=timezone.get_current_timezone(),
-        )
-        autonomous_with_recent_diagnosis_and_no_accepted_application = Q(
-            Exists(
-                EligibilityDiagnosis.objects.filter(
-                    job_seeker_id=OuterRef("pk"),
-                    author_kind=AuthorKind.PRESCRIBER,
-                    created_at__gte=RECENT_DIAGNOSIS_THRESHOLD,
-                )
-            ),
-            ~Exists(
-                JobApplication.objects.filter(
-                    job_seeker_id=OuterRef("pk"),
-                    state=JobApplicationState.ACCEPTED,
-                )
-            ),
-            last_login__isnull=False,
-        )
-        job_seekers_to_import = job_seekers.filter(
-            Q(
-                Q(date_joined__gte=midnight_today - datetime.timedelta(days=30)),
-                JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__"),
-                autonomous_with_recent_diagnosis_and_no_accepted_application,
-                _connector=Q.OR,
-            )
-        )
-        self.logger.info("Job seekers count: %d", len(job_seekers_to_import))
-        if wet_run:
-            client.import_users(job_seekers_to_import, BrevoListID.CANDIDATS, job_seeker_serializer)
+    def import_audiences(self, client, audiences, *, wet_run):
+        """Log the size of each audience, and import it into its Brevo list on a wet run."""
+        for name, users, list_id, serializer in audiences:
+            users = list(users)
+            self.logger.info("%s count: %d", name, len(users))
+            if wet_run:
+                client.import_users(users, list_id, serializer)
