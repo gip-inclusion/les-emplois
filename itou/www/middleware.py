@@ -118,6 +118,8 @@ class ComplianceMiddleware:
             return None  # don't block public endpoints
         if not request.user.is_authenticated:
             return None
+        if getattr(request.user, "is_hijacked", False):
+            return None  # an admin impersonating a user must never answer in their name
         if not self.must_redirect(request):
             return None
         if request.method == "POST" or request.htmx:
@@ -150,6 +152,19 @@ class TermsAcceptanceMiddleware(ComplianceMiddleware):
 
     def get_redirect_url(self, request):
         return reverse("legal-terms", query={"next": request.get_full_path()})
+
+
+class EmailTrackingConsentMiddleware(ComplianceMiddleware):
+    """Middleware to ensure that users have answered whether they consent to email open tracking."""
+
+    def must_redirect(self, request):
+        if not settings.REQUIRE_EMAIL_TRACKING_CONSENT:
+            return False
+        # The terms come first, this page is shown once they are accepted
+        return request.user.must_answer_email_tracking_consent and not terms_acceptance_required(request.user)
+
+    def get_redirect_url(self, request):
+        return reverse("dashboard:email_tracking_consent", query={"next": request.get_full_path()})
 
 
 class RedirectToNewDomainMiddleware:
