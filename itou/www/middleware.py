@@ -115,8 +115,8 @@ class TermsAcceptanceMiddleware:
             return None
         if not (match := getattr(request, "resolver_match", None)):
             return None
-        top_level_namespace = match.namespaces[0] if match.namespaces else ""
-        if top_level_namespace in [
+        top_level_app_name = match.app_names[0] if match.app_names else ""
+        if top_level_app_name in [
             "logout",
             "itou.api",
             # Anyway, this should be only reachable by superusers and staff members... But we don't want
