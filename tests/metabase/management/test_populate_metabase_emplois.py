@@ -32,6 +32,7 @@ from itou.metabase.tables import (
     job_seeker_assignments,
     mobilization_events,
     orientations,
+    services,
 )
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -45,6 +46,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     SuspensionFactory,
 )
+from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geiq_assessments.factories import (
@@ -1426,6 +1428,52 @@ def test_populate_organizations(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
+def test_populate_services(snapshot):
+    vannes = create_city_vannes()
+    service = ServiceFactory(volume_horaire_hebdomadaire=15, nombre_semaines=2, insee_city=vannes)
+    inactive_service = ServiceFactory(is_active=False, source_link="https://link.tld")
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="services")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {services.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": service.id,
+            "uid": service.uid,
+            "structure_uid": service.structure.uid,
+            "source": service.source.value,
+            "source_link": None,
+            "name": service.name,
+            "description": service.description,
+            "is_active": True,
+            "duration_weekly_hours": 15,
+            "duration_weeks": 2,
+            "code_insee": "56260",
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": inactive_service.id,
+            "uid": inactive_service.uid,
+            "structure_uid": inactive_service.structure.uid,
+            "source": inactive_service.source.value,
+            "source_link": inactive_service.source_link,
+            "name": inactive_service.name,
+            "description": inactive_service.description,
+            "duration_weekly_hours": None,
+            "duration_weeks": None,
+            "is_active": False,
+            "code_insee": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
 def test_populate_mobilization_events(snapshot):
     company_membership = CompanyMembershipFactory()
     prescriber_membership = PrescriberMembershipFactory()
@@ -1600,9 +1648,9 @@ def test_populate_orientations(snapshot):
             "sender_public_id": accepted_orientation.sender.public_id,
             "sender_kind": "emplois_" + SenderKind.PRESCRIBER.value,
             "sender_prescriber_organization_id": accepted_orientation.sender_prescriber_organization_id,
-            "sender_prescriber_organization_public_id": accepted_orientation.sender_prescriber_organization.uid,
+            "sender_prescriber_organization_uid": accepted_orientation.sender_prescriber_organization.uid,
             "sender_company_id": None,
-            "sender_company_public_id": None,
+            "sender_company_uid": None,
             "data_protection_commitment": True,
             "last_reminder_email_sent_at": None,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
@@ -1620,9 +1668,9 @@ def test_populate_orientations(snapshot):
             "sender_public_id": pending_orientation.sender.public_id,
             "sender_kind": "emplois_" + SenderKind.EMPLOYER.value,
             "sender_prescriber_organization_id": None,
-            "sender_prescriber_organization_public_id": None,
+            "sender_prescriber_organization_uid": None,
             "sender_company_id": pending_orientation.sender_company_id,
-            "sender_company_public_id": pending_orientation.sender_company.uid,
+            "sender_company_uid": pending_orientation.sender_company.uid,
             "data_protection_commitment": False,
             "last_reminder_email_sent_at": pending_orientation.last_reminder_email_sent_at,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
