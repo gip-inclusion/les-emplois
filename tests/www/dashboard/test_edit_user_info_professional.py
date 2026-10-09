@@ -1,3 +1,5 @@
+from datetime import UTC
+
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -12,11 +14,18 @@ from itou.users.models import User
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory, ProfessionalFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    ProfessionalFactory,
+)
 from tests.utils.testing import parse_response_to_soup
 from tests.www.dashboard.test_edit_user_info_job_seeker import (
     BIRTHDATE_FIELD_NAME,
     DIRECTORY_OPT_OUT_FIELD_ID,
+    EMAIL_TRACKING_CONSENT_FIELD_ID,
     LACK_OF_NIR_FIELD_ID,
     LACK_OF_NIR_REASON_FIELD_ID,
     NIR_FIELD_ID,
@@ -25,6 +34,9 @@ from tests.www.dashboard.test_edit_user_info_job_seeker import (
 
 FUNCTIONS_HTML = '<legend class="h3">Fonctions</legend>'
 FUNCTION_AT_TEXT = "Fonction chez"
+EMAIL_TRACKING_CONSENT_LEGEND = (
+    '<legend class="h3" id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</legend>'
+)
 
 
 def membership_formsets_management_data(company_memberships_count=0, prescriber_memberships_count=0):
@@ -296,6 +308,103 @@ def test_professional_cannot_set_function_with_error(client):
     assertContains(response, error)
     company_membership.refresh_from_db()
     assert company_membership.function == ""
+
+
+@pytest.mark.parametrize("factory", [PrescriberFactory, LaborInspectorFactory])
+@pytest.mark.parametrize("consent", [True, False])
+def test_email_tracking_consent_section(client, factory, consent):
+    with freeze_time("2026-09-28"):
+        user = factory(email_tracking_consent=consent)
+    client.force_login(user)
+    response = client.get(reverse("dashboard:edit_user_info"))
+    assertContains(response, EMAIL_TRACKING_CONSENT_LEGEND, html=True)
+    assertContains(response, EMAIL_TRACKING_CONSENT_FIELD_ID)
+    field = response.context["form"]["email_tracking_consent"]
+    assert field.value() is consent
+    assert field.help_text == (
+        "Choix enregistré le 28/09/2026. Une modification peut prendre jusqu’à 48 heures pour être prise en compte."
+    )
+
+
+def test_no_email_tracking_consent_section_for_staff(client):
+    client.force_login(ItouStaffFactory())
+    response = client.get(reverse("dashboard:edit_user_info"))
+    assertNotContains(response, EMAIL_TRACKING_CONSENT_FIELD_ID)
+    assert "email_tracking_consent" not in response.context["form"].fields
+
+
+def _post_user_info(client, user, **extra_data):
+    data = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "phone": user.phone,
+        **membership_formsets_management_data(),
+    }
+    response = client.post(reverse("dashboard:edit_user_info"), data | extra_data)
+    assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+    user.refresh_from_db()
+
+
+@pytest.mark.parametrize(
+    "initial_consent,post_data,expected_consent",
+    [
+        (True, {"email_tracking_consent": "False"}, False),  # withdrawal
+        (False, {"email_tracking_consent": "True"}, True),
+    ],
+)
+def test_change_email_tracking_consent(client, caplog, initial_consent, post_data, expected_consent):
+    user = PrescriberFactory(email_tracking_consent=initial_consent)
+    client.force_login(user)
+    with freeze_time("2026-09-28T10:00:00+02:00") as frozen_time:
+        _post_user_info(client, user, **post_data)
+    assert user.email_tracking_consent is expected_consent
+    assert user.email_tracking_consent_updated_at == frozen_time().replace(tzinfo=UTC)
+    assert f"user={user.pk} changed the email tracking consent: consent={expected_consent}" in caplog.messages
+
+
+@pytest.mark.parametrize("consent", [True, False])
+def test_unchanged_email_tracking_consent(client, caplog, consent):
+    user = PrescriberFactory(email_tracking_consent=consent)
+    answered_at = user.email_tracking_consent_updated_at
+    client.force_login(user)
+    _post_user_info(client, user, email_tracking_consent=str(consent))
+    assert user.email_tracking_consent is consent
+    assert user.email_tracking_consent_updated_at == answered_at
+    assert not any("changed the email tracking consent" in message for message in caplog.messages)
+
+
+def test_saving_the_profile_is_not_an_email_tracking_consent_answer(client):
+    user = PrescriberFactory(email_tracking_consent_updated_at=None)
+    client.force_login(user)
+    _post_user_info(client, user)
+    assert user.email_tracking_consent is False
+    assert user.email_tracking_consent_updated_at is None
+
+
+def test_missing_email_tracking_consent_keeps_the_answer(client, caplog):
+    user = PrescriberFactory(email_tracking_consent=True)
+    answered_at = user.email_tracking_consent_updated_at
+    client.force_login(user)
+    _post_user_info(client, user)
+    assert user.email_tracking_consent is True
+    assert user.email_tracking_consent_updated_at == answered_at
+    assert not any("changed the email tracking consent" in message for message in caplog.messages)
+
+
+def test_hijacker_cannot_change_email_tracking_consent(client):
+    user = PrescriberFactory(email_tracking_consent=False)
+    answered_at = user.email_tracking_consent_updated_at
+    client.force_login(ItouStaffFactory(is_superuser=True))
+    client.post(reverse("hijack:acquire"), {"user_pk": user.pk})
+
+    response = client.get(reverse("dashboard:edit_user_info"))
+    field = response.context["form"]["email_tracking_consent"]
+    assert field.field.disabled is True
+    assert field.help_text.endswith("Seul l’utilisateur peut modifier ce choix.")
+
+    _post_user_info(client, user, email_tracking_consent="True")
+    assert user.email_tracking_consent is False
+    assert user.email_tracking_consent_updated_at == answered_at
 
 
 def test_edit_user_sso_alert(client):
