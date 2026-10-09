@@ -23,14 +23,13 @@ class Command(BaseCommand):
         )
         self.logger.info(f"Found {len(archivable)} possibly archivable employee record(s)")
 
-        archived_employee_records = []
+        archived_nb = 0
         for employee_record in archivable:
-            self.logger.info(f"Archiving {employee_record.pk=}")
             try:
                 employee_record.archive()
             except Exception as ex:
                 self.logger.warning("Can't archive employee_record=%d ex=%s", employee_record.pk, ex)
             else:
-                archived_employee_records.append(employee_record)
+                archived_nb += 1
 
-        self.logger.info("%d/%d employee record(s) were archived", len(archived_employee_records), len(archivable))
+        self.logger.info("%d/%d employee record(s) were archived", archived_nb, len(archivable))
