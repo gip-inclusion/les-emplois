@@ -17,11 +17,11 @@ class Command(BaseCommand):
         self.logger.info("Start archiving employee records")
 
         archivable = (
-            EmployeeRecord.objects.archivable()
+            EmployeeRecord.objects.possibly_archivable()
             .order_by("job_application__approval__end_at")
             .select_related("job_application__approval")
         )
-        self.logger.info(f"Found {len(archivable)} archivable employee record(s)")
+        self.logger.info(f"Found {len(archivable)} possibly archivable employee record(s)")
 
         archived_employee_records = []
         for employee_record in archivable:
