@@ -1242,6 +1242,13 @@ def test_job_seeker_profile_asp_uid_field_history():
         pytest.param(None, "address_line_2", "Finca Madrigal", id="address_line_2"),
         pytest.param(None, "post_code", "34570", id="post_code"),
         pytest.param(None, "city", "Montarnaud", id="city"),
+        pytest.param(None, "email_tracking_consent", True, id="email_tracking_consent"),
+        pytest.param(
+            None,
+            "email_tracking_consent_updated_at",
+            datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC),
+            id="email_tracking_consent_updated_at",
+        ),
     ],
 )
 def test_user_and_job_seeker_profile_field_history(obj_attr, field, value):

@@ -148,7 +148,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -196,11 +198,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -365,7 +369,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -413,11 +419,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -640,7 +648,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -688,11 +698,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -859,7 +871,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -907,11 +921,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -1132,7 +1148,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -1180,11 +1198,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -1349,7 +1369,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -1397,11 +1419,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
@@ -1566,7 +1590,9 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47",
+                 "col48"
           FROM
             (SELECT *
              FROM
@@ -1614,11 +1640,13 @@
                        "users_user"."external_data_source_history" AS "col39",
                        "users_user"."last_checked_at" AS "col40",
                        "users_user"."terms_accepted_at" AS "col41",
-                       "users_user"."public_id" AS "col42",
-                       "users_user"."address_filled_at" AS "col43",
-                       "users_user"."first_login" AS "col44",
-                       "users_user"."upcoming_deletion_notified_at" AS "col45",
-                       "users_user"."allow_next_sso_sub_update" AS "col46"
+                       "users_user"."email_tracking_consent" AS "col42",
+                       "users_user"."email_tracking_consent_updated_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."upcoming_deletion_notified_at" AS "col47",
+                       "users_user"."allow_next_sso_sub_update" AS "col48"
                 FROM "companies_companymembership"
                 INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
                 WHERE ("users_user"."is_active"
