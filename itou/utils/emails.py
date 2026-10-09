@@ -7,7 +7,6 @@ from django.template.loader import get_template
 from django.urls import reverse
 
 from itou.utils import constants as global_constants
-from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import get_absolute_url
 
 
@@ -34,11 +33,8 @@ def get_email_text_template(template, context):
 
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
-    subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
-    subject = textwrap.shorten(
-        subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
-    )
+    subject = textwrap.shorten(get_email_text_template(subject, context), width=250, placeholder="...")
     return mail.EmailMessage(
         from_email=from_email,
         to=to,
