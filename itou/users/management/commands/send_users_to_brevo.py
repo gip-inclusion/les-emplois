@@ -167,26 +167,7 @@ class Command(BaseCommand):
             datetime.time.min,
             tzinfo=timezone.get_current_timezone(),
         )
-        a_month_ago = midnight_today - datetime.timedelta(days=30)
-        recently_joined = job_seekers.filter(date_joined__gte=a_month_ago)
-        self.logger.info("Job seekers count: %d", len(recently_joined))
-        if wet_run:
-            client.import_users(recently_joined, BrevoListID.CANDIDATS, job_seeker_serializer)
-
-        stalled_autonomous_job_seekers = job_seekers.filter(
-            JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
-        )
-        self.logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
-        if wet_run:
-            client.import_users(
-                stalled_autonomous_job_seekers,
-                BrevoListID.CANDIDATS_AUTONOMES_BLOQUES,
-                job_seeker_serializer,
-            )
-
-        autonomous_job_seekers_with_diagnosis_and_no_accepted_application = job_seekers.filter(
-            last_login__isnull=False,
-        ).filter(
+        autonomous_with_recent_diagnosis_and_no_accepted_application = Q(
             Exists(
                 EligibilityDiagnosis.objects.filter(
                     job_seeker_id=OuterRef("pk"),
@@ -200,14 +181,13 @@ class Command(BaseCommand):
                     state=JobApplicationState.ACCEPTED,
                 )
             ),
+            last_login__isnull=False,
         )
-        self.logger.info(
-            "Autonomous job seekers with IAE diag and no accepted applications count: %d",
-            len(autonomous_job_seekers_with_diagnosis_and_no_accepted_application),
+        job_seekers_to_import = job_seekers.filter(
+            Q(date_joined__gte=midnight_today - datetime.timedelta(days=30))
+            | JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
+            | autonomous_with_recent_diagnosis_and_no_accepted_application
         )
+        self.logger.info("Job seekers count: %d", len(job_seekers_to_import))
         if wet_run:
-            client.import_users(
-                autonomous_job_seekers_with_diagnosis_and_no_accepted_application,
-                BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC,
-                job_seeker_serializer,
-            )
+            client.import_users(job_seekers_to_import, BrevoListID.CANDIDATS, job_seeker_serializer)

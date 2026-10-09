@@ -575,49 +575,81 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_job_seekers")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_stalled_autonomous_job_seekers(self, caplog):
+    def test_wet_run_stalled_job_seekers(self, caplog):
+        long_ago = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
+            date_joined=long_ago,
             # Needed to fill the department field.
             with_ban_geoloc_address=True,
             with_verified_email=True,
             jobseeker_profile__is_stalled=True,
         )
-        JobSeekerFactory(with_verified_email=True)
+        # Stalled and recently joined: sent once
+        sonny = JobSeekerFactory(
+            first_name="Sonny",
+            last_name="Sunder",
+            email="sonny.sunder@mailinator.com",
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+            jobseeker_profile__is_stalled=True,
+        )
+        # Not stalled anymore: ignored
+        JobSeekerFactory(
+            date_joined=long_ago,
+            with_verified_email=True,
+            jobseeker_profile__is_stalled=True,
+            jobseeker_profile__is_not_stalled_anymore=True,
+        )
+        # Not stalled: ignored
+        JobSeekerFactory(date_joined=long_ago, with_verified_email=True)
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        # Employers and prescribers are created by the factories, ignore them.
         assert "Job seekers count: 2" in caplog.messages
-        assert "Stalled autonomous job seekers count: 1" in caplog.messages
-        assert self.imports()[-1] == {
-            "listIds": [BrevoListID.CANDIDATS_AUTONOMES_BLOQUES],
-            "emailBlacklist": False,
-            "smsBlacklist": False,
-            "updateExistingContacts": False,
-            "emptyContactsAttributes": False,
-            "jsonBody": [
-                {
-                    "email": "billy.boo@mailinator.com",
-                    "attributes": {
-                        "prenom": "Billy",
-                        "nom": "BOO",
-                        "date_inscription": "2025-02-25",
-                        "departement": "67",
-                        "id": billy.pk,
+        assert self.imports() == [
+            {
+                "listIds": [BrevoListID.CANDIDATS],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "billy.boo@mailinator.com",
+                        "attributes": {
+                            "prenom": "Billy",
+                            "nom": "BOO",
+                            "date_inscription": "2024-01-01",
+                            "departement": "67",
+                            "id": billy.pk,
+                        },
                     },
-                },
-            ],
-        }
+                    {
+                        "email": "sonny.sunder@mailinator.com",
+                        "attributes": {
+                            "prenom": "Sonny",
+                            "nom": "SUNDER",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": sonny.pk,
+                        },
+                    },
+                ],
+            },
+        ]
 
     @freeze_time("2025-06-25")
     def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog):
-        billy = IAEEligibilityDiagnosisFactory(
+        # Joined long ago, so that only the diagnosis can make them part of the import
+        long_ago = datetime.datetime(2025, 1, 1, tzinfo=datetime.UTC)
+        willy = IAEEligibilityDiagnosisFactory(
             job_seeker__first_name="Willy",
             job_seeker__last_name="Boo",
             job_seeker__email="willy.boo@mailinator.com",
+            job_seeker__date_joined=long_ago,
             # Needed to fill the department field.
             job_seeker__with_ban_geoloc_address=True,
             job_seeker__with_verified_email=True,
@@ -626,6 +658,7 @@ class TestCommandSendUsersToBrevo:
         ).job_seeker
         # Diagnosis too old: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=timezone.now(),
             created_at=timezone.now() - datetime.timedelta(days=310),
@@ -633,6 +666,7 @@ class TestCommandSendUsersToBrevo:
         )
         # Employer diagnosis: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=timezone.now(),
             from_employer=True,
@@ -642,6 +676,7 @@ class TestCommandSendUsersToBrevo:
             sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             job_seeker=IAEEligibilityDiagnosisFactory(
+                job_seeker__date_joined=long_ago,
                 job_seeker__with_verified_email=True,
                 job_seeker__last_login=timezone.now(),
                 from_prescriber=True,
@@ -649,6 +684,7 @@ class TestCommandSendUsersToBrevo:
         )
         # Job seeker is not autonomous: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=None,
             from_prescriber=True,
@@ -656,16 +692,11 @@ class TestCommandSendUsersToBrevo:
 
         call_command("send_users_to_brevo", wet_run=True)
 
+        assert "Job seekers count: 1" in caplog.messages
         # Employers and prescribers are created by the factories, ignore them.
-        assert "Job seekers count: 5" in caplog.messages
-        assert "Autonomous job seekers with IAE diag and no accepted applications count: 1" in caplog.messages
-        [autonomous_job_seekers_import] = [
-            payload
-            for payload in self.imports()
-            if payload["listIds"] == [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC]
-        ]
-        assert autonomous_job_seekers_import == {
-            "listIds": [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC],
+        [job_seekers_import] = [payload for payload in self.imports() if payload["listIds"] == [BrevoListID.CANDIDATS]]
+        assert job_seekers_import == {
+            "listIds": [BrevoListID.CANDIDATS],
             "emailBlacklist": False,
             "smsBlacklist": False,
             "updateExistingContacts": False,
@@ -676,9 +707,9 @@ class TestCommandSendUsersToBrevo:
                     "attributes": {
                         "prenom": "Willy",
                         "nom": "BOO",
-                        "date_inscription": "2025-06-25",
+                        "date_inscription": "2025-01-01",
                         "departement": "67",
-                        "id": billy.pk,
+                        "id": willy.pk,
                     },
                 },
             ],
