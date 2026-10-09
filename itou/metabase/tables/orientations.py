@@ -60,7 +60,7 @@ TABLE.add_columns(
             comment="ID C1 de l’organisation prescriptrice émettrice",
         ),
         {
-            "name": "sender_prescriber_organization_public_id",
+            "name": "sender_prescriber_organization_uid",
             "type": "uuid",
             "comment": "ID public de l’organisation prescriptrice émettrice",
             "fn": lambda o: o.sender_prescriber_organization.uid if o.sender_prescriber_organization else None,
@@ -71,7 +71,7 @@ TABLE.add_columns(
             comment="ID C1 de l’entreprise émettrice",
         ),
         {
-            "name": "sender_company_public_id",
+            "name": "sender_company_uid",
             "type": "uuid",
             "comment": "ID public de l’entreprise émettrice",
             "fn": lambda o: o.sender_company.uid if o.sender_company else None,
