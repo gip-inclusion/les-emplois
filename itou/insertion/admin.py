@@ -92,7 +92,7 @@ class StructureAdmin(InsertionAdmin):
 class ServiceAdmin(InsertionAdmin):
     list_display = ["pk", "name", "structure_link", "source", "kind", "city", "is_active", "updated_at"]
     list_display_links = ["pk", "name"]
-    list_filter = ["source", "kind", "contact_is_public", "is_active"]
+    list_filter = ["source", "kind", "is_active"]
     list_select_related = ["structure", "source", "kind"]
     show_full_result_count = False
     date_hierarchy = "updated_on"
@@ -124,7 +124,7 @@ class ServiceAdmin(InsertionAdmin):
             "Adresse",
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
         ),
-        ("Contact", {"fields": ["contact_full_name", "contact_email", "contact_phone", "contact_is_public"]}),
+        ("Contact", {"fields": ["contact_full_name", "contact_email", "contact_phone"]}),
         (
             "Horaires",
             {

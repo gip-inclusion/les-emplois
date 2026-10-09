@@ -142,12 +142,7 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
         return "Contacter le service"
 
     def get_context_data(self, **kwargs):
-        has_contact_to_display = (
-            self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
-        )
-        can_view_modal = has_contact_to_display and (
-            self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
-        )
+        can_view_modal = bool(self.object.contact_full_name or self.object.contact_email or self.object.contact_phone)
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)

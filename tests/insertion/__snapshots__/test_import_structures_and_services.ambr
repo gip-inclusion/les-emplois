@@ -1028,14 +1028,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1076,14 +1075,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1124,14 +1122,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1343,14 +1340,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1441,14 +1437,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1531,14 +1526,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1629,14 +1623,13 @@
                                            "contact_full_name",
                                            "contact_email",
                                            "contact_phone",
-                                           "contact_is_public",
                                            "average_orientation_response_delay_days",
                                            "updated_on",
                                            "is_active",
                                            "created_at",
                                            "updated_at",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({

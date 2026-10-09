@@ -57,21 +57,14 @@
 
                 {% if service.contact_full_name or service.contact_email or service.contact_phone %}
                     <div class="form-group col-12 col-lg-auto">
-                        {% if user.is_authenticated or service.contact_is_public %}
-                            <button class="btn btn-lg btn-outline-white btn-block justify-content-center"
-                                    type="button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#service-contact-modal"
-                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
-                                    {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
-                                {{ contact_button_label }}
-                            </button>
-                        {% else %}
-                            <a class="btn btn-lg btn-outline-white btn-block justify-content-center"
-                               type="button"
-                               href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}> {{ contact_button_label }} </a>
-                        {% endif %}
+                        <button class="btn btn-lg btn-outline-white btn-block justify-content-center"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#service-contact-modal"
+                                data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
+                                {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
+                            {{ contact_button_label }}
+                        </button>
                     </div>
                 {% endif %}
 

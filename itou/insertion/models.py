@@ -378,7 +378,6 @@ class Service(GeolocatedAddressMixin, models.Model):
     contact_full_name = models.CharField(verbose_name="contact", blank=True)
     contact_email = models.EmailField(verbose_name="e-mail du contact", blank=True)
     contact_phone = models.CharField(verbose_name="téléphone du contact", max_length=20, blank=True)
-    contact_is_public = models.BooleanField(verbose_name="informations du contact publiques", default=True)
 
     average_orientation_response_delay_days = models.PositiveIntegerField(
         verbose_name="temps moyen de réponse aux orientations (jour)", null=True
