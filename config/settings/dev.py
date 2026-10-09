@@ -92,9 +92,6 @@ DORA_AWS_S3_STORAGE_BUCKET_NAME = "doradev"
 
 SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
-# Don't use json formatter in dev
-del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
-
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
 
 OVERVIEW_TAB_TEST_DEPARTMENT = "13"

@@ -401,6 +401,9 @@ LOGGING = {
     },
 }
 
+if os.isatty(1):  # No json formatter for management command ran by humans:
+    del LOGGING["handlers"]["console"]["formatter"]
+
 DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = re.compile(
     r"""
     ^(
