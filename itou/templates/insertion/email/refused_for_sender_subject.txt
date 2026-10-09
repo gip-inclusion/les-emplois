@@ -1,6 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-
-    Votre demande d’orientation a été refusée
-
-{% endblock %}
+{% block subject %}Votre demande d’orientation a été refusée{% endblock %}

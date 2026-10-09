@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-{{ first_name|title }} {{ last_name|upper }} a rejoint votre structure.
-{% endblock %}
+{% block subject %}{{ first_name|title }} {{ last_name|upper }} a rejoint votre structure.{% endblock %}

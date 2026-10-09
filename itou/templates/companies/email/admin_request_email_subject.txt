@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-Demande d'attribution du statut d'administrateur
-{% endblock %}
+{% block subject %}Demande d'attribution du statut d'administrateur{% endblock %}
