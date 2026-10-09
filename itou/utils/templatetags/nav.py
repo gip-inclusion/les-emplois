@@ -102,7 +102,6 @@ NAV_ENTRIES = {
         active_view_names=[
             "directory:people_results",
             "directory:person_detail",
-            "directory:reveal_contact",
             "directory:send_message",
         ],
         is_beta=True,

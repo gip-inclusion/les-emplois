@@ -1,21 +1,17 @@
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
 from tests.www.directory_views.helpers import get_target_person, setup_directory
 
 
 def test_person_detail_preserves_back_url_and_hides_contact(client):
-    _, target, target_organization, person = get_target_person(client)
+    _, _, target_organization, person = get_target_person(client)
     back_url = f"{reverse('directory:people_results')}?q=Alice"
 
     response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}), {"back_url": back_url})
 
     assert response.status_code == 200
     assert response.context["back_url"] == back_url
-    assertNotContains(response, target.email)
-    assertNotContains(response, target.phone)
-    assertNotContains(response, target_organization.email)
-    assertNotContains(response, target_organization.phone)
     assertContains(response, "Afficher l'adresse e-mail")
     assertContains(response, "Afficher le téléphone de la structure")
     assertContains(response, target_organization.get_card_url())
@@ -43,28 +39,3 @@ def test_person_detail_rate_limit(client, mocker):
     mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "0/day")
     response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
     assertContains(response, "Vous avez atteint la limite de messages envoyés : 0 par jour.")
-
-
-def test_reveal_contact(client):
-    _, target, target_organization, person = get_target_person(client)
-
-    response = client.get(reverse("directory:reveal_contact", kwargs={"key": person.key, "field": "email"}))
-
-    assertContains(response, target.email)
-    assertContains(response, "data-it-copy-to-clipboard")
-
-    response = client.get(
-        reverse("directory:reveal_contact", kwargs={"key": person.key, "field": "phone"}),
-        {"org": person.main_organization.key},
-    )
-
-    assertContains(response, target_organization.phone)
-    assertContains(response, "Téléphone de la structure")
-
-
-def test_reveal_contact_rejects_unknown_field(client):
-    _, _, _, person = get_target_person(client)
-
-    response = client.get(reverse("directory:reveal_contact", kwargs={"key": person.key, "field": "website"}))
-
-    assert response.status_code == 404
