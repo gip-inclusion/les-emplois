@@ -611,7 +611,6 @@ class TestServices:
             uid="test-mobilization-link-uid",
             updated_on="2025-01-15",
             lien_mobilisation=external_link,
-            contact_is_public=True,
             structure__updated_on="2025-01-15",
         )
         service.mobilizations.add(mobilization)
@@ -634,7 +633,6 @@ class TestServices:
             uid="test-mobilization-link-private-uid",
             updated_on="2025-01-15",
             lien_mobilisation=external_link,
-            contact_is_public=False,
             structure__updated_on="2025-01-15",
         )
         service.mobilizations.add(mobilization)
@@ -651,7 +649,6 @@ class TestServices:
             uid="test-contact-phone-copy-uid",
             updated_on="2025-01-15",
             contact_phone="01 23 45 67 89",
-            contact_is_public=True,
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
@@ -825,7 +822,6 @@ class TestServices:
             uid="test-contact-auth-uid",
             updated_on="2025-01-15",
             contact_email="contact@example.com",
-            contact_is_public=False,
             structure__uid="test-structure-contact-auth-uid",
             structure__updated_on="2025-01-15",
         )
@@ -865,7 +861,6 @@ class TestServices:
             uid="test-contact-public-uid",
             updated_on="2025-01-15",
             contact_email="contact@example.com",
-            contact_is_public=True,
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
         )
@@ -873,23 +868,6 @@ class TestServices:
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
-
-    def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client):
-        service = ServiceFactory(
-            uid="test-contact-private-uid",
-            updated_on="2025-01-15",
-            contact_email="contact@example.com",
-            contact_is_public=False,
-            structure__uid="test-structure-contact-private-uid",
-            structure__updated_on="2025-01-15",
-        )
-        service_url = self.get_service_url(service)
-        response = client.get(service_url)
-        assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
-        assertContains(response, "Contacter le service par email")
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
-        assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory()
@@ -1066,10 +1044,7 @@ class TestServices:
         ],
     )
     def test_card_view_register_mobilization_event_per_user_kind(self, client, user_factory, assertion):
-        service = ServiceFactory(
-            contact_email="contact@example.com",
-            contact_is_public=True,
-        )
+        service = ServiceFactory(contact_email="contact@example.com")
         if user_factory:
             client.force_login(user_factory())
         response = client.get(self.get_service_url(service))

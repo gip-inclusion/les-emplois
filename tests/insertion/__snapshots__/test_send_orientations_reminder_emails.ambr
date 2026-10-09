@@ -226,7 +226,6 @@
                  "insertion_service"."contact_full_name",
                  "insertion_service"."contact_email",
                  "insertion_service"."contact_phone",
-                 "insertion_service"."contact_is_public",
                  "insertion_service"."average_orientation_response_delay_days",
                  "insertion_service"."updated_on",
                  "insertion_service"."is_active",
