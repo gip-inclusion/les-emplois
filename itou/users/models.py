@@ -377,6 +377,19 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         blank=True,
     )
 
+    email_tracking_consent = models.BooleanField(
+        verbose_name="consentement au suivi de l’ouverture des e-mails",
+        db_default=False,
+        default=False,
+    )
+    email_tracking_consent_updated_at = models.DateTimeField(
+        editable=False,
+        verbose_name="date du choix de suivi de l’ouverture des e-mails",
+        help_text="Vide si l’utilisateur n’a jamais été interrogé",
+        null=True,
+        blank=True,
+    )
+
     public_id = models.UUIDField(
         verbose_name="identifiant public",
         help_text="identifiant opaque, pour les API et les URLs publiques",
@@ -816,6 +829,19 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         if self.terms_accepted_at is None:
             return True
         return self.terms_accepted_at < get_latest_terms_datetime()
+
+    @property
+    def can_answer_email_tracking_consent(self):
+        return self.is_job_seeker or self.is_professional
+
+    @property
+    def must_answer_email_tracking_consent(self):
+        return self.can_answer_email_tracking_consent and self.email_tracking_consent_updated_at is None
+
+    def set_email_tracking_consent(self, consent):
+        """Record the user’s choice about email open tracking (tracking pixel), with its date as a proof."""
+        self.email_tracking_consent = consent
+        self.email_tracking_consent_updated_at = timezone.now()
 
     @cached_property
     def last_assignment(self):
