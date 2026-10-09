@@ -54,7 +54,7 @@ class BrevoClient:
 
         return False
 
-    def _import_contacts(self, users, list_id, serializer):
+    def _import_contacts(self, users, list_id, serializer, update_existing_contacts):
         try:
             response = self.client.post(
                 "/contacts/import",
@@ -62,7 +62,7 @@ class BrevoClient:
                     "listIds": [list_id],
                     "emailBlacklist": False,
                     "smsBlacklist": False,
-                    "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
+                    "updateExistingContacts": update_existing_contacts,
                     "emptyContactsAttributes": False,
                     "jsonBody": [serializer(user) for user in users],
                 },
@@ -77,10 +77,21 @@ class BrevoClient:
                 response.text,
             )
 
-    def import_users(self, users, list_id, serializer):
+    def import_users(self, users, list_id, serializer, *, update_existing_contacts=False):
+        """Import users as Brevo contacts of a list, in batches.
+
+        Imports are asynchronous: Brevo answers 202 and processes them later.
+
+        Args:
+            users: Users to import.
+            list_id: the Brevo list the imported contacts are added to. They are never removed from other lists.
+            serializer: function turning a user into a Brevo contact.
+            update_existing_contacts: by default, imports are meant for new contacts and leave existing ones
+                untouched. When True, existing contacts are also updated with the serialized attributes and added
+                to the list, and unknown ones are still created.
+        """
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
-            if batch:
-                self._import_contacts(batch, list_id, serializer)
+            self._import_contacts(batch, list_id, serializer, update_existing_contacts)
 
     def delete_contact(self, email):
         # Brevo rejects HTTP DELETE calls for addresses ending by
