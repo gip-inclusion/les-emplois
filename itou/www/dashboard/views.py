@@ -341,17 +341,20 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
+    with_email_tracking_consent = request.user.can_answer_email_tracking_consent
     if request.user.is_job_seeker:
         form = EditJobSeekerInfoForm(
             instance=request.user,
             editor=request.user,
             data=request.POST or None,
             back_url=request.get_full_path(),
+            with_email_tracking_consent=with_email_tracking_consent,
         )
     else:
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
+            with_email_tracking_consent=with_email_tracking_consent,
         )
 
     if request.method == "POST" and form.is_valid():
