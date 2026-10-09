@@ -21,6 +21,8 @@ from itou.utils.command import BaseCommand
 
 
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
+# The command runs daily: the overlap makes up for a missed or failed run
+EMAIL_TRACKING_CONSENT_UPDATE_WINDOW = datetime.timedelta(days=2)
 PROFESSIONAL_SSO_PROVIDERS = [IdentityProvider.PRO_CONNECT]
 JOB_SEEKER_SSO_PROVIDERS = [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]
 
@@ -43,14 +45,22 @@ def verified_email_or_sso(identity_providers):
     return has_verified_primary_email() | Q(identity_provider__in=identity_providers)
 
 
-def has_membership(membership_model, **filters):
-    """Condition on users having an active membership of the given model."""
-    return Exists(membership_model.objects.filter(user_id=OuterRef("pk"), **filters))
+def has_membership(membership_model, *, include_inactive=False, **filters):
+    """Condition on users having a membership of the given model, active by default.
+
+    Memberships are deactivated rather than deleted, so `include_inactive` also matches former members.
+    """
+    manager = membership_model.include_inactive if include_inactive else membership_model.objects
+    return Exists(manager.filter(user_id=OuterRef("pk"), **filters))
 
 
-def has_siae_membership():
+def has_siae_membership(*, include_inactive=False):
     """Condition on users being members of an SIAE, as opposed to other kinds of companies."""
-    return has_membership(CompanyMembership, company__kind__in=CompanyKind.siae_kinds())
+    return has_membership(
+        CompanyMembership,
+        include_inactive=include_inactive,
+        company__kind__in=CompanyKind.siae_kinds(),
+    )
 
 
 def email_tracking_consent_attributes(user):
@@ -99,33 +109,48 @@ def job_seeker_serializer(user):
     }
 
 
-def professional_audiences():
-    """Return the audiences of the professionals who are SIAE or prescriber members."""
+def professional_audiences(*, former=False):
+    """Return the audiences of the professionals who are SIAE or prescriber members.
+
+    Professionals who never were are left out: they were never sent to Brevo.
+
+    Args:
+        former: Return former members instead: users with an inactive membership and no active SIAE or prescriber
+            one. Someone now in a structure is only sent to the list of their current one. They are still in Brevo,
+            so their later consent answers must be updated there too.
+    """
     professionals = User.objects.filter(
         verified_email_or_sso(PROFESSIONAL_SSO_PROVIDERS),
         kind=UserKind.PROFESSIONAL,
         is_active=True,
     ).order_by("email")
+    name_suffix = ""
+    if former:
+        professionals = professionals.exclude(has_siae_membership() | has_membership(PrescriberMembership))
+        name_suffix = " (former members)"
     authorized_prescriber = has_membership(
         PrescriberMembership,
+        include_inactive=former,
         organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
     )
     return [
         Audience(
-            "SIAE users",
-            professionals.filter(has_siae_membership()),
+            f"SIAE users{name_suffix}",
+            professionals.filter(has_siae_membership(include_inactive=former)),
             BrevoListID.EMPLOYERS,
             employer_serializer,
         ),
         Audience(
-            "Prescribers",
+            f"Prescribers{name_suffix}",
             professionals.filter(authorized_prescriber),
             BrevoListID.PRESCRIBERS,
             authorized_prescriber_serializer,
         ),
         Audience(
-            "Orienteurs",
-            professionals.filter(has_membership(PrescriberMembership)).exclude(authorized_prescriber),
+            f"Orienteurs{name_suffix}",
+            professionals.filter(has_membership(PrescriberMembership, include_inactive=former)).exclude(
+                authorized_prescriber
+            ),
             BrevoListID.PRESCRIBERS,
             prescriber_serializer,
         ),
@@ -182,6 +207,28 @@ def daily_audiences():
     ]
 
 
+def email_tracking_consent_audiences():
+    """Return the audiences of the users who recently answered the email tracking consent, each in their Brevo list.
+
+    Importing them updates the contacts Brevo knows, and creates the others in that list. Each answer is sent by
+    every run within the update window.
+    """
+    recently_answered = Q(email_tracking_consent_updated_at__gte=timezone.now() - EMAIL_TRACKING_CONSENT_UPDATE_WINDOW)
+    audiences = [
+        *professional_audiences(),
+        # Former members left their structure but remain in Brevo
+        *professional_audiences(former=True),
+        Audience("Job seekers", job_seekers(), BrevoListID.CANDIDATS, job_seeker_serializer),
+    ]
+    return [
+        audience._replace(
+            name=f"{audience.name} with a recent email tracking consent answer",
+            users=audience.users.filter(recently_answered),
+        )
+        for audience in audiences
+    ]
+
+
 class Command(BaseCommand):
     ATOMIC_HANDLE = False
     AUTO_TRIGGER_CONTEXT = False
@@ -207,12 +254,17 @@ class Command(BaseCommand):
     )
     def handle(self, *args, wet_run, **options):
         client = BrevoClient()
+        # Imports are asynchronous, so these passes don't depend on each other. A user in both
+        # is sent twice with the same consent, which is harmless.
         self.import_audiences(client, daily_audiences(), wet_run=wet_run)
+        self.import_audiences(
+            client, email_tracking_consent_audiences(), wet_run=wet_run, update_existing_contacts=True
+        )
 
-    def import_audiences(self, client, audiences, *, wet_run):
+    def import_audiences(self, client, audiences, *, wet_run, update_existing_contacts=False):
         """Log the size of each audience, and import it into its Brevo list on a wet run."""
         for name, users, list_id, serializer in audiences:
             users = list(users)
             self.logger.info("%s count: %d", name, len(users))
             if wet_run:
-                client.import_users(users, list_id, serializer)
+                client.import_users(users, list_id, serializer, update_existing_contacts=update_existing_contacts)

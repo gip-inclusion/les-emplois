@@ -1,3 +1,5 @@
+import json
+
 import httpx
 import pytest
 from django.conf import settings
@@ -65,11 +67,27 @@ def test_import_users(respx_mock, caplog, status_code, content, brevo_client):
         )
 
 
+def test_import_users_update_existing_contacts(respx_mock, brevo_client):
+    user = JobSeekerFactory()
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(return_value=httpx.Response(202))
+
+    brevo_client.import_users([user], 31, lambda x: {"email": x.email}, update_existing_contacts=True)
+
+    assert json.loads(route.calls.last.request.content) == {
+        "listIds": [31],
+        "emailBlacklist": False,
+        "smsBlacklist": False,
+        "updateExistingContacts": True,
+        "emptyContactsAttributes": False,
+        "jsonBody": [{"email": user.email}],
+    }
+
+
 def test_import_contacts_request_error(mocker, caplog, brevo_client):
     mocker.patch("itou.utils.brevo.httpx.Client.post", side_effect=httpx.RequestError("Connection timed out"))
 
     with pytest.raises(httpx.RequestError):
-        brevo_client._import_contacts([{"email": "user1@example.com"}], 1, lambda x: x)
+        brevo_client.import_users([{"email": "user1@example.com"}], 1, lambda x: x)
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == "Brevo API: Request failed: Connection timed out"
