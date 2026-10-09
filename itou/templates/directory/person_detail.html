@@ -142,7 +142,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="back_url" value="{{ back_url }}">
                                 {% bootstrap_form contact_form alert_error_type="all" %}
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary js-prevent-multiple-submit">
                                     <i class="ri-send-plane-line" aria-hidden="true"></i>
                                     <span>Envoyer</span>
                                 </button>
