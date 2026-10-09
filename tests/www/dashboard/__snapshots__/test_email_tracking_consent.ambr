@@ -1,0 +1,101 @@
+# serializer version: 1
+# name: TestEmailTrackingConsent.test_get[EmployerFactory]
+  '''
+  <div class="c-form">
+      <h2 class="h3">
+          Aidez-nous à améliorer nos communications
+      </h2>
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <p>
+          Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
+      Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
+      </p>
+      <div class="form-group form-group-required">
+          <label class="form-label">
+              Acceptez-vous que La plateforme de l’inclusion mesure l’ouverture de vos e-mails afin d’améliorer ses communications ?
+          </label>
+          <div id="id_email_tracking_consent">
+              <div class="form-check">
+                  <input class="form-check-input" id="id_email_tracking_consent_0" name="email_tracking_consent" required="" type="radio" value="True"/>
+                  <label class="form-check-label" for="id_email_tracking_consent_0">
+                      J’accepte
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" id="id_email_tracking_consent_1" name="email_tracking_consent" required="" type="radio" value="False"/>
+                  <label class="form-check-label" for="id_email_tracking_consent_1">
+                      Je refuse
+                  </label>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Enregistrer mon choix et continuer" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Continuer
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestEmailTrackingConsent.test_get[JobSeekerFactory]
+  '''
+  <div class="c-form">
+      <h2 class="h3">
+          Aidez-nous à améliorer nos communications
+      </h2>
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <p>
+          Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
+      Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
+      </p>
+      <div class="form-group form-group-required">
+          <label class="form-label">
+              Acceptez-vous que La plateforme de l’inclusion mesure l’ouverture de vos e-mails afin d’améliorer ses communications ?
+          </label>
+          <div id="id_email_tracking_consent">
+              <div class="form-check">
+                  <input class="form-check-input" id="id_email_tracking_consent_0" name="email_tracking_consent" required="" type="radio" value="True"/>
+                  <label class="form-check-label" for="id_email_tracking_consent_0">
+                      J’accepte
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" id="id_email_tracking_consent_1" name="email_tracking_consent" required="" type="radio" value="False"/>
+                  <label class="form-check-label" for="id_email_tracking_consent_1">
+                      Je refuse
+                  </label>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Enregistrer mon choix et continuer" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Continuer
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
