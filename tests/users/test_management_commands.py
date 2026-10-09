@@ -7,7 +7,6 @@ import pytest
 from allauth.account import models as allauth_models
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
 from django.template.defaultfilters import pluralize
@@ -239,11 +238,18 @@ def test_shorten_active_sessions():
 
 class TestCommandSendUsersToBrevo:
     @pytest.fixture(autouse=True)
-    def setup(self, settings):
+    def setup(self, settings, respx_mock):
         settings.BREVO_API_KEY = "BREVO_API_KEY"
+        self.import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+
+    def imports(self):
+        """Return the payloads sent to the Brevo import endpoint."""
+        return [json.loads(call.request.content) for call in self.import_mock.calls]
 
     @freeze_time("2023-05-01T23:30:00Z")
-    def test_wet_run_siae(self, caplog, respx_mock, snapshot):
+    def test_wet_run_siae(self, caplog, snapshot):
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using ProConnect
@@ -302,12 +308,9 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=dave, company__kind=CompanyKind.ETTI)
         CompanyMembershipFactory(user=eve, company__kind=CompanyKind.EITI)
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
@@ -366,7 +369,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_siae")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
+    def test_wet_run_prescribers(self, caplog, snapshot):
         pe = PrescriberOrganizationFactory(france_travail=True)
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
         alice = ProfessionalFactory(
@@ -402,13 +405,9 @@ class TestCommandSendUsersToBrevo:
             with triggers.fake_context():
                 changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
@@ -440,7 +439,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_prescribers")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
+    def test_wet_run_orienteurs(self, caplog, snapshot):
         # Prescribers without memberships are ignored
         ProfessionalFactory(
             first_name="Billy",
@@ -476,13 +475,9 @@ class TestCommandSendUsersToBrevo:
         with triggers.fake_context():
             changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
@@ -505,7 +500,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_orienteurs")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_job_seekers(self, caplog, respx_mock, snapshot):
+    def test_wet_run_job_seekers(self, caplog, snapshot):
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
@@ -544,13 +539,9 @@ class TestCommandSendUsersToBrevo:
             verified=False,
         )
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.CANDIDATS],
                 "emailBlacklist": False,
@@ -584,7 +575,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_job_seekers")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_stalled_autonomous_job_seekers(self, caplog, respx_mock):
+    def test_wet_run_stalled_autonomous_job_seekers(self, caplog):
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
@@ -595,17 +586,13 @@ class TestCommandSendUsersToBrevo:
             jobseeker_profile__is_stalled=True,
         )
         JobSeekerFactory(with_verified_email=True)
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
 
         call_command("send_users_to_brevo", wet_run=True)
 
         # Employers and prescribers are created by the factories, ignore them.
         assert "Job seekers count: 2" in caplog.messages
         assert "Stalled autonomous job seekers count: 1" in caplog.messages
-        autonomous_job_seeker_mock_call = import_mock.calls[-1]
-        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
+        assert self.imports()[-1] == {
             "listIds": [BrevoListID.CANDIDATS_AUTONOMES_BLOQUES],
             "emailBlacklist": False,
             "smsBlacklist": False,
@@ -626,7 +613,7 @@ class TestCommandSendUsersToBrevo:
         }
 
     @freeze_time("2025-06-25")
-    def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog, respx_mock):
+    def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog):
         billy = IAEEligibilityDiagnosisFactory(
             job_seeker__first_name="Willy",
             job_seeker__last_name="Boo",
@@ -666,21 +653,18 @@ class TestCommandSendUsersToBrevo:
             job_seeker__last_login=None,
             from_prescriber=True,
         )
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
 
         call_command("send_users_to_brevo", wet_run=True)
 
         # Employers and prescribers are created by the factories, ignore them.
         assert "Job seekers count: 5" in caplog.messages
         assert "Autonomous job seekers with IAE diag and no accepted applications count: 1" in caplog.messages
-        [autonomous_job_seeker_mock_call] = [
-            call
-            for call in import_mock.calls
-            if json.loads(call.request.content)["listIds"] == [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC]
+        [autonomous_job_seekers_import] = [
+            payload
+            for payload in self.imports()
+            if payload["listIds"] == [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC]
         ]
-        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
+        assert autonomous_job_seekers_import == {
             "listIds": [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC],
             "emailBlacklist": False,
             "smsBlacklist": False,
@@ -701,7 +685,7 @@ class TestCommandSendUsersToBrevo:
         }
 
     @freeze_time("2023-05-02")
-    def test_wet_run_batch(self, caplog, respx_mock, mocker, snapshot):
+    def test_wet_run_batch(self, caplog, mocker, snapshot):
         annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
@@ -715,14 +699,11 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
         mocker.patch("itou.users.management.commands.send_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
@@ -763,20 +744,18 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_batch")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_errors(self, caplog, respx_mock, snapshot):
+    def test_wet_run_errors(self, caplog, snapshot):
         annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(400, json={})
-        )
+        self.import_mock.mock(return_value=httpx.Response(400, json={}))
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
