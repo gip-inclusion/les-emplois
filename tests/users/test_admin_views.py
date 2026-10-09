@@ -537,6 +537,31 @@ def test_change_hides_permission_section_on_regular_users(client, superuser, ass
     assertNotContains(response, user_permissions_markup)
 
 
+@pytest.mark.parametrize(
+    "factory,expected",
+    [
+        (partial(JobSeekerFactory, email_tracking_consent_updated_at=None), "En attente de réponse"),
+        (partial(JobSeekerFactory, email_tracking_consent=True), "Accepté"),
+        (partial(ProfessionalFactory, email_tracking_consent=False), "Refusé"),
+        (ItouStaffFactory, "-"),
+    ],
+)
+def test_change_shows_email_tracking_consent_status(admin_client, factory, expected):
+    viewed = factory()
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": viewed.pk}))
+    [status] = parse_response_to_soup(response, ".field-email_tracking_consent_status").select(".readonly")
+    assert status.get_text(strip=True) == expected
+
+
+def test_change_does_not_allow_editing_email_tracking_consent(admin_client):
+    viewed = JobSeekerFactory()
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": viewed.pk}))
+    form_fields = response.context["adminform"].form.fields
+    assert "email_tracking_consent" not in form_fields
+    assert "email_tracking_consent_updated_at" not in form_fields
+    assertNotContains(response, 'name="email_tracking_consent')
+
+
 def test_change_shows_permission_section_on_staff_users(client):
     viewed = ItouStaffFactory(is_staff=True)
     user = ItouStaffFactory(is_superuser=True, is_staff=True)
