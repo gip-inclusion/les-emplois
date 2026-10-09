@@ -422,8 +422,21 @@
                                        aria-label="Contact par mail"
                                        class="text-break">{{ service.contact_email }}</a>
                                 </div>
-                                {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
-                                {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}
+                                {% if can_orient_towards_insertion_service %}
+
+                                    <button class="btn btn-lg btn-outline-white btn-block justify-content-center"
+                                            type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#service-send-email-modal">
+                                        Écrire un email à {{ service.contact_email }}
+                                    </button>
+
+
+                                {% endif %}
+                                {% if not can_orient_towards_insertion_service %}
+                                    {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
+                                    {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}
+                                {% endif %}
                             </div>
                         {% endif %}
                         {% if service.contact_phone %}
@@ -439,7 +452,9 @@
                 </div>
             </div>
         </div>
-
+    {% endif %}
+    {% if can_view_send_email_modal %}
+        {% include "insertion/includes/service_send_email_modal.html" with service=service send_email_form=send_email_form request=request csrf_token=csrf_token only %}
     {% endif %}
 {% endblock %}
 

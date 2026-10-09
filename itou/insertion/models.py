@@ -19,6 +19,7 @@ from django_xworkflows import models as xwf_models
 from xworkflows import after_transition, before_transition
 
 import itou.insertion.notifications as orientation_notifications
+from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.files.models import File
 from itou.insertion.enums import (
@@ -33,6 +34,7 @@ from itou.insertion.enums import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
+from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 from itou.utils.emails import get_email_message
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.urls import get_absolute_url
@@ -627,6 +629,46 @@ class MobilizationEvent(models.Model):
                 | (~models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & models.Q(service_external_link="")),
             ),
         ]
+
+
+class MobilizationEmail(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="+")
+    mobilization_event = models.ForeignKey(MobilizationEvent, on_delete=models.SET_NULL, null=True, related_name="+")
+    sender = models.ForeignKey(User, verbose_name="utilisateur", on_delete=models.CASCADE, null=True, related_name="+")
+    sender_prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prescriptrice émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="+",
+    )
+    sender_company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="+",
+    )
+    sent_at = models.DateTimeField(verbose_name="date d’envoi du mail", auto_now_add=True)
+    answered_at = models.DateTimeField(verbose_name="date d’envoi de la réponse", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "mise en relation par mail"
+        verbose_name_plural = "mises en relation par mail"
+
+    def free_form_email_to_service(self, body_message):
+        inbound_parsing_email = generate_inbound_parsing_address(InboundParsingKind.SERVICE_ANSWER)
+        sender_organization = self.sender_prescriber_organization or self.sender_company
+
+        to = [self.service.contact_email]
+        reply_to = [self.sender.email, inbound_parsing_email]
+        context = {"sender": self.sender, "sender_organization": sender_organization, "body": body_message}
+
+        subject = "insertion/email/free_form_email_to_service_subject.txt"
+        body = "insertion/email/free_form_email_to_service_body.md"
+        return get_email_message(to, context, subject, body, reply_to=reply_to)
 
 
 class OrientationWorkflow(xwf_models.Workflow):

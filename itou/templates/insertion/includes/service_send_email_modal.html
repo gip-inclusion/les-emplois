@@ -1,0 +1,45 @@
+{% load django_bootstrap5 %}
+<div class="modal fade"
+     id="service-send-email-modal"
+     tabindex="-1"
+     aria-labelledby="service-send-email-label"
+     aria-modal="true"
+     role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="service-send-email-modal-label">Contacter{% if service.contact_full_name %} {{ service.contact_full_name }}{% endif %} par mail {{ service.contact_email }}</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            {% partialdef service-send-email-form inline %}
+                <form id="service-send-email-form"
+                      class="js-prevent-multiple-submit"
+                      hx-post="{{ request.path }}"
+                      hx-target="#service-send-email-form"
+                      hx-swap="outerHTML">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {% bootstrap_field send_email_form.body %}
+                        {% bootstrap_form_errors send_email_form type="all" %}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-primary btn-sm"
+                                data-bs-dismiss="modal"
+                                aria-label="Annuler l’envoi du mail"
+                                type="button">Annuler</button>
+                        <button class="btn btn-primary btn-sm"
+                                aria-label="Envoyer le mail"
+                                type="submit">Envoyer</button>
+                    </div>
+                </form>
+            {% endpartialdef %}
+        </div>
+    </div>
+</div>
+
+{% partialdef email-sent %}
+    <div class="modal-body">Le message a bien été envoyé.</div>
+    <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" data-bs-dismiss="modal" aria-label="Fermer" type="button">Fermer</button>
+    </div>
+{% endpartialdef %}

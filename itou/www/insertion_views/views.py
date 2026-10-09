@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
@@ -55,6 +56,7 @@ from itou.www.insertion_views.forms import (
     OrientationSelectJobSeekerForm,
     OrientationsFilterForm,
     RefusalOrientationForm,
+    SendEmailForm,
 )
 from itou.www.utils.wizard import WizardView
 
@@ -101,7 +103,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
         }
 
 
-class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
+class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     model = insertion_models.Service
     queryset = insertion_models.Service.objects.select_related(
         "source",
@@ -141,6 +143,19 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
             return "Contacter le service par email"
         return "Contacter le service"
 
+    def get_send_email_form(self, request, job_seeker):
+        email_context = {
+            "service": self.object,
+            "job_seeker": job_seeker,
+            "sender": request.user,
+            "can_view_personal_information": can_view_personal_information(request, job_seeker)
+            if job_seeker
+            else False,
+        }
+        prefilled_body = get_template("insertion/send_email_service_prefilled_body.txt").render(email_context).strip()
+        form = SendEmailForm(initial={"body": prefilled_body}, data=request.POST or None)
+        return form
+
     def get_context_data(self, **kwargs):
         has_contact_to_display = (
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
@@ -148,9 +163,14 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
         can_view_contact_modal = has_contact_to_display and (
             self.object.contact_is_public or self.request.user.is_authenticated and not self.request.user.is_job_seeker
         )
+        can_view_send_email_modal = bool(self.object.contact_email) and can_orient_towards_insertion_service(
+            self.request
+        )
+        orient_for_job_seeker_context = get_orient_for_job_seeker_context(self.request)
+        send_email_form = self.get_send_email_form(self.request, orient_for_job_seeker_context.get("job_seeker"))
         return (
             super().get_context_data(**kwargs)
-            | get_orient_for_job_seeker_context(self.request)
+            | orient_for_job_seeker_context
             | {
                 "formatted_opening_hours": format_osm_hours(self.object.opening_hours),
                 "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("search:services_home")),
@@ -160,9 +180,45 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
                 "formatted_categories": self.format_categories(),
                 "contact_button_label": self.get_contact_button_label(),
                 "can_view_contact_modal": can_view_contact_modal,
+                "can_view_send_email_modal": can_view_send_email_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
+                "send_email_form": send_email_form,
             }
         )
+
+    def post(self, request, *args, **kwargs):
+        if not request.htmx or not can_orient_towards_insertion_service(request):
+            raise PermissionDenied
+        self.object = self.get_object()
+        orient_for_job_seeker_context = get_orient_for_job_seeker_context(request)
+        send_email_form = self.get_send_email_form(request, orient_for_job_seeker_context.get("job_seeker"))
+        partial_name = "#service-send-email-form"
+        if send_email_form.is_valid():
+            prescriber_organization = request.current_organization if request.from_prescriber else None
+            company = request.current_organization if request.from_employer else None
+            mobilization_event = (
+                insertion_models.MobilizationEvent.objects.filter(
+                    user=request.user,
+                    prescriber_organization=prescriber_organization,
+                    company=company,
+                    service=self.object,
+                    created_at__gte=timezone.now() - datetime.timedelta(hours=6),
+                )
+                .order_by("-created_at")
+                .first()
+            )
+            mobilization_email = insertion_models.MobilizationEmail.objects.create(
+                service=self.object,
+                mobilization_event=mobilization_event,
+                sender=request.user,
+                sender_prescriber_organization=prescriber_organization,
+                sender_company=company,
+            )
+            mobilization_email.free_form_email_to_service(body_message=send_email_form.cleaned_data["body"]).send()
+            partial_name = "#email-sent"
+
+        context = {"send_email_form": send_email_form}
+        return render(request, "insertion/includes/service_send_email_modal.html" + partial_name, context)
 
 
 @login_not_required

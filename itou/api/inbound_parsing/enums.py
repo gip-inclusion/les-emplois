@@ -2,4 +2,4 @@ import enum
 
 
 class InboundParsingKind(enum.StrEnum):
-    SERVICE_ANSWER = "service"
+    SERVICE_ANSWER = "sa"

@@ -1,0 +1,17 @@
+{% load format_filters %}
+Bonjour,
+
+Je souhaiterais orienter un usager vers votre service "{{ service.name }}".
+
+TODO
+
+{% if job_seeker and can_view_personal_information %}Informations personnelles {% if job_seeker.jobseeker_profile.age or job_seeker.jobseeker_profile.city %}Celui-ci{% if job_seeker.jobseeker_profile.age %} a {{ job_seeker.jobseeker_profile.age }} ans{% endif %}{% if job_seeker.jobseeker_profile.age and job_seeker.jobseeker_profile.city %} et {% endif %}{% if job_seeker.city %} habite à {{ job_seeker.city }}{% if job_seeker.department %} ({{ job_seeker.department }}){% endif %}{% endif %}.{% endif %}{% endif %}
+
+Mes coordonnées :
+- Email : {{ sender.email }}{% if sender.phone %}
+- Téléphone : {{ sender.phone|format_phone }}{% endif %}
+
+Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+
+Cordialement,
+{{ sender.get_full_name }}

@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+    {{ sender.get_full_name }} de la structure {{ sender_organization.display_name }} souhaite vous adresser un bénéficiaire
+
+{% endblock %}
