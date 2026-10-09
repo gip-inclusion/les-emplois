@@ -49,7 +49,8 @@ compile-deps: $(VIRTUAL_ENV)
 	uv pip compile $(PIP_COMPILE_FLAGS) -o dev.txt dev.in
 
 quality: $(VIRTUAL_ENV)
-	ruff format --check $(LINTER_CHECKED_DIRS)
+	# TODO(xfernandez): remove --target-version py313 when everything is OK with Python 3.14
+	ruff format --check --target-version py313 $(LINTER_CHECKED_DIRS)
 	ruff check $(LINTER_CHECKED_DIRS)
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
