@@ -15,7 +15,26 @@ from itou.directory.models import DirectoryProfile
 from itou.emails.utils import validate_email_address
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.brand import product_name
 from itou.utils.urls import get_zendesk_form_url
+
+
+def email_tracking_consent_field():
+    """Build the field asking users whether they consent to email open tracking (tracking pixel)."""
+    return forms.TypedChoiceField(
+        label=(
+            f"Acceptez-vous que {product_name()} mesure l’ouverture de vos e-mails "
+            "afin d’améliorer ses communications ?"
+        ),
+        choices=[(True, "J’accepte"), (False, "Je refuse")],
+        coerce=lambda value: str(value) == "True",
+        empty_value=None,
+        widget=forms.RadioSelect,
+    )
+
+
+class EmailTrackingConsentForm(forms.Form):
+    email_tracking_consent = email_tracking_consent_field()
 
 
 class SSOReadonlyMixin:
