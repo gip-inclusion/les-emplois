@@ -24,6 +24,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
+EMAIL_TRACKING_CONSENT_FIELD_ID = "id_email_tracking_consent"
 
 
 class TestEditJobSeekerInfo:
@@ -117,6 +118,36 @@ class TestEditJobSeekerInfo:
 
         assert form.is_valid()
         assert form.has_changed()
+
+    def test_third_party_cannot_answer_email_tracking_consent(self):
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            with_ban_geoloc_address=True,
+            title="M",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            email_tracking_consent=False,
+        )
+        answered_at = job_seeker.email_tracking_consent_updated_at
+        post_data = {
+            "email": job_seeker.email,
+            "title": job_seeker.title,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_place": job_seeker.jobseeker_profile.birth_place.pk,
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "email_tracking_consent": "True",
+        }
+        form = EditJobSeekerInfoForm(instance=job_seeker, editor=ProfessionalFactory(), data=post_data)
+
+        assert form.has_email_tracking_consent_field is False
+        assert form.is_valid(), form.errors
+        form.save(commit=False)
+        assert job_seeker.email_tracking_consent is False
+        assert job_seeker.email_tracking_consent_updated_at == answered_at
 
     @pytest.mark.parametrize("born_in_france", [True, False])
     def test_display_modal_when_form_changed(self, client, mocker, snapshot, born_in_france):
@@ -547,6 +578,7 @@ class TestEditJobSeekerInfo:
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(url)
         assert response.status_code == 200
+        assertNotContains(response, EMAIL_TRACKING_CONSENT_FIELD_ID)
 
     def test_edit_by_prescriber_of_organization(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
