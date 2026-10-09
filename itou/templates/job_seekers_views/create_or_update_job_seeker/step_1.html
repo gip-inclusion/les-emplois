@@ -1,5 +1,6 @@
 {% extends "job_seekers_views/create_or_update_job_seeker/step_base.html" %}
 {% load django_bootstrap5 %}
+{% load support %}
 {% load theme_inclusion %}
 
 {% block progress_title %}
@@ -27,40 +28,38 @@
         {% endif %}
     </fieldset>
 
-    {% if confirmation_needed %}
+    {% if job_seeker_already_exists %}
         <!-- Modal -->
         <div class="modal"
-             id="email-confirmation-modal"
+             id="job-seeker-already-exists-modal"
              tabindex="-1"
              role="dialog"
-             aria-labelledby="email-confirmation-label"
+             aria-labelledby="job-seeker-already-exists-label"
              aria-modal="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3 class="modal-title" id="email-confirmation-label">Attention</h3>
+                        <h3 class="modal-title" id="job-seeker-already-exists-label">Compte usager déjà existant</h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <p>
                             <strong>
-                                D'après les informations renseignées, il semblerait que cet
-                                usager soit déjà rattaché à un autre email : {{ redacted_existing_email }}.
+                                Les informations saisies correspondent à un compte existant,
+                                associé à l’adresse {{ redacted_existing_email }}.
                             </strong>
                         </p>
                         <p>
-                            Nous vous invitons à vérifier l'email renseigné précédemment
-                            afin d'éviter la création d'un compte en doublon.
+                            La création d’un second compte pour cet usager n’est pas autorisée.
+                            Pour poursuivre, veuillez renseigner l’adresse email associée à ce compte.
                         </p>
                     </div>
                     <div class="modal-footer">
-                        {# Go to the next step. #}
-                        <button type="submit"
-                                name="confirm"
-                                value="1"
-                                class="btn btn-sm btn-outline-primary">Poursuivre la création du compte</button>
+                        {# Go tell the support. #}
+                        <a href="{% zendesk_form_url request=request subject=support_subject description=support_description %}"
+                           class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto">Je ne connais pas cette adresse</a>
                         {# Reload this page with a new form. #}
-                        <a href="{{ back_url }}" class="btn btn-sm btn-primary">Modifier l'email de l’usager</a>
+                        <a href="{{ back_url }}" class="btn btn-sm btn-primary">Renseigner l’adresse email</a>
                     </div>
                 </div>
             </div>
@@ -70,13 +69,13 @@
 
 {% block script %}
     {{ block.super }}
-    {% if confirmation_needed %}
-        {# Show the confirmation modal after submitting the form. #}
+    {% if job_seeker_already_exists %}
+        {# Show the modal after submitting the form. #}
         <script nonce="{{ csp_nonce }}">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
-            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");
-            emailConfirmationModal.show();
+            const jobSeekerAlreadyExistsModal = new bootstrap.Modal("#job-seeker-already-exists-modal");
+            jobSeekerAlreadyExistsModal.show();
         </script>
     {% endif %}
 {% endblock %}
