@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import itertools
+import uuid
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -20,12 +21,18 @@ from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrati
 from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason, AssessmentState
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.geo.utils import coords_to_geometry
-from itou.insertion.enums import MobilizationEventKind
+from itou.insertion.enums import MobilizationEventKind, OrientationStatus
 from itou.institutions.enums import InstitutionKind
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Rome
-from itou.metabase.tables import geiq_assessments, job_applications, job_seeker_assignments, mobilization_events
+from itou.metabase.tables import (
+    geiq_assessments,
+    job_applications,
+    job_seeker_assignments,
+    mobilization_events,
+    orientations,
+)
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, ActionKind, AssignmentEndReason, IdentityProvider
@@ -1541,6 +1548,83 @@ def test_populate_mobilization_events(snapshot):
             "external_link": "",
             "orientation_id": str(orientation.id),
             "beneficiary_id": orientation.beneficiary_id,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_orientations(snapshot):
+    company_membership = CompanyMembershipFactory()
+    prescriber_membership = PrescriberMembershipFactory()
+
+    accepted_orientation = OrientationFactory(
+        id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        status=OrientationStatus.ACCEPTED,
+        processing_date=datetime.datetime(2023, 2, 15, 12, tzinfo=datetime.UTC),
+        data_protection_commitment=True,
+        sender=prescriber_membership.user,
+        sender_prescriber_organization=prescriber_membership.organization,
+    )
+    pending_orientation = OrientationFactory(
+        id=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        status=OrientationStatus.PENDING,
+        processing_date=None,
+        sender=company_membership.user,
+        sender_company=company_membership.company,
+        sender_prescriber_organization=None,
+        sender_kind=SenderKind.EMPLOYER,
+        data_protection_commitment=False,
+        last_reminder_email_sent_at=datetime.datetime(2023, 2, 16, 12, tzinfo=datetime.UTC),
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="orientations")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {orientations.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": accepted_orientation.pk,
+            "creation_date": accepted_orientation.created_at,
+            "processing_date": accepted_orientation.processing_date,
+            "status": OrientationStatus.ACCEPTED.value,
+            "service_uid": accepted_orientation.service.uid,
+            "structure_uid": accepted_orientation.service.structure.uid,
+            "beneficiary_id": accepted_orientation.beneficiary_id,
+            "beneficiary_public_id": accepted_orientation.beneficiary.public_id,
+            "sender_id": accepted_orientation.sender_id,
+            "sender_public_id": accepted_orientation.sender.public_id,
+            "sender_kind": "emplois_" + SenderKind.PRESCRIBER.value,
+            "sender_prescriber_organization_id": accepted_orientation.sender_prescriber_organization_id,
+            "sender_prescriber_organization_public_id": accepted_orientation.sender_prescriber_organization.uid,
+            "sender_company_id": None,
+            "sender_company_public_id": None,
+            "data_protection_commitment": True,
+            "last_reminder_email_sent_at": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": pending_orientation.pk,
+            "creation_date": pending_orientation.created_at,
+            "processing_date": pending_orientation.processing_date,
+            "status": OrientationStatus.PENDING.value,
+            "service_uid": pending_orientation.service.uid,
+            "structure_uid": pending_orientation.service.structure.uid,
+            "beneficiary_id": pending_orientation.beneficiary_id,
+            "beneficiary_public_id": pending_orientation.beneficiary.public_id,
+            "sender_id": pending_orientation.sender_id,
+            "sender_public_id": pending_orientation.sender.public_id,
+            "sender_kind": "emplois_" + SenderKind.EMPLOYER.value,
+            "sender_prescriber_organization_id": None,
+            "sender_prescriber_organization_public_id": None,
+            "sender_company_id": pending_orientation.sender_company_id,
+            "sender_company_public_id": pending_orientation.sender_company.uid,
+            "data_protection_commitment": False,
+            "last_reminder_email_sent_at": pending_orientation.last_reminder_email_sent_at,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
