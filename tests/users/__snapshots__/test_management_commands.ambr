@@ -53,6 +53,150 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
+      'SIAE users with a recent email tracking consent answer count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_email_tracking_consents_professionals[send_users_to_brevo_email_tracking_consents_professionals]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -92,6 +236,51 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
+      'SIAE users with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 400 Bad Request"',
+    ),
+    tuple(
+      'itou.utils.brevo',
+      40,
+      'Brevo API: Some emails were not imported, status_code=400, content={}',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -117,6 +306,46 @@
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'Job seekers count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 3',
     ),
     tuple(
       'httpx',
@@ -160,6 +389,51 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
+      'SIAE users with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -194,6 +468,46 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
+      'SIAE users with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -224,6 +538,51 @@
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users with a recent email tracking consent answer count: 5',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users (former members) with a recent email tracking consent answer count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs (former members) with a recent email tracking consent answer count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers with a recent email tracking consent answer count: 0',
     ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',

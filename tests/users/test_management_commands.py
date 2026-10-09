@@ -244,9 +244,10 @@ class TestCommandSendUsersToBrevo:
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
-    def imports(self):
-        """Return the payloads sent to the Brevo import endpoint."""
-        return [json.loads(call.request.content) for call in self.import_mock.calls]
+    def imports(self, *, update_existing_contacts=False):
+        """Return the payloads of the daily import, or of the email tracking consent update."""
+        payloads = [json.loads(call.request.content) for call in self.import_mock.calls]
+        return [payload for payload in payloads if payload["updateExistingContacts"] is update_existing_contacts]
 
     @freeze_time("2023-05-01T23:30:00Z")
     def test_wet_run_siae(self, caplog, snapshot):
@@ -823,6 +824,136 @@ class TestCommandSendUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_errors")
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_job_seekers(self, caplog):
+        now = timezone.now()
+        long_ago = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
+        # Not part of the daily import, sent all the same
+        annie = JobSeekerFactory(
+            first_name="Annie",
+            last_name="Amma",
+            email="annie.amma@mailinator.com",
+            date_joined=long_ago,
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+            email_tracking_consent=True,
+            email_tracking_consent_updated_at=now - datetime.timedelta(days=1),
+        )
+        never_answered = JobSeekerFactory(with_verified_email=True, email_tracking_consent_updated_at=None)
+        # Answered before the update window: already sent to Brevo
+        JobSeekerFactory(
+            date_joined=long_ago,
+            with_verified_email=True,
+            email_tracking_consent_updated_at=now - datetime.timedelta(days=3),
+        )
+        # Inactive users are ignored
+        JobSeekerFactory(date_joined=long_ago, with_verified_email=True, is_active=False)
+        # Email not verified, and no SSO to verify it: ignored
+        JobSeekerFactory(date_joined=long_ago, identity_provider=IdentityProvider.DJANGO)
+        # Part of the daily import too
+        bob = JobSeekerFactory(
+            first_name="Bob",
+            last_name="Bailey",
+            email="bob.bailey@mailinator.com",
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+        )
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert "Job seekers with a recent email tracking consent answer count: 2" in caplog.messages
+        assert self.imports(update_existing_contacts=True) == [
+            {
+                "listIds": [BrevoListID.CANDIDATS],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": True,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "annie.amma@mailinator.com",
+                        "attributes": {
+                            "prenom": "Annie",
+                            "nom": "AMMA",
+                            "date_inscription": "2024-01-01",
+                            "departement": "67",
+                            "id": annie.pk,
+                            "_PIXEL_TRACKING_CONSENT": "Yes",
+                        },
+                    },
+                    {
+                        "email": "bob.bailey@mailinator.com",
+                        "attributes": {
+                            "prenom": "Bob",
+                            "nom": "BAILEY",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": bob.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
+                        },
+                    },
+                ],
+            },
+        ]
+        # Contacts created by the daily import get the consent attribute, only when the user answered
+        [daily_import] = self.imports()
+        attributes_by_email = {contact["email"]: contact["attributes"] for contact in daily_import["jsonBody"]}
+        assert attributes_by_email[bob.email]["_PIXEL_TRACKING_CONSENT"] == "No"
+        assert "_PIXEL_TRACKING_CONSENT" not in attributes_by_email[never_answered.email]
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_professionals(self, caplog, snapshot):
+        CompanyMembershipFactory(
+            user__email="employer@mailinator.com",
+            user__email_tracking_consent=True,
+            company__kind=CompanyKind.EI,
+        )
+        CompanyMembershipFactory(
+            user__email="former.employer@mailinator.com",
+            company__kind=CompanyKind.EI,
+            is_active=False,
+        )
+        PrescriberMembershipFactory(
+            user__email="former.prescriber@mailinator.com",
+            organization__authorized=True,
+            is_active=False,
+        )
+        PrescriberMembershipFactory(
+            user__email="former.orienteur@mailinator.com",
+            organization__kind=PrescriberOrganizationKind.OTHER,
+            is_active=False,
+        )
+        # Former employer now in a prescriber organization: only sent to its list
+        now_prescriber = PrescriberMembershipFactory(
+            user__email="now.prescriber@mailinator.com",
+            organization__authorized=True,
+        ).user
+        CompanyMembershipFactory(user=now_prescriber, company__kind=CompanyKind.EI, is_active=False)
+        # Never SIAE or prescriber members, so never sent to Brevo: ignored
+        InstitutionMembershipFactory()
+        CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        ProfessionalFactory()
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert [
+            (
+                payload["listIds"],
+                [
+                    (contact["email"], contact["attributes"]["type"], contact["attributes"]["_PIXEL_TRACKING_CONSENT"])
+                    for contact in payload["jsonBody"]
+                ],
+            )
+            for payload in self.imports(update_existing_contacts=True)
+        ] == [
+            ([BrevoListID.EMPLOYERS], [("employer@mailinator.com", "employeur", "Yes")]),
+            ([BrevoListID.PRESCRIBERS], [("now.prescriber@mailinator.com", "prescripteur habilité", "No")]),
+            ([BrevoListID.EMPLOYERS], [("former.employer@mailinator.com", "employeur", "No")]),
+            ([BrevoListID.PRESCRIBERS], [("former.prescriber@mailinator.com", "prescripteur habilité", "No")]),
+            ([BrevoListID.PRESCRIBERS], [("former.orienteur@mailinator.com", "orienteur", "No")]),
+        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_email_tracking_consents_professionals")
 
 
 @freeze_time("2022-09-13")
