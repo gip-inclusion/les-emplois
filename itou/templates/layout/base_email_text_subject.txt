@@ -1,5 +1,5 @@
 {% autoescape off %}
 
-{% block subject %}{% endblock %}
+{% if itou_environment != "PROD" %}[{{ itou_environment }}] {% endif %}{% block subject %}{% endblock %}
 
 {% endautoescape %}
