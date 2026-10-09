@@ -166,7 +166,9 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     # Itou specific
     "itou.otp.middleware.OtpMiddleware",
+    # The terms come first: the email tracking consent is only asked once they are accepted
     "itou.www.middleware.TermsAcceptanceMiddleware",
+    "itou.www.middleware.EmailTrackingConsentMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     "itou.www.middleware.RedirectToNewDomainMiddleware",
@@ -824,6 +826,7 @@ SECURE_CSP = {
 }
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"
+REQUIRE_EMAIL_TRACKING_CONSENT = os.getenv("REQUIRE_EMAIL_TRACKING_CONSENT", "False") == "True"
 
 # DORA
 # ------------------------------------------------------------------------------

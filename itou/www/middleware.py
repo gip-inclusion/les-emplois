@@ -98,8 +98,11 @@ def maintenance(get_response):
 class ComplianceMiddleware:
     """Base middleware redirecting authenticated users to a compliance page they must go through before using the app.
 
-    Subclasses define when the redirection is needed and where it leads.
+    Subclasses define when the redirection is needed, and the name of the view it leads to. That view is exempt from
+    its own redirection, but not from the ones of the middlewares placed before: they chain in the settings order.
     """
+
+    redirect_view_name = None
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -111,13 +114,15 @@ class ComplianceMiddleware:
         raise NotImplementedError
 
     def get_redirect_url(self, request):
-        raise NotImplementedError
+        return reverse(self.redirect_view_name, query={"next": request.get_full_path()})
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         if not getattr(view_func, "login_required", True):
             return None  # don't block public endpoints
         if not request.user.is_authenticated:
             return None
+        if getattr(request.user, "is_hijacked", False):
+            return None  # an admin impersonating a user must never answer in their name
         if not self.must_redirect(request):
             return None
         if request.method == "POST" or request.htmx:
@@ -125,6 +130,8 @@ class ComplianceMiddleware:
         if request.path.startswith("/accounts/"):
             return None
         if not (match := getattr(request, "resolver_match", None)):
+            return None
+        if match.view_name == self.redirect_view_name:
             return None
         top_level_app_name = match.app_names[0] if match.app_names else ""
         if top_level_app_name in [
@@ -145,11 +152,21 @@ class ComplianceMiddleware:
 class TermsAcceptanceMiddleware(ComplianceMiddleware):
     """Middleware to ensure that professionals have accepted the latest terms before accessing the app."""
 
+    redirect_view_name = "legal-terms"
+
     def must_redirect(self, request):
         return terms_acceptance_required(request.user)
 
-    def get_redirect_url(self, request):
-        return reverse("legal-terms", query={"next": request.get_full_path()})
+
+class EmailTrackingConsentMiddleware(ComplianceMiddleware):
+    """Middleware to ensure that users have answered whether they consent to email open tracking."""
+
+    redirect_view_name = "dashboard:email_tracking_consent"
+
+    def must_redirect(self, request):
+        if not settings.REQUIRE_EMAIL_TRACKING_CONSENT:
+            return False
+        return request.user.must_answer_email_tracking_consent
 
 
 class RedirectToNewDomainMiddleware:

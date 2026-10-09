@@ -32,7 +32,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
-from tests.utils.testing import reload_module
+from tests.utils.testing import answer_email_tracking_consent, email_tracking_consent_url, reload_module
 
 
 FT_CONNECT_USERINFO = {
@@ -57,6 +57,7 @@ def mock_oauth_dance(
     user_info=None,
     userinfo_timeout=False,
     matching_nonces=True,
+    expected_url=None,
 ):
     id_token_nonce = crypto.get_random_string(length=12)
     private_key = france_travail_connect_private_key()
@@ -129,7 +130,7 @@ def mock_oauth_dance(
     )
     url = reverse("ft_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
-    assertRedirects(response, reverse(expected_route))
+    assertRedirects(response, expected_url or reverse(expected_route))
     return response
 
 
@@ -312,8 +313,11 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback(self, client):
+        # A new user answers the email tracking consent question first
+        response = mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        response = answer_email_tracking_consent(client, response)
+        assertRedirects(response, reverse("dashboard:edit_user_info"))
         user = User.objects.get()
         assert user.email == FT_CONNECT_USERINFO["email"]
         assert user.first_name == FT_CONNECT_USERINFO["given_name"]
@@ -386,8 +390,8 @@ class TestPoleEmploiConnect:
         auth_url = reverse("ft_connect:authorize")
         assertContains(response, auth_url)
 
-        # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        # A new user answers the email tracking consent question first
+        mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         user = User.objects.get()
         assert user.email == FT_CONNECT_USERINFO["email"]
         assert user.jobseeker_profile.nir == nir
@@ -528,8 +532,8 @@ class TestPoleEmploiConnect:
         When a France Travail Connect user wants to log out from his local account,
         he should be logged out too from France Travail Connect.
         """
-        # New created job seeker has no title and is redirected to complete its infos
-        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        # A new user answers the email tracking consent question first
+        response = mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
@@ -548,7 +552,7 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_creates_audit_trail(self, client):
         user_info = FT_CONNECT_USERINFO.copy()
-        mock_oauth_dance(client, user_info=user_info, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, user_info=user_info, expected_url=email_tracking_consent_url())
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
         assert trail.data == {"idp": "FranceTravail"}

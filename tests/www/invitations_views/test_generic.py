@@ -28,7 +28,7 @@ from tests.invitations.factories import (
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import DEFAULT_PASSWORD, ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
-from tests.utils.testing import accept_legal_terms, assert_previous_step
+from tests.utils.testing import accept_legal_terms, answer_email_tracking_consent, assert_previous_step
 
 
 class PrescriberMixin:
@@ -472,6 +472,7 @@ class BaseTestAcceptInvitation:
         )
         terms_page_response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, terms_page_response)
+        response = answer_email_tracking_consent(client, response)
         redirect_url = (
             reverse("dashboard:index") if self.org_name == "institution" else reverse("welcoming_tour:index")
         )
