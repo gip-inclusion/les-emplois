@@ -8,7 +8,7 @@ from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, LaborInspectorFactory
-from tests.utils.testing import accept_legal_terms
+from tests.utils.testing import accept_legal_terms, answer_email_tracking_consent
 
 
 def get_confirm_email_url(request, email):
@@ -52,6 +52,7 @@ class TestWelcomingTour:
         response = client.post(url, data=post_data)
         assert response.status_code == 302
         response = verify_email(client, job_seeker.email, response.wsgi_request)
+        response = answer_email_tracking_consent(client, response)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
@@ -65,6 +66,7 @@ class TestWelcomingTour:
         response = pro_connect.mock_oauth_dance(client)
         response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, response)
+        response = answer_email_tracking_consent(client, response)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
@@ -82,6 +84,7 @@ class TestWelcomingTour:
         )
         response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, response)
+        response = answer_email_tracking_consent(client, response)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
@@ -129,6 +132,7 @@ class TestWelcomingTourExceptions:
         response = client.post(url, data=post_data)
         assert response.status_code == 302
         response = verify_email(client, job_seeker.email, response.wsgi_request)
+        response = answer_email_tracking_consent(client, response)
 
         # The user should not be redirected to the welcoming path if he wanted to perform
         # another action before signing up.
