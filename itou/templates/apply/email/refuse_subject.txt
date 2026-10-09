@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-Candidature déclinée
-{% endblock %}
+{% block subject %}Candidature déclinée{% endblock %}
