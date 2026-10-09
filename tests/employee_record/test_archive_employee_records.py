@@ -16,7 +16,7 @@ def process_output(caplog_messages):
 
 def test_management_command_default_run(snapshot, caplog):
     employee_record = factories.EmployeeRecordFactory(pk=42, archivable=True, archived_json="")
-    assert list(EmployeeRecord.objects.archivable()) == [employee_record]
+    assert list(EmployeeRecord.objects.possibly_archivable()) == [employee_record]
 
     call_command("archive_employee_records", wet_run=False)
     employee_record.refresh_from_db()

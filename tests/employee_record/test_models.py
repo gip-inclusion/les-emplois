@@ -205,7 +205,7 @@ class TestEmployeeRecordModel:
 
         assert result.id == employee_record.id
 
-    def test_archivable(self, faker):
+    def test_possibly_archivable(self, faker):
         six_months_ago = timezone.now() - relativedelta(months=6)
         one_month_ago = timezone.now() - relativedelta(months=1)
         parameters = itertools.product(
@@ -226,14 +226,14 @@ class TestEmployeeRecordModel:
                 updated_at=updated_at,
             )
 
-        assert EmployeeRecord.objects.archivable().count() == 1
+        assert EmployeeRecord.objects.possibly_archivable().count() == 1
 
-    def test_archivable_with_archived_employee_record(self):
+    def test_possibly_archivable_with_archived_employee_record(self):
         EmployeeRecordFactory(
             status=Status.ARCHIVED,
             archivable=True,
         )
-        assert EmployeeRecord.objects.archivable().count() == 0
+        assert EmployeeRecord.objects.possibly_archivable().count() == 0
 
     def test_unarchive_with_wrong_status(self, subtests):
         for status in set(Status) - {Status.ARCHIVED}:

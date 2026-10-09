@@ -195,10 +195,13 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
-    def archivable(self):
+    def possibly_archivable(self):
+        # Employee Records present in this queryset might be archivable but rules are slightly more complicated
+        # (cf EmployeeRecord.check_archive method), Employee Records NOT present in this queryset should not be
+        # archivable.
         return (
             self.annotate(
-                approval_is_valid=Exists(Approval.objects.filter(number=OuterRef("approval_number")).valid())
+                approval_is_valid=Exists(Approval.objects.filter(number=OuterRef("approval_number")).valid()),
             )
             .exclude(
                 status=Status.ARCHIVED,
