@@ -13,7 +13,7 @@ STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 def get_user_devices(user):
     return sorted(
-        ItouTOTPDevice.objects.filter(user=user, disabled_at=None),
+        ItouTOTPDevice.objects.active().filter(user=user),
         key=lambda device: device.name,
     )
 
