@@ -53,16 +53,6 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -102,16 +92,6 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -142,16 +122,6 @@
       'httpx',
       20,
       'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
     ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
@@ -190,16 +160,6 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -234,16 +194,6 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
   ])
@@ -274,16 +224,6 @@
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'Job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Stalled autonomous job seekers count: 0',
-    ),
-    tuple(
-      'itou.users.management.commands.send_users_to_brevo',
-      20,
-      'Autonomous job seekers with IAE diag and no accepted applications count: 0',
     ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
