@@ -35,7 +35,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, EmployeeContract
-from itou.insertion.models import MobilizationEvent, Orientation
+from itou.insertion.models import MobilizationEvent, Orientation, Service
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
@@ -65,6 +65,7 @@ from itou.metabase.tables import (
     prolongations,
     rome_codes,
     selected_jobs,
+    services,
     suspensions,
     users,
 )
@@ -154,6 +155,7 @@ class Command(BaseCommand):
             "users": self.populate_users,
             "memberships": self.populate_memberships,
             "job_seeker_assignments": self.populate_job_seeker_assignments,
+            "services": self.populate_services,
             "mobilization_events": self.populate_mobilization_events,
             "orientations": self.populate_orientations,
             "geiq_assessments": self.populate_geiq_assessments,
@@ -674,6 +676,10 @@ class Command(BaseCommand):
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
             store_df(df=df, table_name=table_name, schema="raw_emplois")
+
+    def populate_services(self):
+        queryset = Service.include_inactive.all().select_related("structure", "source", "kind")
+        metabase_db.populate_table(services.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_mobilization_events(self):
         queryset = MobilizationEvent.objects.all().select_related(
