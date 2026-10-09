@@ -10,6 +10,9 @@
           Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
       Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
       </p>
+      <p>
+          Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».
+      </p>
       <div class="form-group">
           <div class="form-check">
               <input class="form-check-input" id="id_email_tracking_consent" name="email_tracking_consent" type="checkbox"/>
@@ -55,6 +58,9 @@
       <p>
           Pour mieux comprendre si nos e-mails vous sont utiles, nous aimerions savoir quand vous les ouvrez.
       Ce choix est facultatif et n’a aucun impact sur l’utilisation du service.
+      </p>
+      <p>
+          Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».
       </p>
       <div class="form-group">
           <div class="form-check">

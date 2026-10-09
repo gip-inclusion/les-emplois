@@ -24,6 +24,7 @@
                             {% csrf_token %}
                             {% bootstrap_form_errors form alert_error_type="all" %}
                             {% include "dashboard/includes/email_tracking_consent_explanation.html" %}
+                            <p>Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».</p>
                             {% bootstrap_field form.email_tracking_consent %}
                             {% itou_buttons_form primary_label="Continuer" primary_aria_label="Enregistrer mon choix et continuer" secondary_label="Refuser" secondary_name="refuse" secondary_value="1" secondary_aria_label="Refuser le suivi de l’ouverture de mes e-mails et continuer" reset_url=None show_mandatory_fields_mention=False %}
                         </div>
