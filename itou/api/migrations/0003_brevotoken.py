@@ -8,7 +8,7 @@ import itou.api.models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("api", "0003_create_existing_tokens"),
+        ("api", "0002_servicetoken"),
     ]
 
     operations = [
