@@ -21,6 +21,12 @@ class BrevoListID(enum.IntEnum):
     CANDIDATS = 82
 
 
+# Brevo system attribute recording the consent to email open tracking (tracking pixel).
+# Imports want "Yes" or "No" and silently ignore a boolean. Brevo sets the related
+# _PIXEL_TRACKING_CONSENT_DATE and _PIXEL_TRACKING_CONSENT_SOURCE attributes on its own.
+PIXEL_TRACKING_CONSENT_ATTRIBUTE = "_PIXEL_TRACKING_CONSENT"
+
+
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
 
