@@ -33,7 +33,7 @@ from itou.users.models import User
 from itou.utils import triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
-from tests.utils.testing import reload_module
+from tests.utils.testing import answer_email_tracking_consent, email_tracking_consent_url, reload_module
 
 
 FC_USERINFO = {
@@ -55,7 +55,9 @@ def france_connect_private_key():
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True):
+def mock_oauth_dance(
+    client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True, expected_url=None
+):
     id_token_nonce = str(uuid.uuid4())
     private_key = france_connect_private_key()
     public_key_numbers = private_key.public_key().public_numbers()
@@ -114,7 +116,7 @@ def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=T
     state = FranceConnectState.save_state(nonce=id_token_nonce if matching_nonces else "other_nonce")
     url = reverse("france_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
-    assertRedirects(response, reverse(expected_route))
+    assertRedirects(response, expected_url or reverse(expected_route))
     return response
 
 
@@ -422,8 +424,11 @@ class TestFranceConnect:
 
     @respx.mock
     def test_callback(self, client):
+        # A new user answers the email tracking consent question first
+        response = mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        response = answer_email_tracking_consent(client, response)
+        assertRedirects(response, reverse("dashboard:edit_user_info"))
         assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
@@ -434,7 +439,7 @@ class TestFranceConnect:
 
     @respx.mock
     def test_creates_audit_trail(self, client):
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         trail = AuditTrail.objects.get()
         assert trail.event_type == AuditTrailEventType.LOG_IN
         assert trail.data == {"idp": "FranceConnect"}
@@ -573,8 +578,8 @@ class TestFranceConnect:
         When a France Connect user wants to log out from his local account,
         he should be logged out too from France Connect.
         """
-        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        # A new user answers the email tracking consent question first
+        response = mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)

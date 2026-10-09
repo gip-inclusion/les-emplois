@@ -5,7 +5,12 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL
 from tests.users.factories import ProfessionalFactory
-from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    accept_legal_terms,
+    answer_email_tracking_consent,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestProfessionalSignup:
@@ -37,6 +42,7 @@ class TestProfessionalSignup:
         )
 
         response = accept_legal_terms(client, response)
+        response = answer_email_tracking_consent(client, response)
         assertRedirects(response, next_url)
 
     def test_user_already_exists(self, client, pro_connect):
