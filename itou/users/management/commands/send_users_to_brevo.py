@@ -15,7 +15,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import JobSeekerProfileQuerySet, User
-from itou.utils.brevo import BrevoClient, BrevoListID
+from itou.utils.brevo import PIXEL_TRACKING_CONSENT_ATTRIBUTE, BrevoClient, BrevoListID
 from itou.utils.command import BaseCommand
 
 
@@ -50,6 +50,13 @@ def has_prescriber_membership(**filters):
     return Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"), **filters))
 
 
+def email_tracking_consent_attributes(user):
+    if user.email_tracking_consent_updated_at is None:
+        # Never asked: no attribute, Brevo must consider that there is no consent
+        return {}
+    return {PIXEL_TRACKING_CONSENT_ATTRIBUTE: "Yes" if user.email_tracking_consent else "No"}
+
+
 def professional_serializer(user, brevo_type):
     return {
         "email": user.email,
@@ -58,6 +65,7 @@ def professional_serializer(user, brevo_type):
             "nom": user.last_name.upper(),
             "date_inscription": timezone.localdate(user.date_joined).isoformat(),
             "type": brevo_type,
+            **email_tracking_consent_attributes(user),
         },
     }
 
@@ -83,6 +91,7 @@ def job_seeker_serializer(user):
             "nom": user.last_name.upper(),
             "departement": user.job_seeker_department,
             "date_inscription": timezone.localdate(user.date_joined).isoformat(),
+            **email_tracking_consent_attributes(user),
         },
     }
 
