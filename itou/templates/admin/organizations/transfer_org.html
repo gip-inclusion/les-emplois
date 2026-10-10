@@ -37,9 +37,9 @@
         {% else %}
             {{ opts.verbose_name_plural|capfirst }}
         {% endif %}
-        › Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_company.pk %}">{{ from_company|truncatewords:"18" }}</a>
-        {% if to_company %}
-            vers <a href="{% url opts|admin_urlname:'change' object_id=to_company.pk %}">{{ to_company|truncatewords:"18" }}</a>
+        › Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_org.pk %}">{{ from_org|truncatewords:"18" }}</a>
+        {% if to_org %}
+            vers <a href="{% url opts|admin_urlname:'change' object_id=to_org.pk %}">{{ to_org|truncatewords:"18" }}</a>
         {% endif %}
     </div>
 {% endblock %}
@@ -52,7 +52,7 @@
             <div>
                 <ul>
                     {% if field_data.data is None %}
-                        <li class="quiet">Rien à transférer: valeur identique pour les deux entreprises</li>
+                        <li class="quiet">Rien à transférer: valeur identique pour les deux structures</li>
                     {% else %}
                         {% for item in field_data.data %}
                             <li>
@@ -72,12 +72,12 @@
         {% csrf_token %}
         <div class="form-row">
             {{ form }}
-            {% if to_company %}
+            {% if to_org %}
                 <strong>Dans le cas d’un transfert partiel des objets : merci de vérifier que les objets ne seront pas orphelins.</strong>
             {% endif %}
         </div>
         <div class="submit-row">
-            <input class="default{% if to_company %} with-confirm{% endif %}" type="submit" value="Valider">
+            <input class="default{% if to_org %} with-confirm{% endif %}" type="submit" value="Valider">
         </div>
     </form>
 

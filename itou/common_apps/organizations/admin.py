@@ -1,8 +1,10 @@
+from django import forms
 from django.contrib import admin, messages
+from django.contrib.admin import widgets
 from django.db.models import Count
-from django.forms import BaseInlineFormSet
+from django.forms import BaseInlineFormSet, ValidationError
 
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline
+from itou.utils.admin import ChooseFieldsToTransfer, FakeRelForRawIdWidget, ItouModelAdmin, ItouTabularInline
 
 
 class MembersInlineFormSet(BaseInlineFormSet):
@@ -118,3 +120,31 @@ class OrganizationAdmin(ItouModelAdmin):
                         "Les membres restants risquent de solliciter le support."
                     ),
                 )
+
+
+class SelectTargetOrgForm(forms.Form):
+    def __init__(self, *args, from_org, org_model_label, admin_site, **kwargs):
+        super().__init__(*args, **kwargs)
+        model = from_org.__class__
+        self.from_org = from_org
+        self.org_model_label = org_model_label
+        self.fields["to_org"] = forms.ModelChoiceField(
+            model.objects.all(),
+            required=True,
+            label=f"Choisissez l’{self.org_model_label} cible",
+            widget=widgets.ForeignKeyRawIdWidget(FakeRelForRawIdWidget(model), admin_site),
+        )
+
+    def clean_to_org(self):
+        to_org = self.cleaned_data["to_org"]
+        if to_org.pk == self.from_org.pk:
+            raise ValidationError(f"L’{self.org_model_label} cible doit être différente de celle d’origine")
+        return to_org
+
+
+class OrgChooseFieldsToTransfer(ChooseFieldsToTransfer):
+    disable_from_org = forms.BooleanField(required=False, initial=True)
+
+    def __init__(self, org_model_label, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["disable_from_org"].label = f"Désactiver l’{org_model_label} source"
