@@ -4160,16 +4160,7 @@ def test_detect_existing_job_seeker(client):
     response = client.post(next_url, data=post_data)
     assertContains(
         response,
-        (
-            "D'après les informations renseignées, il semblerait que cet usager soit "
-            "déjà rattaché à un autre email : j*****@e******.c**."
-        ),
-        html=True,
-    )
-    assertContains(
-        response,
-        '<button type="submit" name="confirm" value="1" class="btn btn-sm btn-outline-primary">'
-        "Poursuivre la création du compte</button>",
+        "Les informations saisies correspondent à un compte existant, associé à l’adresse j*****@e******.c**.",
         html=True,
     )
     check_email_url = reverse(
@@ -4178,31 +4169,9 @@ def test_detect_existing_job_seeker(client):
     )
     assertContains(
         response,
-        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Modifier l'email de l’usager</a>""",
+        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Renseigner l’adresse email</a>""",
         html=True,
     )
-    # Use the modal button to send confirmation
-    response = client.post(next_url, data=post_data | {"confirm": 1})
-
-    # session data is updated and we are correctly redirected to step 2
-    expected_job_seeker_session["profile"] |= {
-        "lack_of_nir_reason": post_data.pop("lack_of_nir_reason", ""),
-        "birthdate": post_data.pop("birthdate"),
-        "birth_country": post_data.pop("birth_country"),
-        "birth_place": post_data.pop("birth_place"),
-    }
-    expected_job_seeker_session["user"] |= post_data
-    assert client.session[job_seeker_session_name] == expected_job_seeker_session
-
-    next_url = reverse(
-        "job_seekers_views:create_job_seeker_step_2_for_sender",
-        kwargs={"session_uuid": job_seeker_session_name},
-    )
-    assertRedirects(response, next_url)
-
-    # If we chose to cancel & go back, we should find our old wrong email in the page
-    response = client.get(check_email_url)
-    assertContains(response, "wrong-email@example.com")
 
 
 class TestApplicationGEIQEligibilityView:
