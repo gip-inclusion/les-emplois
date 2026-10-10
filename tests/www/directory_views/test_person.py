@@ -1,0 +1,41 @@
+from django.urls import reverse
+from pytest_django.asserts import assertContains
+
+from tests.www.directory_views.helpers import get_target_person, setup_directory
+
+
+def test_person_detail_preserves_back_url_and_hides_contact(client):
+    _, _, target_organization, person = get_target_person(client)
+    back_url = f"{reverse('directory:people_results')}?q=Alice"
+
+    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}), {"back_url": back_url})
+
+    assert response.status_code == 200
+    assert response.context["back_url"] == back_url
+    assertContains(response, "Afficher l'adresse e-mail")
+    assertContains(response, "Afficher le téléphone de la structure")
+    assertContains(response, target_organization.get_card_url())
+    assertContains(response, "https://mission-locale.example")
+
+
+def test_person_detail_displays_missing_phone(client):
+    _, _, _, person = get_target_person(client, target_phone="")
+
+    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+
+    assertContains(response, "Non renseigné", html=True)
+
+
+def test_person_detail_unknown_key(client):
+    setup_directory(client)
+
+    response = client.get(reverse("directory:person_detail", kwargs={"key": "invalid"}))
+
+    assert response.status_code == 404
+
+
+def test_person_detail_rate_limit(client, mocker):
+    _, _, _, person = get_target_person(client)
+    mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "0/day")
+    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+    assertContains(response, "Vous avez atteint la limite de messages envoyés : 0 par jour.")
