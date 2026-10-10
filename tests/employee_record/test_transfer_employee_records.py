@@ -5,16 +5,14 @@ import uuid
 import freezegun
 import pytest
 from django.test.utils import override_settings
-from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 
-from itou.employee_record.enums import NotificationStatus, Status
+from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import transfer_employee_records
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
-from tests.approvals.factories import ProlongationFactory, SuspensionFactory
-from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
+from tests.employee_record.factories import EmployeeRecordFactory
 
 
 @pytest.fixture(name="command")
@@ -215,51 +213,4 @@ def test_duplicates_automatic_processing(sftp_directory, command):
     assert employee_record.asp_processing_code == "3436"
     assert employee_record.archived_json.get("libelleTraitement") == "Duplicate"
     assert employee_record.processed_as_duplicate is True
-
-
-@pytest.mark.parametrize("extension_class", [ProlongationFactory, SuspensionFactory])
-def test_duplicates_with_an_extension_generate_an_update_notification(sftp_directory, command, extension_class):
-    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
-    extension_class(approval=employee_record.job_application.approval)
-
-    command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    process_incoming_file(sftp_directory, "3436", "Duplicate")
-
-    command.handle(upload=False, download=True, preflight=False, wet_run=True)
-    assert employee_record.update_notifications.count() == 1
-    assert employee_record.update_notifications.get().status == NotificationStatus.NEW
-
-
-@pytest.mark.parametrize("status", set(NotificationStatus) - {NotificationStatus.NEW})
-@pytest.mark.parametrize("extension_class", [ProlongationFactory, SuspensionFactory])
-def test_duplicates_with_an_extension_generate_a_pristine_update_notification(
-    sftp_directory, command, status, extension_class
-):
-    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
-    EmployeeRecordUpdateNotificationFactory(employee_record=employee_record, status=status)
-    extension_class(approval=employee_record.job_application.approval)
-
-    command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    process_incoming_file(sftp_directory, "3436", "Duplicate")
-
-    command.handle(upload=False, download=True, preflight=False, wet_run=True)
-    assert employee_record.update_notifications.count() == 2
-    assert employee_record.update_notifications.latest("created_at").status == NotificationStatus.NEW
-
-
-@pytest.mark.parametrize("extension_class", [ProlongationFactory, SuspensionFactory])
-def test_duplicates_with_an_extension_update_the_existing_new_notification(sftp_directory, command, extension_class):
-    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
-    EmployeeRecordUpdateNotificationFactory(employee_record=employee_record, status=NotificationStatus.NEW)
-    extension_class(approval=employee_record.job_application.approval)
-
-    command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    process_incoming_file(sftp_directory, "3436", "Duplicate")
-
-    with freezegun.freeze_time():
-        expected_updated_at = timezone.now()
-        command.handle(upload=False, download=True, preflight=False, wet_run=True)
-    assert employee_record.update_notifications.count() == 1
-    notification = employee_record.update_notifications.get()
-    assert notification.status == NotificationStatus.NEW
-    assert notification.updated_at == expected_updated_at
+    assert employee_record.has_watched_data_updated_at_set()
