@@ -968,9 +968,9 @@ invoke==3.0.3 \
     --hash=sha256:437b6a622223824380bfb4e64f612711a6b648c795f565efc8625af66fb57f0c \
     --hash=sha256:f11327165e5cbb89b2ad1d88d3292b5113332c43b8553b494da435d6ec6f5053
     # via paramiko
-itoutils[django]==26.7.9.0 \
-    --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
-    --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
+itoutils[django]==26.10.8.0 \
+    --hash=sha256:c956441e69510f4c5d5982b582585fe42e2eece88ccf90d94a46e6e25b6735c7 \
+    --hash=sha256:dfd646d6785ee2260bc97d2a97ff8447e6b18ea582011d0c058cc9361a9d11a1
     # via -r base.in
 jmespath==1.1.0 \
     --hash=sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d \

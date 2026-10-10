@@ -1114,9 +1114,9 @@ invoke==3.0.3 \
     # via
     #   -r base.txt
     #   paramiko
-itoutils[django,django-testing]==26.7.9.0 \
-    --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
-    --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
+itoutils[django,django-testing]==26.10.8.0 \
+    --hash=sha256:c956441e69510f4c5d5982b582585fe42e2eece88ccf90d94a46e6e25b6735c7 \
+    --hash=sha256:dfd646d6785ee2260bc97d2a97ff8447e6b18ea582011d0c058cc9361a9d11a1
     # via
     #   -r base.txt
     #   -r test.in
