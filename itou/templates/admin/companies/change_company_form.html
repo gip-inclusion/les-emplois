@@ -4,7 +4,7 @@
 
     {% if has_change_permission %}
         <li>
-            <a href="{% url 'admin:transfer_company_data' from_company_pk=original.pk %}">Transférer</a>
+            <a href="{% url 'admin:transfer_company_data' from_org_pk=original.pk %}">Transférer</a>
         </li>
     {% endif %}
 
