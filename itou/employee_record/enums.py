@@ -27,17 +27,7 @@ class Status(models.TextChoices):
         Hide values in forms but don't override self.choices method to keep hidden enums visible in Django admin.
         """
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
-        return empty + [
-            (enum.value, enum.label)
-            for enum in cls
-            if enum
-            not in (
-                Status.ARCHIVED,
-                Status.MODIFICATION_PENDING,
-                Status.MODIFICATION_SENT,
-                Status.MODIFICATION_REJECTED,
-            )
-        ]
+        return empty + [(enum.value, enum.label) for enum in cls if enum is not Status.ARCHIVED]
 
 
 class NotificationStatus(models.TextChoices):

@@ -27,7 +27,7 @@
 
 {% block title_extra %}
     {% enums "employee_record" "Status" as Status %}
-    {% if employee_record.status != Status.READY and employee_record.status != Status.SENT and employee_record.status != Status.ARCHIVED %}
+    {% if employee_record.status != Status.READY and employee_record.status != Status.SENT and employee_record.status != Status.MODIFICATION_SENT and employee_record.status != Status.ARCHIVED %}
         <div class="c-box c-box--action">
             <div class="form-row align-items-center gx-3">
                 {% if employee_record.status == Status.PROCESSED %}
@@ -42,9 +42,9 @@
                             <span>Compléter</span>
                         </a>
                     </div>
-                {% elif employee_record.status == Status.REJECTED %}
+                {% elif employee_record.status == Status.REJECTED or employee_record.status == Status.MODIFICATION_REJECTED %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED"
+                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status={{ employee_record.status }}"
                            class="btn btn-lg btn-white btn-block btn-ico">
                             <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
                             <span>Modifier</span>

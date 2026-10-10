@@ -9,7 +9,11 @@ from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
-from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
+from itou.employee_record.serializers import (
+    EmployeeRecordForUpdateSerializer,
+    EmployeeRecordSerializer,
+    EmployeeRecordUpdateNotificationSerializer,
+)
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.command import BaseCommand
@@ -138,7 +142,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
         self.logger.info("Successfully parsed %d/%d files", successfully_parsed_files, len(result_files))
 
-    def preflight(self, object_class):
+    def preflight(self, object_class, for_update=False):
         """Parse new notifications or employee records and attempt to tackle serialization errors.
         Serialization of EmployeeRecordBatch objects does not allow detailed information
         on what specific employee record is faulty.
@@ -150,19 +154,19 @@ class EmployeeRecordTransferCommand(BaseCommand):
         and border it as well as possible."""
         assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
 
-        objects_to_serialize = (
-            EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
-            if object_class == EmployeeRecordUpdateNotification
-            else EmployeeRecord.objects.filter(
+        if object_class == EmployeeRecordUpdateNotification:
+            objects_to_serialize = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
+            object_serializer = EmployeeRecordUpdateNotificationSerializer
+        elif for_update:
+            objects_to_serialize = EmployeeRecord.objects.filter(
+                status=Status.MODIFICATION_PENDING, job_application__state=JobApplicationState.ACCEPTED
+            )
+            object_serializer = EmployeeRecordForUpdateSerializer
+        else:
+            objects_to_serialize = EmployeeRecord.objects.filter(
                 status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
             )
-        )
-
-        object_serializer = (
-            EmployeeRecordUpdateNotificationSerializer
-            if object_class == EmployeeRecordUpdateNotification
-            else EmployeeRecordSerializer
-        )
+            object_serializer = EmployeeRecordSerializer
 
         if not objects_to_serialize:
             self.logger.info("No object to check. Exiting preflight.")

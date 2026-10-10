@@ -5,7 +5,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Approval
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from tests.employee_record import factories
 from tests.users.factories import ItouStaffFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -97,9 +97,18 @@ def test_available_transitions(snapshot, client, status):
     assertNotContains(response, '<div class="submit-row" id="employee-record-transitions">')
 
 
-@pytest.mark.parametrize("code", ["", "0000", "32##", "3436"])
-def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code):
+@pytest.mark.parametrize(
+    "code,previous_state",
+    [("", None), ("0000", None), ("32##", Status.REJECTED), ("32##", Status.MODIFICATION_REJECTED), ("3436", None)],
+)
+def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code, previous_state):
     employee_record = factories.EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
+    if previous_state is not None:
+        employee_record.logs.create(
+            from_state=previous_state,
+            to_state=Status.ARCHIVED,
+            transition=EmployeeRecordTransition.ARCHIVE,
+        )
 
     response = admin_client.get(reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk]))
     assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()

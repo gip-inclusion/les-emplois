@@ -338,20 +338,12 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                 models.EmployeeRecordTransition.REJECT_MODIFICATION,
                 models.EmployeeRecordTransition.RECREATE,
             }
-            # Blocked until the new system can be used
-            # TODO(xfernandez): remove this when the new system is in place
-            blocked_transitions = {
-                models.EmployeeRecordTransition.RETRY_MODIFICATION,
-                models.EmployeeRecordTransition.UNARCHIVE_MODIFICATION_REJECTED,
-            }
             context.update(
                 {
                     "available_transitions": [
                         transition
                         for transition in obj.status.transitions()
-                        if getattr(obj, transition.name).is_available()
-                        and transition.name not in system_transitions
-                        and transition.name not in blocked_transitions
+                        if getattr(obj, transition.name).is_available() and transition.name not in system_transitions
                     ]
                 }
             )
