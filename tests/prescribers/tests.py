@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -27,10 +28,12 @@ from itou.prescribers.enums import (
     categories_for_kind,
     kinds_for_category,
 )
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.models import User
+from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -750,6 +753,238 @@ class TestPrescriberOrganizationAdmin:
         expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de « Autre »."
         assert len(response.context["errors"]) == 1
         assert response.context["errors"][0] == [expected_msg]
+
+    def test_transfer_button(self, client):
+        organization = PrescriberOrganizationFactory()
+        transfer_url = reverse("admin:transfer_prescriberorg_data", kwargs={"from_org_pk": organization.pk})
+
+        # Basic staff users without write access don't see the button
+        admin_user = ItouStaffFactory()
+        perms = Permission.objects.filter(codename="view_prescriberorganization")
+        admin_user.user_permissions.add(*perms)
+        client.force_login(admin_user)
+        response = client.get(
+            reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": organization.pk})
+        )
+        assertNotContains(response, transfer_url)
+
+        # With change permission, the button appears
+        perms = Permission.objects.filter(codename="change_prescriberorganization")
+        admin_user.user_permissions.add(*perms)
+        response = client.get(
+            reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": organization.pk})
+        )
+        assertContains(response, transfer_url)
+
+    def test_transfer_without_change_permission(self, client):
+        from_org = PrescriberOrganizationFactory()
+        to_org = PrescriberOrganizationFactory()
+        transfer_url_1 = reverse("admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk})
+        transfer_url_2 = reverse(
+            "admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk, "to_org_pk": to_org.pk}
+        )
+
+        admin_user = ItouStaffFactory()
+        perms = Permission.objects.filter(codename="view_prescriberorganization")
+        admin_user.user_permissions.add(*perms)
+        client.force_login(admin_user)
+        response = client.get(transfer_url_1)
+        assert response.status_code == 403
+        response = client.get(transfer_url_2)
+        assert response.status_code == 403
+
+    @freeze_time("2023-08-31 12:34:56")
+    def test_transfer_data(self, admin_client, snapshot, caplog):
+        job_application = JobApplicationFactory(sent_by_prescriber=True, with_approval=True)
+
+        from_org = job_application.sender_prescriber_organization
+        to_org = PrescriberOrganizationFactory()
+
+        transfer_url_1 = reverse("admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk})
+        transfer_url_2 = reverse(
+            "admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk, "to_org_pk": to_org.pk}
+        )
+        response = admin_client.get(transfer_url_1)
+        assertContains(response, "Choisissez l’organisation prescriptrice cible :", html=True)
+        # Select same prescriber organization
+        response = admin_client.post(transfer_url_1, data={"to_org": from_org.pk})
+        assertContains(
+            response, "L’organisation prescriptrice cible doit être différente de celle d’origine", html=True
+        )
+        # Select valid target
+        response = admin_client.post(transfer_url_1, data={"to_org": to_org.pk})
+        assertRedirects(response, transfer_url_2, fetch_redirect_response=False)
+
+        response = admin_client.get(transfer_url_2)
+        assertContains(response, "Choisissez les objets à transférer")
+        assertContains(response, str(job_application))
+
+        response = admin_client.post(transfer_url_2, data={"fields_to_transfer": ["job_applications_sent", "name"]})
+        assertRedirects(
+            response, reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": from_org.pk})
+        )
+
+        job_application.refresh_from_db()
+        assert job_application.sender_prescriber_organization == to_org
+        assert PrescriberOrganization.objects.get(pk=to_org.pk).name == from_org.name
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.INFO,
+                    "Transfert effectué avec succès de l’organisation prescriptrice "
+                    f"{from_org} vers {to_org} (désormais {from_org}).",
+                ),
+            ],
+        )
+        prescriberorg_content_type = ContentType.objects.get_for_model(PrescriberOrganization)
+        to_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=to_org.pk
+        ).first()
+        from_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=from_org.pk
+        ).first()
+        assert to_user_remark.remark == from_user_remark.remark
+        remark = to_user_remark.remark
+        assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
+        assert "Candidatures envoyées" in remark
+        assert (
+            f"staff user={get_user(admin_client).pk} transferred prescriberorganization={from_org.pk} "
+            f"to prescriberorganization={to_org.pk} with fields_to_transfer=['job_applications_sent', 'name'], "
+            "disable_from_org=False" in caplog.messages
+        )
+
+    @freeze_time("2023-08-31 12:34:56")
+    def test_transfer_data_is_searchable_and_disable_from_org(self, admin_client, snapshot):
+        job_application = JobApplicationFactory(sent_by_prescriber=True, with_approval=True)
+
+        from_org = job_application.sender_prescriber_organization
+        assert from_org.is_searchable
+        assert from_org.memberships.filter(is_active=True).count() == 1
+        PrescriberWithOrgInvitationFactory(organization=from_org)
+
+        to_org = PrescriberOrganizationFactory(is_searchable=False)
+
+        transfer_url = reverse(
+            "admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk, "to_org_pk": to_org.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+        assertContains(response, str(job_application))
+
+        response = admin_client.post(
+            transfer_url,
+            data={
+                "fields_to_transfer": ["job_applications_sent", "invitations", "is_searchable"],
+                "disable_from_org": True,
+            },
+        )
+        assertRedirects(
+            response, reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": from_org.pk})
+        )
+
+        job_application.refresh_from_db()
+        assert job_application.sender_prescriber_organization == to_org
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.INFO,
+                    f"Transfert effectué avec succès de l’organisation prescriptrice {from_org} vers {to_org}.",
+                ),
+            ],
+        )
+
+        # Check that from_org has been properly disabled and that the memberships have been disabled
+        from_org.refresh_from_db()
+        assert not from_org.is_searchable
+        assert from_org.memberships.filter(is_active=True).count() == 0
+
+        # and to_org should now be searchable
+        to_org.refresh_from_db()
+        assert to_org.is_searchable
+
+        # Check support remark
+        prescriberorg_content_type = ContentType.objects.get_for_model(PrescriberOrganization)
+        to_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=to_org.pk
+        ).first()
+        from_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=from_org.pk
+        ).first()
+        assert to_user_remark.remark == from_user_remark.remark
+        remark = to_user_remark.remark
+        assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
+        assert "Candidatures envoyées" in remark
+        assert (
+            "Désactivation structure avec désactivation des membres:\n  "
+            f"* prescribers.PrescriberOrganization[{from_org.pk}]" in remark
+        )
+        assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+    @pytest.mark.parametrize("field", {"is_admin", "is_active"})
+    @pytest.mark.parametrize(
+        "value_in_from_org,value_in_to_org,expected",
+        [
+            (None, False, False),
+            (False, None, False),
+            (None, True, True),
+            (True, None, True),
+            (False, False, False),
+            (True, False, True),
+            (False, True, True),
+            (True, True, True),
+        ],
+    )
+    def test_transfer_data_memberships(self, admin_client, field, value_in_from_org, value_in_to_org, expected):
+        user = ProfessionalFactory()
+        default_args = {"user": user, "is_active": False, "is_admin": False}
+        from_org = PrescriberOrganizationFactory(with_membership=False)
+        if value_in_from_org is not None:
+            PrescriberMembership(organization=from_org, **{**default_args, field: value_in_from_org}).save()
+
+        to_org = PrescriberOrganizationFactory(with_membership=False)
+        if value_in_to_org is not None:
+            PrescriberMembership(organization=to_org, **{**default_args, field: value_in_to_org}).save()
+
+        transfer_url = reverse(
+            "admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk, "to_org_pk": to_org.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+
+        if value_in_from_org is not None:
+            assertContains(response, str(PrescriberMembership.include_inactive.get(organization=from_org, user=user)))
+
+            response = admin_client.post(
+                transfer_url,
+                data={"fields_to_transfer": ["memberships"], "disable_from_org": False},
+            )
+            assertRedirects(
+                response, reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": from_org.pk})
+            )
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.INFO,
+                        f"Transfert effectué avec succès de l’organisation prescriptrice {from_org} vers {to_org}.",
+                    ),
+                ],
+            )
+
+        from_org.refresh_from_db()
+        to_org.refresh_from_db()
+
+        if value_in_to_org is None or value_in_from_org is None:
+            # Real transfer, membership in from_org is moved
+            assert PrescriberMembership.include_inactive.filter(organization=from_org).count() == 0
+        else:
+            assert PrescriberMembership.include_inactive.filter(organization=from_org).count() == 1
+        membership = PrescriberMembership.include_inactive.get(organization=to_org)
+        assert getattr(membership, field) is expected
 
 
 @pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)

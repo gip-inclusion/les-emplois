@@ -217,6 +217,9 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
             else:
                 fields_to_transfer = form.cleaned_data["fields_to_transfer"]
                 disable_from_org = form.cleaned_data["disable_from_org"]
+                # In case the target org adopts the source org's name,
+                # save the old name to avoid weird displays
+                to_org_display = str(self.to_org)
                 try:
                     reporter = transfer.transfer_org_data(
                         self.object,
@@ -242,7 +245,9 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
                         "Transfert effectué avec succès de l’{org_label} {from_org} vers {to_org}.",
                         org_label=self.org_model_label_fr,
                         from_org=self.object,
-                        to_org=self.to_org,
+                        to_org=f"{to_org_display} (désormais {self.to_org})"
+                        if to_org_display != str(self.to_org)
+                        else self.to_org,
                     )
                     messages.info(self.request, message)
                     logger.info(
