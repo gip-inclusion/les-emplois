@@ -1,9 +1,11 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.urls import path, reverse
 from django.utils.timezone import now
 
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
+from itou.common_apps.organizations.views import BaseTransferView
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -287,3 +289,39 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
     @admin.display(boolean=True, description="Habilitation")
     def is_authorized(self, obj):
         return obj.is_authorized
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [
+            path(
+                "transfer/<int:from_org_pk>",
+                self.admin_site.admin_view(self.PrescriberOrgTransferView.as_view()),
+                {"model_admin": self},
+                name="transfer_prescriberorg_data",
+            ),
+            path(
+                "transfer/<int:from_org_pk>/<int:to_org_pk>",
+                self.admin_site.admin_view(self.PrescriberOrgTransferView.as_view()),
+                {"model_admin": self},
+                name="transfer_prescriberorg_data",
+            ),
+        ] + urls
+
+    class PrescriberOrgTransferView(BaseTransferView):
+        model = PrescriberOrganization
+        template_name = "admin/organizations/transfer_org.html"
+
+        def get_redirect_url(self, to_org_pk):
+            return reverse(
+                "admin:transfer_prescriberorg_data",
+                kwargs={
+                    "from_org_pk": self.object.pk,
+                    "to_org_pk": to_org_pk,
+                },
+            )
+
+        def get_success_url(self):
+            return reverse(
+                "admin:prescribers_prescriberorganization_change",
+                kwargs={"object_id": self.object.pk},
+            )
