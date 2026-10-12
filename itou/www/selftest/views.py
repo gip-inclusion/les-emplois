@@ -1,5 +1,5 @@
+from allauth.core.internal.httpkit import get_client_ip
 from django.shortcuts import render
-from django_datadog_logger.formatters.datadog import get_client_ip
 
 from itou.utils.auth import check_user
 

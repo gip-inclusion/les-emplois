@@ -4,6 +4,7 @@ import logging
 from allauth.account.internal.flows.email_verification import send_verification_email_to_address
 from allauth.account.models import EmailAddress
 from allauth.account.views import PasswordChangeView
+from allauth.core.internal.httpkit import get_client_ip
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -19,7 +20,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
-from django_datadog_logger.formatters.datadog import get_client_ip
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR

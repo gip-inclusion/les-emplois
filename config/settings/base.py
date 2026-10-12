@@ -607,6 +607,12 @@ ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
 
+
+# `NUM_PROXIES = 1` would be the value set by nginx, which is the IP of a Clever Cloud load-balancer
+# `NUM_PROXIES = 2` is set by a Clever Cloud load-balancer, it is the client IP
+# All other can be spoofed by users so they can’t be trusted.
+NUM_PROXIES = 2
+
 REST_FRAMEWORK = {
     # Namespace versioning e.g. `GET /api/v1/something/`.
     # https://www.django-rest-framework.org/api-guide/versioning/#namespaceversioning
@@ -643,7 +649,10 @@ REST_FRAMEWORK = {
         "job-applications-search": "120/minute",
     },
     "EXCEPTION_HANDLER": "itou.api.errors.custom_exception_handler",
+    "NUM_PROXIES": NUM_PROXIES,
 }
+
+ALLAUTH_TRUSTED_PROXY_COUNT = NUM_PROXIES
 
 SPECTACULAR_SETTINGS = {
     "TITLE": f"API - {product_name()}",
