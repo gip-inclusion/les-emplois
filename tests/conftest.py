@@ -21,6 +21,7 @@ import pandas  # noqa F401
 import paramiko
 import patchy
 import pytest
+import sentry_sdk
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from dateutil.relativedelta import relativedelta
@@ -44,6 +45,7 @@ from tests.openid_connect.pro_connect.testing import ProConnectSetup
 pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 
 # ruff: disable[E402]
+from config.sentry import sentry_init
 from itou.emails.markdown import known_domains
 from itou.utils import faker_providers
 from itou.utils.cache import UnclearableCache
@@ -140,6 +142,10 @@ def pytest_configure(config) -> None:
             "configure temporary_bucket fixture to expect an empty bucket instead of one with objects"
         ),
     )
+    # Install the integrations' patches, as in production, then remove the client: without one, the patches skip
+    # Sentry's code, whereas an active client, even without a DSN, costs about 17 % of the CPU time of the test suite
+    sentry_init()
+    sentry_sdk.get_global_scope().set_client(None)
 
 
 @pytest.fixture
@@ -696,6 +702,15 @@ def profile_login(client):
             raise ValueError(f"Invalid profile: '{profile}'")
 
     return login
+
+
+@pytest.fixture(name="sentry")
+def sentry_fixture():
+    """Give Sentry a client, which the test session removes to keep the test suite fast."""
+    sentry_init()
+    yield
+    # The integrations stay installed but do nothing without a client
+    sentry_sdk.get_global_scope().set_client(None)
 
 
 ## Mockers
