@@ -297,3 +297,8 @@ def test_orientation_reminder_for_structure(snapshot, reminder_days_multiplicato
     assert email.subject == snapshot(name="subject")
     body = email.body.replace(str(link.pk), "[PK of OrientationProcessLink]")
     assert body == snapshot(name="body")
+
+
+def test_free_form_email_to_service():
+    # todo
+    pass
