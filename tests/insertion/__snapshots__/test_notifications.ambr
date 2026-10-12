@@ -294,6 +294,28 @@
 # name: test_expired_orientation_for_structure[subject]
   '[TEST] Cette demande d’orientation a expiré'
 # ---
+# name: test_free_form_email_to_service[body]
+  '''
+  Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "SERVICE".
+  
+  Mon usager a 33 ans et habite à Vannes (56).
+  
+  Plusieurs retours à la ligne non pris en compte.
+  
+  Cordialement,
+  Pierre DUPONT
+  
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_free_form_email_to_service[subject]
+  '[TEST] Pierre DUPONT de la structure Pres. Org. souhaite vous adresser un usager'
+# ---
 # name: test_new_orientation_for_beneficiary[sender_is_not_referent][body]
   '''
   Une orientation a été effectuée en votre nom.

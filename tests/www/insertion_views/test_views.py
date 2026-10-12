@@ -25,6 +25,7 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
+from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.asp.models import Country
 from itou.companies.models import CompanyMembership
 from itou.geo.utils import coords_to_geometry
@@ -38,6 +39,7 @@ from itou.insertion.models import (
     SOURCE_DORA_VALUE,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
+    MobilizationEmail,
     MobilizationEvent,
     Orientation,
     OrientationProcessLink,
@@ -46,6 +48,8 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title
 from itou.utils import triggers
+from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
+from itou.utils.brand import product_name
 from itou.www.insertion_views.views import ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
@@ -53,13 +57,14 @@ from tests.geo.factories import create_qpv
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
+    MobilizationEventFactory,
     OrientationFactory,
     OrientationProcessLinkFactory,
     RemoteReceptionFactory,
     ServiceFactory,
     StructureFactory,
 )
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -660,7 +665,6 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         modal = parse_response_to_soup(response, "#service-contact-modal")
         assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
-        assertNotContains(response, 'class="modal-footer"')
 
     def test_detail_with_external_orientation_link_for_non_orientable_service(self, client):
         user = PrescriberFactory()
@@ -1055,6 +1059,269 @@ class TestServices:
         response = client.get(self.get_service_url(service))
 
         assertion(response, f'body.set("service_uid", "{service.uid}");')
+
+    @pytest.mark.parametrize(
+        "user_factory,assertion_mailto,assertion_button",
+        [
+            (None, assertContains, assertNotContains),
+            (ItouStaffFactory, assertContains, assertNotContains),
+            (JobSeekerFactory, assertContains, assertNotContains),
+            (LaborInspectorFactory, assertContains, assertNotContains),
+            (PrescriberFactory, assertNotContains, assertContains),
+            (EmployerFactory, assertNotContains, assertContains),
+        ],
+    )
+    def test_render_contact_modal(self, client, user_factory, assertion_mailto, assertion_button):
+        service = ServiceFactory(contact_email="contact@example.com")
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_service_url(service))
+
+        assertion_mailto(response, f"mailto:{service.contact_email}")
+        assertion_button(response, f"Écrire un email à {service.contact_email}")
+
+    @pytest.mark.parametrize(
+        "user_factory,do_snapshot",
+        [
+            (None, False),
+            (ItouStaffFactory, False),
+            (JobSeekerFactory, False),
+            (LaborInspectorFactory, False),
+            (partial(PrescriberFactory, for_snapshot=True), True),
+            (partial(EmployerFactory, for_snapshot=True), True),
+        ],
+        ids=["anonymous", "itou_staff", "job_seeker", "labor_inspector", "prescriber", "employer"],
+    )
+    def test_render_send_email_to_service_modal(self, client, user_factory, do_snapshot, snapshot):
+        service = ServiceFactory(contact_email="contact@example.com", uid="service-uid-1", name="Sers-vis")
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_service_url(service))
+
+        modal_id = 'id="service-send-email-modal"'
+        if do_snapshot:
+            assert pretty_indented(parse_response_to_soup(response, selector="#service-send-email-modal")) == snapshot(
+                name="send-email-modal"
+            )
+            assert response.context.get("send_email_form") is not None
+            assertContains(response, modal_id)
+        else:
+            assert response.context.get("send_email_form") is None
+            assertNotContains(response, modal_id)
+
+    @pytest.mark.parametrize(
+        "membership_factory",
+        [
+            partial(
+                PrescriberMembershipFactory,
+                user__for_snapshot=True,
+                organization__for_snapshot=True,
+                organization__authorized=True,
+            ),
+            partial(
+                PrescriberMembershipFactory,
+                user__for_snapshot=True,
+                organization__for_snapshot=True,
+                organization__authorized=False,
+            ),
+            partial(CompanyMembershipFactory, user__for_snapshot=True, company__for_snapshot=True),
+        ],
+        ids=["authorized_prescriber", "prescriber", "employer"],
+    )
+    @pytest.mark.parametrize(
+        "job_seeker_factory",
+        [
+            None,
+            partial(JobSeekerFactory, for_snapshot=True),
+            partial(JobSeekerFactory, city="", jobseeker_profile__birthdate=datetime.date(2000, 1, 1)),
+            partial(
+                JobSeekerFactory, city="Vannes", department="56", post_code="56000", jobseeker_profile__birthdate=None
+            ),
+            partial(JobSeekerFactory, city="Vannes", department="", jobseeker_profile__birthdate=None),
+        ],
+        ids=[
+            "no_job_seeker",
+            "job_seeker_full_info",
+            "job_seeker_age_only",
+            "job_seeker_city_and_dept",
+            "job_seeker_city_only",
+        ],
+    )
+    @freeze_time("2026-01-01")
+    def test_prefilled_email_sent_to_service_provider(self, client, membership_factory, job_seeker_factory, snapshot):
+        service = ServiceFactory(uid="service-uid-1", name="Sers-vis")
+        url = self.get_service_url(service)
+        if job_seeker := job_seeker_factory:
+            job_seeker = job_seeker_factory()
+            url += f"?job_seeker_public_id={job_seeker.public_id}"
+
+        client.force_login(membership_factory().user)
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#service-send-email-content")) == snapshot(
+            name="send-email-content"
+        )
+
+    @pytest.mark.parametrize(
+        "user_factory,is_htmx,expected_status_code",
+        [
+            (None, True, 403),
+            (ItouStaffFactory, True, 403),
+            (JobSeekerFactory, True, 403),
+            (LaborInspectorFactory, True, 403),
+            (PrescriberFactory, False, 403),
+            (PrescriberFactory, True, 200),
+            (EmployerFactory, False, 403),
+            (EmployerFactory, True, 200),
+        ],
+    )
+    def test_post_access(self, client, user_factory, is_htmx, expected_status_code):
+        service = ServiceFactory(contact_email="contact@example.com", uid="service-uid-1", name="Sers-vis")
+        headers = {"HX-Request": "true"} if is_htmx else {}
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.post(self.get_service_url(service), headers=headers)
+
+        assert response.status_code == expected_status_code
+
+    def test_cannot_post_when_no_contact_email(self, client):
+        service = ServiceFactory(contact_email="")
+        headers = {"HX-Request": "true"}
+        client.force_login(PrescriberFactory())
+        response = client.post(self.get_service_url(service), headers=headers)
+        assert response.status_code == 403
+
+    @pytest.mark.parametrize(
+        "membership_factory",
+        [
+            partial(PrescriberMembershipFactory, user__email="sender@example.com"),
+            partial(CompanyMembershipFactory, user__email="sender@example.com"),
+        ],
+    )
+    def test_professional_sends_email_to_service_provider(self, client, membership_factory, settings, mailoutbox):
+        service = ServiceFactory(contact_email="contact@example.com")
+        membership = membership_factory()
+        sender = membership.user
+        if isinstance(membership, PrescriberMembership):
+            sender_prescriber_organization = membership.organization
+            sender_company = None
+        else:
+            sender_prescriber_organization = None
+            sender_company = membership.company
+        client.force_login(sender)
+        headers = {"HX-Request": "true"}
+
+        # First, try to send an empty message.
+        data = {"body": "   "}
+        response = client.post(self.get_service_url(service), headers=headers, data=data)
+        assertContains(response, "Ce champ est obligatoire.")
+        assert not MobilizationEmail.objects.exists()
+        assert len(mailoutbox) == 0
+
+        # Now send a correct form.
+        data = {"body": "Bonjour, je souhaiterais orienter un usager."}
+        response = client.post(self.get_service_url(service), headers=headers, data=data)
+
+        assertContains(response, "Le message a bien été envoyé.")
+        mobilization_email = MobilizationEmail.objects.filter(
+            sender=sender,
+            sender_prescriber_organization=sender_prescriber_organization,
+            sender_company=sender_company,
+            service=service,
+        ).get()
+
+        [email_to_service] = mailoutbox
+        assert email_to_service.to == [service.contact_email]
+        assert (
+            email_to_service.from_email
+            == f"{sender.get_full_name()} {product_name('via')} <{settings.DEFAULT_FROM_EMAIL}>"
+        )
+        inbound_parsing_address = generate_inbound_parsing_address(
+            InboundParsingKind.SERVICE_ANSWER, mobilization_email.inbound_parsing_key
+        )
+        assert email_to_service.reply_to == [
+            f"{sender.get_full_name()} {product_name('via')} <{inbound_parsing_address}>"
+        ]
+
+    def test_mobilization_email_is_associated_to_last_mobilization_event(self, client):
+        service = ServiceFactory(contact_email="contact@example.com")
+        membership = PrescriberMembershipFactory()
+        sender = membership.user
+        sender_prescriber_organization = membership.organization
+        client.force_login(sender)
+        headers = {"HX-Request": "true"}
+
+        # Wrong user
+        MobilizationEventFactory(
+            user=PrescriberFactory(),
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+        )
+        # Wrong organization
+        MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=PrescriberOrganizationFactory(),
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+        )
+        # Wrong service
+        MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=ServiceFactory(),
+            structure=StructureFactory(),
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+        )
+        # Wrong kind
+        MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=StructureFactory(),
+            kind=MobilizationEventKind.SERVICE_ORIENTATION,
+        )
+        data = {"body": "Bonjour, je souhaiterais orienter un usager."}
+        client.post(self.get_service_url(service), headers=headers, data=data)
+        mobilization_email = MobilizationEmail.objects.filter(
+            sender=sender,
+            sender_prescriber_organization=sender_prescriber_organization,
+            service=service,
+        ).get()
+        assert mobilization_email.mobilization_event is None
+
+        # Good one
+        first_mobilization_event = MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+        )
+        client.post(self.get_service_url(service), headers=headers, data=data)
+        mobilization_email = MobilizationEmail.objects.filter(
+            sender=sender,
+            sender_prescriber_organization=sender_prescriber_organization,
+            service=service,
+        ).last()
+        assert mobilization_email.mobilization_event == first_mobilization_event
+
+        # Take the last one
+        second_mobilization_event = MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+        )
+        client.post(self.get_service_url(service), headers=headers, data=data)
+        mobilization_email = MobilizationEmail.objects.filter(
+            sender=sender,
+            sender_prescriber_organization=sender_prescriber_organization,
+            service=service,
+        ).last()
+        assert mobilization_email.mobilization_event == second_mobilization_event
 
 
 class TestOrientationDetailsForSender:
