@@ -8,9 +8,10 @@ import io
 import json
 import os
 import socket
+import sys
 import threading
+import traceback
 import uuid
-from functools import reduce
 from urllib.parse import urlsplit
 
 # Workaround being able to use freezegun with pandas.
@@ -329,33 +330,22 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
 
 
 def _fail_for_invalid_template_variable(var):
-    stack = inspect.stack()
-
     origin = None
-    for frame_info in stack[2:]:
-        if frame_info.function == "render":
-            try:
-                render_self = frame_info.frame.f_locals["self"]
-            except KeyError:
-                continue
-            else:
-                if isinstance(render_self, AttrsNode):
-                    # Escape hatch for AttrsNode, which adds attributes to a tag
-                    # if the matching variables are defined.
-                    return ""
-
-            try:
-                origin = render_self.origin
-            except AttributeError:
-                continue
-            if origin is not None:
-                break
-    if origin is None:
-        # finding the ``render`` needle in the stack
-        frameinfo = reduce(lambda x, y: y if y.function == "render" and "base.py" in y.filename else x, stack)
-        template = frameinfo.frame.f_locals["self"]
-        if isinstance(template, base_template.Template):
-            origin = template.name
+    # Start two frames up, skipping this function and Django’s FilterExpression.resolve, which called it.
+    # Walk the frames with traceback.walk_stack rather than inspect.stack(): the latter also reads the source line
+    # of every frame, and for functions rewritten by patchy (no source file on disk) it falls back to scanning all of
+    # sys.modules, which costs ~70 ms per call.
+    for frame, _lineno in traceback.walk_stack(sys._getframe(2)):
+        if frame.f_code.co_name != "render":
+            continue
+        render_self = frame.f_locals.get("self")
+        if isinstance(render_self, AttrsNode):
+            # Escape hatch for AttrsNode, which adds attributes to a tag
+            # if the matching variables are defined.
+            return ""
+        origin = getattr(render_self, "origin", None)
+        if origin is not None:
+            break
 
     if origin:
         msg = f"Undefined template variable '{var}' in '{origin}'"
