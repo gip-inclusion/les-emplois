@@ -1,0 +1,28 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Inspection entêtes {{ block.super }}{% endblock %}
+
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col">
+                    <h2>Entêtes de la requête</h2>
+                    <table class="table table-striped">
+                        <th>Clef</th>
+                        <th>Valeur</th>
+                        {% for key, value in request.headers.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <h2>IP déduite</h2>
+                    {{ request_ip }}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
