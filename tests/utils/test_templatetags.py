@@ -181,7 +181,9 @@ class TestThemeInclusion:
 
 
 @pytest.fixture
-def load_test_users():
+def load_test_users(settings):
+    # The passwords of these users are hashed with the default hasher, which the test settings replace
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.PBKDF2PasswordHasher"]
     call_command("loaddata", "users__user.json")
     call_command("loaddata", "account__email_address.json")
 

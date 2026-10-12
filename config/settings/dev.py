@@ -1,6 +1,8 @@
 import os
 import socket
 
+from django.conf import global_settings
+
 from itou.utils.enums import ItouEnvironment
 
 
@@ -12,6 +14,8 @@ from config.settings.test import *  # noqa: E402,F403
 
 # Override ITOU_ENVIRONMENT value imported from config.settings.test
 ITOU_ENVIRONMENT = ItouEnvironment.DEV
+
+PASSWORD_HASHERS = global_settings.PASSWORD_HASHERS  # The users of the fixtures use the default hasher
 
 # Django settings
 # ---------------
