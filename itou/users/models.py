@@ -38,7 +38,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
-from itou.companies.models import Company, CompanyMembership, Contract
+from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.emails.utils import get_email_message
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
@@ -130,9 +130,11 @@ class UserQuerySet(models.QuerySet):
     def with_contract_ending_soon(self, siae=None):
         return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
 
-    def last_contract_pk_lookup(self):
-        last_contract = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk"))).order_by("-start_date", "-pk")
-        return Subquery(last_contract.values("pk")[:1])
+    def last_contract_pk_lookup(self, siae=None):
+        contracts = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk")))
+        if siae:
+            contracts = contracts.filter(company=siae)
+        return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
 
     def last_contract_ended_with_valid_approval_lookup(self, siae):
         from itou.approvals.models import Approval
@@ -155,6 +157,20 @@ class UserQuerySet(models.QuerySet):
     def with_end_of_journey(self, siae):
         return self.with_contract_ending_soon(siae).annotate(
             last_contract_ended_with_valid_approval=self.last_contract_ended_with_valid_approval_lookup(siae),
+        )
+
+    def with_last_contract_end_date(self, siae):
+        return self.annotate(
+            last_contract_end_date=Subquery(
+                Contract.objects.filter(pk=self.last_contract_pk_lookup(siae=siae)).values("end_date")
+            )
+        )
+
+    def with_last_contract_has_pro_support_report(self, siae):
+        return self.annotate(
+            last_contract_has_pro_support_report=Exists(
+                ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
+            )
         )
 
 

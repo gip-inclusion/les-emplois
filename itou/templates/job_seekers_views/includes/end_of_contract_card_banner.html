@@ -1,31 +1,33 @@
 {% load components %}
 {% load matomo %}
 
-{% if contract_ending_soon_date %}
+{% if contract_end_date %}
     {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id=fiche_banner_extra_id extra_classes="mb-3 mb-md-4" %}
         {% fragment as title %}
-            {% if request.from_employer %}
-                Le contrat arrive bientôt à échéance
-            {% else %}
+            {% if not request.from_employer %}
                 Ce bénéficiaire arrive en fin de contrat de travail
+            {% elif contract_ended %}
+                Le contrat de travail a pris fin
+            {% else %}
+                Le contrat arrive bientôt à échéance
             {% endif %}
         {% endfragment %}
         {% fragment as content %}
             <p class="mb-0">
-                {% if request.from_employer %}
-                    Le contrat de ce salarié arrive à échéance le {{ contract_ending_soon_date|date:"d/m/Y" }}. Préparez au mieux sa fin de contrat en suggérant une suite de parcours adaptée à sa situation.
+                {% if not request.from_employer %}
+                    Son contrat de travail se termine le {{ contract_end_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                {% elif contract_ended %}
+                    Le contrat de ce salarié a pris fin le {{ contract_end_date|date:"d/m/Y" }}, mais son PASS IAE est encore valide. Remplissez le bilan d’accompagnement pour le transmettre à son prescripteur.
                 {% else %}
-                    Son contrat de travail se termine le {{ contract_ending_soon_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                    Le contrat de ce salarié arrive à échéance le {{ contract_end_date|date:"d/m/Y" }}. Remplissez le bilan d’accompagnement pour le transmettre à son prescripteur.
                 {% endif %}
             </p>
         {% endfragment %}
-        {% if suggest_next_step_url %}
+        {% if create_pro_support_report_url %}
             {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link"
-                   href="{{ suggest_next_step_url }}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-fiche" %}>Suggérer une suite de parcours</a>
+                <a class="btn btn-sm btn-primary"
+                   href="{{ create_pro_support_report_url }}"
+                   {% matomo_event "employeurs" "clic" "remplir-bilan-fiche" %}>Remplir le bilan</a>
             {% endfragment %}
         {% elif pro_support_request_mailto %}
             {% fragment as call_to_action %}
