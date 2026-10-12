@@ -5,6 +5,7 @@ from functools import partial
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.gis.geos import Point
 from django.template import Context
 from django.test import TestCase
 from django.urls import reverse
@@ -23,6 +24,7 @@ from pytest_django.asserts import (
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
@@ -35,6 +37,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.geo.factories import create_qpv
 from tests.insertion.factories import OrientationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -336,6 +339,23 @@ def test_both_diag_from_company(client, snapshot):
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
     assert pretty_indented(soup) == snapshot(name="snapshot with IAE diag")
+
+
+@pytest.mark.parametrize("is_in_qpv,assertion", [(True, assertContains), (False, assertNotContains)])
+def test_address_qpv(client, is_in_qpv, assertion):
+    create_qpv("QP075019")
+    job_seeker = JobSeekerFactory(
+        for_snapshot=True,
+        geocoding_score=1,
+        coords=coords_to_geometry("48.85592", "2.41299") if is_in_qpv else Point(0, 0),
+    )
+    qpv_markup = '<span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>'
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    authorized_prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    client.force_login(authorized_prescriber)
+    response = client.get(url)
+    assertion(response, qpv_markup, html=True)
 
 
 @pytest.mark.parametrize("is_authorized", [True, False], ids=["authorized prescriber", "prescriber"])
