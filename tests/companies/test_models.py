@@ -11,7 +11,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind, CompanySource, ContractType
+from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
 from itou.companies.models import Company, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
@@ -21,6 +21,7 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
     JobDescriptionFactory,
+    ProSupportReportFactory,
     SiaeConventionFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
@@ -720,3 +721,28 @@ class TestSiaeACIConvergencePHCModel:
         instance.siret = instance.siret[:-1]
         with pytest.raises(IntegrityError, match=r".*aci_cvg_phc_siret.*"):
             instance.save()
+
+
+class TestProSupportReport:
+    @pytest.mark.parametrize(
+        "kwargs,constraint",
+        [
+            pytest.param(
+                {"solution": ProSupportReportSolution.TRAINING},
+                "prosupportreport_solution_or_orientation",
+                id="solution_and_orientation",
+            ),
+            pytest.param(
+                {"orientation": ""}, "prosupportreport_solution_or_orientation", id="no_solution_nor_orientation"
+            ),
+            pytest.param({"autonomy": 6}, "prosupportreport_autonomy_range", id="autonomy_out_of_range"),
+        ],
+    )
+    def test_constraints(self, kwargs, constraint):
+        with pytest.raises(IntegrityError, match=constraint):
+            ProSupportReportFactory(**kwargs)
+
+    def test_unique_per_contract(self):
+        report = ProSupportReportFactory()
+        with pytest.raises(IntegrityError, match="unique_prosupportreport_per_contract"):
+            ProSupportReportFactory(contract=report.contract)
