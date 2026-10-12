@@ -171,7 +171,7 @@ def _get_token(request, code):
         if response.status_code == 400:
             try:
                 content = response.json()
-            except (json.decoder.JSONDecodeError, UnicodeDecodeError):
+            except json.decoder.JSONDecodeError, UnicodeDecodeError:
                 content = response.text
             logger.warning(
                 "Bad request in pro_connect_callback",
