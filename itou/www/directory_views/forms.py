@@ -10,7 +10,6 @@ class PeopleSearchForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "id": "q-personnes",
                 "placeholder": "Nom ou prénom",
                 "autocomplete": "off",
                 "class": "form-control",

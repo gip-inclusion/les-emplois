@@ -74,7 +74,6 @@ def test_people_search_restores_query_from_url(client):
     assert response.status_code == 200
     assert response.context["form"]["q"].value() == "Alice"
     assert response.context["form"]["types"].value() == [NexusStructureKind.ML]
-    assertContains(response, 'id="q-personnes"')
     assertContains(response, static("js/directory_feedback.js"))
     assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "Vous faites partie des premiers à accéder à cette fonctionnalité")
