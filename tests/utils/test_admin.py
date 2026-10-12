@@ -82,7 +82,12 @@ def get_all_factories():
     return set(get_all_subclasses(factory.django.DjangoModelFactory))
 
 
-def test_all_admin(admin_client, mocker, subtests):
+# The admin pages take a while to render: spread them over several pytest-xdist workers
+ADMIN_SHARDS = 4
+
+
+@pytest.mark.parametrize("shard", range(ADMIN_SHARDS))
+def test_all_admin(admin_client, mocker, subtests, shard):
     """Test that all admin pages load without error."""
     mocker.patch("itou.utils.throttling.FailSafeUserRateThrottle.rate", "10000/minute")  # Avoid rate limiting
 
@@ -191,8 +196,9 @@ def test_all_admin(admin_client, mocker, subtests):
             continue
         factory_class()
 
-    # Test all admin pages for all registered models
-    for model in admin_registered_models:
+    # Test all admin pages for the registered models of this shard
+    # shard 0 gets models 0, 4, 8, …, shard 1 gets 1, 5, 9, …, and so on
+    for model in sorted(admin_registered_models, key=lambda model: model._meta.label)[shard::ADMIN_SHARDS]:
         app_label = model._meta.app_label
         model_name = model._meta.model_name
         with subtests.test(model=f"{app_label}.{model_name}"):
