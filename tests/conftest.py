@@ -3,6 +3,7 @@ import contextlib
 import copy
 import datetime
 import enum
+import fcntl
 import inspect
 import io
 import json
@@ -138,6 +139,62 @@ def htmx_client():
     ```
     """
     return HtmxClient()
+
+
+def _create_template_db_once(template_db_name, lock_path, verbosity):
+    """Create and migrate the template database, unless another xdist worker of the session already tried."""
+    with open(lock_path, "a+") as lock_file:
+        fcntl.flock(lock_file, fcntl.LOCK_EX)  # released when the file is closed
+        lock_file.seek(0)
+        match lock_file.read():
+            case "created":
+                return
+            case "failed":
+                pytest.fail("Another xdist worker failed to create the template database", pytrace=False)
+        test_settings = connection.settings_dict["TEST"]
+        db_name, worker_db_name = connection.settings_dict["NAME"], test_settings["NAME"]
+        test_settings["NAME"] = template_db_name  # temporarily, to create the template database
+        try:
+            # https://docs.djangoproject.com/en/stable/topics/testing/advanced/#django.db.connection.creation.create_test_db
+            connection.creation.create_test_db(verbosity=verbosity, autoclobber=True)
+        except BaseException:  # including the SystemExit of Django when it can't create the database
+            lock_file.write("failed")  # spare the other workers a migration run bound to fail the same way
+            raise
+        finally:
+            test_settings["NAME"] = worker_db_name
+            # create_test_db() points the settings to the database it creates
+            settings.DATABASES[connection.alias]["NAME"] = connection.settings_dict["NAME"] = db_name
+        connection.close()  # no session may be connected to the template while it is copied
+        lock_file.write("created")
+
+
+@pytest.fixture(scope="session")
+def django_db_modify_db_settings(
+    request,
+    django_test_environment,
+    django_db_modify_db_settings_parallel_suffix,
+    django_db_blocker,
+    django_db_createdb,
+    tmp_path_factory,
+):
+    """Under xdist with `--create-db`, migrate a template database once, which pytest-django copies for each worker.
+
+    Otherwise, every worker runs all the migrations at the same time, which takes much longer.
+    It overrides pytest-django's fixture meant for that purpose, which only adds the xdist and tox suffixes to the
+    database names. PostgreSQL's `TEST["TEMPLATE"]` setting makes `create_test_db()` copy the template with
+    `CREATE DATABASE … TEMPLATE …`, after which its `migrate` has nothing left to apply.
+    """
+    worker_id = getattr(request.config, "workerinput", {}).get("workerid")
+    if worker_id is None or not django_db_createdb:  # xdist is not used or `--create-db` is not passed
+        return
+    # Named after the worker by pytest-django's `django_db_modify_db_settings_xdist_suffix`
+    worker_db_name = connection.creation._get_test_db_name()  # e.g. "test_mydb_gw1" for worker 1
+    template_db_name = worker_db_name.removesuffix(f"_{worker_id}")
+    # The parent directory is shared by all the workers of the session
+    lock_path = tmp_path_factory.getbasetemp().parent / "django_db_template"
+    with django_db_blocker.unblock():
+        _create_template_db_once(template_db_name, lock_path, request.config.option.verbose)
+    connection.settings_dict["TEST"]["TEMPLATE"] = template_db_name
 
 
 @pytest.fixture(autouse=True, scope="session")
