@@ -38,7 +38,9 @@ def generate_html_alternative(plain_text_body):
     )
 
 
-def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
+def get_email_message(
+    to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None, reply_to=None
+):
     email_context = copy.deepcopy(context)
     email_context["itou_help_center_url"] = global_constants.ITOU_HELP_CENTER_URL
     email_context["itou_environment"] = settings.ITOU_ENVIRONMENT
@@ -56,6 +58,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         to=to,
         cc=cc,
         bcc=bcc,
+        reply_to=reply_to,
         subject=subject,
         body=body_text,
     )
