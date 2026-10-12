@@ -8,7 +8,10 @@ os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
 # Inject default redis settings
 os.environ["REDIS_URL"] = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
+os.environ["REDIS_HOST"] = os.getenv("REDIS_HOST", "127.0.0.1")
+os.environ["REDIS_PORT"] = os.getenv("REDIS_PORT", "6379")
 os.environ["REDIS_DB"] = os.getenv("REDIS_DB", "0")
+os.environ["REDIS_PASSWORD"] = os.getenv("REDIS_PASSWORD", "")
 
 from config.settings.base import *  # noqa: E402,F403
 
