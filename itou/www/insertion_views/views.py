@@ -558,7 +558,12 @@ def orientation_details_for_sender(request, orientation_id):
     sender_company = request.current_organization if isinstance(request.current_organization, Company) else None
     orientation = get_object_or_404(
         insertion_models.Orientation.objects.select_related(
-            "beneficiary", "service", "service__structure", "service__source"
+            "beneficiary",
+            "beneficiary__jobseeker_profile",
+            "beneficiary__jobseeker_profile__birth_country",
+            "service",
+            "service__structure",
+            "service__source",
         ).prefetch_related("documents"),
         id=orientation_id,
         sender_prescriber_organization=sender_prescriber_organization,
@@ -584,6 +589,8 @@ def orientation_details_for_service_provider(request):
         insertion_models.OrientationProcessLink.objects.select_related(
             "orientation",
             "orientation__beneficiary",
+            "orientation__beneficiary__jobseeker_profile",
+            "orientation__beneficiary__jobseeker_profile__birth_country",
             "orientation__sender",
             "orientation__sender_prescriber_organization",
             "orientation__sender_company",
