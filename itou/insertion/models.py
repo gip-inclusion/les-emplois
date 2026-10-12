@@ -34,6 +34,7 @@ from itou.insertion.enums import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
+from itou.utils.apis.inbound_parsing import generate_key
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code
@@ -550,6 +551,42 @@ class MobilizationEvent(models.Model):
                 condition=models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & ~models.Q(service_external_link="")
                 | (~models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & models.Q(service_external_link="")),
             ),
+        ]
+
+
+class MobilizationEmail(models.Model):
+    inbound_parsing_key = models.CharField(verbose_name="clé d’inbound parsing", unique=True, default=generate_key)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="+")
+    mobilization_event = models.ForeignKey(MobilizationEvent, on_delete=models.SET_NULL, null=True, related_name="+")
+    sender = models.ForeignKey(User, verbose_name="expéditeur", on_delete=models.CASCADE, related_name="+")
+    sender_prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prescriptrice émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="+",
+    )
+    sender_company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="+",
+    )
+    sent_at = models.DateTimeField(verbose_name="date d’envoi du mail", auto_now_add=True)
+    answered_at = models.DateTimeField(verbose_name="date de réception de la réponse", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "mise en relation par mail"
+        verbose_name_plural = "mises en relation par mail"
+        constraints = [
+            models.CheckConstraint(
+                name="sender_organization_coherence",
+                condition=models.Q(sender_prescriber_organization__isnull=True, sender_company__isnull=False)
+                | models.Q(sender_prescriber_organization__isnull=False, sender_company__isnull=True),
+            )
         ]
 
 
