@@ -24,6 +24,18 @@ def flush_huey(defer_huey):
     HUEY.storage.flush_queue()
 
 
+@pytest.fixture(params=[False, True], ids=["without_sentry", "with_sentry"])
+def sentry_enabled(request):
+    """Run the test without a Sentry client, like the rest of the test suite, and with one, like in production.
+
+    Its Huey integration adds a `sentry_headers` keyword argument to each task when it is enqueued, and removes it
+    before the task is executed.
+    """
+    if request.param:
+        request.getfixturevalue("sentry")
+    return request.param
+
+
 @pytest.fixture(name="fake_task")
 def fake_task_fixture():
     executed = []
@@ -36,7 +48,7 @@ def fake_task_fixture():
     test_task.unregister()
 
 
-def test_redis_unavailable_stores_to_db(fake_task, mocker):
+def test_redis_unavailable_stores_to_db(fake_task, mocker, sentry_enabled):
     mocker.patch("huey.storage.RedisStorage.enqueue", side_effect=RedisError)
     task, executed = fake_task
 
@@ -46,11 +58,13 @@ def test_redis_unavailable_stores_to_db(fake_task, mocker):
     data = HUEY.serializer.deserialize(task.data)
     assert data.name == "test_fallback_to_postgres.test_task"
     assert data.args == (1, 2)
-    del data.kwargs["sentry_headers"]
+    if sentry_enabled:
+        assert data.kwargs.pop("sentry_headers").keys() == {"baggage", "sentry-trace"}
     assert data.kwargs == {"a": None}
     assert executed == []
 
 
+@pytest.mark.usefixtures("sentry_enabled")
 def test_requeue(caplog, fake_task, mocker):
     mocker.patch("huey.storage.RedisStorage.enqueue", side_effect=RedisError)
     task, executed = fake_task

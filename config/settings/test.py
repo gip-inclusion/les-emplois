@@ -10,6 +10,9 @@ os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 os.environ["REDIS_URL"] = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 os.environ["REDIS_DB"] = os.getenv("REDIS_DB", "0")
 
+# Never send events from the test suite, even when the variable is exported in the shell
+os.environ.pop("SENTRY_DSN", None)
+
 from config.settings.base import *  # noqa: E402,F403
 
 
