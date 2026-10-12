@@ -63,53 +63,6 @@
                                   </li>
                               </ul>
                           </div>
-                          <div class="alert alert-info mb-3 mb-md-4" role="status">
-                              <div class="row">
-                                  <div class="col-auto pe-0">
-                                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
-                                      </i>
-                                  </div>
-                                  <div class="col">
-                                      <p class="mb-0">
-                                          Veuillez vous assurer que les coordonnées de votre usager sont bien à jour
-                                      </p>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="c-box mb-3 mb-md-4 position-relative">
-                              <div class="position-absolute top-0 end-0 m-3">
-                                  <span class="btn btn-outline-primary w-100 w-md-auto disabled" data-bs-placement="top" data-bs-title="Cet usager a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" tabindex="0">
-                                      Modifier
-                                  </span>
-                              </div>
-                              <ul class="list-data mb-0 pe-md-5">
-                                  <li class="has-forced-line-break">
-                                      <small>
-                                          Adresse
-                                      </small>
-                                      <i class="text-disabled">
-                                          Non renseignée
-                                      </i>
-                                  </li>
-                                  <li class="has-forced-line-break">
-                                      <small>
-                                          N° de téléphone
-                                      </small>
-                                      <strong>
-                                          0… 0… 0… 0… 0…
-                                      </strong>
-                                  </li>
-                                  <li class="has-forced-line-break">
-                                      <small>
-                                          Adresse mail
-                                      </small>
-                                      <strong>
-                                          t…
-                                      </strong>
-                                  </li>
-                              </ul>
-                          </div>
-                          <hr class="my-3"/>
                           <h2 class="h3">
                               Critères et conditions d'accès
                           </h2>
