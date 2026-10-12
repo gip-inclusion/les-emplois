@@ -3,6 +3,7 @@ import logging
 import math
 import secrets
 import uuid
+from email.headerregistry import Address
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from dateutil.relativedelta import relativedelta
@@ -19,6 +20,7 @@ from django_xworkflows import models as xwf_models
 from xworkflows import after_transition, before_transition
 
 import itou.insertion.notifications as orientation_notifications
+from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.emails.utils import get_email_message
 from itou.files.models import File
@@ -34,7 +36,8 @@ from itou.insertion.enums import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
-from itou.utils.apis.inbound_parsing import generate_key
+from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address, generate_key
+from itou.utils.brand import product_name
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code
@@ -588,6 +591,27 @@ class MobilizationEmail(models.Model):
                 | models.Q(sender_prescriber_organization__isnull=False, sender_company__isnull=True),
             )
         ]
+
+    def free_form_email_to_service(self, body_message):
+        inbound_parsing_email = generate_inbound_parsing_address(
+            kind=InboundParsingKind.SERVICE_ANSWER, key=self.inbound_parsing_key
+        )
+        sender_organization = self.sender_prescriber_organization or self.sender_company
+
+        from_email = Address(
+            display_name=f"{self.sender.get_full_name()} {product_name('via')}", addr_spec=settings.DEFAULT_FROM_EMAIL
+        )
+        to = [self.service.contact_email]
+        reply_to = [
+            Address(
+                display_name=f"{self.sender.get_full_name()} {product_name('via')}", addr_spec=inbound_parsing_email
+            )
+        ]
+        context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
+
+        subject = "insertion/email/free_form_email_to_service_subject.txt"
+        body = "insertion/email/free_form_email_body.md"
+        return get_email_message(to, context, subject, body, from_email=from_email, reply_to=reply_to)
 
 
 class OrientationWorkflow(xwf_models.Workflow):
