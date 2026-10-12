@@ -32,12 +32,6 @@ AUTHOR_KIND_CHOICES = (
 )
 
 
-def get_user_age_in_years(user):
-    if user.jobseeker_profile.birthdate:
-        return timezone.localdate().year - user.jobseeker_profile.birthdate.year
-    return None
-
-
 def get_user_signup_kind(user):
     creator = user.created_by
     if creator is None:
@@ -210,7 +204,12 @@ def get_table():
                 "comment": "Mois de naissance du candidat selon le NIR",
                 "fn": get_birth_month_from_nir,
             },
-            {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
+            {
+                "name": "age",
+                "type": "integer",
+                "comment": "Âge du candidat en années",
+                "fn": lambda o: o.jobseeker_profile.age,
+            },
             get_column_from_field(get_model_field(User, "date_joined"), name="date_inscription", field_type="date"),
             {
                 "name": "type_inscription",
