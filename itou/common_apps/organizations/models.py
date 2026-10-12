@@ -8,8 +8,8 @@ from django.db.models import Prefetch, Q
 from django.forms import ValidationError
 from django.utils import timezone
 
+from itou.emails.utils import get_email_message
 from itou.users.enums import UserKind
-from itou.utils.emails import get_email_message
 
 
 logger = logging.getLogger("itou.members")

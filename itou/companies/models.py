@@ -32,7 +32,7 @@ from itou.companies.enums import (
     JobSource,
     JobSourceTag,
 )
-from itou.utils.emails import get_email_message
+from itou.emails.utils import get_email_message
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url

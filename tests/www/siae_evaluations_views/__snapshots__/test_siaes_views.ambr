@@ -1528,7 +1528,7 @@
       }),
       dict({
         'origin': list([
-          'get_email_message[utils/emails.py]',
+          'get_email_message[emails/utils.py]',
           'InstitutionEmailFactory.submitted_by_siae[siae_evaluations/emails.py]',
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
@@ -1550,7 +1550,7 @@
         'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'send_email_messages[utils/emails.py]',
+          'send_email_messages[emails/utils.py]',
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''

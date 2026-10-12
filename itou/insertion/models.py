@@ -20,6 +20,7 @@ from xworkflows import after_transition, before_transition
 
 import itou.insertion.notifications as orientation_notifications
 from itou.companies.models import Company
+from itou.emails.utils import get_email_message
 from itou.files.models import File
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
@@ -33,7 +34,6 @@ from itou.insertion.enums import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
-from itou.utils.emails import get_email_message
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code

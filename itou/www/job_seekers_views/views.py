@@ -30,6 +30,7 @@ from itou.asp.utils import guess_birth_place_from_nir
 from itou.companies.models import Company, CompanyMembership, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.emails.utils import redact_email_address
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.insertion.models import Orientation
@@ -41,7 +42,6 @@ from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
-from itou.utils.emails import redact_email_address
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information

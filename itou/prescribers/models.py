@@ -15,6 +15,7 @@ from itou.common_apps.organizations.models import (
     OrganizationKind,
     OrganizationQuerySet,
 )
+from itou.emails.utils import get_email_message
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -23,7 +24,6 @@ from itou.prescribers.enums import (
     PrescriberOrganizationKind,
     categories_for_kind,
 )
-from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
 

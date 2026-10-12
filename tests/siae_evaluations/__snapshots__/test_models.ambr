@@ -794,8 +794,8 @@
           'BlockNode[layout/base_email_text_body.md]',
           'AutoEscapeControlNode[layout/base_email_text_body.md]',
           'ExtendsNode[siae_evaluations/email/to_siae_selected_body.md]',
-          'get_email_text_template[utils/emails.py]',
-          'get_email_message[utils/emails.py]',
+          'get_email_text_template[emails/utils.py]',
+          'get_email_message[emails/utils.py]',
           'SIAEEmailFactory.selected[siae_evaluations/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
@@ -817,7 +817,7 @@
       }),
       dict({
         'origin': list([
-          'get_email_message[utils/emails.py]',
+          'get_email_message[emails/utils.py]',
           'SIAEEmailFactory.selected[siae_evaluations/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
@@ -839,7 +839,7 @@
       }),
       dict({
         'origin': list([
-          'get_email_message[utils/emails.py]',
+          'get_email_message[emails/utils.py]',
           'CampaignEmailFactory.selected_siae[siae_evaluations/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
@@ -861,7 +861,7 @@
         'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'send_email_messages[utils/emails.py]',
+          'send_email_messages[emails/utils.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -883,7 +883,7 @@
         'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'send_email_messages[utils/emails.py]',
+          'send_email_messages[emails/utils.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''

@@ -38,6 +38,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
+from itou.emails.utils import redact_email_address
 from itou.job_applications.enums import JobApplicationState
 from itou.otp.middleware import OtpMiddleware
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -45,7 +46,6 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.admin import add_support_remark_to_obj, bulk_add_support_remark_to_objs
-from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware

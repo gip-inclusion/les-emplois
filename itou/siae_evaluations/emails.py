@@ -2,8 +2,8 @@ import urllib.parse
 
 from django.urls import reverse
 
+from itou.emails.utils import get_email_message
 from itou.utils import constants as global_constants
-from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 
 

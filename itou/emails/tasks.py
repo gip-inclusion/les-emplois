@@ -13,7 +13,7 @@ from huey.exceptions import CancelExecution
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
-from itou.utils.emails import generate_html_alternative
+from itou.emails.utils import generate_html_alternative
 from itou.utils.enums import ItouEnvironment
 
 
