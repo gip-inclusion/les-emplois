@@ -413,7 +413,7 @@ class Command(BaseCommand):
         """
         queryset = (
             User.objects.filter(kind=UserKind.JOB_SEEKER)
-            .select_related("jobseeker_profile", "created_by")
+            .select_related("jobseeker_profile", "created_by", "insee_city")
             .prefetch_related(
                 Prefetch(
                     "eligibility_diagnoses",
@@ -492,6 +492,7 @@ class Command(BaseCommand):
                 "department",  # get_department_and_region_columns
                 "coords",  # get_job_seeker_qpv_info
                 "geocoding_score",  # get_job_seeker_qpv_info
+                "insee_city__code_insee",  # get_code_commune
             )
             .all()
         )
