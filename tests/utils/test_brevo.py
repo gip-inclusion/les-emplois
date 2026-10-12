@@ -179,3 +179,16 @@ def test_list_contacts_malformed_response(respx_mock, caplog, brevo_client):
         brevo_client.list_contacts()
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == "Unexpected response format from Brevo API /contacts, limit: 1000, offset: 0"
+
+
+def test_import_users_pauses_between_requests(mocker, respx_mock, brevo_client):
+    sleep = mocker.patch("itou.utils.brevo.time.sleep")
+    mocker.patch.object(BrevoClient, "IMPORT_BATCH_SIZE", 1)
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(return_value=httpx.Response(202))
+
+    # Two batches in a single call, then another request from a second call: both are spaced out
+    brevo_client.import_users([{"email": "user1@example.com"}, {"email": "user2@example.com"}], 31, lambda x: x)
+    brevo_client.import_users([{"email": "user3@example.com"}], 32, lambda x: x)
+
+    assert route.call_count == 3
+    assert sleep.call_args_list == [mocker.call(BrevoClient.IMPORT_BATCH_DELAY)] * 2
