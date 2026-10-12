@@ -9,7 +9,14 @@ from django.utils import timezone
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
-from itou.companies.enums import CompanyKind, CompanySource, ContractType
+from itou.companies.enums import (
+    CompanyKind,
+    CompanySource,
+    ContractType,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+)
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.enums import EvaluationSiaesKind
 from tests.cities.factories import create_city_vannes
@@ -239,3 +246,17 @@ class ContractFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     start_date = factory.Faker("date_between", start_date="-1y", end_date="-1m")
     end_date = factory.Faker("date_between", start_date="-1m", end_date="+1m")
+
+
+class ProSupportReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.ProSupportReport
+
+    contract = factory.SubFactory(ContractFactory)
+    job_seeker = factory.SelfAttribute("contract.job_seeker")
+    company = factory.SelfAttribute("contract.company")
+    author = factory.SubFactory(EmployerFactory)
+    contract_end_date = factory.SelfAttribute("contract.end_date")
+    barriers = factory.List([ProSupportReportBarrier.MOBILITY])
+    autonomy = ProSupportReportAutonomy.OCCASIONAL_SUPPORT
+    orientation = ProSupportReportOrientation.SOCIO_PROFESSIONAL

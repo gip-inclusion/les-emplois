@@ -948,7 +948,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 89,
+    'num_queries': 91,
     'queries': list([
       dict({
         'origin': list([
@@ -1134,6 +1134,11 @@
                              (SELECT %s AS "a"
                               FROM "companies_contract" U0
                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                              LIMIT 1)
+                           OR EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_prosupportreport" U0
+                              WHERE U0."author_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
@@ -1863,6 +1868,43 @@
                                                                    %s,
                                                                    %s,
                                                                    %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_prosupportreport"."id",
+                 "companies_prosupportreport"."public_id",
+                 "companies_prosupportreport"."created_at",
+                 "companies_prosupportreport"."job_seeker_id",
+                 "companies_prosupportreport"."company_id",
+                 "companies_prosupportreport"."author_id",
+                 "companies_prosupportreport"."contract_id",
+                 "companies_prosupportreport"."contract_end_date",
+                 "companies_prosupportreport"."barriers",
+                 "companies_prosupportreport"."other_barrier",
+                 "companies_prosupportreport"."autonomy",
+                 "companies_prosupportreport"."solution",
+                 "companies_prosupportreport"."orientation"
+          FROM "companies_prosupportreport"
+          WHERE "companies_prosupportreport"."author_id" IN (%s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3243,6 +3285,30 @@
                                                             %s,
                                                             %s,
                                                             %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "companies_prosupportreport"
+          WHERE "companies_prosupportreport"."job_seeker_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
         ''',
       }),
       dict({
