@@ -231,12 +231,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
         elif self.request.from_authorized_prescriber and self.object.contract_ending_soon:
             if last_contract := self.object.contracts.order_by("-end_date").first():
                 contract_end_date = last_contract.end_date
-                company_email = (
-                    User.objects.filter(pk=self.object.pk)
-                    .annotate(company_email=_pro_support_request_company_email())
-                    .values_list("company_email", flat=True)
-                    .first()
-                )
+                company_email = last_contract.company.email if last_contract.company else None
                 # The job seeker's name is in the mail body: no action when it must stay masked.
                 if company_email and context["can_view_personal_information"]:
                     pro_support_request_mailto = _build_pro_support_request_mailto(
