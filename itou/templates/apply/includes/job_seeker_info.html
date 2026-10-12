@@ -75,6 +75,9 @@
             <small>Adresse</small>
             {% if job_seeker.address_on_one_line %}
                 <address>{{ job_seeker.address_on_one_line }}</address>
+                {% if job_seeker.address_in_qpv %}
+                    <span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>
+                {% endif %}
             {% else %}
                 <i class="text-disabled">Non renseignée</i>
             {% endif %}
