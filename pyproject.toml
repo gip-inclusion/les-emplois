@@ -21,8 +21,7 @@ select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
     "I",  # isort
-    # TODO(xfernandez): uncomment UP when everything is OK with Python 3.14
-    # "UP",  # pyupgrade
+    "UP",  # pyupgrade
     "TID",  # flake8-tidy-imports
 ]
 
