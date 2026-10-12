@@ -3,6 +3,7 @@ import socket
 
 from django.conf import global_settings
 
+from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
 
 
@@ -16,6 +17,7 @@ from config.settings.test import *  # noqa: E402,F403
 ITOU_ENVIRONMENT = ItouEnvironment.DEV
 
 PASSWORD_HASHERS = global_settings.PASSWORD_HASHERS  # The users of the fixtures use the default hasher
+sentry_init()  # Skipped by the base settings, which see the ITOU_ENVIRONMENT of the test settings
 
 # Django settings
 # ---------------

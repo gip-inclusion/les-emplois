@@ -14,7 +14,7 @@ from itou.utils.logging import REDACTED
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 
 
-pytestmark = pytest.mark.usefixtures("clean_sentry_scope")
+pytestmark = pytest.mark.usefixtures("sentry", "clean_sentry_scope")
 
 
 @pytest.fixture(name="clean_sentry_scope")

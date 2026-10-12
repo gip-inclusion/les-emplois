@@ -458,7 +458,10 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gou
 # Sentry
 # Expose the value through the settings_viewer app.
 SENTRY_DSN = os.getenv("SENTRY_DSN")
-sentry_init()
+if ITOU_ENVIRONMENT != ItouEnvironment.TEST:
+    # Its integrations instrument every request, SQL query, cache access and signal, even without a DSN:
+    # that slows the test suite down
+    sentry_init()
 
 SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (
     ItouEnvironment.DEMO,

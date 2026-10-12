@@ -19,6 +19,7 @@ import pandas  # noqa F401
 import paramiko
 import patchy
 import pytest
+import sentry_sdk
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from dateutil.relativedelta import relativedelta
@@ -42,6 +43,7 @@ from tests.openid_connect.pro_connect.testing import ProConnectSetup
 pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 
 # ruff: disable[E402]
+from config.sentry import sentry_init
 from itou.emails.markdown import known_domains
 from itou.utils import faker_providers
 from itou.utils.cache import UnclearableCache
@@ -656,6 +658,15 @@ def profile_login(client):
             raise ValueError(f"Invalid profile: '{profile}'")
 
     return login
+
+
+@pytest.fixture(name="sentry")
+def sentry_fixture():
+    """Initialize Sentry, which the test settings leave out to keep the test suite fast."""
+    sentry_init()
+    yield
+    # The integrations stay installed but do nothing without a client
+    sentry_sdk.get_global_scope().set_client(None)
 
 
 ## Mockers
