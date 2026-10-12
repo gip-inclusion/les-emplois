@@ -6,7 +6,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+    assertTemplateNotUsed,
+    assertTemplateUsed,
+)
 
 from itou.files.models import File
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation, OrientationProcessLink
@@ -492,7 +499,7 @@ def test_orientation_wizard_happy_path_as_employer(client, mailoutbox):
         pytest.param(False, True, "Jean DUPONT : usager@example.org", id="not_authorized_creator"),
     ],
 )
-def test_orientation_wizard_success_toast_personal_information(client, mocker, authorized, created_by, expected):
+def test_orientation_wizard_and_personal_information(client, authorized, created_by, expected):
     prescriber = PrescriberMembershipFactory(organization__authorized=authorized).user
     job_seeker = JobSeekerFactory(
         first_name="Jean",
@@ -503,11 +510,23 @@ def test_orientation_wizard_success_toast_personal_information(client, mocker, a
     JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
     service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    beneficiary_info_template = "insertion/includes/orientation_beneficiary_contact.html"
 
     client.force_login(prescriber)
     client.get(start_url, {"job_seeker_public_id": job_seeker.public_id})
-
     session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+
+    response = client.get(
+        reverse(
+            "insertion_views:orientation_steps",
+            kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+        )
+    )
+    if authorized or created_by:
+        assertTemplateUsed(response, beneficiary_info_template)
+    else:
+        assertTemplateNotUsed(response, beneficiary_info_template)
+
     client.post(
         reverse(
             "insertion_views:orientation_steps",

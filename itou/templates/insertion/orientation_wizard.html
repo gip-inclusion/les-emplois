@@ -64,13 +64,15 @@
                             <form method="post" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 {% bootstrap_form_errors form type="all" %}
-                                {% component_alert content=coordinates_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
-                                    {% fragment as coordinates_alert_content %}
-                                        <p class="mb-0">Veuillez vous assurer que les coordonnées de votre usager sont bien à jour</p>
-                                    {% endfragment %}
-                                {% endcomponent_alert %}
-                                {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information can_view_personal_information=can_view_personal_information request=request only %}
-                                <hr class="my-3">
+                                {% if can_view_personal_information %}
+                                    {% component_alert content=coordinates_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as coordinates_alert_content %}
+                                            <p class="mb-0">Veuillez vous assurer que les coordonnées de votre usager sont bien à jour</p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                    {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information request=request only %}
+                                    <hr class="my-3">
+                                {% endif %}
                                 <h2 class="h3">Critères et conditions d'accès</h2>
                                 {% if service.fee %}
                                     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
