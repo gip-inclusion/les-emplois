@@ -17,8 +17,49 @@ runs:
         SQL
         docker kill --signal=SIGHUP ${{ job.services.postgres.id }}
       shell: bash
+    # The Ubuntu mirror regularly slows down to a few kB/s: cache the packages.
+    # PRs and the merge queue only restore their own caches and the ones created on main:
+    # after bumping the key, seed it with `gh workflow run ci.yml --ref main`
+    - name: 🔑 Spatial libraries cache key
+      id: apt-cache-key
+      # the .deb files depend on the Ubuntu release and on the CPU architecture:
+      # `steps.apt-cache-key.outputs.key` will contain something like `apt-24.04-X64-gdal-bin-1`
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#setting-an-output-parameter
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
+      run: |
+        . /etc/os-release
+        echo "key=apt-$VERSION_ID-$RUNNER_ARCH-gdal-bin-1" >> "$GITHUB_OUTPUT"
+      shell: bash
+    - name: 💾 Restore spatial libraries cache
+      id: apt-cache
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # https://github.com/actions/cache v6.1.0
+      with:
+        key: ${{ steps.apt-cache-key.outputs.key }}
+        path: ~/apt-cache/
+    - name: 🌍 Download spatial libraries
+      if: steps.apt-cache.outputs.cache-hit != 'true'
+      # Django loads GDAL and GEOS with ctypes: no need for headers or compilers
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends --download-only gdal-bin
+        mkdir -p ~/apt-cache
+        cp /var/cache/apt/archives/*.deb ~/apt-cache/
+      shell: bash
+    - name: 💾 Save spatial libraries cache
+      if: steps.apt-cache.outputs.cache-hit != 'true'
+      # Right away rather than at the end of the job, which failing tests would prevent
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # https://github.com/actions/cache v6.1.0
+      with:
+        key: ${{ steps.apt-cache-key.outputs.key }}
+        path: ~/apt-cache/
     - name: 🌍 Install spatial libraries
-      run: sudo apt-get update && sudo apt-get install binutils build-essential libproj-dev gdal-bin
+      # Unlike `dpkg --install`, apt installs the packages in the order their dependencies require
+      run: |
+        if ! sudo apt-get install --no-install-recommends ~/apt-cache/*.deb; then
+          echo "::warning::The cached spatial libraries no longer fit the runner image, bump the cache key"
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends gdal-bin
+        fi
       shell: bash
     - name: 💾 Create a database to check migrations
       run: |
