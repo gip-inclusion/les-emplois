@@ -1,7 +1,7 @@
+from allauth.core.internal.httpkit import get_client_ip
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django_datadog_logger.formatters.datadog import get_client_ip
 
 
 class AuditTrailEventType(models.TextChoices):
