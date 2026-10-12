@@ -18,6 +18,7 @@ from tests.insertion.factories import (
     THEMATIC_VALUE,
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
+    MobilizationEmailFactory,
     MobilizationEventFactory,
     OtherThematicFactory,
     RemoteReceptionFactory,
@@ -370,6 +371,23 @@ class TestMobilizationEvent:
                 service=ServiceFactory(),
             )
         assert not MobilizationEvent.objects.exists()
+
+
+class TestMobilizationEmail:
+    def test_sender_organization_coherence(self):
+        prescriber_organization = PrescriberOrganizationFactory()
+        company = CompanyFactory()
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*sender_organization_coherence.*"):
+                MobilizationEmailFactory(sender_prescriber_organization=None, sender_company=None)
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*sender_organization_coherence.*"):
+                MobilizationEmailFactory(
+                    sender_prescriber_organization=prescriber_organization, sender_company=company
+                )
+
+        MobilizationEmailFactory(sender_prescriber_organization=prescriber_organization, sender_company=None)
+        MobilizationEmailFactory(sender_prescriber_organization=None, sender_company=company)
 
 
 class TestIsActiveManager:
