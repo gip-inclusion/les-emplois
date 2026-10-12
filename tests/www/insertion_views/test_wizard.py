@@ -2,6 +2,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
@@ -15,7 +16,9 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
+from itou.asp.models import Country
 from itou.files.models import File
+from itou.geo.utils import coords_to_geometry
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation, OrientationProcessLink
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
@@ -23,6 +26,7 @@ from itou.users.models import JobSeekerAssignment
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.geo.factories import create_qpv
 from tests.insertion.factories import GenericReferenceItemFactory, MobilizationEventFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
@@ -44,6 +48,8 @@ def test_orientation_wizard_happy_path(client, snapshot, mailoutbox):
         address_line_1="9 Allée des Peupliers",
         post_code="33000",
         city="Bordeaux",
+        jobseeker_profile__birth_country=Country.objects.get(name="DANEMARK"),
+        jobseeker_profile__pole_emploi_id="5555555A",
     )
     JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
     fee = GenericReferenceItemFactory(
@@ -415,6 +421,74 @@ def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snap
         )
         == snapshot
     )
+
+
+def test_conformity_step_with_unblocking_missing_beneficiary_information(client, snapshot):
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    job_seeker = JobSeekerFactory(
+        for_snapshot=True,
+        first_name="Pierre",
+        last_name="DUPONT",
+        phone="0606060606",
+        email="test@example.org",
+        title="",
+        jobseeker_profile__birthdate=None,
+        jobseeker_profile__birth_country=None,
+        address_line_1="",
+        address_line_2="",
+        city="",
+        department="",
+        post_code="",
+    )
+    service = ServiceFactory(uid="service-uid")
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.get(conformity_url)
+    assert (
+        pretty_indented(
+            parse_response_to_soup(
+                response,
+                "#main div.c-form",
+                replace_in_attr=[
+                    ("href", session_uuid, "[UUID of session]"),
+                    ("action", session_uuid, "[UUID of session]"),
+                ],
+            )
+        )
+        == snapshot
+    )
+
+
+@pytest.mark.parametrize("is_in_qpv,assertion", [(True, assertContains), (False, assertNotContains)])
+def test_address_qpv(client, is_in_qpv, assertion):
+    create_qpv("QP075019")
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    job_seeker = JobSeekerFactory(
+        for_snapshot=True,
+        geocoding_score=1,
+        coords=coords_to_geometry("48.85592", "2.41299") if is_in_qpv else Point(0, 0),
+    )
+    qpv_markup = '<span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>'
+    service = ServiceFactory(uid="service-uid")
+    client.force_login(prescriber)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+    response = client.get(conformity_url)
+    assertion(response, qpv_markup, html=True)
 
 
 def test_orientation_wizard_happy_path_as_employer(client, mailoutbox):
