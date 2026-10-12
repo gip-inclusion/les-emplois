@@ -238,8 +238,10 @@ def test_shorten_active_sessions():
 
 class TestCommandSendUsersToBrevo:
     @pytest.fixture(autouse=True)
-    def setup(self, settings, respx_mock):
+    def setup(self, settings, respx_mock, mocker):
         settings.BREVO_API_KEY = "BREVO_API_KEY"
+        # The daily import and the consent update send several requests, each one but the first waits
+        mocker.patch("itou.utils.brevo.time.sleep")
         self.import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
