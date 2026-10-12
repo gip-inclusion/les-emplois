@@ -38,6 +38,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     SuspensionFactory,
 )
+from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geiq_assessments.factories import (
@@ -196,6 +197,7 @@ def test_populate_analytics(snapshot):
 @pytest.mark.django_db(transaction=True)
 def test_populate_job_seekers(snapshot):
     create_qpv("QP075019")
+    vannes = create_city_vannes()
 
     # Importing this file makes a query so we need to do it inside a test
     # and before the assertNumQueries
@@ -231,6 +233,8 @@ def test_populate_job_seekers(snapshot):
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
         jobseeker_profile__with_pole_emploi_id=True,
+        insee_city=vannes,
+        post_code="56000",
     )
     job_application_2 = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -322,6 +326,7 @@ def test_populate_job_seekers(snapshot):
             "département": "33",
             "nom_département": "33 - Gironde",
             "région": "Nouvelle-Aquitaine",
+            "code_insee": None,
             "adresse_en_qpv": "Adresse en QPV",
             "total_candidatures": 0,
             "total_embauches": 0,
@@ -381,10 +386,11 @@ def test_populate_job_seekers(snapshot):
             "date_dernière_connexion": None,
             "date_premiere_connexion": None,
             "actif": 0,
-            "code_postal": "",
-            "département": "",
-            "nom_département": None,
-            "région": None,
+            "code_postal": "56000",
+            "département": "56",
+            "nom_département": "56 - Morbihan",
+            "région": "Bretagne",
+            "code_insee": "56260",
             "adresse_en_qpv": "Adresse hors QPV",
             "total_candidatures": 1,
             "total_embauches": 1,
@@ -448,6 +454,7 @@ def test_populate_job_seekers(snapshot):
             "département": "",
             "nom_département": None,
             "région": None,
+            "code_insee": None,
             "adresse_en_qpv": "Adresse hors QPV",
             "total_candidatures": 2,
             "total_embauches": 2,

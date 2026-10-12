@@ -11,6 +11,7 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
     get_choice,
+    get_code_commune,
     get_column_from_field,
     get_department_and_region_columns,
     get_model_field,
@@ -250,6 +251,12 @@ def get_table():
 
     job_seekers_table.add_columns(
         [
+            {
+                "name": "code_insee",
+                "type": "varchar",
+                "comment": "Code INSEE de la commune du candidat",
+                "fn": get_code_commune,
+            },
             {
                 "name": "adresse_en_qpv",
                 "type": "varchar",
