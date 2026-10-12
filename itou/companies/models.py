@@ -38,6 +38,7 @@ from itou.companies.enums import (
     ProSupportReportSolution,
 )
 from itou.emails.utils import get_email_message
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.enums import UserKind
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
@@ -1302,6 +1303,13 @@ class ProSupportReport(models.Model):
         on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="+",
     )
+    notified_prescriber = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="prescripteur prévenu",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
     contract = models.OneToOneField(
         Contract,
@@ -1353,6 +1361,27 @@ class ProSupportReport(models.Model):
 
     def __str__(self):
         return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
+
+    def notify_authorized_prescriber(self):
+        from itou.users.models import JobSeekerAssignment
+        from itou.users.notifications import ProSupportReportCreatedNotification
+
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker_id=self.job_seeker_id,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at")
+            .first()
+        )
+        if assignment:
+            self.notified_prescriber = assignment.professional
+            self.save(update_fields=["notified_prescriber"])
+            ProSupportReportCreatedNotification(
+                assignment.professional, assignment.prescriber_organization, report=self
+            ).send()
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

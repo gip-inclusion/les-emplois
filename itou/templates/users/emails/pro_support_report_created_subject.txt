@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+La structure d’insertion {{ report.company.display_name }} vous partage un bilan de fin d’accompagnement
+{% endblock %}
