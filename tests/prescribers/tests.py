@@ -879,7 +879,6 @@ def test_organization_kind_to_PE_typologie_prescripteur(organization_kind):
         PrescriberOrganizationKind.ODC: "ODC",
         PrescriberOrganizationKind.OIL: "OIL",
         PrescriberOrganizationKind.OHPD: "OHPD",
-        PrescriberOrganizationKind.ORIENTEUR: "Orienteur",
         PrescriberOrganizationKind.OTHER: "Autre",
         PrescriberOrganizationKind.FT: "PE",
         PrescriberOrganizationKind.PENSION: "Autre",

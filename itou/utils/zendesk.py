@@ -51,11 +51,7 @@ def serialize_zendesk_params(request):
                     zendesk_prescriber_kind = "residence-fjt"
                 case PrescriberOrganizationKind.DEPT:
                     zendesk_prescriber_kind = "services-sociaux-cd"
-                case (
-                    PrescriberOrganizationKind.ORIENTEUR
-                    | PrescriberOrganizationKind.OCASF
-                    | PrescriberOrganizationKind.PREVENTION
-                ):
+                case PrescriberOrganizationKind.OCASF | PrescriberOrganizationKind.PREVENTION:
                     zendesk_prescriber_kind = "autre"
                 case _:
                     zendesk_prescriber_kind = request.current_organization.kind.lower()

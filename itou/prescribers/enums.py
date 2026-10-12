@@ -6,7 +6,6 @@ class PrescriberOrganizationKind(models.TextChoices):
     # cf test_prescriber_kinds_are_alphabetically_sorted test
     AFPA = "AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"
     ASE = "ASE", "ASE - Aide sociale à l'enfance"
-    ORIENTEUR = "Orienteur", "Autre organisation (orienteur)"
     CAARUD = (
         "CAARUD",
         ("CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers de drogues"),
@@ -47,7 +46,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     DEPT = "DEPT", "Service social du conseil départemental"
     SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
 
-    OTHER = "Autre", "Autre"
+    OTHER = "Autre", "Autre organisation (orienteur)"
 
     def to_PE_typologie_prescripteur(self):
         if self in PE_SENSITIVE_PRESCRIBER_KINDS:
@@ -120,7 +119,6 @@ HIDDEN_PRESCRIBER_KINDS = [
     PrescriberOrganizationKind.FT,
     PrescriberOrganizationKind.OHPD,
     PrescriberOrganizationKind.OCASF,
-    PrescriberOrganizationKind.ORIENTEUR,
 ]
 
 CHOOSABLE_PRESCRIBER_KINDS = [

@@ -212,7 +212,6 @@ class Migration(migrations.Migration):
                         choices=[
                             ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"),
                             ("ASE", "ASE - Aide sociale à l'enfance"),
-                            ("Orienteur", "Autre organisation (orienteur)"),
                             (
                                 "CAARUD",
                                 "CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers "
@@ -261,7 +260,7 @@ class Migration(migrations.Migration):
                             ("PREVENTION", "Service ou club de prévention"),
                             ("DEPT", "Service social du conseil départemental"),
                             ("SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"),
-                            ("Autre", "Autre"),
+                            ("Autre", "Autre organisation (orienteur)"),
                         ],
                         verbose_name="typologie prescripteur à l'origine du PASS\xa0IAE",
                     ),
@@ -1202,7 +1201,6 @@ class Migration(migrations.Migration):
                         choices=[
                             ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"),
                             ("ASE", "ASE - Aide sociale à l'enfance"),
-                            ("Orienteur", "Autre organisation (orienteur)"),
                             (
                                 "CAARUD",
                                 "CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers "
@@ -1251,7 +1249,7 @@ class Migration(migrations.Migration):
                             ("PREVENTION", "Service ou club de prévention"),
                             ("DEPT", "Service social du conseil départemental"),
                             ("SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"),
-                            ("Autre", "Autre"),
+                            ("Autre", "Autre organisation (orienteur)"),
                         ],
                         verbose_name="typologie prescripteur",
                     ),

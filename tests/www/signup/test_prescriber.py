@@ -582,7 +582,7 @@ class TestPrescriberSignup:
         # We cannot check for Orienteur since it's also in the template in other places
         # but we can check it's refused in the form
         post_data = {
-            "kind": PrescriberOrganizationKind.ORIENTEUR.value,
+            "kind": PrescriberOrganizationKind.OHPD.value,
         }
         response = client.post(url, data=post_data)
         assert "kind" in response.context["form"].errors
