@@ -42,16 +42,20 @@ def test_add_user(client):
     response = client.post(
         reverse("admin:users_user_add"),
         {
-            "username": "foo",
             "email": "foo@mailinator.com",
+            "first_name": "Prénom",
+            "last_name": "Nom",
             "kind": UserKind.JOB_SEEKER,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",
         },
     )
-    user = User.objects.get(username="foo")
+    user = User.objects.get(email="foo@mailinator.com")
     assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
     assert user.kind == UserKind.JOB_SEEKER
+    assert user.username  # should not be an empty string
+    assert user.first_name == "Prénom"
+    assert user.last_name == "Nom"
 
 
 def test_no_email_sent(client):
