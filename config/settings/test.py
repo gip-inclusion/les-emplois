@@ -17,6 +17,9 @@ SECRET_KEY = "foobar"
 SALT_KEY = "verymuchsecret"
 ALLOWED_HOSTS = []
 
+# The default hasher is slow by design, no need to pay that price on each login
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
 ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "localhost:8000"
