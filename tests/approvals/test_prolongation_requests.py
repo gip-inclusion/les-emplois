@@ -145,8 +145,9 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
         (31, 3),
         (40, 3),
     ]
+    # Reminders follow local calendar days, including across daylight saving time changes.
     for days_ago, expected in specs:
-        with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
+        with freeze_time(timezone.localtime(prolongation_request.created_at) + relativedelta(days=days_ago)):
             with django_capture_on_commit_callbacks(execute=True):
                 call_command("prolongation_requests_chores", "email_reminder", wet_run=True)
         assert len(mailoutbox) == expected
