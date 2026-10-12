@@ -277,7 +277,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             # These are the siaes not currently hiring, they should
             # be rather high in the list since they are likely to hire again.
             # 3) not has_active_members and is_hiring
-            # These are the siaes with no member, they should show last because noone
+            # These are the siaes with no member, they should show last because no one
             # is there to process any job application.
             # 4) not has_active_members and not is_hiring
             # This group is supposed to be empty. But itou staff may have

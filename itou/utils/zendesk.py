@@ -73,7 +73,7 @@ def serialize_zendesk_params(request):
                 case CompanyKind.EA | CompanyKind.EATT:
                     zendesk_user_kind = "employeur_ea-eatt"
                 case _:
-                    # There's no other kind for now, so this sould not happen
+                    # There's no other kind for now, so this should not happen
                     # but we don't have to pre-fill the field, the user can do it himself
                     logger.error("Invalid employer kind : this should not happen")
 
