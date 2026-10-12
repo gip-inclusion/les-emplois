@@ -1,5 +1,6 @@
 import enum
 import logging
+import time
 from itertools import batched
 
 import httpx
@@ -29,6 +30,9 @@ PIXEL_TRACKING_CONSENT_ATTRIBUTE = "_PIXEL_TRACKING_CONSENT"
 
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
+    # Seconds to wait between two import requests of the same client, even from different
+    # import_users calls, to spare Brevo
+    IMPORT_BATCH_DELAY = 1
 
     def __init__(self):
         self.client = httpx.Client(
@@ -40,6 +44,7 @@ class BrevoClient:
             base_url=settings.BREVO_API_URL,
             timeout=10,
         )
+        self._import_sent = False
 
     # context manager
     def __enter__(self):
@@ -55,6 +60,9 @@ class BrevoClient:
         return False
 
     def _import_contacts(self, users, list_id, serializer, update_existing_contacts):
+        if self._import_sent:
+            time.sleep(self.IMPORT_BATCH_DELAY)
+        self._import_sent = True
         try:
             response = self.client.post(
                 "/contacts/import",
@@ -80,7 +88,8 @@ class BrevoClient:
     def import_users(self, users, list_id, serializer, *, update_existing_contacts=False):
         """Import users as Brevo contacts of a list, in batches.
 
-        Imports are asynchronous: Brevo answers 202 and processes them later.
+        Imports are asynchronous: Brevo answers 202 and processes them later. Every request but the first one sent by
+        this client waits `IMPORT_BATCH_DELAY` seconds, even across calls.
 
         Args:
             users: Users to import.
