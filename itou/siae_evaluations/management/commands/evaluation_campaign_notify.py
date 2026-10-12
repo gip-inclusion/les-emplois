@@ -2,10 +2,10 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Exists, F, OuterRef, Q
 from django.utils import timezone
 
+from itou.emails.utils import send_email_messages
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedSiae, EvaluationCampaign
 from itou.utils.command import BaseCommand
-from itou.utils.emails import send_email_messages
 
 
 class Command(BaseCommand):

@@ -5,10 +5,10 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from itou.emails.utils import redact_email_address
 from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils.emails import redact_email_address
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_zendesk_form_url
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY

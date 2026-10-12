@@ -38,6 +38,7 @@ from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
 from itou.companies.models import Company, CompanyMembership, Contract
+from itou.emails.utils import get_email_message
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -56,7 +57,6 @@ from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils import iso_standards
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
-from itou.utils.emails import get_email_message
 from itou.utils.france_standards import NIR
 from itou.utils.legal_terms import get_latest_terms_datetime
 from itou.utils.models import AbstractFieldsHistoryModel

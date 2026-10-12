@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic.detail import SingleObjectMixin
 
 from itou.companies.models import Company
+from itou.emails.utils import send_email_messages
 from itou.files.models import save_file
 from itou.institutions.models import Institution
 from itou.siae_evaluations import enums as evaluation_enums
@@ -25,7 +26,6 @@ from itou.siae_evaluations.models import (
     Sanctions,
 )
 from itou.utils.auth import check_request
-from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.readonly import http_methods, readonly_view

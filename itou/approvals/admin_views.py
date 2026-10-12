@@ -27,11 +27,11 @@ from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, CancelledApproval
 from itou.approvals.utils import close_approval
+from itou.emails.utils import get_email_text_template
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.apis import enums as api_enums
-from itou.utils.emails import get_email_text_template
 from itou.utils.tokens import prolongation_derogation_token_generator
 from itou.utils.urls import get_absolute_url
 

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
 
-from itou.utils.emails import redact_email_address
+from itou.emails.utils import redact_email_address
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 
 

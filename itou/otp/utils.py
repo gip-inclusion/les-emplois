@@ -2,9 +2,9 @@ from django.conf import settings
 from django.db import transaction
 
 from itou.companies.models import CompanyMembership
+from itou.emails.utils import get_email_message
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.prescribers.models import PrescriberMembership
-from itou.utils.emails import get_email_message
 
 
 FAKE_DEVICE_MODEL = "fake-for-external-totp-device"

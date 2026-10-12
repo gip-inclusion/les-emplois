@@ -8,10 +8,10 @@ from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 
+from itou.emails.utils import get_email_message
 from itou.invitations.notifications import InvitationAcceptedNotification
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
-from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 
 

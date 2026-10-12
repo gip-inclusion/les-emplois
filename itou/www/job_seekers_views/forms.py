@@ -14,6 +14,7 @@ from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
+from itou.emails.utils import redact_email_address
 from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import (
@@ -24,7 +25,6 @@ from itou.users.models import (
     User,
 )
 from itou.utils import constants as global_constants
-from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir

@@ -24,6 +24,7 @@ from itou.eligibility.models.geiq import (
     GEIQEligibilityDiagnosis,
     GEIQSelectedAdministrativeCriteria,
 )
+from itou.emails.utils import get_email_message
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.job_applications import notifications as job_application_notifications
@@ -46,7 +47,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import KIND_EMPLOYER, ActionKind, LackOfPoleEmploiId, UserKind
 from itou.users.models import JobSeekerAssignment
-from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url

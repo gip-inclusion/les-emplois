@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from itou.companies.models import Company
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.eligibility.utils import iae_has_required_criteria
+from itou.emails.utils import send_email_messages
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
@@ -20,7 +21,6 @@ from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.users.enums import KIND_EMPLOYER
-from itou.utils.emails import send_email_messages
 from itou.utils.models import InclusiveDateRangeField, check_nullable_date_order_constraint
 from itou.utils.validators import validate_html
 

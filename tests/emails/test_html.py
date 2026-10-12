@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from bs4 import BeautifulSoup
 
-from itou.utils.emails import get_email_message
+from itou.emails.utils import get_email_message
 
 
 @pytest.fixture(autouse=True)
