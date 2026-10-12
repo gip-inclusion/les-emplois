@@ -60,7 +60,11 @@
                                         {% endcomponent_alert %}
                                     {% endif %}
                                 </div>
-                                {% if contract_ending_soon_date %}
+                                {% if pro_support_report %}
+                                    <div class="col-12 order-1 order-xxl-1">
+                                        {% include "job_seekers_views/includes/pro_support_report_card_banner.html" with report=pro_support_report only %}
+                                    </div>
+                                {% elif contract_ending_soon_date %}
                                     <div class="col-12 order-1 order-xxl-1">
                                         {% include "job_seekers_views/includes/end_of_contract_card_banner.html" with contract_ending_soon_date=contract_ending_soon_date suggest_next_step_url=suggest_next_step_url pro_support_request_mailto=pro_support_request_mailto fiche_banner_extra_id=fiche_banner_extra_id request=request only %}
                                     </div>

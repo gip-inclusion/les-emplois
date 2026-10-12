@@ -1,0 +1,18 @@
+{% load components %}
+{% load matomo %}
+
+{% component_alert title=title content=content call_to_action=call_to_action variant="info" extra_classes="mb-3 mb-md-4" %}
+    {% fragment as title %}
+        Bilan d’accompagnement disponible
+    {% endfragment %}
+    {% fragment as content %}
+        <p class="mb-0">
+            Un bilan d’accompagnement a été rempli le {{ report.created_at|date:"d/m/Y" }}{% if report.company %} par {{ report.company.display_name }}{% endif %}.
+        </p>
+    {% endfragment %}
+    {% fragment as call_to_action %}
+        <a class="btn btn-sm btn-primary"
+           href="{% url "job_seekers_views:pro_support_report" public_id=report.public_id %}"
+           {% matomo_event "candidat" "clic" "consulter-bilan-fiche" %}>Consulter le bilan</a>
+    {% endfragment %}
+{% endcomponent_alert %}
