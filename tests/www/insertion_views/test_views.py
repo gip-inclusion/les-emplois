@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.gis.geos import Point
 from django.template.defaultfilters import urlencode
 from django.test import override_settings
 from django.urls import reverse
@@ -25,7 +26,9 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
+from itou.asp.models import Country
 from itou.companies.models import CompanyMembership
+from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     MobilizationEventKind,
@@ -42,9 +45,12 @@ from itou.insertion.models import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
+from itou.users.enums import Title
+from itou.utils import triggers
 from itou.www.insertion_views.views import ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
+from tests.geo.factories import create_qpv
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
@@ -1077,7 +1083,14 @@ class TestOrientationDetailsForSender:
         user = membership.user
         organization = membership.organization
 
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerFactory(
+            for_snapshot=True,
+            address_line_1="9 Allée des Peupliers",
+            post_code="33000",
+            city="Bordeaux",
+            jobseeker_profile__birth_country=Country.objects.get(name="DANEMARK"),
+            jobseeker_profile__pole_emploi_id="5555555A",
+        )  # full beneficiary details
 
         orientation = OrientationFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
@@ -1203,6 +1216,27 @@ class TestOrientationDetailsForSender:
             orientation.delete()
             document.delete()
 
+    @pytest.mark.parametrize("is_in_qpv,assertion", [(True, assertContains), (False, assertNotContains)])
+    def test_address_qpv(self, client, is_in_qpv, assertion):
+        create_qpv("QP075019")
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        beneficiary = JobSeekerFactory(
+            for_snapshot=True,
+            geocoding_score=1,
+            coords=coords_to_geometry("48.85592", "2.41299") if is_in_qpv else Point(0, 0),
+        )
+        orientation = OrientationFactory(
+            beneficiary=beneficiary,
+            sender=membership.user,
+            sender_prescriber_organization=membership.organization,
+        )
+        qpv_markup = '<span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>'
+
+        client.force_login(membership.user)
+
+        response = client.get(self.get_orientation_url(orientation))
+        assertion(response, qpv_markup, html=True)
+
     @pytest.mark.parametrize(
         "user_factory,status_code",
         [
@@ -1261,10 +1295,13 @@ class TestOrientationDetailsForSender:
         organization = membership.organization
 
         beneficiary = JobSeekerFactory(
+            title=Title.MME,
             first_name="Marimprobable",
             last_name="Astellrare",
             email="marimprobable.astell@email.fake",
             phone="0987654321",
+            jobseeker_profile__pole_emploi_id="5555555A",
+            jobseeker_profile__birth_country=Country.objects.get(name="DANEMARK"),
         )
 
         orientation = OrientationFactory(
@@ -1274,18 +1311,66 @@ class TestOrientationDetailsForSender:
             sender_kind=SenderKind.PRESCRIBER,
             service=service,
             orientation_reasons="Pour améliorer l’embauchabilité de cette bénéficiaire.",
+            status=OrientationStatus.ACCEPTED,
         )
 
         client.force_login(user)
         response = client.get(self.get_orientation_url(orientation))
 
+        assertNotContains(response, f"<strong>{beneficiary.title}</strong>", html=True)
         assertNotContains(response, beneficiary.first_name)
         assertContains(response, "<strong>M…</strong>", html=True)
         assertNotContains(response, beneficiary.last_name)
         assertContains(response, "<strong>A…</strong>", html=True)
+        assertNotContains(response, beneficiary.jobseeker_profile.birth_country.name.title())
         assertNotContains(response, beneficiary.email)
+        assertNotContains(response, beneficiary.address_on_one_line)
         assertNotContains(response, beneficiary.phone)
+        assertNotContains(response, beneficiary.jobseeker_profile.pole_emploi_id)
         assertNotContains(response, self.get_job_seeker_details_url(beneficiary))
+
+    @pytest.mark.parametrize(
+        "status, assertion",
+        [
+            (OrientationStatus.PENDING, assertNotContains),
+            (OrientationStatus.REFUSED, assertNotContains),
+            (OrientationStatus.EXPIRED, assertNotContains),
+            (OrientationStatus.ACCEPTED, assertContains),
+        ],
+    )
+    def test_display_pole_emploi_id_only_for_accepted(self, client, status, assertion):
+        service = ServiceFactory()
+
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        user = membership.user
+        organization = membership.organization
+
+        beneficiary = JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
+
+        orientation = OrientationFactory(
+            beneficiary=beneficiary,
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+            service=service,
+            status=status,
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+        assertion(response, "Identifiant France Travail")
+        assertion(response, beneficiary.jobseeker_profile.pole_emploi_id)
+
+        beneficiary.jobseeker_profile.pole_emploi_id = ""
+        with triggers.fake_context():
+            beneficiary.jobseeker_profile.save()
+
+        response = client.get(self.get_orientation_url(orientation))
+        assertion(
+            response,
+            '<li><small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i></li>',
+            html=True,
+        )
 
     @pytest.mark.parametrize("is_active, assertion", [(True, assertContains), (False, assertNotContains)])
     def test_hide_service_link_if_inactive(self, client, is_active, assertion):
@@ -1371,7 +1456,14 @@ class TestOrientationDetailsForServiceProvider:
         process_link = OrientationProcessLinkFactory(
             id="1111111111zzzzzzzzzz3333333333_4",
             orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
-            orientation__beneficiary=JobSeekerFactory(for_snapshot=True),
+            orientation__beneficiary=JobSeekerFactory(
+                for_snapshot=True,
+                address_line_1="9 Allée des Peupliers",
+                post_code="33000",
+                city="Bordeaux",
+                jobseeker_profile__birth_country=Country.objects.get(name="DANEMARK"),
+                jobseeker_profile__pole_emploi_id="5555555A",
+            ),  # full beneficiary details
             orientation__service=service,
             orientation__sender=membership.user,
             orientation__sender_prescriber_organization=membership.organization,
@@ -1442,6 +1534,48 @@ class TestOrientationDetailsForServiceProvider:
             )
         ) == snapshot(name="page")
         assertNotContains(response, "NonAffiché")
+
+    @pytest.mark.parametrize(
+        "status, assertion",
+        [
+            (OrientationStatus.PENDING, assertNotContains),
+            (OrientationStatus.REFUSED, assertNotContains),
+            (OrientationStatus.EXPIRED, assertNotContains),
+            (OrientationStatus.ACCEPTED, assertContains),
+        ],
+    )
+    def test_display_pole_emploi_id_only_for_accepted(self, client, status, assertion):
+        beneficiary = JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
+        process_link = OrientationProcessLinkFactory(orientation__beneficiary=beneficiary, orientation__status=status)
+
+        response = client.get(self.get_process_link_url(process_link))
+        assertion(response, "Identifiant France Travail")
+        assertion(response, beneficiary.jobseeker_profile.pole_emploi_id)
+
+        beneficiary.jobseeker_profile.pole_emploi_id = ""
+        with triggers.fake_context():
+            beneficiary.jobseeker_profile.save()
+
+        response = client.get(self.get_process_link_url(process_link))
+        assertion(
+            response,
+            '<li><small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i></li>',
+            html=True,
+        )
+
+    @pytest.mark.parametrize("is_in_qpv,assertion", [(True, assertContains), (False, assertNotContains)])
+    def test_address_qpv(self, client, is_in_qpv, assertion):
+        create_qpv("QP075019")
+        beneficiary = JobSeekerFactory(
+            for_snapshot=True,
+            geocoding_score=1,
+            coords=coords_to_geometry("48.85592", "2.41299") if is_in_qpv else Point(0, 0),
+        )
+        process_link = OrientationProcessLinkFactory(orientation__beneficiary=beneficiary)
+        qpv_markup = '<span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>'
+
+        response = client.get(self.get_process_link_url(process_link))
+        assertion(response, qpv_markup, html=True)
 
     @pytest.mark.parametrize("query", [{}, {"token": ""}, {"token": "bad_token"}])
     def test_access_without_token_or_bad_token(self, client, query):

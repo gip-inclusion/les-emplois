@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load badges %}
 {% load components %}
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
@@ -49,6 +50,7 @@
 {% endblock %}
 
 {% block content %}
+    {% enums "insertion" "OrientationStatus" as OrientationStatus %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
@@ -70,6 +72,12 @@
                             {% endif %}
                         </div>
                         <ul class="list-data">
+                            {% if can_view_personal_information %}
+                                <li>
+                                    <small>Civilité</small>
+                                    {{ orientation.beneficiary.get_title_display|title|strong_or_disabled_non_filled }}
+                                </li>
+                            {% endif %}
                             <li>
                                 <small>Prénom</small>
                                 <strong>{{ orientation.beneficiary.first_name|title|mask_unless:can_view_personal_information }}</strong>
@@ -80,6 +88,21 @@
                             </li>
                             {% if can_view_personal_information %}
                                 <li>
+                                    <small>Date de naissance</small>
+                                    {{ orientation.beneficiary.jobseeker_profile.birthdate|date:"d/m/Y"|strong_or_disabled_non_filled }}
+                                </li>
+                                <li>
+                                    <small>Pays de naissance</small>
+                                    {{ orientation.beneficiary.jobseeker_profile.birth_country|default:""|title|strong_or_disabled_non_filled }}
+                                </li>
+                                <li>
+                                    <small>Adresse</small>
+                                    {{ orientation.beneficiary.address_on_one_line|default:""|strong_or_disabled_non_filled:"Non renseignée" }}
+                                    {% if orientation.beneficiary.address_in_qpv %}
+                                        <span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>
+                                    {% endif %}
+                                </li>
+                                <li>
                                     <small>Adresse e-mail</small>
                                     {{ orientation.beneficiary.email|default:""|strong_or_disabled_non_filled }}
                                 </li>
@@ -87,6 +110,12 @@
                                     <small>Téléphone</small>
                                     {{ orientation.beneficiary.phone|default:""|strong_or_disabled_non_filled }}
                                 </li>
+                                {% if orientation.status == OrientationStatus.ACCEPTED %}
+                                    <li>
+                                        <small>Identifiant France Travail</small>
+                                        {{ orientation.beneficiary.jobseeker_profile.pole_emploi_id|strong_or_disabled_non_filled }}
+                                    </li>
+                                {% endif %}
                             {% endif %}
                             {% if orientation.beneficiary_contact_preferences_display %}
                                 <li>
