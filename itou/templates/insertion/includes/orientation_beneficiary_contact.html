@@ -16,8 +16,23 @@
     </div>
     <ul class="list-data mb-0 pe-md-5">
         <li class="has-forced-line-break">
+            <small>Civilité</small>
+            {{ job_seeker.get_title_display|title|strong_or_disabled_non_filled }}
+        </li>
+        <li class="has-forced-line-break">
+            <small>Date de naissance</small>
+            {{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y"|strong_or_disabled_non_filled:"Non renseignée" }}
+        </li>
+        <li class="has-forced-line-break">
+            <small>Pays de naissance</small>
+            {{ job_seeker.jobseeker_profile.birth_country|default:""|title|strong_or_disabled_non_filled }}
+        </li>
+        <li class="has-forced-line-break">
             <small>Adresse</small>
             {{ job_seeker.address_on_one_line|default:""|strong_or_disabled_non_filled:"Non renseignée" }}
+            {% if job_seeker.address_in_qpv %}
+                <span class="badge badge-sm rounded-pill bg-success text-white">QPV</span>
+            {% endif %}
         </li>
         <li class="has-forced-line-break">
             <small>N° de téléphone</small>
@@ -26,6 +41,10 @@
         <li class="has-forced-line-break">
             <small>Adresse mail</small>
             {{ job_seeker.email|default:""|strong_or_disabled_non_filled:"Non renseignée" }}
+        </li>
+        <li class="has-forced-line-break">
+            <small>Identifiant France Travail</small>
+            {{ job_seeker.jobseeker_profile.pole_emploi_id|strong_or_disabled_non_filled }}
         </li>
     </ul>
 </div>

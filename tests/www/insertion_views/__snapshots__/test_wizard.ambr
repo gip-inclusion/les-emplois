@@ -131,6 +131,132 @@
   
   '''
 # ---
+# name: test_conformity_step_with_unblocking_missing_beneficiary_information
+  '''
+  <div class="c-form mb-3 mb-md-4">
+      <form class="js-prevent-multiple-submit" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <div class="alert alert-info mb-3 mb-md-4" role="status">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          Veuillez vous assurer que les coordonnées de votre usager sont bien à jour
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="c-box mb-3 mb-md-4 position-relative">
+              <div class="position-absolute top-0 end-0 m-3">
+                  <a aria-label="Modifier les coordonnées de Pierre DUPONT" class="btn btn-outline-primary w-100 w-md-auto" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                      Modifier
+                  </a>
+              </div>
+              <ul class="list-data mb-0 pe-md-5">
+                  <li class="has-forced-line-break">
+                      <small>
+                          Civilité
+                      </small>
+                      <i class="text-disabled">
+                          Non renseigné
+                      </i>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Date de naissance
+                      </small>
+                      <i class="text-disabled">
+                          Non renseignée
+                      </i>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Pays de naissance
+                      </small>
+                      <i class="text-disabled">
+                          Non renseigné
+                      </i>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Adresse
+                      </small>
+                      <i class="text-disabled">
+                          Non renseignée
+                      </i>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          N° de téléphone
+                      </small>
+                      <strong>
+                          06 06 06 06 06
+                      </strong>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Adresse mail
+                      </small>
+                      <strong>
+                          test@example.org
+                      </strong>
+                  </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Identifiant France Travail
+                      </small>
+                      <i class="text-disabled">
+                          Non renseigné
+                      </i>
+                  </li>
+              </ul>
+          </div>
+          <hr class="my-3"/>
+          <h2 class="h3">
+              Critères et conditions d'accès
+          </h2>
+          <div class="form-group form-group-required-check form-group-required">
+              <div class="form-check">
+                  <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
+                  <label class="form-check-label" for="id_confirms_conditions">
+                      Je confirme que la situation de l'usager répond à ces conditions.
+                  </label>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-12">
+                  <hr class="mb-3"/>
+                  <small class="d-inline-block mb-3">
+                      * champs obligatoires
+                  </small>
+                  <div class="form-row align-items-center justify-content-end gx-3">
+                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/service-uid/">
+                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                              </i>
+                              <span>
+                                  Annuler
+                              </span>
+                          </a>
+                      </div>
+                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="orientation-confirm-submit" type="submit">
+                              <span>
+                                  Suivant
+                              </span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+  
+  '''
+# ---
 # name: test_orientation_wizard_happy_path[conformity]
   '''
   <section class="s-section">
@@ -180,6 +306,30 @@
                               <ul class="list-data mb-0 pe-md-5">
                                   <li class="has-forced-line-break">
                                       <small>
+                                          Civilité
+                                      </small>
+                                      <strong>
+                                          Madame
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Date de naissance
+                                      </small>
+                                      <strong>
+                                          01/01/1990
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Pays de naissance
+                                      </small>
+                                      <strong>
+                                          Danemark
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
                                           Adresse
                                       </small>
                                       <strong>
@@ -200,6 +350,14 @@
                                       </small>
                                       <strong>
                                           usager@example.org
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Identifiant France Travail
+                                      </small>
+                                      <strong>
+                                          5555555A
                                       </strong>
                                   </li>
                               </ul>
