@@ -41,7 +41,7 @@
             </div>
         {% endfor %}
     </div>
-    {% include "includes/pagination.html" with page=results boost=True boost_target="#people-search-results" boost_swap="outerHTML" request=request only %}
+    {% include "includes/pagination.html" with page=results boost=True boost_target="#people-search-results" request=request only %}
 </div>
 {% if request.htmx %}
     {% include "directory/includes/people_list_reset_filters.html" with request=request show_reset=form.has_changed only %}
