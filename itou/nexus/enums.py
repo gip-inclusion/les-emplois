@@ -139,7 +139,6 @@ STRUCTURE_KIND_MAPPING = {
     Service.EMPLOIS: {
         PrescriberOrganizationKind.AFPA: NexusStructureKind.AFPA,
         PrescriberOrganizationKind.ASE: NexusStructureKind.ASE,
-        PrescriberOrganizationKind.ORIENTEUR: "",
         PrescriberOrganizationKind.CAARUD: NexusStructureKind.CAARUD,
         PrescriberOrganizationKind.CADA: NexusStructureKind.CADA,
         PrescriberOrganizationKind.CAF: NexusStructureKind.CAF,
