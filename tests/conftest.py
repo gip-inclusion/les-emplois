@@ -1,3 +1,4 @@
+import argparse
 import collections
 import contextlib
 import copy
@@ -10,6 +11,7 @@ import os
 import socket
 import threading
 import uuid
+import zlib
 from functools import reduce
 from urllib.parse import urlsplit
 
@@ -54,6 +56,18 @@ from tests.utils.htmx.testing import HtmxClient
 from tests.utils.testing import ItouClient, assert_bonjour  # ruff: enable[E402]
 
 
+def _parse_shard(value):
+    """Parse the `--shard` option, e.g. `"1/4"` into `(1, 4)`."""
+    index, _, count = value.partition("/")
+    try:
+        index, count = int(index), int(count)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected I/N, e.g. 1/4, got {value!r}")
+    if not 1 <= index <= count:
+        raise argparse.ArgumentTypeError(f"expected 1 <= I <= N, got {value!r}")
+    return index, count
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--runslow",
@@ -61,11 +75,36 @@ def pytest_addoption(parser):
         default=False,
         help="run slow tests",
     )
+    parser.addoption(
+        "--shard",
+        type=_parse_shard,
+        help="only run shard I out of N (e.g. 1/4) and skip the other tests, split by a hash of their ID",
+    )
+
+
+def _skip_other_shards(config, items):
+    """Skip the tests outside of the shard given by `--shard`.
+
+    They are skipped rather than deselected: syrupy then sees the whole test suite, ignores the snapshots of the
+    skipped tests, and still reports the snapshots that no test uses anymore.
+
+    The split is statistically balanced but doesn't account for test duration: a long test still runs as a whole
+    in a single shard, so split it into chunks (like `test_all_admin`).
+    """
+    shard = config.getoption("--shard")
+    if shard is None:
+        return
+    index, count = shard
+    skip_marker = pytest.mark.skip(reason=f"Not in shard {index}/{count}")
+    for item in items:
+        # Unlike hash(), crc32 isn't salted per process: all the xdist workers and CI jobs agree on the shards
+        if zlib.crc32(item.nodeid.encode()) % count != index - 1:
+            item.add_marker(skip_marker)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_collection_modifyitems(config, items):
-    """Automatically add pytest db marker if needed."""
+    """Automatically add pytest db marker if needed, and skip the tests excluded by `--runslow` or `--shard`."""
     run_slow = config.getoption("--runslow")
     skip_slow_marker = pytest.mark.skip(reason="Use --runslow to execute this test")
     for item in items:
@@ -74,6 +113,7 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.django_db)
         if "slow" in markers and not run_slow:
             item.add_marker(skip_slow_marker)
+    _skip_other_shards(config, items)
 
 
 @pytest.hookimpl(trylast=True)
