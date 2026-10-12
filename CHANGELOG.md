@@ -1,5 +1,24 @@
 # Journal des modifications
 
+## 2026-10-12
+
+### Ajouté
+
+- [Insertion : Afficher le délai attendu de réponse d'un service](https://github.com/gip-inclusion/les-emplois/pull/8973)
+
+### Modifié
+
+- [Connexion : Ne pas pouvoir accepter les CGU à la place d’un utilisateur détourné](https://github.com/gip-inclusion/les-emplois/pull/8980)
+- [Formattage des e-mails en HTML](https://github.com/gip-inclusion/les-emplois/pull/8894)
+- [Insertion : Afficher les modes de mobilisation dans les résultats de recherche de services](https://github.com/gip-inclusion/les-emplois/pull/8886)
+- [Insertion : Mettre à jour les pages structure, service et tunnel d'orientation pour les champs natifs data⋅inclusion](https://github.com/gip-inclusion/les-emplois/pull/8854)
+
+### Supprimé
+
+- [Admin : Suppression de la vue d'import du fichier de retour ASP pour le traitement des 3437](https://github.com/gip-inclusion/les-emplois/pull/8996)
+- [Insertion : Suppression de l’utilisation de l’API DORA](https://github.com/gip-inclusion/les-emplois/pull/8991)
+- [Professionnels : Suppression de l'espace "Mon portail"](https://github.com/gip-inclusion/les-emplois/pull/8997)
+
 ## 2026-10-05
 
 ### Ajouté
