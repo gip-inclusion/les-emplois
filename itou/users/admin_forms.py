@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from django import forms
 from django.contrib.admin import widgets
@@ -17,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 class ItouUserCreationForm(forms.ModelForm):
     def save(self, commit=True):
+        if not self.instance.username:  # This field is not in ItouUserAdmin.add_fieldsets
+            self.instance.username = str(uuid.uuid4())
         self.instance.set_unusable_password()
         return super().save(commit=commit)
 
