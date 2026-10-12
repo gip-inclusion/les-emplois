@@ -42,7 +42,12 @@ from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    ContractFactory,
+    ProSupportReportFactory,
+)
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -232,6 +237,32 @@ class TestQuerySet:
         job_seeker = job_seekers_qs.get(pk=job_seeker_with_ongoing_contract.pk)
         assert job_seeker.contract_ending_soon is False
         assert job_seeker.last_contract_ended_with_valid_approval is False
+
+    def test_with_last_contract_has_pro_support_report(self):
+        report = ProSupportReportFactory()
+        job_seeker_without_report = ContractFactory(company=report.company).job_seeker
+
+        job_seekers_qs = User.objects.with_last_contract_has_pro_support_report(
+            siae=report.company
+        ).with_last_contract_end_date(siae=report.company)
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == report.contract.end_date
+        assert job_seekers_qs.get(pk=job_seeker_without_report.pk).last_contract_has_pro_support_report is False
+
+        # A newer contract with another company does not change the SIAE last contract.
+        ContractFactory(
+            job_seeker=report.job_seeker, start_date=report.contract.start_date + datetime.timedelta(days=1)
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is True
+
+        # A newer contract with the SIAE has no report yet.
+        newer_contract = ContractFactory(
+            job_seeker=report.job_seeker,
+            company=report.company,
+            start_date=report.contract.start_date + datetime.timedelta(days=2),
+        )
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is False
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == newer_contract.end_date
 
 
 class TestManager:
