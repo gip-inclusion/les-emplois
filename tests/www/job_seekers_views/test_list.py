@@ -1548,9 +1548,16 @@ def test_pro_support_request_banner_on_job_seeker_card(client):
         start_date=today - datetime.timedelta(days=200),
         end_date=today + datetime.timedelta(days=20),
     )
+    JobApplicationFactory(
+        job_seeker=job_seeker,
+        sent_by_job_seeker=True,
+        to_company__email="candidature@example.com",
+        state=JobApplicationState.ACCEPTED,
+    )
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-    # The employing SIAE has no e-mail: the banner still warns, without the action.
+    # The employing SIAE has no e-mail: the banner still warns, without the action, even if the SIAE
+    # of an accepted job application has one.
     response = client.get(url)
     assertContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
     assertContains(response, "04/02/2026")
