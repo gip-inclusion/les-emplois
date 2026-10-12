@@ -92,6 +92,11 @@
       'model': 'companies.ProSupportReport',
     }),
     dict({
+      'field': 'notified_prescriber',
+      'hidden': True,
+      'model': 'companies.ProSupportReport',
+    }),
+    dict({
       'field': 'reactivated_by',
       'hidden': False,
       'model': 'companies.SiaeConvention',
