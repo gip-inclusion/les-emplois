@@ -10,8 +10,10 @@ from django.urls import path
 from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 
+from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.insertion.models import (
     GenericReferenceItem,
+    MobilizationEmail,
     MobilizationEvent,
     Orientation,
     OrientationProcessLink,
@@ -20,6 +22,7 @@ from itou.insertion.models import (
     Structure,
 )
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
+from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 
 
 class InsertionAdmin(ReadonlyMixin, ItouModelAdmin):
@@ -212,6 +215,55 @@ class MobilizationEventAdmin(InsertionAdmin):
                 obj.orientation, content=f"Orientation pour {obj.orientation.beneficiary.get_full_name()}"
             )
         return "-"
+
+
+@admin.register(MobilizationEmail)
+class MobilizationEmailAdmin(InsertionAdmin):
+    list_display = [
+        "pk",
+        "service__name",
+        "sender",
+        "sender_prescriber_organization",
+        "sender_company",
+        "sent_at",
+        "has_been_answered",
+    ]
+    list_display_links = ["pk", "service__name"]
+    list_select_related = ["service", "sender_prescriber_organization", "sender_company"]
+    ordering = ["-sent_at"]
+    show_full_result_count = False
+
+    fields = readonly_fields = [
+        "pk",
+        "sender",
+        "display_inbound_parsing_email",
+        "service_link",
+        "sender_prescriber_organization_link",
+        "sender_company_link",
+        "mobilization_event",
+        "sent_at",
+        "answered_at",
+    ]
+
+    @admin.display(boolean=True, description="répondu")
+    def has_been_answered(self, obj):
+        return bool(obj.answered_at)
+
+    @admin.display(description="adresse technique d’inbound parsing")
+    def display_inbound_parsing_email(self, obj):
+        return generate_inbound_parsing_address(key=obj.inbound_parsing_key, kind=InboundParsingKind.SERVICE_ANSWER)
+
+    @admin.display(description="service")
+    def service_link(self, obj):
+        return get_admin_view_link(obj.service, content=obj.service.name)
+
+    @admin.display(description="organisation prescriptrice émettrice")
+    def sender_prescriber_organization_link(self, obj):
+        return get_admin_view_link(obj.sender_prescriber_organization, content=obj.sender_prescriber_organization.name)
+
+    @admin.display(description="entreprise émettrice")
+    def sender_company_link(self, obj):
+        return get_admin_view_link(obj.sender_company, content=obj.sender_company.name)
 
 
 class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
