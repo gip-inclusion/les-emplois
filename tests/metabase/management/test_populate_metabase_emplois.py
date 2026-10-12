@@ -207,10 +207,6 @@ def test_populate_job_seekers(snapshot):
     create_qpv("QP075019")
     vannes = create_city_vannes()
 
-    # Importing this file makes a query so we need to do it inside a test
-    # and before the assertNumQueries
-    from itou.metabase.tables.job_seekers import get_user_age_in_years
-
     # First user
     #  - no job application
     #  - created by prescriber
@@ -322,7 +318,7 @@ def test_populate_job_seekers(snapshot):
             "sexe_selon_nir": "Homme",
             "annee_naissance_selon_nir": 79,
             "mois_naissance_selon_nir": 3,
-            "age": get_user_age_in_years(user_1),
+            "age": user_1.jobseeker_profile.age,
             "date_inscription": timezone.localdate(),
             "type_inscription": "par professionnel",
             "pe_connect": 1,
@@ -386,7 +382,7 @@ def test_populate_job_seekers(snapshot):
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 71,
             "mois_naissance_selon_nir": 4,
-            "age": get_user_age_in_years(user_2),
+            "age": user_2.jobseeker_profile.age,
             "date_inscription": timezone.localdate(),
             "type_inscription": "par professionnel",
             "pe_connect": 0,
@@ -450,7 +446,7 @@ def test_populate_job_seekers(snapshot):
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 97,
             "mois_naissance_selon_nir": 1,
-            "age": get_user_age_in_years(user_3),
+            "age": user_3.jobseeker_profile.age,
             "date_inscription": timezone.localdate(),
             "type_inscription": "autonome",
             "pe_connect": 0,
