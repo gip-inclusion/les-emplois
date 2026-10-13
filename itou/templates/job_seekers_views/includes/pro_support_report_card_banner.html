@@ -12,7 +12,7 @@
     {% endfragment %}
     {% fragment as call_to_action %}
         <a class="btn btn-sm btn-primary"
-           href="{% url "job_seekers_views:pro_support_report" public_id=report.public_id %}"
+           href="{% url "job_seekers_views:pro_support_report" public_id=report.public_id %}?back_url={{ request.get_full_path|urlencode }}"
            {% matomo_event "candidat" "clic" "consulter-bilan-fiche" %}>Consulter le bilan</a>
     {% endfragment %}
 {% endcomponent_alert %}

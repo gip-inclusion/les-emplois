@@ -62,7 +62,7 @@
                                 </div>
                                 {% if pro_support_report %}
                                     <div class="col-12 order-1 order-xxl-1">
-                                        {% include "job_seekers_views/includes/pro_support_report_card_banner.html" with report=pro_support_report only %}
+                                        {% include "job_seekers_views/includes/pro_support_report_card_banner.html" with report=pro_support_report request=request only %}
                                     </div>
                                 {% elif contract_end_date %}
                                     <div class="col-12 order-1 order-xxl-1">

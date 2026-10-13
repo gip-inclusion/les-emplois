@@ -296,7 +296,7 @@ def test_pro_support_report_banner_on_job_seeker_card_for_advisor(client):
     client.force_login(advisor_organization(report).members.get())
     response = client.get(details_url)
     assertContains(response, "Bilan d’accompagnement disponible")
-    assertContains(response, f'href="{report_url(report)}"')
+    assertContains(response, f'href="{report_url(report)}?back_url={details_url}"')
     # It takes the place of the end-of-contract banner.
     assertNotContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
 
@@ -329,7 +329,7 @@ def test_pro_support_report_banner_on_job_seeker_card_for_employer(client):
 
     client.force_login(CompanyMembershipFactory(company=report.company).user)
     response = client.get(details_url)
-    assertContains(response, f'href="{report_url(report)}"')
+    assertContains(response, f'href="{report_url(report)}?back_url={details_url}"')
 
     client.force_login(CompanyMembershipFactory().user)
     response = client.get(details_url)
