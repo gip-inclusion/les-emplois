@@ -12549,6 +12549,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -13981,6 +13998,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -15392,6 +15426,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
