@@ -21,6 +21,7 @@
   "15 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh expire_orientations --wet-run",
   "20 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh send_orientations_reminder_emails --wet-run",
   "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
+  "15 8-18/2 * * MON-FRI $ROOT/clevercloud/run_management_command.sh resend_employee_record_update_notifications --wet-run",
   "25 8-18/2 * * MON-FRI $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * MON-FRI $ROOT/clevercloud/transfer_employee_records.sh --upload",
   "0 7-20/4 * * * $ROOT/clevercloud/run_management_command.sh delete_orientations_documents --wet-run",
