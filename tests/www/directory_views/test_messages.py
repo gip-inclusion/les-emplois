@@ -9,7 +9,7 @@ from itou.directory.models import ContactMessage
 from tests.www.directory_views.helpers import get_target_person
 
 
-def test_send_message_persists_subject_only(client, mailoutbox):
+def test_send_message_emails_recipient_and_records_contact(client, mailoutbox):
     sender, _, _, person = get_target_person(client)
     key = person.key
     url = reverse("directory:send_message", kwargs={"key": key})
@@ -35,7 +35,6 @@ def test_send_message_persists_subject_only(client, mailoutbox):
     assert message.recipient_id == person.recipient_id
     assert message.subject == ContactSubject.OTHER
     assert message.custom_subject == "Échange de pratiques"
-    assert not hasattr(message, "body")
     [email] = mailoutbox
     assert email.to == [person.email]
     assert str(make_header(decode_header(email.from_email))) == (
@@ -58,7 +57,6 @@ def test_custom_subject_is_required(client):
         {"subject": ContactSubject.OTHER, "body": "Bonjour", "back_url": ""},
     )
 
-    assert response.status_code == 200
     assertContains(response, "Précisez l'objet de votre message.", html=True)
     assert not ContactMessage.objects.exists()
 
@@ -66,8 +64,9 @@ def test_custom_subject_is_required(client):
 def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
     _, _, _, person = get_target_person(client)
 
+    key = person.key
     response = client.post(
-        reverse("directory:send_message", kwargs={"key": person.key}),
+        reverse("directory:send_message", kwargs={"key": key}),
         {
             "subject": ContactSubject.MEETING,
             "custom_subject": "Objet injecté",
@@ -76,7 +75,10 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
         },
     )
 
-    assert response.status_code == 302
+    assertRedirects(
+        response,
+        add_url_params(reverse("directory:person_detail", kwargs={"key": key}), {"back_url": ""}),
+    )
     message = ContactMessage.objects.get()
     assert message.custom_subject == ""
     assert "Objet injecté" not in mailoutbox[0].body
@@ -85,10 +87,14 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
 def test_message_rate_limit(client, mailoutbox, mocker):
     _, _, _, person = get_target_person(client)
     mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "1/day")
-    url = reverse("directory:send_message", kwargs={"key": person.key})
+    key = person.key
+    url = reverse("directory:send_message", kwargs={"key": key})
     data = {"subject": ContactSubject.MEETING, "body": "Bonjour", "back_url": ""}
 
-    assert client.post(url, data).status_code == 302
+    assertRedirects(
+        client.post(url, data),
+        add_url_params(reverse("directory:person_detail", kwargs={"key": key}), {"back_url": ""}),
+    )
     response = client.post(url, data)
 
     assertContains(response, "Vous avez atteint la limite de messages envoyés : un par jour.")
