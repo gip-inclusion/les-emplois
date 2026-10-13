@@ -231,6 +231,35 @@ class TestApprovalAdmin:
             ],
         )
 
+    def test_check_inconsistency_check_missing_job_seeker_profile(self, admin_client):
+        correct = JobSeekerFactory()
+        incorrect = JobSeekerFactory()
+        incorrect.jobseeker_profile.delete()
+
+        response = admin_client.post(
+            reverse("admin:users_user_changelist"),
+            {
+                "action": "check_inconsistencies",
+                helpers.ACTION_CHECKBOX_NAME: [correct.pk, incorrect.pk],
+            },
+            follow=True,
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    (
+                        '1 objet incohérent: <ul><li class="warning">'
+                        f'<a href="/admin/users/user/{incorrect.pk}/change/">'
+                        f"utilisateur - {incorrect.pk}"
+                        "</a>: Utilisateur de type usager sans profil usager"
+                        "</li></ul>"
+                    ),
+                )
+            ],
+        )
+
     @pytest.mark.parametrize(
         "origin,diag_required",
         [
