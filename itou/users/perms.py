@@ -26,7 +26,7 @@ def can_fill_pro_support_report(request):
 def can_view_pro_support_report(request, report):
     if request.from_employer:
         return report.company_id == request.current_organization.pk
-    if request.from_prescriber:
+    if request.from_authorized_prescriber:
         return (
             JobSeekerAssignment.objects.assigned_to(
                 request.user, request.current_organization, from_all_coworkers=True

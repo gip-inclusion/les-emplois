@@ -9,6 +9,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import ProSupportReportBarrier, ProSupportReportOrientation, ProSupportReportSolution
 from itou.companies.models import ProSupportReport
+from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
     CompanyFactory,
@@ -249,6 +250,12 @@ def advisor_organization(report, authorized=True, ended=False):
     return organization
 
 
+def advisor_who_created_the_job_seeker(report):
+    prescriber = advisor_organization(report, authorized=False).members.get()
+    User.objects.filter(pk=report.job_seeker_id).update(created_by=prescriber)
+    return prescriber
+
+
 @pytest.mark.parametrize(
     "user_factory,status_code",
     [
@@ -257,6 +264,7 @@ def advisor_organization(report, authorized=True, ended=False):
         (lambda report: PrescriberMembershipFactory(organization=advisor_organization(report)).user, 200),
         (lambda report: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(), 404),
         (lambda report: advisor_organization(report, authorized=False).members.get(), 404),
+        (advisor_who_created_the_job_seeker, 404),
         (lambda report: CompanyMembershipFactory().user, 404),
         (lambda report: report.job_seeker, 403),
     ],
@@ -266,6 +274,7 @@ def advisor_organization(report, authorized=True, ended=False):
         "coworker_of_the_advisor",
         "authorized_prescriber_not_advisor",
         "prescriber_advisor_who_cannot_view_personal_information",
+        "prescriber_advisor_who_can_view_personal_information",
         "employer_of_another_company",
         "job_seeker",
     ],
