@@ -1618,7 +1618,7 @@ def test_active_announcement_campaign_context_processor(client, settings, empty_
     assert response.status_code == 200
     assert response.context["display_campaign_announce"] is True
 
-    # The OTP verification page is only reachable by a user who must use our own 2FA
+    # Don't display campaign announcement if the user still has to use our 2FA
     settings.REQUIRE_OTP_FOR_STAFF = True
     staff_user = ItouStaffFactory()
     ItouTOTPDeviceFactory(user=staff_user)

@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from itou.communications.cache import get_cached_active_announcement
+from itou.otp.utils import require_otp
 
 
 def matomo(request):
@@ -19,7 +20,7 @@ def matomo(request):
 
 
 def active_announcement_campaign(request):
-    if request.user and request.user.is_authenticated and not request.path.startswith("/otp/verify"):
+    if request.user and request.user.is_authenticated and not require_otp(request.user):
         if campaign := get_cached_active_announcement():
             return {
                 "display_campaign_announce": True,
