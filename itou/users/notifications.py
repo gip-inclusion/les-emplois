@@ -111,7 +111,9 @@ class ProSupportReportCreatedNotification(ProfessionalNotification, EmailNotific
     body_template = "users/emails/pro_support_report_created_body.md"
 
     def get_build_extra(self):
-        return {"reply_to": [settings.PRO_SUPPORT_REPORT_REPLY_TO_EMAIL]}
+        if settings.PRO_SUPPORT_REPORT_REPLY_TO_EMAIL:
+            return {"reply_to": [settings.PRO_SUPPORT_REPORT_REPLY_TO_EMAIL]}
+        return super().get_build_extra()
 
     def get_context(self):
         context = super().get_context()
