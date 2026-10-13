@@ -514,7 +514,7 @@ class AccountMigrationView(TemplateView):
     template_name = "account/activate_pro_connect_account.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_professional:
+        if not request.user.is_professional and not request.user.is_staff:
             return HttpResponseRedirect(reverse("dashboard:index"))
         return super().dispatch(request, *args, **kwargs)
 
