@@ -13,15 +13,6 @@ class Service(models.TextChoices):
     MARCHE = "le-marche", "Le marché de l’inclusion"
 
     @classmethod
-    def activable(cls):
-        """Returns the ordered services as displayed in the dashboard"""
-        return [
-            cls.EMPLOIS,
-            cls.DORA,
-            cls.MARCHE,
-        ]
-
-    @classmethod
     def sync_source_choices(cls):
         return [(k, v) for k, v in cls.choices if k in [cls.DORA, cls.MARCHE]]
 
