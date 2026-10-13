@@ -15,7 +15,7 @@
         {% fragment as content %}
             <p class="mb-0">
                 {% if not request.from_employer %}
-                    Son contrat de travail se termine le {{ contract_end_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                    Son contrat de travail se termine le {{ contract_end_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’emploie pour préparer la suite de son parcours.
                 {% elif contract_ended %}
                     Le contrat de ce salarié a pris fin le {{ contract_end_date|date:"d/m/Y" }}, mais son PASS IAE est encore valide. Remplissez le bilan d’accompagnement pour le transmettre à son prescripteur.
                 {% else %}

@@ -751,12 +751,12 @@ def switch_stalled_status(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
-PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de parcours IAE"
+PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de contrat de travail d’insertion"
 # Use non-breaking spaces to avoid mail user agent to trim leading spaces.
 PRO_SUPPORT_REQUEST_EMAIL_BODY = """\
     Bonjour,
 
-{job_seeker_full_name} arrive bientôt en fin de parcours IAE
+{job_seeker_full_name} arrive bientôt en fin de contrat de travail d’insertion.
 
 Pour préparer la suite de son accompagnement, pouvez-vous me partager les éléments utiles : ce qui a été travaillé, les freins encore présents et votre préconisation pour la suite ?
 
