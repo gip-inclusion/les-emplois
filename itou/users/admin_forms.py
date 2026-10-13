@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
 from itou.geo.utils import coords_to_geometry
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.admin import FakeRelForRawIdWidget
 from itou.utils.apis import geocoding as api_geocoding
@@ -20,6 +20,8 @@ class ItouUserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         if not self.instance.username:  # This field is not in ItouUserAdmin.add_fieldsets
             self.instance.username = str(uuid.uuid4())
+        if self.instance.kind == UserKind.PROFESSIONAL:
+            self.instance.identity_provider = IdentityProvider.PRO_CONNECT
         self.instance.set_unusable_password()
         return super().save(commit=commit)
 

@@ -36,7 +36,8 @@ from tests.users.factories import (
 from tests.utils.testing import parse_response_to_soup
 
 
-def test_add_user(client):
+@pytest.mark.parametrize("kind", UserKind)
+def test_add_user(client, kind):
     admin_user = ItouStaffFactory(is_superuser=True)
     client.force_login(admin_user)
     response = client.post(
@@ -45,17 +46,19 @@ def test_add_user(client):
             "email": "foo@mailinator.com",
             "first_name": "Prénom",
             "last_name": "Nom",
-            "kind": UserKind.JOB_SEEKER,
+            "kind": kind,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",
         },
     )
     user = User.objects.get(email="foo@mailinator.com")
     assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
-    assert user.kind == UserKind.JOB_SEEKER
+    assert user.kind == kind
     assert user.username  # should not be an empty string
     assert user.first_name == "Prénom"
     assert user.last_name == "Nom"
+    if kind == UserKind.PROFESSIONAL:
+        assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 
 def test_no_email_sent(client):
