@@ -1,0 +1,498 @@
+# serializer version: 1
+# name: test_people_search_filters_and_htmx
+  '''
+  <div class="c-box--results__body flex-grow-1">
+                          <h3 class="mb-1">Alice Martin</h3>
+                          <p class="text-secondary fs-lg mb-4">Gestionnaire de structure</p>
+                          <hr/>
+                          
+                              <p class="text-tertiary fs-lg mb-1">Mission locale</p>
+                          
+                          <p class="mb-1 fw-bold text-uppercase">Mission locale de Vannes</p>
+                          <address class="mb-1 d-flex align-items-start">
+                              <i aria-hidden="true" class="ri-map-pin-2-line me-2"></i>
+                              <span>1 rue de Vannes 56000 Vannes</span>
+                          </address>
+                          
+                      </div>
+  '''
+# ---
+# name: test_people_search_restores_query_from_url
+  '''
+  <form hx-get="/annuaire/" hx-indicator="#people-search-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#people-search-results" hx-trigger="input changed delay:300ms" id="people-search-form" method="get">
+                  
+  
+  
+  <div class="input-group input-group-xl input-group-search mb-3">
+      <label class="input-group-text" for="id_q">
+          <span class="visually-hidden">Rechercher une personne</span>
+          <i aria-hidden="true" class="ri-user-search-line"></i>
+      </label>
+      <input autocomplete="off" class="form-control" id="id_q" name="q" placeholder="Nom ou prénom" type="text" value="Alice"/>
+  </div>
+  <div class="btn-dropdown-filter-group">
+      
+  
+  
+  <div class="dropdown">
+      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+          
+              Types de structure
+          
+      </button>
+      <ul class="dropdown-menu">
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_0" name="types" type="checkbox" value="ACI"/>
+                      <label class="form-check-label" for="id_types_0">Atelier chantier d'insertion</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_1" name="types" type="checkbox" value="AFPA"/>
+                      <label class="form-check-label" for="id_types_1">AFPA - Agence nationale pour la formation professionnelle des adultes</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_2" name="types" type="checkbox" value="AI"/>
+                      <label class="form-check-label" for="id_types_2">Association intermédiaire</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_3" name="types" type="checkbox" value="ASE"/>
+                      <label class="form-check-label" for="id_types_3">ASE - Aide sociale à l'enfance</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_4" name="types" type="checkbox" value="ASSO"/>
+                      <label class="form-check-label" for="id_types_4">Association</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_5" name="types" type="checkbox" value="AVIP"/>
+                      <label class="form-check-label" for="id_types_5">Crèches AVIP</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_6" name="types" type="checkbox" value="BIB"/>
+                      <label class="form-check-label" for="id_types_6">Bibliothèque / Médiathèque</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_7" name="types" type="checkbox" value="CAARUD"/>
+                      <label class="form-check-label" for="id_types_7">CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers de drogues</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_8" name="types" type="checkbox" value="CADA"/>
+                      <label class="form-check-label" for="id_types_8">CADA - Centre d'accueil de demandeurs d'asile</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_9" name="types" type="checkbox" value="CAF"/>
+                      <label class="form-check-label" for="id_types_9">CAF - Caisse d'allocations familiales</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_10" name="types" type="checkbox" value="CAP_EMPLOI"/>
+                      <label class="form-check-label" for="id_types_10">Cap emploi - Réseau Cheops</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_11" name="types" type="checkbox" value="CAVA"/>
+                      <label class="form-check-label" for="id_types_11">CAVA - Centre d'adaptation à la vie active</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_12" name="types" type="checkbox" value="CCAS_CIAS"/>
+                      <label class="form-check-label" for="id_types_12">Centre communal d'action sociale ou centre intercommunal d'action sociale</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_13" name="types" type="checkbox" value="CCONS"/>
+                      <label class="form-check-label" for="id_types_13">Chambres consulaires</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_14" name="types" type="checkbox" value="CHRS"/>
+                      <label class="form-check-label" for="id_types_14">CHRS - Centre d'hébergement et de réinsertion sociale</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_15" name="types" type="checkbox" value="CHU"/>
+                      <label class="form-check-label" for="id_types_15">CHU - Centre d'hébergement d'urgence</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_16" name="types" type="checkbox" value="CIDFF"/>
+                      <label class="form-check-label" for="id_types_16">CIDFF - Centre d'information sur les droits des femmes et des familles</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_17" name="types" type="checkbox" value="CMP"/>
+                      <label class="form-check-label" for="id_types_17">Centre Médico-Psychologique</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_18" name="types" type="checkbox" value="CMS"/>
+                      <label class="form-check-label" for="id_types_18">Centre Médico-Social</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_19" name="types" type="checkbox" value="COMMUNES"/>
+                      <label class="form-check-label" for="id_types_19">Communes</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_20" name="types" type="checkbox" value="CFP"/>
+                      <label class="form-check-label" for="id_types_20">Centre des Finances Publiques</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_21" name="types" type="checkbox" value="CPAM"/>
+                      <label class="form-check-label" for="id_types_21">Caisse Primaire d’Assurance Maladie</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_22" name="types" type="checkbox" value="CPH"/>
+                      <label class="form-check-label" for="id_types_22">Centres provisoires d’hébergement</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_23" name="types" type="checkbox" value="CSAPA"/>
+                      <label class="form-check-label" for="id_types_23">CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_24" name="types" type="checkbox" value="DEPT"/>
+                      <label class="form-check-label" for="id_types_24">Départements</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_25" name="types" type="checkbox" value="E2C"/>
+                      <label class="form-check-label" for="id_types_25">Écoles de la deuxième chance</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_26" name="types" type="checkbox" value="EA"/>
+                      <label class="form-check-label" for="id_types_26">Entreprise adaptée</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_27" name="types" type="checkbox" value="EATT"/>
+                      <label class="form-check-label" for="id_types_27">Entreprise adaptée de travail temporaire</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_28" name="types" type="checkbox" value="EI"/>
+                      <label class="form-check-label" for="id_types_28">Entreprise d'insertion</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_29" name="types" type="checkbox" value="EITI"/>
+                      <label class="form-check-label" for="id_types_29">Entreprise d'insertion par le travail indépendant</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_30" name="types" type="checkbox" value="EPIDE"/>
+                      <label class="form-check-label" for="id_types_30">EPIDE - Établissement pour l'insertion dans l'emploi</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_31" name="types" type="checkbox" value="ESAT"/>
+                      <label class="form-check-label" for="id_types_31">ESAT - Établissements ou services d'accompagnement par le travail</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_32" name="types" type="checkbox" value="EPN"/>
+                      <label class="form-check-label" for="id_types_32">Espaces publics numériques</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_33" name="types" type="checkbox" value="ETABL_PRI"/>
+                      <label class="form-check-label" for="id_types_33">Établissement privé</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_34" name="types" type="checkbox" value="ETABL_PUB"/>
+                      <label class="form-check-label" for="id_types_34">Établissement public</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_35" name="types" type="checkbox" value="ETTI"/>
+                      <label class="form-check-label" for="id_types_35">Entreprise de travail temporaire d'insertion</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_36" name="types" type="checkbox" value="FAS"/>
+                      <label class="form-check-label" for="id_types_36">Fédération des acteurs de la solidarité</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_37" name="types" type="checkbox" value="FT"/>
+                      <label class="form-check-label" for="id_types_37">France Travail</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_38" name="types" type="checkbox" value="GEIQ"/>
+                      <label class="form-check-label" for="id_types_38">Groupement d'employeurs pour l'insertion et la qualification</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_39" name="types" type="checkbox" value="GEN"/>
+                      <label class="form-check-label" for="id_types_39">Grandes écoles du numérique</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_40" name="types" type="checkbox" value="HUDA"/>
+                      <label class="form-check-label" for="id_types_40">HUDA - Hébergement d’urgence pour demandeurs d’asile</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_41" name="types" type="checkbox" value="POSTE"/>
+                      <label class="form-check-label" for="id_types_41">La Poste</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_42" name="types" type="checkbox" value="MDE"/>
+                      <label class="form-check-label" for="id_types_42">Maisons de l'emploi</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_43" name="types" type="checkbox" value="MDS"/>
+                      <label class="form-check-label" for="id_types_43">Maison des solidarités</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input checked="" class="form-check-input" id="id_types_44" name="types" type="checkbox" value="ML"/>
+                      <label class="form-check-label" for="id_types_44">Mission locale</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_45" name="types" type="checkbox" value="MJC"/>
+                      <label class="form-check-label" for="id_types_45">MJC - Maison des jeunes et de la culture</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_46" name="types" type="checkbox" value="MSAP"/>
+                      <label class="form-check-label" for="id_types_46">Maison de Services Au Public</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_47" name="types" type="checkbox" value="MSA"/>
+                      <label class="form-check-label" for="id_types_47">Mutualité sociale agricole</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_48" name="types" type="checkbox" value="OACAS"/>
+                      <label class="form-check-label" for="id_types_48">OACAS - Structure porteuse d'un agrément national organisme d'accueil communautaire et d'activité solidaire</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_49" name="types" type="checkbox" value="OCASF"/>
+                      <label class="form-check-label" for="id_types_49">Organisme mentionné au 8° du I de l’article L. 312-1 du code de l’action sociale et des familles</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_50" name="types" type="checkbox" value="DCD"/>
+                      <label class="form-check-label" for="id_types_50">Organisation délégataire d’un conseil départemental</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_51" name="types" type="checkbox" value="OIL"/>
+                      <label class="form-check-label" for="id_types_51">Opérateur d'intermédiation locative</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_52" name="types" type="checkbox" value="OPCS"/>
+                      <label class="form-check-label" for="id_types_52">Organisation porteuse de la clause sociale</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_53" name="types" type="checkbox" value="OF"/>
+                      <label class="form-check-label" for="id_types_53">Organisme de formation</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_54" name="types" type="checkbox" value="PENSION"/>
+                      <label class="form-check-label" for="id_types_54">Pension de famille / résidence accueil</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_55" name="types" type="checkbox" value="PIJ_BIJ"/>
+                      <label class="form-check-label" for="id_types_55">Points et bureaux information jeunesse</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_56" name="types" type="checkbox" value="PIMMS"/>
+                      <label class="form-check-label" for="id_types_56">Pimms Médiation</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_57" name="types" type="checkbox" value="PJJ"/>
+                      <label class="form-check-label" for="id_types_57">PJJ - Protection judiciaire de la jeunesse</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_58" name="types" type="checkbox" value="PLIE"/>
+                      <label class="form-check-label" for="id_types_58">PLIE - Plans locaux pour l’insertion et l’emploi</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_59" name="types" type="checkbox" value="REG"/>
+                      <label class="form-check-label" for="id_types_59">Régions</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_60" name="types" type="checkbox" value="RFS"/>
+                      <label class="form-check-label" for="id_types_60">Réseau France Service</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_61" name="types" type="checkbox" value="RS_FJT"/>
+                      <label class="form-check-label" for="id_types_61">Résidence sociale / FJT - Foyer de Jeunes Travailleurs</label>
+                  </div>
+              </li>
+          
+              <li class="dropdown-item">
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_types_62" name="types" type="checkbox" value="SPIP"/>
+                      <label class="form-check-label" for="id_types_62">SPIP - Service pénitentiaire d'insertion et de probation</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </div>
+  
+      <a aria-label="Effacer les filtres actifs" class="btn btn-ico btn-dropdown-filter ms-lg-auto" href="/annuaire/" id="people-clear-filters">
+      <i aria-hidden="true" class="ri-eraser-line"></i>
+      <span>Effacer</span>
+  </a>
+  
+  </div>
+  
+              </form>
+  '''
+# ---

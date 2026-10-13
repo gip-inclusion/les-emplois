@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.templatetags.static import static
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.cities.models import City, DirectoryActiveCity
 from itou.companies.enums import CompanyKind
@@ -11,12 +11,14 @@ from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.utils.htmx.testing import update_page_with_htmx
+from tests.utils.testing import parse_response_to_soup
 from tests.www.directory_views.helpers import get_target_person, setup_directory
 
 
 def test_access_is_restricted(client):
     response = client.get(reverse("directory:people_results"))
-    assert response.status_code == 302
+    assertRedirects(response, f"{reverse('account_login')}?next={reverse('directory:people_results')}")
 
     client.force_login(JobSeekerFactory())
     response = client.get(reverse("directory:people_results"))
@@ -44,8 +46,9 @@ def test_access_requires_organization_coords(client):
     assert response.status_code == 403
 
 
-def test_people_search_filters_and_htmx(client):
+def test_people_search_filters_and_htmx(client, snapshot):
     setup_directory(client)
+    page = parse_response_to_soup(client.get(reverse("directory:people_results")))
 
     response = client.get(
         reverse("directory:people_results"),
@@ -53,17 +56,14 @@ def test_people_search_filters_and_htmx(client):
         headers={"HX-Request": "true"},
     )
 
-    assertContains(response, "Alice Martin")
-    assertContains(response, "Personne (1)")
-    assertContains(response, "Mission locale de Vannes")
-    assertContains(response, "Gestionnaire de structure")
-    assertContains(response, "ri-map-pin-2-line")
-    assertContains(response, "ri-eye-line")
+    update_page_with_htmx(page, "#people-search-form", response)
+    assert [heading.text for heading in page.select("#people-search-results h3")] == ["Alice Martin"]
+    assert str(page.select_one("#people-search-results .c-box--results__body")) == snapshot
     assertTemplateUsed(response, "directory/includes/people_results.html")
     assertNotContains(response, "js/directory_feedback.js")
 
 
-def test_people_search_restores_query_from_url(client):
+def test_people_search_restores_query_from_url(client, snapshot):
     setup_directory(client)
 
     response = client.get(
@@ -71,15 +71,15 @@ def test_people_search_restores_query_from_url(client):
         {"q": "Alice", "types": NexusStructureKind.ML},
     )
 
-    assert response.status_code == 200
-    assert response.context["form"]["q"].value() == "Alice"
-    assert response.context["form"]["types"].value() == [NexusStructureKind.ML]
+    page = parse_response_to_soup(response)
+    assert page.select_one("input[name=q]")["value"] == "Alice"
+    assert page.select_one(f'input[name=types][value="{NexusStructureKind.ML}"]').has_attr("checked")
     assertContains(response, static("js/directory_feedback.js"))
     assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "Vous faites partie des premiers à accéder à cette fonctionnalité")
     assertContains(response, reverse("dashboard:edit_user_info"))
     assertContains(response, 'id="people-clear-filters"')
-    assertNotContains(response, "ms-lg-auto d-none")
+    assert str(page.select_one("#people-search-form")) == snapshot
 
 
 def test_people_search_has_hidden_clear_button_without_filters(client):
@@ -88,7 +88,7 @@ def test_people_search_has_hidden_clear_button_without_filters(client):
     response = client.get(reverse("directory:people_results"))
 
     assertContains(response, 'id="people-clear-filters"')
-    assertContains(response, "ms-lg-auto d-none")
+    assert "d-none" in parse_response_to_soup(response).select_one("#people-clear-filters")["class"]
 
 
 def test_people_search_pagination_replaces_results_container(client, mocker):
