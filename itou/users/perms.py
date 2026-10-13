@@ -20,7 +20,7 @@ def add_user_can_view_personal_information(objects, can_view, user_attr="job_see
 
 
 def can_fill_pro_support_report(request):
-    return bool(request.from_employer and request.from_iae_actor)
+    return request.from_employer and request.from_iae_actor
 
 
 def can_view_pro_support_report(request, report):
