@@ -4,7 +4,9 @@
 {% if contract_end_date %}
     {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id=fiche_banner_extra_id extra_classes="mb-3 mb-md-4" %}
         {% fragment as title %}
-            {% if not request.from_employer %}
+            {% if not request.from_employer and contract_ended %}
+                Le contrat de travail de ce bénéficiaire a pris fin
+            {% elif not request.from_employer %}
                 Ce bénéficiaire arrive en fin de contrat de travail
             {% elif contract_ended %}
                 Le contrat de travail a pris fin
@@ -14,7 +16,9 @@
         {% endfragment %}
         {% fragment as content %}
             <p class="mb-0">
-                {% if not request.from_employer %}
+                {% if not request.from_employer and contract_ended %}
+                    Son contrat s’est terminé le {{ contract_end_date|date:"d/m/Y" }} et son PASS IAE est encore valide. Demandez un bilan à la structure qui l’employait pour préparer la suite de son parcours.
+                {% elif not request.from_employer %}
                     Son contrat de travail se termine le {{ contract_end_date|date:"d/m/Y" }}. Demandez un bilan à la structure qui l’emploie pour préparer la suite de son parcours.
                 {% elif contract_ended %}
                     Le contrat de ce salarié a pris fin le {{ contract_end_date|date:"d/m/Y" }}, mais son PASS IAE est encore valide. Remplissez le bilan d’accompagnement pour le transmettre à son prescripteur.

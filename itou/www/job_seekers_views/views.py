@@ -182,7 +182,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                 .with_last_contract_has_pro_support_report(siae=self.request.current_organization)
                 .with_last_contract_end_date(siae=self.request.current_organization)
             )
-        return queryset.with_contract_ending_soon()
+        return queryset.with_end_of_journey()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,26 +216,24 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 
         # Job seeker card banner: the pro support report for the SIAE, a support request for the authorized prescriber.
         contract_end_date = None
-        contract_ended = False
+        contract_ended = self.object.last_contract_ended_with_valid_approval
+        at_end_of_journey = self.object.contract_ending_soon or contract_ended
         create_pro_support_report_url = None
         pro_support_request_mailto = None
         if can_fill_pro_support_report(self.request):
-            if (
-                self.object.contract_ending_soon or self.object.last_contract_ended_with_valid_approval
-            ) and not self.object.last_contract_has_pro_support_report:
+            if at_end_of_journey and not self.object.last_contract_has_pro_support_report:
                 contract_end_date = self.object.last_contract_end_date
-                contract_ended = self.object.last_contract_ended_with_valid_approval
                 create_pro_support_report_url = reverse(
                     "job_seekers_views:create_pro_support_report", kwargs={"public_id": self.object.public_id}
                 )
-        elif self.request.from_authorized_prescriber and self.object.contract_ending_soon:
+        elif self.request.from_authorized_prescriber and at_end_of_journey:
             if last_contract := self.object.contracts.order_by("-end_date").first():
                 contract_end_date = last_contract.end_date
                 company_email = last_contract.company.email if last_contract.company else None
                 # The job seeker's name is in the mail body: no action when it must stay masked.
                 if company_email and context["can_view_personal_information"]:
                     pro_support_request_mailto = _build_pro_support_request_mailto(
-                        company_email, self.object.get_full_name()
+                        company_email, self.object.get_full_name(), contract_ended=contract_ended
                     )
         approval_expires_soon = (
             self.approval and self.approval.is_valid and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS
@@ -752,11 +750,17 @@ def switch_stalled_status(request, public_id):
 
 
 PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de contrat de travail d’insertion"
+PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON = (
+    "{job_seeker_full_name} arrive bientôt en fin de contrat de travail d’insertion."
+)
+PRO_SUPPORT_REQUEST_CONTRACT_ENDED = (
+    "Le contrat de travail d’insertion de {job_seeker_full_name} a pris fin et son PASS IAE est encore valide."
+)
 # Use non-breaking spaces to avoid mail user agent to trim leading spaces.
 PRO_SUPPORT_REQUEST_EMAIL_BODY = """\
     Bonjour,
 
-{job_seeker_full_name} arrive bientôt en fin de contrat de travail d’insertion.
+{situation}
 
 Pour préparer la suite de son accompagnement, pouvez-vous me partager les éléments utiles : ce qui a été travaillé, les freins encore présents et votre préconisation pour la suite ?
 
@@ -785,13 +789,16 @@ def _pro_support_request_company_email():
     )
 
 
-def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
+def _build_pro_support_request_mailto(to_email, job_seeker_full_name, contract_ended=False):
     # V1 opens a pre-filled mailto to the employing SIAE: no email is
     # sent nor stored server-side.
+    situation = PRO_SUPPORT_REQUEST_CONTRACT_ENDED if contract_ended else PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON
     query = urllib.parse.urlencode(
         {
             "subject": PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
-            "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(job_seeker_full_name=job_seeker_full_name),
+            "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(
+                situation=situation.format(job_seeker_full_name=job_seeker_full_name)
+            ),
         },
         quote_via=urllib.parse.quote,
     )

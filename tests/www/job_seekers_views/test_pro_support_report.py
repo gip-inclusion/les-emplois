@@ -288,8 +288,16 @@ def test_pro_support_report_access_for_roles(client, user_factory, status_code):
 
 
 @freeze_time("2026-01-15")
-def test_pro_support_report_banner_on_job_seeker_card_for_advisor(client):
-    report = ProSupportReportFactory(contract__end_date=datetime.date(2026, 1, 25))
+@pytest.mark.parametrize(
+    "contract_end_date,end_of_contract_title",
+    [
+        (datetime.date(2026, 1, 25), "Ce bénéficiaire arrive en fin de contrat de travail"),
+        (datetime.date(2026, 1, 10), "Le contrat de travail de ce bénéficiaire a pris fin"),
+    ],
+    ids=["contract_ends_soon", "contract_ended"],
+)
+def test_pro_support_report_banner_on_job_seeker_card_for_advisor(client, contract_end_date, end_of_contract_title):
+    report = ProSupportReportFactory(contract__end_date=contract_end_date)
     ApprovalFactory(user=report.job_seeker, start_at=report.contract.start_date, end_at=datetime.date(2026, 6, 1))
     details_url = reverse("job_seekers_views:details", kwargs={"public_id": report.job_seeker.public_id})
 
@@ -298,7 +306,7 @@ def test_pro_support_report_banner_on_job_seeker_card_for_advisor(client):
     assertContains(response, "Bilan d’accompagnement disponible")
     assertContains(response, f'href="{report_url(report)}?back_url={details_url}"')
     # It takes the place of the end-of-contract banner.
-    assertNotContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
+    assertNotContains(response, end_of_contract_title)
 
     # A renewal ending soon is not covered by the report on the previous contract.
     ContractFactory(
