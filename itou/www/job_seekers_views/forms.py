@@ -690,6 +690,7 @@ class ProSupportReportForm(forms.ModelForm):
                 "hx-get": hx_get_url,
                 "hx-target": "#pro-support-report-next-step",
                 "hx-select": "#pro-support-report-next-step",
+                "hx-indicator": "#pro-support-report-next-step",
                 "hx-swap": "outerHTML",
             }
         )
