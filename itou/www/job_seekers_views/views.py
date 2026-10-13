@@ -760,7 +760,7 @@ PRO_SUPPORT_REQUEST_EMAIL_BODY = """\
 
 Pour préparer la suite de son accompagnement, pouvez-vous me partager les éléments utiles : ce qui a été travaillé, les freins encore présents et votre préconisation pour la suite ?
 
-On peut aussi s'appeler si c'est plus simple.
+On peut aussi s’appeler si c’est plus simple.
 
 Merci.
 """  # noqa: E501 # Line too long
