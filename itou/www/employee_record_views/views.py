@@ -245,6 +245,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         row["status"]: row["cnt"]
         for row in EmployeeRecord.objects.for_company(siae).values("status").annotate(cnt=Count("status"))
     }
+    # Merge those two states to simplify filter
+    employee_record_badges.setdefault(Status.REJECTED, 0)
+    employee_record_badges[Status.REJECTED] += employee_record_badges.get(Status.MODIFICATION_REJECTED, 0)
+    employee_record_badges.setdefault(Status.SENT, 0)
+    employee_record_badges[Status.SENT] += employee_record_badges.get(Status.MODIFICATION_SENT, 0)
+
     # Set count of each status for badge display
     STATUS_BADGE_CLASSES = {Status.NEW: "bg-info", Status.REJECTED: "bg-warning"}
     status_badges = [
@@ -278,7 +284,15 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         data.filter(status=Status.PROCESSED).exclude(siret=F("siret_from_asp_source")).exists()
     )
     if statuses := form.cleaned_data.get("status"):
-        data = data.filter(status__in=[Status(value) for value in statuses])
+        allowed_statuses = []
+        for value in statuses:
+            if value == Status.SENT:
+                allowed_statuses.extend([Status.SENT, Status.MODIFICATION_SENT])
+            elif value == Status.REJECTED:
+                allowed_statuses.extend([Status.REJECTED, Status.MODIFICATION_REJECTED])
+            else:
+                allowed_statuses.append(Status(value))
+        data = data.filter(status__in=allowed_statuses)
     if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
         data = data.filter(job_application__job_seeker=job_seeker_id)
 
