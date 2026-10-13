@@ -183,7 +183,9 @@ class TestQuerySet:
         create_employee(None)
         create_employee(ten_days_ago, start_at=two_years_ago, end_at=yesterday)
         ContractFactory(company=company, start_date=two_years_ago, end_date=ten_days_ago)
-        create_employee(in_ten_days, contract_company=CompanyFactory())
+        job_seeker_with_contract_ending_soon_elsewhere = create_employee(
+            in_ten_days, contract_company=CompanyFactory()
+        )
         job_seeker_hired_elsewhere = create_employee(ten_days_ago)
         ContractFactory(job_seeker=job_seeker_hired_elsewhere, start_date=five_days_ago, end_date=in_three_months)
         job_seeker_hired_by_unknown_company = create_employee(ten_days_ago)
@@ -204,6 +206,18 @@ class TestQuerySet:
             ],
             ordered=False,
         )
+        # Without a SIAE, the contracts of every company count.
+        assertQuerySetEqual(
+            User.objects.at_end_of_journey(),
+            [
+                job_seeker_with_contract_ending_soon,
+                job_seeker_with_contract_ending_soon_hired_elsewhere,
+                job_seeker_with_ended_contract,
+                job_seeker_with_contract_ended_long_ago,
+                job_seeker_with_contract_ending_soon_elsewhere,
+            ],
+            ordered=False,
+        )
 
     @freezegun.freeze_time("2026-09-22")
     def test_with_end_of_journey(self):
@@ -214,10 +228,10 @@ class TestQuerySet:
         in_ten_days = today + datetime.timedelta(days=10)
         in_three_months = today + relativedelta(months=3)
 
-        def create_employee(contract_end_date):
+        def create_employee(contract_end_date, *, contract_company=company):
             return ApprovalFactory(
                 with_jobapplication=True,
-                with_jobapplication__to_company=company,
+                with_jobapplication__to_company=contract_company,
                 with_ongoing_contract=True,
                 with_ongoing_contract__start_date=two_years_ago,
                 with_ongoing_contract__end_date=contract_end_date,
@@ -226,6 +240,7 @@ class TestQuerySet:
         job_seeker_with_contract_ending_soon = create_employee(in_ten_days)
         job_seeker_with_ended_contract = create_employee(yesterday)
         job_seeker_with_ongoing_contract = create_employee(in_three_months)
+        job_seeker_with_ended_contract_elsewhere = create_employee(yesterday, contract_company=CompanyFactory())
 
         job_seekers_qs = User.objects.with_end_of_journey(siae=company)
         job_seeker = job_seekers_qs.get(pk=job_seeker_with_contract_ending_soon.pk)
@@ -237,6 +252,12 @@ class TestQuerySet:
         job_seeker = job_seekers_qs.get(pk=job_seeker_with_ongoing_contract.pk)
         assert job_seeker.contract_ending_soon is False
         assert job_seeker.last_contract_ended_with_valid_approval is False
+        job_seeker = job_seekers_qs.get(pk=job_seeker_with_ended_contract_elsewhere.pk)
+        assert job_seeker.last_contract_ended_with_valid_approval is False
+
+        # Without a SIAE, the last contract of any company counts.
+        job_seeker = User.objects.with_end_of_journey().get(pk=job_seeker_with_ended_contract_elsewhere.pk)
+        assert job_seeker.last_contract_ended_with_valid_approval is True
 
     def test_with_last_contract_pro_support_report(self):
         report = ProSupportReportFactory()
