@@ -1,7 +1,5 @@
 import json
-from urllib.parse import urljoin
 
-import httpx
 from django.conf import settings
 
 from itou.utils.command import BaseCommand
@@ -55,7 +53,6 @@ class Command(BaseCommand):
     def handle(self, *args, autoexpire=False, **options):
         buckets = self.get_buckets()
         for bucket_name, bucket in buckets.items():
-            is_minio = self.check_minio(url=bucket.get("url"))
             client = bucket.get("client")
 
             try:
@@ -79,27 +76,25 @@ class Command(BaseCommand):
                     VersioningConfiguration={"Status": "Enabled"},
                 )
 
-            # MinIO does not support setting CORS.
-            if not is_minio:
-                protocol = "https" if settings.ITOU_ENVIRONMENT != ItouEnvironment.DEV else "http"
-                allowed_origins = []
-                for origin in settings.ALLOWED_HOSTS:
-                    if origin.startswith("."):
-                        origin = f"*{origin}"
-                    allowed_origins.append(f"{protocol}://{origin}")
-                client.put_bucket_cors(
-                    Bucket=bucket_name,
-                    CORSConfiguration={
-                        "CORSRules": [
-                            {
-                                "AllowedHeaders": ["Cache-Control", "X-Requested-With"],
-                                "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
-                                "AllowedOrigins": allowed_origins,
-                                "ExposeHeaders": ["ETag", "Location"],
-                            }
-                        ]
-                    },
-                )
+            protocol = "https" if settings.ITOU_ENVIRONMENT != ItouEnvironment.DEV else "http"
+            allowed_origins = []
+            for origin in settings.ALLOWED_HOSTS:
+                if origin.startswith("."):
+                    origin = f"*{origin}"
+                allowed_origins.append(f"{protocol}://{origin}")
+            client.put_bucket_cors(
+                Bucket=bucket_name,
+                CORSConfiguration={
+                    "CORSRules": [
+                        {
+                            "AllowedHeaders": ["Cache-Control", "X-Requested-With"],
+                            "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+                            "AllowedOrigins": allowed_origins,
+                            "ExposeHeaders": ["ETag", "Location"],
+                        }
+                    ]
+                },
+            )
 
             auto_expire_rule_filter = {"Prefix": TEMPORARY_STORAGE_PREFIX}
             if autoexpire:
@@ -127,12 +122,3 @@ class Command(BaseCommand):
                     ]
                 },
             )
-
-    def check_minio(self, url):
-        # https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html#node-liveness
-        livecheck_url = urljoin(url, "minio/health/live")
-        response = httpx.head(livecheck_url)
-        try:
-            return response.headers["Server"] == "MinIO"
-        except KeyError:
-            return False

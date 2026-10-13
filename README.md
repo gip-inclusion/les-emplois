@@ -112,11 +112,11 @@ Il est recommandé d'utiliser [direnv](./docs/developing.md#direnv) qui permet l
 ### Création des *buckets S3*
 
 Les fichiers téléversés sont enregistrés dans un stockage objet type *S3*. En
-local, le service est rendu par [MinIO](https://min.io/). Sa console
+local, le service est rendu par [RustFS](https://rustfs.com/). Sa console
 d’administration est disponible à l’adresse http://localhost:9001/.
 
-Login : `minioadmin`
-Password : `minioadmin`
+Login : `rustfsadmin`
+Password : `rustfsadmin`
 
 Afin de créer les *buckets* nécessaires au développement et aux tests, lancer la commande :
 ```sh

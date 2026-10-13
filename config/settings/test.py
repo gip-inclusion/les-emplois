@@ -41,8 +41,8 @@ AWS_S3_ENDPOINT_URL = (
     if cellar_addon_host
     else f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')}/"
 )
-AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID_TEST", "minioadmin")
-AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_SECRET_KEY_TEST", "minioadmin")
+AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID_TEST", "rustfsadmin")
+AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_SECRET_KEY_TEST", "rustfsadmin")
 # S3 bucket names must be globally unique. CI uses Cellar, so the storage
 # bucket name must not exist on all of Cellar.
 # https://www.clever.cloud/developers/doc/addons/cellar/#name-your-bucket

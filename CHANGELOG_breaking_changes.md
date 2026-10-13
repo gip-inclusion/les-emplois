@@ -1,5 +1,13 @@
 # Journal des changements techniques majeurs
 
+# 2026-10-15
+
+- Remplacement de MinIO par RustFS dans l'environnement de développement:
+    1. Arrêter le conteneur `itou_minio` s'il tourne : `docker stop itou_minio` ou `podman stop itou_minio`
+    2. Supprimer le conteneur `itou_minio` s'il existe : `docker rm itou_minio` ou `podman rm itou_minio`
+    3. Relancer les conteneurs: `docker-compose up -d` ou `podman-compose up -d`
+    4. Éventuellement supprimer le volume `itou_minio`: `docker volume rm itou_minio` ou `podman volume rm itou_minio`
+
 # 2026-10-12
 
 - Mise à jour vers Python 3.14:
