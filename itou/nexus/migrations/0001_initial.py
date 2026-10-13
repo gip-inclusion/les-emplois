@@ -29,7 +29,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("dora", "Dora"),
-                            ("le-marche", "Le marché de l’inclusion"),
                         ],
                         unique=True,
                         verbose_name="service",
@@ -212,7 +211,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("dora", "Dora"),
-                            ("le-marche", "Le marché de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),
@@ -346,7 +344,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("dora", "Dora"),
-                            ("le-marche", "Le marché de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),
@@ -398,7 +395,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("dora", "Dora"),
-                            ("le-marche", "Le marché de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),
