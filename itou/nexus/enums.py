@@ -14,7 +14,7 @@ class Service(models.TextChoices):
 
     @classmethod
     def sync_source_choices(cls):
-        return [(k, v) for k, v in cls.choices if k in [cls.DORA, cls.MARCHE]]
+        return [(k, v) for k, v in cls.choices if k in [cls.DORA]]
 
 
 class Auth(models.TextChoices):
@@ -119,9 +119,6 @@ USER_KIND_MAPPING = {
         "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
         "autre": "",
         "": "",
-    },
-    Service.MARCHE: {
-        "SIAE": NexusUserKind.FACILITY_MANAGER,
     },
 }
 
@@ -265,18 +262,5 @@ STRUCTURE_KIND_MAPPING = {
         "TIERS_LIEUX": NexusStructureKind.ASSO,
         "UDAF": NexusStructureKind.DEPT,
         "": "",
-    },
-    Service.MARCHE: {
-        "EI": NexusStructureKind.EI,
-        "AI": NexusStructureKind.AI,
-        "ACI": NexusStructureKind.ACI,
-        "ETTI": NexusStructureKind.ETTI,
-        "EITI": NexusStructureKind.EITI,
-        "GEIQ": NexusStructureKind.GEIQ,
-        "EA": NexusStructureKind.EA,
-        "EATT": NexusStructureKind.EATT,
-        "ESAT": NexusStructureKind.ESAT,
-        "SEP": NexusStructureKind.SPIP,
-        "OPCS": NexusStructureKind.OPCS,
     },
 }
