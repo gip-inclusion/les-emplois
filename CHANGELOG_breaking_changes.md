@@ -51,7 +51,7 @@
 
 ## 2025-01-27
 
-- Utiliser `FORCE_PROCONNECT_LOGIN=False` en local au lieu de `FORCE_IC_LOGIN=False`.
+- Utiliser `FORCE_PROCONNECT_LOGIN_FOR_PRO=False` en local au lieu de `FORCE_IC_LOGIN=False`.
 
 ## 2024-11-06
 
