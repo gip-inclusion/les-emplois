@@ -1366,7 +1366,7 @@ class ProSupportReport(models.Model):
                 prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
             )
             .select_related("professional", "prescriber_organization")
-            .order_by("-last_action_at", "-pk")
+            .order_by("-last_action_at")
             .first()
         )
         if assignment:
