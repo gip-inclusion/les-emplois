@@ -15,7 +15,7 @@ from tests.users.factories import DEFAULT_PASSWORD, ItouStaffFactory, JobSeekerF
 
 
 def test_login(client):
-    user = ItouStaffFactory(with_verified_email=True)
+    user = JobSeekerFactory(with_verified_email=True)
     session = client.session
     session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
     session.save()

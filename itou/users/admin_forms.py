@@ -20,7 +20,10 @@ class ItouUserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         if not self.instance.username:  # This field is not in ItouUserAdmin.add_fieldsets
             self.instance.username = str(uuid.uuid4())
-        if self.instance.kind == UserKind.PROFESSIONAL:
+        # Use ProConnect for pro and staff users
+        # We could check settings.FORCE_PROCONNECT_LOGIN_* but this view
+        # is only really used on prod where both are true so it's simpler this way
+        if self.instance.kind in [UserKind.PROFESSIONAL, UserKind.ITOU_STAFF]:
             self.instance.identity_provider = IdentityProvider.PRO_CONNECT
         self.instance.set_unusable_password()
         return super().save(commit=commit)

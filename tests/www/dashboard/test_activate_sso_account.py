@@ -10,11 +10,17 @@ from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 
 
-@pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory])
-def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_factory):
+@pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+def test_activate_sso_account(client, pro_connect, user_factory, settings):
+    settings.FORCE_PROCONNECT_LOGIN_FOR_ADMIN = True
+
+    oidc_userinfo = pro_connect.oidc_userinfo.copy()
+    if user_factory == ItouStaffFactory:
+        oidc_userinfo["email"] = "john.doe@inclusion.gouv.fr"
+
     user = user_factory(
         identity_provider=IdentityProvider.DJANGO,
-        email=pro_connect.oidc_userinfo["email"],
+        email=oidc_userinfo["email"],
     )
     client.force_login(user)
     url = reverse("dashboard:index")
@@ -30,6 +36,7 @@ def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_
     response = pro_connect.mock_oauth_dance(
         client,
         previous_url=activate_pro_connect_account_url,
+        oidc_userinfo=oidc_userinfo,
     )
     user.refresh_from_db()
     assert user.identity_provider == IdentityProvider.PRO_CONNECT
@@ -38,7 +45,7 @@ def test_pro_using_django_has_to_activate_sso_account(client, pro_connect, user_
 @pytest.mark.parametrize(
     "user_factory,is_redirected",
     [
-        (ItouStaffFactory, True),
+        (ItouStaffFactory, False),
         (JobSeekerFactory, True),
         (PrescriberFactory, False),
         (EmployerFactory, False),

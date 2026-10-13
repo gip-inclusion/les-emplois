@@ -571,7 +571,7 @@ class TestModel:
         for kind in non_staff_kinds:
             user = UserFactory(kind=kind, is_staff=True)
             assert not user.is_staff
-        user = UserFactory(kind=UserKind.ITOU_STAFF, is_staff=False)
+        user = UserFactory(kind=UserKind.ITOU_STAFF, is_staff=False, email="test@inclusion.gouv.fr")
         assert user.is_staff
 
     def test_get_kind_display(self):

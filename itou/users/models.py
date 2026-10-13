@@ -413,6 +413,14 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.FT_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind=UserKind.PROFESSIONAL)
+                    | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind=UserKind.ITOU_STAFF)
+                ),
+            ),
+            models.CheckConstraint(
+                name="inclusion_staff",
+                violation_error_message="Cet adresse email n'est pas autorisée pour les administrateurs.",
+                condition=models.Q(
+                    ~models.Q(is_staff=True, is_active=True) | models.Q(email__icontains="@inclusion.gouv.fr")
                 ),
             ),
         ]

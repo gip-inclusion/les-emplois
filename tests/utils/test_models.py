@@ -8,7 +8,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.models import AbstractFieldsHistoryModel
 from tests.companies.factories import CompanyFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerProfileFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
 
 
 FIELDS_HISTORY_MODELS_TO_TEST_PARAMS = {
@@ -25,7 +25,7 @@ FIELDS_HISTORY_MODELS_TO_TEST_PARAMS = {
         "update": "1" * 30,
     },
     User: {
-        "factory": ItouStaffFactory,
+        "factory": JobSeekerFactory,
         "test_field": "email",
         "initial": "foo@example.com",
         "update": "bar@example.com",

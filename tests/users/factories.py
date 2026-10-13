@@ -124,6 +124,16 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF
+    email = factory.Sequence("email{}@inclusion.gouv.fr".format)
+
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="John",
+            last_name="Doe",
+            email="john.doe@inclusion.gouv.fr",
+            phone="0707070707",
+            public_id="a290260b-6dd9-4f74-a255-64aabe877b06",
+        )
 
 
 class ProfessionalFactory(UserFactory):
@@ -481,7 +491,7 @@ def random_user_kind_factory(**kwargs):
     factory = None
     if identity_provider := kwargs.get("identity_provider"):
         if identity_provider == IdentityProvider.PRO_CONNECT:
-            factory = random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])
+            factory = random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
         elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]:
             factory = JobSeekerFactory
         elif identity_provider == IdentityProvider.DJANGO:

@@ -39,11 +39,12 @@ from tests.utils.testing import parse_response_to_soup
 @pytest.mark.parametrize("kind", UserKind)
 def test_add_user(client, kind):
     admin_user = ItouStaffFactory(is_superuser=True)
+    user_email = "foo@mailinator.com" if kind != UserKind.ITOU_STAFF else "foo@inclusion.gouv.fr"
     client.force_login(admin_user)
     response = client.post(
         reverse("admin:users_user_add"),
         {
-            "email": "foo@mailinator.com",
+            "email": user_email,
             "first_name": "Prénom",
             "last_name": "Nom",
             "kind": kind,
@@ -51,13 +52,13 @@ def test_add_user(client, kind):
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",
         },
     )
-    user = User.objects.get(email="foo@mailinator.com")
+    user = User.objects.get(email=user_email)
     assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
     assert user.kind == kind
     assert user.username  # should not be an empty string
     assert user.first_name == "Prénom"
     assert user.last_name == "Nom"
-    if kind == UserKind.PROFESSIONAL:
+    if kind in [UserKind.PROFESSIONAL, UserKind.ITOU_STAFF]:
         assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 

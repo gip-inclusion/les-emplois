@@ -33,7 +33,7 @@ IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
     IdentityProvider.DJANGO: tuple(UserKind.values),
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.FT_CONNECT: (UserKind.JOB_SEEKER,),
-    IdentityProvider.PRO_CONNECT: (UserKind.PROFESSIONAL,),
+    IdentityProvider.PRO_CONNECT: (UserKind.PROFESSIONAL, UserKind.ITOU_STAFF),
 }
 
 

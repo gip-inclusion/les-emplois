@@ -198,15 +198,20 @@ class ItouCurrentOrganizationMiddleware:
             if logout_warning is not None:
                 return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
-            # Force ProConnect for pro users
+            # Force ProConnect for pro and staff users
+            user_should_use_proconnect = any(
+                [
+                    (request.user.is_professional and settings.FORCE_PROCONNECT_LOGIN_FOR_PRO),
+                    (request.user.is_staff and settings.FORCE_PROCONNECT_LOGIN_FOR_ADMIN),
+                ]
+            )
             if (
-                user.identity_provider != IdentityProvider.PRO_CONNECT
-                and request.user.is_professional
+                user_should_use_proconnect
+                and request.user.identity_provider != IdentityProvider.PRO_CONNECT
                 and not request.path.startswith(
                     "/dashboard/activate-pro-connect-account"
                 )  # Allow to access ProConnect activation view
                 and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
-                and settings.FORCE_PROCONNECT_LOGIN_FOR_PRO  # Allow to disable on dev setup
             ):
                 return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 

@@ -1,4 +1,3 @@
-import random
 from unittest.mock import patch
 
 import pytest
@@ -231,9 +230,7 @@ class TestExistingUserLogin:
         return [
             (
                 "DJANGO",
-                random.choice([JobSeekerFactory, ItouStaffFactory])(
-                    identity_provider=IdentityProvider.DJANGO, email="django@mailinator.com"
-                ),
+                JobSeekerFactory(identity_provider=IdentityProvider.DJANGO, email="django@mailinator.com"),
             ),
             (
                 "DJANGO+PC",
@@ -241,7 +238,10 @@ class TestExistingUserLogin:
             ),
             (
                 "PC",
-                random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT, email="pc@mailinator.com"),
+                random_user_kind_factory(
+                    identity_provider=IdentityProvider.PRO_CONNECT,
+                    email="pc@inclusion.gouv.fr",  # We can have an itou_staff user here
+                ),
             ),
             (
                 "PE",
