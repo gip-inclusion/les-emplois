@@ -468,7 +468,7 @@ class TestItouStaffLogin:
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, setup_otp_url)
 
-        # Same with an unconfirmed device
+        # With a device, the user is redirected to the otp verification page
         client.logout()
         session = client.session
         session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
