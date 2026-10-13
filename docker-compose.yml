@@ -1,17 +1,16 @@
 services:
-  minio:
-    image: docker.io/minio/minio
-    container_name: itou_minio
+  rustfs:
+    image: docker.io/rustfs/rustfs
+    container_name: itou_rustfs
     restart: unless-stopped
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    command: server /data --console-address ":9001"
+      - RUSTFS_ACCESS_KEY=rustfsadmin
+      - RUSTFS_SECRET_KEY=rustfsadmin
     ports:
-      - "127.0.0.1:${MINIO_PORT_ON_DOCKER_HOST:-9000}:9000"
-      - "127.0.0.1:${MINIO_ADMIN_PORT_ON_DOCKER_HOST:-9001}:9001"
+      - "127.0.0.1:${RUSTFS_PORT_ON_DOCKER_HOST:-9000}:9000"
+      - "127.0.0.1:${RUSTFS_ADMIN_PORT_ON_DOCKER_HOST:-9001}:9001"
     volumes:
-      - itou_minio:/data
+      - itou_rustfs:/data
 
   # https://github.com/appropriate/docker-postgis
   # https://hub.docker.com/r/mdillon/postgis/tags
@@ -60,7 +59,7 @@ services:
       - PGPASSWORD=password
       - PYTHONPATH=.
       - ITOU_LOG_LEVEL=DEBUG
-      - CELLAR_ADDON_HOST=minio:${MINIO_PORT_ON_DOCKER_HOST:-9000}
+      - CELLAR_ADDON_HOST=rustfs:${RUSTFS_PORT_ON_DOCKER_HOST:-9000}
       - VIRTUAL_ENV=/app/.venv-docker
       - REDIS_URL=redis://redis:6379
     depends_on:
@@ -88,4 +87,4 @@ services:
 
 volumes:
   postgres_data:
-  itou_minio:
+  itou_rustfs:
