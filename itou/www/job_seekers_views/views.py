@@ -248,7 +248,11 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             if self.request.from_employer:
                 pro_support_reports = pro_support_reports.filter(company=self.request.current_organization)
             pro_support_report = pro_support_reports.first()
-            if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
+            if pro_support_report and (
+                not can_view_pro_support_report(self.request, pro_support_report)
+                # A report on a previous contract does not cover the contract ending soon.
+                or (contract_end_date and pro_support_report.contract_end_date != contract_end_date)
+            ):
                 pro_support_report = None
 
         return context | {

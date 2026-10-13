@@ -300,6 +300,18 @@ def test_pro_support_report_banner_on_job_seeker_card_for_advisor(client):
     # It takes the place of the end-of-contract banner.
     assertNotContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
 
+    # A renewal ending soon is not covered by the report on the previous contract.
+    ContractFactory(
+        job_seeker=report.job_seeker,
+        company=report.company,
+        start_date=datetime.date(2026, 1, 26),
+        end_date=datetime.date(2026, 2, 10),
+    )
+    response = client.get(details_url)
+    assertNotContains(response, "Bilan d’accompagnement disponible")
+    assertContains(response, "Ce bénéficiaire arrive en fin de contrat de travail")
+    assertContains(response, "10/02/2026")
+
     client.force_login(PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get())
     response = client.get(details_url)
     assertNotContains(response, "Bilan d’accompagnement disponible")
