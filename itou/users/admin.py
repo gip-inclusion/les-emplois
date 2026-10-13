@@ -388,6 +388,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             "PASS IAE lié au diagnostic d'un autre usager",
             lambda q: Approval.objects.filter(user__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
         ),
+        (
+            "Utilisateur de type usager sans profil usager",
+            lambda q: models.User.objects.filter(kind=UserKind.JOB_SEEKER, jobseeker_profile=None),
+        ),
     ]
 
     @admin.display(description="historique des champs modifiés sur le modèle")
