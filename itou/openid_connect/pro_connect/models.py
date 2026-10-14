@@ -24,12 +24,16 @@ class ProConnectUserData(OIDConnectUserData):
     kind: UserKind = UserKind.PROFESSIONAL
     identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
-    # Only ProConnect may update the sub based on the email.
-    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
-    # and create a new one, changing the sub in the process and generating many support tickets.
-    # We are confident that the email is enough to identity prescribers and employers
-    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
-    allow_sub_update = True
+
+    def allow_sub_update(self, user):
+        # Only ProConnect may update the sub based on the email.
+        # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
+        # and create a new one, changing the sub in the process and generating many support tickets.
+        # We are confident that the email is enough to identity prescribers and employers.
+        # For our admins, we only allow it if user.allow_next_sso_sub_update is True.
+        if user.is_itou_staff:
+            return False
+        return True
 
     @staticmethod
     def user_info_mapping_dict(user_info: dict):
