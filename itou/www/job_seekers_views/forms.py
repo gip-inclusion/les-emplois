@@ -71,7 +71,6 @@ class FilterForm(forms.Form):
     # Fields only for authorized prescribers and IAE employers, set in __init__
     approval_ending_soon = None
     contract_ending_soon = None
-    # Field only for IAE employers, set in __init__
     end_of_journey = None
 
     assignments = forms.ChoiceField(
@@ -114,7 +113,6 @@ class FilterForm(forms.Form):
                 required=False,
                 help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
-        if self.company:
             # Reached from links only, it has no checkbox.
             self.fields["end_of_journey"] = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
