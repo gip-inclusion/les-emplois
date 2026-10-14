@@ -1,4 +1,4 @@
-<div class="alert alert-warning alert-dismissible fade show mb-3 mb-md-4" role="status">
+<div class="alert alert-info alert-dismissible fade show mb-3 mb-md-4" role="status">
     <form method="post"
           action="{% url 'insertion_views:orientation_dismiss_disclaimer' session_uuid=orientation_session_uuid %}">
         {% csrf_token %}
@@ -7,14 +7,22 @@
     </form>
     <div class="row">
         <div class="col-auto pe-0">
-            <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
         </div>
         <div class="col">
             <p class="mb-2">
-                <strong>Rappel</strong>
+                <strong>Le saviez-vous ?</strong>
             </p>
             <p class="mb-0">
-                Les orientations non valides (test/fictives) nécessitent une vérification manuelle, ce qui augmente la charge de travail de nos équipes. Pour comprendre le fonctionnement du formulaire, nous vous invitons à consulter <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" class="has-external-link">notre documentation</a>.
+                Le formulaire d’orientation DORA est maintenant intégré à la Plateforme de l’inclusion.
+                Cela permet aux prescripteurs et orienteurs de gérer au même endroit les candidatures en IAE, GEIQ, OPCS, et les orientations vers des services d’insertion.
+                Pour comprendre le fonctionnement du formulaire, nous vous invitons à consulter
+                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/48559455156753--Orienter-un-b%C3%A9n%C3%A9ficiaire-vers-un-service-d-insertion"
+                   target="_blank"
+                   rel="noopener"
+                   class="has-external-link">notre documentation</a>.
+                <br>
+                DORA reste l’annuaire de référence pour toute offre de service d’insertion.
             </p>
         </div>
     </div>
