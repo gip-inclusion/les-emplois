@@ -47,23 +47,24 @@
                         </p>
                     {% endfragment %}
                 {% endcomponent_alert %}
-            {% elif contracts_ending_soon_count %}
-                {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-contract-ending-soon-prescriber-banner" extra_classes="mb-3 mb-md-4" %}
+            {% elif end_of_journey_count %}
+                {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible_once=True extra_id="end-of-journey-prescriber-banner" extra_classes="mb-3 mb-md-4" %}
                     {% fragment as title %}
-                        Vous accompagnez {{ contracts_ending_soon_count }} bénéficiaire{{ contracts_ending_soon_count|pluralizefr }} en fin de contrat de travail
+                        Vous accompagnez {{ end_of_journey_count }} bénéficiaire{{ end_of_journey_count|pluralizefr }} en fin de contrat
                     {% endfragment %}
                     {% fragment as content %}
-                        <p class="mb-0">
-                            {% if contracts_ending_soon_count == 1 %}
-                                Le contrat de travail de ce bénéficiaire arrive à échéance dans moins de 30 jours. Agissez avant sa sortie pour éviter une rupture de parcours.
-                            {% else %}
-                                Le contrat de travail de ces bénéficiaires arrive à échéance dans moins de 30 jours. Agissez avant leur sortie pour éviter une rupture de parcours.
+                        <ul class="mb-0">
+                            {% if contracts_ending_soon_count %}
+                                <li>{{ contracts_ending_soon_count }} {{ contracts_ending_soon_count|pluralizefr:"bénéficiaire termine son contrat,bénéficiaires terminent leur contrat" }} dans les 30 prochains jours.</li>
                             {% endif %}
-                        </p>
+                            {% if last_contract_ended_count %}
+                                <li>{{ last_contract_ended_count }} {{ last_contract_ended_count|pluralizefr:"bénéficiaire n’est plus en contrat mais a,bénéficiaires ne sont plus en contrat mais ont" }} encore un PASS IAE valide.</li>
+                            {% endif %}
+                        </ul>
                     {% endfragment %}
                     {% fragment as call_to_action %}
                         {# Prescribers have two lists: keep the one they are on. #}
-                        <a class="btn btn-sm btn-primary" href="{{ request.path }}?contract_ending_soon=on" {% matomo_event "candidat" "clic" "afficher-fins-de-contrat" %}>Afficher ce{{ contracts_ending_soon_count|pluralizefr }} bénéficiaire{{ contracts_ending_soon_count|pluralizefr }}</a>
+                        <a class="btn btn-sm btn-primary" href="{{ request.path }}?end_of_journey=on" {% matomo_event "candidat" "clic" "afficher-fins-de-contrat" %}>Afficher ce{{ end_of_journey_count|pluralizefr }} bénéficiaire{{ end_of_journey_count|pluralizefr }}</a>
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% endif %}
