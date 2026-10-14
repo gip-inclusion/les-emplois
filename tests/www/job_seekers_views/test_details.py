@@ -1741,6 +1741,16 @@ class TestOrientationsTab:
             last_action_kind=ActionKind.APPLY,
         )
         now = timezone.now()
+        _orientation_from_outside = OrientationFactory(
+            pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
+            beneficiary=job_seeker,
+            service__name="Service 3",
+            service__structure__name="Structure 3",
+            sender__first_name="Ulrich",
+            sender__last_name="Vasseur",
+            sender_prescriber_organization__name="France Travail - CHASSENEUIL",
+            created_at=now - relativedelta(days=3),
+        )
         _orientation_by_self = OrientationFactory(
             pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
             beneficiary=job_seeker,
@@ -1764,16 +1774,6 @@ class TestOrientationsTab:
             sender_prescriber_organization=prescriber_organization,
             sender_company=company,
             created_at=now - relativedelta(days=2),
-        )
-        _orientation_from_outside = OrientationFactory(
-            pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
-            beneficiary=job_seeker,
-            service__name="Service 3",
-            service__structure__name="Structure 3",
-            sender__first_name="Ulrich",
-            sender__last_name="Vasseur",
-            sender_prescriber_organization__name="France Travail - CHASSENEUIL",
-            created_at=now - relativedelta(days=3),
         )
 
         client.force_login(user)

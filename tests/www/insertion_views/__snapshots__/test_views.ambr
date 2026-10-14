@@ -2781,7 +2781,9 @@
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           WHERE "insertion_orientation"."sender_prescriber_organization_id" = %s
-          ORDER BY "insertion_orientation"."updated_at" DESC
+          ORDER BY "insertion_orientation"."updated_at" DESC,
+                   "insertion_orientation"."created_at" DESC,
+                   "insertion_orientation"."id" DESC
         ''',
       }),
       dict({
@@ -2969,7 +2971,9 @@
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           WHERE "insertion_orientation"."sender_prescriber_organization_id" = %s
-          ORDER BY "insertion_orientation"."updated_at" DESC
+          ORDER BY "insertion_orientation"."updated_at" DESC,
+                   "insertion_orientation"."created_at" DESC,
+                   "insertion_orientation"."id" DESC
           LIMIT 2
         ''',
       }),
