@@ -1471,23 +1471,40 @@ def test_end_of_contracts_banners_for_prescriber(client):
         end_date=today + datetime.timedelta(days=20),
     )
     response = client.get(url)
-    assertContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat de travail")
+    assertContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat")
+    assertContains(response, "1 bénéficiaire termine son contrat dans les 30 prochains jours.")
     assertContains(response, "Afficher ce bénéficiaire")
+    assertContains(response, f"{url}?end_of_journey=on")
     assertNotContains(response, pedagogic_banner)
 
-    job_seeker2 = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
-    ContractFactory(
-        job_seeker=job_seeker2,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
-    )
+    # A job seeker whose last contract has ended, while the PASS IAE is still valid.
+    job_seeker2 = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=today - datetime.timedelta(days=200),
+        with_ongoing_contract__end_date=today - datetime.timedelta(days=20),
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker2, professional=prescriber, prescriber_organization=organization)
     response = client.get(url)
-    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
+    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
+    assertContains(response, "1 bénéficiaire termine son contrat dans les 30 prochains jours.")
+    assertContains(response, "1 bénéficiaire n’est plus en contrat mais a encore un PASS IAE valide.")
     assertContains(response, "Afficher ces bénéficiaires")
     assertNotContains(response, pedagogic_banner)
 
+    # An earlier contract still ending soon in another SIAE: counted once, as still under contract.
+    ContractFactory(
+        job_seeker=job_seeker2,
+        start_date=today - datetime.timedelta(days=300),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
+    assertContains(response, "2 bénéficiaires terminent leur contrat dans les 30 prochains jours.")
+    assertNotContains(response, "n’est plus en contrat")
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
+    response = client.get(url, {"end_of_journey": "on"})
     assertContains(response, pedagogic_banner)
     assertNotContains(response, "Afficher ces bénéficiaires")
 
@@ -1495,7 +1512,7 @@ def test_end_of_contracts_banners_for_prescriber(client):
     organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
     organization.save()
     response = client.get(url)
-    assertNotContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
+    assertNotContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
 
 
 @freeze_time("2026-01-15")

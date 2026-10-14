@@ -902,22 +902,20 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
 
     # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
-    # end-of-journey filter is not active. A SIAE counts its employees at the end of their journey,
-    # a prescriber all the contracts ending soon.
+    # end-of-journey filter is not active. A SIAE counts its own contracts, a prescriber those of
+    # every company.
     contracts_ending_soon_count = last_contract_ended_count = 0
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
         assigned_job_seekers = User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker"))
-        if request_from_siae:
-            end_of_journey_counts = assigned_job_seekers.with_end_of_journey(
-                siae=request.current_organization
-            ).aggregate(
-                ends_soon=Count("pk", filter=Q(contract_ending_soon=True)),
-                ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True)),
-            )
-            contracts_ending_soon_count = end_of_journey_counts["ends_soon"]
-            last_contract_ended_count = end_of_journey_counts["ended"]
-        else:
-            contracts_ending_soon_count = assigned_job_seekers.has_contract_ending_soon().count()
+        end_of_journey_counts = assigned_job_seekers.with_end_of_journey(
+            siae=request.current_organization if request_from_siae else None
+        ).aggregate(
+            ends_soon=Count("pk", filter=Q(contract_ending_soon=True)),
+            # A job seeker still having a contract ending soon is only counted once.
+            ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True, contract_ending_soon=False)),
+        )
+        contracts_ending_soon_count = end_of_journey_counts["ends_soon"]
+        last_contract_ended_count = end_of_journey_counts["ended"]
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
