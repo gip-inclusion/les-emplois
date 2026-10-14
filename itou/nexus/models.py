@@ -1,6 +1,8 @@
 import datetime
+import uuid
 
 from citext import CIEmailField
+from django.contrib.postgres.functions import RandomUUID
 from django.db import models
 from django.db.models import F, OuterRef
 from django.db.models.functions import Coalesce
@@ -46,6 +48,14 @@ class NexusUser(NexusModelMixin, models.Model):
     source = models.CharField(verbose_name="source de la donnée", choices=Service.sync_source_choices())
     source_id = models.CharField(verbose_name="ID source")
     source_kind = models.CharField(verbose_name="type d'origine")
+
+    public_id = models.UUIDField(
+        verbose_name="identifiant public",
+        help_text="identifiant opaque, pour les API et les URLs publiques",
+        default=uuid.uuid4,
+        db_default=RandomUUID(),
+        unique=True,
+    )
 
     first_name = models.CharField(verbose_name="prénom")
     last_name = models.CharField(verbose_name="nom")
