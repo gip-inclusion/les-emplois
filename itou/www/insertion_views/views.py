@@ -522,7 +522,7 @@ def orientations_list(request):
 
     orientations = (
         insertion_models.Orientation.objects.filter(**organization_kwargs)
-        .order_by("-updated_at")
+        .order_by("-updated_at", "-created_at", "-pk")
         .select_related("beneficiary", "sender", "service", "service__structure")
     )
 

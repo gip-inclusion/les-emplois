@@ -429,7 +429,7 @@ class OrientationsTabView(BaseJobSeekerDetailView):
         else:
             orientations = orientations_qs.annotate(user_can_see_details=Value(True))
 
-        return orientations.order_by("-updated_at").select_related(
+        return orientations.order_by("-updated_at", "-created_at", "-pk").select_related(
             "beneficiary", "sender", "service", "service__structure"
         )
 
