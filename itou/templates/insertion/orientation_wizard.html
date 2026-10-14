@@ -67,7 +67,7 @@
                                 {% if can_view_personal_information %}
                                     {% component_alert content=coordinates_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
                                         {% fragment as coordinates_alert_content %}
-                                            <p class="mb-0">Veuillez vous assurer que les coordonnées de votre usager sont bien à jour</p>
+                                            <p class="mb-0">Veuillez vous assurer que les informations de votre usager sont bien à jour</p>
                                         {% endfragment %}
                                     {% endcomponent_alert %}
                                     {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information request=request only %}
