@@ -1,5 +1,6 @@
 import datetime
 
+from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
 from itou.employee_record.enums import NotificationStatus
@@ -25,6 +26,13 @@ class Command(BaseCommand):
                 created_at__lte=timezone.now() - datetime.timedelta(days=7),
             )
             .exclude(asp_processing_code=EmployeeRecordUpdateNotification.ASP_UNKNOWN_APPROVAL_CODE)
+            .exclude(
+                Exists(
+                    EmployeeRecordUpdateNotification.objects.filter(
+                        employee_record=OuterRef("employee_record")
+                    ).exclude(pk=OuterRef("pk"))
+                )
+            )
             .order_by("created_at")[: self.BATCH_SIZE]
         ):
             _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
