@@ -1301,8 +1301,54 @@ def test_filtered_by_end_of_journey_for_siae(client):
     assert response.context["page_obj"].object_list == [job_seeker_with_ended_contract]
 
 
-def test_end_of_journey_filter_not_for_prescriber(client):
+@freeze_time("2026-01-15")
+def test_filtered_by_end_of_journey_for_authorized_prescriber(client):
     organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.get()
+    client.force_login(prescriber)
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    twenty_days_ago = today - datetime.timedelta(days=20)
+    in_twenty_days = today + datetime.timedelta(days=20)
+    in_three_months = today + datetime.timedelta(days=90)
+
+    job_seeker_with_ended_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=twenty_days_ago,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_ended_contract, professional=prescriber, prescriber_organization=organization
+    )
+    job_seeker_with_contract_ending_soon = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_twenty_days,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_contract_ending_soon, professional=prescriber, prescriber_organization=organization
+    )
+    job_seeker_with_ongoing_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_three_months,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_ongoing_contract, professional=prescriber, prescriber_organization=organization
+    )
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert set(response.context["page_obj"].object_list) == {
+        job_seeker_with_ended_contract,
+        job_seeker_with_contract_ending_soon,
+    }
+
+
+def test_end_of_journey_filter_not_for_unauthorized_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=False)
     prescriber = organization.members.first()
     client.force_login(prescriber)
     job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
