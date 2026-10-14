@@ -242,7 +242,7 @@ class TestDashboardView:
         }
 
     @freeze_time("2026-01-15")
-    def test_dashboard_contracts_ending_soon_count_for_prescriber(self, client):
+    def test_dashboard_end_of_journey_count_for_prescriber(self, client):
         organization = prescribers_factories.PrescriberOrganizationFactory(authorized=True, with_membership=True)
         prescriber = organization.members.first()
         client.force_login(prescriber)
@@ -262,7 +262,7 @@ class TestDashboardView:
         # No contract ending soon yet: the entry is shown without a badge.
         response = client.get(url)
         assertContains(response, "Fins de contrats")
-        assert response.context["contracts_ending_soon_count"] == 0
+        assert response.context["end_of_journey_count"] == 0
 
         # A job seeker followed by the prescriber, whose contract ends in 20 days, is counted whatever the SIAE.
         job_seeker = JobSeekerAssignmentFactory(
@@ -283,19 +283,41 @@ class TestDashboardView:
             end_date=today + timedelta(days=90),
         )
 
+        # An ended contract is counted while the PASS IAE is still valid.
+        job_seeker_with_ended_contract = ApprovalFactory(
+            with_jobapplication=True,
+            with_ongoing_contract=True,
+            with_ongoing_contract__start_date=today - timedelta(days=200),
+            with_ongoing_contract__end_date=today - timedelta(days=20),
+        ).user
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker_with_ended_contract, professional=prescriber, prescriber_organization=organization
+        )
+        job_seeker_with_expired_approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_ongoing_contract=True,
+            with_ongoing_contract__start_date=today - timedelta(days=200),
+            with_ongoing_contract__end_date=today - timedelta(days=20),
+            start_at=today - timedelta(days=730),
+            end_at=today - timedelta(days=10),
+        ).user
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker_with_expired_approval, professional=prescriber, prescriber_organization=organization
+        )
+
         response = client.get(url)
-        assert response.context["contracts_ending_soon_count"] == 1
+        assert response.context["end_of_journey_count"] == 2
 
         # The dashboard counter matches the filtered "Mes accompagnements" list results.
-        list_response = client.get(reverse("job_seekers_views:list"), {"contract_ending_soon": "on"})
-        assert list(list_response.context["page_obj"].object_list) == [job_seeker]
+        list_response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+        assert set(list_response.context["page_obj"].object_list) == {job_seeker, job_seeker_with_ended_contract}
 
         # An unauthorized prescriber gets neither the entry nor the counter.
         organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
         organization.save()
         response = client.get(url)
         assertNotContains(response, "Fins de contrats")
-        assert response.context["contracts_ending_soon_count"] is None
+        assert response.context["end_of_journey_count"] is None
 
     def test_dashboard_applications_to_process(self, client):
         non_geiq_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
