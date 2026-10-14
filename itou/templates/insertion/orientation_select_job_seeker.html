@@ -3,6 +3,7 @@
 {% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
+{% load static %}
 
 {% block title %}Orienter vers un service d'insertion{{ block.super }}{% endblock %}
 
@@ -22,7 +23,9 @@
                     <div class="c-form mb-5">
                         <h2 class="h3">Rechercher un usager</h2>
                         <p>Dans le menu déroulant ci-dessous, vous trouverez la liste de vos usagers.</p>
-                        <form method="post" class="c-form js-prevent-multiple-submit">
+                        <form method="post"
+                              class="js-prevent-multiple-submit"
+                              data-create-job-seeker-url="{{ create_job_seeker_url }}">
                             {% csrf_token %}
                             {% bootstrap_form_errors form type="all" %}
                             {% bootstrap_field form.job_seeker wrapper_class="form-group form-group-input-w-lg-66" %}
@@ -36,10 +39,16 @@
     {% matomo_event "compte-candidat" "clic" "creer-un-compte-candidat-orientation" %}>Créer un compte usager</a>
                     </div>
                 </div>
-                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% include "insertion/includes/orientation_service_info.html" with service=service request=request only %}
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+
+{% block extra_script_files %}
+    {{ block.super }}
+    <script src="{% static 'js/orientation_select_job_seeker_select2.js' %}"></script>
 {% endblock %}
