@@ -69,6 +69,7 @@ from itou.metabase.tables import (
     suspensions,
     users,
 )
+from itou.metabase.tables.utils import get_post_code_to_insee_cities_map
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (
@@ -501,6 +502,10 @@ class Command(BaseCommand):
             .all()
         )
         job_seekers_table = job_seekers.get_table()
+
+        # Run the following cached function outside of populate_table to deterministically set cache,
+        # otherwise the snapshot gets flaky.
+        get_post_code_to_insee_cities_map()
 
         metabase_db.populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset], schema="raw_emplois")
 
