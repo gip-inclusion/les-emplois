@@ -143,7 +143,9 @@ def _employer_dashboard_context(request):
         "job_applications_categories": job_applications_categories,
         "list_exports_url": reverse("apply:list_prescriptions_exports"),
         "num_rejected_employee_records": (
-            EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
+            EmployeeRecord.objects.for_company(current_org)
+            .filter(status__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
+            .count()
         ),
         "siae_suspension_text_with_dates": (
             current_org.get_active_suspension_text_with_dates()

@@ -166,8 +166,10 @@ class TestDashboardView:
         # create rejected job applications
         EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
         EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.MODIFICATION_REJECTED)
 
         EmployeeRecordFactory(job_application__to_company=other_company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=other_company, status=Status.MODIFICATION_REJECTED)
 
         session = client.session
 
@@ -176,14 +178,14 @@ class TestDashboardView:
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
-        assert response.context["num_rejected_employee_records"] == 2
+        assert response.context["num_rejected_employee_records"] == 3
 
         # select the second company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.organization_switch_key
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
-        assert response.context["num_rejected_employee_records"] == 1
+        assert response.context["num_rejected_employee_records"] == 2
 
         # select the third company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_company.organization_switch_key
