@@ -11,6 +11,7 @@ from itou.employee_record.models import (
     EmployeeRecordTransition,
     EmployeeRecordTransitionLog,
     EmployeeRecordUpdateNotification,
+    EmployeeRecordWorkflow,
 )
 from itou.utils.command import BaseCommand
 
@@ -120,14 +121,20 @@ class Command(BaseCommand):
 
         for employee_record in employee_records:
             er_notifications = list(employee_record.update_notifications.all())
+            disable_employee_record = False
             reject_employee_record = False
             if er_notifications[-1].status == NotificationStatus.REJECTED and (
                 not employee_record.last_transition_timestamp  # This shouldn't be possible
                 or (er_notifications[-1].updated_at > employee_record.last_transition_timestamp)
             ):
-                # This UpdateNotification implies to change the employee record status
+                # This UpdateNotification might imply to change the employee record status
                 if include_last_rejected:
-                    reject_employee_record = True
+                    if er_notifications[-1].asp_processing_code == EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE:
+                        # This error means that the employee record is unknown to the ASP, meaning
+                        # that it was deleted manually: the employer likely knows
+                        disable_employee_record = True
+                    else:
+                        reject_employee_record = True
                 else:
                     # Do not change the status yet, but keep the last update notification to change it later
                     er_notifications = er_notifications[:-1]
@@ -138,7 +145,7 @@ class Command(BaseCommand):
                 logs_to_create.extend(create_logs(employee_record, notification))
                 notification_ids_to_delete.append(notification.pk)
 
-            if reject_employee_record:
+            if reject_employee_record or disable_employee_record:
                 employee_record_to_update = EmployeeRecord.objects.select_for_update().get(
                     pk=employee_record.pk,
                 )  # Make sure we don't overwrite a changing status
@@ -147,9 +154,27 @@ class Command(BaseCommand):
                         "Status change of employee_record=%d skipped: its status changed recently", employee_record.pk
                     )
                     continue
-                self.logger.info("Updating employee_record=%d status to MODIFICATION_REJECTED", employee_record.pk)
-                employee_record_to_update.status = Status.MODIFICATION_REJECTED
-                employee_record_to_update.save(update_fields=("status", "updated_at"))
+                if reject_employee_record:
+                    self.logger.info("Updating employee_record=%d status to MODIFICATION_REJECTED", employee_record.pk)
+                    employee_record_to_update.status = Status.MODIFICATION_REJECTED
+                    employee_record_to_update.save(update_fields=("status", "updated_at"))
+                elif disable_employee_record:
+                    if employee_record_to_update.status in {Status.DISABLED, Status.ARCHIVED}:
+                        self.logger.info("employee_record=%d already disabled/archived - skipping", employee_record.pk)
+                    elif employee_record_to_update.status in EmployeeRecordWorkflow.CAN_BE_DISABLED_STATES:
+                        self.logger.info(
+                            "Disabling employee_record=%d due to last notification error code being 3446",
+                            employee_record.pk,
+                        )
+                        employee_record.disable()
+                    else:
+                        # status is one for READY/SENT/MODIFICATION_PENDING/MODIFICATION_SENT
+                        # It will soon be updated - do not touch it
+                        self.logger.info(
+                            "Ignoring employee_record=%d due to its status=%s",
+                            employee_record.pk,
+                            employee_record.status,
+                        )
 
         EmployeeRecordTransitionLog.objects.bulk_create(logs_to_create)
         EmployeeRecordUpdateNotification.objects.filter(pk__in=notification_ids_to_delete).delete()
