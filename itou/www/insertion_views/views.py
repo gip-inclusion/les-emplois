@@ -485,9 +485,8 @@ class OrientationWizardView(WizardView):
         }
 
 
-@readonly_view
 @require_POST
-def dismiss_orientation_disclaimer(request, session_uuid):
+def dismiss_orientation_alert(request, session_uuid):
     try:
         wizard_session = SessionNamespace(
             request.session,

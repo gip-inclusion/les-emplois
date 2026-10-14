@@ -29,7 +29,7 @@ urlpatterns = [
     ),
     path(
         "orientations/<uuid:session_uuid>/dismiss-disclaimer/",
-        views.dismiss_orientation_disclaimer,
+        views.dismiss_orientation_alert,
         name="orientation_dismiss_disclaimer",
     ),
     path(
