@@ -6677,6 +6677,25 @@
       }),
       dict({
         'origin': list([
+          'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
+          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee"
+          FROM "cities_city"
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7633,28 +7652,6 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
-          'get_code_commune[metabase/tables/utils.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee"
-          FROM "cities_city"
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
