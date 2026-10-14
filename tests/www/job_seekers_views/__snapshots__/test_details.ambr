@@ -6257,11 +6257,11 @@
                                                       </strong>
                                                   </p>
                                                   <p class="mb-0">
-                                                      Son contrat de travail se termine le 04/10/2026. Demandez un bilan à la structure qui l’accompagne pour préparer la suite de son parcours.
+                                                      Son contrat de travail se termine le 04/10/2026. Demandez un bilan à la structure qui l’emploie pour préparer la suite de son parcours.
                                                   </p>
                                               </div>
                                               <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="demande-bilan-accompagnement-fiche" href="mailto:siae@test.local?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement%20en%20fin%20de%20parcours%20IAE&body=%C2%A0%C2%A0%C2%A0%C2%A0Bonjour%2C%0A%0AJane%20DOE%20arrive%20bient%C3%B4t%20en%20fin%20de%20parcours%20IAE%0A%0APour%20pr%C3%A9parer%20la%20suite%20de%20son%20accompagnement%2C%20pouvez-vous%20me%20partager%20les%20%C3%A9l%C3%A9ments%20utiles%C2%A0%3A%20ce%20qui%20a%20%C3%A9t%C3%A9%20travaill%C3%A9%2C%20les%20freins%20encore%20pr%C3%A9sents%20et%20votre%20pr%C3%A9conisation%20pour%20la%20suite%C2%A0%3F%0A%0AOn%20peut%20aussi%20s%27appeler%20si%20c%27est%20plus%20simple.%0A%0AMerci.%0A">
+                                                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="demande-bilan-accompagnement-fiche" href="mailto:siae@test.local?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement%20en%20fin%20de%20contrat%20de%20travail%20d%E2%80%99insertion&body=%C2%A0%C2%A0%C2%A0%C2%A0Bonjour%2C%0A%0AJane%20DOE%20arrive%20bient%C3%B4t%20en%20fin%20de%20contrat%20de%20travail%20d%E2%80%99insertion.%0A%0APour%20pr%C3%A9parer%20la%20suite%20de%20son%20accompagnement%2C%20pouvez-vous%20me%20partager%20les%20%C3%A9l%C3%A9ments%20utiles%C2%A0%3A%20ce%20qui%20a%20%C3%A9t%C3%A9%20travaill%C3%A9%2C%20les%20freins%20encore%20pr%C3%A9sents%20et%20votre%20pr%C3%A9conisation%20pour%20la%20suite%C2%A0%3F%0A%0AOn%20peut%20aussi%20s%E2%80%99appeler%20si%20c%E2%80%99est%20plus%20simple.%0A%0AMerci.%0A">
                                                       Demander un bilan d’accompagnement
                                                   </a>
                                               </div>
@@ -12617,6 +12617,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -14049,6 +14066,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
@@ -15460,6 +15494,23 @@
              WHERE (U0."end_date" BETWEEN %s AND %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",

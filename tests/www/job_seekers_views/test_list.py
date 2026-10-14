@@ -1301,8 +1301,54 @@ def test_filtered_by_end_of_journey_for_siae(client):
     assert response.context["page_obj"].object_list == [job_seeker_with_ended_contract]
 
 
-def test_end_of_journey_filter_not_for_prescriber(client):
+@freeze_time("2026-01-15")
+def test_filtered_by_end_of_journey_for_authorized_prescriber(client):
     organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.get()
+    client.force_login(prescriber)
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    twenty_days_ago = today - datetime.timedelta(days=20)
+    in_twenty_days = today + datetime.timedelta(days=20)
+    in_three_months = today + datetime.timedelta(days=90)
+
+    job_seeker_with_ended_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=twenty_days_ago,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_ended_contract, professional=prescriber, prescriber_organization=organization
+    )
+    job_seeker_with_contract_ending_soon = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_twenty_days,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_contract_ending_soon, professional=prescriber, prescriber_organization=organization
+    )
+    job_seeker_with_ongoing_contract = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=in_the_past,
+        with_ongoing_contract__end_date=in_three_months,
+    ).user
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_with_ongoing_contract, professional=prescriber, prescriber_organization=organization
+    )
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    assert set(response.context["page_obj"].object_list) == {
+        job_seeker_with_ended_contract,
+        job_seeker_with_contract_ending_soon,
+    }
+
+
+def test_end_of_journey_filter_not_for_unauthorized_prescriber(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=False)
     prescriber = organization.members.first()
     client.force_login(prescriber)
     job_seeker = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
@@ -1425,23 +1471,40 @@ def test_end_of_contracts_banners_for_prescriber(client):
         end_date=today + datetime.timedelta(days=20),
     )
     response = client.get(url)
-    assertContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat de travail")
+    assertContains(response, "Vous accompagnez 1 bénéficiaire en fin de contrat")
+    assertContains(response, "1 bénéficiaire termine son contrat dans les 30 prochains jours.")
     assertContains(response, "Afficher ce bénéficiaire")
+    assertContains(response, f"{url}?end_of_journey=on")
     assertNotContains(response, pedagogic_banner)
 
-    job_seeker2 = JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=organization).job_seeker
-    ContractFactory(
-        job_seeker=job_seeker2,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today + datetime.timedelta(days=20),
-    )
+    # A job seeker whose last contract has ended, while the PASS IAE is still valid.
+    job_seeker2 = ApprovalFactory(
+        with_jobapplication=True,
+        with_ongoing_contract=True,
+        with_ongoing_contract__start_date=today - datetime.timedelta(days=200),
+        with_ongoing_contract__end_date=today - datetime.timedelta(days=20),
+    ).user
+    JobSeekerAssignmentFactory(job_seeker=job_seeker2, professional=prescriber, prescriber_organization=organization)
     response = client.get(url)
-    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
+    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
+    assertContains(response, "1 bénéficiaire termine son contrat dans les 30 prochains jours.")
+    assertContains(response, "1 bénéficiaire n’est plus en contrat mais a encore un PASS IAE valide.")
     assertContains(response, "Afficher ces bénéficiaires")
     assertNotContains(response, pedagogic_banner)
 
+    # An earlier contract still ending soon in another SIAE: counted once, as still under contract.
+    ContractFactory(
+        job_seeker=job_seeker2,
+        start_date=today - datetime.timedelta(days=300),
+        end_date=today + datetime.timedelta(days=20),
+    )
+    response = client.get(url)
+    assertContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
+    assertContains(response, "2 bénéficiaires terminent leur contrat dans les 30 prochains jours.")
+    assertNotContains(response, "n’est plus en contrat")
+
     # When the end-of-journey filter is active: pedagogic banner replaces the discovery banner.
-    response = client.get(url, {"contract_ending_soon": "on"})
+    response = client.get(url, {"end_of_journey": "on"})
     assertContains(response, pedagogic_banner)
     assertNotContains(response, "Afficher ces bénéficiaires")
 
@@ -1449,7 +1512,7 @@ def test_end_of_contracts_banners_for_prescriber(client):
     organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
     organization.save()
     response = client.get(url)
-    assertNotContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat de travail")
+    assertNotContains(response, "Vous accompagnez 2 bénéficiaires en fin de contrat")
 
 
 @freeze_time("2026-01-15")
@@ -2150,6 +2213,16 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
     assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
     assertContains(response, "Jean%20DUPONT%20arrive")
     assertNotContains(response, "Remplir le bilan")
+
+    # Once the last contract has ended, the e-mail says so.
+    ContractFactory(
+        job_seeker=job_seeker,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today - datetime.timedelta(days=10),
+    )
+    response = client.get(url, {"approval_ending_soon": "on"})
+    assertContains(response, "Le%20contrat%20de%20travail%20d%E2%80%99insertion%20de%20Jean%20DUPONT%20a%20pris%20fin")
 
 
 @freeze_time("2026-01-15")

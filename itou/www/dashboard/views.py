@@ -162,7 +162,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "active_geiq_campaign": None,
         "active_campaigns": [],
         "closed_campaigns": [],
-        "contracts_ending_soon_count": None,
+        "end_of_journey_count": None,
         "job_applications_categories": [],
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
@@ -195,7 +195,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 assigned_job_seekers = User.objects.filter(
                     pk__in=User.objects.assigned_job_seeker_ids(request.user, current_org, archived=False)
                 )
-                context["contracts_ending_soon_count"] = assigned_job_seekers.has_contract_ending_soon().count()
+                context["end_of_journey_count"] = assigned_job_seekers.at_end_of_journey().count()
     elif request.from_institution:
         current_org = get_current_institution_or_404(request)
         six_months_ago = timezone.now() - timezone.timedelta(days=182)
