@@ -873,7 +873,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or form.cleaned_data.get("end_of_journey")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
-            queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
+            queryset = queryset.with_end_of_journey().annotate(
+                pro_support_request_company_email=_pro_support_request_company_email()
+            )
 
     queryset = (
         queryset.annotate(
@@ -941,6 +943,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             job_seeker.pro_support_request_mailto = _build_pro_support_request_mailto(
                 job_seeker.pro_support_request_company_email,
                 job_seeker.get_full_name(),
+                contract_ended=job_seeker.last_contract_ended_with_valid_approval,
             )
         job_seeker.show_create_pro_support_report = (
             request_from_siae
