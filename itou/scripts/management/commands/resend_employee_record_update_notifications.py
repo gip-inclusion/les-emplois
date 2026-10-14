@@ -2,6 +2,7 @@ import datetime
 
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecordUpdateNotification
@@ -18,6 +19,7 @@ class Command(BaseCommand):
 
         parser.add_argument("--wet-run", action="store_true")
 
+    @dry_runnable
     def handle(self, *, wet_run, **options):
         total_created = 0
         for notification in (
