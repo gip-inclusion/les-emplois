@@ -2151,6 +2151,16 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
     assertContains(response, "Jean%20DUPONT%20arrive")
     assertNotContains(response, "Remplir le bilan")
 
+    # Once the last contract has ended, the e-mail says so.
+    ContractFactory(
+        job_seeker=job_seeker,
+        company=company,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today - datetime.timedelta(days=10),
+    )
+    response = client.get(url, {"approval_ending_soon": "on"})
+    assertContains(response, "Le%20contrat%20de%20travail%20d%E2%80%99insertion%20de%20Jean%20DUPONT%20a%20pris%20fin")
+
 
 @freeze_time("2026-01-15")
 def test_pro_support_request_not_for_employer(client):
