@@ -60,6 +60,7 @@ def test_add_user(client, kind):
     assert user.last_name == "Nom"
     if kind in [UserKind.PROFESSIONAL, UserKind.ITOU_STAFF]:
         assert user.identity_provider == IdentityProvider.PRO_CONNECT
+    assert user.allow_next_sso_sub_update == user.is_itou_staff
 
 
 def test_no_email_sent(client):

@@ -25,6 +25,10 @@ class ItouUserCreationForm(forms.ModelForm):
         # is only really used on prod where both are true so it's simpler this way
         if self.instance.kind in [UserKind.PROFESSIONAL, UserKind.ITOU_STAFF]:
             self.instance.identity_provider = IdentityProvider.PRO_CONNECT
+        if self.instance.is_itou_staff:
+            # A the first login, ProConnect will give us the real sub that won't match
+            # the random uuid we just used as sub.
+            self.instance.allow_next_sso_sub_update = True
         self.instance.set_unusable_password()
         return super().save(commit=commit)
 
