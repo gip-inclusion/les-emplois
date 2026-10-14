@@ -164,17 +164,10 @@ class TestDashboardView:
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
-        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
-        # You can't create 2 employee records with the same job application
-        # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
-        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
 
-        other_job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, with_approval=True, to_company=other_company
-        )
-        EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=other_company, status=Status.REJECTED)
 
         session = client.session
 
