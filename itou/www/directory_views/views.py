@@ -13,8 +13,8 @@ from itou.cities.cache import get_directory_active_city_ids
 from itou.directory.enums import ContactSubject
 from itou.directory.models import ContactMessage
 from itou.directory.services import get_directory_people, get_directory_person
+from itou.emails.utils import get_email_message
 from itou.utils.auth import check_request
-from itou.utils.emails import get_email_message
 from itou.utils.pagination import pager
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
