@@ -51,3 +51,19 @@ def test_default_run(caplog):
     assert rejected_notification.employee_record.update_notifications.count() == 2
     # No new notification created (one already exists)
     assert rejected_notification_with_new_notification.employee_record.update_notifications.count() == 2
+
+    # Mark new notification as rejected to force update_or_create to recreate a new notification if needed
+    rejected_notification.employee_record.update_notifications.filter(status=NotificationStatus.NEW).update(
+        status=NotificationStatus.REJECTED
+    )
+
+    # Recalling it should now ignore rejected_notification
+    caplog.clear()
+    call_command("resend_employee_record_update_notifications", wet_run=True)
+    assert process_output(caplog.messages) == [
+        "Recreated 0 rejected employee record update notifications",
+    ]
+    # No new notification created
+    assert rejected_notification.employee_record.update_notifications.count() == 2
+    # No new notification created (one already exists)
+    assert rejected_notification_with_new_notification.employee_record.update_notifications.count() == 2
