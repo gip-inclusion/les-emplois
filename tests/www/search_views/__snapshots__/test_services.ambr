@@ -14,7 +14,7 @@
          <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-tertiary">
          </i>
         </label>
-        <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Ville ou code postal" data-theme="bootstrap-5" id="id_services_city" lang="fr" name="city" required="">
+        <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Ville ou code postal" data-service-search-city="true" data-theme="bootstrap-5" id="id_services_city" lang="fr" name="city" required="">
         </select>
        </div>
        <div class="input-group input-group-lg flex-nowrap align-items-center">

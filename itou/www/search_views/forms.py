@@ -220,6 +220,7 @@ class ServiceSearchForm(forms.Form):
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
                 "data-placeholder": "Ville ou code postal",
+                "data-service-search-city": "true",
             }
         ),
     )
