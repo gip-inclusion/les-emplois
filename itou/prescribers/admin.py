@@ -321,7 +321,8 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
             )
 
         def get_success_url(self):
+            object_id = self.object and self.object.pk or self.to_org.pk
             return reverse(
                 "admin:prescribers_prescriberorganization_change",
-                kwargs={"object_id": self.object.pk},
+                kwargs={"object_id": object_id},
             )
