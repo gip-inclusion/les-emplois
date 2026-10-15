@@ -1,6 +1,8 @@
 import datetime
 
 from citext import CIEmailField
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.db import models
 from django.db.models import F, OuterRef
 from django.db.models.functions import Coalesce
@@ -39,6 +41,14 @@ class NexusManager(models.Manager.from_queryset(NexusQuerySet)):
     def get_queryset(self):
         return super().get_queryset().with_threshold().filter(updated_at__gte=F("_threshold"))
 
+    def search_by_full_name(self, name):
+        """
+        Eficient search using PSQL full text search
+        """
+        search_query = SearchQuery(name, config="simple_unaccent")
+        users_qs = self.filter(full_name_search_vector=search_query)
+        return users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
+
 
 class NexusUser(NexusModelMixin, models.Model):
     id = models.CharField(verbose_name="ID unique", primary_key=True)  # Built from source and source_id
@@ -49,6 +59,12 @@ class NexusUser(NexusModelMixin, models.Model):
 
     first_name = models.CharField(verbose_name="prénom")
     last_name = models.CharField(verbose_name="nom")
+    full_name_search_vector = models.GeneratedField(
+        expression=SearchVector("first_name", "last_name", config="simple_unaccent"),
+        output_field=SearchVectorField(),
+        verbose_name="nom complet utilisé pour rechercher un utilisateur",
+        db_persist=True,
+    )
     # We use the Email to fetch a user activaed services : use an index to speed up the requests
     email = CIEmailField("adresse e-mail", db_index=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
@@ -65,6 +81,9 @@ class NexusUser(NexusModelMixin, models.Model):
         verbose_name = "utilisateur"
         constraints = [
             models.UniqueConstraint(fields=["email", "source"], name="email_source_unique"),
+        ]
+        indexes = [
+            GinIndex("full_name_search_vector", name="nexus_nexususer_full_name_idx"),
         ]
 
 
