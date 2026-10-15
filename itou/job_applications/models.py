@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, ForeignKey, Func, Max, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models.constraints import Deferrable
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -920,6 +921,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 ],
                 condition=~Q(approval_id=None),
                 violation_error_message="Le PASS IAE est déjà utilisé par un autre candidat.",
+                # Deferred is required to transfer multiple job apps from a job seeker linked to the same approval
+                # as using bulk_update in the admin transfer view is not enough
+                deferrable=Deferrable.DEFERRED,
             ),
         ]
         permissions = [

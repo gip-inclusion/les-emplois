@@ -269,6 +269,7 @@ class TestJobApplicationModel:
         assert new_job_application.get_geiq_eligibility_diagnosis() == newer_company_diagnosis
         assert new_job_application.get_geiq_eligibility_diagnosis(for_prescriber=True) == expired_prescriber_diagnosis
 
+    @pytest.mark.django_db(transaction=True)
     def test_multiple_jobseekers_for_approval(self):
         job_application = JobApplicationFactory(with_approval=True, sent_by_job_seeker=True)
         with pytest.raises(

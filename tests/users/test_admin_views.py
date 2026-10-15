@@ -173,12 +173,17 @@ class TestTransferUserData:
         assertNotContains(response, self.CHOOSE_TARGET_TEXT, html=True)
 
     @freeze_time("2023-08-31 12:34:56")
-    def test_transfer_data(self, admin_client, snapshot):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
-        approval = job_application.approval
+    def test_transfer_data(self, admin_client):
+        job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        approval = job_application_1.approval
 
-        from_user = job_application.job_seeker
+        from_user = job_application_1.job_seeker
         to_user = JobSeekerFactory()
+
+        # Create another job application to check that one_job_seeker_per_approval doesn't raise during the transfer
+        job_application_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, job_seeker=from_user, approval=approval
+        )
 
         orientation = OrientationFactory(beneficiary=from_user)
 
@@ -198,7 +203,8 @@ class TestTransferUserData:
 
         response = admin_client.get(transfer_url_2)
         assertContains(response, "Choisissez les objets à transférer")
-        assertContains(response, str(job_application))
+        assertContains(response, str(job_application_1))
+        assertContains(response, str(job_application_2))
         assertContains(response, str(approval))
         assertContains(response, str(orientation))
 
@@ -207,10 +213,10 @@ class TestTransferUserData:
         )
         assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": from_user.pk}))
 
-        job_application.refresh_from_db()
+        job_application_1.refresh_from_db()
         approval.refresh_from_db()
         orientation.refresh_from_db()
-        assert job_application.job_seeker == to_user
+        assert job_application_1.job_seeker == to_user
         assert approval.user == to_user
         assert orientation.beneficiary == to_user
         assertMessages(
@@ -222,14 +228,18 @@ class TestTransferUserData:
                 messages.Message(
                     messages.WARNING,
                     (
-                        "2 objets incohérents: <ul>"
+                        "3 objets incohérents: <ul>"
                         '<li class="warning">'
-                        f'<a href="/admin/job_applications/jobapplication/{job_application.pk}/change/">'
-                        f"candidature - {job_application.pk}"
+                        f'<a href="/admin/job_applications/jobapplication/{job_application_1.pk}/change/">'
+                        f"candidature - {job_application_1.pk}"
                         "</a>: Candidature liée au diagnostic d&#x27;un autre usager</li>"
                         '<li class="warning">'
-                        f'<a href="/admin/approvals/approval/{job_application.approval.pk}/change/">'
-                        f"PASS IAE - {job_application.approval.pk}"
+                        f'<a href="/admin/job_applications/jobapplication/{job_application_2.pk}/change/">'
+                        f"candidature - {job_application_2.pk}"
+                        "</a>: Candidature liée au diagnostic d&#x27;un autre usager</li>"
+                        '<li class="warning">'
+                        f'<a href="/admin/approvals/approval/{job_application_1.approval.pk}/change/">'
+                        f"PASS IAE - {job_application_1.approval.pk}"
                         "</a>: PASS IAE lié au diagnostic d&#x27;un autre usager</li>"
                         "</ul>"
                     ),
