@@ -359,3 +359,26 @@ table.table td > .modal .modal-content {
         display: none !important;
     }
 }
+
+/* Login page (pre_login): dark blue background while keeping the white header. */
+.p-login .s-main {
+    background-color: var(--bs-primary, #000638);
+}
+
+.p-login .s-main .s-title-02 {
+    background-color: transparent;
+    position: static;
+}
+
+.p-login .s-main .s-title-02:after {
+    display: none;
+}
+
+.p-login .s-section hr {
+    border-color: rgba(255, 255, 255, .4);
+}
+
+.p-login .s-section hr[data-it-text]:after {
+    background-color: var(--bs-primary, #000638);
+    color: #fff;
+}
