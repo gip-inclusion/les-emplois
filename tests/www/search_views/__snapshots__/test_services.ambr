@@ -4,7 +4,7 @@
   <div aria-labelledby="services-tab" class="tab-pane active" id="profile" role="tabpanel" tabindex="0">
    <div class="c-search">
     <div class="c-search__bar">
-     <form action="/search/services/results" aria-label="Rechercher un service d'insertion" role="search">
+     <form action="/search/services/results" aria-label="Rechercher un service d’insertion" role="search">
       <div class="c-search__bar__grid">
        <div class="input-group input-group-lg flex-nowrap align-items-center">
         <label class="input-group-text mb-0" for="id_services_city">
@@ -25,7 +25,7 @@
          <i aria-hidden="true" class="ri-compass-3-line fw-medium ri-xl text-tertiary">
          </i>
         </label>
-        <select class="django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Thématique" data-theme="bootstrap-5" id="id_services_category" lang="fr" name="category" required="">
+        <select class="django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Thématique" data-service-search-category="true" data-theme="bootstrap-5" id="id_services_category" lang="fr" name="category" required="">
          <option selected="" value="">
           Sélectionnez une thématique
          </option>

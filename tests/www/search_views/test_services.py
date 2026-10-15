@@ -34,7 +34,7 @@ class TestSearchServices:
         )
         soup = parse_response_to_soup(response)
         [tabButton, tabContent] = soup.find_all(class_="active")
-        assert list(tabButton.stripped_strings) == ["Un service d'insertion", "Service d'insertion"]
+        assert list(tabButton.stripped_strings) == ["Un service d’insertion", "Service d’insertion"]
         assert tabContent.prettify() == snapshot
 
     def test_home_connected(self, client):
