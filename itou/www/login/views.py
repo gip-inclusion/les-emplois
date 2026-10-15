@@ -86,7 +86,10 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context | {"redirect_field_value": self.next_url}
+        show_dora_banner = self.request.GET.get("mtm_campaign") == "DORA" or (
+            bool(self.next_url) and get_url_param_value(self.next_url, "mtm_campaign") == "DORA"
+        )
+        return context | {"redirect_field_value": self.next_url, "show_dora_banner": show_dora_banner}
 
 
 class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
