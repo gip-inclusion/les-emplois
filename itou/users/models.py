@@ -3,6 +3,7 @@ import logging
 import time
 import uuid
 from collections import Counter
+from functools import reduce
 
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
@@ -11,7 +12,14 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import GinIndex, OpClass
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
+from django.contrib.postgres.search import (
+    Lexeme,
+    SearchQuery,
+    SearchRank,
+    SearchVector,
+    SearchVectorField,
+    psql_escape,
+)
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
@@ -296,9 +304,27 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
     def search_by_full_name(self, name):
         """
-        Eficient search using PSQL full text search
+        Eficient search using PSQL full text search.
+
+        All words in the name query are searched as a word prefix in the user
+        full name.
         """
-        search_query = SearchQuery(name, config="simple_unaccent")
+        # Lexeme("&") runs psql_escape("&"), which returns None and cannot be dumped in the query.
+        # Traceback on Django 6.0.9:
+        # File ~/dev/django/django/contrib/postgres/search.py:23, in UTF8Dumper.dump(self, obj)
+        # def dump(self, obj):
+        #    return bytes(obj, "utf-8")
+        # TypeError: encoding without a string argument
+        #
+        # Fixed in Django 6.2+.
+        lexemes = []
+        for word in name.split():
+            escaped = psql_escape(word)
+            if escaped is not None and escaped.strip():
+                lexemes.append(Lexeme(word, prefix=True))
+        if not lexemes:
+            return self.none()
+        search_query = SearchQuery(reduce(Lexeme.__and__, lexemes), config="simple_unaccent", search_type="raw")
         users_qs = self.filter(full_name_search_vector=search_query)
         users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
         return users_qs
