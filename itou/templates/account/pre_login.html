@@ -8,6 +8,18 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
+{% block title_navinfo %}
+    {% if show_dora_banner %}
+        {% component_alert title="Vous êtes au bon endroit !" content=content variant="info" dismissible=True extra_classes="mb-3 mb-md-4" %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Le formulaire d’orientation DORA se trouve désormais sur {% brand %}. Connectez-vous avec vos identifiants ProConnect habituels, les mêmes que sur DORA, pour orienter la personne vers le service choisi et suivre vos orientations. Pas encore de compte sur ProConnect ? Créez-en un.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
