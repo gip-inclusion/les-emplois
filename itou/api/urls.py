@@ -12,7 +12,6 @@ from itou.api.insertion.views import OrientationsCountView, OrientationsView
 from itou.api.job_application_api.views import JobApplicationSearchView
 from itou.api.marche_api.views import MarcheCompanyView
 from itou.api.nexus.views import (
-    DropDownStatusView,
     MembershipsView,
     StructuresView,
     SyncCompletedView,
@@ -67,7 +66,6 @@ urlpatterns = [
     path("nexus/memberships", MembershipsView.as_view(), name="nexus-memberships"),
     path("nexus/sync-start", SyncStartView.as_view(), name="nexus-sync-start"),
     path("nexus/sync-completed", SyncCompletedView.as_view(), name="nexus-sync-completed"),
-    path("nexus/dropdown-status", DropDownStatusView.as_view(), name="nexus-dropdown-status"),
     path("insertion/orientations", OrientationsView.as_view(), name="orientations-list"),
     path("insertion/orientations-count", OrientationsCountView.as_view(), name="orientations-count"),
     *router.urls,
