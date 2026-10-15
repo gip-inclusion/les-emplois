@@ -1,0 +1,7 @@
+{
+  "codeConnect": {
+    "include": ["components/**/*.figma.js"],
+    "label": "HTML",
+    "language": "html"
+  }
+}
