@@ -117,7 +117,11 @@ class EditJobSeekerInfoForm(
 
 class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
     is_directory_opted_out = forms.BooleanField(
-        label="Ne pas apparaître dans l'annuaire des professionnels",
+        label="Je ne souhaite pas apparaître dans l’annuaire",
+        help_text=(
+            "Si vous cochez cette option, "
+            "votre profil ne sera plus visible par les autres professionnels dans l’annuaire."
+        ),
         required=False,
     )
 
