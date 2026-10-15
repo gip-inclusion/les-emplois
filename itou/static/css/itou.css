@@ -1,14 +1,4 @@
-.container-messages div.alert {
-    margin-top: 1rem;
-}
-
-.container-breadcrumb:empty {
-    background-color: var(--bs-red);
-    display: none !important;
-}
-
-/* Spacing.
---------------------------------------------------------------------------- */
+/* Set the hero heading size and add more spacing on wide screens. */
 .h1-hero-c1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
@@ -20,37 +10,15 @@
     }
 }
 
-/* Cards.
---------------------------------------------------------------------------- */
-
-.card-deck-itou {
-    text-align: center;
-    justify-content: space-between;
-}
-
-.card-deck-itou > .card {
-    /* flex: 0 0 26%; */
-    position: relative;
-    padding: 1.5rem;
-}
-
-.card-deck-itou > .card > .card-body {
-    align-items: center;
-    justify-content: center;
-    display: flex;
-}
-
-.card-deck-itou > .card > .card-footer {
-    background: transparent;
-}
-
 /* Forms.
 --------------------------------------------------------------------------- */
 
+/* Keep Select2 dropdowns above surrounding content. */
 .select2-dropdown {
     z-index: 4051 !important;
 }
 
+/* Align the remove button within each selected Select2 item. */
 .select2-selection__choice__remove {
     float: right;
     margin-left: 2px;
@@ -83,6 +51,7 @@ Force the display of `.invalid-feedback` for django-bootstrap5 25.2.
     width: 100%;
 }
 
+/* Give an invalid file drop target the theme's danger border. */
 .form-group.is-invalid > .file-dropzone {
     border: 2px dashed var(--bs-danger);
 }
@@ -96,23 +65,27 @@ so checkbox labels (nested in .form-check) never get it. Restore it here.
     font-weight: 700;
 }
 
+/* Make Select2 form controls fill their form group. */
 .form-group > .select2-container--bootstrap-5 {
     width: 100% !important;
 }
 
+/* Style the full-width area where users drop files to upload them. */
 .file-dropzone {
     width: 100%;
     border: 2px dashed var(--bs-gray-700);
-    border-radius: 0.25rem;
+    border-radius: var(--bs-border-radius);
     text-align: center;
     padding: 1rem;
     margin-bottom: 0.5rem;
 }
 
+/* Indicate that a file is being dragged over the drop target. */
 .file-dropzone.highlighted {
     opacity: 0.5;
 }
 
+/* Visually hide the native file input without removing it from screen readers. */
 input[type="file"] {
     opacity: 0;
     position: absolute;
@@ -125,6 +98,7 @@ input[type="file"] {
     width: 1px;
 }
 
+/* Restore the native input appearance inside the multi-file component. */
 .c-multi-file-input input[type="file"] {
     opacity: 1;
     position: static;
@@ -139,53 +113,23 @@ input[type="file"] {
 Make dropdown menus scrollable in case there are too many items.
 Credits go to https://stackoverflow.com/a/19229738
 */
-
 .dropdown-menu {
     max-height: 360px;
     overflow-y: auto;
 }
 
+/* Allow long selected values in Select2 controls to wrap onto multiple lines. */
 .select2-selection__rendered {
     white-space: break-spaces !important;
 }
 
-/* Missing Boostrap utilities.
---------------------------------------------------------------------------- */
-
-@media (min-width: 768px) {
-    .fixed-sm-bottom {
-        position: fixed !important;
-        right: 0;
-        bottom: 0;
-        z-index: 1030;
-    }
-}
-
-.border-dashed {
-    border-style: dashed !important;
-}
-
-/* Overrides opacity for disabled button (search cities) */
-
+/* Keep disabled search buttons at full opacity. */
 .js-search-button {
     opacity: 100% !important;
 }
 
-/* Browser-specific issues.
---------------------------------------------------------------------------- */
 
-/* Firefox applies `:-moz-ui-invalid` as soon as it considers
-an input field being invalid, generating an uncontrolled red box-shadow. */
-
-.home-search :not(output):-moz-ui-invalid:not(:focus) {
-    box-shadow: none;
-}
-
-.home-search :not(output):-moz-ui-invalid:-moz-focusring:not(:focus) {
-    box-shadow: none;
-}
-
-/* CSS for js-shroud.
+/* Dim and cover diagnosis forms while their eligibility state is unresolved.
 ---------------------------------------------------------------------------- */
 
 .js-shroud {
@@ -204,7 +148,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     z-index: 4;
 }
 
-/* Dropzone component used to upload files to an S3 bucket.
+/* Keep Dropzone upload errors visible and style their error marker.
 --------------------------------------------------------------------------- */
 
 /* By default, an error message is displayed only on hover */
@@ -231,6 +175,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 /* To be integrated to the global theme.
 --------------------------------------------------------------------------- */
 
+/* Make list items transparent so the surrounding surface shows through. */
 .list-group-item {
     background-color: transparent;
 }
@@ -238,11 +183,13 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 /* To be discussed.
 --------------------------------------------------------------------------- */
 
+/* Let badges wrap and remove their extra spacing in employee record lists. */
 .employee-records-list .badge {
     white-space: normal;
     margin: 0;
 }
 
+/* Display the branded FranceConnect button using its provided images. */
 .itou-france-connect {
     display: inline-block;
     height: 56px !important;
@@ -259,78 +206,58 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-image: url(../img/franceconnect-bouton-hover.svg);
 }
 
-.job-appellation-nb_open_positions {
-    width: 80px;
-    margin: 0 auto;
-}
 
-.approval-left-border {
-    border-left-width: 3px !important;
-}
-
-/* step 1/5 */
+/* Wizard progress bar widths are completion percentages. */
 .progress-bar-20 {
     width: 20%;
 }
 
-/* step 1/4 */
 .progress-bar-25 {
     width: 25%;
 }
 
-/* step 1/3 */
 .progress-bar-33 {
     width: 33%;
 }
 
-/* step 2/5 */
 .progress-bar-40 {
     width: 40%;
 }
 
-/* step 2/4 */
 .progress-bar-50 {
     width: 50%;
 }
 
-/* step 3/5 */
 .progress-bar-60 {
     width: 60%;
 }
 
-/* step 2/3 */
 .progress-bar-66 {
     width: 66%;
 }
 
-/* step 3/4 */
 .progress-bar-75 {
     width: 75%;
 }
 
-/* step 4/5 */
 .progress-bar-80 {
     width: 80%;
 }
 
-/* final step */
 .progress-bar-100 {
     width: 100%;
 }
 
-.edit-siae-header-image {
-    width: 100px;
-}
-
 /* Dashboard
 --------------------------------------------------------------------------- */
+/* Apply the matching artwork to dashboard card headers. */
 .c-box__header--dora {
     background-image: url("../img/dashboard/card-header-bg-dora.png");
     background-repeat: no-repeat;
     background-position: center right;
     background-size: contain;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--bs-border-radius-lg);
+    border-top-right-radius: var(--bs-border-radius-lg);
 }
 
 .c-box__header--diagoriente {
@@ -338,8 +265,8 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-repeat: no-repeat;
     background-position: center right;
     background-size: contain;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--bs-border-radius-lg);
+    border-top-right-radius: var(--bs-border-radius-lg);
 }
 
 .c-box__header--mon-recap {
@@ -347,20 +274,21 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-repeat: no-repeat;
     background-position: center right;
     background-size: contain;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--bs-border-radius-lg);
+    border-top-right-radius: var(--bs-border-radius-lg);
 }
 
-/* Fiche salarié */
+/* Header artwork for the employee record card. */
 .c-box__header--immersion-facile {
     background-image: url("../img/dashboard/card-header-bg-immersion-facile.png");
     background-repeat: no-repeat;
     background-position: center right;
     background-size: contain;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--bs-border-radius-lg);
+    border-top-right-radius: var(--bs-border-radius-lg);
 }
 
+/* Use the statistics banner image as the pilotage page background. */
 .c-banner--pilotage {
     background-image: url("../img/dashboard/banner-statistiques-pilotage-bg.jpg");
     background-repeat: no-repeat;
@@ -368,27 +296,28 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-size: cover;
 }
 
-/* Fix for form.company and form.job_seeker width */
+/* Keep selected values on one line in wide company and job-seeker forms. */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
 }
 
-/* Fix for form.job_seeker width */
+/* Make the Select2 control fill the wide job-seeker form. */
 .w-lg-400px select + .select2-container--bootstrap-5 {
    width: 100% !important;
 }
 
-/* Fix for .modal-content than inherit style rules from td parent */
+/* Keep modal content readable when the modal is inside a table cell. */
 table.table td > .modal .modal-content {
     text-align: left;
     font-size: var(--bs-body-font-size);
 }
 
+/* Add more vertical spacing between checkbox choices in this form. */
 .form-checkbox-greater-spacing > .form-check {
     margin-bottom: .75rem;
 }
 
-/* Pro Connect button theme */
+/* Display the branded ProConnect button and its hover image. */
 .proconnect-button {
   background-color: transparent !important;
   background-image: url("../img/pro_connect_bouton.svg");
@@ -403,7 +332,7 @@ table.table td > .modal .modal-content {
   background-image: url("../img/pro_connect_bouton_hover.svg");
 }
 
-/* Fix tooltip z-index depths under specific conditions */
+/* Keep action and modal tooltips above their surrounding content. */
 .c-box--action-tooltip {
   z-index: 1050 !important;
 }
@@ -412,23 +341,7 @@ table.table td > .modal .modal-content {
   z-index: 3055 !important;
 }
 
-/* Service description collapsible */
-.service-description-wrapper {
-    max-height: 150px;
-    overflow: hidden;
-    position: relative;
-}
-
-.service-description-fade {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(transparent, white);
-}
-
-/* offcanvasNav Menu */
+/* Hide important-status badges while a mobile navigation item is expanded. */
 #offcanvasNav .offcanvas-body .nav-link[aria-expanded=true] {
     .badge.bg-important,
     .badge.bg-important-lighter {
