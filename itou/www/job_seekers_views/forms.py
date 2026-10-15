@@ -354,7 +354,7 @@ class JobSeekerExistsForm(forms.Form):
 
 
 class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileModelForm):
-    PROFILE_FIELDS = ["birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = ["nationality", "birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
 
     class Meta(JobSeekerProfileModelForm.Meta):
         pass

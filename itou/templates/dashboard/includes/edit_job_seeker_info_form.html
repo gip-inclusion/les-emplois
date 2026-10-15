@@ -27,6 +27,7 @@
     {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
     <div id="collapse_lack_of_nir_reason"
          class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">{% bootstrap_field form.lack_of_nir_reason %}</div>
+    {% bootstrap_field form.nationality %}
     {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.birth_place %}
     {% bootstrap_field form.birth_country %}
