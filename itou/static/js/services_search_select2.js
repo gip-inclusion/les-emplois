@@ -4,7 +4,7 @@ $.fn.select2.defaults.set("dropdownCssClass", ($element) =>
   $element.is("[data-service-search-category]") ? "c-search-dropdown" : ""
 );
 
-// Both dropdowns span from the start of the city field to the end of the category field.
+// On the home page, both dropdowns span from the start of the city field to the end of the category field.
 function alignServiceSearchDropdown(select) {
   const form = $(select.form);
   const ownContainer = $(select).data("select2").$container[0];
@@ -16,7 +16,8 @@ function alignServiceSearchDropdown(select) {
   dropdown.style.minWidth = `${categoryContainer.getBoundingClientRect().right - left}px`;
 }
 
-const serviceSearchSelects = "[data-service-search-city], [data-service-search-category]";
+const serviceSearchSelects =
+  ".s-home-search [data-service-search-city], .s-home-search [data-service-search-category]";
 $(document).on("select2:open", serviceSearchSelects, function () {
   alignServiceSearchDropdown(this);
   $(window).on("resize.serviceSearchDropdown", () => alignServiceSearchDropdown(this));
