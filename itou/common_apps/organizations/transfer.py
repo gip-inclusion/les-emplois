@@ -1,3 +1,5 @@
+import enum
+
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import IntegrityError, transaction
@@ -93,6 +95,12 @@ PRESCRIBERORG_TRANSFER_FIELDS = {
 class ReportSection(TextChoices):
     JOB_UNLINK = "job_unlink", "Désassociation de fiche de poste"
     ORG_DEACTIVATION = "org_deactivation", "Désactivation structure avec désactivation des membres"
+    ORG_DELETION = "org_deletion", "Suppression de la structure"
+
+
+class PostTransferAction(enum.Enum):
+    DEACTIVATE = ReportSection.ORG_DEACTIVATION
+    DELETE = ReportSection.ORG_DELETION
 
 
 COMPANY_TRANSFER_SPECS = {
@@ -362,11 +370,13 @@ def transfer_org_data(
     from_org,
     to_org,
     fields_to_transfer,
-    disable_from_org=False,
+    post_transfer_action=None,
 ):
     assert type(from_org) is type(to_org), "Cannot transfer data between organizations of different kind"
     assert from_org.pk != to_org.pk, "Cannot transfer from one organization to itself"
     is_company_transfer = isinstance(from_org, companies_models.Company)
+    if is_company_transfer:
+        assert post_transfer_action != PostTransferAction.DELETE, "Cannot delete the source company"
     TRANSFER_SPECS = COMPANY_TRANSFER_SPECS if is_company_transfer else PRESCRIBERORG_TRANSFER_SPECS
 
     if (
@@ -453,7 +463,7 @@ def transfer_org_data(
         save_update_fields.append("updated_at")
         to_org.save(update_fields=save_update_fields)
 
-    if disable_from_org:
+    if post_transfer_action is PostTransferAction.DEACTIVATE:
         if is_company_transfer:
             companies_models.Company.objects.filter(pk=from_org.pk).update(
                 block_job_applications=True,
@@ -464,5 +474,8 @@ def transfer_org_data(
         else:
             prescribers_models.PrescriberOrganization.objects.filter(pk=from_org.pk).update(is_searchable=False)
             prescribers_models.PrescriberMembership.objects.filter(organization=from_org).update(is_active=False)
-        reporter.add(ReportSection.ORG_DEACTIVATION, _format_model(from_org))
+        reporter.add(post_transfer_action.value, _format_model(from_org))
+    elif post_transfer_action is PostTransferAction.DELETE:
+        prescribers_models.PrescriberOrganization.objects.filter(pk=from_org.pk).delete()
+        reporter.add(post_transfer_action.value, _format_model(from_org))
     return reporter

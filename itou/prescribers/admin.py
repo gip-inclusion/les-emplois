@@ -321,7 +321,8 @@ class PrescriberOrgTransferView(BaseTransferView):
         )
 
     def get_success_url(self):
+        object_id = self.object.pk if self.object else self.to_org.pk
         return reverse(
             "admin:prescribers_prescriberorganization_change",
-            kwargs={"object_id": self.object.pk},
+            kwargs={"object_id": object_id},
         )

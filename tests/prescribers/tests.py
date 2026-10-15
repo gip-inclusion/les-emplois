@@ -39,7 +39,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 class TestPrescriberOrganizationManager:
@@ -851,7 +851,7 @@ class TestPrescriberOrganizationAdmin:
         assert (
             f"staff user={get_user(admin_client).pk} transferred prescriberorganization={from_org.pk} "
             f"to prescriberorganization={to_org.pk} with fields_to_transfer=['job_applications_sent', 'name'], "
-            "disable_from_org=False" in caplog.messages
+            "post_transfer_action=None" in caplog.messages
         )
 
     @freeze_time("2023-08-31 12:34:56")
@@ -941,6 +941,8 @@ class TestPrescriberOrganizationAdmin:
         user = ProfessionalFactory()
         default_args = {"user": user, "is_active": False, "is_admin": False}
         from_org = PrescriberOrganizationFactory(with_membership=False)
+        # create a related object to the organization otherwise it gets deleted
+        JobSeekerAssignmentFactory(prescriber_organization=from_org)
         if value_in_from_org is not None:
             PrescriberMembership(organization=from_org, **{**default_args, field: value_in_from_org}).save()
 
@@ -985,6 +987,63 @@ class TestPrescriberOrganizationAdmin:
             assert PrescriberMembership.include_inactive.filter(organization=from_org).count() == 1
         membership = PrescriberMembership.include_inactive.get(organization=to_org)
         assert getattr(membership, field) is expected
+
+    @freeze_time("2023-08-31 12:34:56")
+    def test_transfer_data_and_delete_from_org(self, admin_client, snapshot):
+        from_org = PrescriberOrganizationWith2MembershipFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber=True, sender_prescriber_organization=from_org)
+        PrescriberWithOrgInvitationFactory(organization=from_org)
+
+        to_org = PrescriberOrganizationFactory()
+
+        transfer_url = reverse(
+            "admin:transfer_prescriberorg_data", kwargs={"from_org_pk": from_org.pk, "to_org_pk": to_org.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+
+        response = admin_client.post(
+            transfer_url,
+            data={
+                "fields_to_transfer": ["job_applications_sent", "invitations", "memberships"],
+                "disable_from_org": True,
+            },
+        )
+        assertRedirects(
+            response, reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": to_org.pk})
+        )
+
+        job_application.refresh_from_db()
+        assert job_application.sender_prescriber_organization == to_org
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.INFO,
+                    f"Transfert effectué avec succès de l’organisation prescriptrice {from_org} vers {to_org}.",
+                ),
+            ],
+        )
+
+        # Check that from_org has been deleted
+        assert PrescriberOrganization.objects.filter(pk=from_org.pk).first() is None
+
+        # Check support remark
+        prescriberorg_content_type = ContentType.objects.get_for_model(PrescriberOrganization)
+        to_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=to_org.pk
+        ).first()
+        from_user_remark = PkSupportRemark.objects.filter(
+            content_type=prescriberorg_content_type, object_id=from_org.pk
+        ).first()
+        assert to_user_remark.remark == from_user_remark.remark
+        remark = to_user_remark.remark
+        assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
+        assert "Candidatures envoyées" in remark
+        assert "Invitations" in remark
+        assert "Utilisateurs membres" in remark
+        assert f"Suppression de la structure:\n  * prescribers.PrescriberOrganization[{from_org.pk}]" in remark
 
 
 @pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)

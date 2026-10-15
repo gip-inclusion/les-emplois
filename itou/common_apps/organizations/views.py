@@ -18,6 +18,7 @@ from django.views.generic import DetailView, ListView
 from itou.common_apps.organizations import transfer
 from itou.common_apps.organizations.admin import OrgChooseFieldsToTransfer, SelectTargetOrgForm
 from itou.companies.models import Company
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.admin import bulk_add_support_remark_to_objs
 from itou.utils.pagination import ItouPaginator
 from itou.www.invitations_views.views import MAX_PENDING_INVITATION
@@ -139,6 +140,7 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
         self.transfer_fields = []
         self.transfer_specs = {}
         self.transfer_data = {}
+        self.related_fields = []
         self.model_admin = None
 
     def test_func(self):
@@ -190,6 +192,7 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
                             f"{transfer_field.label} ({len(from_data)} objet{s} à transférer)",
                         )
                     )
+                    self.related_fields.append(transfer_field)
             return OrgChooseFieldsToTransfer(
                 fields_choices=sorted(fields_choices, key=lambda field: field[1]),
                 data=self.request.POST or None,
@@ -217,6 +220,13 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
             else:
                 fields_to_transfer = form.cleaned_data["fields_to_transfer"]
                 disable_from_org = form.cleaned_data["disable_from_org"]
+                post_transfer_action = disable_from_org and transfer.PostTransferAction.DEACTIVATE or None
+                # If every related field is to be transferred to the target org, the source org should be deleted
+                if (
+                    all([field in fields_to_transfer for field in self.related_fields])
+                    and self.model is PrescriberOrganization
+                ):
+                    post_transfer_action = transfer.PostTransferAction.DELETE
                 # In case the target org adopts the source org's name,
                 # save the old name to avoid weird displays
                 to_org_display = str(self.to_org)
@@ -225,7 +235,7 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
                         self.object,
                         self.to_org,
                         fields_to_transfer=fields_to_transfer,
-                        disable_from_org=disable_from_org,
+                        post_transfer_action=post_transfer_action,
                     )
                 except transfer.TransferError as e:
                     messages.error(request, e.args[0])
@@ -251,15 +261,17 @@ class BaseTransferView(UserPassesTestMixin, DetailView):
                     )
                     messages.info(self.request, message)
                     logger.info(
-                        "staff user=%d transferred %s=%d to %s=%d with fields_to_transfer=%s, disable_from_org=%s",
+                        "staff user=%d transferred %s=%d to %s=%d with fields_to_transfer=%s, post_transfer_action=%s",
                         self.request.user.pk,
                         self.org_model_label,
                         self.object.pk,
                         self.org_model_label,
                         self.to_org.pk,
                         fields_to_transfer,
-                        disable_from_org,
+                        getattr(post_transfer_action, "value", None),
                     )
+                    if post_transfer_action is transfer.PostTransferAction.DELETE:
+                        self.object = None
                     return redirect(self.get_success_url())
         return self.render_to_response(self.get_context_data(**kwargs))
 
