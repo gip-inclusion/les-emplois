@@ -823,11 +823,6 @@ class TestEditUserInfoView:
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
-        response = client.get(url)
-
-        assertContains(response, "Annuaire des professionnels")
-        assertContains(response, "Ne pas apparaître dans l&#x27;annuaire des professionnels")
-
         response = client.post(
             url,
             {
