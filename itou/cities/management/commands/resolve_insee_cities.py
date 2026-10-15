@@ -17,7 +17,7 @@ that we can ask the users to fix it.
 from django.core.management.base import CommandError
 from itoutils.django.commands import dry_runnable
 
-from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, resolve_insee_city
+from itou.common_apps.address.models import resolve_insee_city
 from itou.companies.models import Company
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -33,6 +33,11 @@ class Command(BaseCommand):
     # address changes, so probably very few objects at a time.
     BATCH_UPDATE_SIZE = 100
     ITEMS_PER_RUN = 1_000
+
+    # Be more tolerant than BAN_API_RELIANCE_SCORE, it’s okay if the street
+    # isn’t matched perfectly, we’re only matching the city based on post code
+    # and name against cities.City entries.
+    BAN_API_RELIANCE_SCORE_FOR_RESOLVE_INSEE_CITIES = 0.6
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -70,7 +75,7 @@ class Command(BaseCommand):
         failed_items = []
         qs = (
             queryset.filter(
-                geocoding_score__gt=BAN_API_RELIANCE_SCORE,
+                geocoding_score__gt=self.BAN_API_RELIANCE_SCORE_FOR_RESOLVE_INSEE_CITIES,
                 insee_city=None,
             )
             .exclude(city="")
