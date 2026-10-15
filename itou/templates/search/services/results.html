@@ -89,6 +89,10 @@
     </section>
 {% endblock %}
 
+{% block extra_script_files %}
+    <script src='{% static "js/services_search_select2.js" %}'></script>
+{% endblock %}
+
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>

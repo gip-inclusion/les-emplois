@@ -51,6 +51,10 @@
     z-index: 4051 !important;
 }
 
+.c-search-dropdown .select2-results__options:not(.select2-results__options--nested) {
+    max-height: none !important;
+}
+
 .select2-selection__choice__remove {
     float: right;
     margin-left: 2px;

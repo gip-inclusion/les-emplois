@@ -229,7 +229,7 @@ class ServiceSearchForm(forms.Form):
         choices=[("", "Sélectionnez une thématique")] + [(c.value, c.label) for c in data_inclusion_v1.Categorie],
         label="Sélectionnez une thématique",
         widget=Select2Widget(
-            attrs={"data-placeholder": "Thématique"},
+            attrs={"data-service-search-category": "true", "data-placeholder": "Thématique"},
         ),
     )
     thematics = forms.MultipleChoiceField(
