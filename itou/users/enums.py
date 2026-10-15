@@ -88,3 +88,9 @@ class JobSeekerAssignmentDisplayMode(enum.StrEnum):
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
     # - https://github.com/django/django/pull/12304
     do_not_call_in_templates = enum.nonmember(True)
+
+
+class Nationality(models.TextChoices):
+    FRANCE = "FRENCH", "Française"
+    EU = "EU", "Union Européenne (hors France)"
+    OUTSIDE_EU = "OUTSIDE_EU", "Hors Union Européenne"
