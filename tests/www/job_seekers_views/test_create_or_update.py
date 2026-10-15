@@ -11,7 +11,7 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
-from itou.users.enums import ActionKind, LackOfPoleEmploiId, Title
+from itou.users.enums import ActionKind, LackOfPoleEmploiId, Nationality, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
@@ -859,12 +859,14 @@ class TestStandaloneCreateAsPrescriber:
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
             "birth_country": Country.FRANCE_ID,
+            "nationality": Nationality.FRENCH.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 

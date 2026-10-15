@@ -91,6 +91,6 @@ class JobSeekerAssignmentDisplayMode(enum.StrEnum):
 
 
 class Nationality(models.TextChoices):
-    FRANCE = "FRENCH", "Française"
+    FRENCH = "FRENCH", "Française"
     EU = "EU", "Union Européenne (hors France)"
     OUTSIDE_EU = "OUTSIDE_EU", "Hors Union Européenne"

@@ -31,7 +31,7 @@ from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnos
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import ActionKind, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import ActionKind, LackOfNIRReason, LackOfPoleEmploiId, Nationality
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
@@ -1081,12 +1081,14 @@ class TestApplyAsAuthorizedPrescriber:
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
             "birth_country": Country.FRANCE_ID,
+            "nationality": Nationality.FRENCH.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1398,12 +1400,14 @@ class TestApplyAsAuthorizedPrescriber:
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
             "birth_country": Country.FRANCE_ID,
+            "nationality": Nationality.FRENCH.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         post_data.pop("nir")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1929,12 +1933,14 @@ class TestApplyAsPrescriber:
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
             "birth_country": Country.FRANCE_ID,
+            "nationality": Nationality.FRENCH.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2659,12 +2665,14 @@ class TestApplyAsCompany:
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
             "birth_country": Country.FRANCE_ID,
+            "nationality": Nationality.FRENCH.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -3674,12 +3682,14 @@ class UpdateJobSeekerTestMixin:
         birthdate = post_data.pop("birthdate", None)
         birth_place = post_data.pop("birth_place", None)
         birth_country = post_data.pop("birth_country", None)
+        nationality = post_data.pop("nationality", None)
         expected_job_seeker_session = {
             "user": post_data,
             "profile": {
                 "birth_place": birth_place or self.job_seeker.jobseeker_profile.birth_place,
                 "birth_country": birth_country or self.job_seeker.jobseeker_profile.birth_country,
                 "birthdate": birthdate or self.job_seeker.jobseeker_profile.birthdate,
+                "nationality": nationality or self.job_seeker.jobseeker_profile.nationality,
                 "nir": nir or self.job_seeker.jobseeker_profile.nir,
                 "lack_of_nir_reason": lack_of_nir_reason,
             },
@@ -3929,6 +3939,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
+                "nationality": Nationality.FRENCH.value,
             },
         )
 
@@ -3949,6 +3960,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
+                "nationality": Nationality.FRENCH.value,
             },
         )
 
@@ -3968,6 +3980,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
+                "nationality": Nationality.FRENCH.value,
             },
         )
 
@@ -4008,6 +4021,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
                 "lack_of_nir_reason": LackOfNIRReason.NO_NIR.value,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
+                "nationality": Nationality.FRENCH.value,
             },
         )
         # Check that we could update its NIR infos
