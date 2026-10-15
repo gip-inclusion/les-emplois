@@ -1,6 +1,7 @@
 import datetime
 import enum
 import logging
+import re
 
 import xworkflows
 from dateutil.relativedelta import relativedelta
@@ -19,6 +20,7 @@ from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
+from itou.users.models import JobSeekerProfile
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
 
 
@@ -670,6 +672,47 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         return fs
+
+    def handle_3437_error(self) -> None:
+        if self.status != Status.REJECTED or self.asp_processing_code != self.ASP_UNIQUE_ID_MISMATCH_CODE:
+            # This shouldn't happen
+            logger.error(
+                "handle_3437_error called on employee_record=%d despite its status=%s / code=%s",
+                self.pk,
+                self.status,
+                self.asp_processing_code,
+            )
+            return
+        # The label looks like: "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme
+        # de l'inclusion différent. (ASP_UID)"
+        match = re.search(r"\(([^)]+)\)", self.asp_processing_label)
+        if match is None:
+            logger.error("Could not extract asp_uid from asp_processing_label of employee_record=%s", self.pk)
+            return
+
+        asp_uid = match.group(1)
+        if not re.match(r"^[0-9a-f]{30}$", asp_uid):
+            logger.error("Could not extract asp_uid from asp_processing_label of employee_record=%s", self.pk)
+            return
+        if jobseeker_profile := JobSeekerProfile.objects.filter(asp_uid=asp_uid).first():
+            # We have a duplicate job seeker to handle manually
+            logger.info(
+                "employee_record=%s is likely linked to job_seeker=%s",
+                self.pk,
+                jobseeker_profile.user_id,
+            )
+            return
+        self.job_application.job_seeker.jobseeker_profile.asp_uid = asp_uid
+        self.job_application.job_seeker.jobseeker_profile.save(update_fields={"asp_uid"})
+        logger.info(
+            "Updated asp_uid field of job_seeker=%s according to ASP response for employee_record=%s",
+            self.job_application.job_seeker_id,
+            self.pk,
+        )
+        try:
+            self.ready()
+        except Exception as exc:
+            logger.warning("Could not automatically make employee_record=%s ready - exc=%s", self.pk, exc)
 
 
 class EmployeeRecordTransitionLog(xwf_models.BaseTransitionLog, ASPExchangeInformation):

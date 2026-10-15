@@ -28,6 +28,7 @@ from itou.employee_record.models import (
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import Title
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -38,7 +39,7 @@ from tests.employee_record.factories import (
     EmployeeRecordWithProfileFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import ProfessionalFactory
+from tests.users.factories import JobSeekerProfileFactory, ProfessionalFactory
 
 
 class TestEmployeeRecordModel:
@@ -1142,3 +1143,48 @@ def test_watched_data_updated_at_race_condition(faker):
 
     # The employee record should have its watched_data_updated_at flag still set
     assert EmployeeRecord.objects.get(pk=employee_record.pk).watched_data_updated_at is not None
+
+
+@pytest.mark.parametrize(
+    "new_asp_uid,ready_for_transfer,profile_duplicate,expected_status,profile_updated",
+    [
+        # Nominal case
+        ("1234567890abcdef1234567890abcd", True, False, Status.READY, True),
+        # asp_uid field updated without ready transition
+        ("1234567890abcdef1234567890abcd", False, False, Status.REJECTED, True),
+        # Invalid label
+        (None, False, False, Status.REJECTED, None),
+        # Invalid uid (too short)
+        ("1234567890abcdef", False, False, Status.REJECTED, None),
+        # Duplicate case
+        ("1234567890abcdef1234567890abcd", True, True, Status.REJECTED, False),
+    ],
+)
+def test_handle_3437_error(new_asp_uid, ready_for_transfer, profile_duplicate, expected_status, profile_updated):
+    processing_label = (
+        (
+            "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. "
+            f"({new_asp_uid})"
+        )
+        if new_asp_uid is not None
+        else "Unexpected label"
+    )
+    if profile_duplicate:
+        JobSeekerProfileFactory(asp_uid=new_asp_uid)
+    employee_record = EmployeeRecordFactory(
+        ready_for_transfer=ready_for_transfer,
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+    )
+    assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
+    with triggers.fake_context():
+        employee_record.handle_3437_error()
+    employee_record.job_application.job_seeker.jobseeker_profile.refresh_from_db()
+    if profile_updated:
+        assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid == new_asp_uid
+    else:
+        assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
+
+    employee_record.refresh_from_db()
+    assert employee_record.status == expected_status
