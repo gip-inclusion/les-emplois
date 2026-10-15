@@ -80,7 +80,3 @@ class DeleteObjectSerializer(serializers.Serializer):
 
 class SyncCompletedSerializer(serializers.Serializer):
     started_at = serializers.DateTimeField()
-
-
-class EmailSerializer(serializers.Serializer):
-    email = serializers.EmailField()

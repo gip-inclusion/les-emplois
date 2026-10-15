@@ -1,9 +1,7 @@
 from django.utils import timezone
 
-from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
+from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Service
 from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
-from itou.users.enums import IdentityProvider, UserKind
-from itou.users.models import User
 
 
 SERVICE_MAPPING = {
@@ -16,37 +14,6 @@ SERVICE_MAPPING = {
 
 def service_id(service, id):
     return f"{SERVICE_MAPPING[service]}--{id}"
-
-
-# ------------------------------------------------
-# Check user
-
-
-def get_service_users(*, email=None, user=None):
-    assert (email is None) ^ (user is None), "One and only one of email and user is required"
-    if email:
-        user = User.objects.filter(email=email, is_active=True, kind=UserKind.PROFESSIONAL).first()
-    else:
-        email = user.email
-
-    service_users = list(NexusUser.objects.filter(email=email))
-
-    if user:
-        user_data = serialize_user(user)
-        service_users.append(build_user(user_data, Service.EMPLOIS))
-
-    return service_users
-
-
-def dropdown_status(*, email=None, user=None):
-    assert (email is None) ^ (user is None), "One and only one of email and user is required"
-    service_users = get_service_users(email=email, user=user)
-    email = email or user.email
-
-    return {
-        "proconnect": Auth.PRO_CONNECT in {user.auth for user in service_users},
-        "activated_services": sorted([user.source for user in service_users]),
-    }
 
 
 # ------------------------------------------------
@@ -69,23 +36,6 @@ def complete_full_sync(service, started_at):
             in_progress_since=None, valid_since=started_at
         )
     )
-
-
-def serialize_user(user):
-    # Serialize the user to reproduce the data received in the API
-    return {
-        "source_id": user.pk,
-        "source_kind": user.kind,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "phone": user.phone,
-        "last_login": user.last_login,
-        "auth": {
-            IdentityProvider.DJANGO: Auth.DJANGO,
-            IdentityProvider.PRO_CONNECT: Auth.PRO_CONNECT,
-        }[user.identity_provider],
-    }
 
 
 def build_user(user_data, service):
