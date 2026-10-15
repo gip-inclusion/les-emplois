@@ -29,8 +29,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, UserKind
 from itou.utils import constants as global_constants
-from itou.utils.auth import LoginNotRequiredMixin
-from itou.utils.legal_terms import bypass_terms_acceptance
+from itou.utils.auth import LoginNotRequiredMixin, skip_compliance_checks
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url, get_zendesk_form_url
@@ -374,7 +373,7 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
         }
 
 
-@method_decorator(bypass_terms_acceptance, name="dispatch")
+@method_decorator(skip_compliance_checks, name="dispatch")
 class CompanyJoinView(CompanyBaseView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_professional:
@@ -615,7 +614,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_join_org(request):

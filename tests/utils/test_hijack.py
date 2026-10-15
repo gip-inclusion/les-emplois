@@ -111,9 +111,14 @@ class TestUserHijack:
         )
         assertContains(response, "Voir toutes les candidatures")
 
+    @pytest.mark.parametrize("hijacked_must_answer_email_tracking_consent", [True, False])
     @pytest.mark.parametrize("hijacked_must_accept_terms", [True, False])
-    def test_release_redirects_to_admin(self, client, hijacked_must_accept_terms):
+    def test_release_redirects_to_admin(
+        self, client, hijacked_must_accept_terms, hijacked_must_answer_email_tracking_consent
+    ):
         kwargs = {"terms_accepted_at": None} if hijacked_must_accept_terms else {}
+        if hijacked_must_answer_email_tracking_consent:
+            kwargs["email_tracking_consent_updated_at"] = None
         hijacked = ProfessionalFactory(**kwargs)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
@@ -126,13 +131,13 @@ class TestUserHijack:
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
         assertRedirects(response, initial_url, fetch_redirect_response=False)
 
-    def test_hijacker_does_not_answer_blocking_pages_in_the_name_of_the_user(self, client):
-        hijacked = EmployerFactory(terms_accepted_at=None)
+    def test_hijacker_does_not_answer_compliance_pages_in_the_name_of_the_user(self, client):
+        hijacked = EmployerFactory(terms_accepted_at=None, email_tracking_consent_updated_at=None)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
         client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk})
 
-        # The terms page is not displayed
+        # Neither the terms nor the email tracking consent page is displayed
         response = client.get(reverse("dashboard:index"))
         assertTemplateUsed(response, "dashboard/dashboard.html")
 
@@ -146,6 +151,12 @@ class TestUserHijack:
         assertContains(
             response, "Seul l’utilisateur peut accepter les Conditions Générales d’Utilisation.", status_code=403
         )
+        # Nor can the email tracking consent be answered
+        response = client.post(reverse("dashboard:email_tracking_consent"), {"email_tracking_consent": "on"})
+        assert response.status_code == 403
+        hijacked.refresh_from_db()
+        assert hijacked.terms_accepted_at is None
+        assert hijacked.email_tracking_consent_updated_at is None
 
     def test_keep_otp_after_hijack(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True

@@ -242,6 +242,28 @@ def accept_legal_terms(client, response, next_url=None, follow=True):
     )
 
 
+def email_tracking_consent_url(next_url=None):
+    """URL of the email tracking consent page, where new users land before going to `next_url`."""
+    return reverse("dashboard:email_tracking_consent", query={"next": next_url or reverse("dashboard:index")})
+
+
+def answer_email_tracking_consent(client, response, consent=False, follow=True):
+    """Helper to answer the email tracking consent question in tests, following redirections if needed.
+
+    Handles both followed responses (200 on the consent page) and unfollowed redirects
+    (302 pointing somewhere that eventually leads to the consent page through the EmailTrackingConsentMiddleware).
+    """
+    consent_url = reverse("dashboard:email_tracking_consent")
+    if response.status_code == 302:
+        response = client.get(response.url, follow=True)
+    assert response.wsgi_request.path == consent_url, (
+        f"Expected to end up on {consent_url}, but landed on {response.wsgi_request.path}"
+    )
+    post_data = {"email_tracking_consent": "on"} if consent else {"refuse": "1"}
+    # The full path keeps the `next` parameter
+    return client.post(response.wsgi_request.get_full_path(), data=post_data, follow=follow)
+
+
 def create_fake_postcode(ignore=None):
     departments_to_choose_from = set(DEPARTMENTS) - set(ignore or [])
     department = random.choice(list(departments_to_choose_from))

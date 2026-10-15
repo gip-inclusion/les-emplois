@@ -121,6 +121,12 @@ class UserFactory(factory.django.DjangoModelFactory):
             return timezone.now()
         return None
 
+    @factory.lazy_attribute
+    def email_tracking_consent_updated_at(self):
+        if self.kind in (UserKind.JOB_SEEKER, UserKind.PROFESSIONAL):
+            return timezone.now()
+        return None
+
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF

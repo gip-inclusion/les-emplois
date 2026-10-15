@@ -1,3 +1,5 @@
+import logging
+
 from allauth.account.fields import PasswordField
 from allauth.account.models import EmailAddress
 from django import forms
@@ -17,6 +19,72 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
 
 
+logger = logging.getLogger(__name__)
+
+
+def email_tracking_consent_field():
+    """Build the field asking users whether they consent to email open tracking (tracking pixel)."""
+    return forms.BooleanField(
+        required=False,
+        label=(
+            "J’accepte que La plateforme de l’inclusion mesure l’ouverture de mes e-mails "
+            "afin d’améliorer ses communications."
+        ),
+    )
+
+
+class EmailTrackingConsentForm(forms.Form):
+    email_tracking_consent = email_tracking_consent_field()
+
+
+class EmailTrackingConsentFieldMixin:
+    """Let users change their own email tracking consent (tracking pixel) from a form editing their account.
+
+    The field is only added with `with_email_tracking_consent=True`: a third party
+    editing someone else’s account must never answer in their name.
+    """
+
+    def __init__(self, *args, with_email_tracking_consent=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if with_email_tracking_consent:
+            self.fields["email_tracking_consent"] = self._build_email_tracking_consent_field()
+
+    def _build_email_tracking_consent_field(self):
+        field = email_tracking_consent_field()
+        field.initial = self.instance.email_tracking_consent
+        # When editing their own account, the instance is request.user, which carries the hijack flag:
+        # an admin impersonating a user must never answer in their name
+        field.disabled = getattr(self.instance, "is_hijacked", False)
+        help_texts = []
+        if answered_at := self.instance.email_tracking_consent_updated_at:
+            help_texts.append(f"Choix enregistré le {timezone.localdate(answered_at):%d/%m/%Y}.")
+        if field.disabled:
+            help_texts.append("Seul l’utilisateur peut modifier ce choix.")
+        else:
+            # The change reaches Brevo with the next daily send_users_to_brevo run
+            help_texts.append("Une modification peut prendre jusqu’à 48 heures pour être prise en compte.")
+        field.help_text = " ".join(help_texts)
+        return field
+
+    @property
+    def has_email_tracking_consent_field(self):
+        return "email_tracking_consent" in self.fields
+
+    def save(self, commit=True):
+        # Only an actual change is recorded: saving the profile must not count as an answer
+        consent_changed = "email_tracking_consent" in self.changed_data
+        if consent_changed:
+            self.instance.set_email_tracking_consent(self.cleaned_data["email_tracking_consent"])
+        saved = super().save(commit=commit)
+        if consent_changed and commit:
+            logger.info(
+                "user=%d changed the email tracking consent: consent=%s",
+                self.instance.pk,
+                self.instance.email_tracking_consent,
+            )
+        return saved
+
+
 class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +100,7 @@ class SSOReadonlyMixin:
 # SSOReadonlyMixin needs to be before JobSeekerProfileFieldsMixin here
 # since it disables the birthdate field that is added by JobSeekerProfileFieldsMixin
 class EditJobSeekerInfoForm(
+    EmailTrackingConsentFieldMixin,
     JobSeekerNIRUpdateMixin,
     SSOReadonlyMixin,
     JobSeekerProfileModelForm,
@@ -113,7 +182,7 @@ class EditJobSeekerInfoForm(
         return super().save(commit=commit)
 
 
-class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
+class EditUserInfoForm(EmailTrackingConsentFieldMixin, SSOReadonlyMixin, forms.ModelForm):
     is_directory_opted_out = forms.BooleanField(
         label="Ne pas apparaître dans l'annuaire des professionnels",
         required=False,

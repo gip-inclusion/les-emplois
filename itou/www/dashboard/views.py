@@ -42,12 +42,12 @@ from itou.users.notifications import (
     NewAPITokenNotification,
 )
 from itou.utils import constants as global_constants
-from itou.utils.auth import check_request
-from itou.utils.legal_terms import bypass_terms_acceptance
+from itou.utils.auth import check_request, skip_compliance_checks
+from itou.utils.legal_terms import terms_acceptance_required
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
-from itou.utils.readonly import readonly_view
+from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
 from itou.www.dashboard.forms import (
@@ -55,6 +55,7 @@ from itou.www.dashboard.forms import (
     EditUserEmailForm,
     EditUserInfoForm,
     EditUserNotificationForm,
+    EmailTrackingConsentForm,
 )
 from itou.www.search_views.forms import CompanySearchForm
 from itou.www.stats import utils as stats_utils
@@ -317,7 +318,7 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 @with_triggers_context()
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
@@ -332,7 +333,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, {"form": form})
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 @with_triggers_context
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
@@ -340,17 +341,20 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
+    with_email_tracking_consent = request.user.can_answer_email_tracking_consent
     if request.user.is_job_seeker:
         form = EditJobSeekerInfoForm(
             instance=request.user,
             editor=request.user,
             data=request.POST or None,
             back_url=request.get_full_path(),
+            with_email_tracking_consent=with_email_tracking_consent,
         )
     else:
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
+            with_email_tracking_consent=with_email_tracking_consent,
         )
 
     if request.method == "POST" and form.is_valid():
@@ -437,7 +441,7 @@ def switch_organization(request):
     return HttpResponseRedirect(next_url)
 
 
-@bypass_terms_acceptance
+@skip_compliance_checks
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if request.user.is_staff:
         raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
@@ -465,6 +469,32 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     }
 
     return render(request, template_name, context)
+
+
+@skip_compliance_checks
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def email_tracking_consent(request, template_name="dashboard/email_tracking_consent.html"):
+    """Ask the user whether they consent to email open tracking (tracking pixel).
+
+    Users are redirected here by EmailTrackingConsentMiddleware until they answer.
+    """
+    next_url = get_safe_url(request, "next", fallback_url=reverse("dashboard:index"))
+    if not request.user.must_answer_email_tracking_consent or terms_acceptance_required(request.user):
+        # Nothing to answer, or the terms must be accepted first: TermsAcceptanceMiddleware will redirect there
+        return HttpResponseRedirect(next_url)
+
+    form = EmailTrackingConsentForm(data=request.POST if request.method == "POST" else None)
+    if request.method == "POST":
+        if getattr(request.user, "is_hijacked", False):
+            raise PermissionDenied("Seul l’utilisateur peut répondre à cette question.")
+        if form.is_valid():
+            consent = form.cleaned_data["email_tracking_consent"] and "refuse" not in request.POST
+            request.user.set_email_tracking_consent(consent)
+            request.user.save(update_fields=["email_tracking_consent", "email_tracking_consent_updated_at"])
+            logger.info("user=%d answered the email tracking consent question: consent=%s", request.user.pk, consent)
+            return HttpResponseRedirect(next_url)
+
+    return render(request, template_name, {"form": form})
 
 
 def api_token(request, template_name="dashboard/api_token.html"):
@@ -509,7 +539,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
     return render(request, template_name, context)
 
 
-@method_decorator(bypass_terms_acceptance, name="dispatch")
+@method_decorator(skip_compliance_checks, name="dispatch")
 class AccountMigrationView(TemplateView):
     template_name = "account/activate_pro_connect_account.html"
 

@@ -1,4 +1,5 @@
 import datetime
+from collections import namedtuple
 from zoneinfo import ZoneInfo
 
 from allauth.account.models import EmailAddress
@@ -15,11 +16,58 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import JobSeekerProfileQuerySet, User
-from itou.utils.brevo import BrevoClient, BrevoListID
+from itou.utils.brevo import PIXEL_TRACKING_CONSENT_ATTRIBUTE, BrevoClient, BrevoListID
 from itou.utils.command import BaseCommand
 
 
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
+# The command runs daily: the overlap makes up for a missed or failed run
+EMAIL_TRACKING_CONSENT_UPDATE_WINDOW = datetime.timedelta(days=2)
+PROFESSIONAL_SSO_PROVIDERS = [IdentityProvider.PRO_CONNECT]
+JOB_SEEKER_SSO_PROVIDERS = [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]
+
+Audience = namedtuple("Audience", ["name", "users", "list_id", "serializer"])
+
+
+def has_verified_primary_email():
+    return Exists(
+        EmailAddress.objects.filter(
+            user_id=OuterRef("pk"),
+            email=OuterRef("email"),
+            primary=True,
+            verified=True,
+        )
+    )
+
+
+def verified_email_or_sso(identity_providers):
+    """Condition on users having a verified primary email, or an account from an SSO, which verifies emails itself."""
+    return has_verified_primary_email() | Q(identity_provider__in=identity_providers)
+
+
+def has_membership(membership_model, *, include_inactive=False, **filters):
+    """Condition on users having a membership of the given model, active by default.
+
+    Memberships are deactivated rather than deleted, so `include_inactive` also matches former members.
+    """
+    manager = membership_model.include_inactive if include_inactive else membership_model.objects
+    return Exists(manager.filter(user_id=OuterRef("pk"), **filters))
+
+
+def has_siae_membership(*, include_inactive=False):
+    """Condition on users being members of an SIAE, as opposed to other kinds of companies."""
+    return has_membership(
+        CompanyMembership,
+        include_inactive=include_inactive,
+        company__kind__in=CompanyKind.siae_kinds(),
+    )
+
+
+def email_tracking_consent_attributes(user):
+    if user.email_tracking_consent_updated_at is None:
+        # Never asked: no attribute, Brevo must consider that there is no consent
+        return {}
+    return {PIXEL_TRACKING_CONSENT_ATTRIBUTE: "Yes" if user.email_tracking_consent else "No"}
 
 
 def professional_serializer(user, brevo_type):
@@ -30,6 +78,7 @@ def professional_serializer(user, brevo_type):
             "nom": user.last_name.upper(),
             "date_inscription": timezone.localdate(user.date_joined).isoformat(),
             "type": brevo_type,
+            **email_tracking_consent_attributes(user),
         },
     }
 
@@ -55,8 +104,129 @@ def job_seeker_serializer(user):
             "nom": user.last_name.upper(),
             "departement": user.job_seeker_department,
             "date_inscription": timezone.localdate(user.date_joined).isoformat(),
+            **email_tracking_consent_attributes(user),
         },
     }
+
+
+def professional_audiences(*, former=False):
+    """Return the audiences of the professionals who are SIAE or prescriber members.
+
+    Professionals who never were are left out: they were never sent to Brevo.
+
+    Args:
+        former: Return former members instead: users with an inactive membership and no active SIAE or prescriber
+            one. Someone now in a structure is only sent to the list of their current one. They are still in Brevo,
+            so their later consent answers must be updated there too.
+    """
+    professionals = User.objects.filter(
+        verified_email_or_sso(PROFESSIONAL_SSO_PROVIDERS),
+        kind=UserKind.PROFESSIONAL,
+        is_active=True,
+    ).order_by("email")
+    name_suffix = ""
+    if former:
+        professionals = professionals.exclude(has_siae_membership() | has_membership(PrescriberMembership))
+        name_suffix = " (former members)"
+    authorized_prescriber = has_membership(
+        PrescriberMembership,
+        include_inactive=former,
+        organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+    )
+    return [
+        Audience(
+            f"SIAE users{name_suffix}",
+            professionals.filter(has_siae_membership(include_inactive=former)),
+            BrevoListID.EMPLOYERS,
+            employer_serializer,
+        ),
+        Audience(
+            f"Prescribers{name_suffix}",
+            professionals.filter(authorized_prescriber),
+            BrevoListID.PRESCRIBERS,
+            authorized_prescriber_serializer,
+        ),
+        Audience(
+            f"Orienteurs{name_suffix}",
+            professionals.filter(has_membership(PrescriberMembership, include_inactive=former)).exclude(
+                authorized_prescriber
+            ),
+            BrevoListID.PRESCRIBERS,
+            prescriber_serializer,
+        ),
+    ]
+
+
+def job_seekers():
+    """Return the job seekers who may be sent to Brevo."""
+    return User.objects.filter(
+        verified_email_or_sso(JOB_SEEKER_SSO_PROVIDERS),
+        kind=UserKind.JOB_SEEKER,
+        is_active=True,
+    ).order_by("pk")
+
+
+def job_seekers_to_import():
+    """Return the job seekers of the daily import: recently joined, stalled, or autonomous and waiting for a job."""
+    midnight_today = datetime.datetime.combine(
+        timezone.localdate(),
+        datetime.time.min,
+        tzinfo=timezone.get_current_timezone(),
+    )
+    autonomous_with_recent_diagnosis_and_no_accepted_application = Q(
+        Exists(
+            EligibilityDiagnosis.objects.filter(
+                job_seeker_id=OuterRef("pk"),
+                author_kind=AuthorKind.PRESCRIBER,
+                created_at__gte=RECENT_DIAGNOSIS_THRESHOLD,
+            )
+        ),
+        ~Exists(
+            JobApplication.objects.filter(
+                job_seeker_id=OuterRef("pk"),
+                state=JobApplicationState.ACCEPTED,
+            )
+        ),
+        last_login__isnull=False,
+    )
+    return job_seekers().filter(
+        Q(
+            Q(date_joined__gte=midnight_today - datetime.timedelta(days=30)),
+            JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__"),
+            autonomous_with_recent_diagnosis_and_no_accepted_application,
+            _connector=Q.OR,
+        )
+    )
+
+
+def daily_audiences():
+    """Return the audiences of the daily import, meant for new contacts."""
+    return [
+        *professional_audiences(),
+        Audience("Job seekers", job_seekers_to_import(), BrevoListID.CANDIDATS, job_seeker_serializer),
+    ]
+
+
+def email_tracking_consent_audiences():
+    """Return the audiences of the users who recently answered the email tracking consent, each in their Brevo list.
+
+    Importing them updates the contacts Brevo knows, and creates the others in that list. Each answer is sent by
+    every run within the update window.
+    """
+    recently_answered = Q(email_tracking_consent_updated_at__gte=timezone.now() - EMAIL_TRACKING_CONSENT_UPDATE_WINDOW)
+    audiences = [
+        *professional_audiences(),
+        # Former members left their structure but remain in Brevo
+        *professional_audiences(former=True),
+        Audience("Job seekers", job_seekers(), BrevoListID.CANDIDATS, job_seeker_serializer),
+    ]
+    return [
+        audience._replace(
+            name=f"{audience.name} with a recent email tracking consent answer",
+            users=audience.users.filter(recently_answered),
+        )
+        for audience in audiences
+    ]
 
 
 class Command(BaseCommand):
@@ -84,130 +254,17 @@ class Command(BaseCommand):
     )
     def handle(self, *args, wet_run, **options):
         client = BrevoClient()
-        self.import_professionals(client, wet_run=wet_run)
-        self.import_job_seekers(client, wet_run=wet_run)
-
-    def import_professionals(self, client, *, wet_run):
-        professional_qs = (
-            User.objects.filter(kind=UserKind.PROFESSIONAL)
-            .filter(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-                | Q(identity_provider=IdentityProvider.PRO_CONNECT),  # the SSO verifies emails on its own
-                is_active=True,
-            )
-            .order_by("email")
+        # Imports are asynchronous, so these passes don't depend on each other. A user in both
+        # is sent twice with the same consent, which is harmless.
+        self.import_audiences(client, daily_audiences(), wet_run=wet_run)
+        self.import_audiences(
+            client, email_tracking_consent_audiences(), wet_run=wet_run, update_existing_contacts=True
         )
-        self.import_employers(client, professional_qs, wet_run=wet_run)
-        self.import_prescribers(client, professional_qs, wet_run=wet_run)
 
-    def import_employers(self, client, professional_qs, *, wet_run):
-        employers = list(
-            professional_qs.filter(
-                Exists(
-                    CompanyMembership.objects.filter(
-                        user_id=OuterRef("pk"),
-                        company__kind__in=CompanyKind.siae_kinds(),
-                    )
-                )
-            )
-        )
-        self.logger.info("SIAE users count: %d", len(employers))
-        if wet_run:
-            client.import_users(employers, BrevoListID.EMPLOYERS, employer_serializer)
-
-    def import_prescribers(self, client, professional_qs, *, wet_run):
-        all_prescribers = professional_qs.filter(Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"))))
-
-        authorized_prescriber_memberships = PrescriberMembership.objects.filter(
-            user_id=OuterRef("pk"),
-            organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-        )
-        authorized_prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
-
-        self.logger.info("Prescribers count: %d", len(authorized_prescribers))
-        if wet_run:
-            client.import_users(authorized_prescribers, BrevoListID.PRESCRIBERS, authorized_prescriber_serializer)
-
-        orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
-        self.logger.info("Orienteurs count: %d", len(orienteurs))
-        if wet_run:
-            client.import_users(orienteurs, BrevoListID.PRESCRIBERS, prescriber_serializer)
-
-    def import_job_seekers(self, client, *, wet_run):
-        job_seekers = User.objects.filter(
-            Q(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-            )
-            | Q(
-                identity_provider__in=[
-                    IdentityProvider.FRANCE_CONNECT,
-                    IdentityProvider.FT_CONNECT,
-                ]
-            ),
-            kind=UserKind.JOB_SEEKER,
-            is_active=True,
-        ).order_by("pk")
-
-        midnight_today = datetime.datetime.combine(
-            timezone.localdate(),
-            datetime.time.min,
-            tzinfo=timezone.get_current_timezone(),
-        )
-        a_month_ago = midnight_today - datetime.timedelta(days=30)
-        recently_joined = job_seekers.filter(date_joined__gte=a_month_ago)
-        self.logger.info("Job seekers count: %d", len(recently_joined))
-        if wet_run:
-            client.import_users(recently_joined, BrevoListID.CANDIDATS, job_seeker_serializer)
-
-        stalled_autonomous_job_seekers = job_seekers.filter(
-            JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
-        )
-        self.logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
-        if wet_run:
-            client.import_users(
-                stalled_autonomous_job_seekers,
-                BrevoListID.CANDIDATS_AUTONOMES_BLOQUES,
-                job_seeker_serializer,
-            )
-
-        autonomous_job_seekers_with_diagnosis_and_no_accepted_application = job_seekers.filter(
-            last_login__isnull=False,
-        ).filter(
-            Exists(
-                EligibilityDiagnosis.objects.filter(
-                    job_seeker_id=OuterRef("pk"),
-                    author_kind=AuthorKind.PRESCRIBER,
-                    created_at__gte=RECENT_DIAGNOSIS_THRESHOLD,
-                )
-            ),
-            ~Exists(
-                JobApplication.objects.filter(
-                    job_seeker_id=OuterRef("pk"),
-                    state=JobApplicationState.ACCEPTED,
-                )
-            ),
-        )
-        self.logger.info(
-            "Autonomous job seekers with IAE diag and no accepted applications count: %d",
-            len(autonomous_job_seekers_with_diagnosis_and_no_accepted_application),
-        )
-        if wet_run:
-            client.import_users(
-                autonomous_job_seekers_with_diagnosis_and_no_accepted_application,
-                BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC,
-                job_seeker_serializer,
-            )
+    def import_audiences(self, client, audiences, *, wet_run, update_existing_contacts=False):
+        """Log the size of each audience, and import it into its Brevo list on a wet run."""
+        for name, users, list_id, serializer in audiences:
+            users = list(users)
+            self.logger.info("%s count: %d", name, len(users))
+            if wet_run:
+                client.import_users(users, list_id, serializer, update_existing_contacts=update_existing_contacts)

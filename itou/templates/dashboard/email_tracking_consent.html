@@ -1,0 +1,36 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+
+{% block title %}Suivi de l’ouverture de vos e-mails {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Suivi de l’ouverture de vos e-mails</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock title_content %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <form method="post" class="js-prevent-multiple-submit">
+                        <div class="c-form">
+                            <h2 class="h3">Aidez-nous à améliorer nos communications</h2>
+                            {% csrf_token %}
+                            {% bootstrap_form_errors form alert_error_type="all" %}
+                            {% include "dashboard/includes/email_tracking_consent_explanation.html" %}
+                            <p>Vous pourrez modifier ce choix à tout moment depuis la page « Modifier mon profil ».</p>
+                            {% bootstrap_field form.email_tracking_consent %}
+                            {% itou_buttons_form primary_label="Continuer" primary_aria_label="Enregistrer mon choix et continuer" secondary_label="Refuser" secondary_name="refuse" secondary_value="1" secondary_aria_label="Refuser le suivi de l’ouverture de mes e-mails et continuer" reset_url=None show_mandatory_fields_mention=False %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
