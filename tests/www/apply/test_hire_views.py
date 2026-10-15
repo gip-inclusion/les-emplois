@@ -37,7 +37,13 @@ from itou.eligibility.models import (
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import (
+    ActionKind,
+    IdentityCertificationAuthorities,
+    LackOfNIRReason,
+    LackOfPoleEmploiId,
+    Nationality,
+)
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
@@ -526,12 +532,14 @@ class TestDirectHireFullProcess:
             "lack_of_nir_reason": "",
             "birth_place": birth_place_id,
             "birth_country": birth_country_id,
+            "nationality": Nationality.FR.value,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
         expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["profile"]["nationality"] = post_data.pop("nationality")
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -616,6 +624,7 @@ class TestDirectHireFullProcess:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nir
+        assert new_job_seeker.jobseeker_profile.nationality == Nationality.FR
 
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
