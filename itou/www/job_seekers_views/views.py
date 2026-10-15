@@ -1345,6 +1345,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         session_birthdate = self.job_seeker_session.get("profile", {}).get("birthdate")
+        session_birth_name = self.job_seeker_session.get("profile", {}).get("birth_name")
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
         prefilled_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
@@ -1359,6 +1360,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
+                "birth_name": session_birth_name,
                 "birthdate": session_birthdate,
                 "nir": session_nir,
                 "lack_of_nir_reason": session_lack_of_nir_reason,
