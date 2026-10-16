@@ -69,7 +69,7 @@ class Command(BaseCommand):
     def _handle_3437_errors(self):
         # Rejected records with the asp_processing_code 3437
         # The ASP now returns the "expected" asp_uid that can be handled automatically.
-        # XXX: this processing will be moved to batch file processing in a second time.
+        # TODO(xfernandez): drop this function after the run of sanitize_employee_records
         for employee_record in (
             EmployeeRecord.objects.filter(
                 status=Status.REJECTED,
