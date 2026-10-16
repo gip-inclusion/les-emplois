@@ -95,7 +95,7 @@ def test_missed_notifications_limit(mocker, snapshot, command, caplog):
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
-def test_handle_3437_errors():
+def test_handle_3437_errors(mailoutbox, django_capture_on_commit_callbacks):
     expected_label = (
         "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. ({})"
     )
@@ -139,7 +139,8 @@ def test_handle_3437_errors():
             employee_record_duplicate_asp_uid,
         ]
     }
-    call_command("sanitize_employee_records", wet_run=True)
+    with django_capture_on_commit_callbacks(execute=True):
+        call_command("sanitize_employee_records", wet_run=True)
 
     employee_record_OK.job_application.job_seeker.jobseeker_profile.refresh_from_db()
     assert (
@@ -171,3 +172,5 @@ def test_handle_3437_errors():
         assert untouched_er.status == models.Status.REJECTED
         untouched_er.job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert untouched_er.job_application.job_seeker.jobseeker_profile.asp_uid == previous_asp_uid[untouched_er.pk]
+    # No email sent
+    assert len(mailoutbox) == 0
