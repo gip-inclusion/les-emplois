@@ -1,4 +1,3 @@
-import datetime
 from urllib.parse import urljoin
 
 import httpx
@@ -7,7 +6,6 @@ import respx
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
-from freezegun import freeze_time
 
 from itou.rdv_insertion.api import (
     RDV_I_INVITATION_DELIVERED_STATUSES,
@@ -16,7 +14,7 @@ from itou.rdv_insertion.api import (
     get_api_credentials,
     get_invitation_status,
 )
-from itou.rdv_insertion.models import Invitation, Participation
+from itou.rdv_insertion.models import Invitation
 from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_AUTH_FAILURE_BODY,
     RDV_INSERTION_AUTH_SUCCESS_BODY,
@@ -27,7 +25,6 @@ from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.rdv_insertion.factories import (
     InvitationFactory,
     InvitationRequestFactory,
-    ParticipationFactory,
     WebhookEventFactory,
 )
 
@@ -206,66 +203,6 @@ class TestInvitationModel:
         assert not self.invitation_email.is_postal
         assert not self.invitation_sms.is_postal
         assert self.invitation_postal.is_postal
-
-
-@freeze_time("2024-08-01")
-class TestParticipationModel:
-    def setup_method(self, freeze, **kwargs):
-        organization = PrescriberOrganizationFactory(
-            membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
-        )
-        self.job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
-            to_company__name="Hit Pit",
-            to_company__with_membership=True,
-            to_company__rdv_solidarites_id=1234,
-            job_seeker__first_name="Jacques",
-            job_seeker__last_name="Henry",
-            sender=organization.active_members.get(),
-            for_snapshot=True,
-        )
-        self.participation = ParticipationFactory(
-            job_seeker=self.job_application.job_seeker,
-            appointment__company=self.job_application.to_company,
-            appointment__start_at=datetime.datetime(2024, 8, 1, 8, 0, tzinfo=datetime.UTC),
-        )
-
-    def test_get_status_display(self):
-        # Status unknown and start_at in the future
-        self.participation.status = Participation.Status.UNKNOWN
-        assert self.participation.get_status_display() == "RDV à venir"
-
-        # Status unknown and start_at in the past
-        self.participation.appointment.start_at = datetime.datetime(2024, 7, 31, tzinfo=datetime.UTC)
-        assert self.participation.get_status_display() == "Statut du RDV à préciser"
-
-        self.participation.status = Participation.Status.SEEN
-        assert self.participation.get_status_display() == Participation.Status.SEEN.label
-
-        self.participation.status = Participation.Status.REVOKED
-        assert self.participation.get_status_display() == Participation.Status.REVOKED.label
-
-        self.participation.status = Participation.Status.EXCUSED
-        assert self.participation.get_status_display() == Participation.Status.EXCUSED.label
-
-        self.participation.status = Participation.Status.NOSHOW
-        assert self.participation.get_status_display() == Participation.Status.NOSHOW.label
-
-    def test_get_status_class_name(self):
-        self.participation.status = Participation.Status.UNKNOWN
-        assert self.participation.get_status_class_name() == "bg-important-lightest text-important"
-
-        self.participation.status = Participation.Status.SEEN
-        assert self.participation.get_status_class_name() == "bg-success-lighter text-success"
-
-        self.participation.status = Participation.Status.REVOKED
-        assert self.participation.get_status_class_name() == "bg-warning-lighter text-warning"
-
-        self.participation.status = Participation.Status.EXCUSED
-        assert self.participation.get_status_class_name() == "bg-warning-lighter text-warning"
-
-        self.participation.status = Participation.Status.NOSHOW
-        assert self.participation.get_status_class_name() == "bg-danger-lighter text-danger"
 
 
 class TestWebhookEventModel:
