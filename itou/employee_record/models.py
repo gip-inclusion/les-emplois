@@ -698,23 +698,34 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         if not re.match(r"^[0-9a-f]{30}$", asp_uid):
             logger.error("Could not extract asp_uid from asp_processing_label of employee_record=%s", self.pk)
             return
-        if jobseeker_profile := JobSeekerProfile.objects.filter(asp_uid=asp_uid).first():
-            # We have a duplicate job seeker to handle manually
+        asp_uid_profile = JobSeekerProfile.objects.filter(asp_uid=asp_uid).first()
+        if asp_uid_profile:
+            if asp_uid_profile.user_id != self.job_application.job_seeker_id:
+                # We have a duplicate job seeker to handle manually
+                logger.info(
+                    "employee_record=%s is likely linked to job_seeker=%s",
+                    self.pk,
+                    asp_uid_profile.user_id,
+                )
+                if send_email_for_duplicate:
+                    self.email_3437_error_notification(duplicate_job_seeker_id=asp_uid_profile.user_id).send()
+                return
+            else:
+                # The job seeker has already been fixed (maybe by a previous 3437 error ?)
+                logger.info(
+                    "asp_uid field of job_seeker=%s already updated according to ASP response for employee_record=%s",
+                    self.job_application.job_seeker_id,
+                    self.pk,
+                )
+                # Do not return to try to call the ready transition
+        else:
+            self.job_application.job_seeker.jobseeker_profile.asp_uid = asp_uid
+            self.job_application.job_seeker.jobseeker_profile.save(update_fields={"asp_uid"})
             logger.info(
-                "employee_record=%s is likely linked to job_seeker=%s",
+                "Updated asp_uid field of job_seeker=%s according to ASP response for employee_record=%s",
+                self.job_application.job_seeker_id,
                 self.pk,
-                jobseeker_profile.user_id,
             )
-            if send_email_for_duplicate:
-                self.email_3437_error_notification(duplicate_job_seeker_id=jobseeker_profile.user_id).send()
-            return
-        self.job_application.job_seeker.jobseeker_profile.asp_uid = asp_uid
-        self.job_application.job_seeker.jobseeker_profile.save(update_fields={"asp_uid"})
-        logger.info(
-            "Updated asp_uid field of job_seeker=%s according to ASP response for employee_record=%s",
-            self.job_application.job_seeker_id,
-            self.pk,
-        )
         try:
             self.ready()
         except Exception as exc:
