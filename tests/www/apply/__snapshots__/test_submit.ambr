@@ -1054,7 +1054,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -1076,6 +1077,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1334,7 +1336,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -1356,6 +1359,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1698,7 +1702,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -1720,6 +1725,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1953,7 +1959,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -1975,6 +1982,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2241,7 +2249,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -2349,6 +2358,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2607,7 +2617,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -2715,6 +2726,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3105,7 +3117,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -3213,6 +3226,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3494,7 +3508,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -3602,6 +3617,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3916,7 +3932,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -3938,6 +3955,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4196,7 +4214,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -4218,6 +4237,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4560,7 +4580,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -4582,6 +4603,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4815,7 +4837,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -4837,6 +4860,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -5103,7 +5127,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -5211,6 +5236,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -5469,7 +5495,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -5577,6 +5604,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -5967,7 +5995,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -6075,6 +6104,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -6356,7 +6386,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s)
@@ -6464,6 +6495,7 @@
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",

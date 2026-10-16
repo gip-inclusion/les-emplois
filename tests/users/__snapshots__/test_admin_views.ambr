@@ -361,7 +361,8 @@
                  "prescribers_prescribermembership"."created_at",
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
-                 "prescribers_prescribermembership"."updated_by_id"
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function"
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."user_id" = %s
           ORDER BY "prescribers_prescribermembership"."id" ASC
@@ -383,7 +384,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           WHERE "companies_companymembership"."user_id" = %s
           ORDER BY "companies_companymembership"."id" ASC
