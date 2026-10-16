@@ -80,7 +80,8 @@ class Command(BaseCommand):
                 "created_at",
             )
         ):
-            employee_record.handle_3437_error()
+            # This command is called every hour: we don't want to send a new email every hour
+            employee_record.handle_3437_error(send_email_for_duplicate=False)
 
     @dry_runnable
     def handle(self, **options):

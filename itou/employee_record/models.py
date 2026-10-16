@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, Subquery
 from django.db.models.query import QuerySet
+from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -17,10 +18,13 @@ from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.enums import CompanySource
 from itou.companies.models import Company, SiaeFinancialAnnex
+from itou.emails.utils import get_email_message
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
 from itou.users.models import JobSeekerProfile
+from itou.utils.admin import get_admin_url
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
 
 
@@ -673,7 +677,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
         return fs
 
-    def handle_3437_error(self) -> None:
+    def handle_3437_error(self, send_email_for_duplicate=True) -> None:
         if self.status != Status.REJECTED or self.asp_processing_code != self.ASP_UNIQUE_ID_MISMATCH_CODE:
             # This shouldn't happen
             logger.error(
@@ -701,6 +705,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
                 self.pk,
                 jobseeker_profile.user_id,
             )
+            if send_email_for_duplicate:
+                self.email_3437_error_notification(duplicate_job_seeker_id=jobseeker_profile.user_id).send()
             return
         self.job_application.job_seeker.jobseeker_profile.asp_uid = asp_uid
         self.job_application.job_seeker.jobseeker_profile.save(update_fields={"asp_uid"})
@@ -713,6 +719,25 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             self.ready()
         except Exception as exc:
             logger.warning("Could not automatically make employee_record=%s ready - exc=%s", self.pk, exc)
+
+    def email_3437_error_notification(self, *, duplicate_job_seeker_id):
+        to = [settings.ITOU_EMAIL_CONTACT]
+        context = {
+            "employee_record": self,
+            "employee_record_url": get_absolute_url(get_admin_url(self)),
+            "employee_record_job_seeker_id": self.job_application.job_seeker.pk,
+            "employee_record_job_seeker_url": get_absolute_url(get_admin_url(self.job_application.job_seeker)),
+            "duplicate_job_seeker_id": duplicate_job_seeker_id,
+            "duplicate_job_seeker_url": get_absolute_url(
+                reverse(
+                    "admin:users_user_change",
+                    args=[duplicate_job_seeker_id],
+                )
+            ),
+        }
+        subject = "employee_record/emails/3437_error_notification_subject.txt"
+        body = "employee_record/emails/3437_error_notification_body.md"
+        return get_email_message(to, context, subject, body)
 
 
 class EmployeeRecordTransitionLog(xwf_models.BaseTransitionLog, ASPExchangeInformation):
