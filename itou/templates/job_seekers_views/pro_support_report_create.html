@@ -1,0 +1,66 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+{% block title %}
+    Bilan d’accompagnement de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information services_search_url=services_search_url service_search_event_option="services-search-from-pro-support-report-create" only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="c-form mb-3 mb-md-4">
+                        <form method="post" id="pro-support-report-form">
+                            {% csrf_token %}
+
+                            <h2 class="h3 mb-1">Bilan d’accompagnement</h2>
+                            <p class="mb-4">
+                                {% if last_contract.has_ended %}
+                                    Le contrat de travail a pris fin le {{ last_contract.end_date|date:"d/m/Y" }}.
+                                {% else %}
+                                    Le contrat arrive à échéance le {{ last_contract.end_date|date:"d/m/Y" }}.
+                                {% endif %}
+                            </p>
+
+                            {% bootstrap_form_errors form type="non_fields" %}
+
+                            {% bootstrap_field form.barriers %}
+                            {% bootstrap_field form.other_barrier %}
+                            {% component_info c_info__summary=c_info__summary extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Ces informations seront visibles par les autres accompagnateurs. N’inscrivez aucune information médicale ni confidentielle dans ce champ.
+                                {% endfragment %}
+                            {% endcomponent_info %}
+
+                            {% bootstrap_field form.autonomy %}
+
+                            {% bootstrap_field form.has_solution %}
+                            <div id="pro-support-report-next-step">
+                                {% if form.has_solution.value == "True" %}
+                                    {% bootstrap_field form.solution %}
+                                {% elif form.has_solution.value == "False" %}
+                                    {% bootstrap_field form.orientation %}
+                                {% endif %}
+                            </div>
+
+                            <p>Une fois envoyé, le bilan ne pourra plus être modifié.</p>
+                            {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

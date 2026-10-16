@@ -11,7 +11,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind, CompanySource, ContractType
+from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
 from itou.companies.models import Company, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
@@ -21,12 +21,14 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
     JobDescriptionFactory,
+    ProSupportReportFactory,
     SiaeConventionFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerFactory, ProfessionalFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 from tests.utils.testing import normalize_fields_history
 
 
@@ -720,3 +722,59 @@ class TestSiaeACIConvergencePHCModel:
         instance.siret = instance.siret[:-1]
         with pytest.raises(IntegrityError, match=r".*aci_cvg_phc_siret.*"):
             instance.save()
+
+
+class TestProSupportReport:
+    @pytest.mark.parametrize(
+        "kwargs,constraint",
+        [
+            pytest.param(
+                {"solution": ProSupportReportSolution.TRAINING},
+                "prosupportreport_solution_or_orientation",
+                id="solution_and_orientation",
+            ),
+            pytest.param(
+                {"orientation": ""}, "prosupportreport_solution_or_orientation", id="no_solution_nor_orientation"
+            ),
+            pytest.param({"autonomy": 6}, "prosupportreport_autonomy_range", id="autonomy_out_of_range"),
+        ],
+    )
+    def test_constraints(self, kwargs, constraint):
+        with pytest.raises(IntegrityError, match=constraint):
+            ProSupportReportFactory(**kwargs)
+
+    def test_notify_authorized_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+
+        def assignment(days_ago, **kwargs):
+            return JobSeekerAssignmentFactory(
+                job_seeker=report.job_seeker,
+                last_action_at=timezone.now() - timedelta(days=days_ago),
+                **kwargs,
+            )
+
+        # Created first so that the order cannot come from the primary key.
+        latest = assignment(5, prescriber_organization=PrescriberOrganizationFactory(authorized=True), ended=True)
+        assignment(10, prescriber_organization=PrescriberOrganizationFactory(authorized=True))
+        # More recent, but not an authorized prescriber.
+        assignment(1, prescriber_organization=PrescriberOrganizationFactory())
+        assignment(1, company=report.company, professional=report.author)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert [email.to for email in mailoutbox] == [[latest.professional.email]]
+        report.refresh_from_db()
+        assert report.notified_prescriber == latest.professional
+
+    def test_notify_authorized_prescriber_without_one(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_authorized_prescriber()
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.notified_prescriber is None
+
+    def test_unique_per_contract(self):
+        report = ProSupportReportFactory()
+        with pytest.raises(IntegrityError, match="unique_prosupportreport_per_contract"):
+            ProSupportReportFactory(contract=report.contract)

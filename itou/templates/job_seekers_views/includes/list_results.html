@@ -96,12 +96,10 @@
                                     </button>
                                     <div class="dropdown-menu"
                                          aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                        {% if suggest_next_step_url and job_seeker.contract_ending_soon %}
-                                            <a href="{{ suggest_next_step_url }}"
-                                               class="dropdown-item has-external-link"
-                                               target="_blank"
-                                               rel="noopener noreferrer"
-                                               {% matomo_event "employeurs" "clic" "suggerer-suite-parcours-liste" %}>Suggérer une suite de parcours</a>
+                                        {% if job_seeker.show_create_pro_support_report %}
+                                            <a href="{% url 'job_seekers_views:create_pro_support_report' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="dropdown-item"
+                                               {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Remplir le bilan</a>
                                         {% endif %}
                                         {% if request.current_organization.is_authorized %}
                                             {% if not job_seeker.has_valid_approval %}

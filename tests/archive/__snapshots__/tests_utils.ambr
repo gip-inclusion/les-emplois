@@ -87,6 +87,16 @@
       'model': 'companies.Contract',
     }),
     dict({
+      'field': 'author',
+      'hidden': True,
+      'model': 'companies.ProSupportReport',
+    }),
+    dict({
+      'field': 'notified_prescriber',
+      'hidden': True,
+      'model': 'companies.ProSupportReport',
+    }),
+    dict({
       'field': 'reactivated_by',
       'hidden': False,
       'model': 'companies.SiaeConvention',
@@ -244,6 +254,11 @@
       'field': 'user',
       'hidden': False,
       'model': 'companies.CompanyMembership',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'companies.ProSupportReport',
     }),
     dict({
       'field': 'user',
