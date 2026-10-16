@@ -142,7 +142,9 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
         return "Contacter le service"
 
     def get_context_data(self, **kwargs):
-        can_view_modal = bool(self.object.contact_full_name or self.object.contact_email or self.object.contact_phone)
+        can_view_contact_modal = bool(
+            self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
+        )
         return (
             super().get_context_data(**kwargs)
             | get_orient_for_job_seeker_context(self.request)
@@ -154,7 +156,7 @@ class ServiceDetailView(LoginNotRequiredMixin, ReadonlyViewMixin, DetailView):
                 "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "formatted_categories": self.format_categories(),
                 "contact_button_label": self.get_contact_button_label(),
-                "can_view_modal": can_view_modal,
+                "can_view_contact_modal": can_view_contact_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
             }
         )
