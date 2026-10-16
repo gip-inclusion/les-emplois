@@ -39,7 +39,6 @@ def handle_service_answer_email(email):
         )
     else:
         mobilization_email.answered_at = sent_at
-
         if mobilization_email.service.contact_email != email["From"]["Address"]:
             logger.info(
                 "service=%s replied to mobilization_email=%d with an address different from contact_email",
