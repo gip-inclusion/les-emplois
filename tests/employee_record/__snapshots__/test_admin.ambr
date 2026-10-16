@@ -29,6 +29,7 @@
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_disable" type="submit" value="Désactivée"/>
+      <input class="danger js-with-confirm" name="transition_retry_modification" type="submit" value="Mise à jour planifiée"/>
   </div>
   
   '''
@@ -69,7 +70,18 @@
   
   '''
 # ---
-# name: test_available_transitions_for_unarchive[0000]
+# name: test_available_transitions_for_unarchive[-None]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+      <p>
+          Changer l'état de la fiche salarié :
+      </p>
+      <input class="danger js-with-confirm" name="transition_unarchive_new" type="submit" value="Nouvelle"/>
+  </div>
+  
+  '''
+# ---
+# name: test_available_transitions_for_unarchive[0000-None]
   '''
   <div class="submit-row" id="employee-record-transitions">
       <p>
@@ -80,7 +92,18 @@
   
   '''
 # ---
-# name: test_available_transitions_for_unarchive[32##]
+# name: test_available_transitions_for_unarchive[32##-MODIFICATION_REJECTED]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+      <p>
+          Changer l'état de la fiche salarié :
+      </p>
+      <input class="danger js-with-confirm" name="transition_unarchive_modification_rejected" type="submit" value="Mise à jour en erreur"/>
+  </div>
+  
+  '''
+# ---
+# name: test_available_transitions_for_unarchive[32##-REJECTED]
   '''
   <div class="submit-row" id="employee-record-transitions">
       <p>
@@ -91,24 +114,13 @@
   
   '''
 # ---
-# name: test_available_transitions_for_unarchive[3436]
+# name: test_available_transitions_for_unarchive[3436-None]
   '''
   <div class="submit-row" id="employee-record-transitions">
       <p>
           Changer l'état de la fiche salarié :
       </p>
       <input class="danger js-with-confirm" name="transition_unarchive_processed" type="submit" value="Intégrée"/>
-  </div>
-  
-  '''
-# ---
-# name: test_available_transitions_for_unarchive[]
-  '''
-  <div class="submit-row" id="employee-record-transitions">
-      <p>
-          Changer l'état de la fiche salarié :
-      </p>
-      <input class="danger js-with-confirm" name="transition_unarchive_new" type="submit" value="Nouvelle"/>
   </div>
   
   '''

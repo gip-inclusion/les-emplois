@@ -166,3 +166,60 @@ def test_batch_size_continue(caplog, mocker):
         "Migrated 0 EmployeeRecordUpdateNotification to 0 EmployeeRecordTransitionLog",
         "Stored last migrated employee record - pk=0",
     ]
+
+
+def test_management_command_disabling_employee_record(caplog, faker):
+    employee_record = factories.EmployeeRecordFactory()
+    factories.EmployeeRecordUpdateNotificationFactory(
+        employee_record=employee_record,
+        status=NotificationStatus.REJECTED,
+        asp_batch_file=EmployeeRecordBatch.get_remote_path(),
+        asp_batch_line_number=42,
+        archived_json={"notification": "rejected_notification_not_last"},
+        asp_processing_label="Something processed",
+        asp_processing_code=EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE,
+    )
+    factories.EmployeeRecordUpdateNotificationFactory(
+        employee_record=employee_record,
+        status=NotificationStatus.SENT,
+        asp_batch_file=EmployeeRecordBatch.get_remote_path(),
+        asp_batch_line_number=43,
+        archived_json={"notification": "sent_notification_ignored"},
+    )
+
+    records_with_3436 = {}
+    for idx, status in enumerate(Status, start=1):
+        # Create 10 records with different status but all with a final 3446 update notification
+        records_with_3436[status] = factories.EmployeeRecordUpdateNotificationFactory(
+            employee_record__status=status,
+            status=NotificationStatus.REJECTED,
+            asp_batch_file=EmployeeRecordBatch.get_remote_path(),
+            asp_batch_line_number=idx,
+            archived_json={"notification": "rejected_notification_last"},
+            asp_processing_label="Something errored",
+            asp_processing_code=EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE,
+        ).employee_record
+
+    call_command("migrate_employee_record_update_notifications", wet_run=True, include_last_rejected=True)
+    assert process_output(caplog.messages)[-2:] == [
+        "Migrated 11 EmployeeRecordUpdateNotification to 33 EmployeeRecordTransitionLog",
+        f"Stored last migrated employee record - pk={records_with_3436[list(Status)[-1]].pk}",
+    ]
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.NEW
+
+    for record in records_with_3436.values():
+        record.refresh_from_db()
+
+    for status in Status:
+        if status in [
+            Status.ARCHIVED,
+            Status.DISABLED,
+            Status.READY,
+            Status.MODIFICATION_PENDING,
+            Status.SENT,
+            Status.MODIFICATION_SENT,
+        ]:
+            assert records_with_3436[status].status == status  # Status unchanged
+        else:
+            assert records_with_3436[status].status == Status.DISABLED
