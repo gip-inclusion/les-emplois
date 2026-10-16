@@ -597,12 +597,27 @@ class MobilizationEmail(models.Model):
         sender_organization = self.sender_prescriber_organization or self.sender_company
 
         to = [self.service.contact_email]
+        # todo: add name?
         reply_to = [inbound_parsing_email]
         context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
 
         subject = "insertion/email/free_form_email_to_service_subject.txt"
         body = "insertion/email/free_form_email_body.md"
         return get_email_message(to, context, subject, body, reply_to=reply_to)
+
+    def free_form_email_to_sender(self, body_message, signature, email_from):
+        # todo: same conversation id?
+        sender_organization = self.sender_prescriber_organization or self.sender_company
+
+        to = [self.sender.email]
+        # todo: add contact_name?
+        # reply_to = [self.service.contact_email]
+        body_message += "\n" + signature
+        context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
+
+        subject = "insertion/email/free_form_email_to_sender_subject.txt"
+        body = "insertion/email/free_form_email_body.md"
+        return get_email_message(to, context, subject, body, reply_to=[email_from])
 
 
 class OrientationWorkflow(xwf_models.Workflow):

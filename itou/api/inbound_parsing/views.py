@@ -26,7 +26,11 @@ def handle_service_answer_email(email):
         sent_at = timezone.now()
 
     try:
-        mobilization_email = MobilizationEmail.objects.filter(inbound_parsing_key=key).select_related("service").get()
+        mobilization_email = (
+            MobilizationEmail.objects.filter(inbound_parsing_key=key)
+            .select_related("service", "sender", "sender_prescriber_organization", "sender_company")
+            .get()
+        )
     except MobilizationEmail.DoesNotExist:
         logger.error("no mobilization_email found for inbound_parsing_address=%s", inbound_parsing_address)
         return
@@ -39,13 +43,22 @@ def handle_service_answer_email(email):
         )
     else:
         mobilization_email.answered_at = sent_at
-        if mobilization_email.service.contact_email != email["From"]["Address"]:
-            logger.info(
-                "service=%s replied to mobilization_email=%d with an address different from contact_email",
-                mobilization_email.service.uid,
-                mobilization_email.pk,
-            )
         mobilization_email.save(update_fields=["answered_at"])
+
+    email_from = email["From"]["Address"]
+    if mobilization_email.service.contact_email != email_from:
+        logger.info(
+            "service=%s replied to mobilization_email=%d with an address different from contact_email",
+            mobilization_email.service.uid,
+            mobilization_email.pk,
+        )
+
+    # Always send the message to the orientation sender
+    message = email.get("ExtractedMarkdownMessage")
+    signature = email.get("ExtractedMarkdownSignature")
+    mobilization_email.free_form_email_to_sender(
+        body_message=message, signature=signature, email_from=email_from
+    ).send()
 
 
 KIND_MAPPING = {InboundParsingKind.SERVICE_ANSWER: handle_service_answer_email}
