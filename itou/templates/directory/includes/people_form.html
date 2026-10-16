@@ -1,0 +1,14 @@
+{% load django_bootstrap5 %}
+
+{% bootstrap_form_errors form type="all" %}
+<div class="input-group input-group-xl input-group-search mb-3">
+    <label class="input-group-text" for="{{ form.q.id_for_label }}">
+        <span class="visually-hidden">{{ form.q.label }}</span>
+        <i class="ri-user-search-line" aria-hidden="true"></i>
+    </label>
+    {{ form.q }}
+</div>
+<div class="btn-dropdown-filter-group">
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.types only %}
+    {% include "directory/includes/people_list_reset_filters.html" with request=request show_reset=form.has_changed only %}
+</div>

@@ -1,0 +1,167 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}{{ person.full_name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ person.full_name }}</h1>
+            <p class="mb-0 text-muted">{{ person.kind_label }} · {{ person.main_organization.name }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row g-4 align-items-start">
+                <div class="col-4">
+                    <div class="c-box border-info border-2 bg-info-lightest mb-3">
+                        <h2 class="h3">Coordonnées partagées</h2>
+                        <hr>
+                        <div class="d-grid gap-3">
+                            <div>
+                                <p class="fs-sm mb-1">Téléphone</p>
+                                {% if person.phone %}
+                                    <button type="button" class="btn btn-link btn-ico p-0 text-start js-reveal">
+                                        <i class="ri-phone-line" aria-hidden="true"></i>
+                                        <span>Afficher le téléphone</span>
+                                    </button>
+                                    {% include "directory/includes/contact_value.html" with label="Téléphone" value=person.phone only %}
+                                {% else %}
+                                    <p class="mb-0">Non renseigné</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="fs-sm mb-1">Courriel</p>
+                                {% if person.email %}
+                                    <button type="button" class="btn btn-link btn-ico p-0 text-start js-reveal">
+                                        <i class="ri-mail-line" aria-hidden="true"></i>
+                                        <span>Afficher l'adresse e-mail</span>
+                                    </button>
+                                    {% include "directory/includes/contact_value.html" with label="Adresse e-mail" value=person.email only %}
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="c-box">
+                        <button type="button"
+                                class="btn btn-outline-transparent has-collapse-caret collapsed d-flex align-items-center gap-3 w-100 p-0 text-start"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#struct-details"
+                                aria-expanded="false"
+                                aria-controls="struct-details">
+                            <span class="bg-info-lighter text-info rounded p-2">
+                                <i class="ri-building-line ri-xl" aria-hidden="true"></i>
+                            </span>
+                            <span class="flex-grow-1">
+                                {% if person.main_organization.kind_label %}
+                                    <span class="d-block fs-sm text-muted fw-normal">{{ person.main_organization.kind_label }}</span>
+                                {% endif %}
+                                <span class="d-block">{{ person.main_organization.name }}</span>
+                            </span>
+                        </button>
+                        <div id="struct-details" class="collapse">
+                            <hr>
+                            {% if person.main_organization.address %}
+                                <address>
+                                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ person.main_organization.address|urlencode }}"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="has-external-link">{{ person.main_organization.address }}</a>
+                                </address>
+                            {% endif %}
+                            {% if person.main_organization.phone %}
+                                <button type="button"
+                                        class="btn btn-link btn-ico p-0 text-start mb-2 d-flex js-reveal"
+                                        aria-label="Afficher le téléphone de la structure">
+                                    <i class="ri-phone-line" aria-hidden="true"></i>
+                                    <span>Afficher le téléphone</span>
+                                </button>
+                                {% include "directory/includes/contact_value.html" with label="Téléphone de la structure" value=person.main_organization.phone only %}
+                            {% endif %}
+                            {% if person.main_organization.email %}
+                                <button type="button"
+                                        class="btn btn-link btn-ico p-0 text-start mb-2 d-flex js-reveal"
+                                        aria-label="Afficher l'adresse e-mail de la structure">
+                                    <i class="ri-mail-line" aria-hidden="true"></i>
+                                    <span>Afficher l'adresse e-mail</span>
+                                </button>
+                                {% include "directory/includes/contact_value.html" with label="Adresse e-mail de la structure" value=person.main_organization.email only %}
+                            {% endif %}
+                            {% if person.main_organization.website %}
+                                <p>
+                                    <a href="{{ person.main_organization.website }}"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="has-external-link text-break">{{ person.main_organization.website }}</a>
+                                </p>
+                            {% endif %}
+                            {% if person.main_organization.card_url %}
+                                <a href="{{ person.main_organization.card_url }}"
+                                   class="btn btn-sm btn-outline-primary w-100 mt-2">Voir la fiche structure</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-8">
+                    <div class="c-box">
+                        {% if rate_limited_message %}
+                            {% component_alert content=content variant="danger" icon=False %}
+                                {% fragment as content %}
+                                    <p class="mb-0">{{ rate_limited_message }}</p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                        {% else %}
+                            <h2 class="h3">Envoyer un message à {{ person.full_name }}</h2>
+                            <hr>
+                            <p class="text-muted fs-sm">
+                                <i class="ri-information-line" aria-hidden="true"></i>
+                                Ce formulaire est destiné aux échanges entre professionnels — veillons à ne pas nous sursolliciter.
+                                Pour orienter une personne, privilégiez les formulaires de candidature ou de prescription disponibles sur la plateforme.
+                            </p>
+                            <form id="contact-form"
+                                  method="post"
+                                  action="{% url 'directory:send_message' key=person.key %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="back_url" value="{{ back_url }}">
+                                {% bootstrap_form contact_form alert_error_type="all" %}
+                                <button type="submit" class="btn btn-primary js-prevent-multiple-submit">
+                                    <i class="ri-send-plane-line" aria-hidden="true"></i>
+                                    <span>Envoyer</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/htmx_compat.js' %}"></script>
+    <script src="{% static 'js/directory.js' %}"></script>
+    {% include "directory/includes/feedback.html" %}
+    <script nonce="{{ csp_nonce }}">
+        htmx.onLoad(function(target) {
+            target.getElementsByClassName("js-reveal").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    btn.nextElementSibling.classList.remove("d-none");
+                    btn.classList.add("d-none");
+                });
+            });
+        });
+    </script>
+{% endblock %}
