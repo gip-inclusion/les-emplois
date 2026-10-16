@@ -1,3 +1,4 @@
+{% load badges %}
 {% load datetime_filters %}
 {% load matomo %}
 
@@ -24,7 +25,7 @@
                 {% for participation in participations %}
                     <tr>
                         <td>
-                            <span class="badge badge-xs rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
+                            {% participation_status_badge participation.status participation.appointment.start_at extra_classes="badge-xs" %}
                         </td>
                         <td>{{ participation.appointment.start_at }}</td>
                         <td>{{ participation.appointment.reason }}</td>
@@ -55,9 +56,7 @@
                                                     aria-label="Fermer"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>
-                                                <span class="badge badge-sm rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
-                                            </p>
+                                            <p>{% participation_status_badge participation.status participation.appointment.start_at %}</p>
                                             <p>
                                                 Date et heure : <strong>{{ participation.appointment.start_at|date:"d/m/Y \à H\hi" }}</strong>
                                                 <br>

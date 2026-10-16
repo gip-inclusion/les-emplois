@@ -15,9 +15,14 @@ from pytest_django.asserts import assertHTMLEqual
 
 from itou.insertion.enums import OrientationStatus
 from itou.job_applications.enums import JobApplicationState
+from itou.rdv_insertion.enums import ParticipationStatus
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.templatetags.badges import criterion_certification_badge, orientation_state_badge
+from itou.utils.templatetags.badges import (
+    criterion_certification_badge,
+    orientation_state_badge,
+    participation_status_badge,
+)
 from itou.utils.templatetags.demo_accounts import (
     employers_accounts_tag,
     job_seekers_accounts_tag,
@@ -387,3 +392,51 @@ class TestUrlizeNewTab:
 def test_orientation_state_badge(status, snapshot):
     orientation = OrientationFactory(status=status)
     assert str(orientation_state_badge(orientation)).replace(str(orientation.id), "[PK of Orientation]") == snapshot
+
+
+@freeze_time("2024-08-01")
+@pytest.mark.parametrize(
+    "status, start_at, expected_classes, expected_label",
+    [
+        (
+            ParticipationStatus.UNKNOWN,
+            datetime(2024, 8, 2, tzinfo=UTC),
+            "bg-important-lightest text-important",
+            "RDV à venir",
+        ),
+        (
+            ParticipationStatus.UNKNOWN,
+            datetime(2024, 7, 31, tzinfo=UTC),
+            "bg-important-lightest text-important",
+            "Statut du RDV à préciser",
+        ),
+        (
+            ParticipationStatus.SEEN,
+            datetime(2024, 7, 31, tzinfo=UTC),
+            "bg-success-lighter text-success",
+            "RDV honoré",
+        ),
+        (
+            ParticipationStatus.REVOKED,
+            datetime(2024, 7, 31, tzinfo=UTC),
+            "bg-warning-lighter text-warning",
+            "RDV annulé à l’initiative du service",
+        ),
+        (
+            ParticipationStatus.EXCUSED,
+            datetime(2024, 7, 31, tzinfo=UTC),
+            "bg-warning-lighter text-warning",
+            "RDV annulé à l’initiative de l’usager",
+        ),
+        (
+            ParticipationStatus.NOSHOW,
+            datetime(2024, 7, 31, tzinfo=UTC),
+            "bg-danger-lighter text-danger",
+            "Absence non excusée au RDV",
+        ),
+    ],
+)
+def test_participation_status_badge(status, start_at, expected_classes, expected_label):
+    assert participation_status_badge(status, start_at) == (
+        f'<span class="badge badge-sm rounded-pill {expected_classes}">{expected_label}</span>'
+    )
