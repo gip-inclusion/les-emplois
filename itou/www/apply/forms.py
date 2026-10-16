@@ -30,6 +30,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
 from itou.users.models import JobSeekerProfile, User
+from itou.users.utils import auto_clear_last_name_if_same_as_birth_name
 from itou.utils import constants as global_constants
 from itou.utils.choices import get_choices_label
 from itou.utils.perms.utils import can_view_personal_information
@@ -786,6 +787,7 @@ class JobSeekerPersonalDataForm(
     JobSeekerNIRUpdateMixin, PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, forms.ModelForm
 ):
     PROFILE_FIELDS = [
+        "birth_name",
         "pole_emploi_id",
         "lack_of_pole_emploi_id_reason",
         "nir",
@@ -794,10 +796,20 @@ class JobSeekerPersonalDataForm(
 
     class Meta:
         model = User
-        fields = []
+        fields = ["last_name"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance.jobseeker_profile.birth_name:
+            del self.fields["last_name"]
+            del self.fields["birth_name"]
+        else:
+            self.fields["birth_name"].required = True
+            self.fields["last_name"].label = "Nom d’usage"
+            self.fields[
+                "last_name"
+            ].help_text = "À renseigner si différent du nom de naissance (Exemple : nom marital)"
+
         if self.instance.jobseeker_profile.nir:
             del self.fields["nir"]
             del self.fields["lack_of_nir"]
@@ -809,6 +821,10 @@ class JobSeekerPersonalDataForm(
         ):
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
+
+    def clean(self):
+        super().clean()
+        auto_clear_last_name_if_same_as_birth_name(self)
 
 
 class BirthDateForm(forms.ModelForm):

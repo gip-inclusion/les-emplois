@@ -16,7 +16,7 @@ L'employeur souhaite vous apporter des explications supplémentaires par télép
 - Numéro de téléphone de l’employeur : {{ prolongation_request.contact_phone }}{% endif %}
 - Numéro de PASS : {{ prolongation_request.approval.number }}
 - Prénom : {{ prolongation_request.approval.user.first_name|title }}
-- Nom : {{ prolongation_request.approval.user.last_name|upper }}
+- Nom : {{ prolongation_request.approval.user.get_last_name_for_display|upper }}
 - Date de naissance : {{ prolongation_request.approval.user.jobseeker_profile.birthdate|date:"d/m/Y" }}
 - Début de la prolongation : {{ prolongation_request.start_at|date:"d/m/Y" }}
 - Fin de la prolongation : {{ prolongation_request.end_at|date:"d/m/Y" }}

@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
-from django.db.models.functions import Coalesce, Concat, Lower
+from django.db.models.functions import Coalesce, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -784,8 +784,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
 
     queryset = (
-        queryset.annotate(
-            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
+        queryset.annotate_with_last_name_for_display()
+        .annotate(
+            full_name=Lower("last_name_for_display"),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
@@ -1344,6 +1345,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         session_birthdate = self.job_seeker_session.get("profile", {}).get("birthdate")
+        session_birth_name = self.job_seeker_session.get("profile", {}).get("birth_name")
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
         prefilled_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
@@ -1358,6 +1360,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
+                "birth_name": session_birth_name,
                 "birthdate": session_birthdate,
                 "nir": session_nir,
                 "lack_of_nir_reason": session_lack_of_nir_reason,
@@ -1370,10 +1373,11 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         context = self.get_context_data(**kwargs)
         if self.form.is_valid():
             existing_job_seeker = User.objects.filter(
+                Q(last_name__unaccent__iexact=self.form.cleaned_data["last_name"])
+                | Q(jobseeker_profile__birth_name__unaccent__iexact=self.form.cleaned_data["last_name"]),
                 kind=UserKind.JOB_SEEKER,
                 jobseeker_profile__birthdate=self.form.cleaned_data["birthdate"],
                 first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
-                last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
             ).first()
             if existing_job_seeker:
                 # If an existing job seeker matches the info, block its creation
