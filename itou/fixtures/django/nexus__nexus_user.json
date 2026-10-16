@@ -1,0 +1,594 @@
+[
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer20@inclusion.gouv.fr",
+      "first_name": "Véronique",
+      "kind": "GUIDE",
+      "last_login": "2020-10-17T23:29:04.116Z",
+      "last_name": "Faure",
+      "phone": "02 78 12 05 00",
+      "source": "dora",
+      "source_id": "01f63f5f-1e10-4178-900b-1c2ed8aabae6",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--01f63f5f-1e10-4178-900b-1c2ed8aabae6"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer15@inclusion.gouv.fr",
+      "first_name": "Roger-Éric",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2022-08-02T12:51:02.583Z",
+      "last_name": "Turpin-Leclerc",
+      "phone": "+33 (0)5 61 93 48 97",
+      "source": "dora",
+      "source_id": "04ab208d-3174-43b0-bfae-a018c6040e92",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--04ab208d-3174-43b0-bfae-a018c6040e92"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer19@inclusion.gouv.fr",
+      "first_name": "Marie",
+      "kind": "GUIDE",
+      "last_login": "2026-09-14T19:01:28.914Z",
+      "last_name": "Roy",
+      "phone": "0498941451",
+      "source": "dora",
+      "source_id": "0c25b2e2-56ba-44b8-bb4f-2684d0947b94",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--0c25b2e2-56ba-44b8-bb4f-2684d0947b94"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer14@inclusion.gouv.fr",
+      "first_name": "Thierry-Frédérique",
+      "kind": "GUIDE",
+      "last_login": "2021-01-24T21:10:03.975Z",
+      "last_name": "Ferrand-Hernandez",
+      "phone": "02 46 03 87 41",
+      "source": "dora",
+      "source_id": "1a261658-59b3-4b64-a1da-a87c5192cb7c",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--1a261658-59b3-4b64-a1da-a87c5192cb7c"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer32@inclusion.gouv.fr",
+      "first_name": "Daniel",
+      "kind": "GUIDE",
+      "last_login": "2021-09-28T04:10:37.372Z",
+      "last_name": "Nicolas",
+      "phone": "+33 (0)4 42 20 86 03",
+      "source": "dora",
+      "source_id": "1e1377c6-d781-4b91-a335-14a2711bf58a",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--1e1377c6-d781-4b91-a335-14a2711bf58a"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer27@inclusion.gouv.fr",
+      "first_name": "Hugues-Gabrielle",
+      "kind": "GUIDE",
+      "last_login": "2020-07-30T15:26:18.468Z",
+      "last_name": "Simon-Letellier",
+      "phone": "+33 (0)3 53 94 59 69",
+      "source": "dora",
+      "source_id": "261e2f77-2e7e-4baf-8e93-759ed1399112",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--261e2f77-2e7e-4baf-8e93-759ed1399112"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer1@inclusion.gouv.fr",
+      "first_name": "Charles-Stéphanie",
+      "kind": "GUIDE",
+      "last_login": "2020-10-17T08:38:14.593Z",
+      "last_name": "Marchal",
+      "phone": "+33 4 23 49 41 12",
+      "source": "dora",
+      "source_id": "297dac14-23f8-41ef-b04e-481f01f08178",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--297dac14-23f8-41ef-b04e-481f01f08178"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer18@inclusion.gouv.fr",
+      "first_name": "Hélène-Jeannine",
+      "kind": "GUIDE",
+      "last_login": "2025-03-05T01:29:28.969Z",
+      "last_name": "Becker-Louis",
+      "phone": "05 34 04 90 12",
+      "source": "dora",
+      "source_id": "30707ba8-cafe-4582-89b7-3cac04991f81",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--30707ba8-cafe-4582-89b7-3cac04991f81"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer24@inclusion.gouv.fr",
+      "first_name": "Chantal-François",
+      "kind": "GUIDE",
+      "last_login": "2026-09-22T08:34:29.531Z",
+      "last_name": "Charrier",
+      "phone": "+33 (0)2 34 22 56 20",
+      "source": "dora",
+      "source_id": "3923112a-4d76-44bb-93c6-e56a2fb1d51e",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--3923112a-4d76-44bb-93c6-e56a2fb1d51e"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer33@inclusion.gouv.fr",
+      "first_name": "Alfred",
+      "kind": "GUIDE",
+      "last_login": "2021-02-16T22:51:57.988Z",
+      "last_name": "Durand",
+      "phone": "+33 (0)6 08 89 49 49",
+      "source": "dora",
+      "source_id": "40619a25-b0c2-4fe4-a65f-54434b221d45",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--40619a25-b0c2-4fe4-a65f-54434b221d45"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer13@inclusion.gouv.fr",
+      "first_name": "Claude-Rémy",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2025-08-08T15:59:29.145Z",
+      "last_name": "Teixeira",
+      "phone": "06 95 83 96 70",
+      "source": "dora",
+      "source_id": "4b774acb-e427-4eeb-8c27-d8ba7b554cbb",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--4b774acb-e427-4eeb-8c27-d8ba7b554cbb"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer26@inclusion.gouv.fr",
+      "first_name": "Marianne",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2025-11-28T21:39:03.162Z",
+      "last_name": "Guérin-Petit",
+      "phone": "05 19 48 99 69",
+      "source": "dora",
+      "source_id": "4d74f706-36fa-428a-9796-c82ba81e5773",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--4d74f706-36fa-428a-9796-c82ba81e5773"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer10@inclusion.gouv.fr",
+      "first_name": "Augustin-André",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2025-06-23T16:27:38.634Z",
+      "last_name": "Delannoy-Gillet",
+      "phone": "+33 5 56 98 40 37",
+      "source": "dora",
+      "source_id": "587a40b9-dc5c-4d79-961e-d8e8d4936dd8",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--587a40b9-dc5c-4d79-961e-d8e8d4936dd8"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer30@inclusion.gouv.fr",
+      "first_name": "Nath",
+      "kind": "GUIDE",
+      "last_login": "2021-02-27T14:57:49.975Z",
+      "last_name": "Dijoux",
+      "phone": "04 82 91 47 66",
+      "source": "dora",
+      "source_id": "590c6b95-59f3-4a94-9522-309731819572",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--590c6b95-59f3-4a94-9522-309731819572"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer11@inclusion.gouv.fr",
+      "first_name": "Jeannine-Michèle",
+      "kind": "GUIDE",
+      "last_login": "2021-02-12T10:01:06.393Z",
+      "last_name": "Lefèvre-Lelièvre",
+      "phone": "+33 1 45 33 74 43",
+      "source": "dora",
+      "source_id": "5b746e51-29d9-461b-8f66-519056c5e0ae",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--5b746e51-29d9-461b-8f66-519056c5e0ae"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer29@inclusion.gouv.fr",
+      "first_name": "Thierry-Léon",
+      "kind": "GUIDE",
+      "last_login": "2021-02-13T23:25:03.884Z",
+      "last_name": "Lagarde",
+      "phone": "+33 5 19 24 55 07",
+      "source": "dora",
+      "source_id": "6209b6fa-6ca5-4f7c-bec0-4ab6a2dcee08",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--6209b6fa-6ca5-4f7c-bec0-4ab6a2dcee08"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer31@inclusion.gouv.fr",
+      "first_name": "Margaud-Charlotte",
+      "kind": "GUIDE",
+      "last_login": "2025-09-09T09:48:41.319Z",
+      "last_name": "Baron",
+      "phone": "+33 (0)5 65 78 05 72",
+      "source": "dora",
+      "source_id": "63c5d6a4-a7a4-48b7-928e-04fc5bbdcd17",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--63c5d6a4-a7a4-48b7-928e-04fc5bbdcd17"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer16@inclusion.gouv.fr",
+      "first_name": "Éric",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2024-02-27T15:06:07.869Z",
+      "last_name": "Georges",
+      "phone": "0351827882",
+      "source": "dora",
+      "source_id": "740e03a5-5855-4e42-a7b3-b493dc4ce45a",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--740e03a5-5855-4e42-a7b3-b493dc4ce45a"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer2@inclusion.gouv.fr",
+      "first_name": "Pénélope-Élisabeth",
+      "kind": "GUIDE",
+      "last_login": "2024-07-29T11:13:06.898Z",
+      "last_name": "Texier",
+      "phone": "0553400664",
+      "source": "dora",
+      "source_id": "89b29f39-68d7-4b15-a507-134705f58d27",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--89b29f39-68d7-4b15-a507-134705f58d27"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer34@inclusion.gouv.fr",
+      "first_name": "Eugène-Étienne",
+      "kind": "GUIDE",
+      "last_login": "2020-11-17T05:28:51.592Z",
+      "last_name": "Lebrun-Didier",
+      "phone": "+33 (0)3 89 67 57 44",
+      "source": "dora",
+      "source_id": "8d4ad522-5491-4921-9838-9f68dd275f00",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--8d4ad522-5491-4921-9838-9f68dd275f00"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer22@inclusion.gouv.fr",
+      "first_name": "Caroline-Sabine",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2020-05-28T15:50:36.816Z",
+      "last_name": "Deschamps-Torres",
+      "phone": "+33 (0)3 70 45 49 72",
+      "source": "dora",
+      "source_id": "98d9f619-2bb0-4fd5-b37a-cf8c3c820655",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--98d9f619-2bb0-4fd5-b37a-cf8c3c820655"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer5@inclusion.gouv.fr",
+      "first_name": "Emmanuelle",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2026-07-26T10:00:22.366Z",
+      "last_name": "Rey",
+      "phone": "+33 3 45 94 49 91",
+      "source": "dora",
+      "source_id": "9dcd0421-a6cf-4533-a275-e607d7da2a0f",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--9dcd0421-a6cf-4533-a275-e607d7da2a0f"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer21@inclusion.gouv.fr",
+      "first_name": "Stéphanie",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2026-04-18T19:52:45.929Z",
+      "last_name": "Legrand",
+      "phone": "0786301981",
+      "source": "dora",
+      "source_id": "9e67be81-174e-427d-b5e0-ce9b472b9889",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--9e67be81-174e-427d-b5e0-ce9b472b9889"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer7@inclusion.gouv.fr",
+      "first_name": "Margot-Nathalie",
+      "kind": "GUIDE",
+      "last_login": "2025-05-06T14:53:18.596Z",
+      "last_name": "Courtois-Julien",
+      "phone": "0618069396",
+      "source": "dora",
+      "source_id": "a29b1d78-f71d-415d-b351-ac3490d0c81d",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--a29b1d78-f71d-415d-b351-ac3490d0c81d"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer28@inclusion.gouv.fr",
+      "first_name": "Célina",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2020-03-23T01:20:13.868Z",
+      "last_name": "Lévêque",
+      "phone": "+33 (0)5 16 51 24 90",
+      "source": "dora",
+      "source_id": "ab9570b9-2446-4a64-b900-7afa943597bc",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--ab9570b9-2446-4a64-b900-7afa943597bc"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer36@inclusion.gouv.fr",
+      "first_name": "NE SOUHAITE PAS",
+      "kind": "GUIDE",
+      "last_login": "2024-06-25T17:12:27.649Z",
+      "last_name": "APPARAÎTRE",
+      "phone": "+33 2 77 13 64 04",
+      "source": "dora",
+      "source_id": "c6e6ce62-4cdf-42db-81bc-687ce2839a70",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--c6e6ce62-4cdf-42db-81bc-687ce2839a70"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer6@inclusion.gouv.fr",
+      "first_name": "Alfred-Nath",
+      "kind": "GUIDE",
+      "last_login": "2020-03-09T05:24:21.568Z",
+      "last_name": "Delattre-Hardy",
+      "phone": "+33 4 94 71 80 74",
+      "source": "dora",
+      "source_id": "c78db1fa-13fa-460c-b23e-e34d11031ce6",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--c78db1fa-13fa-460c-b23e-e34d11031ce6"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer25@inclusion.gouv.fr",
+      "first_name": "Marianne",
+      "kind": "GUIDE",
+      "last_login": "2021-10-13T00:44:57.095Z",
+      "last_name": "Lemaire-Marchand",
+      "phone": "0147582775",
+      "source": "dora",
+      "source_id": "cb7344b2-f58e-4830-9a3e-2e12ef511e61",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--cb7344b2-f58e-4830-9a3e-2e12ef511e61"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer3@inclusion.gouv.fr",
+      "first_name": "Olivie-Hortense",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2025-12-28T16:46:04.790Z",
+      "last_name": "Aubert-Jacques",
+      "phone": "+33 1 69 30 86 53",
+      "source": "dora",
+      "source_id": "cbf2a370-73f7-40f1-a8d9-08f842253288",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--cbf2a370-73f7-40f1-a8d9-08f842253288"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer23@inclusion.gouv.fr",
+      "first_name": "Andrée-Michel",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2020-08-13T05:42:34.469Z",
+      "last_name": "Imbert",
+      "phone": "0180913308",
+      "source": "dora",
+      "source_id": "d29ec9f6-55ba-420b-9476-c70270c8e722",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--d29ec9f6-55ba-420b-9476-c70270c8e722"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer17@inclusion.gouv.fr",
+      "first_name": "Lucie-Philippe",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2024-09-08T05:29:04.909Z",
+      "last_name": "Masse-Bouvier",
+      "phone": "+33 4 73 34 95 82",
+      "source": "dora",
+      "source_id": "d3e7d3ac-d5db-406f-8657-565b4072e8ec",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--d3e7d3ac-d5db-406f-8657-565b4072e8ec"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+ei@inclusion.gouv.fr",
+      "first_name": "Agathe-Laurent",
+      "kind": "GUIDE",
+      "last_login": "2024-06-17T01:39:53.215Z",
+      "last_name": "Dupré",
+      "phone": "02 19 42 09 95",
+      "source": "dora",
+      "source_id": "d9bd536f-2d2a-427b-8f42-1106eff951d1",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--d9bd536f-2d2a-427b-8f42-1106eff951d1"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer9@inclusion.gouv.fr",
+      "first_name": "Margot",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2023-01-29T15:58:53.478Z",
+      "last_name": "Faure-Peron",
+      "phone": "01 88 40 57 41",
+      "source": "dora",
+      "source_id": "dafd1b1c-8f61-4f71-b973-c081ec5a3e79",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--dafd1b1c-8f61-4f71-b973-c081ec5a3e79"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer35@inclusion.gouv.fr",
+      "first_name": "Jeanne",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2025-09-26T19:07:53.700Z",
+      "last_name": "Pages-Gros",
+      "phone": "+33 1 75 80 34 56",
+      "source": "dora",
+      "source_id": "e15c4bc8-89b9-4bd6-9c03-6fdc766a83a3",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--e15c4bc8-89b9-4bd6-9c03-6fdc766a83a3"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer8@inclusion.gouv.fr",
+      "first_name": "Capucine",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2026-02-08T00:28:16.953Z",
+      "last_name": "Berger-Roux",
+      "phone": "+33 2 36 22 53 44",
+      "source": "dora",
+      "source_id": "ea6711cb-ef22-4151-a130-14870c103aab",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--ea6711cb-ef22-4151-a130-14870c103aab"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer12@inclusion.gouv.fr",
+      "first_name": "Robert-Robert",
+      "kind": "GUIDE",
+      "last_login": "2023-10-05T01:35:19.925Z",
+      "last_name": "Thomas",
+      "phone": "0481911471",
+      "source": "dora",
+      "source_id": "ebe6e117-dee7-4904-8b7c-5ea41436d6d9",
+      "source_kind": "GUIDE"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--ebe6e117-dee7-4904-8b7c-5ea41436d6d9"
+  },
+  {
+    "fields": {
+      "auth": "PRO_CONNECT",
+      "email": "demo.emplois+nexususer4@inclusion.gouv.fr",
+      "first_name": "Noémi-Pénélope",
+      "kind": "FACILITY_MANAGER",
+      "last_login": "2020-11-03T13:27:59.714Z",
+      "last_name": "Dupuis",
+      "phone": "06 34 81 63 86",
+      "source": "dora",
+      "source_id": "f75ca3ef-2469-4104-9e07-2b960c93a670",
+      "source_kind": "FACILITY_MANAGER"
+    },
+    "model": "nexus.nexususer",
+    "pk": "dora--f75ca3ef-2469-4104-9e07-2b960c93a670"
+  }
+]
