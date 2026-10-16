@@ -2,7 +2,6 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
 from itou.rdv_insertion.enums import (
     InvitationRequestReasonCategory,
@@ -161,22 +160,6 @@ class Participation(models.Model):
     class Meta:
         verbose_name = "participation à un événement RDV-I"
         verbose_name_plural = "participations aux événements RDV-I"
-
-    def get_status_display(self):
-        if self.status == self.Status.UNKNOWN:
-            if self.appointment.start_at > timezone.now():
-                return "RDV à venir"
-            return "Statut du RDV à préciser"
-        return self._get_FIELD_display(field=self._meta.get_field("status"))
-
-    def get_status_class_name(self):
-        return {
-            self.Status.UNKNOWN: "bg-important-lightest text-important",
-            self.Status.SEEN: "bg-success-lighter text-success",
-            self.Status.REVOKED: "bg-warning-lighter text-warning",
-            self.Status.EXCUSED: "bg-warning-lighter text-warning",
-            self.Status.NOSHOW: "bg-danger-lighter text-danger",
-        }.get(self.status)
 
 
 class Location(models.Model):
