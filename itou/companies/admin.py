@@ -3,18 +3,15 @@ from pprint import pformat
 
 from django.contrib import admin, messages
 from django.contrib.admin.utils import display_for_value
-from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.shortcuts import get_object_or_404, redirect
-from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
-from itou.companies import enums, models, transfer
-from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
+from itou.common_apps.organizations.views import BaseTransferView
+from itou.companies import enums, models
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanySource
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
@@ -23,7 +20,6 @@ from itou.utils.admin import (
     ItouTabularInline,
     PkSupportRemarkInline,
     ReadonlyMixin,
-    bulk_add_support_remark_to_objs,
     get_admin_view_link,
 )
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -287,144 +283,38 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
         urls = super().get_urls()
         return [
             path(
-                "transfer/<int:from_company_pk>",
-                self.admin_site.admin_view(self.transfer_view),
+                "transfer/<int:from_org_pk>",
+                self.admin_site.admin_view(self.CompanyTransferView.as_view()),
+                {"model_admin": self},
                 name="transfer_company_data",
             ),
             path(
-                "transfer/<int:from_company_pk>/<int:to_company_pk>",
-                self.admin_site.admin_view(self.transfer_view),
+                "transfer/<int:from_org_pk>/<int:to_org_pk>",
+                self.admin_site.admin_view(self.CompanyTransferView.as_view()),
+                {"model_admin": self},
                 name="transfer_company_data",
             ),
         ] + urls
 
-    def transfer_view(self, request, from_company_pk, to_company_pk=None):
-        if not self.has_change_permission(request):
-            raise PermissionDenied
+    class CompanyTransferView(BaseTransferView):
+        model = models.Company
+        queryset = models.Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET)
+        template_name = "admin/organizations/transfer_org.html"
 
-        from_company = get_object_or_404(
-            # we might need to transfer data from a EA/EATT, so we need to use unfiltered_objects,
-            # but we still don't want to allow transferring from France Travail
-            models.Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET),
-            pk=from_company_pk,
-        )
-        to_company = get_object_or_404(models.Company.objects, pk=to_company_pk) if to_company_pk is not None else None
-
-        transfer_data = {}
-        for transfer_field in transfer.TransferField:
-            spec = transfer.TRANSFER_SPECS[transfer_field]
-            if model_field := spec.get("model_field"):
-                from_data = [getattr(from_company, model_field.name)]
-            else:
-                from_data = transfer.get_transfer_queryset(from_company, to_company, spec)
-            transfer_data[transfer_field] = {
-                "data": from_data,
-            }
-
-        if not to_company:
-            form = SelectTargetCompanyForm(
-                from_company=from_company,
-                admin_site=self.admin_site,
-                data=request.POST or None,
+        def get_redirect_url(self, to_org_pk):
+            return reverse(
+                "admin:transfer_company_data",
+                kwargs={
+                    "from_org_pk": self.object.pk,
+                    "to_org_pk": to_org_pk,
+                },
             )
-            if request.POST and form.is_valid():
-                return redirect(
-                    reverse(
-                        "admin:transfer_company_data",
-                        kwargs={
-                            "from_company_pk": from_company.pk,
-                            "to_company_pk": form.cleaned_data["to_company"].pk,
-                        },
-                    )
-                )
-        else:
-            fields_choices = []
-            for transfer_field in transfer.TransferField:
-                spec = transfer.TRANSFER_SPECS[transfer_field]
-                if model_field := spec.get("model_field"):
-                    if transfer_data[transfer_field]["data"] == [getattr(to_company, model_field.name)]:
-                        transfer_data[transfer_field]["data"] = None
-                    else:
-                        fields_choices.append((transfer_field.value, transfer_field.label))
-                elif from_data := transfer_data[transfer_field]["data"]:
-                    s = "s" if len(from_data) > 1 else ""
-                    fields_choices.append(
-                        (
-                            transfer_field.value,
-                            f"{transfer_field.label} ({len(from_data)} objet{s} à transférer)",
-                        )
-                    )
 
-            form = CompanyChooseFieldsToTransfer(
-                fields_choices=sorted(fields_choices, key=lambda field: field[1]),
-                data=request.POST or None,
+        def get_success_url(self):
+            return reverse(
+                "admin:companies_company_change",
+                kwargs={"object_id": self.object.pk},
             )
-            if request.POST and form.is_valid():
-                fields_to_transfer = form.cleaned_data["fields_to_transfer"]
-                disable_from_company = form.cleaned_data["disable_from_company"]
-                try:
-                    reporter = transfer.transfer_company_data(
-                        from_company,
-                        to_company,
-                        fields_to_transfer=fields_to_transfer,
-                        disable_from_company=disable_from_company,
-                    )
-                except transfer.TransferError as e:
-                    messages.error(request, e.args[0])
-                else:
-                    summary_lines = [
-                        "-" * 20,
-                        f"Transfert du {timezone.now():%Y-%m-%d %H:%M:%S} effectué par {request.user} ",
-                        f"de l'entreprise {from_company.pk} vers {to_company.pk}:",
-                    ]
-                    for report_field, items in reporter.changes.items():
-                        if items:
-                            summary_lines.extend([f"- {report_field.label}:"] + [f"  * {item}" for item in items])
-                    summary_lines += ["-" * 20]
-                    summary_text = "\n".join(summary_lines)
-                    bulk_add_support_remark_to_objs([from_company, to_company], summary_text)
-                    message = format_html(
-                        "Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
-                        from_company=from_company,
-                        to_company=to_company,
-                    )
-                    messages.info(request, message)
-                    logger.info(
-                        "staff user=%d transferred company=%d to company=%d with fields_to_transfer=%s, "
-                        "disable_from_company=%s",
-                        request.user.pk,
-                        from_company.pk,
-                        to_company.pk,
-                        fields_to_transfer,
-                        disable_from_company,
-                    )
-
-                    return redirect(
-                        reverse(
-                            "admin:companies_company_change",
-                            kwargs={"object_id": from_company.pk},
-                        )
-                    )
-        title = f"Transfert des données de '{from_company}' [{from_company.kind}]"
-        if to_company:
-            title += f" vers '{to_company}' [{to_company.kind}]"
-        context = self.admin_site.each_context(request) | {
-            "media": self.media,
-            "opts": self.opts,
-            "form": form,
-            "from_company": from_company,
-            "to_company": to_company,
-            "transfer_data": transfer_data,
-            "title": title,
-            "subtitle": None,
-            "has_view_permission": self.has_view_permission(request),
-        }
-
-        return TemplateResponse(
-            request,
-            "admin/companies/transfer_company.html",
-            context,
-        )
 
 
 @admin.register(models.SiaeACIConvergencePHC)

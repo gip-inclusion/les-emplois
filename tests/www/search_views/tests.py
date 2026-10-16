@@ -781,6 +781,21 @@ class TestSearchPrescriber:
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
+    def test_is_searchable(self, client):
+        city = create_city_vannes()
+        url = reverse("search:prescribers_results", query={"city": city.slug})
+        searchable_org = PrescriberOrganizationFactory(
+            department="44", coords=city.coords, post_code="44117", authorized=True
+        )
+        unsearchable_org = PrescriberOrganizationFactory(
+            department="44", coords=city.coords, post_code="44117", is_searchable=False, authorized=True
+        )
+
+        # A searchable authorized prescriber organization (default) should appear in the results
+        response = client.get(url)
+        assertContains(response, f"<h3>{searchable_org.display_name}</h3>")
+        assertNotContains(response, f"<h3>{unsearchable_org.display_name}</h3>")
+
 
 class TestJobDescriptionSearchView:
     URL = reverse_lazy("search:job_descriptions_results")

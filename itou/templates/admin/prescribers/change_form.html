@@ -41,3 +41,15 @@
         });
     </script>
 {% endblock %}
+
+{% block object-tools-items %}
+
+    {% if has_change_permission %}
+        <li>
+            <a href="{% url 'admin:transfer_prescriberorg_data' from_org_pk=original.pk %}">Transférer</a>
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+
+{% endblock %}

@@ -359,6 +359,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
 
         prescriber_orgs = PrescriberOrganization.objects.filter(
             authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            is_searchable=True,
         )
         if category:
             prescriber_orgs = prescriber_orgs.filter(kind__in=kinds_for_category(category))

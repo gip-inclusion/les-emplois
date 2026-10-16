@@ -317,7 +317,7 @@ class TestTransferCompanyData:
 
     def test_transfer_button(self, client):
         company = CompanyFactory()
-        transfer_url = reverse("admin:transfer_company_data", kwargs={"from_company_pk": company.pk})
+        transfer_url = reverse("admin:transfer_company_data", kwargs={"from_org_pk": company.pk})
 
         # Basic staff users without write access don't see the button
         admin_user = ItouStaffFactory()
@@ -336,9 +336,9 @@ class TestTransferCompanyData:
     def test_transfer_without_change_permission(self, client):
         from_company = CompanyFactory()
         to_company = CompanyFactory()
-        transfer_url_1 = reverse("admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk})
+        transfer_url_1 = reverse("admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk})
         transfer_url_2 = reverse(
-            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+            "admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk, "to_org_pk": to_company.pk}
         )
 
         admin_user = ItouStaffFactory()
@@ -357,17 +357,17 @@ class TestTransferCompanyData:
         from_company = job_application.to_company
         to_company = CompanyFactory()
 
-        transfer_url_1 = reverse("admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk})
+        transfer_url_1 = reverse("admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk})
         transfer_url_2 = reverse(
-            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+            "admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk, "to_org_pk": to_company.pk}
         )
         response = admin_client.get(transfer_url_1)
         assertContains(response, self.CHOOSE_TARGET_TEXT, html=True)
         # Select same company
-        response = admin_client.post(transfer_url_1, data={"to_company": from_company.pk})
+        response = admin_client.post(transfer_url_1, data={"to_org": from_company.pk})
         assertContains(response, "L’entreprise cible doit être différente de celle d’origine", html=True)
         # Select valid target
-        response = admin_client.post(transfer_url_1, data={"to_company": to_company.pk})
+        response = admin_client.post(transfer_url_1, data={"to_org": to_company.pk})
         assertRedirects(response, transfer_url_2, fetch_redirect_response=False)
 
         response = admin_client.get(transfer_url_2)
@@ -400,7 +400,7 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert (
             f"staff user={get_user(admin_client).pk} transferred company={from_company.pk} to company={to_company.pk}"
-            " with fields_to_transfer=['job_applications_received'], disable_from_company=False" in caplog.messages
+            " with fields_to_transfer=['job_applications_received'], post_transfer_action=None" in caplog.messages
         )
 
     @freeze_time("2023-08-31 12:34:56")
@@ -417,7 +417,7 @@ class TestTransferCompanyData:
         to_company = CompanyFactory(is_searchable=False)
 
         transfer_url = reverse(
-            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+            "admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk, "to_org_pk": to_company.pk}
         )
 
         response = admin_client.get(transfer_url)
@@ -428,7 +428,7 @@ class TestTransferCompanyData:
             transfer_url,
             data={
                 "fields_to_transfer": ["job_applications_received", "invitations", "is_searchable"],
-                "disable_from_company": True,
+                "disable_from_org": True,
             },
         )
         assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
@@ -468,7 +468,7 @@ class TestTransferCompanyData:
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "Candidatures reçues" in remark
         assert (
-            f"Désactivation entreprise avec désactivation des membres:\n  * companies.Company[{from_company.pk}]"
+            f"Désactivation structure avec désactivation des membres:\n  * companies.Company[{from_company.pk}]"
             in remark
         )
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
@@ -501,7 +501,7 @@ class TestTransferCompanyData:
             CompanyMembership(company=to_company, **{**default_args, field: value_in_to_company}).save()
 
         transfer_url = reverse(
-            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+            "admin:transfer_company_data", kwargs={"from_org_pk": from_company.pk, "to_org_pk": to_company.pk}
         )
 
         response = admin_client.get(transfer_url)
@@ -512,7 +512,7 @@ class TestTransferCompanyData:
 
             response = admin_client.post(
                 transfer_url,
-                data={"fields_to_transfer": ["memberships"], "disable_from_company": False},
+                data={"fields_to_transfer": ["memberships"], "disable_from_org": False},
             )
             assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
             assertMessages(

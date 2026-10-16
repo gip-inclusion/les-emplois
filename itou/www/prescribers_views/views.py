@@ -23,6 +23,7 @@ def card(request, org_id, template_name="prescribers/card.html"):
         PrescriberOrganization,
         pk=org_id,
         authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        is_searchable=True,
     )
     back_url = get_safe_url(request, "back_url")
     context = {
