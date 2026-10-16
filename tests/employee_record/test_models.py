@@ -10,6 +10,7 @@ import pgtrigger
 import pytest
 import xworkflows
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
@@ -29,6 +30,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import Title
 from itou.utils import triggers
+from itou.utils.admin import get_admin_url
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -1146,21 +1148,30 @@ def test_watched_data_updated_at_race_condition(faker):
 
 
 @pytest.mark.parametrize(
-    "new_asp_uid,ready_for_transfer,profile_duplicate,expected_status,profile_updated",
+    "new_asp_uid,ready_for_transfer,profile_duplicate,expected_status,profile_updated,email_expected",
     [
         # Nominal case
-        ("1234567890abcdef1234567890abcd", True, False, Status.READY, True),
+        ("1234567890abcdef1234567890abcd", True, False, Status.READY, True, False),
         # asp_uid field updated without ready transition
-        ("1234567890abcdef1234567890abcd", False, False, Status.REJECTED, True),
+        ("1234567890abcdef1234567890abcd", False, False, Status.REJECTED, True, False),
         # Invalid label
-        (None, False, False, Status.REJECTED, None),
+        (None, False, False, Status.REJECTED, None, False),
         # Invalid uid (too short)
-        ("1234567890abcdef", False, False, Status.REJECTED, None),
+        ("1234567890abcdef", False, False, Status.REJECTED, None, False),
         # Duplicate case
-        ("1234567890abcdef1234567890abcd", True, True, Status.REJECTED, False),
+        ("1234567890abcdef1234567890abcd", True, True, Status.REJECTED, False, True),
     ],
 )
-def test_handle_3437_error(new_asp_uid, ready_for_transfer, profile_duplicate, expected_status, profile_updated):
+def test_handle_3437_error(
+    mailoutbox,
+    django_capture_on_commit_callbacks,
+    new_asp_uid,
+    ready_for_transfer,
+    profile_duplicate,
+    expected_status,
+    profile_updated,
+    email_expected,
+):
     processing_label = (
         (
             "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. "
@@ -1169,8 +1180,7 @@ def test_handle_3437_error(new_asp_uid, ready_for_transfer, profile_duplicate, e
         if new_asp_uid is not None
         else "Unexpected label"
     )
-    if profile_duplicate:
-        JobSeekerProfileFactory(asp_uid=new_asp_uid)
+    duplicate = JobSeekerProfileFactory(asp_uid=new_asp_uid) if profile_duplicate else None
     employee_record = EmployeeRecordFactory(
         ready_for_transfer=ready_for_transfer,
         status=Status.REJECTED,
@@ -1178,7 +1188,7 @@ def test_handle_3437_error(new_asp_uid, ready_for_transfer, profile_duplicate, e
         asp_processing_label=processing_label,
     )
     assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
-    with triggers.fake_context():
+    with triggers.fake_context(), django_capture_on_commit_callbacks(execute=True):
         employee_record.handle_3437_error()
     employee_record.job_application.job_seeker.jobseeker_profile.refresh_from_db()
     if profile_updated:
@@ -1188,3 +1198,12 @@ def test_handle_3437_error(new_asp_uid, ready_for_transfer, profile_duplicate, e
 
     employee_record.refresh_from_db()
     assert employee_record.status == expected_status
+    if email_expected:
+        [email] = mailoutbox
+        assert email.to == [settings.ITOU_EMAIL_CONTACT]
+        assert "Doublon de compte à régulariser suite à une erreur 3437" in email.subject
+        assert get_admin_url(employee_record) in email.body
+        assert get_admin_url(employee_record.job_application.job_seeker) in email.body
+        assert get_admin_url(duplicate.user) in email.body
+    else:
+        assert len(mailoutbox) == 0

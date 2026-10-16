@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Doublon de compte à régulariser suite à une erreur 3437 ({{ employee_record.pk }})
+{% endblock %}
