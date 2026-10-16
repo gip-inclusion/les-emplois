@@ -11,7 +11,7 @@ from itou.audit_trail.models import AuditTrail, AuditTrailEventType
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.audit_trail.factories import AuditTrailFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
-from tests.users.factories import DEFAULT_PASSWORD, ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, ItouStaffFactory, JobSeekerFactory, random_pro_user_factory
 
 
 def test_login(client):
@@ -38,26 +38,18 @@ def test_login(client):
     assert before <= event.timestamp <= after
 
 
-def test_partial_then_full_login_via_otp(client, settings):
+def test_partial_then_full_login_via_otp(client, settings, pro_connect):
     """Here, OTP is required for staff, we'll only log a partial login until the OTP is given."""
-    settings.REQUIRE_OTP_FOR_STAFF = True
-    user = ItouStaffFactory(with_verified_email=True)
+    settings.REQUIRE_MFA_FOR_PROS = True
+    user = random_pro_user_factory(email=pro_connect.oidc_userinfo["email"])
     device = ItouTOTPDeviceFactory(name="1", user=user)
     totp = TOTP(device.bin_key)
     session = client.session
     session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
     session.save()
 
-    # First, the password, for a partial login:
-    response = client.post(
-        reverse("login:existing_user"),
-        data={
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        },
-        follow=True,
-    )
-    assert response.status_code == 200
+    # First, log with ProConnect for a partial login:
+    pro_connect.mock_oauth_dance(client)
     assert {event.event_type for event in AuditTrail.objects.all()} == {AuditTrailEventType.PARTIAL_LOG_IN}
 
     # Then, the TOTP, for a full login:

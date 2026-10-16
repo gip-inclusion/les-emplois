@@ -72,7 +72,7 @@ def user_is_concerned_by_otp(user):
     """Whether 2FA applies to this user, regardless of whether they have already
     verified in the current session (unlike `require_otp`, which short-circuits on
     `is_verified()`). Assumes an authenticated itou user."""
-    if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
+    if user.is_itou_staff and settings.REQUIRE_OTP_FOR_STAFF:
         return True
 
     if user.is_professional and _require_otp_for_pro(user):
