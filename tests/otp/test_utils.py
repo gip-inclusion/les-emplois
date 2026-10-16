@@ -16,7 +16,7 @@ from itou.otp.utils import (
     user_uses_external_mfa,
     verify_token_for_user,
 )
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
@@ -146,6 +146,16 @@ class TestRequireOtpForPro:
         user = EmployerFactory()
         assert not _require_otp_for_pro(user)
         ItouTOTPDeviceFactory(user=user)
+        assert _require_otp_for_pro(user)
+
+    def test_require_otp_on_selected_batch(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        settings.REQUIRE_MFA_FOR_PROS_BATCH = 2
+        company = CompanyFactory(pk=2)
+        user = EmployerFactory(membership__company=company)
+        assert not _require_otp_for_pro(user)
+
+        settings.REQUIRE_MFA_FOR_PROS_BATCH = 3
         assert _require_otp_for_pro(user)
 
 
