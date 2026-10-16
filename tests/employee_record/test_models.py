@@ -41,7 +41,7 @@ from tests.employee_record.factories import (
     EmployeeRecordWithProfileFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerProfileFactory, ProfessionalFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, ProfessionalFactory
 
 
 class TestEmployeeRecordModel:
@@ -1207,3 +1207,55 @@ def test_handle_3437_error(
         assert get_admin_url(duplicate.user) in email.body
     else:
         assert len(mailoutbox) == 0
+
+
+def test_handle_two_3437_in_a_row_for_same_job_seeker(mailoutbox, django_capture_on_commit_callbacks):
+    # Test the (improbable) case where 2 different employee records for the same job seeker
+    # are rejected in the same transfer
+    new_asp_uid = "1234567890abcdef1234567890abcd"
+
+    processing_label = (
+        "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. "
+        f"({new_asp_uid})"
+    )
+    common_job_seeker = JobSeekerFactory(
+        # Make sure the ready transition will work
+        with_mocked_address=True,
+        jobseeker_profile__with_hexa_address=True,
+        jobseeker_profile__with_education_level=True,
+        born_in_france=True,
+    )
+    employee_record_1 = EmployeeRecordFactory(
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+        job_application__job_seeker=common_job_seeker,
+    )
+    employee_record_2 = EmployeeRecordFactory(
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+        job_application=JobApplicationFactory(
+            job_seeker=common_job_seeker,
+            sent_by_job_seeker=True,
+            approval=employee_record_1.job_application.approval,
+            state=JobApplicationState.ACCEPTED,
+            to_company__subject_to_iae_rules=True,
+        ),
+    )
+    with triggers.fake_context(), django_capture_on_commit_callbacks(execute=True):
+        employee_record_1.handle_3437_error()
+        employee_record_2.handle_3437_error()
+
+    # The job seeker's ASP uid has been fixed
+    common_job_seeker.refresh_from_db()
+    common_job_seeker.jobseeker_profile.refresh_from_db()
+    assert common_job_seeker.jobseeker_profile.asp_uid == new_asp_uid
+
+    # Both employee record were transitionned to READY
+    for employee_record in [employee_record_1, employee_record_2]:
+        employee_record.refresh_from_db()
+        assert employee_record.status == Status.READY
+
+    # No mail was sent to the support
+    assert len(mailoutbox) == 0
