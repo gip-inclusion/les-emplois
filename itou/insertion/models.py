@@ -601,7 +601,7 @@ class MobilizationEmail(models.Model):
         context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
 
         subject = "insertion/email/free_form_email_to_service_subject.txt"
-        body = "insertion/email/free_form_email_to_service_body.md"
+        body = "insertion/email/free_form_email_body.md"
         return get_email_message(to, context, subject, body, reply_to=reply_to)
 
 
