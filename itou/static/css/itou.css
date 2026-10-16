@@ -51,6 +51,29 @@
     z-index: 4051 !important;
 }
 
+@media (min-width: 768px) {
+    .c-search-dropdown .select2-results__options:not(.select2-results__options--nested) {
+        max-height: none !important;
+    }
+
+    .c-search-dropdown .select2-results__message {
+        grid-column: 1 / -1;
+    }
+
+    /* On the home page, the dropdown spans the city and category fields (see services_search_select2.js). */
+    .p-home .c-search-dropdown .select2-results__options:not(.select2-results__options--nested) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .c-search-dropdown .select2-results__options:not(.select2-results__options--nested) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .select2-selection__choice__remove {
     float: right;
     margin-left: 2px;
