@@ -451,7 +451,7 @@ class TestLogin:
 
         # With a device, the user is redirected to the otp verification page
         client.logout()
-        device = ItouTOTPDeviceFactory(name="1", user=user, confirmed=False)
+        device = ItouTOTPDeviceFactory(name="1", user=user)
         response = pro_connect.mock_oauth_dance(client, expected_redirect_url=reverse("dashboard:index"))
         response = client.get(response.url)
         next_url = add_url_params(verify_otp_url, {"next": reverse("dashboard:index")})
