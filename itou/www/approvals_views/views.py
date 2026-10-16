@@ -284,7 +284,7 @@ class ApprovalPrintableDisplay(ReadonlyViewMixin, ApprovalBaseViewMixin, Templat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        queryset = Approval.objects.select_related("user")
+        queryset = Approval.objects.visible_by_company(self.siae.pk).select_related("user")
         approval = get_object_or_404(queryset, public_id=self.kwargs["public_id"])
 
         diagnosis = approval.eligibility_diagnosis
