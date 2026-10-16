@@ -20,9 +20,24 @@ from itou.utils.validators import validate_post_code
 
 logger = logging.getLogger(__name__)
 
-# this score assures us almost zero false positives, after careful semi-manual inspection.
+# This score assures us almost zero false positives, after careful semi-manual inspection.
 # see the comments on BAN_API_LEGACY_RELIANCE_SCORE below for more details.
-# there is ample discussion about this topic in our Notion.
+#
+# The data·inclusion team has spent significant time considering the data and
+# uses a minimum score of 0.75 [1].
+#
+# The BAN API scores [2] using the Levenshtein distance between the significant
+# words in the address and the query (among other criteria). Despite heuristics
+# [3] to ignore irrelevant words in the distance, many gaps remain, such as bvd
+# for Boulevard, or using . for separators (e.g. U.R.S.S. != URSS).
+#
+# The data·inclusion team expanded the heuristics [4], but still, it’s hard to
+# pick a good minimum score.
+#
+# [1] https://github.com/gip-inclusion/data-inclusion/blob/fc24c8e8884389cf1746b6c9813a593ee5094e8e/pipeline/dbt/models/intermediate/v1/003_enrichments/int__adresses_v1.sql#L32
+# [2] https://github.com/BaseAdresseNationale/fantoir/blob/2798380bce755af518796d13ccb858f55c565128/lib/index.js#L50-L78
+# [3] https://github.com/BaseAdresseNationale/adresses-util/blob/732eca4df5ecac139186d165ad35b32f7cab45cb/lib/voies/words.js
+# [4] https://github.com/gip-inclusion/data-inclusion/blob/fc24c8e8884389cf1746b6c9813a593ee5094e8e/pipeline/dbt/macros/udfs/geocode/geocode.py
 BAN_API_RELIANCE_SCORE = 0.8
 
 
