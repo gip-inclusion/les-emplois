@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import (
+    MEMBERSHIP_FUNCTION_MAX_LENGTH,
     MembershipAbstract,
     OrganizationAbstract,
     OrganizationKind,
@@ -691,6 +692,13 @@ class CompanyMembership(MembershipAbstract):
         null=True,
         on_delete=models.RESTRICT,  # For traceability and accountability
         verbose_name="mis à jour par",
+    )
+    function = models.CharField(
+        verbose_name="fonction occupée dans l'entreprise",
+        max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
+        blank=True,
+        default="",
+        db_default="",
     )
 
     class Meta:
