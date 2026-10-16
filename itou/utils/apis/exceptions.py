@@ -3,3 +3,7 @@ class GeocodingDataError(Exception):
 
 
 class AddressLookupError(GeocodingDataError): ...
+
+
+class InboundParsingValueError(Exception):
+    "Generic exception for inbound parsing API."

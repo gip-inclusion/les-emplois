@@ -948,7 +948,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 88,
+    'num_queries': 89,
     'queries': list([
       dict({
         'origin': list([
@@ -3085,6 +3085,31 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
+          SELECT "insertion_mobilizationevent"."id"
+          FROM "insertion_mobilizationevent"
+          WHERE "insertion_mobilizationevent"."user_id" IN (%s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
           SELECT "insertion_orientation"."id"
           FROM "insertion_orientation"
           WHERE "insertion_orientation"."beneficiary_id" IN (%s,
@@ -3520,16 +3545,16 @@
         ]),
         'sql': '''
           DELETE
-          FROM "insertion_mobilizationevent"
-          WHERE "insertion_mobilizationevent"."user_id" IN (%s,
-                                                            %s,
-                                                            %s,
-                                                            %s,
-                                                            %s,
-                                                            %s,
-                                                            %s,
-                                                            %s,
-                                                            %s)
+          FROM "insertion_mobilizationemail"
+          WHERE "insertion_mobilizationemail"."sender_id" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
         ''',
       }),
       dict({

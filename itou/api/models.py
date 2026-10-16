@@ -12,6 +12,23 @@ def _generate_key():
     return secrets.token_urlsafe()
 
 
+class BrevoToken(models.Model):
+    key = models.CharField(default=_generate_key, unique=True)
+    purpose = models.TextField(verbose_name="utilisation du token")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "jeton d'API pour webhook Brevo"
+        verbose_name_plural = "jetons d'API pour webhook Brevo"
+
+    def __str__(self):
+        return f"BrevoToken-{self.pk}"
+
+    def datadog_info(self):
+        """Method returning the token representation in our Datadog logs (no secret here!)"""
+        return f"BrevoToken-{self.pk}"
+
+
 class CompanyToken(models.Model):
     key = models.CharField(default=_generate_key, unique=True)
     label = models.CharField(verbose_name="mémo permettant d'identifier l'usage du jeton", max_length=60, unique=True)

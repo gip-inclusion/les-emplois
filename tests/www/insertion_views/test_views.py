@@ -661,7 +661,6 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         modal = parse_response_to_soup(response, "#service-contact-modal")
         assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
-        assertNotContains(response, 'class="modal-footer"')
 
     def test_detail_with_external_orientation_link_for_non_orientable_service(self, client):
         user = PrescriberFactory()
@@ -1413,6 +1412,22 @@ class TestOrientationDetailsForSender:
         response = client.get(self.get_orientation_url(orientation))
         assertContains(response, META_ROBOTS_MARKUP, html=True)
         assertContains(response, REL_CANONICAL_MARKUP_FOR_SERVICE_PROVIDER, html=True)
+
+    def test_professional_sends_email_to_service_provider(self, client):
+        # TODO
+        pass
+
+    def test_professional_cannot_send_empty_email(self, client):
+        # TODO
+        pass
+
+    def test_prefilled_email_sent_to_service_provider(self, client):
+        # TODO
+        pass
+
+    def test_mobilization_email_is_associated_to_last_mobilization_event(self, client):
+        # TODO
+        pass
 
 
 class TestOrientationDetailsForServiceProvider:

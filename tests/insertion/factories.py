@@ -9,6 +9,7 @@ from itou.insertion.models import (
     GenericReferenceItem,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
+    MobilizationEmail,
     MobilizationEvent,
     Orientation,
     OrientationProcessLink,
@@ -133,6 +134,15 @@ class MobilizationEventFactory(factory.django.DjangoModelFactory):
     session_key = factory.LazyFunction(lambda: str(uuid.uuid4()).replace("-", ""))
     kind = MobilizationEventKind.STRUCTURE_CONTACT
     structure = factory.SubFactory(StructureFactory)
+
+
+class MobilizationEmailFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MobilizationEmail
+
+    service = factory.SubFactory(ServiceFactory)
+    sender = factory.SubFactory("tests.users.factories.PrescriberFactory", membership=False)  # FIXME
+    sender_prescriber_organization = factory.SubFactory("tests.prescribers.factories.PrescriberOrganizationFactory")
 
 
 class OrientationFactory(factory.django.DjangoModelFactory):

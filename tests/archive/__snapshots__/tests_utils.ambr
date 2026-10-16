@@ -261,6 +261,11 @@
       'model': 'eligibility.GEIQEligibilityDiagnosis',
     }),
     dict({
+      'field': 'sender',
+      'hidden': True,
+      'model': 'insertion.MobilizationEmail',
+    }),
+    dict({
       'field': 'user',
       'hidden': True,
       'model': 'insertion.MobilizationEvent',
