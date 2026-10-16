@@ -8,20 +8,35 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
+{% block body_class %}p-login{% endblock %}
+
+{% block title_navinfo %}
+    {% if show_dora_banner %}
+        {% component_alert title="Vous êtes au bon endroit !" content=content variant="info" dismissible=True extra_classes="mb-3 mb-md-4" %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Le formulaire d’orientation DORA se trouve désormais sur {% brand %}. Connectez-vous avec vos identifiants ProConnect habituels, les mêmes que sur DORA, pour orienter la personne vers le service choisi et suivre vos orientations. Pas encore de compte sur ProConnect ? Créez-en un.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Se connecter</h1>
+            <h1 class="text-white">Se connecter</h1>
+            <p class="text-white">Retrouvez vos candidatures et vos orientations vers des services d’insertion, au même endroit.</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
+    <section class="s-section text-white">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">
-                    <div class="c-form mb-5">
+                    <div class="c-form border-white mb-5">
                         <p class="h4 text-primary">Quelle adresse e-mail utilisez-vous ?</p>
                         <p class="text-secondary fs-sm">
                             Renseignez l’adresse e-mail associée à votre compte.
@@ -44,13 +59,13 @@
                     <hr data-it-text="ou" class="my-5">
                     <div class="text-center mb-3">
                         Vous n'avez pas de compte ?
-                        <a href="{% url 'signup:choose_user_kind' %}" class="btn-link">Inscription</a>
+                        <a href="{% url 'signup:choose_user_kind' %}" class="btn-link link-white">Inscription</a>
                     </div>
                 </div>
                 <!-- Hide left column on small devices. -->
                 <div class="d-none d-lg-inline-flex align-items-center col-lg-6 justify-content-center">
                     <div class="w-75">
-                        <img class="img-fluid img-fitcover" src="{% static 'img/login.svg' %}" alt="">
+                        <img class="img-fluid img-fitcover" src="{% static 'img/login.png' %}" alt="">
                     </div>
                 </div>
             </div>

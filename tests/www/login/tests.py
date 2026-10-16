@@ -118,6 +118,32 @@ class TestPreLogin:
         ]
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
+    DORA_BANNER_TEXT = (
+        "Le formulaire d’orientation DORA se trouve désormais sur La plateforme de l’inclusion."
+        " Connectez-vous avec vos identifiants ProConnect habituels, les mêmes que sur DORA, pour orienter la personne"
+        " vers le service choisi et suivre vos orientations. Pas encore de compte sur ProConnect ? Créez-en un."
+    )
+
+    def test_pre_login_shows_dora_banner_from_next_url(self, client):
+        next_url = "/some/path?mtm_campaign=DORA"
+        url = reverse("account_login", query={"next": next_url})
+        response = client.get(url)
+        assertContains(response, self.DORA_BANNER_TEXT)
+
+    def test_pre_login_shows_dora_banner_from_direct_param(self, client):
+        url = reverse("account_login", query={"mtm_campaign": "DORA"})
+        response = client.get(url)
+        assertContains(response, self.DORA_BANNER_TEXT)
+
+    def test_pre_login_hides_dora_banner_without_campaign(self, client):
+        # No next param.
+        response = client.get(reverse("account_login"))
+        assertNotContains(response, self.DORA_BANNER_TEXT)
+        # next param without the DORA campaign.
+        url = reverse("account_login", query={"next": "/some/path?mtm_campaign=OTHER"})
+        response = client.get(url)
+        assertNotContains(response, self.DORA_BANNER_TEXT)
+
     def test_rate_limits(self, client):
         url = reverse("account_login")
         form_data = {"email": "any@mailinator.com"}
