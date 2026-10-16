@@ -146,6 +146,8 @@ class Command(EmployeeRecordTransferCommand):
                         continue
 
                     employee_record.reject(code=processing_code, label=processing_label, archive=raw_employee_record)
+                    if employee_record.asp_processing_code == EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE:
+                        employee_record.handle_3437_error()
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 

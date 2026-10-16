@@ -4,6 +4,7 @@ import uuid
 
 import freezegun
 import pytest
+from django.conf import settings
 from django.test.utils import override_settings
 from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
@@ -12,9 +13,12 @@ from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.management.commands import transfer_employee_records
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.job_applications.enums import JobApplicationState
+from itou.utils import triggers
+from itou.utils.admin import get_admin_url
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
+from tests.users.factories import JobSeekerProfileFactory
 
 
 @pytest.fixture(name="command")
@@ -215,6 +219,56 @@ def test_duplicates_automatic_processing(sftp_directory, command):
     assert employee_record.asp_processing_code == "3436"
     assert employee_record.archived_json.get("libelleTraitement") == "Duplicate"
     assert employee_record.processed_as_duplicate is True
+
+
+def test_3437_automatic_processing(sftp_directory, command):
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    new_asp_uid = "1234567890abcdef1234567890abcd"
+
+    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    processing_label = (
+        "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion "
+        f"différent. ({new_asp_uid})"
+    )
+    process_incoming_file(sftp_directory, "3437", processing_label)
+
+    with triggers.fake_context():  # Needed because test isn't using call_command
+        command.handle(upload=False, download=True, preflight=False, wet_run=True)
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.READY
+    assert employee_record.asp_processing_code == "3437"
+    assert employee_record.archived_json.get("libelleTraitement") == processing_label
+    assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid == new_asp_uid
+
+
+def test_3437_processing_with_duplicate(sftp_directory, mailoutbox, django_capture_on_commit_callbacks, command):
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    duplicate_profile = JobSeekerProfileFactory()
+    new_asp_uid = duplicate_profile.asp_uid
+
+    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    processing_label = (
+        "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion "
+        f"différent. ({new_asp_uid})"
+    )
+    process_incoming_file(sftp_directory, "3437", processing_label)
+
+    with (
+        django_capture_on_commit_callbacks(execute=True),
+        triggers.fake_context(),  # Needed because test isn't using call_command
+    ):
+        command.handle(upload=False, download=True, preflight=False, wet_run=True)
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.REJECTED
+    assert employee_record.asp_processing_code == "3437"
+    assert employee_record.archived_json.get("libelleTraitement") == processing_label
+    assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
+    [support_email] = mailoutbox
+    assert support_email.to == [settings.ITOU_EMAIL_CONTACT]
+    assert "Doublon de compte à régulariser suite à une erreur 3437" in support_email.subject
+    assert get_admin_url(employee_record) in support_email.body
+    assert get_admin_url(employee_record.job_application.job_seeker) in support_email.body
+    assert get_admin_url(duplicate_profile.user) in support_email.body
 
 
 @pytest.mark.parametrize("extension_class", [ProlongationFactory, SuspensionFactory])
