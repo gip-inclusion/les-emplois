@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from tests.companies.factories import CompanyFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
-from tests.users.factories import ItouStaffFactory, PrescriberFactory
+from tests.users.factories import ItouStaffFactory, PrescriberFactory, random_pro_user_factory
 
 
 class TestRedirectToNewDomainMiddleware:
@@ -73,9 +73,9 @@ class TestRedirectToNewDomainMiddleware:
         settings.NEW_DOMAIN = "new.domain"
         settings.ALLOWED_HOSTS = ["old.domain", settings.NEW_DOMAIN]
         settings.REDIRECT_TO_NEW_DOMAIN = True
-        settings.REQUIRE_OTP_FOR_STAFF = True
+        settings.REQUIRE_MFA_FOR_PROS = True
 
-        user = ItouStaffFactory()
+        user = random_pro_user_factory()
         ItouTOTPDeviceFactory(user=user)
         client.force_login(user)
         response = client.get(

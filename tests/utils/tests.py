@@ -85,7 +85,13 @@ from tests.institutions.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory, random_user_kind_factory
+from tests.users.factories import (
+    ItouStaffFactory,
+    JobSeekerFactory,
+    ProfessionalFactory,
+    random_pro_user_factory,
+    random_user_kind_factory,
+)
 from tests.utils.testing import (
     create_fake_postcode,
     get_request,
@@ -1619,10 +1625,10 @@ def test_active_announcement_campaign_context_processor(client, settings, empty_
     assert response.context["display_campaign_announce"] is True
 
     # Don't display campaign announcement if the user still has to use our 2FA
-    settings.REQUIRE_OTP_FOR_STAFF = True
-    staff_user = ItouStaffFactory()
-    ItouTOTPDeviceFactory(user=staff_user)
-    client.force_login(staff_user)
+    settings.REQUIRE_MFA_FOR_PROS = True
+    user = random_pro_user_factory()
+    ItouTOTPDeviceFactory(user=user)
+    client.force_login(user)
 
     response = client.get(reverse("otp_views:verify_otp") + "?next=%2Fadmin%2F")
     assert response.status_code == 200

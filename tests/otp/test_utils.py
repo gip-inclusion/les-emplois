@@ -19,7 +19,13 @@ from itou.otp.utils import (
 from tests.companies.factories import CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+    random_pro_user_factory,
+)
 
 
 def test_get_user_devices():
@@ -184,16 +190,16 @@ class TestUserCanUseOtp:
     section and its menu link."""
 
     def test_not_concerned_by_otp(self, settings):
-        settings.REQUIRE_OTP_FOR_STAFF = False
-        user = ItouStaffFactory()
+        settings.REQUIRE_MFA_FOR_PROS = False
+        user = random_pro_user_factory()
         ItouTOTPDeviceFactory(user=user)
 
         assert not user_can_enroll_otp_device(user)
         assert not user_can_manage_otp_devices(user)
 
     def test_concerned_by_otp(self, settings):
-        settings.REQUIRE_OTP_FOR_STAFF = True
-        user = ItouStaffFactory()
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = random_pro_user_factory()
 
         # Without a device, there is nothing to manage yet
         assert user_can_enroll_otp_device(user)
@@ -203,16 +209,16 @@ class TestUserCanUseOtp:
         assert user_can_manage_otp_devices(user)
 
     def test_disabled_device_is_ignored(self, settings):
-        settings.REQUIRE_OTP_FOR_STAFF = True
-        user = ItouStaffFactory()
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = random_pro_user_factory()
         ItouTOTPDeviceFactory(user=user, disabled_at=timezone.now())
 
         assert not user_can_manage_otp_devices(user)
 
     @pytest.mark.parametrize("with_device", [True, False])
     def test_mfa_handled_by_identity_provider(self, settings, with_device):
-        settings.REQUIRE_OTP_FOR_STAFF = True
-        user = ItouStaffFactory()
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = random_pro_user_factory()
         if with_device:
             ItouTOTPDeviceFactory(user=user)
         # Mimic `OtpMiddleware` for a session verified through ProConnect

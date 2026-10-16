@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestItouStaffLogin.test_login_shows_list_of_devices
+# name: TestLogin.test_login_shows_list_of_devices
   '''
   <div class="c-form mb-5">
       <h2>
