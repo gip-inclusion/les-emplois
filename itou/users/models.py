@@ -50,6 +50,7 @@ from itou.users.enums import (
     JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
+    Nationality,
     Title,
     UserKind,
 )
@@ -950,6 +951,13 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         null=True,
         blank=True,
         on_delete=models.RESTRICT,
+    )
+    nationality = models.CharField(
+        verbose_name="nationalité",
+        max_length=10,
+        choices=Nationality.choices,
+        null=True,
+        blank=True,
     )
 
     # Don’t need to specify db_index because unique implies the creation of an index.

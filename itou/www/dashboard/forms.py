@@ -49,6 +49,7 @@ class EditJobSeekerInfoForm(
         "lack_of_pole_emploi_id_reason",
         "nir",
         "lack_of_nir_reason",
+        "nationality",
     ]
 
     email = forms.EmailField(
