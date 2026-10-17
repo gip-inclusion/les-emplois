@@ -188,11 +188,11 @@ class JobSeekerAddressAutocompleteWidget(AddressAutocompleteWidget):
         address_choice = None
 
         # The following code is required as we are using a Select2 version not tied to a model
-        # in order to perform Ajax calls, but we need it to mimick the behavior of a model field
+        # in order to perform Ajax calls, but we need it to mimic the behavior of a model field
         if initial_data and "ban_api_resolved_address" in initial_data:
             # The ban_api_resolved_address field is populated using javascript (after selecting an address).
             # So if it present in the submitted data, it means that the user did a select2 choice
-            # so we should refill and populate the choosen address in the select2 field if there was a form error
+            # so we should refill and populate the chosen address in the select2 field if there was a form error
             address_choice = initial_data["ban_api_resolved_address"]
         elif job_seeker:
             # If there is no ban_api_resolvedaddress_field, let's fill the form with the geocoding_address saved

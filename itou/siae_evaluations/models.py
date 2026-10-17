@@ -627,7 +627,7 @@ class EvaluatedSiae(models.Model):
             evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE,
         )
         # if SUBMITTED, the SIAE cannot do anything until the DDETS reviews the documents
-        # if ACCEPTED, it is either because the DDETS is currently reviewing or because it is fully acccepted
+        # if ACCEPTED, it is either because the DDETS is currently reviewing or because it is fully accepted
         # if REFUSED, it is either because the DDETS is currently reviewing or because it is fully refused
 
     def review(self):

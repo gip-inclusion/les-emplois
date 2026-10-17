@@ -116,7 +116,7 @@ def get_vue_af_df():
     assert len(df[df.duplicated(["asp_id", "number"])]) >= 1
 
     # Sort dataframe in a smart way before we drop duplicates by
-    # keeping the first occurence in this order.
+    # keeping the first occurrence in this order.
     df.sort_values(
         # In case of duplicates, we will keep:
         # - the active one if there is one
