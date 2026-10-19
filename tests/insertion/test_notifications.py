@@ -327,3 +327,25 @@ Pierre DUPONT"""
     assert email.to == [mobilization_email.service.contact_email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
+
+
+def test_free_form_email_to_sender(snapshot):
+    mobilization_email = MobilizationEmailFactory(
+        sender__for_snapshot=True,
+        sender_prescriber_organization__for_snapshot=True,
+    )
+    from_email = "Jean DUSERVICE <jean@service.fake>"
+    reply_to = "Jean DUSERVICE <jean@example.com>"
+    body_message = """Bonjour,
+
+Bien reçu.
+
+Cordialement,
+Jean DUSERVICE"""
+    email = mobilization_email.free_form_email_to_sender(body_message, from_email, reply_to=reply_to)
+
+    assert email.from_email == from_email
+    assert email.to == [mobilization_email.sender.email]
+    assert email.reply_to == [reply_to]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")

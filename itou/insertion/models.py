@@ -613,6 +613,17 @@ class MobilizationEmail(models.Model):
         body = "insertion/email/free_form_email_body.md"
         return get_email_message(to, context, subject, body, from_email=from_email, reply_to=reply_to)
 
+    def free_form_email_to_sender(self, body_message, from_email, reply_to):
+        sender_organization = self.sender_prescriber_organization or self.sender_company
+
+        to = [self.sender.email]
+        reply_to = [reply_to]
+        context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
+
+        subject = "insertion/email/free_form_email_to_sender_subject.txt"
+        body = "insertion/email/free_form_email_body.md"
+        return get_email_message(to, context, subject, body, from_email=from_email, reply_to=reply_to)
+
 
 class OrientationWorkflow(xwf_models.Workflow):
     """

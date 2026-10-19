@@ -1,5 +1,7 @@
 import logging
+from email.headerregistry import Address
 
+from django.conf import settings
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, views
@@ -12,6 +14,7 @@ from itou.insertion.models import MobilizationEmail
 from itou.utils.apis.exceptions import InboundParsingValueError
 from itou.utils.apis.inbound_parsing import get_parsed_inbound_parsing_address
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.brand import product_name
 
 
 logger = logging.getLogger(__name__)
@@ -19,9 +22,14 @@ logger = logging.getLogger(__name__)
 
 def handle_service_answer_email(email):
     kind, key = get_parsed_inbound_parsing_address(email)
+    from_email_address = email["From"]["Address"]
 
     try:
-        mobilization_email = MobilizationEmail.objects.filter(inbound_parsing_key=key).select_related("service").get()
+        mobilization_email = (
+            MobilizationEmail.objects.filter(inbound_parsing_key=key)
+            .select_related("service", "sender", "sender_prescriber_organization", "sender_company")
+            .get()
+        )
     except MobilizationEmail.DoesNotExist:
         logger.error("no mobilization_email found for inbound parsing address (kind=%s, key=%s)", kind, key)
         return
@@ -42,6 +50,24 @@ def handle_service_answer_email(email):
                 mobilization_email.service.uid,
                 mobilization_email.pk,
             )
+
+    if mobilization_email.service.contact_email != from_email_address:
+        logger.info(
+            "service=%s replied to mobilization_email=%d with an address different from contact_email",
+            mobilization_email.service.uid,
+            mobilization_email.pk,
+        )
+
+    # Always send the message to the orientation sender
+    parts = [email.get("ExtractedMarkdownMessage"), email.get("ExtractedMarkdownSignature")]
+    message = "\n".join([part for part in parts if part]) or email.get("RawTextBody") or ""
+    from_name = email["From"].get("Name")
+    from_address = email["From"]["Address"]
+    from_email = Address(
+        display_name=f"{from_name} {product_name('via')}" if from_name else "", addr_spec=settings.DEFAULT_FROM_EMAIL
+    )
+    reply_to = Address(display_name=from_name or "", addr_spec=from_address)
+    mobilization_email.free_form_email_to_sender(body_message=message, from_email=from_email, reply_to=reply_to).send()
 
 
 KIND_MAPPING = {InboundParsingKind.SERVICE_ANSWER: handle_service_answer_email}
