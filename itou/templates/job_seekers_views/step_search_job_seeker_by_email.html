@@ -14,17 +14,16 @@
                     <label for="id_nir">Numéro de sécurité sociale de l’usager</label>
                     <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
                 </div>
+                {% component_alert content=content variant="info" extra_classes="mb-3" %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
+                            <br>
+                            Merci de renseigner l'adresse e-mail de votre usager pour l'inscrire.
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
             {% endif %}
-
-            {% component_alert content=content variant="info" extra_classes="mb-3" %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
-                        <br>
-                        Merci de renseigner l'adresse e-mail de votre usager pour l'inscrire.
-                    </p>
-                {% endfragment %}
-            {% endcomponent_alert %}
 
             {% csrf_token %}
 
