@@ -728,6 +728,24 @@ class TestStandaloneCreateAsPrescriber:
         modal = parse_response_to_soup(response, selector=selector)
         assert pretty_indented(modal) == snapshot()
 
+    def test_search_by_email_nir_banner_and_no_nir_banner(self, client):
+        client.force_login(PrescriberFactory())
+        client.get(reverse("job_seekers_views:get_or_create_start", query={"tunnel": "standalone", "from_url": "/"}))
+        kwargs = {"session_uuid": get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)}
+        banner_to_find = "Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale."
+        assertNotContains(
+            client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs)),
+            banner_to_find,
+        )
+        client.post(
+            reverse("job_seekers_views:check_nir_for_sender", kwargs=kwargs),
+            data={"nir": "178128619400507", "confirm": 1},
+        )
+        assertContains(
+            client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs)),
+            banner_to_find,
+        )
+
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
         prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
