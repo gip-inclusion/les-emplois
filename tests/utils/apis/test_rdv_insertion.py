@@ -1,8 +1,13 @@
+import datetime
+
 import httpx
 import pytest
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
 
 from itou.utils.apis import rdv_insertion
+from itou.utils.mocks.rdv_insertion import RDV_INSERTION_USER_SEARCH_BODY
+from tests.users.factories import JobSeekerFactory
 
 
 SEARCH_URL = "https://rdv-insertion.fake/api/plateforme_inclusion/users/search"
@@ -55,3 +60,52 @@ def test_search_user_by_nir_errors(respx_mock, rdvi_settings):
     respx_mock.post(SEARCH_URL).respond(200, content="not json")
     with pytest.raises(rdv_insertion.RdvInsertionApiError, match="JSONDecodeError"):
         client.search_user_by_nir(NIR)
+
+
+@pytest.mark.parametrize(
+    "status_code, body, expected_follow_ups, expected_ttl",
+    [
+        (
+            200,
+            RDV_INSERTION_USER_SEARCH_BODY,
+            RDV_INSERTION_USER_SEARCH_BODY["user"]["follow_ups"],
+            datetime.timedelta(hours=1),
+        ),
+        (404, {"errors": ["Aucun usager ne correspond à ce NIR"]}, [], datetime.timedelta(days=1)),
+    ],
+)
+def test_get_follow_ups_is_cached(respx_mock, rdvi_settings, status_code, body, expected_follow_ups, expected_ttl):
+    job_seeker = JobSeekerFactory(jobseeker_profile__nir=NIR)
+    route = respx_mock.post(SEARCH_URL).respond(status_code, json=body)
+
+    assert rdv_insertion.get_follow_ups(job_seeker) == expected_follow_ups
+    assert route.call_count == 1
+    cache_ttl = caches["failsafe"].ttl(f"rdv-insertion-follow-ups:{job_seeker.pk}")
+    assert cache_ttl == pytest.approx(expected_ttl.total_seconds(), abs=1)
+
+    # Subsequent calls should hit the cache
+    assert rdv_insertion.get_follow_ups(job_seeker) == expected_follow_ups
+    assert route.call_count == 1
+
+
+def test_get_follow_ups_without_nir(respx_mock, rdvi_settings):
+    # No route: any request to rdv-insertion would fail the test
+    assert rdv_insertion.get_follow_ups(JobSeekerFactory(jobseeker_profile__nir="")) == []
+
+
+def test_get_follow_ups_when_rdv_insertion_is_unavailable(respx_mock, rdvi_settings, caplog):
+    route = respx_mock.post(SEARCH_URL).respond(500)
+
+    assert rdv_insertion.get_follow_ups(JobSeekerFactory(jobseeker_profile__nir=NIR)) == []
+    assert "rdv-insertion is unavailable: Error requesting rdv-insertion API: HTTPStatusError" in caplog.messages
+
+    # rdv-insertion is not called again, even for another job seeker
+    assert rdv_insertion.get_follow_ups(JobSeekerFactory()) == []
+    assert route.call_count == 1
+
+
+def test_get_follow_ups_without_configuration(respx_mock, rdvi_settings):
+    # No route: any request to rdv-insertion would fail the test
+    rdvi_settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = None
+
+    assert rdv_insertion.get_follow_ups(JobSeekerFactory(jobseeker_profile__nir=NIR)) == []
