@@ -138,7 +138,7 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
             </p>
             <p>
                 L'identité de l’usager est une information clé pour la structure.
-                Si cette candidature n'est pas pour
+                Si votre usager n'est pas
                 <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
                 cliquez sur « Ce n'est pas mon usager » afin d'enregistrer ses informations personnelles.
             </p>

@@ -760,10 +760,10 @@
               <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                   <div class="c-form mb-5">
                       <h2 class="h3">
-                          Rechercher un usager
+                          Rechercher ou créer un usager
                       </h2>
                       <p>
-                          Dans le menu déroulant ci-dessous, vous trouverez la liste de vos usagers.
+                          Commencez à saisir un nom
                       </p>
                       <form class="js-prevent-multiple-submit" data-create-job-seeker-url="/job-seekers/start?tunnel=orientation&from_url=%2Finsertion%2Fservices%2Ftest-orientation-wizard-uid%2F&service_uid=test-orientation-wizard-uid" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>

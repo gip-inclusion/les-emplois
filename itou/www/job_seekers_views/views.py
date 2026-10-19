@@ -1143,6 +1143,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
+            "orientation_process": self.is_orientation,
         }
 
     def get_active_assignment(self, job_seeker):
