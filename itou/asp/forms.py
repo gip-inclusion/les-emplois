@@ -8,6 +8,8 @@ from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Wi
 
 
 class BirthPlaceModelForm(forms.ModelForm):
+    require_birth_country = True
+
     birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
     birth_place = forms.ModelChoiceField(
         queryset=Commune.objects,
@@ -53,7 +55,7 @@ class BirthPlaceModelForm(forms.ModelForm):
             if birth_place:
                 birth_country = Country.objects.get(pk=Country.FRANCE_ID)
                 self.cleaned_data["birth_country"] = birth_country
-            else:
+            elif self.require_birth_country:
                 # Display the error above the field instead of top of page.
                 self.add_error("birth_country", "Le pays de naissance est obligatoire.")
 
