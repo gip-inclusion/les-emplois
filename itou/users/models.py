@@ -49,6 +49,7 @@ from itou.users.enums import (
     IdentityCertificationAuthorities,
     IdentityProvider,
     JobSeekerAssignmentDisplayMode,
+    JobSeekerCreationSource,
     LackOfNIRReason,
     LackOfPoleEmploiId,
     Nationality,
@@ -1256,6 +1257,14 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         ),
     )
     is_not_stalled_anymore = models.BooleanField(null=True, blank=True, db_default=None)
+
+    creation_source = models.CharField(
+        verbose_name="parcours de création",
+        choices=JobSeekerCreationSource.choices,
+        blank=True,
+        db_default="",
+        help_text="Parcours par lequel un professionnel a créé le compte de l'usager",
+    )
 
     objects = JobSeekerProfileManager()
 

@@ -38,7 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
+from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import (
     can_fill_pro_support_report,
@@ -1629,6 +1629,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
+                self.profile.creation_source = JobSeekerCreationSource(self.job_seeker_session.get("config")["tunnel"])
                 if self.standalone_creation:
                     message = format_html(
                         "Usager ajouté||Le compte de {} a été créé et ajouté à votre liste d'accompagnements.<br>"
@@ -1638,8 +1639,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     messages.success(request, message, extra_tags="toast")
                 self.profile.validate_constraints()  # Detect inconsistencies (like duplicate NIR)
                 self.profile.save()
-                # TODO(ewen): add tunnel information when we have it in self.tunnel
-                logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
+                logger.info(
+                    "user=%s created job_seeker=%s source=%s", self.sender.pk, user.pk, self.profile.creation_source
+                )
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
