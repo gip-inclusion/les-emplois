@@ -22,6 +22,12 @@ class ParticipationStatus(models.TextChoices):
     NOSHOW = "noshow", "Absence non excusée au RDV"
 
 
+class AppointmentCreatedBy(models.TextChoices):
+    AGENT = "agent", "Agent"
+    USER = "user", "Usager"
+    PRESCRIPTEUR = "prescripteur", "Prescripteur"
+
+
 class InvitationRequestReasonCategory(models.TextChoices):
     RSA_DROITS_DEVOIRS = "rsa_droits_devoirs", "RSA - droits et devoirs"
     RSA_ORIENTATION = "rsa_orientation", "RSA orientation"

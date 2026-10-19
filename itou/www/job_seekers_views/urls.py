@@ -32,6 +32,11 @@ urlpatterns = [
         name="orientations",
     ),
     path(
+        "appointments/<uuid:public_id>",
+        views.AppointmentsTabView.as_view(),
+        name="appointments",
+    ),
+    path(
         "overview/<uuid:public_id>",
         views.job_seeker_overview,
         name="overview",

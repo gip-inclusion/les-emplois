@@ -38,6 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
+from itou.rdv_insertion.models import JobSeekerAppointment
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import (
@@ -45,6 +46,7 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_view_pro_support_report,
 )
+from itou.utils.apis import rdv_insertion
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
@@ -152,6 +154,12 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
     def approval_missing_or_expired(self):
         return self.approval is None or self.approval.is_valid is False
 
+    @cached_property
+    def appointments(self):
+        if not can_view_appointments(self.request, self.object):
+            return []
+        return get_job_seeker_appointments(self.object)
+
     def get_context_data(self, **kwargs):
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
@@ -170,6 +178,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
             "is_in_overview_test_perimeter": is_in_overview_test_perimeter,
             "show_overview_tab": show_overview_tab,
+            "show_appointments_tab": bool(self.appointments),
         }
 
 
@@ -459,6 +468,32 @@ class OrientationsTabView(BaseJobSeekerDetailView):
         }
 
 
+class AppointmentsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/appointments.html"
+
+    def get_context_data(self, **kwargs):
+        if not can_view_appointments(self.request, self.object):
+            raise PermissionDenied
+        return super().get_context_data(**kwargs) | {"appointments": self.appointments}
+
+
+def can_view_appointments(request, job_seeker):
+    # FIXME: Waiting for a product decision on who can see which appointments
+    return can_view_personal_information(request, job_seeker)
+
+
+def get_job_seeker_appointments(job_seeker):
+    """Appointments from rdv-insertion and the invitation experiment, most recent first."""
+    api_appointments = JobSeekerAppointment.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
+    participations = job_seeker.rdvi_participations.select_related("appointment__company", "appointment__location")
+    stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in participations]
+    # An appointment can be in both sources: keep the stored one
+    appointments_by_id = {a.rdv_insertion_id: a for a in api_appointments} | {
+        a.rdv_insertion_id: a for a in stored_appointments
+    }
+    return sorted(appointments_by_id.values(), key=lambda a: a.start_at, reverse=True)
+
+
 def get_jobseeker_overview_data(request, job_seeker):
     """
     Several conditions need to be cleared to display/access the overview tab:
@@ -528,6 +563,8 @@ def job_seeker_overview(request, public_id, template_name="job_seekers_views/ove
         "can_view_external_job_applications": can_view_external_actions(job_seeker, request),
         "matomo_custom_title": "Synthèse usager",
         "show_overview_tab": True,
+        "show_appointments_tab": can_view_appointments(request, job_seeker)
+        and bool(get_job_seeker_appointments(job_seeker)),
         "has_applied_for_job_seeker": has_applied_for_job_seeker,
         "suspension": None,  # Not handled yet
         "prolongation": None,  # Not handled yet
