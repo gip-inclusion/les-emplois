@@ -9,11 +9,16 @@ def test_product_name():
     assert product_name() == "La plateforme de l’inclusion"
     assert product_name("de") == "de La plateforme de l’inclusion"
     assert product_name("à") == "à La plateforme de l’inclusion"
+    assert product_name("via") == "via La plateforme de l’inclusion"
 
 
 def test_brand_template_tag_is_builtin():
-    template = Template("Bienvenue sur {% brand %}, le site {% brand 'de' %} : parlez {% brand 'à' %}.")
+    template = Template(
+        "Bienvenue sur {% brand %}, le site {% brand 'de' %} : parlez {% brand 'à' %}. "
+        "Ce message vous a été envoyé par André Dufour {% brand 'via' %}."
+    )
     assert template.render(Context()) == (
         "Bienvenue sur La plateforme de l’inclusion, le site de La plateforme de l’inclusion : "
-        "parlez à La plateforme de l’inclusion."
+        "parlez à La plateforme de l’inclusion. Ce message vous a été envoyé par André Dufour "
+        "via La plateforme de l’inclusion."
     )
