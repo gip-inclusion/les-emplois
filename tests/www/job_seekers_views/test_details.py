@@ -638,14 +638,28 @@ def test_end_of_contract_banner(client, snapshot):
     response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
     assertTemplateNotUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
 
-    # Banner does not appear if the contract has ended
+    # Banner does not appear if the contract has ended without a valid PASS IAE
     job_seeker = ContractFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
         company__email="siae@test.local",
         start_date=a_year_ago,
         end_date=ten_days_ago,
     ).job_seeker
     response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
     assertTemplateNotUsed(response, "job_seekers_views/includes/end_of_contract_card_banner.html")
+
+    # With a valid PASS IAE, a support report can still be requested
+    ApprovalFactory(user=job_seeker, start_at=a_year_ago, end_at=in_ninety_days)
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+    assertContains(response, "Le contrat de travail de ce bénéficiaire a pris fin")
+    assertContains(response, "Son contrat s’est terminé le 14/09/2026 et son PASS IAE est encore valide.")
+    assertContains(response, "mailto:siae@test.local")
+    assertContains(
+        response,
+        "Le%20contrat%20de%20travail%20d%E2%80%99insertion%20de%20Jean%20DUPONT%20a%20pris%20fin%20et%20son%20"
+        "PASS%C2%A0IAE%20est%20encore%20valide.",
+    )
 
 
 @freeze_time("2026-09-24")

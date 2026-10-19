@@ -315,14 +315,14 @@
                  (EXISTS
                     (SELECT %s AS "a"
                      FROM "companies_contract" V0
-                     WHERE (V0."company_id" = %s
-                            AND V0."end_date" < %s
+                     WHERE (V0."end_date" < %s
                             AND V0."id" =
                               (SELECT U0."id" AS "pk"
                                FROM "companies_contract" U0
                                WHERE U0."job_seeker_id" = ("users_user"."id")
                                ORDER BY U0."start_date" DESC, 1 DESC
-                               LIMIT 1))
+                               LIMIT 1)
+                            AND V0."company_id" = %s)
                      LIMIT 1)
                   AND EXISTS
                     (SELECT %s AS "a"
@@ -1342,14 +1342,14 @@
                  (EXISTS
                     (SELECT %s AS "a"
                      FROM "companies_contract" V0
-                     WHERE (V0."company_id" = %s
-                            AND V0."end_date" < %s
+                     WHERE (V0."end_date" < %s
                             AND V0."id" =
                               (SELECT U0."id" AS "pk"
                                FROM "companies_contract" U0
                                WHERE U0."job_seeker_id" = ("users_user"."id")
                                ORDER BY U0."start_date" DESC, 1 DESC
-                               LIMIT 1))
+                               LIMIT 1)
+                            AND V0."company_id" = %s)
                      LIMIT 1)
                   AND EXISTS
                     (SELECT %s AS "a"
@@ -4200,24 +4200,47 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          WHERE ("users_user"."id" IN
-                   (SELECT U0."job_seeker_id" AS "job_seeker"
-                    FROM "users_jobseekerassignment" U0
-                    WHERE (((U0."company_id" IS NULL
-                             AND U0."prescriber_organization_id" IS NULL
-                             AND U0."professional_id" = %s)
-                            OR (U0."company_id" IS NULL
-                                AND U0."prescriber_organization_id" = %s
-                                AND U0."professional_id" = %s))
-                           AND U0."ended_at" IS NULL))
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" BETWEEN %s AND %s
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    LIMIT 1))
+          SELECT COUNT("__col1") FILTER (
+                                         WHERE "contract_ending_soon"),
+                                 COUNT("__col1") FILTER (
+                                                         WHERE (NOT "contract_ending_soon"
+                                                                AND "last_contract_ended_with_valid_approval"))
+          FROM
+            (SELECT EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" BETWEEN %s AND %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                LIMIT 1) AS "contract_ending_soon",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "companies_contract" V0
+                        WHERE (V0."end_date" < %s
+                               AND V0."id" =
+                                 (SELECT U0."id" AS "pk"
+                                  FROM "companies_contract" U0
+                                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                                  ORDER BY U0."start_date" DESC, 1 DESC
+                                  LIMIT 1))
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE (U0."user_id" = ("users_user"."id")
+                               AND U0."end_at" >= %s)
+                        LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                    "users_user"."id" AS "__col1"
+             FROM "users_user"
+             WHERE "users_user"."id" IN
+                 (SELECT U0."job_seeker_id" AS "job_seeker"
+                  FROM "users_jobseekerassignment" U0
+                  WHERE (((U0."company_id" IS NULL
+                           AND U0."prescriber_organization_id" IS NULL
+                           AND U0."professional_id" = %s)
+                          OR (U0."company_id" IS NULL
+                              AND U0."prescriber_organization_id" = %s
+                              AND U0."professional_id" = %s))
+                         AND U0."ended_at" IS NULL))) subquery
         ''',
       }),
       dict({
@@ -5386,23 +5409,46 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          WHERE ("users_user"."id" IN
-                   (SELECT U0."job_seeker_id" AS "job_seeker"
-                    FROM "users_jobseekerassignment" U0
-                    WHERE (((U0."company_id" IS NULL
-                             AND U0."prescriber_organization_id" IS NULL
-                             AND U0."professional_id" = %s)
-                            OR (U0."company_id" IS NULL
-                                AND U0."prescriber_organization_id" = %s))
-                           AND U0."ended_at" IS NULL))
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "companies_contract" U0
-                    WHERE (U0."end_date" BETWEEN %s AND %s
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    LIMIT 1))
+          SELECT COUNT("__col1") FILTER (
+                                         WHERE "contract_ending_soon"),
+                                 COUNT("__col1") FILTER (
+                                                         WHERE (NOT "contract_ending_soon"
+                                                                AND "last_contract_ended_with_valid_approval"))
+          FROM
+            (SELECT EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" BETWEEN %s AND %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                LIMIT 1) AS "contract_ending_soon",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "companies_contract" V0
+                        WHERE (V0."end_date" < %s
+                               AND V0."id" =
+                                 (SELECT U0."id" AS "pk"
+                                  FROM "companies_contract" U0
+                                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                                  ORDER BY U0."start_date" DESC, 1 DESC
+                                  LIMIT 1))
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE (U0."user_id" = ("users_user"."id")
+                               AND U0."end_at" >= %s)
+                        LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                    "users_user"."id" AS "__col1"
+             FROM "users_user"
+             WHERE "users_user"."id" IN
+                 (SELECT U0."job_seeker_id" AS "job_seeker"
+                  FROM "users_jobseekerassignment" U0
+                  WHERE (((U0."company_id" IS NULL
+                           AND U0."prescriber_organization_id" IS NULL
+                           AND U0."professional_id" = %s)
+                          OR (U0."company_id" IS NULL
+                              AND U0."prescriber_organization_id" = %s))
+                         AND U0."ended_at" IS NULL))) subquery
         ''',
       }),
       dict({

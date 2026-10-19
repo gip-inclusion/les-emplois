@@ -182,7 +182,7 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                 .with_last_contract_pro_support_report(siae=self.request.current_organization)
                 .with_last_contract_end_date(siae=self.request.current_organization)
             )
-        return queryset.with_contract_ending_soon()
+        return queryset.with_end_of_journey()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,26 +216,24 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 
         # Job seeker card banner: the pro support report for the SIAE, a support request for the authorized prescriber.
         contract_end_date = None
-        contract_ended = False
+        contract_ended = self.object.last_contract_ended_with_valid_approval
+        at_end_of_journey = self.object.contract_ending_soon or contract_ended
         create_pro_support_report_url = None
         pro_support_request_mailto = None
         if can_fill_pro_support_report(self.request):
-            if (
-                self.object.contract_ending_soon or self.object.last_contract_ended_with_valid_approval
-            ) and not self.object.last_contract_has_pro_support_report:
+            if at_end_of_journey and not self.object.last_contract_has_pro_support_report:
                 contract_end_date = self.object.last_contract_end_date
-                contract_ended = self.object.last_contract_ended_with_valid_approval
                 create_pro_support_report_url = reverse(
                     "job_seekers_views:create_pro_support_report", kwargs={"public_id": self.object.public_id}
                 )
-        elif self.request.from_authorized_prescriber and self.object.contract_ending_soon:
+        elif self.request.from_authorized_prescriber and at_end_of_journey:
             if last_contract := self.object.contracts.order_by("-end_date").first():
                 contract_end_date = last_contract.end_date
                 company_email = last_contract.company.email if last_contract.company else None
                 # The job seeker's name is in the mail body: no action when it must stay masked.
                 if company_email and context["can_view_personal_information"]:
                     pro_support_request_mailto = _build_pro_support_request_mailto(
-                        company_email, self.object.get_full_name()
+                        company_email, self.object.get_full_name(), contract_ended=contract_ended
                     )
         approval_expires_soon = (
             self.approval and self.approval.is_valid and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS
@@ -754,16 +752,22 @@ def switch_stalled_status(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
-PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de parcours IAE"
+PRO_SUPPORT_REQUEST_EMAIL_SUBJECT = "Demande de bilan d’accompagnement en fin de contrat de travail d’insertion"
+PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON = (
+    "{job_seeker_full_name} arrive bientôt en fin de contrat de travail d’insertion."
+)
+PRO_SUPPORT_REQUEST_CONTRACT_ENDED = (
+    "Le contrat de travail d’insertion de {job_seeker_full_name} a pris fin et son PASS IAE est encore valide."
+)
 # Use non-breaking spaces to avoid mail user agent to trim leading spaces.
 PRO_SUPPORT_REQUEST_EMAIL_BODY = """\
     Bonjour,
 
-{job_seeker_full_name} arrive bientôt en fin de parcours IAE
+{situation}
 
 Pour préparer la suite de son accompagnement, pouvez-vous me partager les éléments utiles : ce qui a été travaillé, les freins encore présents et votre préconisation pour la suite ?
 
-On peut aussi s'appeler si c'est plus simple.
+On peut aussi s’appeler si c’est plus simple.
 
 Merci.
 """  # noqa: E501 # Line too long
@@ -788,13 +792,16 @@ def _pro_support_request_company_email():
     )
 
 
-def _build_pro_support_request_mailto(to_email, job_seeker_full_name):
+def _build_pro_support_request_mailto(to_email, job_seeker_full_name, contract_ended=False):
     # V1 opens a pre-filled mailto to the employing SIAE: no email is
     # sent nor stored server-side.
+    situation = PRO_SUPPORT_REQUEST_CONTRACT_ENDED if contract_ended else PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON
     query = urllib.parse.urlencode(
         {
             "subject": PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
-            "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(job_seeker_full_name=job_seeker_full_name),
+            "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(
+                situation=situation.format(job_seeker_full_name=job_seeker_full_name)
+            ),
         },
         quote_via=urllib.parse.quote,
     )
@@ -866,7 +873,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or form.cleaned_data.get("end_of_journey")
         )
         if end_of_journey_filter_active and request.from_authorized_prescriber:
-            queryset = queryset.annotate(pro_support_request_company_email=_pro_support_request_company_email())
+            queryset = queryset.with_end_of_journey().annotate(
+                pro_support_request_company_email=_pro_support_request_company_email()
+            )
 
     queryset = (
         queryset.annotate(
@@ -893,22 +902,20 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
 
     # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
-    # end-of-journey filter is not active. A SIAE counts its employees at the end of their journey,
-    # a prescriber all the contracts ending soon.
+    # end-of-journey filter is not active. A SIAE counts its own contracts, a prescriber those of
+    # every company.
     contracts_ending_soon_count = last_contract_ended_count = 0
     if show_end_of_contracts_banner and not end_of_journey_filter_active:
         assigned_job_seekers = User.objects.filter(pk__in=assignments_qs.filter(ended_at=None).values("job_seeker"))
-        if request_from_siae:
-            end_of_journey_counts = assigned_job_seekers.with_end_of_journey(
-                siae=request.current_organization
-            ).aggregate(
-                ends_soon=Count("pk", filter=Q(contract_ending_soon=True)),
-                ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True)),
-            )
-            contracts_ending_soon_count = end_of_journey_counts["ends_soon"]
-            last_contract_ended_count = end_of_journey_counts["ended"]
-        else:
-            contracts_ending_soon_count = assigned_job_seekers.has_contract_ending_soon().count()
+        end_of_journey_counts = assigned_job_seekers.with_end_of_journey(
+            siae=request.current_organization if request_from_siae else None
+        ).aggregate(
+            ends_soon=Count("pk", filter=Q(contract_ending_soon=True)),
+            # A job seeker still having a contract ending soon is only counted once.
+            ended=Count("pk", filter=Q(last_contract_ended_with_valid_approval=True, contract_ending_soon=False)),
+        )
+        contracts_ending_soon_count = end_of_journey_counts["ends_soon"]
+        last_contract_ended_count = end_of_journey_counts["ended"]
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
@@ -934,6 +941,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             job_seeker.pro_support_request_mailto = _build_pro_support_request_mailto(
                 job_seeker.pro_support_request_company_email,
                 job_seeker.get_full_name(),
+                contract_ended=job_seeker.last_contract_ended_with_valid_approval,
             )
         job_seeker.show_create_pro_support_report = (
             request_from_siae

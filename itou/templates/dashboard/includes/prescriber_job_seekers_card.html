@@ -37,16 +37,16 @@
                     </a>
                 </li>
             {% endif %}
-            {% if contracts_ending_soon_count is not None %}
+            {% if end_of_journey_count is not None %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'job_seekers_views:list' %}?contract_ending_soon=on"
+                    <a href="{% url 'job_seekers_views:list' %}?end_of_journey=on"
                        class="btn-link btn-ico"
                        {% matomo_event "dashboard" "clic" "fins-de-contrat" %}>
                         <i class="ri-history-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Fins de contrats</span>
                     </a>
-                    {% if contracts_ending_soon_count %}
-                        <span class="badge rounded-pill badge-xs bg-warning">{{ contracts_ending_soon_count }}</span>
+                    {% if end_of_journey_count %}
+                        <span class="badge rounded-pill badge-xs bg-warning">{{ end_of_journey_count }}</span>
                     {% endif %}
                 </li>
             {% endif %}
