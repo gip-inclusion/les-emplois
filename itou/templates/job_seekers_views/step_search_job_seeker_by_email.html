@@ -66,9 +66,12 @@
                                     {% else %}
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
+                                {% elif orientation_process %}
+                                    Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager que vous souhaitez orienter.
                                 {% else %}
                                     L'identité de l’usager est une information clé pour la structure.
-                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                     « Ce n'est pas mon usager » afin d'enregistrer ses informations
                                     personnelles.
                                 {% endif %}
