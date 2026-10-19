@@ -11,25 +11,27 @@
 {% endblock %}
 
 {% block form_content %}
-    <fieldset>
-        <legend class="visually-hidden">État civil de l’usager</legend>
-        {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
-        {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
-        {% bootstrap_field form.first_name %}
-        {% bootstrap_field form.last_name %}
-        <hr class="mt-2 mb-3">
-        {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
-        {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
-        <div id="collapse_lack_of_nir_reason"
-             class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">{% bootstrap_field form.lack_of_nir_reason %}</div>
-        <hr class="mt-2 mb-3">
-        {% bootstrap_field form.nationality %}
-        {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
-        {% if form.birth_place %}
-            {% bootstrap_field form.birth_place %}
-            {% bootstrap_field form.birth_country %}
-        {% endif %}
-    </fieldset>
+    {% block fields %}
+        <fieldset>
+            <legend class="visually-hidden">État civil de l’usager</legend>
+            {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
+            {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
+            {% bootstrap_field form.first_name %}
+            {% bootstrap_field form.last_name %}
+            <hr class="mt-2 mb-3">
+            {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
+            {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
+            <div id="collapse_lack_of_nir_reason"
+                 class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">{% bootstrap_field form.lack_of_nir_reason %}</div>
+            <hr class="mt-2 mb-3">
+            {% bootstrap_field form.nationality %}
+            {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
+            {% if form.birth_place %}
+                {% bootstrap_field form.birth_place %}
+                {% bootstrap_field form.birth_country %}
+            {% endif %}
+        </fieldset>
+    {% endblock %}
 
     {% if job_seeker_already_exists %}
         <!-- Modal -->

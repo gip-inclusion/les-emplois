@@ -107,6 +107,16 @@ urlpatterns = [
         views.CreateJobSeekerStepEndForSenderView.as_view(),
         name="create_job_seeker_step_end_for_sender",
     ),
+    path(
+        "<uuid:session_uuid>/orientation/create/1",
+        views.CreateJobSeekerStep1ForOrientationView.as_view(),
+        name="create_job_seeker_step_1_for_orientation",
+    ),
+    path(
+        "<uuid:session_uuid>/orientation/create/2",
+        views.CreateJobSeekerStep2ForOrientationView.as_view(),
+        name="create_job_seeker_step_2_for_orientation",
+    ),
     # Direct hire process
     path(
         "<uuid:session_uuid>/hire/check-nir",
