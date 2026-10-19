@@ -1079,6 +1079,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "pe_obfuscated_nir",
                     "pe_last_certification_attempt_at",
                     "disabled_notifications",
+                    "creation_source",
                 )
             },
         ),
@@ -1173,6 +1174,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             "pe_obfuscated_nir",
             "pe_last_certification_attempt_at",
             "disabled_notifications",
+            "creation_source",
             "fields_history_formatted",
         ]
 

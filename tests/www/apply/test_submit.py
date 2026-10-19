@@ -2042,6 +2042,7 @@ class TestApplyAsPrescriber:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nationality == Nationality.FR
+        assert new_job_seeker.jobseeker_profile.creation_source == "sender"
 
         next_url = reverse(
             "apply:application_jobs",
