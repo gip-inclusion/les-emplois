@@ -1176,9 +1176,9 @@ itoutils[django,django-testing]==26.10.14.0 \
     --hash=sha256:4ea6126100a325a5ff83a7ca3524af219b340b3f77c83936d38f47b0fe225db5 \
     --hash=sha256:b5dd80408af9051c5eef5ca366a3676507c0e6cc1ee895a3352fb9d506860e43
     # via -r test.txt
-jedi==0.20.0 \
-    --hash=sha256:7bdd9c2634f56713299976f4cbd59cb3fa92165cc5e05ea811fb253480728b67 \
-    --hash=sha256:c3f4ccbd276696f4b19c54618d4fb18f9fc24b0aef02acf704b23f487daa1011
+jedi==0.20.1 \
+    --hash=sha256:0fb16d86c4a4c73c37ba518c77419975e30fcc620658a8d14fbb5720cdd34142 \
+    --hash=sha256:2f71208c3f9c1bca057c0e90d3f272aba44ace88fc4067d7587e9e069331b7e5
     # via ipython
 jmespath==1.1.0 \
     --hash=sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d \
