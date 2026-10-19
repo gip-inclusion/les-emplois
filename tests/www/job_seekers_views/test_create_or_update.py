@@ -15,6 +15,7 @@ from itou.users.enums import ActionKind, LackOfPoleEmploiId, Nationality, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
@@ -1100,6 +1101,21 @@ class TestCreateForOrientation:
         )
 
         assertContains(response, "Email existant")
+        assertContains(
+            response, f"<h1>Orienter {mask_unless(job_seeker.get_inverted_full_name(), False)}</h1>", html=True
+        )
+        assertContains(
+            response,
+            f"""
+            <p>
+                Si votre usager n'est pas <b>{mask_unless(job_seeker.get_inverted_full_name(), False)}</b>,
+                cliquez sur « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager
+                que vous souhaitez orienter.
+            </p>
+            """,
+            html=True,
+        )
+        assertNotContains(response, "information clé pour la structure")
 
     def test_existing_identity(self, client):
         job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=datetime.date(1978, 12, 20))
