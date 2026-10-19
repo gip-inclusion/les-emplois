@@ -294,6 +294,24 @@
 # name: test_expired_orientation_for_structure[subject]
   '[TEST] Cette demande d’orientation a expiré'
 # ---
+# name: test_free_form_email_to_sender[body]
+  '''
+  Bonjour,
+  
+  Bien reçu.
+  
+  Cordialement,
+  Jean DUSERVICE
+  
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_free_form_email_to_sender[subject]
+  '[TEST] Re: Pierre DUPONT de la structure Pres. Org. souhaite vous adresser un usager'
+# ---
 # name: test_free_form_email_to_service[body]
   '''
   Bonjour,
