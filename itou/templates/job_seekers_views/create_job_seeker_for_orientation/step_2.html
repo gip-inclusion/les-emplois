@@ -1,0 +1,47 @@
+{% extends "job_seekers_views/create_or_update_job_seeker/step_base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+
+{% block progress_title %}
+    <strong>Étape 2</strong>/2 : Finaliser la création de l’usager
+{% endblock %}
+{% block step_title %}
+    Compléter les informations de l’usager
+{% endblock %}
+
+{% block form_content %}
+    {% component_alert content=content variant="info" extra_classes="mb-3" %}
+        {% fragment as content %}
+            <p class="mb-0">Ces informations permettent d’accélérer le temps de traitement de la demande.</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+    <fieldset>
+        <legend class="h4">Compléter l’état civil</legend>
+        {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
+        {% bootstrap_field form.birth_country %}
+        {% bootstrap_field form.birth_place %}
+    </fieldset>
+    <fieldset>
+        <legend class="h4">Compléter les coordonnées</legend>
+        {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+        {% bootstrap_field form.address_for_autocomplete %}
+        {% bootstrap_field form.address_line_1 %}
+        {% bootstrap_field form.address_line_2 %}
+        {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+        {% bootstrap_field form.city %}
+
+        {% bootstrap_field form.insee_code %}
+        {% bootstrap_field form.ban_api_resolved_address %}
+        {% bootstrap_field form.fill_mode %}
+    </fieldset>
+    <fieldset>
+        <legend class="h4">Compléter la situation</legend>
+        {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
+    </fieldset>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+    {{ form.media.js }}
+{% endblock %}

@@ -56,6 +56,8 @@ from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKin
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
+    CreateJobSeekerForOrientationStep1Form,
+    CreateJobSeekerForOrientationStep2Form,
     CreateOrUpdateJobSeekerStep1Form,
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
@@ -1001,7 +1003,9 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.is_orientation = self.job_seeker_session.get("config", {}).get("tunnel") == "orientation"
+        self.is_orientation = (
+            self.job_seeker_session.get("config", {}).get("tunnel") == JobSeekerCreationSource.ORIENTATION
+        )
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         self.standalone_creation = self.company is None and not self.is_orientation
@@ -1238,16 +1242,15 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
-                user_infos = self.job_seeker_session.get("user", {})
-                user_infos.update({"email": self.form.cleaned_data["email"]})
-                profile_infos = self.job_seeker_session.get("profile", {})
-                profile_infos.update({"nir": nir})
-                self.job_seeker_session.update({"user": user_infos, "profile": profile_infos})
-                view_name = (
-                    "job_seekers_views:create_job_seeker_step_1_for_hire"
-                    if self.hire_process
-                    else "job_seekers_views:create_job_seeker_step_1_for_sender"
+                self.job_seeker_session.set(
+                    "user", self.job_seeker_session.get("user", {}) | {"email": self.form.cleaned_data["email"]}
                 )
+                if self.hire_process:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_hire"
+                elif self.is_orientation:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_orientation"
+                else:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_sender"
 
                 return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
@@ -1339,6 +1342,7 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
+    form_class = CreateOrUpdateJobSeekerStep1Form
 
     previous_apply_url = "job_seekers_views:search_by_email_for_sender"
     previous_hire_url = "job_seekers_views:search_by_email_for_hire"
@@ -1362,7 +1366,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
             prefilled_birth_place = prefilled_birth_place or birth_city_from_nir
             prefilled_birth_country = prefilled_birth_country or birth_country_from_nir
 
-        self.form = CreateOrUpdateJobSeekerStep1Form(
+        self.form = self.form_class(
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
@@ -1594,6 +1598,52 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "progress": "80",
             **jobseeker_personal_infos_display_kwargs(self.profile),
         }
+
+
+class CreateJobSeekerStep1ForOrientationView(CreateJobSeekerStep1ForSenderView):
+    template_name = "job_seekers_views/create_job_seeker_for_orientation/step_1.html"
+    form_class = CreateJobSeekerForOrientationStep1Form
+
+    previous_apply_url = "job_seekers_views:search_by_email_for_sender"
+    next_apply_url = "job_seekers_views:create_job_seeker_step_2_for_orientation"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"progress": "50"}
+
+
+class CreateJobSeekerStep2ForOrientationView(CreateJobSeekerStepEndForSenderView):
+    template_name = "job_seekers_views/create_job_seeker_for_orientation/step_2.html"
+
+    previous_apply_url = "job_seekers_views:create_job_seeker_step_1_for_orientation"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = CreateJobSeekerForOrientationStep2Form(
+            self.job_seeker_session.get("profile")["birthdate"],
+            data=request.POST or None,
+            initial=self.job_seeker_session.get("user") | self.job_seeker_session.get("profile"),
+        )
+
+    def post(self, request, *args, **kwargs):
+        if not self.form.is_valid():
+            return self.render_to_response(self.get_context_data(**kwargs))
+        self.job_seeker_session.set(
+            "user", self.job_seeker_session.get("user") | self.form.cleaned_data_without_profile_fields
+        )
+        # Why: the session is only JSON-serialized at the end of the request, and the creation expects primary keys.
+        self.job_seeker_session.set(
+            "profile",
+            self.job_seeker_session.get("profile")
+            | {k: getattr(v, "pk", v) for k, v in self.form.cleaned_data_from_profile_fields.items()},
+        )
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"form": self.form, "progress": "100"}
 
 
 class UpdateJobSeekerStartView(View):
