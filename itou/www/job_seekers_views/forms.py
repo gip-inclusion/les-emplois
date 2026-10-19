@@ -675,6 +675,12 @@ class ProSupportReportForm(forms.ModelForm):
         labels = {
             "other_barrier": "Autres freins identifiés",
         }
+        help_texts = {
+            "other_barrier": (
+                "Ces informations seront visibles par les autres accompagnateurs. "
+                "N’inscrivez aucune information médicale ni confidentielle dans ce champ."
+            ),
+        }
         widgets = {
             "other_barrier": forms.Textarea(attrs={"rows": 3}),
         }

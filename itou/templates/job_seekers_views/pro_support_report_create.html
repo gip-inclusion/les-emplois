@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
-{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 
@@ -38,11 +37,6 @@
 
                             {% bootstrap_field form.barriers %}
                             {% bootstrap_field form.other_barrier %}
-                            {% component_info c_info__summary=c_info__summary extra_classes="mb-3" %}
-                                {% fragment as c_info__summary %}
-                                    Ces informations seront visibles par les autres accompagnateurs. N’inscrivez aucune information médicale ni confidentielle dans ce champ.
-                                {% endfragment %}
-                            {% endcomponent_info %}
 
                             {% bootstrap_field form.autonomy %}
 
