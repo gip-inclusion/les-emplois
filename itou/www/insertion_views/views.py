@@ -34,7 +34,7 @@ from itou.insertion.utils import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import ActionKind, UserKind
+from itou.users.enums import ActionKind, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     add_user_can_view_personal_information,
@@ -289,7 +289,7 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             "create_job_seeker_url": reverse(
                 "job_seekers_views:get_or_create_start",
                 query={
-                    "tunnel": "orientation",
+                    "tunnel": JobSeekerCreationSource.ORIENTATION,
                     "from_url": service_detail_url,
                     "service_uid": self.service.uid,
                 },

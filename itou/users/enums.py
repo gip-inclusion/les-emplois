@@ -59,6 +59,13 @@ class LackOfPoleEmploiId(models.TextChoices):
     REASON_NOT_REGISTERED = "NOT_REGISTERED", "Non inscrit auprès de France Travail"
 
 
+class JobSeekerCreationSource(models.TextChoices):
+    HIRE = "hire", "déclaration d'embauche"
+    ORIENTATION = "orientation", "orientation vers un service"
+    SENDER = "sender", "candidature"
+    STANDALONE = "standalone", "ajout d'un usager"
+
+
 class ActionKind(models.TextChoices):
     CREATE = "CREATE", "création du compte usager"
     APPLY = "APPLY", "envoi de candidature"

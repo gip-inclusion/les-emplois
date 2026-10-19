@@ -38,7 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
+from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
@@ -898,7 +898,7 @@ class GetOrCreateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         self.tunnel = request.GET.get("tunnel")
-        if self.tunnel not in ("sender", "hire", "standalone", "orientation"):
+        if self.tunnel not in JobSeekerCreationSource:
             raise Http404
         self.from_url = get_safe_url(request, "from_url")
         if not self.from_url:
@@ -912,10 +912,18 @@ class GetOrCreateJobSeekerStartView(View):
         }
 
         # apply or hire data
-        if self.tunnel == "sender" or self.tunnel == "hire":
+        if self.tunnel in (JobSeekerCreationSource.SENDER, JobSeekerCreationSource.HIRE):
             param_key, session_kind, error_message = {
-                "sender": ("apply_session_uuid", APPLY_SESSION_KIND, "Session de candidature invalide"),
-                "hire": ("hire_session_uuid", HIRE_SESSION_KIND, "Session de déclaration d’embauche invalide"),
+                JobSeekerCreationSource.SENDER: (
+                    "apply_session_uuid",
+                    APPLY_SESSION_KIND,
+                    "Session de candidature invalide",
+                ),
+                JobSeekerCreationSource.HIRE: (
+                    "hire_session_uuid",
+                    HIRE_SESSION_KIND,
+                    "Session de déclaration d’embauche invalide",
+                ),
             }[self.tunnel]
             session_uuid = request.GET.get(param_key)
             try:
@@ -930,7 +938,7 @@ class GetOrCreateJobSeekerStartView(View):
             except ValueError:  # In case the pk isn't an integer
                 raise Http404("Aucune entreprise n'a été trouvée")
             data["apply"] = apply_data
-        elif self.tunnel == "orientation":
+        elif self.tunnel == JobSeekerCreationSource.ORIENTATION:
             service_uid = request.GET.get("service_uid")
             if not service_uid:
                 raise Http404
@@ -945,11 +953,11 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel == "orientation":
+        if self.tunnel == JobSeekerCreationSource.ORIENTATION:
             view_name = "job_seekers_views:search_by_email_for_sender"
-        elif self.tunnel in ("sender", "standalone"):
+        elif self.tunnel in (JobSeekerCreationSource.SENDER, JobSeekerCreationSource.STANDALONE):
             view_name = "job_seekers_views:check_nir_for_sender"
-        elif self.tunnel == "hire":
+        elif self.tunnel == JobSeekerCreationSource.HIRE:
             view_name = "job_seekers_views:check_nir_for_hire"
 
         return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
@@ -1545,6 +1553,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
+                self.profile.creation_source = self.job_seeker_session.get("config")["tunnel"]
                 if self.standalone_creation:
                     message = format_html(
                         "Usager ajouté||Le compte de {} a été créé et ajouté à votre liste d'accompagnements.<br>"
@@ -1554,8 +1563,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     messages.success(request, message, extra_tags="toast")
                 self.profile.validate_constraints()  # Detect inconsistencies (like duplicate NIR)
                 self.profile.save()
-                # TODO(ewen): add tunnel information when we have it in self.tunnel
-                logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
+                logger.info(
+                    "user=%s created job_seeker=%s source=%s", self.sender.pk, user.pk, self.profile.creation_source
+                )
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")

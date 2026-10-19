@@ -990,6 +990,7 @@ class TestStandaloneCreateAsPrescriber:
         ).exists()
         for field in boolean_fields:
             assert getattr(new_job_seeker.jobseeker_profile, field) == (field in true_fields)
+        assert new_job_seeker.jobseeker_profile.creation_source == "standalone"
 
 
 class TestUpdateAsOther:
