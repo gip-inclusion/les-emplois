@@ -1,9 +1,12 @@
+import dataclasses
+import datetime
 import uuid
 
 from django.conf import settings
 from django.db import models
 
 from itou.rdv_insertion.enums import (
+    AppointmentCreatedBy,
     InvitationRequestReasonCategory,
     InvitationStatus,
     InvitationType,
@@ -196,3 +199,69 @@ class WebhookEvent(models.Model):
     @property
     def for_invitation(self):
         return self.body["meta"]["model"].lower() == "invitation"
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class JobSeekerAppointment:
+    """A job seeker's appointment, from rdv-insertion's API or the invitation experiment. Not stored."""
+
+    rdv_insertion_id: int  # RDV-I rdv id, shared by both sources
+    status: ParticipationStatus
+    start_at: datetime.datetime
+    duration: datetime.timedelta
+    category: str
+    reason: str
+    is_collective: bool
+    organization_name: str
+    location_name: str | None
+    address: str | None
+    agents: tuple[str, ...]
+    created_by: AppointmentCreatedBy | None
+
+    @classmethod
+    def from_api(cls, participation, *, category):
+        rdv = participation["rdv"]
+        lieu = rdv["lieu"]
+        return cls(
+            rdv_insertion_id=rdv["id"],
+            status=ParticipationStatus(participation["status"]),
+            start_at=datetime.datetime.fromisoformat(participation["starts_at"]),
+            duration=datetime.timedelta(minutes=rdv["duration_in_min"]),
+            category=category,
+            reason=rdv["motif"]["name"],
+            is_collective=rdv["motif"]["collectif"],
+            organization_name=rdv["organisation"]["name"],
+            location_name=lieu["name"] if lieu else None,
+            address=lieu["address"] if lieu else rdv["address"],
+            agents=tuple(f"{agent['first_name']} {agent['last_name']}" for agent in rdv["agents"]),
+            created_by=AppointmentCreatedBy(participation["created_by"]),
+        )
+
+    @classmethod
+    def list_from_api(cls, follow_ups):
+        """Appointments of the follow-ups returned by rdv-insertion's API."""
+        return [
+            cls.from_api(participation, category=follow_up["motif_category"]["name"])
+            for follow_up in follow_ups
+            for participation in follow_up["participations"]
+        ]
+
+    @classmethod
+    def from_stored_participation(cls, participation):
+        appointment = participation.appointment
+        location = appointment.location
+        return cls(
+            rdv_insertion_id=appointment.rdv_insertion_id,
+            status=ParticipationStatus(participation.status),
+            start_at=appointment.start_at,
+            duration=appointment.duration,
+            category=appointment.get_reason_category_display(),
+            reason=appointment.reason,
+            is_collective=appointment.is_collective,
+            organization_name=appointment.company.display_name,
+            location_name=location.name if location else None,
+            address=location.address if location else appointment.address,
+            # Not stored by the invitation experiment
+            agents=(),
+            created_by=None,
+        )

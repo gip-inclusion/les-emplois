@@ -1,3 +1,4 @@
+import copy
 import datetime
 import random
 import uuid
@@ -28,6 +29,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
+from itou.utils.mocks.rdv_insertion import RDV_INSERTION_USER_SEARCH_BODY
 from itou.www.job_seekers_views.views import JobApplication, can_view_external_actions
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -41,6 +43,7 @@ from tests.geo.factories import create_qpv
 from tests.insertion.factories import OrientationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.rdv_insertion.factories import ParticipationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -2332,3 +2335,75 @@ class TestOverviewTab:
         del job_seeker.last_assignment
         rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
         assert pretty_indented(rendered) == snapshot(name="no active assignment")
+
+
+class TestAppointmentsTab:
+    SEARCH_URL = "https://rdv-insertion.fake/api/plateforme_inclusion/users/search"
+
+    @pytest.fixture(autouse=True)
+    def rdvi_settings(self, settings):
+        settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_BASE_URL = (
+            "https://rdv-insertion.fake/api/plateforme_inclusion/"
+        )
+        settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = "S3cr3t!"
+
+    @pytest.fixture
+    def job_seeker(self):
+        return JobSeekerFactory(
+            for_snapshot=True, jobseeker_profile__nir=RDV_INSERTION_USER_SEARCH_BODY["user"]["nir"]
+        )
+
+    @freeze_time("2026-10-01")
+    def test_appointments(self, client, snapshot, respx_mock, job_seeker):
+        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
+        ParticipationFactory(for_snapshot=True, job_seeker=job_seeker)
+        prescriber_membership = PrescriberMembershipFactory(
+            user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
+        )
+        client.force_login(prescriber_membership.user)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+
+    def test_appointment_without_lieu(self, client, respx_mock, job_seeker):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        rdv = body["user"]["follow_ups"][0]["participations"][0]["rdv"]
+        rdv["lieu"] = None
+        rdv["address"] = "1 place de la Mairie 26000 Valence"
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "Lieu\xa0: <strong>1 place de la Mairie 26000 Valence</strong>")
+
+    def test_appointment_in_both_sources(self, client, respx_mock, job_seeker):
+        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
+        ParticipationFactory(job_seeker=job_seeker, appointment__rdv_insertion_id=1)
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "Détails du rendez-vous", count=1)
+        # Only in the rdv-insertion version
+        assertNotContains(response, "Plateforme Insertion Valence")
+
+    def test_tab_only_shown_with_appointments(self, client, respx_mock, job_seeker):
+        respx_mock.post(self.SEARCH_URL).respond(404, json={"errors": ["Aucun usager ne correspond à ce NIR"]})
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        details_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        appointments_url = reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id})
+
+        assertNotContains(client.get(details_url), appointments_url)
+        assertContains(client.get(appointments_url), "Aucun rendez-vous à afficher.")
+
+        ParticipationFactory(job_seeker=job_seeker)
+        assertContains(client.get(details_url), appointments_url)
+
+    def test_access(self, client, respx_mock, job_seeker):
+        # No route: rdv-insertion must not be called for someone who can't see the appointments
+        ParticipationFactory(job_seeker=job_seeker)
+        client.force_login(PrescriberFactory(membership__organization__authorized=False))
+        details_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        appointments_url = reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id})
+
+        assertNotContains(client.get(details_url), appointments_url)
+        assert client.get(appointments_url).status_code == 403

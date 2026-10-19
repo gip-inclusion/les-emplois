@@ -1,0 +1,136 @@
+{% extends "layout/base.html" %}
+{% load badges %}
+{% load datetime_filters %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-appointments" only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_overview_tab=show_overview_tab show_appointments_tab=show_appointments_tab active_nav_tab="appointments" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Rendez-vous</h2>
+            {% if appointments %}
+                <div class="table-responsive mt-3 mt-md-4">
+                    <table class="table table-hover">
+                        <caption class="visually-hidden">Liste des rendez-vous</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Statut</th>
+                                <th scope="col">Date et heure</th>
+                                <th scope="col">Motif</th>
+                                <th scope="col">Organisation</th>
+                                <th scope="col" class="text-end w-50px">
+                                    <span class="visually-hidden">Actions possibles sur les rendez-vous</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{% participation_status_badge appointment.status appointment.start_at extra_classes="badge-xs" %}</td>
+                                    <td>{{ appointment.start_at }}</td>
+                                    <td>{{ appointment.reason }}</td>
+                                    <td>{{ appointment.organization_name }}</td>
+                                    <td class="text-end w-50px">
+                                        <button type="button"
+                                                class="btn btn-sm btn-link btn-ico-only"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#appointment-{{ forloop.counter }}-modal"
+                                                {% matomo_event "candidat" "clic" "visualisation-rdv" %}>
+                                            <i class="ri-search-line"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="Voir"
+                                               aria-label="Voir le rendez-vous du {{ appointment.start_at }}"></i>
+                                        </button>
+                                        <div class="modal modal--mini fade text-start"
+                                             id="appointment-{{ forloop.counter }}-modal"
+                                             tabindex="-1"
+                                             aria-labelledby="appointment-{{ forloop.counter }}-modal-title"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h3 class="modal-title"
+                                                            id="appointment-{{ forloop.counter }}-modal-title">Détails du rendez-vous</h3>
+                                                        <button type="button"
+                                                                class="btn-close"
+                                                                data-bs-dismiss="modal"
+                                                                aria-label="Fermer"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>{% participation_status_badge appointment.status appointment.start_at %}</p>
+                                                        <p>
+                                                            Date et heure : <strong>{{ appointment.start_at|date:"d/m/Y \à H\hi" }}</strong>
+                                                            <br>
+                                                            Durée : <strong>{{ appointment.duration|duration }}</strong>
+                                                        </p>
+                                                        <p>
+                                                            Type de rendez-vous : <strong>{{ appointment.is_collective|yesno:"Collectif,Individuel" }}</strong>
+                                                            <br>
+                                                            Catégorie de motif : <strong>{{ appointment.category }}</strong>
+                                                            <br>
+                                                            Motif : <strong>{{ appointment.reason }}</strong>
+                                                        </p>
+                                                        {% if appointment.location_name %}
+                                                            <p>
+                                                                Lieu : <strong>{{ appointment.location_name }}</strong>
+                                                                <br>
+                                                                Adresse : <strong>{{ appointment.address }}</strong>
+                                                            </p>
+                                                        {% elif appointment.address %}
+                                                            <p>
+                                                                Lieu : <strong>{{ appointment.address }}</strong>
+                                                            </p>
+                                                        {% endif %}
+                                                        <p class="mb-0">
+                                                            Organisation qui reçoit : <strong>{{ appointment.organization_name }}</strong>
+                                                            {% if appointment.agents %}
+                                                                <br>
+                                                                Agent qui reçoit : <strong>{{ appointment.agents|join:", " }}</strong>
+                                                            {% endif %}
+                                                            {% if appointment.created_by %}
+                                                                <br>
+                                                                Auteur du RDV : <strong>{{ appointment.created_by.label }}</strong>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="c-box c-box--results mb-3 mb-md-4">
+                    <div class="c-box--results__body">
+                        <p class="mb-0">Aucun rendez-vous à afficher.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}
