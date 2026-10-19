@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
+from itou.utils.enums import ItouEnvironment
 from itou.utils.legal_terms import terms_acceptance_required
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
 
@@ -34,6 +35,8 @@ class RateLimitMiddleware:
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
+        if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
+            return None
         # Django REST Framework handles the rate limiting on the API.
         if "itou.api" not in request.resolver_match.app_names:
             throttler = FailSafeUserRateThrottle() if request.user.is_authenticated else FailSafeAnonRateThrottle()
