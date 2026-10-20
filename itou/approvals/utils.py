@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from django.db.models import Max, Q
+from django.db.models import Max
 from django.utils import timezone
 
 from itou.approvals.constants import CLOSURE_PENDING_APPLICATION_MAX_AGE
@@ -60,10 +60,7 @@ def can_close_approval(approval):
     ):
         return False
 
-    return not Contract.objects.filter(
-        Q(end_date__isnull=True) | Q(end_date__gte=today),
-        job_seeker=approval.user,
-    ).exists()
+    return not Contract.objects.ongoing().filter(job_seeker=approval.user).exists()
 
 
 def _clip_approval_dependency(approval, model, end_date, acting_user):

@@ -1206,6 +1206,12 @@ class SiaeFinancialAnnex(models.Model):
         return self.state in SiaeFinancialAnnex.STATES_ACTIVE and self.end_at > timezone.localdate()
 
 
+class ContractQuerySet(models.QuerySet):
+    def ongoing(self):
+        """Contracts still running according to the ASP data (no end date, or ending today or later)."""
+        return self.filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.localdate()))
+
+
 class Contract(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)
     job_seeker = models.ForeignKey(
@@ -1230,6 +1236,8 @@ class Contract(models.Model):
         default=list,
     )
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    objects = ContractQuerySet.as_manager()
 
     @property
     def has_ended(self):
