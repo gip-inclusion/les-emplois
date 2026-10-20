@@ -26,7 +26,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -53,7 +53,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -138,7 +138,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -165,7 +165,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -250,7 +250,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -277,7 +277,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -362,7 +362,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -389,7 +389,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -444,7 +444,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-light text-primary">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -471,7 +471,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-light text-primary">
                                           Statut du RDV à préciser
                                       </span>
                                   </p>
@@ -556,7 +556,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -583,7 +583,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -638,7 +638,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-light text-primary">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -665,7 +665,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-light text-primary">
                                           Statut du RDV à préciser
                                       </span>
                                   </p>
@@ -750,7 +750,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -777,7 +777,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -832,7 +832,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-light text-primary">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -859,7 +859,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-light text-primary">
                                           Statut du RDV à préciser
                                       </span>
                                   </p>
@@ -944,7 +944,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -971,7 +971,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -1384,7 +1384,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -1411,7 +1411,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -1824,7 +1824,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
                       RDV à venir
                   </span>
               </td>
@@ -1851,7 +1851,7 @@
                               </div>
                               <div class="modal-body">
                                   <p>
-                                      <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                                           RDV à venir
                                       </span>
                                   </p>
@@ -2256,7 +2256,7 @@
                   </div>
                   <div class="modal-body">
                       <p>
-                          <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                               RDV à venir
                           </span>
                       </p>
@@ -2330,7 +2330,7 @@
                   </div>
                   <div class="modal-body">
                       <p>
-                          <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                               RDV à venir
                           </span>
                       </p>
@@ -2404,7 +2404,7 @@
                   </div>
                   <div class="modal-body">
                       <p>
-                          <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
+                          <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
                               RDV à venir
                           </span>
                       </p>

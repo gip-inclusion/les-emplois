@@ -401,13 +401,13 @@ def test_orientation_state_badge(status, snapshot):
         (
             ParticipationStatus.UNKNOWN,
             datetime(2024, 8, 2, tzinfo=UTC),
-            "bg-important-lightest text-important",
+            "bg-info-lighter text-info",
             "RDV à venir",
         ),
         (
             ParticipationStatus.UNKNOWN,
             datetime(2024, 7, 31, tzinfo=UTC),
-            "bg-important-lightest text-important",
+            "bg-light text-primary",
             "Statut du RDV à préciser",
         ),
         (
