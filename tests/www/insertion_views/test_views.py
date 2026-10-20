@@ -6,7 +6,6 @@ from functools import partial
 from unittest.mock import patch
 
 import pytest
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import urlencode
@@ -83,7 +82,7 @@ class TestStructures:
     def get_structure_url(self, structure):
         return reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid})
 
-    def test_card_view_anonymous_renders_description_tab(self, client, snapshot):
+    def test_card_view_anonymous_renders_description_tab(self, client, snapshot, settings):
         structure = StructureFactory(
             name="Structure test",
             description="Description de test",
@@ -289,7 +288,7 @@ class TestStructures:
             (ItouStaffFactory, assertNotContains),
         ],
     )
-    def test_card_view_register_mobilization_event_per_user_kind(self, client, user_factory, assertion):
+    def test_card_view_register_mobilization_event_per_user_kind(self, client, user_factory, assertion, settings):
         structure = StructureFactory(
             name="Structure test",
             description="Description de test",
