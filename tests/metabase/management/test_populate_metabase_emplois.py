@@ -991,7 +991,8 @@ def test_populate_users_exclude_job_seekers():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 def test_populate_users(snapshot):
-    pro_user = ProfessionalFactory()
+    pro_user_with_phone = ProfessionalFactory()
+    pro_user_without_phone = ProfessionalFactory(phone="")
 
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="users")
@@ -1001,14 +1002,27 @@ def test_populate_users(snapshot):
         rows = cursor.fetchall()
         assert rows == [
             (
-                pro_user.id,
-                pro_user.public_id,
-                pro_user.email,
+                pro_user_with_phone.id,
+                pro_user_with_phone.public_id,
+                pro_user_with_phone.email,
                 "professional",
-                pro_user.first_name,
-                pro_user.last_name,
-                pro_user.last_login,
+                pro_user_with_phone.first_name,
+                pro_user_with_phone.last_name,
+                pro_user_with_phone.last_login,
                 datetime.date(2023, 2, 2),
+                1,
+                datetime.date(2023, 2, 2),
+            ),
+            (
+                pro_user_without_phone.id,
+                pro_user_without_phone.public_id,
+                pro_user_without_phone.email,
+                "professional",
+                pro_user_without_phone.first_name,
+                pro_user_without_phone.last_name,
+                pro_user_without_phone.last_login,
+                datetime.date(2023, 2, 2),
+                0,
                 datetime.date(2023, 2, 2),
             ),
         ]
