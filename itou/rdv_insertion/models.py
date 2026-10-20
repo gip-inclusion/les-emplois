@@ -11,6 +11,7 @@ from itou.rdv_insertion.enums import (
     InvitationRequestReasonCategory,
     InvitationStatus,
     InvitationType,
+    MotifCategoryType,
     ParticipationStatus,
 )
 
@@ -203,6 +204,12 @@ class WebhookEvent(models.Model):
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class AppointmentAgent:
+    full_name: str
+    email: str
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class JobSeekerAppointment:
     """A job seeker's appointment, from rdv-insertion's API or the invitation experiment. Not stored."""
 
@@ -210,17 +217,17 @@ class JobSeekerAppointment:
     status: ParticipationStatus
     start_at: datetime.datetime
     duration: datetime.timedelta
-    category: str
+    theme: str
     reason: str
     is_collective: bool
     organization_name: str
     location_name: str | None
     address: str | None
-    agents: tuple[str, ...]
+    agents: tuple[AppointmentAgent, ...]
     created_by: AppointmentCreatedBy | None
 
     @classmethod
-    def from_api(cls, participation, *, category):
+    def from_api(cls, participation, *, theme):
         rdv = participation["rdv"]
         lieu = rdv["lieu"]
         return cls(
@@ -228,13 +235,20 @@ class JobSeekerAppointment:
             status=ParticipationStatus(participation["status"]),
             start_at=datetime.datetime.fromisoformat(participation["starts_at"]),
             duration=datetime.timedelta(minutes=rdv["duration_in_min"]),
-            category=category,
+            theme=theme,
             reason=rdv["motif"]["name"],
             is_collective=rdv["motif"]["collectif"],
             organization_name=rdv["organisation"]["name"],
             location_name=lieu["name"] if lieu else None,
             address=lieu["address"] if lieu else rdv["address"],
-            agents=tuple(f"{agent['first_name']} {agent['last_name']}" for agent in rdv["agents"]),
+            agents=tuple(
+                AppointmentAgent(
+                    # Same format as User.get_full_name
+                    full_name=f"{agent['first_name'].strip().title()} {agent['last_name'].upper()}",
+                    email=agent["email"],
+                )
+                for agent in rdv["agents"]
+            ),
             created_by=AppointmentCreatedBy(participation["created_by"]),
         )
 
@@ -246,7 +260,9 @@ class JobSeekerAppointment:
         the only source that links them to their company.
         """
         return [
-            cls.from_api(participation, category=follow_up["motif_category"]["name"])
+            cls.from_api(
+                participation, theme=MotifCategoryType(follow_up["motif_category"]["motif_category_type"]).label
+            )
             for follow_up in follow_ups
             if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
             for participation in follow_up["participations"]
@@ -261,7 +277,7 @@ class JobSeekerAppointment:
             status=ParticipationStatus(participation.status),
             start_at=appointment.start_at,
             duration=appointment.duration,
-            category=appointment.get_reason_category_display(),
+            theme="Suite à une candidature",
             reason=appointment.reason,
             is_collective=appointment.is_collective,
             organization_name=appointment.company.display_name,

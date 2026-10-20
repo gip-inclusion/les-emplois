@@ -2060,7 +2060,10 @@
               <h2>
                   Rendez-vous
               </h2>
-              <div class="table-responsive mt-3 mt-md-4">
+              <p class="mb-3 mb-md-4">
+                  2 résultats
+              </p>
+              <div class="table-responsive mb-3 mb-md-4">
                   <table class="table table-hover">
                       <caption class="visually-hidden">
                           Liste des rendez-vous
@@ -2068,13 +2071,19 @@
                       <thead>
                           <tr>
                               <th scope="col">
+                                  Motif
+                              </th>
+                              <th scope="col">
                                   Statut
                               </th>
                               <th scope="col">
-                                  Date et heure
+                                  Date
                               </th>
                               <th scope="col">
-                                  Motif
+                                  Thématique
+                              </th>
+                              <th scope="col">
+                                  Reçu par
                               </th>
                               <th scope="col">
                                   Organisation
@@ -2087,19 +2096,29 @@
                           </tr>
                       </thead>
                       <tbody>
-                          <tr>
+                          <tr class="align-top">
+                              <td class="fw-bold">
+                                  Rendez-vous d'orientation
+                              </td>
                               <td>
                                   <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                       RDV honoré
                                   </span>
                               </td>
                               <td>
-                                  15 septembre 2026 14:00
+                                  15/09/2026 · 14h00
                               </td>
                               <td>
-                                  Rendez-vous d'orientation
+                                  RSA orientation
                               </td>
                               <td>
+                                  <span class="d-block">
+                                      Claire DURAND
+                                  </span>
+                              </td>
+                              <td>
+                                  <i aria-hidden="true" class="ri-community-line">
+                                  </i>
                                   Plateforme Insertion Valence
                               </td>
                               <td class="text-end w-50px">
@@ -2140,7 +2159,7 @@
                                                           Individuel
                                                       </strong>
                                                       <br/>
-                                                      Catégorie de motif :
+                                                      Thématique :
                                                       <strong>
                                                           RSA orientation
                                                       </strong>
@@ -2169,7 +2188,7 @@
                                                       <br/>
                                                       Agent qui reçoit :
                                                       <strong>
-                                                          Claire Durand
+                                                          Claire DURAND
                                                       </strong>
                                                       <br/>
                                                       Auteur du RDV :
@@ -2183,19 +2202,26 @@
                                   </div>
                               </td>
                           </tr>
-                          <tr>
+                          <tr class="align-top">
+                              <td class="fw-bold">
+                                  Entretien d'embauche
+                              </td>
                               <td>
                                   <span class="badge badge-xs rounded-pill bg-light text-primary">
                                       Statut du RDV à préciser
                                   </span>
                               </td>
                               <td>
-                                  6 août 2024 10:00
+                                  06/08/2024 · 10h00
                               </td>
                               <td>
-                                  Entretien d'embauche
+                                  Suite à une candidature
                               </td>
                               <td>
+                              </td>
+                              <td>
+                                  <i aria-hidden="true" class="ri-community-line">
+                                  </i>
                                   ACME Inc.
                               </td>
                               <td class="text-end w-50px">
@@ -2236,9 +2262,9 @@
                                                           Individuel
                                                       </strong>
                                                       <br/>
-                                                      Catégorie de motif :
+                                                      Thématique :
                                                       <strong>
-                                                          Entretien SIAE
+                                                          Suite à une candidature
                                                       </strong>
                                                       <br/>
                                                       Motif :
