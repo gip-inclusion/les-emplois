@@ -185,17 +185,28 @@ def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
     return mark_safe(badge)
 
 
-@register.simple_tag
-def participation_status_badge(status, start_at, *, extra_classes="badge-sm"):
-    status_classes = {
-        ParticipationStatus.UNKNOWN: "bg-important-lightest text-important",
+def _participation_status_label(status, start_at):
+    if status == ParticipationStatus.UNKNOWN:
+        return "RDV à venir" if start_at > timezone.now() else "Statut du RDV à préciser"
+    return ParticipationStatus(status).label
+
+
+def _participation_status_classes(status, start_at):
+    if status == ParticipationStatus.UNKNOWN:
+        return "bg-info-lighter text-info" if start_at > timezone.now() else "bg-light text-primary"
+    return {
         ParticipationStatus.SEEN: "bg-success-lighter text-success",
         ParticipationStatus.REVOKED: "bg-warning-lighter text-warning",
         ParticipationStatus.EXCUSED: "bg-warning-lighter text-warning",
         ParticipationStatus.NOSHOW: "bg-danger-lighter text-danger",
     }[status]
-    if status == ParticipationStatus.UNKNOWN:
-        label = "RDV à venir" if start_at > timezone.now() else "Statut du RDV à préciser"
-    else:
-        label = ParticipationStatus(status).label
-    return format_html('<span class="badge {} rounded-pill {}">{}</span>', extra_classes, status_classes, label)
+
+
+@register.simple_tag
+def participation_status_badge(status, start_at, *, extra_classes="badge-sm"):
+    return format_html(
+        '<span class="badge {} rounded-pill {}">{}</span>',
+        extra_classes,
+        _participation_status_classes(status, start_at),
+        _participation_status_label(status, start_at),
+    )
