@@ -11745,7 +11745,7 @@
 # ---
 # name: test_populate_users
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -11791,7 +11791,7 @@
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_utilisateurs_v0" ("id" integer,"uid" UUID,
                                                                                  "email" varchar,"type" varchar,"prenom" varchar,"nom" varchar,"dernière_connexion" timestamp WITH TIME ZONE,
-                                                                                                                                                                                        "date_inscription" date,"date_mise_à_jour_metabase" date)
+                                                                                                                                                                                        "date_inscription" date,"avec_téléphone" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -11900,6 +11900,18 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_utilisateurs_v0"."avec_téléphone" IS \'A renseigné un numéro de téléphone\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_utilisateurs_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
       }),
       dict({
@@ -11976,6 +11988,7 @@
                                         "nom",
                                         "dernière_connexion",
                                         "date_inscription",
+                                        "avec_téléphone",
                                         "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
