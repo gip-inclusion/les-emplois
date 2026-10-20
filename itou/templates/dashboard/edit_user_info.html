@@ -76,11 +76,27 @@
                                     {% endif %}
                                 </fieldset>
                                 <hr class="mt-2 mb-3">
+
                                 <fieldset>
                                     <legend class="h3">Coordonnées</legend>
                                     {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
                                 </fieldset>
                                 <hr class="mt-2 mb-3">
+
+                                {% if memberships_formsets %}
+                                    <fieldset>
+                                        <legend class="h3">Fonctions</legend>
+                                        {% for formset in memberships_formsets %}
+                                            {{ formset.management_form }}
+                                            {% bootstrap_formset_errors formset %}
+                                            {% for membership_form in formset %}
+                                                {% bootstrap_form membership_form %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </fieldset>
+                                    <hr class="mt-2 mb-3">
+                                {% endif %}
+
                                 <fieldset>
                                     <legend class="h3">Visibilité dans l’Annuaire Pro</legend>
                                     {% bootstrap_field form.is_directory_opted_out %}
