@@ -79,7 +79,7 @@ def _get_person_email(identifier):
         public_id = str(identifier).removeprefix("user-")
         try:
             return User.objects.filter(public_id=public_id).values_list("email", flat=True).first()
-        except (ValidationError, ValueError):
+        except ValidationError, ValueError:
             return None
     return NexusUser.objects.filter(pk=identifier).values_list("email", flat=True).first()
 

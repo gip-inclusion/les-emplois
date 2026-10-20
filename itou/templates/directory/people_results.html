@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
 
@@ -39,20 +40,35 @@
             <form id="people-search-form"
                   method="get"
                   hx-get="{% url 'directory:people_results' %}"
-                  hx-trigger="input changed delay:300ms"
+                  hx-trigger="change delay:300ms"
                   hx-target="#people-search-results"
                   hx-swap="outerHTML"
                   hx-push-url="true"
                   hx-indicator="#people-search-results">
-                {% include "directory/includes/people_form.html" with request=request form=form only %}
+                {% include "directory/includes/people_top_filters.html" with request=request form=form only %}
+                <div class="s-section__row row">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                            <div class="flex-md-grow-1">
+                                {% include "directory/includes/people_counter.html" with results=results request=request only %}
+                            </div>
+                            <div class="flex-column flex-md-row mt-3 mt-md-0">
+                                {% bootstrap_field form.q wrapper_class="w-lg-400px" show_label=False %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
-            <div class="mt-4">{% include "directory/includes/people_results.html" %}</div>
+            <div class="s-section__row row">
+                <div class="col-12">{% include "directory/includes/people_results.html" %}</div>
+            </div>
         </div>
     </section>
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
+    {{ form.media.js }}
     <script src="{% static 'js/htmx_compat.js' %}"></script>
     <script src="{% static 'js/htmx_dropdown_filter.js' %}"></script>
     <script src="{% static 'js/directory.js' %}"></script>

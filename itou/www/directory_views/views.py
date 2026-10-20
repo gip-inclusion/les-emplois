@@ -1,9 +1,10 @@
+import unicodedata
 from datetime import timedelta
 from email.utils import formataddr
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from itoutils.urls import add_url_params
@@ -37,7 +38,9 @@ def can_access_directory(request):
 
 
 def _normalize_name(value):
-    return " ".join(value.replace("-", " ").casefold().split())
+    normalized = unicodedata.normalize("NFKD", value.casefold())
+    without_diacritics = "".join(character for character in normalized if not unicodedata.combining(character))
+    return " ".join(without_diacritics.replace("-", " ").split())
 
 
 def _matches_name(person, query):
@@ -47,10 +50,10 @@ def _matches_name(person, query):
 
 
 def _filter_people(people, form):
-    query = form.cleaned_data["q"]
+    selected_person_key = form.cleaned_data["q"]
     structure_types = set(form.cleaned_data["types"])
-    if query:
-        people = [person for person in people if _matches_name(person, query)]
+    if selected_person_key:
+        people = [person for person in people if person.recipient_id == selected_person_key]
     if structure_types:
         # Match any affiliation, even if another structure is shown first.
         people = [
@@ -64,10 +67,12 @@ def _filter_people(people, form):
 @check_request(can_access_directory)
 @readonly_view
 def people_results(request, template_name="directory/people_results.html"):
-    form = PeopleSearchForm(request.GET)
-    people = []
+    people = get_directory_people(request.current_organization.coords)
+    form = PeopleSearchForm(request.GET, people=people)
     if form.is_valid():
-        people = _filter_people(get_directory_people(request.current_organization.coords), form)
+        people = _filter_people(people, form)
+    else:
+        people = []
     results = pager(people, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     context = {
         "form": form,
@@ -79,6 +84,17 @@ def people_results(request, template_name="directory/people_results.html"):
         "directory/includes/people_results.html" if request.htmx else template_name,
         context,
     )
+
+
+@check_request(can_access_directory)
+@readonly_view
+def people_autocomplete(request):
+    term = request.GET.get("term", "").strip()
+    people = get_directory_people(request.current_organization.coords) if term else []
+    results = [
+        {"id": person.recipient_id, "text": person.full_name} for person in people if _matches_name(person, term)
+    ][:20]
+    return JsonResponse({"results": results})
 
 
 def _get_person(request, key):

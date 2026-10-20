@@ -47,39 +47,41 @@ def test_access_requires_organization_coords(client):
 
 
 def test_people_search_filters_and_htmx(client, snapshot):
-    setup_directory(client)
-    page = parse_response_to_soup(client.get(reverse("directory:people_results")))
+    _, _, _, person = get_target_person(client)
+    page = parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.recipient_id}))
 
     response = client.get(
         reverse("directory:people_results"),
-        {"q": "Alice"},
+        {"q": person.recipient_id},
         headers={"HX-Request": "true"},
     )
 
     update_page_with_htmx(page, "#people-search-form", response)
     assert [heading.text for heading in page.select("#people-search-results h3")] == ["Alice Martin"]
-    assert str(page.select_one("#people-search-results .c-box--results__body")) == snapshot
+    assert page.select_one(f'#people-search-form select[name="q"] option[value="{person.recipient_id}"][selected]')
+    assert page.select_one("#people-search-count")
+    assert page.select_one('#people-search-form input[name="types"]')
     assertTemplateUsed(response, "directory/includes/people_results.html")
     assertNotContains(response, "js/directory_feedback.js")
 
 
-def test_people_search_restores_query_from_url(client, snapshot):
-    setup_directory(client)
+def test_people_search_restores_query_from_url(client):
+    _, _, _, person = get_target_person(client)
 
     response = client.get(
         reverse("directory:people_results"),
-        {"q": "Alice", "types": NexusStructureKind.ML},
+        {"q": person.recipient_id, "types": NexusStructureKind.ML},
     )
 
     page = parse_response_to_soup(response)
-    assert page.select_one("input[name=q]")["value"] == "Alice"
+    assert page.select_one(f'select[name="q"] option[value="{person.recipient_id}"][selected]')
     assert page.select_one(f'input[name=types][value="{NexusStructureKind.ML}"]').has_attr("checked")
     assertContains(response, static("js/directory_feedback.js"))
     assertContains(response, "Annuaire Pro en accès bêta restreint")
     assertContains(response, "Vous faites partie des premiers à accéder à cette fonctionnalité")
     assertContains(response, reverse("dashboard:edit_user_info"))
     assertContains(response, 'id="people-clear-filters"')
-    assert str(page.select_one("#people-search-form")) == snapshot
+    assert page.select_one("#people-search-form")["hx-trigger"] == "change delay:300ms"
 
 
 def test_people_search_has_hidden_clear_button_without_filters(client):
@@ -120,19 +122,21 @@ def test_people_search_includes_nearby_other_city(client):
         organization=PrescriberOrganizationFactory(coords=neighboring_city.coords, insee_city=neighboring_city),
     )
 
-    response = client.get(reverse("directory:people_results"), {"q": "Claire"})
+    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Claire"})
+    selected_person = autocomplete_response.json()["results"][0]
+    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
 
     assertContains(response, "Claire Dupont")
 
 
-def test_people_search_matches_hyphenated_name(client):
+def test_people_autocomplete_matches_accents_and_hyphenated_name(client):
     city = create_city_vannes()
     DirectoryActiveCity.objects.create(city=city)
     current_user = EmployerFactory(membership=False)
     CompanyMembershipFactory(user=current_user, company=CompanyFactory(coords=city.coords, insee_city=city))
     target = PrescriberFactory(
         membership=False,
-        first_name="Jean-Philippe",
+        first_name="Jean-Éloïse",
         last_name="Martin",
         email="jean-philippe@example.com",
         phone="0601020304",
@@ -143,9 +147,16 @@ def test_people_search_matches_hyphenated_name(client):
     )
     client.force_login(current_user)
 
-    response = client.get(reverse("directory:people_results"), {"q": "Jean Philippe"})
+    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Jean Eloise"})
+    selected_person = autocomplete_response.json()["results"][0]
+    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
 
-    assertContains(response, "Jean-Philippe Martin")
+    assertContains(response, "Jean-Éloïse Martin")
+
+
+def test_people_autocomplete_is_restricted(client):
+    response = client.get(reverse("directory:people_autocomplete"))
+    assertRedirects(response, f"{reverse('account_login')}?next={reverse('directory:people_autocomplete')}")
 
 
 def test_people_search_filters_by_structure_type(client):
@@ -180,7 +191,9 @@ def test_people_search_displays_membership_count(client):
     _, target, _, city = setup_directory(client)
     CompanyMembershipFactory(user=target, company=CompanyFactory(coords=city.coords, insee_city=city))
 
-    response = client.get(reverse("directory:people_results"), {"q": "Alice"})
+    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Alice"})
+    selected_person = autocomplete_response.json()["results"][0]
+    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
 
     assertContains(response, "Membre de 2 structures")
 
