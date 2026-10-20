@@ -1,0 +1,11 @@
+{% load components %}
+{% if form.reason.field.widget.disabled_values %}
+    {% component_alert title="Certains motifs ne peuvent pas être sélectionnés" content=content variant=variant %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Nous avons détecté, d’après les données de l’extranet IAE 2.0 de l’ASP, qu’<b>un contrat est en cours pour cette personne</b>.
+                Les motifs « Contrat de travail rompu » et « Contrat de travail terminé » ne sont donc pas disponibles pour le moment.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endif %}
