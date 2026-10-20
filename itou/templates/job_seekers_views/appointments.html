@@ -26,14 +26,21 @@
         <div class="s-section__container container">
             <h2>Rendez-vous</h2>
             {% if appointments %}
-                <div class="table-responsive mt-3 mt-md-4">
+                <p class="mb-3 mb-md-4">
+                    {% with appointments|length as counter %}
+                        {{ counter }} résultat{{ counter|pluralizefr }}
+                    {% endwith %}
+                </p>
+                <div class="table-responsive mb-3 mb-md-4">
                     <table class="table table-hover">
                         <caption class="visually-hidden">Liste des rendez-vous</caption>
                         <thead>
                             <tr>
-                                <th scope="col">Statut</th>
-                                <th scope="col">Date et heure</th>
                                 <th scope="col">Motif</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Thématique</th>
+                                <th scope="col">Reçu par</th>
                                 <th scope="col">Organisation</th>
                                 <th scope="col" class="text-end w-50px">
                                     <span class="visually-hidden">Actions possibles sur les rendez-vous</span>
@@ -42,11 +49,23 @@
                         </thead>
                         <tbody>
                             {% for appointment in appointments %}
-                                <tr>
+                                <tr class="align-top">
+                                    <td class="fw-bold">{{ appointment.reason }}</td>
                                     <td>{% participation_status_badge appointment.status appointment.start_at extra_classes="badge-xs" %}</td>
-                                    <td>{{ appointment.start_at }}</td>
-                                    <td>{{ appointment.reason }}</td>
-                                    <td>{{ appointment.organization_name }}</td>
+                                    <td>{{ appointment.start_at|date:"d/m/Y · G\hi" }}</td>
+                                    <td>{{ appointment.theme }}</td>
+                                    <td>
+                                        {% for agent in appointment.agents %}
+                                            <span class="d-block">{{ agent.full_name }}</span>
+                                            {% if agent.email == request.user.email %}
+                                                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <i class="ri-community-line" aria-hidden="true"></i>
+                                        {{ appointment.organization_name }}
+                                    </td>
                                     <td class="text-end w-50px">
                                         <button type="button"
                                                 class="btn btn-sm btn-link btn-ico-only"
@@ -83,7 +102,7 @@
                                                         <p>
                                                             Type de rendez-vous : <strong>{{ appointment.is_collective|yesno:"Collectif,Individuel" }}</strong>
                                                             <br>
-                                                            Catégorie de motif : <strong>{{ appointment.category }}</strong>
+                                                            Thématique : <strong>{{ appointment.theme }}</strong>
                                                             <br>
                                                             Motif : <strong>{{ appointment.reason }}</strong>
                                                         </p>
@@ -102,7 +121,7 @@
                                                             Organisation qui reçoit : <strong>{{ appointment.organization_name }}</strong>
                                                             {% if appointment.agents %}
                                                                 <br>
-                                                                Agent qui reçoit : <strong>{{ appointment.agents|join:", " }}</strong>
+                                                                Agent qui reçoit : <strong>{% for agent in appointment.agents %}{{ agent.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
                                                             {% endif %}
                                                             {% if appointment.created_by %}
                                                                 <br>

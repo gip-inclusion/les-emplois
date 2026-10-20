@@ -2398,6 +2398,15 @@ class TestAppointmentsTab:
         # Only in the rdv-insertion version
         assertNotContains(response, "Plateforme Insertion Valence")
 
+    def test_agent_is_current_user(self, client, respx_mock, job_seeker, prescriber):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        body["user"]["follow_ups"][0]["participations"][0]["rdv"]["agents"][0]["email"] = prescriber.email
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "C’est vous")
+
     @pytest.mark.parametrize("motif_category_type", [MotifCategoryType.SIAE, MotifCategoryType.AUTRE])
     def test_only_rsa_appointments_from_api(self, client, respx_mock, job_seeker, prescriber, motif_category_type):
         body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
