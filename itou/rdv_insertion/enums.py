@@ -28,6 +28,16 @@ class AppointmentCreatedBy(models.TextChoices):
     PRESCRIPTEUR = "prescripteur", "Prescripteur"
 
 
+class MotifCategoryType(models.TextChoices):
+    RSA_ORIENTATION = "rsa_orientation", "RSA orientation"
+    RSA_ACCOMPAGNEMENT = "rsa_accompagnement", "RSA accompagnement"
+    SIAE = "siae", "SIAE"
+    AUTRE = "autre", "Autre"
+
+
+RSA_MOTIF_CATEGORY_TYPES = {MotifCategoryType.RSA_ORIENTATION, MotifCategoryType.RSA_ACCOMPAGNEMENT}
+
+
 class InvitationRequestReasonCategory(models.TextChoices):
     RSA_DROITS_DEVOIRS = "rsa_droits_devoirs", "RSA - droits et devoirs"
     RSA_ORIENTATION = "rsa_orientation", "RSA orientation"
