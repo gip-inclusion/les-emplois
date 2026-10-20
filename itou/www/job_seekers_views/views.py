@@ -156,9 +156,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
 
     @cached_property
     def appointments(self):
-        if not can_view_appointments(self.request, self.object):
-            return []
-        return get_job_seeker_appointments(self.object)
+        return get_job_seeker_appointments(self.request, self.object)
 
     def get_context_data(self, **kwargs):
         fallback_back_url = (
@@ -472,20 +470,21 @@ class AppointmentsTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/appointments.html"
 
     def get_context_data(self, **kwargs):
-        if not can_view_appointments(self.request, self.object):
-            raise PermissionDenied
         return super().get_context_data(**kwargs) | {"appointments": self.appointments}
 
 
-def can_view_appointments(request, job_seeker):
-    # FIXME: Waiting for a product decision on who can see which appointments
-    return can_view_personal_information(request, job_seeker)
-
-
-def get_job_seeker_appointments(job_seeker):
-    """Appointments from rdv-insertion and the invitation experiment, most recent first."""
-    api_appointments = JobSeekerAppointment.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
-    participations = job_seeker.rdvi_participations.select_related("appointment__company", "appointment__location")
+def get_job_seeker_appointments(request, job_seeker):
+    """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
+    if can_view_external_actions(job_seeker, request):
+        api_appointments = JobSeekerAppointment.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
+        participations = job_seeker.rdvi_participations.all()
+    elif request.from_employer:
+        # Only the appointments organized by the company
+        api_appointments = []
+        participations = job_seeker.rdvi_participations.filter(appointment__company=request.current_organization)
+    else:
+        return []
+    participations = participations.select_related("appointment__company", "appointment__location")
     stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in participations]
     # An appointment can be in both sources: keep the stored one
     appointments_by_id = {a.rdv_insertion_id: a for a in api_appointments} | {
@@ -563,8 +562,7 @@ def job_seeker_overview(request, public_id, template_name="job_seekers_views/ove
         "can_view_external_job_applications": can_view_external_actions(job_seeker, request),
         "matomo_custom_title": "Synthèse usager",
         "show_overview_tab": True,
-        "show_appointments_tab": can_view_appointments(request, job_seeker)
-        and bool(get_job_seeker_appointments(job_seeker)),
+        "show_appointments_tab": bool(get_job_seeker_appointments(request, job_seeker)),
         "has_applied_for_job_seeker": has_applied_for_job_seeker,
         "suspension": None,  # Not handled yet
         "prolongation": None,  # Not handled yet
