@@ -7,7 +7,7 @@ import xworkflows
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Exists, OuterRef, Q, Subquery
 from django.db.models.query import QuerySet
 from django.urls import reverse
@@ -727,7 +727,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
                 self.pk,
             )
         try:
-            self.ready()
+            with transaction.atomic():
+                self.ready()
         except Exception as exc:
             logger.warning("Could not automatically make employee_record=%s ready - exc=%s", self.pk, exc)
 
