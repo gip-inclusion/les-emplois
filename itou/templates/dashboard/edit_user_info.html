@@ -67,6 +67,21 @@
                                 {% endif %}
                                 {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
                                 <hr class="my-4">
+
+                                {% if memberships_formsets %}
+                                    <fieldset>
+                                        <legend>Fonctions</legend>
+                                        {% for formset in memberships_formsets %}
+                                            {{ formset.management_form }}
+                                            {% bootstrap_formset_errors formset %}
+                                            {% for membership_form in formset %}
+                                                {% bootstrap_form membership_form %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </fieldset>
+                                    <hr class="my-4">
+                                {% endif %}
+
                                 <h2 class="h3">Annuaire des professionnels</h2>
                                 <p>
                                     Vos coordonnées professionnelles peuvent apparaître dans l’annuaire afin que d’autres professionnels puissent vous contacter.

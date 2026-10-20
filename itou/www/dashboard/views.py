@@ -25,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -32,6 +33,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.prescribers.models import PrescriberMembership
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
@@ -51,10 +53,12 @@ from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
 from itou.www.dashboard.forms import (
+    CompanyMembershipsFormSet,
     EditJobSeekerInfoForm,
     EditUserEmailForm,
     EditUserInfoForm,
     EditUserNotificationForm,
+    PrescriberMembershipsFormSet,
 )
 from itou.www.search_views.forms import CompanySearchForm
 from itou.www.stats import utils as stats_utils
@@ -340,6 +344,8 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
+    memberships_formsets = []
+
     if request.user.is_job_seeker:
         form = EditJobSeekerInfoForm(
             instance=request.user,
@@ -348,19 +354,46 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             back_url=request.get_full_path(),
         )
     else:
+        company_memberships = (
+            CompanyMembership.objects.filter(user=request.user).select_related("company").order_by("joined_at")
+        )
+        prescriber_memberships = (
+            PrescriberMembership.objects.filter(user=request.user).select_related("organization").order_by("joined_at")
+        )
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
         )
+        if company_memberships:
+            memberships_formsets.append(
+                CompanyMembershipsFormSet(
+                    data=request.POST or None,
+                    queryset=company_memberships,
+                    prefix="company_memberships",
+                )
+            )
+        if prescriber_memberships:
+            memberships_formsets.append(
+                PrescriberMembershipsFormSet(
+                    data=request.POST or None,
+                    queryset=prescriber_memberships,
+                    prefix="prescriber_memberships",
+                )
+            )
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and all([form.is_valid(), *[formset.is_valid() for formset in memberships_formsets]]):
         form.save()
+        for formset in memberships_formsets:
+            for membership in formset.save(commit=False):
+                membership.updated_by = request.user
+                membership.save()
         messages.success(request, "Les informations de votre profil ont bien été mises à jour.", extra_tags="toast")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
     context = {
         "form": form,
+        "memberships_formsets": memberships_formsets,
         "prev_url": prev_url,
         "preview_mode": False,
     }
