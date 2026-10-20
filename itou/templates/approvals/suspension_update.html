@@ -27,6 +27,8 @@
 
                             {% bootstrap_form_errors form alert_error_type="all" %}
 
+                            {% include "approvals/includes/contract_reasons_disabled_alert.html" with variant="warning" %}
+
                             {% bootstrap_form form %}
 
                             {% itou_buttons_form primary_label="Enregistrer les modifications" reset_url=back_url %}

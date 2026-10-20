@@ -31,6 +31,8 @@
 
                                 {% bootstrap_form_errors form alert_error_type="all" %}
 
+                                {% include "approvals/includes/contract_reasons_disabled_alert.html" with variant="warning" %}
+
                                 {# Split form fields for easier collapsible behaviour #}
                                 {% bootstrap_field form.start_at %}
 
