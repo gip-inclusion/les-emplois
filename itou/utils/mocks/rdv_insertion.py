@@ -273,7 +273,12 @@ RDV_INSERTION_USER_SEARCH_BODY = {
                 "status": "rdv_seen",
                 "human_status": "RDV honoré",
                 "closed_at": None,
-                "motif_category": {"id": 1, "short_name": "rsa_orientation", "name": "RSA orientation"},
+                "motif_category": {
+                    "id": 1,
+                    "short_name": "rsa_orientation",
+                    "name": "RSA orientation",
+                    "motif_category_type": "rsa_orientation",
+                },
                 "participations": [
                     {
                         "id": 1,
@@ -318,6 +323,7 @@ RDV_INSERTION_USER_SEARCH_BODY = {
                                     "id": 1,
                                     "short_name": "rsa_orientation",
                                     "name": "RSA orientation",
+                                    "motif_category_type": "rsa_orientation",
                                 },
                             },
                             "organisation": {

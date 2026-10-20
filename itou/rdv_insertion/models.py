@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 
 from itou.rdv_insertion.enums import (
+    RSA_MOTIF_CATEGORY_TYPES,
     AppointmentCreatedBy,
     InvitationRequestReasonCategory,
     InvitationStatus,
@@ -239,10 +240,15 @@ class JobSeekerAppointment:
 
     @classmethod
     def list_from_api(cls, follow_ups):
-        """Appointments of the follow-ups returned by rdv-insertion's API."""
+        """Appointments of the RSA follow-ups returned by rdv-insertion's API.
+
+        SIAE appointments are only shown when stored by the invitation experiment,
+        the only source that links them to their company.
+        """
         return [
             cls.from_api(participation, category=follow_up["motif_category"]["name"])
             for follow_up in follow_ups
+            if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
             for participation in follow_up["participations"]
         ]
 
