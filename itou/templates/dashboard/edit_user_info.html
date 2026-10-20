@@ -67,6 +67,17 @@
                                 {% endif %}
                                 {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
                                 <hr class="my-4">
+
+                                {% if form.company_memberships or form.prescriber_memberships %}
+                                    <fieldset>
+                                        <legend class="h3">Fonctions</legend>
+                                        {% for field in form.iter_function_fields %}
+                                            {% bootstrap_field field %}
+                                        {% endfor %}
+                                    </fieldset>
+                                    <hr class="my-4">
+                                {% endif %}
+
                                 <h2 class="h3">Annuaire des professionnels</h2>
                                 <p>
                                     Vos coordonnées professionnelles peuvent apparaître dans l’annuaire afin que d’autres professionnels puissent vous contacter.

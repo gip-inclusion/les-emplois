@@ -9,6 +9,7 @@ from django.utils.text import slugify
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
+from itou.common_apps.organizations.models import MEMBERSHIP_FUNCTION_MAX_LENGTH
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.directory.models import DirectoryProfile
@@ -114,6 +115,9 @@ class EditJobSeekerInfoForm(
 
 
 class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
+    COMPANY_FUNCTION_PREFIX = "company_function"
+    PRESCRIBER_FUNCTION_PREFIX = "prescriber_function"
+
     is_directory_opted_out = forms.BooleanField(
         label="Ne pas apparaître dans l'annuaire des professionnels",
         required=False,
@@ -128,7 +132,7 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
         ]
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, company_memberships, prescriber_memberships, **kwargs):
         super().__init__(*args, **kwargs)
 
         assert not self.instance.is_job_seeker, self.instance
@@ -136,6 +140,39 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
             user=self.instance,
             is_opted_out=True,
         ).exists()
+
+        self.company_memberships = {}
+        for membership in company_memberships:
+            field_name = f"{self.COMPANY_FUNCTION_PREFIX}_{membership.pk}"
+            self.fields[field_name] = forms.CharField(
+                label=f"Fonction chez {membership.company.display_name}",
+                max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
+                required=False,
+                initial=membership.function,
+            )
+            self.company_memberships[field_name] = membership
+
+        self.prescriber_memberships = {}
+        for membership in prescriber_memberships:
+            field_name = f"{self.PRESCRIBER_FUNCTION_PREFIX}_{membership.pk}"
+            self.fields[field_name] = forms.CharField(
+                label=f"Fonction chez {membership.organization.display_name}",
+                max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
+                required=False,
+                initial=membership.function,
+            )
+            self.prescriber_memberships[field_name] = membership
+
+    def iter_function_fields(self):
+        for field_name in self.company_memberships | self.prescriber_memberships:
+            yield self[field_name]
+
+    def _save_memberships(self, memberships):
+        for field_name, membership in memberships.items():
+            if field_name in self.changed_data:
+                membership.function = self.cleaned_data[field_name]
+                membership.updated_by = self.instance
+                membership.save()
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()
@@ -145,6 +182,8 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
                 user=user,
                 defaults={"is_opted_out": self.cleaned_data["is_directory_opted_out"]},
             )
+            self._save_memberships(self.company_memberships)
+            self._save_memberships(self.prescriber_memberships)
         return user
 
 

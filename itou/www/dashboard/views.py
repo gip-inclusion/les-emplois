@@ -348,9 +348,15 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             back_url=request.get_full_path(),
         )
     else:
+        company_memberships = request.user.companymembership_set.select_related("company").order_by("joined_at")
+        prescriber_memberships = request.user.prescribermembership_set.select_related("organization").order_by(
+            "joined_at"
+        )
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
+            company_memberships=company_memberships,
+            prescriber_memberships=prescriber_memberships,
         )
 
     if request.method == "POST" and form.is_valid():
