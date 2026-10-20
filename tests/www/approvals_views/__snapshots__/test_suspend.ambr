@@ -1720,7 +1720,7 @@
 # ---
 # name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -2173,6 +2173,21 @@
                                                     %s))
           ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'SuspensionForm.__init__[www/approvals_views/forms.py]',
+          'suspension_update[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_contract"
+          WHERE (("companies_contract"."end_date" IS NULL
+                  OR "companies_contract"."end_date" >= %s)
+                 AND "companies_contract"."job_seeker_id" = %s)
           LIMIT 1
         ''',
       }),

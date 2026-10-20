@@ -1,3 +1,4 @@
+import random
 from unittest import mock
 
 import pytest
@@ -13,7 +14,7 @@ from itou.employee_record.enums import Status
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
@@ -271,6 +272,132 @@ class TestApprovalSuspendView:
             f"user={employer.pk} deleted suspension={suspension.pk} (approval={approval.pk}) which ranged "
             f"from {suspension.start_at} to {suspension.end_at}"
         )
+
+    ALERT_TEXT = "Nous avons détecté, d’après les données de l’extranet IAE 2.0 de l’ASP"
+
+    @pytest.mark.parametrize(
+        "end_date_offset",
+        [
+            pytest.param(None, id="no_end_date"),
+            pytest.param(relativedelta(months=1), id="future_end_date"),
+        ],
+    )
+    def test_contract_reasons_disabled_with_ongoing_contract(self, client, end_date_offset):
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=today - relativedelta(days=1),
+        )
+        approval = job_application.approval
+        end_date = today + end_date_offset if end_date_offset is not None else None
+        ContractFactory(job_seeker=approval.user, company=job_application.to_company, end_date=end_date)
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        response = client.get(url)
+        assertContains(response, self.ALERT_TEXT)
+
+        # The two following reasons cannot be chosen if there is an ongoing contract.
+        for reason in [Suspension.Reason.BROKEN_CONTRACT, Suspension.Reason.FINISHED_CONTRACT]:
+            post_data = {
+                "start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": (today + relativedelta(days=10)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": reason,
+                "reason_explanation": "",
+            }
+            form = SuspensionForm(approval=approval, siae=job_application.to_company, data=post_data)
+            assert not form.is_valid()
+            assert "reason" in form.errors
+
+        # Other reasons stay valid.
+        form = SuspensionForm(
+            approval=approval,
+            siae=job_application.to_company,
+            data={
+                "start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": (today + relativedelta(days=10)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": Suspension.Reason.SUSPENDED_CONTRACT,
+                "reason_explanation": "",
+            },
+        )
+        assert form.is_valid()
+
+    @pytest.mark.parametrize(
+        "with_contract",
+        [
+            pytest.param(False, id="no_contract"),
+            pytest.param(True, id="ended_contract"),
+        ],
+    )
+    def test_contract_reasons_enabled_without_ongoing_contract(self, client, with_contract):
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=today - relativedelta(days=1),
+        )
+        approval = job_application.approval
+        if with_contract:
+            ContractFactory(
+                job_seeker=approval.user,
+                company=job_application.to_company,
+                end_date=today - relativedelta(days=1),
+            )
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        response = client.get(url)
+        assertNotContains(response, self.ALERT_TEXT)
+
+        form = SuspensionForm(
+            approval=approval,
+            siae=job_application.to_company,
+            data={
+                "start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": (today + relativedelta(days=10)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": random.choice([Suspension.Reason.BROKEN_CONTRACT, Suspension.Reason.FINISHED_CONTRACT]),
+                "reason_explanation": "",
+            },
+        )
+        assert form.is_valid()
+
+    def test_update_keeps_previously_saved_contract_reason_with_ongoing_contract(self, client):
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=today - relativedelta(days=1),
+        )
+        approval = job_application.approval
+        ContractFactory(job_seeker=approval.user, company=job_application.to_company, end_date=None)
+
+        employer = job_application.to_company.members.first()
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=today,
+            end_at=today + relativedelta(days=10),
+            reason=Suspension.Reason.BROKEN_CONTRACT,
+            created_by=employer,
+        )
+
+        # An already stored reason must stay selectable/editable...
+        form = SuspensionForm(
+            approval=approval,
+            siae=job_application.to_company,
+            instance=suspension,
+            data={
+                "start_at": suspension.start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": suspension.end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": Suspension.Reason.BROKEN_CONTRACT,
+                "reason_explanation": "",
+            },
+        )
+        assert form.is_valid()
+        # ...while the other reason must stay disabled.
+        assert form.fields["reason"].widget.disabled_values == {Suspension.Reason.FINISHED_CONTRACT.value}
 
 
 class TestApprovalSuspendActionChoiceView:
