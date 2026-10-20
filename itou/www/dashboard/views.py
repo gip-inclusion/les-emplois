@@ -25,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -32,6 +33,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.prescribers.models import PrescriberMembership
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
@@ -348,9 +350,17 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             back_url=request.get_full_path(),
         )
     else:
+        company_memberships = (
+            CompanyMembership.objects.filter(user=request.user).select_related("company").order_by("joined_at")
+        )
+        prescriber_memberships = (
+            PrescriberMembership.objects.filter(user=request.user).select_related("organization").order_by("joined_at")
+        )
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
+            company_memberships=company_memberships,
+            prescriber_memberships=prescriber_memberships,
         )
 
     if request.method == "POST" and form.is_valid():

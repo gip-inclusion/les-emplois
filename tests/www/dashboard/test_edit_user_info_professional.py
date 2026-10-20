@@ -1,10 +1,16 @@
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.html import escape
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.directory.models import DirectoryProfile
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
-from tests.users.factories import PrescriberFactory
+from tests.companies.factories import CompanyMembershipFactory
+from tests.institutions.factories import InstitutionMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.users.factories import PrescriberFactory, ProfessionalFactory
 from tests.www.dashboard.test_edit_user_info_job_seeker import (
     BIRTHDATE_FIELD_NAME,
     LACK_OF_NIR_FIELD_ID,
@@ -87,6 +93,93 @@ class TestEditUserInfoView:
         assertRedirects(response, reverse("dashboard:index"))
         profile.refresh_from_db()
         assert profile.is_opted_out is False
+
+    def test_function_field_displayed_for_each_organization(self, client):
+        user = ProfessionalFactory()
+        company_membership = CompanyMembershipFactory(user=user)
+        prescriber_membership = PrescriberMembershipFactory(user=user)
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:edit_user_info"))
+
+        assertContains(response, "Fonctions")
+        assertContains(response, escape(f"Fonction chez {company_membership.company.display_name}"))
+        assertContains(response, escape(f"Fonction chez {prescriber_membership.organization.display_name}"))
+
+    def test_function_field_not_displayed_for_institution_member(self, client):
+        user = ProfessionalFactory()
+        InstitutionMembershipFactory(user=user)
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:edit_user_info"))
+
+        assertNotContains(response, "Fonctions")
+        assertNotContains(response, "Fonction chez")
+
+    def test_professional_can_set_function_for_each_organization(self, client):
+        COMPANY_FUNCTION = "Directeur"
+        PRESCRIBER_FUNCTION = "Conseiller à l'emploi"
+        user = ProfessionalFactory()
+        company_membership = CompanyMembershipFactory(user=user)
+        prescriber_membership = PrescriberMembershipFactory(user=user)
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        with freeze_time():
+            now = timezone.now()
+            post_data = {
+                f"company_function_{company_membership.pk}": COMPANY_FUNCTION,
+                f"prescriber_function_{prescriber_membership.pk}": PRESCRIBER_FUNCTION,
+            }
+            response = client.post(url, post_data)
+
+        assert response.status_code == 302
+        company_membership.refresh_from_db()
+        assert company_membership.function == COMPANY_FUNCTION
+        assert company_membership.updated_by == user
+        assert company_membership.updated_at == now
+
+        prescriber_membership.refresh_from_db()
+        assert prescriber_membership.function == PRESCRIBER_FUNCTION
+        assert prescriber_membership.updated_by == user
+        assert prescriber_membership.updated_at == now
+
+    def test_unchanged_membership_is_not_updated(self, client):
+        COMPANY_FUNCTION = "Directeur"
+        user = ProfessionalFactory()
+        unchanged_membership = CompanyMembershipFactory(user=user, function=COMPANY_FUNCTION)
+        client.force_login(user)
+
+        with freeze_time():
+            now = timezone.now()
+            post_data = {
+                f"company_function_{unchanged_membership.pk}": COMPANY_FUNCTION,
+            }
+            response = client.post(reverse("dashboard:edit_user_info"), post_data)
+
+        assert response.status_code == 302
+        unchanged_membership.refresh_from_db()
+        assert unchanged_membership.function == COMPANY_FUNCTION
+        assert not unchanged_membership.updated_by
+        assert unchanged_membership.updated_at < now
+
+    def test_professional_cannot_set_function_of_another_user_membership(self, client):
+        user = ProfessionalFactory()
+        company_membership = CompanyMembershipFactory(user=user)
+        other_user_membership = CompanyMembershipFactory()
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        post_data = {
+            f"company_function_{other_user_membership.pk}": "Directeur",
+        }
+        response = client.post(url, post_data)
+
+        assert response.status_code == 302
+        other_user_membership.refresh_from_db()
+        company_membership.refresh_from_db()
+        assert not other_user_membership.function
+        assert not company_membership.function
 
     def test_edit_user_sso_alert(self, client):
         ALERT_COMPONENT = (
