@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
@@ -14,7 +15,7 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>{{ person.full_name }}</h1>
-            <p class="mb-0 text-muted">{{ person.kind_label }} · {{ person.main_organization.name }}</p>
+            <p>{{ person.kind_label }} - {{ person.main_organization.name }} {% if person.other_organizations_count %}(+ {{ person.other_organizations_count }} autres structures){% endif %}</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -22,100 +23,10 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row g-4 align-items-start">
-                <div class="col-4">
-                    <div class="c-box border-info border-2 bg-info-lightest mb-3">
-                        <h2 class="h3">Coordonnées partagées</h2>
-                        <hr>
-                        <div class="d-grid gap-3">
-                            <div>
-                                <p class="fs-sm mb-1">Téléphone</p>
-                                {% if person.phone %}
-                                    <button type="button" class="btn btn-link btn-ico p-0 text-start js-reveal">
-                                        <i class="ri-phone-line" aria-hidden="true"></i>
-                                        <span>Afficher le téléphone</span>
-                                    </button>
-                                    {% include "directory/includes/contact_value.html" with label="Téléphone" value=person.phone only %}
-                                {% else %}
-                                    <p class="mb-0">Non renseigné</p>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <p class="fs-sm mb-1">Courriel</p>
-                                {% if person.email %}
-                                    <button type="button" class="btn btn-link btn-ico p-0 text-start js-reveal">
-                                        <i class="ri-mail-line" aria-hidden="true"></i>
-                                        <span>Afficher l'adresse e-mail</span>
-                                    </button>
-                                    {% include "directory/includes/contact_value.html" with label="Adresse e-mail" value=person.email only %}
-                                {% endif %}
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="c-box">
-                        <button type="button"
-                                class="btn btn-outline-transparent has-collapse-caret collapsed d-flex align-items-center gap-3 w-100 p-0 text-start"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#struct-details"
-                                aria-expanded="false"
-                                aria-controls="struct-details">
-                            <span class="bg-info-lighter text-info rounded p-2">
-                                <i class="ri-building-line ri-xl" aria-hidden="true"></i>
-                            </span>
-                            <span class="flex-grow-1">
-                                {% if person.main_organization.kind_label %}
-                                    <span class="d-block fs-sm text-muted fw-normal">{{ person.main_organization.kind_label }}</span>
-                                {% endif %}
-                                <span class="d-block">{{ person.main_organization.name }}</span>
-                            </span>
-                        </button>
-                        <div id="struct-details" class="collapse">
-                            <hr>
-                            {% if person.main_organization.address %}
-                                <address>
-                                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ person.main_organization.address|urlencode }}"
-                                       target="_blank"
-                                       rel="noopener"
-                                       class="has-external-link">{{ person.main_organization.address }}</a>
-                                </address>
-                            {% endif %}
-                            {% if person.main_organization.phone %}
-                                <button type="button"
-                                        class="btn btn-link btn-ico p-0 text-start mb-2 d-flex js-reveal"
-                                        aria-label="Afficher le téléphone de la structure">
-                                    <i class="ri-phone-line" aria-hidden="true"></i>
-                                    <span>Afficher le téléphone</span>
-                                </button>
-                                {% include "directory/includes/contact_value.html" with label="Téléphone de la structure" value=person.main_organization.phone only %}
-                            {% endif %}
-                            {% if person.main_organization.email %}
-                                <button type="button"
-                                        class="btn btn-link btn-ico p-0 text-start mb-2 d-flex js-reveal"
-                                        aria-label="Afficher l'adresse e-mail de la structure">
-                                    <i class="ri-mail-line" aria-hidden="true"></i>
-                                    <span>Afficher l'adresse e-mail</span>
-                                </button>
-                                {% include "directory/includes/contact_value.html" with label="Adresse e-mail de la structure" value=person.main_organization.email only %}
-                            {% endif %}
-                            {% if person.main_organization.website %}
-                                <p>
-                                    <a href="{{ person.main_organization.website }}"
-                                       target="_blank"
-                                       rel="noopener"
-                                       class="has-external-link text-break">{{ person.main_organization.website }}</a>
-                                </p>
-                            {% endif %}
-                            {% if person.main_organization.card_url %}
-                                <a href="{{ person.main_organization.card_url }}"
-                                   class="btn btn-sm btn-outline-primary w-100 mt-2">Voir la fiche structure</a>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-8">
-                    <div class="c-box">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <div class="c-form">
+                        <h2 class="h3">Envoyer un message à {{ person.full_name }}</h2>
                         {% if rate_limited_message %}
                             {% component_alert content=content variant="danger" icon=False %}
                                 {% fragment as content %}
@@ -123,25 +34,174 @@
                                 {% endfragment %}
                             {% endcomponent_alert %}
                         {% else %}
-                            <h2 class="h3">Envoyer un message à {{ person.full_name }}</h2>
-                            <hr>
-                            <p class="text-muted fs-sm">
-                                <i class="ri-information-line" aria-hidden="true"></i>
-                                Ce formulaire est destiné aux échanges entre professionnels — veillons à ne pas nous sursolliciter.
-                                Pour orienter une personne, privilégiez les formulaires de candidature ou de prescription disponibles sur la plateforme.
-                            </p>
+                            {% component_alert content=content variant="info" %}
+                                {% fragment as content %}
+                                    <p class="mb-0">
+                                        Ce formulaire est destiné aux échanges entre professionnels — veillons à ne pas nous sursolliciter.
+                                        Pour orienter une personne, privilégiez les formulaires de candidature ou de prescription disponibles sur la plateforme.
+                                    </p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                             <form id="contact-form"
                                   method="post"
                                   action="{% url 'directory:send_message' key=person.key %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="back_url" value="{{ back_url }}">
                                 {% bootstrap_form contact_form alert_error_type="all" %}
-                                <button type="submit" class="btn btn-primary js-prevent-multiple-submit">
-                                    <i class="ri-send-plane-line" aria-hidden="true"></i>
-                                    <span>Envoyer</span>
-                                </button>
+                                {% itou_buttons_form primary_label="Envoyer" reset_url=back_url %}
                             </form>
                         {% endif %}
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h3>Coordonnées</h3>
+                        <ul class="fs-sm list-unstyled mb-0">
+                            {% if person.email %}
+                                <li id="collapseMail01Show" class="collapse has-no-transition show collapseMail01">
+                                    <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                    <button class="btn-link btn-ico"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target=".collapseMail01"
+                                            aria-expanded="false"
+                                            aria-controls="collapseMail01Show collapseMail01Hide">
+                                        <span>Afficher l’adresse e-mail</span>
+                                    </button>
+                                </li>
+                                <li id="collapseMail01Hide" class="collapse has-no-transition collapseMail01">
+                                    <div class="d-flex">
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <a href="mailto:{{ person.email }}"
+                                           aria-label="Contact par mail"
+                                           class="text-truncate">{{ person.email }}</a>
+                                        {% include "includes/copy_to_clipboard.html" with content=person.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                    <i class="text-disabled">Non renseigné</i>
+                                </li>
+                            {% endif %}
+                            {% if person.phone %}
+                                <li id="collapsePhone01Show" class="collapse has-no-transition show collapsePhone01">
+                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                    <button class="btn-link btn-ico"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target=".collapsePhone01"
+                                            aria-expanded="false"
+                                            aria-controls="collapsePhone01Show collapsePhone01Hide">
+                                        <span>Afficher le téléphone</span>
+                                    </button>
+                                </li>
+                                <li id="collapsePhone01Hide" class="collapse has-no-transition collapsePhone01">
+                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                    <a href="tel:{{ person.phone|cut:" " }}" class="text-break">{{ person.phone }}</a>
+                                    {% include "includes/copy_to_clipboard.html" with content=person.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                </li>
+                            {% else %}
+                                <li>
+                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                    <i class="text-disabled">Non renseigné</i>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="c-box c-box--organization mb-3 mb-md-4">
+                        <div class="c-box--organization__summary">
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            <div>
+                                {% if person.main_organization.kind_label %}
+                                    <span>{{ person.main_organization.kind_label }}</span>
+                                {% endif %}
+                                <span class="d-block h3">{{ person.main_organization.name }}</span>
+                            </div>
+                        </div>
+                        <div class="c-box--organization__detail">
+                            <hr class="my-4">
+                            <ul class="c-box--organization__list-contact">
+                                {% if person.main_organization.address %}
+                                    <li>
+                                        <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
+                                        <address class="m-0">{{ person.main_organization.address }}</address>
+                                        {% include "includes/copy_to_clipboard.html" with content=person.main_organization.address css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                    </li>
+                                {% endif %}
+                                {% if person.main_organization.email %}
+                                    <li id="collapseMailOrga01Show"
+                                        class="collapse has-no-transition show collapseMailOrga01">
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <button class="btn-link btn-ico"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target=".collapseMailOrga01"
+                                                aria-expanded="false"
+                                                aria-controls="collapseMailOrga01Show collapseMailOrga01Hide">
+                                            <span>Afficher l’adresse e-mail</span>
+                                        </button>
+                                    </li>
+                                    <li id="collapseMailOrga01Hide"
+                                        class="collapse has-no-transition collapseMailOrga01">
+                                        <div class="d-flex">
+                                            <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                            <a href="mailto:{{ person.main_organization.email }}"
+                                               aria-label="Contact par mail"
+                                               class="text-truncate">{{ person.main_organization.email }}</a>
+                                            {% include "includes/copy_to_clipboard.html" with content=person.main_organization.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <i class="text-disabled">Non renseigné</i>
+                                    </li>
+                                {% endif %}
+                                {% if person.main_organization.phone %}
+                                    <li id="collapsePhoneOrga01Show"
+                                        class="collapse has-no-transition show collapsePhoneOrga01">
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        <button class="btn-link btn-ico"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target=".collapsePhoneOrga01"
+                                                aria-expanded="false"
+                                                aria-controls="collapsePhoneOrga01Show collapsePhoneOrga01Hide">
+                                            <span>Afficher le téléphone</span>
+                                        </button>
+                                    </li>
+                                    <li id="collapsePhoneOrga01Hide"
+                                        class="collapse has-no-transition collapsePhoneOrga01">
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        <a href="tel:{{ person.main_organization.phone|cut:" " }}"
+                                           class="text-break">{{ person.main_organization.phone }}</a>
+                                        {% include "includes/copy_to_clipboard.html" with content=person.main_organization.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        <i class="text-disabled">Non renseigné</i>
+                                    </li>
+                                {% endif %}
+                                {% if person.main_organization.website %}
+                                    <li>
+                                        <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
+                                        <a href="{{ person.main_organization.website }}"
+                                           rel="noopener"
+                                           target="_blank"
+                                           class="btn-link fw-medium has-external-link"
+                                           aria-label="Site web (ouverture dans un nouvel onglet)">
+                                            {{ person.main_organization.website }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                            {% if person.main_organization.card_url %}
+                                <a href="{{ person.main_organization.card_url }}"
+                                   class="btn btn-secondary btn-block mt-3">Voir la fiche structure</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -154,14 +214,4 @@
     <script src="{% static 'js/htmx_compat.js' %}"></script>
     <script src="{% static 'js/directory.js' %}"></script>
     {% include "directory/includes/feedback.html" %}
-    <script nonce="{{ csp_nonce }}">
-        htmx.onLoad(function(target) {
-            target.getElementsByClassName("js-reveal").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    btn.nextElementSibling.classList.remove("d-none");
-                    btn.classList.add("d-none");
-                });
-            });
-        });
-    </script>
 {% endblock %}

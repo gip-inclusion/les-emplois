@@ -11,8 +11,8 @@ def test_person_detail_preserves_back_url_and_hides_contact(client):
     response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}), {"back_url": back_url})
 
     assert response.context["back_url"] == back_url
-    assertContains(response, "Afficher l'adresse e-mail")
-    assertContains(response, "Afficher le téléphone de la structure")
+    assertContains(response, "Afficher l’adresse e-mail")
+    assertContains(response, "Afficher le téléphone")
     assertContains(response, target_organization.get_card_url())
     assertContains(response, "https://mission-locale.example")
 
