@@ -102,6 +102,7 @@ del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
 
 OVERVIEW_TAB_TEST_DEPARTMENT = "13"
+XP_REF_IAE_DEPARTMENT = "83"
 
 # Allow to disable ProConnect on dev environnments
 PRO_CONNECT_BASE_URL = os.getenv("PRO_CONNECT_BASE_URL")
