@@ -473,6 +473,28 @@ class AppointmentsTabView(BaseJobSeekerDetailView):
         return super().get_context_data(**kwargs) | {"appointments": self.appointments}
 
 
+@readonly_view
+@check_request(lambda request: request.from_prescriber or request.from_employer)
+def appointment_details(
+    request, public_id, rdv_insertion_id, template_name="job_seekers_views/appointment_details.html"
+):
+    job_seeker = get_object_or_404(User, kind=UserKind.JOB_SEEKER, public_id=public_id)
+    appointment = next(
+        (a for a in get_job_seeker_appointments(request, job_seeker) if a.rdv_insertion_id == rdv_insertion_id), None
+    )
+    if appointment is None:
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "appointment": appointment,
+        "back_url": get_safe_url(
+            request, "back_url", fallback_url=reverse("job_seekers_views:appointments", args=(public_id,))
+        ),
+        "matomo_custom_title": "Détail d’un rendez-vous",
+    }
+    return render(request, template_name, context)
+
+
 def get_job_seeker_appointments(request, job_seeker):
     """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
     if can_view_external_actions(job_seeker, request):
