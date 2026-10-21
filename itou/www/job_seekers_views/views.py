@@ -509,11 +509,7 @@ def get_job_seeker_appointments(request, job_seeker):
         return []
     stored_participations = stored_participations.select_related("appointment__company", "appointment__location")
     stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in stored_participations]
-    # An appointment can be in both sources: keep the stored one
-    appointments_by_id = {a.rdv_insertion_id: a for a in api_appointments} | {
-        a.rdv_insertion_id: a for a in stored_appointments
-    }
-    return sorted(appointments_by_id.values(), key=lambda a: a.start_at, reverse=True)
+    return sorted(api_appointments + stored_appointments, key=lambda a: a.start_at, reverse=True)
 
 
 def get_jobseeker_overview_data(request, job_seeker):
