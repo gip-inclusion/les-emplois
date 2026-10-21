@@ -18,6 +18,7 @@ from itou.geiq_assessments.models import Assessment
 from itou.insertion import models as insertion_models
 from itou.institutions.models import Institution
 from itou.job_applications import models as job_applications_models
+from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
 from itou.prescribers import models as prescribers_models
 from itou.rdv_insertion import models as rdv_insertion_models
@@ -26,6 +27,7 @@ from tests.approvals import factories as approvals_factories
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.geiq_assessments.factories import AssessmentFactory
+from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.invitations import factories as invitations_factories
 from tests.job_applications.factories import JobApplicationFactory
@@ -110,7 +112,6 @@ class TestOrganizationTransfer:
                 (Assessment, "companies"),  # handled through `Assessment.companies.through`
                 (insertion_models.MobilizationEmail, "sender_company"),
                 (insertion_models.MobilizationEvent, "company"),
-                (insertion_models.Orientation, "sender_company"),
                 (Appellation, "company"),  # handled through `JobDescription`
                 (job_applications_models.JobApplicationComment, "company"),
                 (job_applications_models.JobApplicationTransitionLog, "target_company"),
@@ -124,7 +125,6 @@ class TestOrganizationTransfer:
             prescribers_models.PrescriberOrganization: {
                 (insertion_models.MobilizationEmail, "sender_prescriber_organization"),
                 (insertion_models.MobilizationEvent, "prescriber_organization"),
-                (insertion_models.Orientation, "sender_prescriber_organization"),
                 (users_models.User, "authorization_status_set"),
                 (users_models.User, "created_prescriber_organization_set"),
                 (users_models.User, "prescriberorganization"),  # handled through `PrescriberMembership`
@@ -280,6 +280,9 @@ class TestOrganizationTransfer:
         active_membership = companies_factories.CompanyMembershipFactory(company=from_company)
         inactive_membership = companies_factories.CompanyMembershipFactory(company=from_company, is_active=False)
         invitation = invitations_factories.EmployerInvitationFactory(company=from_company)
+        orientation = OrientationFactory(
+            sender_kind=SenderKind.EMPLOYER, sender_company=from_company, sender_prescriber_organization=None
+        )
 
         transfer.transfer_org_data(from_company, to_company, transfer.COMPANY_TRANSFER_FIELDS, disable_from_org)
 
@@ -292,6 +295,7 @@ class TestOrganizationTransfer:
         active_membership.refresh_from_db()
         inactive_membership.refresh_from_db()
         invitation.refresh_from_db()
+        orientation.refresh_from_db()
 
         assert sent_jobapp.sender_company == to_company
         assert received_jobapp.to_company == to_company
@@ -301,6 +305,7 @@ class TestOrganizationTransfer:
         assert active_membership.company == to_company
         assert inactive_membership.company == to_company
         assert invitation.company == to_company
+        assert orientation.sender_company == to_company
         assert to_company.brand == from_company.brand
         assert to_company.description == from_company.description
         assert to_company.phone == from_company.phone
@@ -356,6 +361,7 @@ class TestOrganizationTransfer:
         active_membership = prescribers_factories.PrescriberMembershipFactory(organization=from_org)
         inactive_membership = prescribers_factories.PrescriberMembershipFactory(organization=from_org, is_active=False)
         invitation = invitations_factories.PrescriberWithOrgInvitationFactory(organization=from_org)
+        orientation = OrientationFactory(sender_prescriber_organization=from_org)
         prolongation_request = approvals_factories.ProlongationRequestFactory(prescriber_organization=from_org)
         prolongation = approvals_factories.ProlongationFactory(prescriber_organization=from_org)
 
@@ -369,6 +375,7 @@ class TestOrganizationTransfer:
         active_membership.refresh_from_db()
         inactive_membership.refresh_from_db()
         invitation.refresh_from_db()
+        orientation.refresh_from_db()
         prolongation_request.refresh_from_db()
         prolongation.refresh_from_db()
 
@@ -379,6 +386,7 @@ class TestOrganizationTransfer:
         assert active_membership.organization == to_org
         assert inactive_membership.organization == to_org
         assert invitation.organization == to_org
+        assert orientation.sender_prescriber_organization == to_org
         assert prolongation_request.prescriber_organization == to_org
         assert prolongation.prescriber_organization == to_org
         assert to_org.description == from_org.description
