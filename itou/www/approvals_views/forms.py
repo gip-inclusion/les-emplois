@@ -500,7 +500,7 @@ class SuspensionForm(forms.ModelForm):
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
-        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices(self.siae)
 
         # When the jobseeker has an ongoing contract (according to ASP data), the suspension must not indicate that the
         # contract is broken or finished.
