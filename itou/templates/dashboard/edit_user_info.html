@@ -54,18 +54,20 @@
                                 <fieldset>
                                     <legend class="h3">Informations personnelles</legend>
                                     {% if request.user.identity_provider == "PC" %}
-                                        <ul class="list-unstyled">
+                                        <ul class="list-data mb-3">
                                             <li>
-                                                Prénom : <strong>{{ user.first_name|title }}</strong>
+                                                <small>Prénom</small>
+                                                <strong>{{ user.first_name|title }}</strong>
                                             </li>
                                             <li>
-                                                Nom : <strong>{{ user.last_name|upper }}</strong>
+                                                <small>Nom</small>
+                                                <strong>{{ user.last_name|upper }}</strong>
                                             </li>
                                             <li>
-                                                Adresse e-mail : <strong>{{ user.email }}</strong>
+                                                <small>Adresse e-mail</small>
+                                                <strong>{{ user.email }}</strong>
                                             </li>
                                         </ul>
-                                        <hr class="my-4">
                                         {% bootstrap_form_errors form type="all" %}
                                     {% else %}
                                         {% bootstrap_form_errors form type="all" %}
