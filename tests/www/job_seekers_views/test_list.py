@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.approvals.enums import ProlongationRequestStatus
 from itou.asp.models import Commune
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
@@ -20,7 +21,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
-from tests.approvals.factories import ApprovalFactory, SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory, SuspensionFactory
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -402,7 +403,7 @@ def test_multiple(client, snapshot):
         ) == snapshot(name="job seekers list table")
 
         # Address is in search URL
-        for i, application in enumerate([job_app, job_app2, job_app3]):
+        for application in [job_app]:
             assert_contains_button_apply_for(response, application.job_seeker, with_city=True)
 
         for assignment in [job_seeker_assignment, job_seeker_assignment4, job_seeker_assignment5]:
@@ -489,6 +490,11 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         last_action_kind=ActionKind.APPLY,
         assigned_to_unknown_advisor=True,
     )
+    bernard_prolongation_request = ProlongationRequestFactory(
+        approval__user=bernard,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
 
     # Job seeker created by a member of the organization, but not in the organization anymore
     prescriber_not_in_org_anymore = PrescriberFactory(
@@ -511,6 +517,11 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         prescriber_organization=organization,
         last_action_kind=ActionKind.CREATE,
         last_action_at=timezone.now() - datetime.timedelta(days=2 * 365),
+    )
+    # A prolongation request for Charlotte's PASS was sent to another organization
+    ProlongationRequestFactory(
+        approval__user=charlotte,
+        status=ProlongationRequestStatus.PENDING,
     )
 
     company = CompanyFactory(for_snapshot=True)
@@ -560,15 +571,57 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
                     "href",
                     f"/job-seekers/{alain.public_id}/assignments/{alain_assignment.pk}/edit",
                     f"/job-seekers/{alain.public_id}/assignments/[JobSeekerAssignment PK]/edit",
-                )
+                ),
+                (
+                    "href",
+                    f"/approvals/prolongation/request/{bernard_prolongation_request.pk}",
+                    "/approvals/prolongation/request/[ProlongationRequest PK]",
+                ),
             ],
         )
         assert pretty_indented(soup) == snapshot(name="job seekers list tbody")
 
         # Job seekers are displayed for the prescriber
-        for job_seeker in [alain, bernard, charlotte]:
+        for job_seeker in [alain, charlotte]:
             assert_contains_job_seeker(response, job_seeker, back_url=url_organization, with_personal_information=True)
             assert_contains_button_apply_for(response, job_seeker, with_city=True)
+
+        # Bernard has a pending prolongation request for his PASS
+        assert_contains_job_seeker(response, bernard, back_url=url_organization, with_personal_information=True)
+        assertContains(
+            response,
+            f"""
+                <a class="btn btn-sm btn-warning btn-ico text-nowrap"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Traiter la demande de prolongation de PASS IAE"
+                    data-matomo-event="true"
+                    data-matomo-category="pass-iae" data-matomo-action="clic"
+                    data-matomo-option="traiter-demande-prolongation"
+                    href="{reverse("approvals:prolongation_request_show", args=(bernard_prolongation_request.pk,))}">
+                    <i class="ri-pencil-line"
+                    aria-label="Traiter la demande de prolongation du PASS IAE de {bernard.get_inverted_full_name()}">
+                    </i>
+                    <span>Traiter la demande</span>
+                </a>
+            """,
+            count=1,
+            html=True,
+        )
+        assertContains(
+            response,
+            f"""
+                <a href="{reverse('search:employers_results')}?job_seeker_public_id={bernard.public_id}&city={bernard.city_slug}"
+                    class="dropdown-item"
+                    data-matomo-event="true"
+                    data-matomo-category="candidature"
+                    data-matomo-action="clic"
+                    data-matomo-option="postuler-pour-ce-candidat">
+                    Postuler
+                </a>
+            """,
+            count=1,
+            html=True,
+        )
 
         for assignment in [alain_assignment, bernard_assignment, charlotte_assignment]:
             assert_contains_last_advisor(response, assignment)
@@ -703,6 +756,11 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         created_by=other_prescriber,
         with_job_seeker_assignment=True,
         with_job_seeker_assignment__prescriber_organization=organization,
+    )
+    # An unauthorized prescriber should not see Bernard's prolongation request
+    ProlongationRequestFactory(
+        approval__user=bernard,
+        status=ProlongationRequestStatus.PENDING,
     )
 
     response = client.get(url_user)
@@ -1543,7 +1601,7 @@ def test_create_pro_support_report_action_in_list_for_employer(client):
             "job_seekers_views:create_pro_support_report", kwargs={"public_id": contract.job_seeker.public_id}
         )
         assertContains(response, f"{create_url}?back_url=", count=1)
-    assertContains(response, "Remplir le bilan</a>", count=2)
+    assertContains(response, "Remplir le bilan</span>", count=2)
 
 
 @freeze_time("2026-01-15")
@@ -2066,6 +2124,66 @@ def test_job_seekers_order(client, factory, url, subtests):
             assert response.context["page_obj"].object_list == list(reversed(job_seekers))
 
 
+def test_job_seekers_order_with_prolongation_request(client, subtests):
+    user = PrescriberFactory(membership__organization__authorized=True)
+    organization = user.prescriberorganization_set.get()
+    url = reverse("job_seekers_views:list_organization")
+    a_b_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Berger",
+        prescriber_organization=organization,
+    ).job_seeker
+    b_c_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Basile",
+        job_seeker__last_name="Craspouille",
+        prescriber_organization=organization,
+    ).job_seeker
+    m_n_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Maëva",
+        job_seeker__last_name="Noiret",
+        prescriber_organization=organization,
+        last_action_at=timezone.now() - datetime.timedelta(seconds=10),
+    ).job_seeker
+    ProlongationRequestFactory(
+        approval__user=m_n_job_seeker,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
+    s_t_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Sylvain",
+        job_seeker__last_name="Tassin",
+        prescriber_organization=organization,
+        last_action_at=timezone.now() - datetime.timedelta(seconds=20),
+    ).job_seeker
+    ProlongationRequestFactory(
+        approval__user=s_t_job_seeker,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
+
+    client.force_login(user)
+
+    expected_order = {
+        "-last_action_at": [m_n_job_seeker, s_t_job_seeker, b_c_job_seeker, a_b_job_seeker],
+        "last_action_at": [s_t_job_seeker, m_n_job_seeker, a_b_job_seeker, b_c_job_seeker],
+        "full_name": [m_n_job_seeker, s_t_job_seeker, a_b_job_seeker, b_c_job_seeker],
+        "-full_name": [s_t_job_seeker, m_n_job_seeker, b_c_job_seeker, a_b_job_seeker],
+    }
+
+    with subtests.test(order="<missing_value>"):
+        response = client.get(url)
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
+
+    with subtests.test(order="<invalid_value>"):
+        response = client.get(url, {"order": "invalid_value"})
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
+
+    for order, job_seekers in expected_order.items():
+        with subtests.test(order=order):
+            response = client.get(url, {"order": order})
+            assert response.context["page_obj"].object_list == job_seekers
+
+
 @pytest.mark.parametrize(
     "factory, url",
     [
@@ -2185,44 +2303,35 @@ def test_pro_support_request_action_for_authorized_prescriber(client, view):
         start_at=today - datetime.timedelta(days=600),
         end_at=today + datetime.timedelta(days=30),
     )
-    job_application = JobApplicationFactory(
+    contract = ContractFactory(
         job_seeker=job_seeker,
-        sent_by_job_seeker=True,
-        to_company__email="",
-        state=JobApplicationState.ACCEPTED,
-        hiring_start_at=today - datetime.timedelta(days=200),
+        company__email="",
+        end_date=today,
     )
-
-    # Without the end-of-journey filter, the action is hidden.
-    mailto_label = "Demander un bilan d’accompagnement à la SIAE"
+    mailto_label = "<span>Demander un bilan</span>"
     url = reverse(view)
     response = client.get(url)
-    assertNotContains(response, mailto_label)
 
     # With the filter active, the action should be displayed, unless
     # the company does not have any email. The label alone is not a reliable signal: the banner
     # explaining where to find the action also spells it out.
-    response = client.get(url, {"approval_ending_soon": "on"})
+    response = client.get(url)
     assertNotContains(response, "mailto:")
 
     # Now with a company that has an e-mail.
-    company = job_application.to_company
+    company = contract.company
     company.email = "siae@example.com"
     company.save()
-    response = client.get(url, {"approval_ending_soon": "on"})
+    response = client.get(url)
     assertContains(response, mailto_label)
     assertContains(response, "mailto:siae@example.com?subject=Demande%20de%20bilan%20d%E2%80%99accompagnement")
     assertContains(response, "Jean%20DUPONT%20arrive")
     assertNotContains(response, "Remplir le bilan")
 
     # Once the last contract has ended, the e-mail says so.
-    ContractFactory(
-        job_seeker=job_seeker,
-        company=company,
-        start_date=today - datetime.timedelta(days=200),
-        end_date=today - datetime.timedelta(days=10),
-    )
-    response = client.get(url, {"approval_ending_soon": "on"})
+    contract.end_date = today - datetime.timedelta(days=10)
+    contract.save()
+    response = client.get(url)
     assertContains(response, "Le%20contrat%20de%20travail%20d%E2%80%99insertion%20de%20Jean%20DUPONT%20a%20pris%20fin")
 
 
