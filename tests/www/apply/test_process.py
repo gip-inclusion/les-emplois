@@ -2941,6 +2941,9 @@ class TestXpRefIae:
         settings.XP_REF_IAE_DEPARTMENT = "83"
         settings.XP_REF_IAE_END_DATE = timezone.localdate()
 
+    def create_job_application(self, department="83"):
+        return JobApplicationFactory(sent_by_authorized_prescriber=True, to_company__department=department)
+
     def login_ft_agent(self, client, department="83"):
         membership = PrescriberMembershipFactory(
             organization__france_travail=True, organization__department=department
@@ -2950,25 +2953,32 @@ class TestXpRefIae:
     def get_details(self, client, job_application):
         return client.get(reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}))
 
+    def get_resume(self, client, job_application):
+        return client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+
     def test_access(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
+        job_application = self.create_job_application()
         self.login_ft_agent(client)
         assert self.get_details(client, job_application).status_code == 200
-        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
-        assert response.status_code == 302
+        assert self.get_resume(client, job_application).status_code == 302
         url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application.job_seeker.public_id})
         details_url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         assertContains(client.get(url), details_url)
 
+    def test_no_access_to_a_company_from_another_department(self, client):
+        job_application = self.create_job_application(department="06")
+        self.login_ft_agent(client)
+        assert self.get_details(client, job_application).status_code == 404
+        assert self.get_resume(client, job_application).status_code == 404
+
     def test_no_access_from_another_department(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
+        job_application = self.create_job_application()
         self.login_ft_agent(client, department="06")
         assert self.get_details(client, job_application).status_code == 404
-        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
-        assert response.status_code == 404
+        assert self.get_resume(client, job_application).status_code == 404
 
     def test_no_access_from_another_organization_kind(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
+        job_application = self.create_job_application()
         membership = PrescriberMembershipFactory(
             organization__kind=PrescriberOrganizationKind.CAP_EMPLOI,
             organization__authorized=True,
@@ -2979,6 +2989,6 @@ class TestXpRefIae:
 
     def test_no_access_after_end_date(self, client, settings):
         settings.XP_REF_IAE_END_DATE = timezone.localdate() - datetime.timedelta(days=1)
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
+        job_application = self.create_job_application()
         self.login_ft_agent(client)
         assert self.get_details(client, job_application).status_code == 404
