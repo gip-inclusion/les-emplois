@@ -8,6 +8,7 @@ from django.db import models
 from itou.rdv_insertion.enums import (
     RSA_MOTIF_CATEGORY_TYPES,
     AppointmentCreatedBy,
+    AppointmentLocationType,
     InvitationRequestReasonCategory,
     InvitationStatus,
     InvitationType,
@@ -216,11 +217,10 @@ class JobSeekerAppointment:
     rdv_insertion_id: int  # RDV-I rdv id, shared by both sources
     status: ParticipationStatus
     start_at: datetime.datetime
-    duration: datetime.timedelta
     theme: str
     reason: str
-    is_collective: bool
     organization_name: str
+    location_type: AppointmentLocationType | None
     location_name: str | None
     address: str | None
     agents: tuple[AppointmentAgent, ...]
@@ -234,11 +234,10 @@ class JobSeekerAppointment:
             rdv_insertion_id=rdv["id"],
             status=ParticipationStatus(participation["status"]),
             start_at=datetime.datetime.fromisoformat(participation["starts_at"]),
-            duration=datetime.timedelta(minutes=rdv["duration_in_min"]),
             theme=theme,
             reason=rdv["motif"]["name"],
-            is_collective=rdv["motif"]["collectif"],
             organization_name=rdv["organisation"]["name"],
+            location_type=AppointmentLocationType(rdv["motif"]["location_type"]),
             location_name=lieu["name"] if lieu else None,
             address=lieu["address"] if lieu else rdv["address"],
             agents=tuple(
@@ -276,14 +275,13 @@ class JobSeekerAppointment:
             rdv_insertion_id=appointment.rdv_insertion_id,
             status=ParticipationStatus(participation.status),
             start_at=appointment.start_at,
-            duration=appointment.duration,
             theme="Suite à une candidature",
             reason=appointment.reason,
-            is_collective=appointment.is_collective,
             organization_name=appointment.company.display_name,
             location_name=location.name if location else None,
             address=location.address if location else appointment.address,
             # Not stored by the invitation experiment
+            location_type=None,
             agents=(),
             created_by=None,
         )
