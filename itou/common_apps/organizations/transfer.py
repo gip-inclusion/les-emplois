@@ -77,6 +77,7 @@ PRESCRIBERORG_TRANSFER_FIELDS = {
     TransferField.INVITATIONS,
     TransferField.PROLONGATION_REQUESTS,
     TransferField.PROLONGATIONS,
+    TransferField.SUSPENSIONS,
     TransferField.DESCRIPTION,
     TransferField.EMAIL,
     TransferField.IS_SEARCHABLE,
@@ -258,6 +259,10 @@ PRESCRIBERORG_TRANSFER_SPECS = {
     },
     TransferField.PROLONGATIONS: {
         "related_model": approvals_models.Prolongation,
+        "related_model_field": "prescriber_organization",
+    },
+    TransferField.SUSPENSIONS: {
+        "related_model": approvals_models.Suspension,
         "related_model_field": "prescriber_organization",
     },
     TransferField.DESCRIPTION: {

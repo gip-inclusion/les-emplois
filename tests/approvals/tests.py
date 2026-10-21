@@ -32,6 +32,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
@@ -799,6 +800,14 @@ class TestSuspensionModel:
         with pytest.raises(ValidationError):
             suspension.clean()
 
+    def test_siae_or_prescriber_organization_constraint(self):
+        SuspensionFactory(siae=None, prescriber_organization=PrescriberOrganizationFactory())
+        SuspensionFactory(siae=None)
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError):
+                SuspensionFactory(prescriber_organization=PrescriberOrganizationFactory())
+
     def test_duration(self):
         expected_duration = datetime.timedelta(days=2)
         start_at = timezone.localdate()
@@ -842,14 +851,14 @@ class TestSuspensionModel:
         # EI and ACI kind have one more choice
         for kind in [CompanyKind.EI, CompanyKind.ACI]:
             company = CompanyFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(company)
+            result = Suspension.Reason.displayed_choices(company)
             assert len(result) == 5
             assert result[-1][0] == Suspension.Reason.CONTRAT_PASSERELLE.value
 
         # Some other cases
         for kind in [CompanyKind.ETTI, CompanyKind.AI]:
             company = CompanyFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(company)
+            result = Suspension.Reason.displayed_choices(company)
             assert len(result) == 4
 
     def test_next_min_start_date(self):
