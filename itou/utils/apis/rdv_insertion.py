@@ -1,6 +1,7 @@
 """rdv-insertion API dedicated to les emplois."""
 
 import datetime
+import hashlib
 import json
 import logging
 
@@ -15,9 +16,8 @@ logger = logging.getLogger(__name__)
 API_TIMEOUT_SECONDS = 1.0
 CACHE_TIMEOUT_FOUND = datetime.timedelta(hours=1).total_seconds()
 CACHE_TIMEOUT_NOT_FOUND = datetime.timedelta(days=1).total_seconds()
-# While set, rdv-insertion is not called so that pages don't wait for its timeout
-UNAVAILABLE_CACHE_KEY = "rdv-insertion-unavailable"
-UNAVAILABLE_CACHE_TIMEOUT = datetime.timedelta(minutes=1).total_seconds()
+# Short, so that pages don't wait for the timeout each time while rdv-insertion is unavailable
+CACHE_TIMEOUT_ERROR = datetime.timedelta(minutes=1).total_seconds()
 
 
 class RdvInsertionApiError(Exception):
@@ -61,20 +61,20 @@ def get_follow_ups(job_seeker):
 
     A follow-up is the job seeker's journey in a motif category (e.g. "RSA orientation"), with its participations.
     """
+    nir = job_seeker.jobseeker_profile.nir
+    if not nir:
+        return []
     cache = caches["failsafe"]
-    cache_key = f"rdv-insertion-follow-ups:{job_seeker.pk}"
+    cache_key = f"rdv-insertion-follow-ups:{hashlib.sha256(nir.encode()).hexdigest()}"
     if (follow_ups := cache.get(cache_key)) is not None:
         return follow_ups
-    nir = job_seeker.jobseeker_profile.nir
-    if not nir or cache.get(UNAVAILABLE_CACHE_KEY):
-        return []
     try:
         user = get_client().search_user_by_nir(nir)
     except ImproperlyConfigured:
         return []
     except RdvInsertionApiError as exc:
         logger.warning("rdv-insertion is unavailable: %s", exc)
-        cache.set(UNAVAILABLE_CACHE_KEY, True, UNAVAILABLE_CACHE_TIMEOUT)
+        cache.set(cache_key, [], CACHE_TIMEOUT_ERROR)
         return []
     follow_ups = user["follow_ups"] if user else []
     cache.set(cache_key, follow_ups, CACHE_TIMEOUT_FOUND if user else CACHE_TIMEOUT_NOT_FOUND)

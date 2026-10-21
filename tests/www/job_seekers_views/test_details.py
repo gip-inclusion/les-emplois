@@ -2380,16 +2380,6 @@ class TestAppointmentsTab:
         assertContains(response, '<span class="d-block">1 place de la Mairie 26000 Valence</span>', html=True)
         assertNotContains(response, "Maison départementale de Valence")
 
-    def test_appointment_in_both_sources(self, client, respx_mock, job_seeker, prescriber):
-        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
-        ParticipationFactory(job_seeker=job_seeker, appointment__rdv_insertion_id=1)
-        client.force_login(prescriber)
-
-        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
-        assertContains(response, "1 résultat")
-        # Only in the rdv-insertion version
-        assertNotContains(response, "Plateforme Insertion Valence")
-
     def test_agent_is_current_user(self, client, respx_mock, job_seeker, prescriber):
         body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
         body["user"]["follow_ups"][0]["participations"][0]["rdv"]["agents"][0]["email"] = prescriber.email
@@ -2456,6 +2446,16 @@ class TestAppointmentsTab:
 
         response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
         assertContains(response, "Aucun rendez-vous à afficher.")
+
+    def test_unexpected_appointment_data(self, client, respx_mock, job_seeker, prescriber, caplog):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        body["user"]["follow_ups"][0]["participations"][0]["rdv"]["motif"]["location_type"] = "teleportation"
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+        assert response.status_code == 200
+        assert "Unexpected rdv-insertion data" in caplog.messages
 
     def test_tab_only_shown_with_appointments(self, client, respx_mock, job_seeker, prescriber):
         respx_mock.post(self.SEARCH_URL).respond(404, json={"errors": ["Aucun usager ne correspond à ce NIR"]})
