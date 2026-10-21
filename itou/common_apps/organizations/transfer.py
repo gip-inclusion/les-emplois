@@ -11,6 +11,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.models import EmployeeRecord
 from itou.geiq_assessments.models import Assessment
+from itou.insertion.models import Orientation
 from itou.institutions.models import Institution
 from itou.invitations import models as invitations_models
 from itou.job_applications.models import JobApplication
@@ -33,6 +34,7 @@ class TransferField(TextChoices):
     JOB_DESCRIPTIONS = "job_descriptions", "Fiches de poste"
     MEMBERSHIPS = "memberships", "Utilisateurs membres"
     INVITATIONS = "invitations", "Invitations"
+    ORIENTATIONS = "orientations", "Demandes d’orientation"
     PROLONGATIONS = "prolongations", "Prolongations déclarées"
     PROLONGATION_REQUESTS = "demandes de prolongation", "Demandes de prolongation"
     SUSPENSIONS = "suspensions", "Suspensions déclarées"
@@ -58,6 +60,7 @@ COMPANY_TRANSFER_FIELDS = {
     TransferField.JOB_DESCRIPTIONS,
     TransferField.MEMBERSHIPS,
     TransferField.INVITATIONS,
+    TransferField.ORIENTATIONS,
     TransferField.PROLONGATIONS,
     TransferField.PROLONGATION_REQUESTS,
     TransferField.SUSPENSIONS,
@@ -75,6 +78,7 @@ PRESCRIBERORG_TRANSFER_FIELDS = {
     TransferField.JOB_SEEKER_ASSIGNMENTS,
     TransferField.MEMBERSHIPS,
     TransferField.INVITATIONS,
+    TransferField.ORIENTATIONS,
     TransferField.PROLONGATION_REQUESTS,
     TransferField.PROLONGATIONS,
     TransferField.DESCRIPTION,
@@ -178,6 +182,10 @@ COMPANY_TRANSFER_SPECS = {
             )
         ),
     },
+    TransferField.ORIENTATIONS: {
+        "related_model": Orientation,
+        "related_model_field": "sender_company",
+    },
     TransferField.PROLONGATION_REQUESTS: {
         "related_model": approvals_models.ProlongationRequest,
         "related_model_field": "declared_by_siae",
@@ -251,6 +259,10 @@ PRESCRIBERORG_TRANSFER_SPECS = {
                 "email", flat=True
             )
         ),
+    },
+    TransferField.ORIENTATIONS: {
+        "related_model": Orientation,
+        "related_model_field": "sender_prescriber_organization",
     },
     TransferField.PROLONGATION_REQUESTS: {
         "related_model": approvals_models.ProlongationRequest,
