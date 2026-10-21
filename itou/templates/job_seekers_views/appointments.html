@@ -63,7 +63,7 @@
                                     <td>
                                         {% for agent in appointment.agents %}
                                             <span class="d-block">{{ agent.get_full_name }}</span>
-                                            {% if agent.email == request.user.email %}
+                                            {% if agent.email|lower == request.user.email|lower %}
                                                 <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
                                             {% endif %}
                                         {% endfor %}

@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+import logging
 import uuid
 
 from django.conf import settings
@@ -15,6 +16,9 @@ from itou.rdv_insertion.enums import (
     MotifCategoryType,
     ParticipationStatus,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class InvitationRequest(models.Model):
@@ -206,12 +210,13 @@ class WebhookEvent(models.Model):
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class AppointmentAgent:
-    first_name: str
-    last_name: str
+    first_name: str | None
+    last_name: str | None
     email: str
 
     def get_full_name(self):
-        return f"{self.first_name.strip().title()} {self.last_name.upper()}"
+        full_name = f"{(self.first_name or '').strip().title()} {(self.last_name or '').upper()}"
+        return full_name.strip()
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
@@ -254,16 +259,20 @@ class JobSeekerAppointment:
     @classmethod
     def list_from_api(cls, follow_ups):
         """Appointments of the RSA follow-ups returned by rdv-insertion's API."""
-        return [
-            cls.from_api(
-                participation, theme=MotifCategoryType(follow_up["motif_category"]["motif_category_type"]).label
-            )
-            for follow_up in follow_ups
-            # SIAE appointments are only shown when stored by the invitation experiment,
-            # the only source that links them to their company
-            if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
-            for participation in follow_up["participations"]
-        ]
+        try:
+            return [
+                cls.from_api(
+                    participation, theme=MotifCategoryType(follow_up["motif_category"]["motif_category_type"]).label
+                )
+                for follow_up in follow_ups
+                # SIAE appointments are only shown when stored by the invitation experiment,
+                # the only source that links them to their company
+                if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
+                for participation in follow_up["participations"]
+            ]
+        except KeyError, TypeError, ValueError:
+            logger.exception("Unexpected rdv-insertion data")
+            return []
 
     @classmethod
     def from_stored_participation(cls, participation):
