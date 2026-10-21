@@ -1235,6 +1235,10 @@ class Contract(models.Model):
     def has_ended(self):
         return self.end_date and self.end_date < timezone.localdate()
 
+    class Meta:
+        verbose_name = "contrat IAE"
+        verbose_name_plural = "contrats IAE"
+
 
 class SiaeACIConvergencePHC(models.Model):
     siret = models.CharField(

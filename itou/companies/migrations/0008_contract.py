@@ -51,5 +51,6 @@ class Migration(migrations.Migration):
                     models.DateTimeField(auto_now=True, verbose_name="date de modification"),
                 ),
             ],
+            options={"verbose_name": "contrat IAE", "verbose_name_plural": "contrats IAE"},
         ),
     ]
