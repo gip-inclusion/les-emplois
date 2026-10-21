@@ -483,15 +483,16 @@ def get_job_seeker_appointments(request, job_seeker):
     """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
     if can_view_external_actions(job_seeker, request):
         api_appointments = JobSeekerAppointment.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
-        participations = job_seeker.rdvi_participations.all()
+        stored_participations = job_seeker.rdvi_participations.all()
     elif request.from_employer:
-        # Only the appointments organized by the company
         api_appointments = []
-        participations = job_seeker.rdvi_participations.filter(appointment__company=request.current_organization)
+        stored_participations = job_seeker.rdvi_participations.filter(
+            appointment__company=request.current_organization
+        )
     else:
         return []
-    participations = participations.select_related("appointment__company", "appointment__location")
-    stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in participations]
+    stored_participations = stored_participations.select_related("appointment__company", "appointment__location")
+    stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in stored_participations]
     # An appointment can be in both sources: keep the stored one
     appointments_by_id = {a.rdv_insertion_id: a for a in api_appointments} | {
         a.rdv_insertion_id: a for a in stored_appointments
