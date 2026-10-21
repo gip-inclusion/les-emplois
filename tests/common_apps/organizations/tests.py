@@ -364,6 +364,9 @@ class TestOrganizationTransfer:
         orientation = OrientationFactory(sender_prescriber_organization=from_org)
         prolongation_request = approvals_factories.ProlongationRequestFactory(prescriber_organization=from_org)
         prolongation = approvals_factories.ProlongationFactory(prescriber_organization=from_org)
+        suspension = approvals_factories.SuspensionFactory(
+            approval__origin_pe_approval=True, siae=None, prescriber_organization=from_org
+        )
 
         transfer.transfer_org_data(from_org, to_org, transfer.PRESCRIBERORG_TRANSFER_FIELDS, disable_from_org)
 
@@ -378,6 +381,7 @@ class TestOrganizationTransfer:
         orientation.refresh_from_db()
         prolongation_request.refresh_from_db()
         prolongation.refresh_from_db()
+        suspension.refresh_from_db()
 
         assert iae_diag.author_prescriber_organization == to_org
         assert geiq_diag.author_prescriber_organization == to_org
@@ -389,6 +393,7 @@ class TestOrganizationTransfer:
         assert orientation.sender_prescriber_organization == to_org
         assert prolongation_request.prescriber_organization == to_org
         assert prolongation.prescriber_organization == to_org
+        assert suspension.prescriber_organization == to_org
         assert to_org.description == from_org.description
         assert to_org.email == from_org.email
         assert to_org.name == from_org.name
