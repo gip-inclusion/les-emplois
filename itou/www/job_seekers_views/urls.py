@@ -37,6 +37,11 @@ urlpatterns = [
         name="appointments",
     ),
     path(
+        "appointments/<uuid:public_id>/<int:rdv_insertion_id>",
+        views.appointment_details,
+        name="appointment_details",
+    ),
+    path(
         "overview/<uuid:public_id>",
         views.job_seeker_overview,
         name="overview",

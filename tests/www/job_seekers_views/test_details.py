@@ -2385,8 +2385,14 @@ class TestAppointmentsTab:
         respx_mock.post(self.SEARCH_URL).respond(200, json=body)
         client.force_login(prescriber)
 
-        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
-        assertContains(response, "Lieu\xa0: <strong>1 place de la Mairie 26000 Valence</strong>")
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={"public_id": job_seeker.public_id, "rdv_insertion_id": rdv["id"]},
+            )
+        )
+        assertContains(response, '<span class="d-block">1 place de la Mairie 26000 Valence</span>', html=True)
+        assertNotContains(response, "Maison départementale de Valence")
 
     def test_appointment_in_both_sources(self, client, respx_mock, job_seeker, prescriber):
         respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
@@ -2394,7 +2400,7 @@ class TestAppointmentsTab:
         client.force_login(prescriber)
 
         response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
-        assertContains(response, "Détails du rendez-vous", count=1)
+        assertContains(response, "1 résultat")
         # Only in the rdv-insertion version
         assertNotContains(response, "Plateforme Insertion Valence")
 
@@ -2406,6 +2412,54 @@ class TestAppointmentsTab:
 
         response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
         assertContains(response, "C’est vous")
+
+    @freeze_time("2026-10-01")
+    def test_appointment_details(self, client, snapshot, respx_mock, job_seeker, prescriber):
+        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
+        client.force_login(prescriber)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={"public_id": job_seeker.public_id, "rdv_insertion_id": 1},
+            )
+        )
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+
+    def test_stored_appointment_details(self, client, respx_mock, job_seeker):
+        membership = CompanyMembershipFactory()
+        participation = ParticipationFactory(job_seeker=job_seeker, appointment__company=membership.company)
+        client.force_login(membership.user)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={
+                    "public_id": job_seeker.public_id,
+                    "rdv_insertion_id": participation.appointment.rdv_insertion_id,
+                },
+            )
+        )
+        assertContains(response, "Suite à une candidature")
+        # Not stored by the invitation experiment
+        assertNotContains(response, "Modalité")
+        assertNotContains(response, "Pris par")
+
+    def test_appointment_details_not_visible(self, client, respx_mock, job_seeker):
+        # Organized by another company
+        participation = ParticipationFactory(job_seeker=job_seeker)
+        client.force_login(CompanyMembershipFactory().user)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={
+                    "public_id": job_seeker.public_id,
+                    "rdv_insertion_id": participation.appointment.rdv_insertion_id,
+                },
+            )
+        )
+        assert response.status_code == 404
 
     @pytest.mark.parametrize("motif_category_type", [MotifCategoryType.SIAE, MotifCategoryType.AUTRE])
     def test_only_rsa_appointments_from_api(self, client, respx_mock, job_seeker, prescriber, motif_category_type):

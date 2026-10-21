@@ -23,9 +23,16 @@ class ParticipationStatus(models.TextChoices):
 
 
 class AppointmentCreatedBy(models.TextChoices):
-    AGENT = "agent", "Agent"
-    USER = "user", "Usager"
-    PRESCRIPTEUR = "prescripteur", "Prescripteur"
+    AGENT = "agent", "Un agent (convocation)"
+    USER = "user", "L’usager"
+    PRESCRIPTEUR = "prescripteur", "Un prescripteur"
+
+
+class AppointmentLocationType(models.TextChoices):
+    PUBLIC_OFFICE = "public_office", "Sur place"
+    PHONE = "phone", "Par téléphone"
+    HOME = "home", "À domicile"
+    VISIO = "visio", "Par visioconférence"
 
 
 class MotifCategoryType(models.TextChoices):
