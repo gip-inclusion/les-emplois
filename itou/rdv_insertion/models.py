@@ -206,15 +206,19 @@ class WebhookEvent(models.Model):
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class AppointmentAgent:
-    full_name: str
+    first_name: str
+    last_name: str
     email: str
+
+    def get_full_name(self):
+        return f"{self.first_name.strip().title()} {self.last_name.upper()}"
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class JobSeekerAppointment:
     """A job seeker's appointment, from rdv-insertion's API or the invitation experiment. Not stored."""
 
-    rdv_insertion_id: int  # RDV-I rdv id, shared by both sources
+    rdv_insertion_id: int
     status: ParticipationStatus
     start_at: datetime.datetime
     theme: str
@@ -241,11 +245,7 @@ class JobSeekerAppointment:
             location_name=lieu["name"] if lieu else None,
             address=lieu["address"] if lieu else rdv["address"],
             agents=tuple(
-                AppointmentAgent(
-                    # Same format as User.get_full_name
-                    full_name=f"{agent['first_name'].strip().title()} {agent['last_name'].upper()}",
-                    email=agent["email"],
-                )
+                AppointmentAgent(first_name=agent["first_name"], last_name=agent["last_name"], email=agent["email"])
                 for agent in rdv["agents"]
             ),
             created_by=AppointmentCreatedBy(participation["created_by"]),
@@ -253,16 +253,14 @@ class JobSeekerAppointment:
 
     @classmethod
     def list_from_api(cls, follow_ups):
-        """Appointments of the RSA follow-ups returned by rdv-insertion's API.
-
-        SIAE appointments are only shown when stored by the invitation experiment,
-        the only source that links them to their company.
-        """
+        """Appointments of the RSA follow-ups returned by rdv-insertion's API."""
         return [
             cls.from_api(
                 participation, theme=MotifCategoryType(follow_up["motif_category"]["motif_category_type"]).label
             )
             for follow_up in follow_ups
+            # SIAE appointments are only shown when stored by the invitation experiment,
+            # the only source that links them to their company
             if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
             for participation in follow_up["participations"]
         ]
