@@ -203,7 +203,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         # Useful for get_suspensions method and the approval remainder field
         Prefetch(
             "suspension_set",
-            queryset=Suspension.objects.select_related("siae"),
+            queryset=Suspension.objects.select_related("siae", "prescriber_organization"),
         ),
     )
     template_name = "approvals/details.html"
