@@ -13,12 +13,17 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    {% include "dashboard/includes/edit_user_sso_alert.html" with user=request.user viewing_self=True only %}
+{% endblock %}
+
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    {% include "dashboard/includes/edit_user_sso_alert.html" with user=request.user viewing_self=True only %}
                     <div class="c-form">
                         {% if request.user.is_job_seeker %}
                             <h2 class="h3">Informations personnelles</h2>

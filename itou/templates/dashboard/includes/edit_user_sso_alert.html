@@ -8,7 +8,7 @@
 {% enums "users" "IdentityProvider" as IdentityProvider %}
 {% if user.is_job_seeker %}
     {% if user.identity_provider == IdentityProvider.FT_CONNECT %}
-        {% component_alert variant="info" title=title content=content %}
+        {% component_alert variant="warning" title=title content=content %}
             {% fragment as title %}
                 {{ viewing_self|yesno:"Vos informations d’identité,Les informations d’identité de cet usager" }} viennent de {{ IdentityProvider.FT_CONNECT.label }}
             {% endfragment %}
@@ -21,7 +21,7 @@
             {% endfragment %}
         {% endcomponent_alert %}
     {% elif user.identity_provider == IdentityProvider.FRANCE_CONNECT %}
-        {% component_alert variant="info" title=title content=content %}
+        {% component_alert variant="warning" title=title content=content %}
             {% fragment as title %}
                 {{ viewing_self|yesno:"Vos informations d’identité,Les informations d’identité de cet usager" }} viennent de {{ IdentityProvider.FRANCE_CONNECT.label }}
             {% endfragment %}
@@ -35,7 +35,7 @@
         {% endcomponent_alert %}
     {% endif %}
 {% elif user.identity_provider == IdentityProvider.PRO_CONNECT %}
-    {% component_alert variant="info" title=title content=content %}
+    {% component_alert variant="warning" title=title content=content %}
         {% fragment as title %}
             Vos informations d’identité viennent de {{ IdentityProvider.PRO_CONNECT.label }}
         {% endfragment %}
