@@ -71,6 +71,7 @@ def get_permissions_dict():
         communications_models.AnnouncementItem: PERMS_ALL,
         companies_models.SiaeFinancialAnnex: PERMS_READ,
         companies_models.Company: PERMS_ALL | PERMS_IMPORT_ACI_CONVERGENCE_PHC,
+        companies_models.Contract: PERMS_READ,
         companies_models.SiaeACIConvergencePHC: PERMS_READ,
         companies_models.SiaeConvention: PERMS_EDIT,
         companies_models.JobDescription: PERMS_DELETE,
