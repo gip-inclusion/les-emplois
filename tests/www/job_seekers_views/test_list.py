@@ -2047,6 +2047,66 @@ def test_job_seekers_order(client, factory, url, subtests):
             assert response.context["page_obj"].object_list == list(reversed(job_seekers))
 
 
+def test_job_seekers_order_with_prolongation_request(client, subtests):
+    user = PrescriberFactory(membership__organization__authorized=True)
+    organization = user.prescriberorganization_set.get()
+    url = reverse("job_seekers_views:list_organization")
+    a_b_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Berger",
+        prescriber_organization=organization,
+    ).job_seeker
+    b_c_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Basile",
+        job_seeker__last_name="Craspouille",
+        prescriber_organization=organization,
+    ).job_seeker
+    m_n_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Maëva",
+        job_seeker__last_name="Noiret",
+        prescriber_organization=organization,
+        last_action_at=timezone.now() - datetime.timedelta(seconds=10),
+    ).job_seeker
+    ProlongationRequestFactory(
+        approval__user=m_n_job_seeker,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
+    s_t_job_seeker = JobSeekerAssignmentFactory(
+        job_seeker__first_name="Sylvain",
+        job_seeker__last_name="Tassin",
+        prescriber_organization=organization,
+        last_action_at=timezone.now() - datetime.timedelta(seconds=20),
+    ).job_seeker
+    ProlongationRequestFactory(
+        approval__user=s_t_job_seeker,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
+
+    client.force_login(user)
+
+    expected_order = {
+        "-last_action_at": [m_n_job_seeker, s_t_job_seeker, b_c_job_seeker, a_b_job_seeker],
+        "last_action_at": [s_t_job_seeker, m_n_job_seeker, a_b_job_seeker, b_c_job_seeker],
+        "full_name": [m_n_job_seeker, s_t_job_seeker, a_b_job_seeker, b_c_job_seeker],
+        "-full_name": [s_t_job_seeker, m_n_job_seeker, b_c_job_seeker, a_b_job_seeker],
+    }
+
+    with subtests.test(order="<missing_value>"):
+        response = client.get(url)
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
+
+    with subtests.test(order="<invalid_value>"):
+        response = client.get(url, {"order": "invalid_value"})
+        assert response.context["page_obj"].object_list == expected_order["-last_action_at"]
+
+    for order, job_seekers in expected_order.items():
+        with subtests.test(order=order):
+            response = client.get(url, {"order": order})
+            assert response.context["page_obj"].object_list == job_seekers
+
+
 @pytest.mark.parametrize(
     "factory, url",
     [

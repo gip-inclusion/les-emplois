@@ -53,7 +53,7 @@
                             {% if request.from_iae_actor %}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        {% if job_seeker.pending_prolongation_request %}
+                                        {% if job_seeker.action_expected == JobSeekerAction.PROLONG_IAE_PASS %}
                                             <span class="badge badge-sm rounded-pill bg-warning text-white">
                                                 <i class="ri-error-warning-line" aria-hidden="true"></i>
                                                 Prolongation demandée
@@ -86,7 +86,7 @@
                                     {% else %}
                                         {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                     {% endif %}
-                                    {% if job_seeker.pending_prolongation_request %}
+                                    {% if job_seeker.action_expected == JobSeekerAction.PROLONG_IAE_PASS %}
                                         <a class="btn btn-sm btn-warning btn-ico"
                                            href="{% url "approvals:prolongation_request_show" prolongation_request_id=job_seeker.pending_prolongation_request %}"
                                            data-bs-toggle="tooltip"
@@ -119,7 +119,7 @@
                                         </button>
                                         <div class="dropdown-menu"
                                              aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                            {% if job_seeker.pending_prolongation_request %}
+                                            {% if job_seeker.action_expected != JobSeekerAction.APPLY %}
                                                 <a href="{{ url_query }}"
                                                    class="dropdown-item"
                                                    {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>

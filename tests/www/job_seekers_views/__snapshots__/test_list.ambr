@@ -2243,7 +2243,19 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment"
+                LIMIT 1) AS "active_assignment",
+                        CASE
+                            WHEN NOT (COALESCE(
+                                                 (SELECT U0."id" AS "id"
+                                                  FROM "approvals_prolongationrequest" U0
+                                                  INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                                  WHERE (U1."user_id" = ("users_user"."id")
+                                                         AND U0."prescriber_organization_id" = %s
+                                                         AND U0."status" = %s)
+                                                  ORDER BY U0."created_at" DESC
+                                                  LIMIT 1), %s) = %s) THEN %s
+                            ELSE %s
+                        END AS "action_expected"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -2272,7 +2284,8 @@
                       3,
                       5,
                       6,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -2392,6 +2405,18 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
+                     CASE
+                         WHEN NOT (COALESCE(
+                                              (SELECT U0."id" AS "id"
+                                               FROM "approvals_prolongationrequest" U0
+                                               INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                               WHERE (U1."user_id" = ("users_user"."id")
+                                                      AND U0."prescriber_organization_id" = %s
+                                                      AND U0."status" = %s)
+                                               ORDER BY U0."created_at" DESC
+                                               LIMIT 1), %s) = %s) THEN %s
+                         ELSE %s
+                     END AS "action_expected",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -2468,8 +2493,10 @@
                    44,
                    45,
                    46,
+                   47,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
+          ORDER BY 47 ASC,
+                   43 DESC,
                    "users_user"."id" DESC
           LIMIT 5
         ''',
@@ -3470,7 +3497,19 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment"
+                LIMIT 1) AS "active_assignment",
+                        CASE
+                            WHEN NOT (COALESCE(
+                                                 (SELECT U0."id" AS "id"
+                                                  FROM "approvals_prolongationrequest" U0
+                                                  INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                                  WHERE (U1."user_id" = ("users_user"."id")
+                                                         AND U0."prescriber_organization_id" = %s
+                                                         AND U0."status" = %s)
+                                                  ORDER BY U0."created_at" DESC
+                                                  LIMIT 1), %s) = %s) THEN %s
+                            ELSE %s
+                        END AS "action_expected"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -3497,7 +3536,8 @@
                       3,
                       5,
                       6,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -3614,6 +3654,18 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
+                     CASE
+                         WHEN NOT (COALESCE(
+                                              (SELECT U0."id" AS "id"
+                                               FROM "approvals_prolongationrequest" U0
+                                               INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                               WHERE (U1."user_id" = ("users_user"."id")
+                                                      AND U0."prescriber_organization_id" = %s
+                                                      AND U0."status" = %s)
+                                               ORDER BY U0."created_at" DESC
+                                               LIMIT 1), %s) = %s) THEN %s
+                         ELSE %s
+                     END AS "action_expected",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -3688,8 +3740,10 @@
                    44,
                    45,
                    46,
+                   47,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
+          ORDER BY 47 ASC,
+                   43 DESC,
                    "users_user"."id" DESC
           LIMIT 3
         ''',

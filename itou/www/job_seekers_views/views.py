@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
+from django.db.models import Case, Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -52,7 +52,7 @@ from itou.utils.urls import get_safe_url, get_tally_form_url
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireWizardMixin
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
-from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
+from itou.www.job_seekers_views.enums import JobSeekerAction, JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
@@ -803,6 +803,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             valid_eligibility_diagnosis=subquery_diagnosis,
             pending_prolongation_request=Coalesce(subquery_prolongation_request, 0),
             active_assignment=subquery_active_assignment,
+            action_expected=Case(
+                When(~Q(pending_prolongation_request=0), then=JobSeekerAction.PROLONG_IAE_PASS),
+                default=JobSeekerAction.APPLY,
+            ),
         )
         .select_related("jobseeker_profile")
         .prefetch_related(
@@ -852,7 +856,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
-    queryset = queryset.order_by(*order.order_by)
+    queryset = queryset.order_by("action_expected", *order.order_by)
     if request_from_siae:
         queryset = queryset.with_contract_ending_soon(
             siae=request.current_organization if request.from_employer else None
@@ -901,6 +905,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             if request.from_employer and request.current_organization.can_use_employee_record
             else 0
         ),
+        "JobSeekerAction": JobSeekerAction,
     }
 
     return render(request, "job_seekers_views/includes/list_results.html" if request.htmx else template_name, context)
