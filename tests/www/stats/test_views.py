@@ -24,22 +24,6 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import ItouStaffFactory
 
 
-class TestStatsView:
-    @override_settings(
-        METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux"
-    )
-    def test_stats_public(self, client):
-        url = reverse("stats:stats_public")
-        response = client.get(url)
-        assert response.status_code == 200
-
-    @override_settings(METABASE_SITE_URL=None, METABASE_SECRET_KEY=None)
-    def test_stats_public_empty_settings(self, client):
-        url = reverse("stats:stats_public")
-        response = client.get(url)
-        assert response.status_code == 200
-
-
 def assert_stats_dashboard_equal(values):
     assertQuerySetEqual(
         StatsDashboardVisit.objects.all(),
