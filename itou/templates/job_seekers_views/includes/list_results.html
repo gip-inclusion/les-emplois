@@ -53,7 +53,7 @@
                             {% if request.from_iae_actor %}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        {% if job_seeker.pending_prolongation_request %}
+                                        {% if job_seeker.action_for_job_seeker == ActionForJobSeeker.PROLONG_IAE_PASS %}
                                             <span class="badge badge-sm rounded-pill bg-warning text-white">
                                                 <i class="ri-error-warning-line" aria-hidden="true"></i>
                                                 Prolongation demandée
@@ -101,15 +101,45 @@
                                     {% else %}
                                         {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                     {% endif %}
-                                    {% if job_seeker.pending_prolongation_request %}
-                                        <a class="btn btn-sm btn-warning btn-ico"
+                                    {% if job_seeker.action_for_job_seeker == ActionForJobSeeker.PROLONG_IAE_PASS %}
+                                        <a class="btn btn-sm btn-warning btn-ico text-nowrap"
                                            href="{% url "approvals:prolongation_request_show" prolongation_request_id=job_seeker.pending_prolongation_request %}"
                                            data-bs-toggle="tooltip"
                                            data-bs-title="Traiter la demande de prolongation de PASS IAE"
                                            {% matomo_event "pass-iae" "clic" "traiter-demande-prolongation" %}>
                                             <i class="ri-pencil-line"
                                                aria-label="Traiter la demande de prolongation du PASS IAE de {{ job_seeker.get_inverted_full_name }}"></i>
-                                            <span>Traiter</span>
+                                            <span>Traiter la demande</span>
+                                        </a>
+                                    {% elif job_seeker.action_for_job_seeker == ActionForJobSeeker.EVALUATE_IAE_ELIGIBILITY %}
+                                        <a class="btn btn-sm btn-warning btn-ico text-nowrap"
+                                           href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Valider l’éligibilité IAE de {{ job_seeker.get_inverted_full_name }}"
+                                           {% matomo_event "candidat" "clic" "valider-eligibilite-iae" %}>
+                                            <i class="ri-pencil-line"
+                                               aria-label="Valider l’éligibilité IAE de {{ job_seeker.get_inverted_full_name }}"></i>
+                                            <span>Valider l’éligibilité IAE</span>
+                                        </a>
+                                    {% elif job_seeker.action_for_job_seeker == ActionForJobSeeker.FILL_REPORT %}
+                                        <a class="btn btn-sm btn-warning btn-ico text-nowrap"
+                                           href="{% url 'job_seekers_views:create_pro_support_report' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Remplir le bilan d’accompagnement de {{ job_seeker.get_inverted_full_name }}"
+                                           {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>
+                                            <i class="ri-pencil-line"
+                                               aria-label="Remplir le bilan d’accompagnement de {{ job_seeker.get_inverted_full_name }}"></i>
+                                            <span>Remplir le bilan</span>
+                                        </a>
+                                    {% elif job_seeker.action_for_job_seeker == ActionForJobSeeker.ASK_FOR_REPORT %}
+                                        <a class="btn btn-sm btn-warning btn-ico text-nowrap"
+                                           href="{{ job_seeker.pro_support_request_mailto }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Demander un bilan d’accompagnement pour {{ job_seeker.get_inverted_full_name }}"
+                                           {% matomo_event "candidat" "clic" "demande_bilan_accompagnement" %}>
+                                            <i class="ri-pencil-line"
+                                               aria-label="Demander un bilan d’accompagnement pour {{ job_seeker.get_inverted_full_name }}"></i>
+                                            <span>Demander un bilan</span>
                                         </a>
                                     {% else %}
                                         <a class="btn btn-sm btn-secondary btn-ico"
@@ -134,10 +164,10 @@
                                         </button>
                                         <div class="dropdown-menu"
                                              aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                            {% if job_seeker.show_create_pro_support_report %}
-                                                <a href="{% url 'job_seekers_views:create_pro_support_report' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                            {% if job_seeker.action_for_job_seeker != ActionForJobSeeker.APPLY %}
+                                                <a href="{{ url_query }}"
                                                    class="dropdown-item"
-                                                   {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Remplir le bilan</a>
+                                                   {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Postuler</a>
                                             {% endif %}
                                             {% if request.current_organization.is_authorized %}
                                                 {% if not job_seeker.has_valid_approval %}
@@ -145,7 +175,7 @@
                                                        class="dropdown-item">
                                                         {% if job_seeker.valid_eligibility_diagnosis %}
                                                             Mettre à jour son éligibilité IAE
-                                                        {% else %}
+                                                        {% elif job_seeker.action_for_job_seeker != ActionForJobSeeker.EVALUATE_IAE_ELIGIBILITY %}
                                                             Valider son éligibilité IAE
                                                         {% endif %}
                                                     </a>
@@ -180,11 +210,6 @@
                                                 <a href="{% url "job_seekers_views:create_assignment" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                                    class="dropdown-item"
                                                    {% matomo_event "candidat" "clic" "create-assignment-from-list" %}>Ajouter mon intervention</a>
-                                            {% endif %}
-                                            {% if job_seeker.pro_support_request_mailto %}
-                                                <a href="{{ job_seeker.pro_support_request_mailto }}"
-                                                   class="dropdown-item"
-                                                   {% matomo_event "candidat" "clic" "demande_bilan_accompagnement" %}>Demander un bilan d’accompagnement à la SIAE</a>
                                             {% endif %}
                                         </div>
                                     {% endif %}
