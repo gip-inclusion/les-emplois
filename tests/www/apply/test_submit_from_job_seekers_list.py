@@ -59,7 +59,7 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
@@ -67,6 +67,7 @@ class TestApplyAsPrescriber:
                 href="{next_url}">
                 <i class="ri-draft-line" aria-label="Postuler pour ZORRO Alain">
                 </i>
+                <span>Postuler</span>
             </a>
             """,
             html=True,
@@ -263,13 +264,14 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
                 <i class="ri-draft-line" aria-label="Postuler pour Z… A…"></i>
+                <span>Postuler</span>
             </a>
             """,
             html=True,

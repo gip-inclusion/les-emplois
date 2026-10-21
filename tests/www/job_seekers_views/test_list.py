@@ -58,7 +58,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
     assertContains(
         response,
         f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true"
@@ -66,6 +66,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{reverse("search:employers_results")}?job_seeker_public_id={job_seeker.public_id}{city}">
                 <i class="ri-draft-line" aria-label="Postuler pour {aria_label}"></i>
+                <span>Postuler</span>
             </a>
         """,
         count=1,
