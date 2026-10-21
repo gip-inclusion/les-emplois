@@ -32,7 +32,7 @@ class Command(BaseCommand):
         )
 
     def notify_inactive_jobseekers(self, batch_size):
-        now = timezone.now()
+        now = timezone.now().astimezone(timezone.get_default_timezone())
         inactive_since = now - INACTIVITY_PERIOD
         self.logger.info("Notifying inactive job seekers without recent related objects before: %s", inactive_since)
         users = list(
