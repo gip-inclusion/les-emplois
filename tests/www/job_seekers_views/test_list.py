@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.approvals.enums import ProlongationRequestStatus
 from itou.asp.models import Commune
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
@@ -20,7 +21,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
-from tests.approvals.factories import ApprovalFactory, SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory, SuspensionFactory
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -488,6 +489,11 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         last_action_kind=ActionKind.APPLY,
         assigned_to_unknown_advisor=True,
     )
+    bernard_prolongation_request = ProlongationRequestFactory(
+        approval__user=bernard,
+        prescriber_organization=organization,
+        status=ProlongationRequestStatus.PENDING,
+    )
 
     # Job seeker created by a member of the organization, but not in the organization anymore
     prescriber_not_in_org_anymore = PrescriberFactory(
@@ -510,6 +516,11 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         prescriber_organization=organization,
         last_action_kind=ActionKind.CREATE,
         last_action_at=timezone.now() - datetime.timedelta(days=2 * 365),
+    )
+    # A prolongation request for Charlotte's PASS was sent to another organization
+    ProlongationRequestFactory(
+        approval__user=charlotte,
+        status=ProlongationRequestStatus.PENDING,
     )
 
     company = CompanyFactory(for_snapshot=True)
@@ -559,15 +570,62 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
                     "href",
                     f"/job-seekers/{alain.public_id}/assignments/{alain_assignment.pk}/edit",
                     f"/job-seekers/{alain.public_id}/assignments/[JobSeekerAssignment PK]/edit",
-                )
+                ),
+                (
+                    "href",
+                    f"/approvals/prolongation/request/{bernard_prolongation_request.pk}",
+                    "/approvals/prolongation/request/[ProlongationRequest PK]",
+                ),
             ],
         )
         assert pretty_indented(soup) == snapshot(name="job seekers list tbody")
 
         # Job seekers are displayed for the prescriber
-        for job_seeker in [alain, bernard, charlotte]:
+        for job_seeker in [alain, charlotte]:
             assert_contains_job_seeker(response, job_seeker, back_url=url_organization, with_personal_information=True)
             assert_contains_button_apply_for(response, job_seeker, with_city=True)
+
+        # Bernard has a pending prolongation request for his PASS
+        assert_contains_job_seeker(response, bernard, back_url=url_organization, with_personal_information=True)
+        assertContains(
+            response,
+            f"""
+                <a class="btn btn-sm btn-warning btn-ico"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Traiter la demande de prolongation de PASS IAE"
+                    data-matomo-event="true"
+                    data-matomo-category="pass-iae" data-matomo-action="clic"
+                    data-matomo-option="traiter-demande-prolongation"
+                    href="{reverse("approvals:prolongation_request_show", args=(bernard_prolongation_request.pk,))}">
+                    <i class="ri-pencil-line"
+                    aria-label="Traiter la demande de prolongation du PASS IAE de {bernard.get_inverted_full_name()}">
+                    </i>
+                    <span>Traiter</span>
+                </a>
+            """,
+            count=1,
+            html=True,
+        )
+        assertContains(
+            response,
+            f"""
+            <a href="{
+                (
+                    f"{reverse('search:employers_results')}?job_seeker_public_id={bernard.public_id}"
+                    f"&city={bernard.city_slug}"
+                )
+            }"
+                class="dropdown-item"
+                data-matomo-event="true"
+                data-matomo-category="candidature"
+                data-matomo-action="clic"
+                data-matomo-option="postuler-pour-ce-candidat">
+                Postuler
+            </a>
+            """,
+            count=1,
+            html=True,
+        )
 
         for assignment in [alain_assignment, bernard_assignment, charlotte_assignment]:
             assert_contains_last_advisor(response, assignment)
@@ -702,6 +760,11 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         created_by=other_prescriber,
         with_job_seeker_assignment=True,
         with_job_seeker_assignment__prescriber_organization=organization,
+    )
+    # An unauthorized prescriber should not see Bernard's prolongation request
+    ProlongationRequestFactory(
+        approval__user=bernard,
+        status=ProlongationRequestStatus.PENDING,
     )
 
     response = client.get(url_user)

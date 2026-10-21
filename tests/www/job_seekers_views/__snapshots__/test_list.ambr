@@ -2219,6 +2219,15 @@
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "valid_eligibility_diagnosis",
+                        COALESCE(
+                                   (SELECT U0."id" AS "id"
+                                    FROM "approvals_prolongationrequest" U0
+                                    INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                    WHERE (U1."user_id" = ("users_user"."id")
+                                           AND U0."prescriber_organization_id" = %s
+                                           AND U0."status" = %s)
+                                    ORDER BY U0."created_at" DESC
+                                    LIMIT 1), %s) AS "pending_prolongation_request",
           
                (SELECT U0."id" AS "id"
                 FROM "users_jobseekerassignment" U0
@@ -2262,7 +2271,8 @@
                       2,
                       3,
                       5,
-                      6) subquery
+                      6,
+                      7) subquery
         ''',
       }),
       dict({
@@ -2357,6 +2367,15 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+                     COALESCE(
+                                (SELECT U0."id" AS "id"
+                                 FROM "approvals_prolongationrequest" U0
+                                 INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                 WHERE (U1."user_id" = ("users_user"."id")
+                                        AND U0."prescriber_organization_id" = %s
+                                        AND U0."status" = %s)
+                                 ORDER BY U0."created_at" DESC
+                                 LIMIT 1), %s) AS "pending_prolongation_request",
           
             (SELECT U0."id" AS "id"
              FROM "users_jobseekerassignment" U0
@@ -2448,6 +2467,7 @@
                    42,
                    44,
                    45,
+                   46,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 43 DESC,
                    "users_user"."id" DESC
@@ -3041,7 +3061,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3427,6 +3447,15 @@
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "valid_eligibility_diagnosis",
+                        COALESCE(
+                                   (SELECT U0."id" AS "id"
+                                    FROM "approvals_prolongationrequest" U0
+                                    INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                    WHERE (U1."user_id" = ("users_user"."id")
+                                           AND U0."prescriber_organization_id" = %s
+                                           AND U0."status" = %s)
+                                    ORDER BY U0."created_at" DESC
+                                    LIMIT 1), %s) AS "pending_prolongation_request",
           
                (SELECT U0."id" AS "id"
                 FROM "users_jobseekerassignment" U0
@@ -3467,7 +3496,8 @@
                       2,
                       3,
                       5,
-                      6) subquery
+                      6,
+                      7) subquery
         ''',
       }),
       dict({
@@ -3560,6 +3590,15 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
+                     COALESCE(
+                                (SELECT U0."id" AS "id"
+                                 FROM "approvals_prolongationrequest" U0
+                                 INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                 WHERE (U1."user_id" = ("users_user"."id")
+                                        AND U0."prescriber_organization_id" = %s
+                                        AND U0."status" = %s)
+                                 ORDER BY U0."created_at" DESC
+                                 LIMIT 1), %s) AS "pending_prolongation_request",
           
             (SELECT U0."id" AS "id"
              FROM "users_jobseekerassignment" U0
@@ -3648,6 +3687,7 @@
                    42,
                    44,
                    45,
+                   46,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 43 DESC,
                    "users_user"."id" DESC
@@ -3685,6 +3725,30 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."id" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s,
+                                                         %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
         ''',
       }),
       dict({
@@ -3880,10 +3944,10 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning text-white">
                       <i aria-hidden="true" class="ri-error-warning-line">
                       </i>
-                      Éligibilité IAE à valider
+                      Prolongation demandée
                   </span>
               </div>
           </td>
@@ -3901,11 +3965,11 @@
           </td>
           <td class="text-end w-100px">
               <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
-                      <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
+                  <a class="btn btn-sm btn-warning btn-ico" data-bs-title="Traiter la demande de prolongation de PASS IAE" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="pass-iae" data-matomo-event="true" data-matomo-option="traiter-demande-prolongation" href="/approvals/prolongation/request/[ProlongationRequest PK]">
+                      <i aria-label="Traiter la demande de prolongation du PASS IAE de YGREC Bernard" class="ri-pencil-line">
                       </i>
                       <span>
-                          Postuler
+                          Traiter
                       </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
@@ -3913,8 +3977,8 @@
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">
-                          Valider son éligibilité IAE
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
+                          Postuler
                       </a>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                           Orienter vers un service d’insertion
@@ -3988,10 +4052,10 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                      <i aria-hidden="true" class="ri-error-warning-line">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-pass-valid-line">
                       </i>
-                      Éligibilité IAE à valider
+                      PASS IAE valide
                   </span>
               </div>
           </td>
@@ -4021,9 +4085,6 @@
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href="/eligibility/update/iae/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">
-                          Valider son éligibilité IAE
-                      </a>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                           Orienter vers un service d’insertion
                       </a>

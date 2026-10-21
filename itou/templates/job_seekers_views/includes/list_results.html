@@ -53,14 +53,21 @@
                             {% if request.from_iae_actor %}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
-                                        {% if job_seeker.has_valid_approval and job_seeker.latest_approval.state == "SUSPENDED" %}
-                                            <i class="ms-1 ri-information-line text-info"
-                                               aria-label="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter cet usager sans restriction."
-                                               data-bs-toggle="tooltip"
-                                               data-bs-title="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter cet usager sans restriction."
-                                               role="button"
-                                               tabindex="0"></i>
+                                        {% if job_seeker.pending_prolongation_request %}
+                                            <span class="badge badge-sm rounded-pill bg-warning text-white">
+                                                <i class="ri-error-warning-line" aria-hidden="true"></i>
+                                                Prolongation demandée
+                                            </span>
+                                        {% else %}
+                                            {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                                            {% if job_seeker.has_valid_approval and job_seeker.latest_approval.state == "SUSPENDED" %}
+                                                <i class="ms-1 ri-information-line text-info"
+                                                   aria-label="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter cet usager sans restriction."
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter cet usager sans restriction."
+                                                   role="button"
+                                                   tabindex="0"></i>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </td>
@@ -79,15 +86,27 @@
                                     {% else %}
                                         {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                     {% endif %}
-                                    <a class="btn btn-sm btn-secondary btn-ico"
-                                       href="{{ url_query }}"
-                                       data-bs-toggle="tooltip"
-                                       data-bs-title="Postuler pour cet usager"
-                                       {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
-                                        <i class="ri-draft-line"
-                                           aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
-                                        <span>Postuler</span>
-                                    </a>
+                                    {% if job_seeker.pending_prolongation_request %}
+                                        <a class="btn btn-sm btn-warning btn-ico"
+                                           href="{% url "approvals:prolongation_request_show" prolongation_request_id=job_seeker.pending_prolongation_request %}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Traiter la demande de prolongation de PASS IAE"
+                                           {% matomo_event "pass-iae" "clic" "traiter-demande-prolongation" %}>
+                                            <i class="ri-pencil-line"
+                                               aria-label="Traiter la demande de prolongation du PASS IAE de {{ job_seeker.get_inverted_full_name }}"></i>
+                                            <span>Traiter</span>
+                                        </a>
+                                    {% else %}
+                                        <a class="btn btn-sm btn-secondary btn-ico"
+                                           href="{{ url_query }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Postuler pour cet usager"
+                                           {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
+                                            <i class="ri-draft-line"
+                                               aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
+                                            <span>Postuler</span>
+                                        </a>
+                                    {% endif %}
                                     {% if job_seeker.show_more_actions %}
                                         <button id="dropdown_{{ forloop.counter }}_action_menu"
                                                 class="btn btn-sm btn-secondary btn-ico-only"
@@ -100,6 +119,13 @@
                                         </button>
                                         <div class="dropdown-menu"
                                              aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                            {% if job_seeker.pending_prolongation_request %}
+                                                <a href="{{ url_query }}"
+                                                   class="dropdown-item"
+                                                   {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
+                                                    Postuler
+                                                </a>
+                                            {% endif %}
                                             {% if suggest_next_step_url and job_seeker.contract_ending_soon %}
                                                 <a href="{{ suggest_next_step_url }}"
                                                    class="dropdown-item has-external-link"
