@@ -842,14 +842,14 @@ class TestSuspensionModel:
         # EI and ACI kind have one more choice
         for kind in [CompanyKind.EI, CompanyKind.ACI]:
             company = CompanyFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(company)
+            result = Suspension.Reason.displayed_choices(company)
             assert len(result) == 5
             assert result[-1][0] == Suspension.Reason.CONTRAT_PASSERELLE.value
 
         # Some other cases
         for kind in [CompanyKind.ETTI, CompanyKind.AI]:
             company = CompanyFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(company)
+            result = Suspension.Reason.displayed_choices(company)
             assert len(result) == 4
 
     def test_next_min_start_date(self):

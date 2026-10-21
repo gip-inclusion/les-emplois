@@ -1045,8 +1045,8 @@ class SuspensionQuerySet(models.QuerySet):
 
 class Suspension(models.Model):
     """
-    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
-    without intervention of a prescriber or a posteriori control.
+    A PASS IAE (or approval) can be directly suspended, without a posteriori control, either by the SIAE currently
+    hiring the jobseeker or by an authorized France Travail prescriber.
 
     When a suspension is saved/edited/deleted, the end date of its approval is
     automatically pushed back or forth with a PostgreSQL trigger:
@@ -1097,7 +1097,7 @@ class Suspension(models.Model):
         )
 
         @staticmethod
-        def displayed_choices_for_siae(siae):
+        def displayed_choices(siae=None):
             """
             Old reasons are not showed anymore but kept to let users still see
             a nice label in their dashboard instead of just the enum stored in the DB.
@@ -1109,7 +1109,8 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [companies_enums.CompanyKind.ACI, companies_enums.CompanyKind.EI]:
+            # `siae` is None when the suspension has been created by an authorized France Travail prescriber.
+            if siae and siae.kind in [companies_enums.CompanyKind.ACI, companies_enums.CompanyKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -1130,6 +1131,14 @@ class Suspension(models.Model):
         null=True,
         on_delete=models.RESTRICT,  # Prevent a soft lock, also for traceability and accountability
         related_name="approvals_suspended",
+    )
+    prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prescriptrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For the same reasons as for the `siae` field.
+        related_name="approvals_suspended_by_prescriber",
     )
     reason = models.CharField(
         verbose_name="motif",

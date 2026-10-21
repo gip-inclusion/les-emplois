@@ -499,7 +499,7 @@ class SuspensionForm(forms.ModelForm):
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
-        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices(siae=self.siae)
 
         # End date is not strictly required because it can be set
         # with `set_default_end_date` input
