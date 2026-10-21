@@ -25,7 +25,7 @@ from django.utils.text import Truncator
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
 from itou.communications.models import NotificationSettings
-from itou.companies.models import CompanyMembership
+from itou.companies.models import CompanyMembership, Contract
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.insertion.models import Orientation
@@ -222,6 +222,23 @@ class OrientationInline(ReadonlyMixin, ItouTabularInline):
     @admin.display(description="service d'insertion")
     def service_link(self, obj):
         return get_admin_view_link(obj.service, content=obj.service.name)
+
+
+class ContractInline(ReadonlyMixin, ItouTabularInline):
+    model = Contract
+    fk_name = "job_seeker"
+    extra = 0
+    fields = ("pk_link", "company_link", "start_date", "end_date")
+    readonly_fields = fields
+    list_select_related = ("company",)
+
+    @admin.display(description="PK")
+    def pk_link(self, obj):
+        return get_admin_view_link(obj)
+
+    @admin.display(description="entreprise")
+    def company_link(self, obj):
+        return get_admin_view_link(obj.company, content=obj.company.display_name)
 
 
 class SentOrientationInline(OrientationInline):
@@ -709,6 +726,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 ConditionalInline(lambda user: user.approvals.all(), ApprovalInline, False),
                 ConditionalInline(lambda user: user.job_applications.all(), JobApplicationInline, True),
                 ConditionalInline(lambda user: user.orientations.all(), OrientationInline, True),
+                ConditionalInline(lambda user: user.contracts.all(), ContractInline, True),
             ],
         }
         for check, related_fields in conditional_inlines.items():

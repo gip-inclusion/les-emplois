@@ -84,6 +84,8 @@ def test_no_email_sent(client):
             "emailaddress_set-TOTAL_FORMS": "0",
             "eligibility_diagnoses-INITIAL_FORMS": "0",
             "eligibility_diagnoses-TOTAL_FORMS": "0",
+            "contracts-INITIAL_FORMS": "0",
+            "contracts-TOTAL_FORMS": "0",
             "geiq_eligibility_diagnoses-INITIAL_FORMS": "0",
             "geiq_eligibility_diagnoses-TOTAL_FORMS": "0",
             "approvals-INITIAL_FORMS": "0",
