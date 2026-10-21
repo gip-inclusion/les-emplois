@@ -822,6 +822,18 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ),
         output_field=IntegerField(),
     )
+    subquery_prolongation_request = (
+        Subquery(
+            ProlongationRequest.objects.filter(
+                approval__user=OuterRef("pk"),
+                prescriber_organization=request.current_organization,
+                status=ProlongationRequestStatus.PENDING,
+            ).values("id")[:1],
+            output_field=IntegerField(),
+        )
+        if request.from_authorized_prescriber
+        else Value(None, output_field=IntegerField())
+    )
     subquery_active_assignment = Subquery(
         assignments_qs.filter(job_seeker=OuterRef("pk"), professional=request.user, assigned_to_unknown_advisor=False)
         .exclude(prescriber_organization=None, company=None)
@@ -858,6 +870,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             job_applications_nb=Coalesce(subquery_count, 0),
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
+            pending_prolongation_request=subquery_prolongation_request,
             active_assignment=subquery_active_assignment,
         )
         .select_related("jobseeker_profile")
