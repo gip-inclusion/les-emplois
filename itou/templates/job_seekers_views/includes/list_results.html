@@ -78,14 +78,15 @@
                                 {% endif %}
                                 <div class="d-flex justify-content-end gap-2"
                                      role="group"
-                                     aria-label="Actions rapides sur les usagers">
-                                    <a class="btn btn-sm btn-secondary btn-ico-only"
+                                     aria-label="Actions rapides sur les accompagnements">
+                                    <a class="btn btn-sm btn-secondary btn-ico"
                                        href="{{ url_query }}"
                                        data-bs-toggle="tooltip"
                                        data-bs-title="Postuler pour cet usager"
                                        {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
                                         <i class="ri-draft-line"
                                            aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
+                                        <span>Postuler</span>
                                     </a>
                                     {% if job_seeker.show_more_actions %}
                                         <button id="dropdown_{{ forloop.counter }}_action_menu"

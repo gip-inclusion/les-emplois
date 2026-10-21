@@ -5035,10 +5035,13 @@
                   DERAY Odile (Non précisé)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777">
                           <i aria-label="Postuler pour BERTHELOT Paul" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5086,10 +5089,13 @@
                   DERAY Odile (Pres. Org.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444">
                           <i aria-label="Postuler pour WATERFORD David" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5141,10 +5147,13 @@
                   DERAY Odile (Pres. Org.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
                           <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5199,10 +5208,13 @@
                   Non précisé (ACME Inc.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
                           <i aria-label="Postuler pour XERUS Charlotte" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_4_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5258,10 +5270,13 @@
                   BIALÈS Patrick (Pres. Org.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
                           <i aria-label="Postuler pour ZORRO Alain" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_5_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -6187,10 +6202,13 @@
               Non précisé (Pres. Org.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
                       <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
                       </i>
+                      <span>
+                          Postuler
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
@@ -6238,10 +6256,13 @@
               GRAVIER Emile (Pres. Org.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
                       <i aria-label="Postuler pour ZORRO Alain" class="ri-draft-line">
                       </i>
+                      <span>
+                          Postuler
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
@@ -6289,10 +6310,13 @@
               Non précisé (ACME Inc.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
                       <i aria-label="Postuler pour XERUS Charlotte" class="ri-draft-line">
                       </i>
+                      <span>
+                          Postuler
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
