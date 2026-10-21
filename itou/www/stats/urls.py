@@ -7,8 +7,6 @@ app_name = "stats"
 
 
 urlpatterns = [
-    # Public stats.
-    path("", views.stats_public, name="stats_public"),
     path("redirect/<str:dashboard_name>", views.stats_redirect, name="redirect"),
     # Employer stats.
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),

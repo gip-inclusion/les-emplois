@@ -24,12 +24,6 @@ FT_FILTER_VALUE = "France Travail"
 
 METABASE_DASHBOARDS = {
     #
-    # Public stats.
-    #
-    "stats_public": {
-        "dashboard_id": 236,
-    },
-    #
     # Employer stats.
     #
     "stats_siae_etp": {
@@ -319,8 +313,8 @@ def _get_token(payload):
 
 
 def get_view_name(request):
-    full_view_name = request.resolver_match.view_name  # e.g. "stats:stats_public"
-    view_name = full_view_name.split(":")[-1]  # e.g. "stats_public"
+    full_view_name = request.resolver_match.view_name  # e.g. "stats:stats_siae_etp"
+    view_name = full_view_name.split(":")[-1]  # e.g. "stats_siae_etp"
     return view_name
 
 

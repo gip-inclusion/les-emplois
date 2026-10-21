@@ -17,7 +17,6 @@ make sure that the correct filters are "Verrouillé".
 import re
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -108,7 +107,6 @@ def render_stats(
         "iframeurl": (
             mb.metabase_embedded_url(dashboard_id=dashboard_id, params=params) if settings.METABASE_SITE_URL else ""
         ),
-        "is_stats_public": False,
         "show_siae_evaluation_message": False,
         "stats_base_url": settings.METABASE_SITE_URL,
         "tally_popup_form_id": metabase_dashboard.get("tally_popup_form_id") if show_tally else None,
@@ -154,18 +152,6 @@ def render_stats(
         )
 
     return render(request, template_name, base_context)
-
-
-@login_not_required
-def stats_public(request):
-    """
-    Public basic stats (signed and embedded version)
-    """
-    context = {
-        "page_title": "Statistiques",
-        "is_stats_public": True,
-    }
-    return render_stats(request=request, context=context)
 
 
 def stats_redirect(request, dashboard_name):
