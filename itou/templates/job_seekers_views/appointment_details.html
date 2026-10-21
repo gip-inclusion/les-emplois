@@ -76,7 +76,7 @@
                             </li>
                             {% for agent in appointment.agents %}
                                 <li class="mt-3">
-                                    <strong class="d-block">{{ agent.full_name }}</strong>
+                                    <strong class="d-block">{{ agent.get_full_name }}</strong>
                                     <a href="mailto:{{ agent.email }}" class="text-break">{{ agent.email }}</a>
                                 </li>
                             {% endfor %}
