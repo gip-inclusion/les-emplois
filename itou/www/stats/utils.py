@@ -3,7 +3,6 @@ from django.core.cache import caches
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.metabase.models import DatumKey
@@ -39,7 +38,6 @@ def can_view_stats_siae(request):
     """
     return (
         request.from_employer
-        and isinstance(request.current_organization, Company)
         # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
         # we require a convention object to exist here.
         # Some SIAE don't have a convention (SIAE created by support, GEIQ...).
@@ -99,65 +97,37 @@ def can_view_stats_ddets_iae(request):
     """
     Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
     """
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DDETS_IAE
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DDETS_IAE
 
 
 def can_view_stats_ddets_log(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DDETS_LOG
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DDETS_LOG
 
 
 def can_view_stats_dreets_iae(request):
     """
     Users of a DREETS IAE can view the confidential DREETS IAE stats of their region only.
     """
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DREETS_IAE
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DREETS_IAE
 
 
 def can_view_stats_dgefp_iae(request):
     """
     Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
     """
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DGEFP_IAE
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DGEFP_IAE
 
 
 def can_view_stats_ffgeiq(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.FFGEIQ
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.FFGEIQ
 
 
 def can_view_stats_dgefp_geiq(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DGEFP_GEIQ
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DGEFP_GEIQ
 
 
 def can_view_stats_dreets_geiq(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DREETS_GEIQ
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DREETS_GEIQ
 
 
 def can_view_stats_geiq_execution_assessment(request):
@@ -165,35 +135,19 @@ def can_view_stats_geiq_execution_assessment(request):
 
 
 def can_view_stats_dihal(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DIHAL
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DIHAL
 
 
 def can_view_stats_drihl(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DRIHL
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.DRIHL
 
 
 def can_view_stats_iae_network(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.IAE_NETWORK
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.IAE_NETWORK
 
 
 def can_view_stats_convergence(request):
-    return (
-        request.from_institution
-        and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.CONVERGENCE
-    )
+    return request.from_institution and request.current_organization.kind == InstitutionKind.CONVERGENCE
 
 
 def can_view_stats_staff(request):
