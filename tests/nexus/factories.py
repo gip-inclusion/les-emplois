@@ -1,4 +1,5 @@
 import datetime
+import string
 import uuid
 
 import factory
@@ -50,6 +51,7 @@ class NexusStructureFactory(factory.django.DjangoModelFactory):
     accessibility = factory.LazyFunction(lambda: "https://acceslibre.beta.gouv.fr/" + str(uuid.uuid4()))
     description = factory.Faker("sentence", locale="fr_FR")
     source_link = factory.Faker("url")
+    siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")  # Don't start a SIRET with 0
 
     class Meta:
         model = NexusStructure
