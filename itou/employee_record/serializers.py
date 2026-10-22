@@ -410,6 +410,8 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         required_fields = {"education_level"}
         if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_id:
             required_fields.add("pole_emploi_since")
+        if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_since:
+            required_fields.add("pole_emploi_id")
         if is_eiti:
             required_fields.update({"mean_monthly_income_before_process", "actor_met_for_business_creation"})
         is_missing_required_fields = not all(
