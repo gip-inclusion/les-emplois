@@ -167,6 +167,9 @@ def load_placeholder_for_external_totp_device(persistent_id):
 class ExternalTOTPDevice:
     """This placeholder is a session-only marker: verification already happened on ProConnect's side."""
 
+    # Read by django_otp's OTPMiddleware, which ignores unconfirmed devices since django-otp 1.7.5
+    confirmed = True
+
     def __init__(self, user_id: int):
         self.user_id = user_id
 
