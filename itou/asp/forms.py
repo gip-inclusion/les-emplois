@@ -15,8 +15,8 @@ class BirthPlaceModelForm(forms.ModelForm):
         queryset=Commune.objects,
         label="Commune de naissance",
         help_text=(
-            "La commune de naissance est obligatoire lorsque le salarié est né en France. "
-            "Elle ne doit pas être renseignée s’il est né à l'étranger."
+            "La commune de naissance est obligatoire lorsque la personne est née en France. "
+            "Elle ne doit pas être renseignée si elle est née à l'étranger."
         ),
         required=False,
         widget=RemoteAutocompleteSelect2Widget(
