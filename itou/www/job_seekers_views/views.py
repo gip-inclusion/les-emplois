@@ -38,7 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.rdv_insertion.models import JobSeekerAppointment
+from itou.rdv_insertion.models import JobSeekerAppointmentData
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import (
@@ -498,7 +498,7 @@ def appointment_details(
 def get_job_seeker_appointments(request, job_seeker):
     """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
     if can_view_external_actions(job_seeker, request):
-        api_appointments = JobSeekerAppointment.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
+        api_appointments = JobSeekerAppointmentData.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
         stored_participations = job_seeker.rdvi_participations.all()
     elif request.from_employer:
         api_appointments = []
@@ -508,7 +508,7 @@ def get_job_seeker_appointments(request, job_seeker):
     else:
         return []
     stored_participations = stored_participations.select_related("appointment__company", "appointment__location")
-    stored_appointments = [JobSeekerAppointment.from_stored_participation(p) for p in stored_participations]
+    stored_appointments = [JobSeekerAppointmentData.from_stored_participation(p) for p in stored_participations]
     return sorted(api_appointments + stored_appointments, key=lambda a: a.start_at, reverse=True)
 
 
