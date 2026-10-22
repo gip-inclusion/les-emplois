@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2026-10-19
+
+### Ajouté
+
+- [Accompagnements : Ajout du badge QPV aux informations usager](https://github.com/gip-inclusion/les-emplois/pull/9021)
+- [Fiche de poste : Ajout d'un badge quand les fiches de postes sont fermées](https://github.com/gip-inclusion/les-emplois/pull/8987)
+- [Pilotage : tableaux de bord de pilotage bilans GEIQ pour la FFGEIQ/DGEFP](https://github.com/gip-inclusion/les-emplois/pull/8979)
+- [Recherche prescripteur : Nouveau filtre service `Financé par`](https://github.com/gip-inclusion/les-emplois/pull/8948)
+
+### Modifié
+
+- [Accompagnements : Repérer les salariés en fin de parcours](https://github.com/gip-inclusion/les-emplois/pull/8813)
+- [Connexion : Correction d'un bug de connexion pour les utilisateur qui doivent à la fois valider leur 2FA et activer ProConnect](https://github.com/gip-inclusion/les-emplois/pull/9101)
+- [Inscription : Empêcher la création par un tiers de comptes usager en doublon](https://github.com/gip-inclusion/les-emplois/pull/9017)
+- [Insertion : Ajouter des informations sur l’usager sur le formulaire d’orientation et sur la page de détail d’une orientation](https://github.com/gip-inclusion/les-emplois/pull/9028)
+- [Interface : Afficher le PASS IAE sur la fiche usager même quand il a expiré](https://github.com/gip-inclusion/les-emplois/pull/8999)
+- [Interface : Bandeau signalant l'intégration du formulaire d'orientation DORA](https://github.com/gip-inclusion/les-emplois/pull/9055)
+- [Interface : Évolution de l'affichage des contrats IAE](https://github.com/gip-inclusion/les-emplois/pull/9001)
+
+### Tech
+
+- [Performances : Nouveau paginateur pour accélérer le chargement de certaines pages de l'admin](https://github.com/gip-inclusion/les-emplois/pull/7397)
+- [Performances : Optimisations de l'admin](https://github.com/gip-inclusion/les-emplois/pull/8926)
+- [Tech : Accélérer la suite de tests](https://github.com/gip-inclusion/les-emplois/pull/9069)
+- [Tech : Mise à jour de python en 3.14](https://github.com/gip-inclusion/les-emplois/pull/8655)
+- [Tech : Remplacer MinIO par RustFS](https://github.com/gip-inclusion/les-emplois/pull/9053)
+- [Tech : Répartir les tests de la CI en 4 shards équilibrés et mettre en cache certaines libs](https://github.com/gip-inclusion/les-emplois/pull/9072)
+- [Tech : Répartition des tests en 4 shards équilibrés](https://github.com/gip-inclusion/les-emplois/pull/9070)
+
 ## 2026-10-12
 
 ### Ajouté
@@ -9,7 +38,7 @@
 ### Modifié
 
 - [Connexion : Ne pas pouvoir accepter les CGU à la place d’un utilisateur détourné](https://github.com/gip-inclusion/les-emplois/pull/8980)
-- [Formattage des e-mails en HTML](https://github.com/gip-inclusion/les-emplois/pull/8894)
+- [Notifications : Formatage des e-mails en HTML](https://github.com/gip-inclusion/les-emplois/pull/8894)
 - [Insertion : Afficher les modes de mobilisation dans les résultats de recherche de services](https://github.com/gip-inclusion/les-emplois/pull/8886)
 - [Insertion : Mettre à jour les pages structure, service et tunnel d'orientation pour les champs natifs data⋅inclusion](https://github.com/gip-inclusion/les-emplois/pull/8854)
 
@@ -25,7 +54,7 @@
 
 - [Annuaire pro : Permettre aux professionnels de masquer leur profil](https://github.com/gip-inclusion/les-emplois/pull/8911)
 - [Candidature : Dépublier les fiches de poste et fermer les candidatures spontanées lors d’un refus "Pas de recrutement en cours"](https://github.com/gip-inclusion/les-emplois/pull/8896)
-- [Empêcher des candidats multiples d’utiliser le même PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/6539)
+- [PASS IAE : Empêcher des candidats multiples d’utiliser le même PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/6539)
 - [Insertion : Envoyer des rappels par mail aux structures pour traiter les orientations](https://github.com/gip-inclusion/les-emplois/pull/8741)
 - [Insertion : Expiration automatique des orientations](https://github.com/gip-inclusion/les-emplois/pull/8703)
 - [Insertion : Page de pilotage d’une orientation (2/2 : actions)](https://github.com/gip-inclusion/les-emplois/pull/8559)
@@ -35,14 +64,14 @@
 
 ### Modifié
 
-- [Connexion : Permet à un utilisateur désactivé de se créer un nouveau compte](https://github.com/gip-inclusion/les-emplois/pull/8839)
+- [Connexion : Permettre à un utilisateur désactivé de se créer un nouveau compte](https://github.com/gip-inclusion/les-emplois/pull/8839)
 - [Connexion : Rendre obligatoire ProConnect](https://github.com/gip-inclusion/les-emplois/pull/8931)
 - [Insertion : Enregistrer les iMER provenant des usagers](https://github.com/gip-inclusion/les-emplois/pull/8891)
 - [Interface : Affichage des candidatures en vue tableau sur le profil d'un usager](https://github.com/gip-inclusion/les-emplois/pull/8876)
 - [Interface : Changement de wording pour les erreurs 3308](https://github.com/gip-inclusion/les-emplois/pull/8954)
 - [Interface : Remplacement du mot "Candidat" par "Usager" sur toute la plateforme](https://github.com/gip-inclusion/les-emplois/pull/8822)
-- [Interface : Renommage et réorganisation des items du menu "Candidatures envoyees" et "Candidatures reçue"](https://github.com/gip-inclusion/les-emplois/pull/8783)
-- [Marque : Changement de l'url par défaut des liens générés](https://github.com/gip-inclusion/les-emplois/pull/8715)
+- [Interface : Renommage et réorganisation des items du menu "Candidatures envoyées" et "Candidatures reçues"](https://github.com/gip-inclusion/les-emplois/pull/8783)
+- [Marque : Changement de l'URL par défaut des liens générés](https://github.com/gip-inclusion/les-emplois/pull/8715)
 
 ### Supprimé
 
