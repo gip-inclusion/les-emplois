@@ -373,10 +373,7 @@ def nav(request):
                     items=[NAV_ENTRIES["institutional-members"]],
                 )
             )
-            if (
-                request.current_organization
-                and request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST
-            ):
+            if request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST:
                 menu_items.append(NAV_ENTRIES["institutional-geiq-assessments"])
         menu_items.append(
             NavGroup(
