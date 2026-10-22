@@ -783,9 +783,9 @@ django-citext==1.0.3 \
     --hash=sha256:30167d71369438ee27b76643466cf0d35a9dad43b3f4c8d1924efd9ba2f88dcd \
     --hash=sha256:aaec55853c84cd48de1668fb059acba98bef4e343a4420b0e670773498e0aedd
     # via -r test.txt
-django-datadog-logger==0.9.1 \
-    --hash=sha256:76061776560ebd06b748d46b936e6678d0af457e8e41acd7c1bb43bf60a0a508 \
-    --hash=sha256:ac97a03a673f2e56d032368080111a131624bc7ff9196eb6884fc28264e6a4e7
+django-datadog-logger==0.9.2 \
+    --hash=sha256:07ac5a339f922ac6f9ab4b91c99a3ebc943f0703efe7d1c1c278d25117522d1f \
+    --hash=sha256:398962a15ad49715979508d7a4b222b9c2c8999c16f7f119e81dce9015b58caa
     # via
     #   -r test.txt
     #   itoutils
