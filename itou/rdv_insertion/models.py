@@ -209,7 +209,7 @@ class WebhookEvent(models.Model):
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
-class AppointmentAgent:
+class AppointmentAgentData:
     first_name: str | None
     last_name: str | None
     email: str
@@ -220,7 +220,7 @@ class AppointmentAgent:
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
-class JobSeekerAppointment:
+class JobSeekerAppointmentData:
     """A job seeker's appointment, from rdv-insertion's API or the invitation experiment. Not stored."""
 
     rdv_insertion_id: int
@@ -232,7 +232,7 @@ class JobSeekerAppointment:
     location_type: AppointmentLocationType | None
     location_name: str | None
     address: str | None
-    agents: tuple[AppointmentAgent, ...]
+    agents: tuple[AppointmentAgentData, ...]
     created_by: AppointmentCreatedBy | None
 
     @classmethod
@@ -250,7 +250,9 @@ class JobSeekerAppointment:
             location_name=lieu["name"] if lieu else None,
             address=lieu["address"] if lieu else rdv["address"],
             agents=tuple(
-                AppointmentAgent(first_name=agent["first_name"], last_name=agent["last_name"], email=agent["email"])
+                AppointmentAgentData(
+                    first_name=agent["first_name"], last_name=agent["last_name"], email=agent["email"]
+                )
                 for agent in rdv["agents"]
             ),
             created_by=AppointmentCreatedBy(participation["created_by"]),
