@@ -267,8 +267,8 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="geiq-bilan-execution",
     ),
-    # Labor inspectors.
-    "labor-inspector-members": NavItem(
+    # Institutionals.
+    "institutional-members": NavItem(
         label="Collaborateurs",
         target=reverse_lazy("institutions_views:members"),
         active_view_names=["institutions_views:members"],
@@ -276,7 +276,7 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
     ),
-    "labor-inspector-geiq-assessments": NavItem(
+    "institutional-geiq-assessments": NavItem(
         label="Bilans d’exécution GEIQ",
         icon="ri-list-check-3",
         target=reverse_lazy("geiq_assessments_views:list_for_institution"),
@@ -370,14 +370,14 @@ def nav(request):
                 NavGroup(
                     label="Organisation",
                     icon="ri-community-line",
-                    items=[NAV_ENTRIES["labor-inspector-members"]],
+                    items=[NAV_ENTRIES["institutional-members"]],
                 )
             )
             if (
                 request.current_organization
                 and request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST
             ):
-                menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
+                menu_items.append(NAV_ENTRIES["institutional-geiq-assessments"])
         menu_items.append(
             NavGroup(
                 label="Rechercher",

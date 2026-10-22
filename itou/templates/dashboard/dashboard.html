@@ -264,9 +264,9 @@
                                 {# end of if request.from_employer #}
 
                                 {% if request.from_institution %}
-                                    {% include "dashboard/includes/labor_inspector_organization_card.html" %}
+                                    {% include "dashboard/includes/institution_organization_card.html" %}
                                     {% if active_campaigns or closed_campaigns %}
-                                        {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
+                                        {% include "dashboard/includes/institution_evaluation_campains_card.html" %}
                                     {% endif %}
                                 {% endif %}
                                 {# end of if request.from_institution #}
