@@ -10,6 +10,7 @@ FORMS = {
     None: "La plateforme de l’inclusion",
     "de": "de La plateforme de l’inclusion",
     "à": "à La plateforme de l’inclusion",
+    "via": "via La plateforme de l’inclusion",
 }
 
 
