@@ -234,3 +234,9 @@ class RefusalOrientationForm(forms.ModelForm):
     class Meta:
         model = Orientation
         fields = ["refusal_reasons", "refusal_details"]
+
+
+class SendEmailForm(forms.Form):
+    body = forms.CharField(
+        label="Contenu de l’email", required=True, strip=True, widget=forms.Textarea(attrs={"rows": 12})
+    )

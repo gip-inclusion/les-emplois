@@ -2,6 +2,7 @@ from datetime import timedelta
 from functools import partial
 
 import pytest
+from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -11,8 +12,9 @@ from itou.insertion.enums import OrientationRefusalReason, OrientationStatus
 from itou.insertion.models import Orientation
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
+from itou.utils.brand import product_name
 from tests.companies.factories import CompanyMembershipFactory
-from tests.insertion.factories import OrientationFactory, OrientationProcessLinkFactory
+from tests.insertion.factories import MobilizationEmailFactory, OrientationFactory, OrientationProcessLinkFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 
 
@@ -297,3 +299,53 @@ def test_orientation_reminder_for_structure(snapshot, reminder_days_multiplicato
     assert email.subject == snapshot(name="subject")
     body = email.body.replace(str(link.pk), "[PK of OrientationProcessLink]")
     assert body == snapshot(name="body")
+
+
+def test_free_form_email_to_service(snapshot):
+    mobilization_email = MobilizationEmailFactory(
+        sender__for_snapshot=True, sender_prescriber_organization__for_snapshot=True
+    )
+    body_message = """Bonjour,
+
+Je souhaiterais orienter un usager vers votre service "SERVICE".
+
+Mon usager a 33 ans et habite à Vannes (56).
+
+
+
+
+Plusieurs retours à la ligne non pris en compte.
+
+Cordialement,
+Pierre DUPONT"""
+    email = mobilization_email.free_form_email_to_service(body_message)
+
+    assert (
+        str(email.from_email)
+        == f"{mobilization_email.sender.get_full_name()} {product_name('via')} <{settings.DEFAULT_FROM_EMAIL}>"
+    )
+    assert email.to == [mobilization_email.service.contact_email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+def test_free_form_email_to_sender(snapshot):
+    mobilization_email = MobilizationEmailFactory(
+        sender__for_snapshot=True,
+        sender_prescriber_organization__for_snapshot=True,
+    )
+    from_email = "Jean DUSERVICE <jean@service.fake>"
+    reply_to = "Jean DUSERVICE <jean@example.com>"
+    body_message = """Bonjour,
+
+Bien reçu.
+
+Cordialement,
+Jean DUSERVICE"""
+    email = mobilization_email.free_form_email_to_sender(body_message, from_email, reply_to=reply_to)
+
+    assert email.from_email == from_email
+    assert email.to == [mobilization_email.sender.email]
+    assert email.reply_to == [reply_to]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
