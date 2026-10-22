@@ -1594,6 +1594,46 @@
     'sufPassIae': None,
   })
 # ---
+# name: test_update_notification_use_static_serializers_on_missing_pole_emploi_id_fields
+  ReturnDict({
+    'cotisationsTI': None,
+    'inscritPoleEmploi': False,
+    'inscritPoleEmploiDepuis': None,
+    'niveauFormation': '00',
+    'nomActeurCreationEntr': None,
+    'numeroIDE': None,
+    'orienteur': '08',
+    'revenuMensuelMoyenTI': None,
+    'salarieAideSociale': False,
+    'salarieBenefAAH': False,
+    'salarieBenefAAHDepuis': None,
+    'salarieBenefARE': None,
+    'salarieBenefAREDepuis': None,
+    'salarieBenefASS': False,
+    'salarieBenefASSDepuis': None,
+    'salarieBenefATA': False,
+    'salarieBenefATADepuis': None,
+    'salarieBenefCAPE': None,
+    'salarieBenefCESA': None,
+    'salarieBenefPrimeActivite': None,
+    'salarieBenefPrimeActiviteDepuis': None,
+    'salarieBenefRSA': 'NON',
+    'salarieBenefRSADepuis': None,
+    'salarieEnEmploi': True,
+    'salarieHebergement': False,
+    'salarieLangueFrancaise': False,
+    'salarieMobilite': False,
+    'salarieOETH': False,
+    'salarieParentIsole': False,
+    'salarieRQTH': False,
+    'salarieRefugie': False,
+    'salarieSansEmploiDepuis': None,
+    'salarieSansRessource': False,
+    'salarieSortantASE': False,
+    'salarieSortantDetention': False,
+    'salarieTypeEmployeur': '01',
+  })
+# ---
 # name: test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields
   ReturnDict({
     'cotisationsTI': None,

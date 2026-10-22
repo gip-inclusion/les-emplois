@@ -302,6 +302,17 @@ def test_update_notification_use_static_serializers_on_missing_pole_emploi_since
     assert data["situationSalarie"] == snapshot()
 
 
+def test_update_notification_use_static_serializers_on_missing_pole_emploi_id_fields(snapshot):
+    notification = EmployeeRecordUpdateNotificationFactory(
+        employee_record__job_application__for_snapshot=True,
+        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_id="",
+        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_since=AllocationDuration.FROM_6_TO_11_MONTHS,
+    )
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["situationSalarie"] == snapshot()
+
+
 @pytest.mark.parametrize(
     "field,value",
     [
