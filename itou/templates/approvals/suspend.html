@@ -39,6 +39,8 @@
 
                                 {% collapse_field form.set_default_end_date target_id="collapse_end_at" %}
 
+                                {% include "approvals/includes/contract_reasons_disabled_alert.html" with variant="info" %}
+
                                 {% bootstrap_field form.reason %}
 
                                 {% component_alert content=content variant="info" %}

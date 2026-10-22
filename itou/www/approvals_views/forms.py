@@ -23,6 +23,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.companies.models import Contract
 from itou.files.forms import ItouFileField
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
@@ -475,7 +476,7 @@ class SuspensionForm(forms.ModelForm):
             "reason_explanation",
         ]
         widgets = {
-            "reason": forms.RadioSelect(),
+            "reason": RadioSelectWithDisabledChoices(),
             "start_at": DuetDatePickerWidget(),
             "end_at": DuetDatePickerWidget(),
         }
@@ -496,10 +497,30 @@ class SuspensionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
-        self.siae = kwargs.pop("siae")
+        # A suspension is created either by an employer (cf. siae) or by an authorized FT prescriber
+        # (cf. prescriber_organization); exactly one of them is set.
+        self.siae = kwargs.pop("siae", None)
+        self.prescriber_organization = kwargs.pop("prescriber_organization", None)
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
         self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+
+        # When the jobseeker has an ongoing contract (according to ASP data), the suspension must not indicate that the
+        # contract is broken or finished.
+        if Contract.objects.ongoing().filter(job_seeker=self.approval.user).exists():
+            disabled_values = {
+                Suspension.Reason.BROKEN_CONTRACT.value,
+                Suspension.Reason.FINISHED_CONTRACT.value,
+            }
+            # But when editing a suspension, its already stored reason must stay selectable.
+            if self.instance.pk:
+                disabled_values.discard(self.instance.reason)
+            # Make those options appear as disabled.
+            self.fields["reason"].widget.disabled_values = disabled_values
+            # Prevent those options to be accepted.
+            self.fields["reason"]._choices = [
+                (value, label) for value, label in self.fields["reason"]._choices if value not in disabled_values
+            ]
 
         # End date is not strictly required because it can be set
         # with `set_default_end_date` input
@@ -513,6 +534,7 @@ class SuspensionForm(forms.ModelForm):
             referent_date = today
             suspension_pk = None
             self.instance.siae = self.siae
+            self.instance.prescriber_organization = self.prescriber_organization
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
@@ -570,9 +592,10 @@ class SuspensionEndDateForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, approval, instance, siae, **kwargs):
+    def __init__(self, *args, approval, instance, siae=None, prescriber_organization=None, **kwargs):
         self.approval = approval
         self.siae = siae
+        self.prescriber_organization = prescriber_organization
         self.instance = instance
         super().__init__(*args, **kwargs)
 

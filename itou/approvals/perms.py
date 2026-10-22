@@ -1,6 +1,7 @@
 import logging
 
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.models import User
 from itou.utils.tokens import prolongation_derogation_token_generator
 
@@ -9,6 +10,34 @@ logger = logging.getLogger(__name__)
 
 PERMS_READ = "read"
 PERMS_READ_AND_WRITE = "read_and_write"
+
+
+def is_ft_prescriber_allowed_to_suspend(request, approval):
+    """Whether the current user is an authorized France Travail prescriber allowed to suspend the given approval.
+
+    Only an authorized FT prescriber to whom this very jobseeker is assigned is allowed.
+    """
+    return (
+        request.from_authorized_prescriber
+        and request.current_organization.kind == PrescriberOrganizationKind.FT
+        and User.objects.assigned_job_seeker_ids(request.user, request.current_organization)
+        .filter(pk=approval.user_id)
+        .exists()
+    )
+
+
+def is_ft_prescriber_allowed_to_handle_suspension(request, suspension):
+    """Whether the current user is an authorized France Travail prescriber allowed to edit/delete the given suspension.
+
+    Like an employer (`Suspension.can_be_handled_by_siae`), a prescriber may only handle an ongoing suspension, and
+    only the FT prescriber organization that created it.
+    """
+    return (
+        request.from_authorized_prescriber
+        and request.current_organization.kind == PrescriberOrganizationKind.FT
+        and suspension.prescriber_organization_id == request.current_organization.pk
+        and suspension.is_in_progress
+    )
 
 
 def can_view_approval_details(request, approval):

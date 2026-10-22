@@ -264,6 +264,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -273,6 +274,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -351,6 +353,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -360,6 +363,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -377,6 +381,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -801,6 +806,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -810,6 +816,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -888,6 +895,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -897,6 +905,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -914,6 +923,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -1445,6 +1455,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -1453,6 +1464,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -1531,6 +1543,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -1539,6 +1552,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -1556,6 +1570,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -1720,7 +1735,7 @@
 # ---
 # name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1983,6 +1998,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -1992,6 +2008,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -2070,6 +2087,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -2079,6 +2097,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
@@ -2096,6 +2115,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension_to_handle[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -2173,6 +2193,21 @@
                                                     %s))
           ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'SuspensionForm.__init__[www/approvals_views/forms.py]',
+          'suspension_update[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_contract"
+          WHERE (("companies_contract"."end_date" IS NULL
+                  OR "companies_contract"."end_date" >= %s)
+                 AND "companies_contract"."job_seeker_id" = %s)
           LIMIT 1
         ''',
       }),
@@ -2276,6 +2311,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",
