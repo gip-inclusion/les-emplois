@@ -10,6 +10,7 @@ import pgtrigger
 import pytest
 import xworkflows
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
@@ -28,6 +29,8 @@ from itou.employee_record.models import (
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import Title
+from itou.utils import triggers
+from itou.utils.admin import get_admin_url
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -38,7 +41,7 @@ from tests.employee_record.factories import (
     EmployeeRecordWithProfileFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import ProfessionalFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, ProfessionalFactory
 
 
 class TestEmployeeRecordModel:
@@ -1142,3 +1145,117 @@ def test_watched_data_updated_at_race_condition(faker):
 
     # The employee record should have its watched_data_updated_at flag still set
     assert EmployeeRecord.objects.get(pk=employee_record.pk).watched_data_updated_at is not None
+
+
+@pytest.mark.parametrize(
+    "new_asp_uid,ready_for_transfer,profile_duplicate,expected_status,profile_updated,email_expected",
+    [
+        # Nominal case
+        ("1234567890abcdef1234567890abcd", True, False, Status.READY, True, False),
+        # asp_uid field updated without ready transition
+        ("1234567890abcdef1234567890abcd", False, False, Status.REJECTED, True, False),
+        # Invalid label
+        (None, False, False, Status.REJECTED, None, False),
+        # Invalid uid (too short)
+        ("1234567890abcdef", False, False, Status.REJECTED, None, False),
+        # Duplicate case
+        ("1234567890abcdef1234567890abcd", True, True, Status.REJECTED, False, True),
+    ],
+)
+def test_handle_3437_error(
+    mailoutbox,
+    django_capture_on_commit_callbacks,
+    new_asp_uid,
+    ready_for_transfer,
+    profile_duplicate,
+    expected_status,
+    profile_updated,
+    email_expected,
+):
+    processing_label = (
+        (
+            "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. "
+            f"({new_asp_uid})"
+        )
+        if new_asp_uid is not None
+        else "Unexpected label"
+    )
+    duplicate = JobSeekerProfileFactory(asp_uid=new_asp_uid) if profile_duplicate else None
+    employee_record = EmployeeRecordFactory(
+        ready_for_transfer=ready_for_transfer,
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+    )
+    assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
+    with triggers.fake_context(), django_capture_on_commit_callbacks(execute=True):
+        employee_record.handle_3437_error()
+    employee_record.job_application.job_seeker.jobseeker_profile.refresh_from_db()
+    if profile_updated:
+        assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid == new_asp_uid
+    else:
+        assert employee_record.job_application.job_seeker.jobseeker_profile.asp_uid != new_asp_uid
+
+    employee_record.refresh_from_db()
+    assert employee_record.status == expected_status
+    if email_expected:
+        [email] = mailoutbox
+        assert email.to == [settings.ITOU_EMAIL_CONTACT]
+        assert "Doublon de compte à régulariser suite à une erreur 3437" in email.subject
+        assert get_admin_url(employee_record) in email.body
+        assert get_admin_url(employee_record.job_application.job_seeker) in email.body
+        assert get_admin_url(duplicate.user) in email.body
+    else:
+        assert len(mailoutbox) == 0
+
+
+def test_handle_two_3437_in_a_row_for_same_job_seeker(mailoutbox, django_capture_on_commit_callbacks):
+    # Test the (improbable) case where 2 different employee records for the same job seeker
+    # are rejected in the same transfer
+    new_asp_uid = "1234567890abcdef1234567890abcd"
+
+    processing_label = (
+        "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme de l'inclusion différent. "
+        f"({new_asp_uid})"
+    )
+    common_job_seeker = JobSeekerFactory(
+        # Make sure the ready transition will work
+        with_mocked_address=True,
+        jobseeker_profile__with_hexa_address=True,
+        jobseeker_profile__with_education_level=True,
+        born_in_france=True,
+    )
+    employee_record_1 = EmployeeRecordFactory(
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+        job_application__job_seeker=common_job_seeker,
+    )
+    employee_record_2 = EmployeeRecordFactory(
+        status=Status.REJECTED,
+        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        asp_processing_label=processing_label,
+        job_application=JobApplicationFactory(
+            job_seeker=common_job_seeker,
+            sent_by_job_seeker=True,
+            approval=employee_record_1.job_application.approval,
+            state=JobApplicationState.ACCEPTED,
+            to_company__subject_to_iae_rules=True,
+        ),
+    )
+    with triggers.fake_context(), django_capture_on_commit_callbacks(execute=True):
+        employee_record_1.handle_3437_error()
+        employee_record_2.handle_3437_error()
+
+    # The job seeker's ASP uid has been fixed
+    common_job_seeker.refresh_from_db()
+    common_job_seeker.jobseeker_profile.refresh_from_db()
+    assert common_job_seeker.jobseeker_profile.asp_uid == new_asp_uid
+
+    # Both employee record were transitionned to READY
+    for employee_record in [employee_record_1, employee_record_2]:
+        employee_record.refresh_from_db()
+        assert employee_record.status == Status.READY
+
+    # No mail was sent to the support
+    assert len(mailoutbox) == 0
