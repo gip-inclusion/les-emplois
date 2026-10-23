@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.antivirus.models import Scan
 from itou.approvals.enums import ProlongationReason
@@ -31,7 +32,8 @@ def test_urls():
     with io.BytesIO() as content:
         default_storage.save("test_file.pdf", content)
 
-    assert file.url() == default_storage.url(file.key)
+    with freeze_time():
+        assert file.url() == default_storage.url(file.key)
 
 
 @pytest.mark.usefixtures("temporary_bucket")
