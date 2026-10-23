@@ -69,12 +69,22 @@
                                 <hr class="my-4">
 
                                 {% if form.company_memberships or form.prescriber_memberships %}
-                                    <fieldset>
+                                    <fieldset data-emplois-membership-functions>
                                         <legend class="h3">Fonctions</legend>
-                                        {% for field in form.function_fields|slice:":3" %}
-                                            {% bootstrap_field field %}
-                                        {% endfor %}
                                         {% if form.function_fields|length > 3 %}
+                                            {% bootstrap_field form.function_fields.0 %}
+                                            <div class="form-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           id="same-membership-function">
+                                                    <label class="form-check-label"
+                                                           for="same-membership-function">Fonction identique pour toutes les structures</label>
+                                                </div>
+                                            </div>
+                                            {% for field in form.function_fields|slice:"1:3" %}
+                                                {% bootstrap_field field %}
+                                            {% endfor %}
                                             <div class="collapse" id="collapse-more-memberships">
                                                 {% for field in form.function_fields|slice:"3:" %}
                                                     {% bootstrap_field field %}
@@ -90,6 +100,10 @@
                                                     {{ hidden_count }} autre{{ hidden_count|pluralize }} structure{{ hidden_count|pluralize }}
                                                 {% endwith %}
                                             </button>
+                                        {% else %}
+                                            {% for field in form.function_fields %}
+                                                {% bootstrap_field field %}
+                                            {% endfor %}
                                         {% endif %}
                                         <datalist id="membership-function-suggestions">
                                             <option value="Accompagnant éducatif et social (AES)"></option>
@@ -164,5 +178,37 @@
         {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
         {{ form.media.js }}
     {% endif %}
+    {% if form.function_fields|length > 3 %}
+        <script nonce="{{ csp_nonce }}">
+            {
+                const sameMembershipFunctionCheckbox = document.getElementById("same-membership-function");
+                const [firstMembershipFunctionInput, ...otherMembershipFunctionInputs] = document.querySelectorAll("[data-emplois-membership-functions] input[list]");
 
+                function copyFirstMembershipFunction() {
+                    otherMembershipFunctionInputs.forEach((input) => {
+                        input.value = firstMembershipFunctionInput.value;
+                    });
+                }
+
+                function toggleSameMembershipFunction() {
+                    // readonly rather than disabled: disabled inputs are not submitted, which would erase their value.
+                    otherMembershipFunctionInputs.forEach((input) => {
+                        input.readOnly = sameMembershipFunctionCheckbox.checked;
+                    });
+                    if (sameMembershipFunctionCheckbox.checked) {
+                        copyFirstMembershipFunction();
+                    }
+                }
+
+                sameMembershipFunctionCheckbox.addEventListener("change", toggleSameMembershipFunction);
+                firstMembershipFunctionInput.addEventListener("input", () => {
+                    if (sameMembershipFunctionCheckbox.checked) {
+                        copyFirstMembershipFunction();
+                    }
+                });
+                // The browser may restore the checkbox state when navigating back.
+                toggleSameMembershipFunction();
+            }
+        </script>
+    {% endif %}
 {% endblock %}
