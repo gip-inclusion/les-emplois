@@ -101,6 +101,7 @@ def render_stats(
     view_name = view_name or mb.get_view_name(request)
     metabase_dashboard = mb.METABASE_DASHBOARDS[view_name]
     dashboard_id = metabase_dashboard["dashboard_id"]
+    template_name = metabase_dashboard.get("template_name", template_name)
 
     base_context = {
         "back_url": None,

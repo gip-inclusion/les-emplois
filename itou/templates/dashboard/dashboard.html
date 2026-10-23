@@ -201,6 +201,7 @@
 {% endblock %}
 
 {% block content %}
+    {% enums "institutions" "InstitutionKind" as InstitutionKind %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
@@ -264,6 +265,9 @@
                                 {# end of if request.from_employer #}
 
                                 {% if request.from_institution %}
+                                    {% if request.current_organization.kind == InstitutionKind.DDETS_IAE or request.current_organization.kind == InstitutionKind.DREETS_IAE %}
+                                        {% include "dashboard/includes/institution_territory.html" only %}
+                                    {% endif %}
                                     {% include "dashboard/includes/institution_organization_card.html" %}
                                     {% if active_campaigns or closed_campaigns %}
                                         {% include "dashboard/includes/institution_evaluation_campains_card.html" %}

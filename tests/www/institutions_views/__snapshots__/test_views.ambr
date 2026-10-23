@@ -126,3 +126,63 @@
   
   '''
 # ---
+# name: TestOrganizationListView.test_view
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Listes des organisations inscrites dans mon département
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <p>
+                          <strong>
+                              Contribuez à la mise à jour des organisations de votre territoire.
+                          </strong>
+                          <br/>
+                          Ces listes recensent les prescripteurs habilités, les orienteurs et les employeurs inscrits sur La plateforme de l’inclusion.
+                      </p>
+                      <p>
+                          <strong>
+                              Vous constatez un changement dans l’habilitation d’un prescripteur ou le conventionnement d’une structure ? Signalez-le-nous à l’aide de
+                              <a class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=jeanne.d.orleans%40test.local&tf_30473760509585=0611223344&tf_15923279049745=ddets-dreets&tf_16096355658513=ddets&tf_16096931518225=DDETS+01" rel="noopener" target="_blank">
+                                  ce formulaire
+                              </a>
+                              afin que nous puissions mettre à jour les informations sur la plateforme.
+                          </strong>
+                          <br/>
+                          Votre contribution nous aide à maintenir des listes fiables et à jour pour l’ensemble des acteurs de l’inclusion.
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <iframe id="stats-iframe" src="" title="Liste des organisations (01 - Ain) - Tableau de bord Metabase">
+                      </iframe>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---

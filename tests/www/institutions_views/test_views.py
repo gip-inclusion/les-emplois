@@ -4,6 +4,8 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.common_apps.organizations.views import BaseMemberList
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -316,3 +318,62 @@ class TestMembers:
             )
         )
         assert response.status_code == 400
+
+
+class TestOrganizationListView:
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            pytest.param(JobSeekerFactory, id="JobSeeker"),
+            pytest.param(EmployerFactory, id="Employer"),
+            pytest.param(PrescriberFactory, id="Prescriber"),
+        ],
+    )
+    def test_permission(self, client, user_factory):
+        client.force_login(user_factory())
+        response = client.get(reverse("institutions_views:organizations_list"))
+        assert response.status_code == 403
+
+    def test_institutional_permission(self, client):
+        user = LaborInspectorFactory()
+        institution = Institution.objects.get()
+        client.force_login(user)
+
+        for kind in InstitutionKind:
+            institution.kind = kind
+            institution.save()
+            response = client.get(reverse("institutions_views:organizations_list"))
+
+            if kind in [InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]:
+                assert response.status_code == 200, f"kind={kind} should grant access to organizations_list"
+            else:
+                assert response.status_code == 403, f"kind={kind} should not grant access to organizations_list"
+
+    def test_nav_entry(self, client):
+        MENU_STR = "Mon territoire"
+        user = LaborInspectorFactory()
+        institution = Institution.objects.get()
+        client.force_login(user)
+
+        for kind in InstitutionKind:
+            institution.kind = kind
+            institution.save()
+            response = client.get(reverse("dashboard:index"))
+
+            if kind in [InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]:
+                assertContains(response, MENU_STR)
+                assertContains(response, reverse("institutions_views:organizations_list"))
+            else:
+                assertNotContains(response, MENU_STR)
+                assertNotContains(response, reverse("institutions_views:organizations_list"))
+
+    def test_view(self, client, snapshot):
+        user = LaborInspectorFactory(
+            for_snapshot=True,
+            membership__institution__department="01",
+            membership__institution__name="DDETS 01",
+        )
+        client.force_login(user)
+        response = client.get(reverse("institutions_views:organizations_list"))
+
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
