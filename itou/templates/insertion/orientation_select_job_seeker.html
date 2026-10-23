@@ -43,3 +43,27 @@
         </div>
     </section>
 {% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% if show_dora_modal %}
+        {% include "insertion/includes/orientation_dora_modal.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if show_dora_modal %}
+        <script nonce="{{ csp_nonce }}">
+            document.addEventListener('DOMContentLoaded', function() {
+                const key = "doraOrientationModalDismissed";
+                if (!localStorage.getItem(key)) {
+                    new bootstrap.Modal("#dora_orientation_modal").show();
+                }
+                document.getElementById("dora_orientation_modal_dismiss").addEventListener("click", function() {
+                    localStorage.setItem(key, "true");
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
