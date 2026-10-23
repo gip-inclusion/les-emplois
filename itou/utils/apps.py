@@ -46,6 +46,14 @@ class UtilsAppConfig(AppConfig):
 
     def ready(self):
         from django.contrib.admin import widgets
+        from django.urls import register_converter
+
+        from itou.utils.urls import EncodedUidConverter, SiretConverter
+
+        # Registered here rather than in a urls.py: ready() runs once per process, whereas a urls.py that failed
+        # to import is re-executed, and registering the same converter twice raises a ValueError hiding the error.
+        register_converter(SiretConverter, "siret")
+        register_converter(EncodedUidConverter, "encoded_uid")
 
         # This allows models to be displayed in the admin forms via their display_with_pii property
         # instead of the default __str__ method when such property exists.

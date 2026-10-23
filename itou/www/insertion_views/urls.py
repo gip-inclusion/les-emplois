@@ -1,12 +1,9 @@
-from django.urls import path, register_converter
+from django.urls import path
 
-from itou.utils.urls import EncodedUidConverter
 from itou.www.insertion_views import views
 
 
 app_name = "insertion_views"
-
-register_converter(EncodedUidConverter, "encoded_uid")
 
 urlpatterns = [
     path("structures/<str:structure_uid>/", views.StructureCardView.as_view(), name="structure_card"),
