@@ -145,6 +145,8 @@ def test_function_field_displayed_for_each_organization(client):
     assertContains(response, FUNCTIONS_HTML)
     assertContainsFunctionAt(response, company_membership.company.display_name)
     assertContainsFunctionAt(response, prescriber_membership.organization.display_name)
+    assertContains(response, 'list="membership-function-suggestions"', count=2)
+    assertContains(response, '<datalist id="membership-function-suggestions">', count=1)
 
 
 def test_function_field_not_displayed_for_inactive_company(client):
