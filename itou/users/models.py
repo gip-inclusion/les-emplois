@@ -3,6 +3,7 @@ import logging
 import time
 import uuid
 from collections import Counter
+from functools import reduce
 
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
@@ -10,7 +11,7 @@ from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import GinIndex, OpClass
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
+from django.contrib.postgres.search import Lexeme, SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
@@ -270,7 +271,10 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         """
         Eficient search using PSQL full text search
         """
-        search_query = SearchQuery(name, config="simple_unaccent")
+        if not name.strip():
+            return self.none()
+        lexemes = [Lexeme(part, prefix=True) for part in name.split()]
+        search_query = SearchQuery(reduce(Lexeme.__and__, lexemes), config="simple_unaccent", search_type="raw")
         users_qs = self.filter(full_name_search_vector=search_query)
         users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
         return users_qs

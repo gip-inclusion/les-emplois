@@ -299,9 +299,16 @@ class TestManager:
     def test_search_by_full_name(self):
         user_1 = JobSeekerFactory(first_name="Jean-Paul", last_name="II")
         JobSeekerFactory(first_name="Jean-Michel", last_name="Relou")
+        user_3 = JobSeekerFactory(first_name="Hélène", last_name="Dupont-Durant")
 
         assert User.objects.search_by_full_name("Jean").count() == 2
+        assert User.objects.search_by_full_name("Je").count() == 2
+        assert User.objects.search_by_full_name("paul").get() == user_1
         assert User.objects.search_by_full_name("Jean II").get() == user_1
+        assert User.objects.search_by_full_name("helene").get() == user_3
+        assert User.objects.search_by_full_name("helène").get() == user_3
+        assert User.objects.search_by_full_name("DURANT").get() == user_3
+        assert list(User.objects.search_by_full_name("")) == []
 
     def test_assigned_job_seeker_ids(self):
         """The main logic is in JobSeekerAssignment.objects.assigned_to, which is tested more thoroughly."""
