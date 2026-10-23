@@ -82,12 +82,14 @@ def get_all_factories():
     return set(get_all_subclasses(factory.django.DjangoModelFactory))
 
 
-# The admin pages take a while to render: spread them over several pytest-xdist workers
-ADMIN_SHARDS = 4
+# The admin pages take a while to render: split them into chunks that pytest-xdist spreads over several workers.
+# Not to be confused with the `--shard` option (see tests/conftest.py), which runs a subset of the whole test suite:
+# each chunk is a distinct test, so the chunks may land in different shards.
+ADMIN_CHUNKS = 4
 
 
-@pytest.mark.parametrize("shard", range(ADMIN_SHARDS))
-def test_all_admin(admin_client, mocker, subtests, shard):
+@pytest.mark.parametrize("chunk", range(ADMIN_CHUNKS))
+def test_all_admin(admin_client, mocker, subtests, chunk):
     """Test that all admin pages load without error."""
     mocker.patch("itou.utils.throttling.FailSafeUserRateThrottle.rate", "10000/minute")  # Avoid rate limiting
 
@@ -196,9 +198,9 @@ def test_all_admin(admin_client, mocker, subtests, shard):
             continue
         factory_class()
 
-    # Test all admin pages for the registered models of this shard
-    # shard 0 gets models 0, 4, 8, …, shard 1 gets 1, 5, 9, …, and so on
-    for model in sorted(admin_registered_models, key=lambda model: model._meta.label)[shard::ADMIN_SHARDS]:
+    # Test all admin pages for the registered models of this chunk
+    # chunk 0 gets models 0, 4, 8, …, chunk 1 gets 1, 5, 9, …, and so on
+    for model in sorted(admin_registered_models, key=lambda model: model._meta.label)[chunk::ADMIN_CHUNKS]:
         app_label = model._meta.app_label
         model_name = model._meta.model_name
         with subtests.test(model=f"{app_label}.{model_name}"):

@@ -93,7 +93,7 @@ def _skip_other_shards(config, items):
     skipped tests, and still reports the snapshots that no test uses anymore.
 
     The split is statistically balanced but doesn't account for test duration: a long test still runs as a whole
-    in a single shard, so split it (like `test_all_admin`).
+    in a single shard, so split it into chunks (like `test_all_admin`).
     """
     shard = config.getoption("--shard")
     if shard is None:
