@@ -390,6 +390,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     context = {
         "form": form,
         "memberships_formsets": memberships_formsets,
+        "membership_forms": [membership_form for formset in memberships_formsets for membership_form in formset],
         "prev_url": prev_url,
         "preview_mode": False,
     }
