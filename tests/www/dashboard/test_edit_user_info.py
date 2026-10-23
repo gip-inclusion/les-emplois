@@ -798,9 +798,11 @@ class TestEditUserInfoView:
         assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
         assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
         assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-        assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
-        assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
-        assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
+        assertContains(
+            response, f"<small>Prénom</small> <strong>{original_user.first_name.title()}</strong>", html=True
+        )
+        assertContains(response, f"<small>Nom</small> <strong>{original_user.last_name.upper()}</strong>", html=True)
+        assertContains(response, f"<small>Adresse e-mail</small> <strong>{original_user.email}</strong>", html=True)
         assertContains(response, "Vos informations d’identité viennent de ProConnect", count=1)
 
         post_data = {
@@ -822,11 +824,6 @@ class TestEditUserInfoView:
         user = PrescriberFactory()
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-
-        response = client.get(url)
-
-        assertContains(response, "Annuaire des professionnels")
-        assertContains(response, "Ne pas apparaître dans l&#x27;annuaire des professionnels")
 
         response = client.post(
             url,

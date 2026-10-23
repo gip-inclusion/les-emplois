@@ -13,65 +13,85 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    {% include "dashboard/includes/edit_user_sso_alert.html" with user=request.user viewing_self=True only %}
+{% endblock %}
+
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    {% include "dashboard/includes/edit_user_sso_alert.html" with user=request.user viewing_self=True only %}
                     <div class="c-form">
-                        <h2 class="h3">Informations personnelles</h2>
-                        {% if request.user.is_job_seeker and not request.user.title %}
-                            {% component_alert title=title content=content variant="warning" extra_id="missing-infos-warning" %}
-                                {% fragment as title %}
-                                    Informations manquantes
-                                {% endfragment %}
-                                {% fragment as content %}
-                                    <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace usager.</p>
-                                    <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
-                                    <ul class="mb-0">
-                                        {% for field in form %}
-                                            {% if field.field.required and not field.value or field.name == "phone" and not field.value %}
-                                                <li>
-                                                    <strong>{{ field.label }}</strong>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                {% endfragment %}
-                            {% endcomponent_alert %}
-                        {% endif %}
                         {% if request.user.is_job_seeker %}
+                            <h2 class="h3">Informations personnelles</h2>
+                            {% if not request.user.title %}
+                                {% component_alert title=title content=content variant="warning" extra_id="missing-infos-warning" %}
+                                    {% fragment as title %}
+                                        Informations manquantes
+                                    {% endfragment %}
+                                    {% fragment as content %}
+                                        <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace usager.</p>
+                                        <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
+                                        <ul class="mb-0">
+                                            {% for field in form %}
+                                                {% if field.field.required and not field.value or field.name == "phone" and not field.value %}
+                                                    <li>
+                                                        <strong>{{ field.label }}</strong>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
+                            {% endif %}
                             {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer et quitter" %}
                         {% else %}
                             <form method="post" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
-                                {% if request.user.identity_provider == "PC" %}
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            Prénom : <strong>{{ user.first_name|title }}</strong>
-                                        </li>
-                                        <li>
-                                            Nom : <strong>{{ user.last_name|upper }}</strong>
-                                        </li>
-                                        <li>
-                                            Adresse e-mail : <strong>{{ user.email }}</strong>
-                                        </li>
-                                    </ul>
-                                    <hr class="my-4">
-                                    {% bootstrap_form_errors form type="all" %}
-                                {% else %}
-                                    {% bootstrap_form_errors form type="all" %}
-                                    {% bootstrap_field form.first_name %}
-                                    {% bootstrap_field form.last_name %}
-                                {% endif %}
-                                {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
-                                <hr class="my-4">
-                                <h2 class="h3">Annuaire des professionnels</h2>
-                                <p>
-                                    Vos coordonnées professionnelles peuvent apparaître dans l’annuaire afin que d’autres professionnels puissent vous contacter.
-                                </p>
-                                {% bootstrap_field form.is_directory_opted_out %}
+                                <fieldset>
+                                    <legend class="h3">Informations personnelles</legend>
+                                    {% if request.user.identity_provider == "PC" %}
+                                        <ul class="list-data mb-3">
+                                            <li>
+                                                <small>Prénom</small>
+                                                <strong>{{ user.first_name|title }}</strong>
+                                            </li>
+                                            <li>
+                                                <small>Nom</small>
+                                                <strong>{{ user.last_name|upper }}</strong>
+                                            </li>
+                                            <li>
+                                                <small>Adresse e-mail</small>
+                                                <strong>{{ user.email }}</strong>
+                                            </li>
+                                        </ul>
+                                        {% bootstrap_form_errors form type="all" %}
+                                    {% else %}
+                                        {% bootstrap_form_errors form type="all" %}
+                                        {% bootstrap_field form.first_name %}
+                                        {% bootstrap_field form.last_name %}
+                                    {% endif %}
+                                </fieldset>
+                                <hr class="mt-2 mb-3">
+                                <fieldset>
+                                    <legend class="h3">Coordonnées</legend>
+                                    {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                                </fieldset>
+                                <hr class="mt-2 mb-3">
+                                <fieldset>
+                                    <legend class="h3">Visibilité dans l’Annuaire Pro</legend>
+                                    {% bootstrap_field form.is_directory_opted_out %}
+                                    {% component_alert variant="info" content=content %}
+                                        {% fragment as content %}
+                                            <p class="mb-0">
+                                                L’Annuaire Pro permet aux professionnels connectés de retrouver et de contacter rapidement les professionnels de l’insertion de leur territoire. En test sur certains territoires, il sera progressivement déployé à tous les professionnels.
+                                            </p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                </fieldset>
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                                 {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=prev_url %}
