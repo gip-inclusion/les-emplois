@@ -1,0 +1,310 @@
+[
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "1b6f6dac-0bfa-42fe-bfb2-269fb681769a",
+      "structure": "data-inclusion--476fc31f-9f2c-490e-a340-a8d8083a2cb4",
+      "user": "data-inclusion--408a89da-3a5b-451a-8e0e-e99134e47e11"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--1b6f6dac-0bfa-42fe-bfb2-269fb681769a"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "20fd5bd5-8a60-4f50-be77-6e50afa876fe",
+      "structure": "data-inclusion--59125b09-a1c0-43e2-9142-14666539a16c",
+      "user": "data-inclusion--de70cf4d-afa8-4817-9180-6ce2589247e5"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--20fd5bd5-8a60-4f50-be77-6e50afa876fe"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "70d82eb7-a200-406f-b08f-eaf6e5aa22de",
+      "structure": "data-inclusion--a0cbf4be-116b-4752-bbd9-23a2fb68266a",
+      "user": "data-inclusion--d9a5fd70-06db-498b-a199-9dc19ec5d301"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--70d82eb7-a200-406f-b08f-eaf6e5aa22de"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "data-inclusion",
+      "source_id": "968b9ef6-bd52-48d0-847f-5e7920143abf",
+      "structure": "data-inclusion--b0221e16-39bb-4eb7-9a65-b53f3594e2d9",
+      "user": "data-inclusion--664273fd-ca87-42c4-9c16-0752a8b07f0f"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--968b9ef6-bd52-48d0-847f-5e7920143abf"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "data-inclusion",
+      "source_id": "9ea63b25-8715-4cd2-b4b0-94f661bef5a9",
+      "structure": "data-inclusion--989e60dd-2f88-47c7-9bcc-6736513b6ecb",
+      "user": "data-inclusion--c1caac8f-4fd9-418a-ac07-c87b25830fe0"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--9ea63b25-8715-4cd2-b4b0-94f661bef5a9"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "9f988806-77fd-4a6d-b692-0e2099d22061",
+      "structure": "data-inclusion--5b11ef0e-2aee-4dc4-9d0a-b4734a5d2f0c",
+      "user": "data-inclusion--fa755af0-cb00-41c0-8313-450554e475c3"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--9f988806-77fd-4a6d-b692-0e2099d22061"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "abd6b1b6-9434-43af-a2b6-8b5cee2d8f97",
+      "structure": "data-inclusion--2713803d-631c-4f7f-b5ba-3cb5e6c04b62",
+      "user": "data-inclusion--085a5a70-dea5-442a-bd93-dc714679bf15"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--abd6b1b6-9434-43af-a2b6-8b5cee2d8f97"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "ac861fd8-b645-4c08-8fd0-c7c88498cdd3",
+      "structure": "data-inclusion--6224d817-cc63-4de0-a9c1-4fafbe7951ea",
+      "user": "data-inclusion--4b46657e-3b67-4ee6-a5fb-aa65a3cdcfeb"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--ac861fd8-b645-4c08-8fd0-c7c88498cdd3"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "data-inclusion",
+      "source_id": "d9461419-c511-4655-a576-c0046bcc24ea",
+      "structure": "data-inclusion--bf35bc8b-9f6e-4600-beba-6a005fba6709",
+      "user": "data-inclusion--8509e39b-ce7e-4772-bd44-bd7a7f82b853"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--d9461419-c511-4655-a576-c0046bcc24ea"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "data-inclusion",
+      "source_id": "e4375e22-4c9f-457f-b03b-95f1bedb61a3",
+      "structure": "data-inclusion--85c905aa-3f81-442d-823c-b921342476a0",
+      "user": "data-inclusion--b3631674-b650-43d2-9697-2f6f04e0cf84"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "data-inclusion--e4375e22-4c9f-457f-b03b-95f1bedb61a3"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "dora",
+      "source_id": "25c4f7b2-a802-4af1-9015-47f325b3b264",
+      "structure": "dora--5a955bf4-3b2e-4d79-8631-3bb3e6041ded",
+      "user": "dora--b981db50-89b2-4995-b3b3-b4e51512f90e"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--25c4f7b2-a802-4af1-9015-47f325b3b264"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "dora",
+      "source_id": "489908f2-3511-44d5-b541-0137fdeaa52a",
+      "structure": "dora--738e71a1-d491-46f3-a3ca-9a775f712ef5",
+      "user": "dora--ed231ae5-1396-4432-9e0e-563c8a15d839"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--489908f2-3511-44d5-b541-0137fdeaa52a"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "dora",
+      "source_id": "6c9c838c-628a-4f35-8b9c-88ba08092df7",
+      "structure": "dora--d627cabc-c7e8-43ff-ac53-175734090506",
+      "user": "dora--cbe14ea4-538d-49e3-8db3-833e6c82cab2"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--6c9c838c-628a-4f35-8b9c-88ba08092df7"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "dora",
+      "source_id": "729a1bb3-dad6-4c6d-a861-08a31b7389d4",
+      "structure": "dora--6f35f619-4a85-42b8-a5ab-459bcf242533",
+      "user": "dora--cbc46391-e945-45b1-996e-97527340bb2c"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--729a1bb3-dad6-4c6d-a861-08a31b7389d4"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "dora",
+      "source_id": "d767a6e8-fe01-4295-ba7f-47da732b089d",
+      "structure": "dora--c4a10b8f-e302-4343-9968-c704714e4165",
+      "user": "dora--dedf4018-4c3d-4d60-aa04-701c69c1ded7"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--d767a6e8-fe01-4295-ba7f-47da732b089d"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "dora",
+      "source_id": "f25b920e-6074-4949-a796-aa6ab5241520",
+      "structure": "dora--92fdb599-c8b8-4d8e-8411-cd06211a7a6e",
+      "user": "dora--8e240b42-0fc7-4310-ac52-4cb144955f9c"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "dora--f25b920e-6074-4949-a796-aa6ab5241520"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "34847821-b308-40e2-a0e2-97d18294f1f3",
+      "structure": "emplois-de-linclusion--ef95d0e2-6420-4198-a095-50dbdf422e30",
+      "user": "emplois-de-linclusion--c7843fc1-12d5-43b7-943c-265296c5eb69"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--34847821-b308-40e2-a0e2-97d18294f1f3"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "359f6d75-f598-4f2b-a358-d8d2893d3b00",
+      "structure": "emplois-de-linclusion--240ce3a1-d698-4c5d-8f69-ab380dc4e14f",
+      "user": "emplois-de-linclusion--b7c05d7f-9e01-4226-8f2e-8153f00d6d78"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--359f6d75-f598-4f2b-a358-d8d2893d3b00"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "37f2ff97-756d-4eef-ba45-8b0ca22cf6d2",
+      "structure": "emplois-de-linclusion--24394462-4aa3-4e4f-8175-b2f3f49d38da",
+      "user": "emplois-de-linclusion--d13fd0d5-efdf-4d7b-bcd4-7ac11c144b89"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--37f2ff97-756d-4eef-ba45-8b0ca22cf6d2"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "3d16a903-0b88-4800-ae9b-a779701e0110",
+      "structure": "emplois-de-linclusion--807ce305-899e-44a8-afd7-2ef1291bb7a8",
+      "user": "emplois-de-linclusion--0757098e-857c-471b-b019-ede0e32986dd"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--3d16a903-0b88-4800-ae9b-a779701e0110"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "6c22363b-499a-419c-8600-91b0afc9f6dd",
+      "structure": "emplois-de-linclusion--392e5ae3-077d-408f-a213-3aba388bcf7c",
+      "user": "emplois-de-linclusion--df650fd5-f3e4-4d1a-b7da-c96fbb4cde32"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--6c22363b-499a-419c-8600-91b0afc9f6dd"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "bb74eaf4-deee-4c17-bd25-e5c8d987aa23",
+      "structure": "emplois-de-linclusion--4d868432-65ef-4b9c-959c-93c0da1c0ceb",
+      "user": "emplois-de-linclusion--64993a79-40bb-486f-bb00-b407b33ff654"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--bb74eaf4-deee-4c17-bd25-e5c8d987aa23"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "bc948d13-9641-4b63-ad95-6583a5224027",
+      "structure": "emplois-de-linclusion--d465b87b-74e8-4e8d-905c-d364a03bff68",
+      "user": "emplois-de-linclusion--8b7f94dd-392c-41bf-88ec-cced106260ad"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--bc948d13-9641-4b63-ad95-6583a5224027"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "le-marche",
+      "source_id": "0fab942d-55e4-4023-914a-1700b9658856",
+      "structure": "le-marché--3d793915-2107-46c5-8063-cd2bcbc797d1",
+      "user": "le-marché--35073d59-fb52-4d57-b1af-0b34fa0fb3e5"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "le-marché--0fab942d-55e4-4023-914a-1700b9658856"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "le-marche",
+      "source_id": "8c6ec7bf-e192-4895-a03d-17f1abcfa72d",
+      "structure": "le-marché--d3560170-6b56-451c-918e-a99d810a58af",
+      "user": "le-marché--c8b682c8-d3d6-4454-8add-146105672a0f"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "le-marché--8c6ec7bf-e192-4895-a03d-17f1abcfa72d"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "le-marche",
+      "source_id": "c1501207-279b-4e7f-8dcc-27a26f0106e1",
+      "structure": "le-marché--a60badfd-68e9-475f-9aef-484d703d961d",
+      "user": "le-marché--67a9fd04-af87-46be-b113-4ec8ae92d21a"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "le-marché--c1501207-279b-4e7f-8dcc-27a26f0106e1"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "le-marche",
+      "source_id": "c7698a79-a42a-496b-a3b6-131df4068f8e",
+      "structure": "le-marché--11cbbc3b-132e-4297-a98d-ffa47d86fff6",
+      "user": "le-marché--02724f81-f225-46f4-9f58-c0b9ea505b7e"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "le-marché--c7698a79-a42a-496b-a3b6-131df4068f8e"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "le-marche",
+      "source_id": "ecb0fd2e-f042-4b11-af78-4d1bd5e623a8",
+      "structure": "le-marché--9428b386-27f9-4d75-bd2c-6b09d9d0f98a",
+      "user": "le-marché--5f02307f-3248-449e-a858-f6a73db83aef"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "le-marché--ecb0fd2e-f042-4b11-af78-4d1bd5e623a8"
+  }
+]

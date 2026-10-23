@@ -1,0 +1,56 @@
+{% if request.htmx %}
+    {% include "directory/includes/people_counter.html" with results=results request=request only %}
+{% endif %}
+<div id="people-search-results">
+    {% for person in results %}
+        <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
+            <div class="c-box--results__header">
+                <div class="d-flex flex-column flex-md-row gap-2 gap-md-3">
+                    <div class="c-box--results__summary flex-grow-1">
+                        <i class="ri-user-line" aria-hidden="true"></i>
+                        <div>
+                            <h3>{{ person.full_name }}</h3>
+                            <span>{{ person.kind_label }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto stretched-link"
+                           href="{% url 'directory:person_detail' key=person.key %}?back_url={{ request.get_full_path|urlencode }}">Voir ses coordonnées</a>
+                    </div>
+                </div>
+            </div>
+            <hr class="m-0">
+            <div class="c-box--results__body">
+                <ul class="list-data list-data__two-column-md">
+                    <li>
+                        <small>Structure</small>
+                        <strong>
+                            {{ person.main_organization.name }}
+                            {% if person.other_organizations_count %}(+ {{ person.other_organizations_count }} autres structures){% endif %}
+                        </strong>
+                    </li>
+                    {% if person.main_organization.kind_label %}
+                        <li>
+                            <small>Type</small>
+                            <strong>{{ person.main_organization.kind_label }}</strong>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <small>Adresse</small>
+                        <address class="m-0">{{ person.main_organization.address }}</address>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% empty %}
+        <div id="empty-personnes" class="c-box c-box--results mb-3 mb-md-4">
+            <div class="c-box--results__body">
+                <p class="mb-0">Aucune personne ne correspond à votre recherche.</p>
+            </div>
+        </div>
+    {% endfor %}
+    {% include "includes/pagination.html" with page=results boost=True boost_target="#people-search-results" request=request only %}
+</div>
+{% if request.htmx %}
+    {% include "directory/includes/people_list_reset_filters.html" with request=request show_reset=form.has_changed only %}
+{% endif %}
