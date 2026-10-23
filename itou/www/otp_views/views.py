@@ -5,6 +5,7 @@ import logging
 import segno
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -13,6 +14,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
+from itoutils.urls import add_url_params
 
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.otp.signals import user_logged_in_with_2fa
@@ -25,7 +27,7 @@ from itou.otp.utils import (
 )
 from itou.utils.auth import check_user_or_404
 from itou.utils.readonly import http_methods
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.otp_views.enums import DeviceType
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeForm, VerifyOTPForm
 
@@ -75,20 +77,76 @@ def enrollment_step_0_intro(request, template_name="otp_views/enrollment_step_0_
 
 @check_user_can_enroll
 def enrollment_step_1_choose_device_type(request, template_name="otp_views/enrollment_step_1_choose_device_type.html"):
-    context = {"next_step_url": reverse("otp_views:enrollment_step_2_and_3_confirm_device")}
+    context = {
+        "next_step_url": reverse("otp_views:enrollment_step_2_download_app"),
+    }
     return render(request, template_name, context)
+
+
+@check_user_can_enroll
+def enrollment_step_2_download_app(request, template_name="otp_views/enrollment_step_2_download_app.html"):
+    previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
+    next_step_url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
+
+    device_type = request.GET.get("device_type")
+    if device_type not in DeviceType:
+        # should not happen, unless user manipulates the request
+        return HttpResponseRedirect(previous_step_url)
+
+    if device_type == DeviceType.DESKTOP:
+        # Skip step 2 for desktops
+        return HttpResponseRedirect(add_url_params(next_step_url, {"device_type": device_type}))
+
+    link_to_list_of_apps = get_absolute_url(reverse("otp_views:enrollment_step_2_download_app_for_phones"))
+    qrcode = segno.make(link_to_list_of_apps).svg_data_uri()
+
+    context = {
+        "previous_step_url": previous_step_url,
+        "device_type": device_type,
+        "next_step_url": next_step_url,
+        "link_to_list_of_apps": link_to_list_of_apps,
+        "qrcode": qrcode,
+    }
+    return render(request, template_name, context)
+
+
+@login_not_required
+def enrollment_step_2_download_app_for_phones(
+    request, template_name="otp_views/enrollment_step_2_download_app_for_phones.html"
+):
+    """This view is to be displayed on smartphones only, quickly accessible via a QR code.
+
+    So this is a public documentation page, which varies depending on user-agents.
+    """
+    user_agent = request.headers.get("user-agent", "")
+    for device_brand in "iPhone", "Android":
+        if device_brand in user_agent:
+            break
+    else:
+        device_brand = "Other"
+    context = {"device_brand": device_brand}
+    response = render(request, template_name, context)
+    response.headers["Vary"] = "User-Agent"
+    return response
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user_can_enroll
-def enrollment_step_2_and_3_confirm_device(
-    request, template_name="otp_views/enrollment_step_2_and_3_confirm_device.html"
+def enrollment_step_3_and_4_confirm_device(
+    request, template_name="otp_views/enrollment_step_3_and_4_confirm_device.html"
 ):
-    previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
     device_type = request.GET.get("device_type") or request.POST.get("device_type")
     if device_type not in DeviceType:
         # should not happen, unless user manipulates the request
-        return HttpResponseRedirect(previous_step_url)
+        return HttpResponseRedirect(reverse("otp_views:enrollment_step_1_choose_device_type"))
+
+    match device_type:
+        case DeviceType.SMARTPHONE:
+            previous_step_url = add_url_params(
+                reverse("otp_views:enrollment_step_2_download_app"), {"device_type": device_type}
+            )
+        case DeviceType.DESKTOP:
+            previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
 
     if request.POST:
         if not request.POST.get("key"):
@@ -121,7 +179,7 @@ def enrollment_step_2_and_3_confirm_device(
             messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
             otp_login(request, device)  # mark the user as verified
             user_logged_in_with_2fa.send(
-                sender=enrollment_step_2_and_3_confirm_device, request=request, user=request.user
+                sender=enrollment_step_3_and_4_confirm_device, request=request, user=request.user
             )
             backup_code = create_otp_backup_code(request.user)
             if len(get_user_devices(request.user)) > 1:
