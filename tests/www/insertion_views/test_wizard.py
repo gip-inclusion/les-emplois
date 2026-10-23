@@ -341,6 +341,26 @@ def test_orientation_select_job_seeker_redirects_when_external_link_preferred(cl
     assertRedirects(response, service_detail_url, fetch_redirect_response=False)
 
 
+@pytest.mark.parametrize(
+    "query,shown",
+    [
+        ({"mtm_campaign": "DORA"}, True),
+        ({"mtm_campaign": "other"}, False),
+        ({}, False),
+    ],
+)
+def test_orientation_select_job_seeker_dora_modal(client, query, shown):
+    prescriber = PrescriberFactory()
+    service = ServiceFactory(source__value="dora")
+    client.force_login(prescriber)
+
+    response = client.get(
+        reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}, query=query)
+    )
+
+    assert response.context["show_dora_modal"] is shown
+
+
 def test_session_isolation_between_users(client):
     prescriber = PrescriberFactory()
     job_seeker = JobSeekerFactory(phone="0606060606")
