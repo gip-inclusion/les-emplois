@@ -1,15 +1,22 @@
 import datetime
+import functools
 import secrets
 
 from django.conf import settings
-from django.urls import reverse_lazy
+from django.urls import reverse
 
 
-WRITING_GETS = {  # Known GET requests that modify server state
-    reverse_lazy("france_connect:callback"),
-    reverse_lazy("ft_connect:callback"),
-    reverse_lazy("pro_connect:callback"),
-}
+@functools.cache
+def _writing_gets():
+    """Known GET requests that modify server state.
+
+    Resolved lazily: reversing at import time would load the whole URLconf as soon as this middleware is imported.
+    """
+    return {
+        reverse("france_connect:callback"),
+        reverse("ft_connect:callback"),
+        reverse("pro_connect:callback"),
+    }
 
 
 def _should_set_cookie(request):
@@ -22,7 +29,7 @@ def _should_set_cookie(request):
     We're only creating the cookie for requests that modify the server
     state.
     """
-    return request.method == "POST" or request.path in WRITING_GETS
+    return request.method == "POST" or request.path in _writing_gets()
 
 
 def browser_id_cookie(get_response):
