@@ -297,6 +297,13 @@ METABASE_DASHBOARDS = {
     "stats_staff_service_indicators": {
         "dashboard_id": 438,
     },
+    #
+    # IAE Institution stats
+    #
+    "organizations_list": {
+        "dashboard_id": 682,
+        "template_name": "institutions/organizations_list.html",
+    },
 }
 
 

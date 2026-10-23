@@ -1,10 +1,12 @@
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
+from itou.institutions.enums import InstitutionKind
 from itou.users.models import User
 from itou.utils.auth import check_request
+from itou.www.stats.views import render_stats_ddets, render_stats_dreets_iae
 
 
 class MemberList(BaseMemberList):
@@ -45,3 +47,18 @@ def update_admin_role(request, action, public_id, template_name="institutions/up
         success_url=reverse("institutions_views:members"),
         template_name=template_name,
     )
+
+
+@check_request(lambda request: request.from_institution)
+def organizations_list(request):
+    if request.current_organization.kind == InstitutionKind.DDETS_IAE:
+        return render_stats_ddets(
+            request=request,
+            page_title="Liste des organisations",
+        )
+    if request.current_organization.kind == InstitutionKind.DREETS_IAE:
+        return render_stats_dreets_iae(
+            request=request,
+            page_title="Liste des organisations",
+        )
+    raise PermissionDenied

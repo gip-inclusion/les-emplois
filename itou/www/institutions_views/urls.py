@@ -10,4 +10,5 @@ urlpatterns = [
     path("colleagues", views.MemberList.as_view(), name="members"),
     path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
     path("admin_role/<str:action>/<uuid:public_id>", views.update_admin_role, name="update_admin_role"),
+    path("organizations-list", views.organizations_list, name="organizations_list"),
 ]
