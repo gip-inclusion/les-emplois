@@ -154,6 +154,7 @@ class EditCompanyFunctionForm(forms.ModelForm):
     class Meta:
         model = CompanyMembership
         fields = ["function"]
+        widgets = {"function": forms.TextInput(attrs={"list": "membership-function-suggestions"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,6 +166,7 @@ class EditPrescriberFunctionForm(forms.ModelForm):
     class Meta:
         model = PrescriberMembership
         fields = ["function"]
+        widgets = {"function": forms.TextInput(attrs={"list": "membership-function-suggestions"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -118,6 +118,8 @@ class TestEditUserInfoView:
         assertContains(response, "Fonctions")
         assertContains(response, escape(f"Fonction chez {company_membership.company.display_name}"))
         assertContains(response, escape(f"Fonction chez {prescriber_membership.organization.display_name}"))
+        assertContains(response, 'list="membership-function-suggestions"', count=2)
+        assertContains(response, '<datalist id="membership-function-suggestions">', count=1)
 
     def test_function_field_not_displayed_for_institution_member(self, client):
         user = ProfessionalFactory()
