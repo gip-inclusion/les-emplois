@@ -71,9 +71,26 @@
                                 {% if form.company_memberships or form.prescriber_memberships %}
                                     <fieldset>
                                         <legend>Fonctions</legend>
-                                        {% for field in form.iter_function_fields %}
+                                        {% for field in form.function_fields|slice:":3" %}
                                             {% bootstrap_field field %}
                                         {% endfor %}
+                                        {% if form.function_fields|length > 3 %}
+                                            <div class="collapse" id="collapse-more-memberships">
+                                                {% for field in form.function_fields|slice:"3:" %}
+                                                    {% bootstrap_field field %}
+                                                {% endfor %}
+                                            </div>
+                                            <button class="btn btn-link has-collapse-caret"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-more-memberships"
+                                                    aria-expanded="false"
+                                                    aria-controls="collapse-more-memberships">
+                                                {% with hidden_count=form.function_fields|length|add:"-3" %}
+                                                    {{ hidden_count }} autre{{ hidden_count|pluralize }} structure{{ hidden_count|pluralize }}
+                                                {% endwith %}
+                                            </button>
+                                        {% endif %}
                                         <datalist id="membership-function-suggestions">
                                             <option value="Accompagnant éducatif et social (AES)"></option>
                                             <option value="Accompagnateur socioprofessionnel (ASP)"></option>

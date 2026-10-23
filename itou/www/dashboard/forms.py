@@ -165,9 +165,9 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
             )
             self.prescriber_memberships[field_name] = membership
 
-    def iter_function_fields(self):
-        for field_name in self.company_memberships | self.prescriber_memberships:
-            yield self[field_name]
+    @property
+    def function_fields(self):
+        return [self[field_name] for field_name in self.company_memberships | self.prescriber_memberships]
 
     def _save_memberships(self, memberships):
         for field_name, membership in memberships.items():
