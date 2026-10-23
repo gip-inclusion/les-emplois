@@ -74,10 +74,27 @@
                                         {% for formset in memberships_formsets %}
                                             {{ formset.management_form }}
                                             {% bootstrap_formset_errors formset %}
-                                            {% for membership_form in formset %}
-                                                {% bootstrap_form membership_form %}
-                                            {% endfor %}
                                         {% endfor %}
+                                        {% for membership_form in membership_forms|slice:":3" %}
+                                            {% bootstrap_form membership_form %}
+                                        {% endfor %}
+                                        {% if membership_forms|length > 3 %}
+                                            <div class="collapse" id="collapse-more-memberships">
+                                                {% for membership_form in membership_forms|slice:"3:" %}
+                                                    {% bootstrap_form membership_form %}
+                                                {% endfor %}
+                                            </div>
+                                            <button class="btn btn-link has-collapse-caret"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-more-memberships"
+                                                    aria-expanded="false"
+                                                    aria-controls="collapse-more-memberships">
+                                                {% with hidden_count=membership_forms|length|add:"-3" %}
+                                                    {{ hidden_count }} autre{{ hidden_count|pluralize }} structure{{ hidden_count|pluralize }}
+                                                {% endwith %}
+                                            </button>
+                                        {% endif %}
                                         <datalist id="membership-function-suggestions">
                                             <option value="Accompagnant éducatif et social (AES)"></option>
                                             <option value="Accompagnateur socioprofessionnel (ASP)"></option>

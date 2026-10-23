@@ -12,6 +12,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import PrescriberFactory, ProfessionalFactory
+from tests.utils.testing import parse_response_to_soup
 from tests.www.dashboard.test_edit_user_info_job_seeker import (
     BIRTHDATE_FIELD_NAME,
     LACK_OF_NIR_FIELD_ID,
@@ -120,6 +121,19 @@ class TestEditUserInfoView:
         assertContains(response, escape(f"Fonction chez {prescriber_membership.organization.display_name}"))
         assertContains(response, 'list="membership-function-suggestions"', count=2)
         assertContains(response, '<datalist id="membership-function-suggestions">', count=1)
+
+    def test_function_fields_collapsed_beyond_three_memberships(self, client):
+        user = ProfessionalFactory()
+        CompanyMembershipFactory.create_batch(2, user=user)
+        PrescriberMembershipFactory.create_batch(2, user=user)
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:edit_user_info"))
+
+        collapse_button = parse_response_to_soup(response, "[aria-controls=collapse-more-memberships]")
+        assert collapse_button.get_text(strip=True) == "1 autre structure"
+        collapse = parse_response_to_soup(response, "#collapse-more-memberships")
+        assert collapse.select_one("input")["name"] == "prescriber_memberships-1-function"
 
     def test_function_field_not_displayed_for_institution_member(self, client):
         user = ProfessionalFactory()
