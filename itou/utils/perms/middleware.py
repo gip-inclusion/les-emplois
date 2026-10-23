@@ -174,13 +174,20 @@ class ItouCurrentOrganizationMiddleware:
             if require_otp(user):
                 logger.info("Requiring internal OTP for user %d", user.id)
                 login_verify_otp_url = reverse("otp_views:verify_otp")
-                login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
-                if get_user_devices(user):
-                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
-                        return HttpResponseRedirect(
-                            add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                        )
-                elif not request.path.startswith("/otp/enrollment"):
+                otp_is_needed = all(
+                    request.path != url
+                    for url in (
+                        login_verify_otp_url,
+                        reverse("otp_views:login_with_backup_code"),
+                        reverse("otp_views:enrollment_step_2_download_app_for_phones"),
+                    )
+                )
+                user_has_devices = bool(get_user_devices(user))
+                if user_has_devices and otp_is_needed:
+                    return HttpResponseRedirect(
+                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                    )
+                if not user_has_devices and not request.path.startswith("/otp/enrollment"):
                     return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
             # Allow access to signup and invitations view even without ProConnect or an active organization
