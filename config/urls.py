@@ -2,11 +2,10 @@ from allauth.account import views as account_views
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
-from django.urls import include, path, re_path, register_converter, reverse_lazy
+from django.urls import include, path, re_path, reverse_lazy
 from django.views.generic import RedirectView, TemplateView
 
 from itou.utils import redirect_legacy_views
-from itou.utils.urls import SiretConverter
 from itou.utils.views import with_triggers_context
 from itou.www.dashboard import views as dashboard_views
 from itou.www.error import server_error
@@ -14,8 +13,6 @@ from itou.www.legal_views.views import legal_terms, legal_terms_version
 from itou.www.login import views as login_views
 from itou.www.signup import views as signup_views
 
-
-register_converter(SiretConverter, "siret")
 
 urlpatterns = [
     path("admin/login/", login_views.PreLoginView.as_view()),
