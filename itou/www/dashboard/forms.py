@@ -149,6 +149,7 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
                 max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
                 required=False,
                 initial=membership.function,
+                widget=forms.TextInput(attrs={"list": "membership-function-suggestions"}),
             )
             self.company_memberships[field_name] = membership
 
@@ -160,6 +161,7 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
                 max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
                 required=False,
                 initial=membership.function,
+                widget=forms.TextInput(attrs={"list": "membership-function-suggestions"}),
             )
             self.prescriber_memberships[field_name] = membership
 
