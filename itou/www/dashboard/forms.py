@@ -11,7 +11,9 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
+from itou.companies.models import CompanyMembership
 from itou.directory.models import DirectoryProfile
+from itou.prescribers.models import PrescriberMembership
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
@@ -146,6 +148,45 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
                 defaults={"is_opted_out": self.cleaned_data["is_directory_opted_out"]},
             )
         return user
+
+
+class EditCompanyFunctionForm(forms.ModelForm):
+    class Meta:
+        model = CompanyMembership
+        fields = ["function"]
+        widgets = {"function": forms.TextInput(attrs={"list": "membership-function-suggestions"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["function"].label = f"Fonction chez {self.instance.company.display_name}"
+
+
+class EditPrescriberFunctionForm(forms.ModelForm):
+    class Meta:
+        model = PrescriberMembership
+        fields = ["function"]
+        widgets = {"function": forms.TextInput(attrs={"list": "membership-function-suggestions"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["function"].label = f"Fonction chez {self.instance.organization.display_name}"
+
+
+CompanyMembershipsFormSet = forms.modelformset_factory(
+    CompanyMembership,
+    form=EditCompanyFunctionForm,
+    extra=0,
+    edit_only=True,
+)
+
+PrescriberMembershipsFormSet = forms.modelformset_factory(
+    PrescriberMembership,
+    form=EditPrescriberFunctionForm,
+    extra=0,
+    edit_only=True,
+)
 
 
 class EditUserEmailForm(forms.Form):

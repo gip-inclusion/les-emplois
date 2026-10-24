@@ -317,6 +317,9 @@ class ActiveMembershipManager(models.Manager.from_queryset(MembershipQuerySet)):
         return super().get_queryset().active()
 
 
+MEMBERSHIP_FUNCTION_MAX_LENGTH = 150
+
+
 class MembershipAbstract(models.Model):
     """
     Abstract class to handle memberships.
