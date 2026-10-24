@@ -920,13 +920,19 @@ class TestEditJobSeekerInfo:
             IdentityProvider.FRANCE_CONNECT: (
                 "Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr, "
                 "Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service "
-                "partenaire, elles seront automatiquement répercutées ici lors de sa prochaine connexion."
+                "partenaire. <br> "
+                "Lors de sa prochaine connexion, l'usager devra saisir son <strong>ancienne adresse e-mail</strong> "
+                "(celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors "
+                "automatiquement répercutées ici."
             ),
             IdentityProvider.FT_CONNECT: (
                 "Invitez-le à effectuer les modifications directement sur "
                 '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
                 'class="has-external-link">France Travail</a>. '
-                "Les changements seront automatiquement répercutés ici lors de sa prochaine connexion."
+                "Les changements seront automatiquement répercutés ici lors de sa prochaine connexion. <br> "
+                "Lors de sa prochaine connexion, l'usager devra saisir son <strong>ancienne adresse e-mail</strong> "
+                "(celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors "
+                "automatiquement répercutées ici."
             ),
         }
 
@@ -941,4 +947,5 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
 
         assertContains(response, f"Les informations d’identité de cet usager viennent de {identity_provider.label}")
-        assertContains(response, ALERT_COMPONENT[identity_provider])
+        normalized_content = " ".join(response.content.decode().split())
+        assert ALERT_COMPONENT[identity_provider] in normalized_content
