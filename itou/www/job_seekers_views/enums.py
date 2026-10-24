@@ -9,6 +9,17 @@ class JobSeekerSessionKinds(enum.StrEnum):
     UPDATE = "job-seeker-update"
 
 
+class JobSeekerAction(enum.IntEnum):
+    PROLONG_IAE_PASS = 0
+    APPLY = 1
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+
 class JobSeekerOrder(OrderEnum):
     FULL_NAME_ASC = "full_name"
     FULL_NAME_DESC = "-full_name"
