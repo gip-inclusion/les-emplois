@@ -1,4 +1,5 @@
 import sys
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -31,8 +32,14 @@ from itou.companies.enums import (
     JobDescriptionSource,
     JobSource,
     JobSourceTag,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
 )
 from itou.emails.utils import get_email_message
+from itou.prescribers.enums import PrescriberAuthorizationStatus
+from itou.users.enums import UserKind
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -1267,3 +1274,119 @@ class SiaeACIConvergencePHC(models.Model):
 
     def __str__(self):
         return self.siret
+
+
+class ProSupportReport(models.Model):
+    """
+    The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
+    """
+
+    public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    job_seeker = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="salarié",
+        on_delete=models.CASCADE,
+        related_name="pro_support_reports",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="auteur",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+    notified_prescriber = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="prescripteur prévenu",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    # Contracts missing from the ASP data are deleted: the end date is kept on the report.
+    contract = models.ForeignKey(
+        Contract,
+        verbose_name="contrat",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="pro_support_reports",
+    )
+    contract_end_date = models.DateField(verbose_name="date de fin du contrat")
+
+    barriers = ArrayField(
+        verbose_name="freins périphériques",
+        base_field=models.CharField(choices=ProSupportReportBarrier.choices),
+        blank=True,
+    )
+    other_barrier = models.TextField(verbose_name="autres freins identifiés", blank=True, default="")
+    autonomy = models.PositiveSmallIntegerField(
+        verbose_name="autonomie dans la recherche d’emploi",
+        choices=ProSupportReportAutonomy.choices,
+    )
+    solution = models.CharField(
+        verbose_name="solution envisagée",
+        choices=ProSupportReportSolution.choices,
+        blank=True,
+        default="",
+    )
+    orientation = models.CharField(
+        verbose_name="orientation la plus adaptée",
+        choices=ProSupportReportOrientation.choices,
+        blank=True,
+        default="",
+    )
+
+    class Meta:
+        verbose_name = "bilan d’accompagnement"
+        verbose_name_plural = "bilans d’accompagnement"
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_%(class)s_per_contract",
+                fields=["contract"],
+                violation_error_message="Un bilan d’accompagnement existe déjà pour ce contrat.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_autonomy_range",
+                condition=Q(autonomy__range=(1, 5)),
+                violation_error_message="L’autonomie est notée de 1 à 5.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_solution_or_orientation",
+                condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
+                violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
+
+    def notify_authorized_prescriber(self):
+        from itou.users.models import JobSeekerAssignment
+        from itou.users.notifications import ProSupportReportCreatedNotification
+
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker_id=self.job_seeker_id,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at")
+            .first()
+        )
+        if assignment:
+            self.notified_prescriber = assignment.professional
+            self.save(update_fields=["notified_prescriber"])
+            ProSupportReportCreatedNotification(
+                assignment.professional, assignment.prescriber_organization, report=self
+            ).send()
+
+    def get_barriers_display(self):
+        return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

@@ -13035,13 +13035,20 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT "companies_contract"."id",
-                 "companies_contract"."job_seeker_id",
-                 "companies_contract"."company_id",
-                 "companies_contract"."start_date",
-                 "companies_contract"."end_date",
-                 "companies_contract"."details",
-                 "companies_contract"."updated_at",
+          SELECT "companies_prosupportreport"."id",
+                 "companies_prosupportreport"."public_id",
+                 "companies_prosupportreport"."created_at",
+                 "companies_prosupportreport"."job_seeker_id",
+                 "companies_prosupportreport"."company_id",
+                 "companies_prosupportreport"."author_id",
+                 "companies_prosupportreport"."notified_prescriber_id",
+                 "companies_prosupportreport"."contract_id",
+                 "companies_prosupportreport"."contract_end_date",
+                 "companies_prosupportreport"."barriers",
+                 "companies_prosupportreport"."other_barrier",
+                 "companies_prosupportreport"."autonomy",
+                 "companies_prosupportreport"."solution",
+                 "companies_prosupportreport"."orientation",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -13079,13 +13086,10 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
-          FROM "companies_contract"
-          LEFT OUTER JOIN "companies_company" ON ("companies_contract"."company_id" = "companies_company"."id")
-          WHERE ("companies_contract"."job_seeker_id" = %s
-                 AND NOT ("companies_contract"."end_date" < %s
-                          AND "companies_contract"."end_date" IS NOT NULL)
-                 AND NOT ("companies_contract"."start_date" > %s))
-          ORDER BY "companies_contract"."start_date" DESC
+          FROM "companies_prosupportreport"
+          LEFT OUTER JOIN "companies_company" ON ("companies_prosupportreport"."company_id" = "companies_company"."id")
+          WHERE "companies_prosupportreport"."job_seeker_id" = %s
+          ORDER BY "companies_prosupportreport"."created_at" DESC
           LIMIT 1
         ''',
       }),
@@ -14486,13 +14490,20 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT "companies_contract"."id",
-                 "companies_contract"."job_seeker_id",
-                 "companies_contract"."company_id",
-                 "companies_contract"."start_date",
-                 "companies_contract"."end_date",
-                 "companies_contract"."details",
-                 "companies_contract"."updated_at",
+          SELECT "companies_prosupportreport"."id",
+                 "companies_prosupportreport"."public_id",
+                 "companies_prosupportreport"."created_at",
+                 "companies_prosupportreport"."job_seeker_id",
+                 "companies_prosupportreport"."company_id",
+                 "companies_prosupportreport"."author_id",
+                 "companies_prosupportreport"."notified_prescriber_id",
+                 "companies_prosupportreport"."contract_id",
+                 "companies_prosupportreport"."contract_end_date",
+                 "companies_prosupportreport"."barriers",
+                 "companies_prosupportreport"."other_barrier",
+                 "companies_prosupportreport"."autonomy",
+                 "companies_prosupportreport"."solution",
+                 "companies_prosupportreport"."orientation",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -14530,13 +14541,10 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
-          FROM "companies_contract"
-          LEFT OUTER JOIN "companies_company" ON ("companies_contract"."company_id" = "companies_company"."id")
-          WHERE ("companies_contract"."job_seeker_id" = %s
-                 AND NOT ("companies_contract"."end_date" < %s
-                          AND "companies_contract"."end_date" IS NOT NULL)
-                 AND NOT ("companies_contract"."start_date" > %s))
-          ORDER BY "companies_contract"."start_date" DESC
+          FROM "companies_prosupportreport"
+          LEFT OUTER JOIN "companies_company" ON ("companies_prosupportreport"."company_id" = "companies_company"."id")
+          WHERE "companies_prosupportreport"."job_seeker_id" = %s
+          ORDER BY "companies_prosupportreport"."created_at" DESC
           LIMIT 1
         ''',
       }),
@@ -15871,13 +15879,20 @@
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT "companies_contract"."id",
-                 "companies_contract"."job_seeker_id",
-                 "companies_contract"."company_id",
-                 "companies_contract"."start_date",
-                 "companies_contract"."end_date",
-                 "companies_contract"."details",
-                 "companies_contract"."updated_at",
+          SELECT "companies_prosupportreport"."id",
+                 "companies_prosupportreport"."public_id",
+                 "companies_prosupportreport"."created_at",
+                 "companies_prosupportreport"."job_seeker_id",
+                 "companies_prosupportreport"."company_id",
+                 "companies_prosupportreport"."author_id",
+                 "companies_prosupportreport"."notified_prescriber_id",
+                 "companies_prosupportreport"."contract_id",
+                 "companies_prosupportreport"."contract_end_date",
+                 "companies_prosupportreport"."barriers",
+                 "companies_prosupportreport"."other_barrier",
+                 "companies_prosupportreport"."autonomy",
+                 "companies_prosupportreport"."solution",
+                 "companies_prosupportreport"."orientation",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -15915,13 +15930,10 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
-          FROM "companies_contract"
-          LEFT OUTER JOIN "companies_company" ON ("companies_contract"."company_id" = "companies_company"."id")
-          WHERE ("companies_contract"."job_seeker_id" = %s
-                 AND NOT ("companies_contract"."end_date" < %s
-                          AND "companies_contract"."end_date" IS NOT NULL)
-                 AND NOT ("companies_contract"."start_date" > %s))
-          ORDER BY "companies_contract"."start_date" DESC
+          FROM "companies_prosupportreport"
+          LEFT OUTER JOIN "companies_company" ON ("companies_prosupportreport"."company_id" = "companies_company"."id")
+          WHERE "companies_prosupportreport"."job_seeker_id" = %s
+          ORDER BY "companies_prosupportreport"."created_at" DESC
           LIMIT 1
         ''',
       }),
