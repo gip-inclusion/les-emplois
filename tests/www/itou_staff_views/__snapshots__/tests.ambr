@@ -241,7 +241,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_searchable"
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
@@ -817,6 +818,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_searchable",
                  T9."id",
                  T9."fields_history",
                  T9."address_line_1",
@@ -1456,6 +1458,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_searchable",
                  T9."id",
                  T9."fields_history",
                  T9."address_line_1",
@@ -2095,6 +2098,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_searchable",
                  T9."id",
                  T9."fields_history",
                  T9."address_line_1",
@@ -2505,7 +2509,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_searchable"
           FROM "prescribers_prescriberorganization"
           WHERE ("prescribers_prescriberorganization"."id") IN ((%s))
         ''',
