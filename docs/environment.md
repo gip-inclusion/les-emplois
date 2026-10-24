@@ -80,6 +80,13 @@ Identifiants Mailjet de l’applicatif, utilisé lors de l’envoi d’emails.
 Connexion à l’instance Matomo du GIP de l’inclusion. Le site par défaut dans
 l’environnement de développement est un site dédié aux expérimentations.
 
-### `REDIS_URL`
+### `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, `REDIS_DB`
 
-Connexion à Redis, au format `redis://<host>:<port>`.
+Connexion à Redis, les valeurs par défaut en `dev` et en `test` sont :
+
+```bash
+export REDIS_HOST=localhost
+export REDIS_PORT=6378
+export REDIS_PASSWORD=""
+export REDIS_DB=0
+```
