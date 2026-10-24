@@ -1526,7 +1526,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -1561,6 +1562,7 @@
         'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -2145,7 +2147,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -2885,7 +2888,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -2968,6 +2972,7 @@
         'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -3772,7 +3777,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -4388,7 +4394,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -4423,6 +4430,7 @@
         'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -5007,7 +5015,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -5747,7 +5756,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -5830,6 +5840,7 @@
         'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -6634,7 +6645,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s

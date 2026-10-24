@@ -38,7 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
+from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
@@ -56,6 +56,8 @@ from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKin
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
+    CreateJobSeekerForOrientationStep1Form,
+    CreateJobSeekerForOrientationStep2Form,
     CreateOrUpdateJobSeekerStep1Form,
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
@@ -898,7 +900,7 @@ class GetOrCreateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         self.tunnel = request.GET.get("tunnel")
-        if self.tunnel not in ("sender", "hire", "standalone", "orientation"):
+        if self.tunnel not in JobSeekerCreationSource:
             raise Http404
         self.from_url = get_safe_url(request, "from_url")
         if not self.from_url:
@@ -912,10 +914,18 @@ class GetOrCreateJobSeekerStartView(View):
         }
 
         # apply or hire data
-        if self.tunnel == "sender" or self.tunnel == "hire":
+        if self.tunnel in (JobSeekerCreationSource.SENDER, JobSeekerCreationSource.HIRE):
             param_key, session_kind, error_message = {
-                "sender": ("apply_session_uuid", APPLY_SESSION_KIND, "Session de candidature invalide"),
-                "hire": ("hire_session_uuid", HIRE_SESSION_KIND, "Session de déclaration d’embauche invalide"),
+                JobSeekerCreationSource.SENDER: (
+                    "apply_session_uuid",
+                    APPLY_SESSION_KIND,
+                    "Session de candidature invalide",
+                ),
+                JobSeekerCreationSource.HIRE: (
+                    "hire_session_uuid",
+                    HIRE_SESSION_KIND,
+                    "Session de déclaration d’embauche invalide",
+                ),
             }[self.tunnel]
             session_uuid = request.GET.get(param_key)
             try:
@@ -930,7 +940,7 @@ class GetOrCreateJobSeekerStartView(View):
             except ValueError:  # In case the pk isn't an integer
                 raise Http404("Aucune entreprise n'a été trouvée")
             data["apply"] = apply_data
-        elif self.tunnel == "orientation":
+        elif self.tunnel == JobSeekerCreationSource.ORIENTATION:
             service_uid = request.GET.get("service_uid")
             if not service_uid:
                 raise Http404
@@ -945,11 +955,11 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel == "orientation":
+        if self.tunnel == JobSeekerCreationSource.ORIENTATION:
             view_name = "job_seekers_views:search_by_email_for_sender"
-        elif self.tunnel in ("sender", "standalone"):
+        elif self.tunnel in (JobSeekerCreationSource.SENDER, JobSeekerCreationSource.STANDALONE):
             view_name = "job_seekers_views:check_nir_for_sender"
-        elif self.tunnel == "hire":
+        elif self.tunnel == JobSeekerCreationSource.HIRE:
             view_name = "job_seekers_views:check_nir_for_hire"
 
         return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
@@ -993,7 +1003,9 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.is_orientation = self.job_seeker_session.get("config", {}).get("tunnel") == "orientation"
+        self.is_orientation = (
+            self.job_seeker_session.get("config", {}).get("tunnel") == JobSeekerCreationSource.ORIENTATION
+        )
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         self.standalone_creation = self.company is None and not self.is_orientation
@@ -1057,6 +1069,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
+            "orientation_process": self.is_orientation,
         }
 
     def get_active_assignment(self, job_seeker):
@@ -1230,16 +1243,15 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
-                user_infos = self.job_seeker_session.get("user", {})
-                user_infos.update({"email": self.form.cleaned_data["email"]})
-                profile_infos = self.job_seeker_session.get("profile", {})
-                profile_infos.update({"nir": nir})
-                self.job_seeker_session.update({"user": user_infos, "profile": profile_infos})
-                view_name = (
-                    "job_seekers_views:create_job_seeker_step_1_for_hire"
-                    if self.hire_process
-                    else "job_seekers_views:create_job_seeker_step_1_for_sender"
+                self.job_seeker_session.set(
+                    "user", self.job_seeker_session.get("user", {}) | {"email": self.form.cleaned_data["email"]}
                 )
+                if self.hire_process:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_hire"
+                elif self.is_orientation:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_orientation"
+                else:
+                    view_name = "job_seekers_views:create_job_seeker_step_1_for_sender"
 
                 return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
@@ -1331,6 +1343,7 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
+    form_class = CreateOrUpdateJobSeekerStep1Form
 
     previous_apply_url = "job_seekers_views:search_by_email_for_sender"
     previous_hire_url = "job_seekers_views:search_by_email_for_hire"
@@ -1354,7 +1367,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
             prefilled_birth_place = prefilled_birth_place or birth_city_from_nir
             prefilled_birth_country = prefilled_birth_country or birth_country_from_nir
 
-        self.form = CreateOrUpdateJobSeekerStep1Form(
+        self.form = self.form_class(
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
@@ -1545,6 +1558,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
+                self.profile.creation_source = self.job_seeker_session.get("config")["tunnel"]
                 if self.standalone_creation:
                     message = format_html(
                         "Usager ajouté||Le compte de {} a été créé et ajouté à votre liste d'accompagnements.<br>"
@@ -1554,8 +1568,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     messages.success(request, message, extra_tags="toast")
                 self.profile.validate_constraints()  # Detect inconsistencies (like duplicate NIR)
                 self.profile.save()
-                # TODO(ewen): add tunnel information when we have it in self.tunnel
-                logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
+                logger.info(
+                    "user=%s created job_seeker=%s source=%s", self.sender.pk, user.pk, self.profile.creation_source
+                )
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
@@ -1584,6 +1599,52 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "progress": "80",
             **jobseeker_personal_infos_display_kwargs(self.profile),
         }
+
+
+class CreateJobSeekerStep1ForOrientationView(CreateJobSeekerStep1ForSenderView):
+    template_name = "job_seekers_views/create_job_seeker_for_orientation/step_1.html"
+    form_class = CreateJobSeekerForOrientationStep1Form
+
+    previous_apply_url = "job_seekers_views:search_by_email_for_sender"
+    next_apply_url = "job_seekers_views:create_job_seeker_step_2_for_orientation"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"progress": "50"}
+
+
+class CreateJobSeekerStep2ForOrientationView(CreateJobSeekerStepEndForSenderView):
+    template_name = "job_seekers_views/create_job_seeker_for_orientation/step_2.html"
+
+    previous_apply_url = "job_seekers_views:create_job_seeker_step_1_for_orientation"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = CreateJobSeekerForOrientationStep2Form(
+            self.job_seeker_session.get("profile")["birthdate"],
+            data=request.POST or None,
+            initial=self.job_seeker_session.get("user") | self.job_seeker_session.get("profile"),
+        )
+
+    def post(self, request, *args, **kwargs):
+        if not self.form.is_valid():
+            return self.render_to_response(self.get_context_data(**kwargs))
+        self.job_seeker_session.set(
+            "user", self.job_seeker_session.get("user") | self.form.cleaned_data_without_profile_fields
+        )
+        # Why: the session is only JSON-serialized at the end of the request, and the creation expects primary keys.
+        self.job_seeker_session.set(
+            "profile",
+            self.job_seeker_session.get("profile")
+            | {k: getattr(v, "pk", v) for k, v in self.form.cleaned_data_from_profile_fields.items()},
+        )
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"form": self.form, "progress": "100"}
 
 
 class UpdateJobSeekerStartView(View):

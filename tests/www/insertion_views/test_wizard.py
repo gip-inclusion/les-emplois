@@ -854,7 +854,7 @@ def test_orientation_create_job_seeker_starts_with_search_by_email(client):
     )
 
     client.force_login(prescriber)
-    response = client.get(create_job_seeker_url)
+    response = client.get(create_job_seeker_url, follow=True)
 
     job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
     assertRedirects(
@@ -863,5 +863,6 @@ def test_orientation_create_job_seeker_starts_with_search_by_email(client):
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         ),
-        fetch_redirect_response=False,
     )
+    assertContains(response, "<title>Orienter", html=False)
+    assertContains(response, "<h1>Orienter</h1>", html=True)

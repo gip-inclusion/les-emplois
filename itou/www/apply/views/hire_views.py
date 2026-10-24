@@ -17,7 +17,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
-from itou.users.enums import UserKind
+from itou.users.enums import JobSeekerCreationSource, UserKind
 from itou.users.models import User
 from itou.utils.auth import check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -50,7 +50,7 @@ def start_hire_wizard(request, company_pk):
         reverse(
             "job_seekers_views:get_or_create_start",
             query={
-                "tunnel": "hire",
+                "tunnel": JobSeekerCreationSource.HIRE,
                 "hire_session_uuid": hire_session.name,
                 "company": company.pk,
                 "from_url": reset_url,

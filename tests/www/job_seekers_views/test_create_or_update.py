@@ -15,11 +15,13 @@ from itou.users.enums import ActionKind, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
+from tests.insertion.factories import ServiceFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWith2MembershipFactory
@@ -728,6 +730,28 @@ class TestStandaloneCreateAsPrescriber:
         modal = parse_response_to_soup(response, selector=selector)
         assert pretty_indented(modal) == snapshot()
 
+    def test_search_by_email_nir_banner(self, client):
+        client.force_login(PrescriberFactory())
+        client.get(reverse("job_seekers_views:get_or_create_start", query={"tunnel": "standalone", "from_url": "/"}))
+        kwargs = {"session_uuid": get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)}
+        client.post(
+            reverse("job_seekers_views:check_nir_for_sender", kwargs=kwargs),
+            data={"nir": "178128619400507", "confirm": 1},
+        )
+        assertContains(
+            client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs)),
+            "Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.",
+        )
+
+    def test_search_by_email_no_nir_banner(self, client):
+        client.force_login(PrescriberFactory())
+        client.get(reverse("job_seekers_views:get_or_create_start", query={"tunnel": "standalone", "from_url": "/"}))
+        kwargs = {"session_uuid": get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)}
+        assertNotContains(
+            client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs)),
+            "Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.",
+        )
+
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
         prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
@@ -968,6 +992,153 @@ class TestStandaloneCreateAsPrescriber:
         ).exists()
         for field in boolean_fields:
             assert getattr(new_job_seeker.jobseeker_profile, field) == (field in true_fields)
+        assert new_job_seeker.jobseeker_profile.creation_source == "standalone"
+
+
+class TestCreateForOrientation:
+    def _start(self, client, service):
+        client.get(
+            reverse(
+                "job_seekers_views:get_or_create_start",
+                query={
+                    "tunnel": "orientation",
+                    "from_url": reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}),
+                    "service_uid": service.uid,
+                },
+            )
+        )
+        return get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+
+    @pytest.mark.parametrize("complete", [False, True])
+    def test_create(self, client, complete):
+        prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
+        prescriber = prescriber_organization.members.get()
+        service = ServiceFactory()
+        client.force_login(prescriber)
+        session_name = self._start(client, service)
+
+        response = client.post(
+            reverse("job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": session_name}),
+            data={"email": "michel.durant@example.com", "preview": "1"},
+        )
+        step_1_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_orientation", kwargs={"session_uuid": session_name}
+        )
+        assertRedirects(response, step_1_url)
+
+        response = client.get(step_1_url)
+        assertContains(response, "Étape 1</strong>/2")
+        assertContains(response, "michel.durant@example.com")
+        assertNotContains(response, 'id="id_title"')
+        assertNotContains(response, 'id="id_nir"')
+
+        response = client.post(
+            step_1_url,
+            data={"first_name": "Michel", "last_name": "Durant", "birthdate": datetime.date(1978, 12, 20)},
+        )
+        step_2_url = reverse(
+            "job_seekers_views:create_job_seeker_step_2_for_orientation", kwargs={"session_uuid": session_name}
+        )
+        assertRedirects(response, step_2_url)
+
+        response = client.get(step_2_url)
+        assertContains(response, "Étape 2</strong>/2")
+        assertNotContains(response, 'id="id_birthdate"')
+
+        geispolsheim = create_city_geispolsheim()
+        response = client.post(
+            step_2_url,
+            data={
+                "title": Title.M,
+                "birth_place": Commune.objects.by_insee_code_and_period(
+                    geispolsheim.code_insee, datetime.date(1978, 12, 20)
+                ).pk,
+                "birth_country": Country.FRANCE_ID,
+                "phone": "0612345678",
+                "pole_emploi_id": "1234567A",
+            }
+            if complete
+            else {"title": ""},
+        )
+
+        job_seeker = User.objects.get(email="michel.durant@example.com")
+        assertRedirects(
+            response,
+            reverse(
+                "insertion_views:start_orientation",
+                kwargs={"service_uid": service.uid},
+                query={"job_seeker_public_id": job_seeker.public_id},
+            ),
+            fetch_redirect_response=False,
+        )
+        assert session_name not in client.session
+        assert (job_seeker.first_name, job_seeker.last_name) == ("Michel", "Durant")
+        assert job_seeker.created_by == prescriber
+        assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 12, 20)
+        assert job_seeker.jobseeker_profile.nir == ""
+        assert job_seeker.jobseeker_profile.creation_source == "orientation"
+        assert (
+            job_seeker.title,
+            job_seeker.phone,
+            job_seeker.jobseeker_profile.birth_country_id,
+            job_seeker.jobseeker_profile.pole_emploi_id,
+        ) == ((Title.M, "0612345678", Country.FRANCE_ID, "1234567A") if complete else ("", "", None, ""))
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=job_seeker,
+            professional=prescriber,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
+        ).exists()
+
+    def test_existing_email(self, client):
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberFactory())
+        session_name = self._start(client, ServiceFactory())
+
+        response = client.post(
+            reverse("job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": session_name}),
+            data={"email": job_seeker.email, "preview": "1"},
+        )
+
+        assertContains(response, "Email existant")
+        assertContains(
+            response, f"<h1>Orienter {mask_unless(job_seeker.get_inverted_full_name(), False)}</h1>", html=True
+        )
+        assertContains(
+            response,
+            f"""
+            <p>
+                Si votre usager n'est pas <b>{mask_unless(job_seeker.get_inverted_full_name(), False)}</b>,
+                cliquez sur « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager
+                que vous souhaitez orienter.
+            </p>
+            """,
+            html=True,
+        )
+        assertNotContains(response, "information clé pour la structure")
+
+    def test_existing_identity(self, client):
+        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=datetime.date(1978, 12, 20))
+        client.force_login(PrescriberFactory())
+        session_name = self._start(client, ServiceFactory())
+        client.post(
+            reverse("job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": session_name}),
+            data={"email": "other@example.com", "preview": "1"},
+        )
+
+        response = client.post(
+            reverse(
+                "job_seekers_views:create_job_seeker_step_1_for_orientation", kwargs={"session_uuid": session_name}
+            ),
+            data={
+                "first_name": job_seeker.first_name,
+                "last_name": job_seeker.last_name,
+                "birthdate": datetime.date(1978, 12, 20),
+            },
+        )
+
+        assertContains(response, "Compte usager déjà existant")
+        assert not User.objects.filter(email="other@example.com").exists()
 
 
 class TestUpdateAsOther:

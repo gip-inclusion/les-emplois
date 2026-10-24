@@ -616,6 +616,7 @@ class TestDirectHireFullProcess:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nir
+        assert new_job_seeker.jobseeker_profile.creation_source == "hire"
 
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------

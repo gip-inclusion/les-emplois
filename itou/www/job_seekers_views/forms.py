@@ -11,6 +11,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 from itou.approvals.constants import APPROVAL_ENDING_SOON_DAYS
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
+from itou.asp.forms import BirthPlaceWithoutBirthdateModelForm
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
@@ -361,6 +362,37 @@ class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
     class Meta(JobSeekerAddressForm.Meta):
         fields = JobSeekerAddressForm.Meta.fields + ["phone"]
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
+
+
+class CreateJobSeekerForOrientationStep1Form(JobSeekerProfileModelForm):
+    PROFILE_FIELDS = ["birthdate"]
+    REQUIRED_FIELDS = ["first_name", "last_name", "birthdate"]
+
+    email = forms.EmailField(label="Adresse électronique personnelle", disabled=True)
+
+    class Meta(JobSeekerProfileModelForm.Meta):
+        fields = ["first_name", "last_name"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        del self.fields["birth_place"]
+        del self.fields["birth_country"]
+
+
+class CreateJobSeekerForOrientationStep2Form(
+    JobSeekerProfileFieldsMixin, JobSeekerAddressForm, BirthPlaceWithoutBirthdateModelForm
+):
+    PROFILE_FIELDS = ["birth_place", "birth_country", "pole_emploi_id"]
+    require_birth_country = False
+
+    class Meta:
+        model = User
+        fields = ["title", "phone", *JobSeekerAddressForm.Meta.fields]
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["address_for_autocomplete"].required = False
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):

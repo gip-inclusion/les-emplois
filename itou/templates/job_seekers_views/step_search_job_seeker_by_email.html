@@ -14,17 +14,16 @@
                     <label for="id_nir">Numéro de sécurité sociale de l’usager</label>
                     <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
                 </div>
+                {% component_alert content=content variant="info" extra_classes="mb-3" %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
+                            <br>
+                            Merci de renseigner l'adresse e-mail de votre usager pour l'inscrire.
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
             {% endif %}
-
-            {% component_alert content=content variant="info" extra_classes="mb-3" %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
-                        <br>
-                        Merci de renseigner l'adresse e-mail de votre usager pour l'inscrire.
-                    </p>
-                {% endfragment %}
-            {% endcomponent_alert %}
 
             {% csrf_token %}
 
@@ -67,9 +66,12 @@
                                     {% else %}
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
+                                {% elif orientation_process %}
+                                    Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager que vous souhaitez orienter.
                                 {% else %}
                                     L'identité de l’usager est une information clé pour la structure.
-                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                     « Ce n'est pas mon usager » afin d'enregistrer ses informations
                                     personnelles.
                                 {% endif %}

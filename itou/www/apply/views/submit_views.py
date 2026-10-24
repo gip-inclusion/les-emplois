@@ -23,7 +23,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import save_file
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
-from itou.users.enums import ActionKind, UserKind
+from itou.users.enums import ActionKind, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -207,7 +207,7 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
         if request.user.is_job_seeker:
             job_seeker_tunnel = "job_seeker"
         else:
-            job_seeker_tunnel = "sender"
+            job_seeker_tunnel = JobSeekerCreationSource.SENDER
             job_seeker = _get_job_seeker_to_apply_for(self.request)
 
             if job_seeker:
@@ -219,7 +219,7 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
         self.apply_session = initialize_apply_session(request, session_data)
 
         # Go directly to step CheckPreviousApplicationsForSubmitView if we're carrying the job seeker public id with us
-        if job_seeker_tunnel == "sender" and job_seeker:
+        if job_seeker_tunnel == JobSeekerCreationSource.SENDER and job_seeker:
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_prev_applications",
@@ -389,7 +389,7 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         params = {
-            "tunnel": "sender",
+            "tunnel": JobSeekerCreationSource.SENDER,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
             "apply_session_uuid": self.apply_session.name,
