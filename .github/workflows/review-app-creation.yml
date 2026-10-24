@@ -58,6 +58,10 @@ jobs:
         token: ${{ secrets.CLEVER_TOKEN }}
         secret: ${{ secrets.CLEVER_SECRET }}
 
+    - name: ✅ Ensure the app does not already exist
+      run: |
+        ! $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME "
+
     - name: 🧫 Create a review app on Clever Cloud
       run: |
         $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $CLEVER_ORG_ID --region par --alias $REVIEW_APP_NAME
