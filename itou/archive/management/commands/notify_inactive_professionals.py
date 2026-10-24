@@ -30,7 +30,7 @@ class Command(BaseCommand):
         )
 
     def notify_inactive_professionals(self):
-        now = timezone.now()
+        now = timezone.now().astimezone(timezone.get_default_timezone())
         inactive_since = now - INACTIVITY_PERIOD
         self.logger.info("Notifying inactive professionals without activity before: %s", inactive_since)
 
