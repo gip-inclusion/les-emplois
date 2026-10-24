@@ -473,6 +473,14 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def required_2fa(self, obj):
         return user_is_concerned_by_otp(obj)
 
+    @admin.display(description="consentement au suivi de l’ouverture des e-mails")
+    def email_tracking_consent_status(self, obj):
+        if not obj.can_answer_email_tracking_consent:
+            return self.get_empty_value_display()
+        if obj.must_answer_email_tracking_consent:
+            return "En attente de réponse"
+        return "Accepté" if obj.email_tracking_consent else "Refusé"
+
     @admin.display(description="appareils enrôlés pour la 2FA interne")
     def internal_2fa_devices(self, obj):
         count = ItouTOTPDevice.objects.filter(user=obj, disabled_at=None).count()
@@ -551,6 +559,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "external_data_source_history_formatted",
                 "first_login",
                 "terms_accepted_at",
+                "email_tracking_consent",
+                "email_tracking_consent_status",
+                "email_tracking_consent_updated_at",
                 "fields_history_formatted",
                 "required_2fa",
                 "internal_2fa_devices",
@@ -626,6 +637,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     "last_checked_at",
                     "upcoming_deletion_notified_at",
                     "terms_accepted_at",
+                    "email_tracking_consent_status",
+                    "email_tracking_consent_updated_at",
                 )
             },
         )

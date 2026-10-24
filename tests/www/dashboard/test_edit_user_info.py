@@ -17,7 +17,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
@@ -29,6 +29,9 @@ class TestEditUserInfoView:
     LACK_OF_NIR_FIELD_ID = "id_lack_of_nir"
     LACK_OF_NIR_REASON_FIELD_ID = "id_lack_of_nir_reason"
     BIRTHDATE_FIELD_NAME = "birthdate"
+    EMAIL_TRACKING_CONSENT_TITLE = (
+        '<h2 class="h3" id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</h2>'
+    )
 
     @pytest.fixture(autouse=True)
     def setup_method(self, mocker):
@@ -857,6 +860,111 @@ class TestEditUserInfoView:
         assertRedirects(response, reverse("dashboard:index"))
         profile.refresh_from_db()
         assert profile.is_opted_out is False
+
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, PrescriberFactory, LaborInspectorFactory])
+    @pytest.mark.parametrize("consent", [True, False])
+    def test_email_tracking_consent_section(self, client, factory, consent):
+        with freeze_time("2026-09-28"):
+            user = factory(email_tracking_consent=consent)
+        client.force_login(user)
+        response = client.get(reverse("dashboard:edit_user_info"))
+        assertContains(response, self.EMAIL_TRACKING_CONSENT_TITLE, html=True)
+        field = response.context["form"]["email_tracking_consent"]
+        assert field.value() is consent
+        assert field.help_text == (
+            "Choix enregistré le 28/09/2026. "
+            "Une modification peut prendre jusqu’à 48 heures pour être prise en compte."
+        )
+
+    def test_no_email_tracking_consent_section_for_staff(self, client):
+        client.force_login(ItouStaffFactory())
+        response = client.get(reverse("dashboard:edit_user_info"))
+        assertNotContains(response, self.EMAIL_TRACKING_CONSENT_TITLE, html=True)
+        assert "email_tracking_consent" not in response.context["form"].fields
+
+    def _create_user(self, is_job_seeker, **kwargs):
+        if is_job_seeker:
+            # Matches the title and birthdate posted by _post_user_info
+            return JobSeekerFactory(jobseeker_profile__nir="178122978200508", **kwargs)
+        return PrescriberFactory(**kwargs)
+
+    def _post_user_info(self, client, user, **extra_data):
+        data = {"first_name": user.first_name, "last_name": user.last_name, "phone": user.phone}
+        if user.is_job_seeker:
+            birthdate = date(1978, 12, 20)
+            data |= {
+                "title": "M",
+                "birthdate": birthdate.isoformat(),
+                "birth_place": Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate).pk,
+                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            } | self.address_form_fields(fill_mode="ban_api")
+        response = client.post(reverse("dashboard:edit_user_info"), data | extra_data)
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        user.refresh_from_db()
+
+    @pytest.mark.parametrize("is_job_seeker", [False, True], ids=["professional", "job_seeker"])
+    @pytest.mark.parametrize(
+        "initial_consent,post_data,expected_consent",
+        [
+            (True, {"email_tracking_consent": "False"}, False),  # withdrawal
+            (False, {"email_tracking_consent": "True"}, True),
+        ],
+    )
+    def test_change_email_tracking_consent(
+        self, client, caplog, is_job_seeker, initial_consent, post_data, expected_consent
+    ):
+        user = self._create_user(is_job_seeker, email_tracking_consent=initial_consent)
+        client.force_login(user)
+        with freeze_time("2026-09-28T10:00:00+02:00") as frozen_time:
+            self._post_user_info(client, user, **post_data)
+        assert user.email_tracking_consent is expected_consent
+        assert user.email_tracking_consent_updated_at == frozen_time().replace(tzinfo=UTC)
+        assert f"user={user.pk} changed the email tracking consent: consent={expected_consent}" in caplog.messages
+
+    @pytest.mark.parametrize("is_job_seeker", [False, True], ids=["professional", "job_seeker"])
+    @pytest.mark.parametrize("consent", [True, False])
+    def test_unchanged_email_tracking_consent(self, client, caplog, is_job_seeker, consent):
+        user = self._create_user(is_job_seeker, email_tracking_consent=consent)
+        answered_at = user.email_tracking_consent_updated_at
+        client.force_login(user)
+        self._post_user_info(client, user, email_tracking_consent=str(consent))
+        assert user.email_tracking_consent is consent
+        assert user.email_tracking_consent_updated_at == answered_at
+        assert not any("changed the email tracking consent" in message for message in caplog.messages)
+
+    @pytest.mark.parametrize("is_job_seeker", [False, True], ids=["professional", "job_seeker"])
+    def test_saving_the_profile_is_not_an_email_tracking_consent_answer(self, client, is_job_seeker):
+        user = self._create_user(is_job_seeker, email_tracking_consent_updated_at=None)
+        client.force_login(user)
+        self._post_user_info(client, user)
+        assert user.email_tracking_consent is False
+        assert user.email_tracking_consent_updated_at is None
+
+    @pytest.mark.parametrize("is_job_seeker", [False, True], ids=["professional", "job_seeker"])
+    def test_missing_email_tracking_consent_keeps_the_answer(self, client, caplog, is_job_seeker):
+        user = self._create_user(is_job_seeker, email_tracking_consent=True)
+        answered_at = user.email_tracking_consent_updated_at
+        client.force_login(user)
+        self._post_user_info(client, user)
+        assert user.email_tracking_consent is True
+        assert user.email_tracking_consent_updated_at == answered_at
+        assert not any("changed the email tracking consent" in message for message in caplog.messages)
+
+    @pytest.mark.parametrize("is_job_seeker", [False, True], ids=["professional", "job_seeker"])
+    def test_hijacker_cannot_change_email_tracking_consent(self, client, is_job_seeker):
+        user = self._create_user(is_job_seeker, email_tracking_consent=False)
+        answered_at = user.email_tracking_consent_updated_at
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        client.post(reverse("hijack:acquire"), {"user_pk": user.pk})
+
+        response = client.get(reverse("dashboard:edit_user_info"))
+        field = response.context["form"]["email_tracking_consent"]
+        assert field.field.disabled is True
+        assert field.help_text.endswith("Seul l’utilisateur peut modifier ce choix.")
+
+        self._post_user_info(client, user, email_tracking_consent="True")
+        assert user.email_tracking_consent is False
+        assert user.email_tracking_consent_updated_at == answered_at
 
     @pytest.mark.parametrize(
         "user_factory,identity_provider",

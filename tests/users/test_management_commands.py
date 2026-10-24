@@ -7,7 +7,6 @@ import pytest
 from allauth.account import models as allauth_models
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
 from django.template.defaultfilters import pluralize
@@ -239,11 +238,21 @@ def test_shorten_active_sessions():
 
 class TestCommandSendUsersToBrevo:
     @pytest.fixture(autouse=True)
-    def setup(self, settings):
+    def setup(self, settings, respx_mock, mocker):
         settings.BREVO_API_KEY = "BREVO_API_KEY"
+        # The daily import and the consent update send several requests, each one but the first waits
+        mocker.patch("itou.utils.brevo.time.sleep")
+        self.import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+
+    def imports(self, *, update_existing_contacts=False):
+        """Return the payloads of the daily import, or of the email tracking consent update."""
+        payloads = [json.loads(call.request.content) for call in self.import_mock.calls]
+        return [payload for payload in payloads if payload["updateExistingContacts"] is update_existing_contacts]
 
     @freeze_time("2023-05-01T23:30:00Z")
-    def test_wet_run_siae(self, caplog, respx_mock, snapshot):
+    def test_wet_run_siae(self, caplog, snapshot):
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using ProConnect
@@ -302,12 +311,9 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=dave, company__kind=CompanyKind.ETTI)
         CompanyMembershipFactory(user=eve, company__kind=CompanyKind.EITI)
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
@@ -322,6 +328,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "AMMA",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -331,6 +338,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "BAILEY",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -340,6 +348,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "CINNAMON",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -349,6 +358,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "DOLL",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -358,6 +368,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "EBI",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -366,7 +377,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_siae")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
+    def test_wet_run_prescribers(self, caplog, snapshot):
         pe = PrescriberOrganizationFactory(france_travail=True)
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
         alice = ProfessionalFactory(
@@ -402,13 +413,9 @@ class TestCommandSendUsersToBrevo:
             with triggers.fake_context():
                 changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
@@ -423,6 +430,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "AAMAR",
                             "date_inscription": "2023-05-02",
                             "type": "prescripteur habilité",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -432,6 +440,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "WOOD",
                             "date_inscription": "2023-05-02",
                             "type": "prescripteur habilité",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -440,7 +449,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_prescribers")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
+    def test_wet_run_orienteurs(self, caplog, snapshot):
         # Prescribers without memberships are ignored
         ProfessionalFactory(
             first_name="Billy",
@@ -476,13 +485,9 @@ class TestCommandSendUsersToBrevo:
         with triggers.fake_context():
             changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
@@ -497,6 +502,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "TIMBER",
                             "date_inscription": "2023-05-02",
                             "type": "orienteur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -505,7 +511,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_orienteurs")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_job_seekers(self, caplog, respx_mock, snapshot):
+    def test_wet_run_job_seekers(self, caplog, snapshot):
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
@@ -544,13 +550,9 @@ class TestCommandSendUsersToBrevo:
             verified=False,
         )
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
-
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.CANDIDATS],
                 "emailBlacklist": False,
@@ -566,6 +568,7 @@ class TestCommandSendUsersToBrevo:
                             "date_inscription": "2025-02-25",
                             "departement": "67",
                             "id": billy.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                     {
@@ -576,6 +579,7 @@ class TestCommandSendUsersToBrevo:
                             "date_inscription": "2025-02-25",
                             "departement": "67",
                             "id": valery.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -584,53 +588,83 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_job_seekers")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_stalled_autonomous_job_seekers(self, caplog, respx_mock):
+    def test_wet_run_stalled_job_seekers(self, caplog):
+        long_ago = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
+            date_joined=long_ago,
             # Needed to fill the department field.
             with_ban_geoloc_address=True,
             with_verified_email=True,
             jobseeker_profile__is_stalled=True,
         )
-        JobSeekerFactory(with_verified_email=True)
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
+        # Stalled and recently joined: sent once
+        sonny = JobSeekerFactory(
+            first_name="Sonny",
+            last_name="Sunder",
+            email="sonny.sunder@mailinator.com",
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+            jobseeker_profile__is_stalled=True,
         )
+        # Not stalled anymore: ignored
+        JobSeekerFactory(
+            date_joined=long_ago,
+            with_verified_email=True,
+            jobseeker_profile__is_stalled=True,
+            jobseeker_profile__is_not_stalled_anymore=True,
+        )
+        # Not stalled: ignored
+        JobSeekerFactory(date_joined=long_ago, with_verified_email=True)
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        # Employers and prescribers are created by the factories, ignore them.
         assert "Job seekers count: 2" in caplog.messages
-        assert "Stalled autonomous job seekers count: 1" in caplog.messages
-        autonomous_job_seeker_mock_call = import_mock.calls[-1]
-        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
-            "listIds": [BrevoListID.CANDIDATS_AUTONOMES_BLOQUES],
-            "emailBlacklist": False,
-            "smsBlacklist": False,
-            "updateExistingContacts": False,
-            "emptyContactsAttributes": False,
-            "jsonBody": [
-                {
-                    "email": "billy.boo@mailinator.com",
-                    "attributes": {
-                        "prenom": "Billy",
-                        "nom": "BOO",
-                        "date_inscription": "2025-02-25",
-                        "departement": "67",
-                        "id": billy.pk,
+        assert self.imports() == [
+            {
+                "listIds": [BrevoListID.CANDIDATS],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "billy.boo@mailinator.com",
+                        "attributes": {
+                            "prenom": "Billy",
+                            "nom": "BOO",
+                            "date_inscription": "2024-01-01",
+                            "departement": "67",
+                            "id": billy.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
+                        },
                     },
-                },
-            ],
-        }
+                    {
+                        "email": "sonny.sunder@mailinator.com",
+                        "attributes": {
+                            "prenom": "Sonny",
+                            "nom": "SUNDER",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": sonny.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
+                        },
+                    },
+                ],
+            },
+        ]
 
     @freeze_time("2025-06-25")
-    def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog, respx_mock):
-        billy = IAEEligibilityDiagnosisFactory(
+    def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog):
+        # Joined long ago, so that only the diagnosis can make them part of the import
+        long_ago = datetime.datetime(2025, 1, 1, tzinfo=datetime.UTC)
+        willy = IAEEligibilityDiagnosisFactory(
             job_seeker__first_name="Willy",
             job_seeker__last_name="Boo",
             job_seeker__email="willy.boo@mailinator.com",
+            job_seeker__date_joined=long_ago,
             # Needed to fill the department field.
             job_seeker__with_ban_geoloc_address=True,
             job_seeker__with_verified_email=True,
@@ -639,6 +673,7 @@ class TestCommandSendUsersToBrevo:
         ).job_seeker
         # Diagnosis too old: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=timezone.now(),
             created_at=timezone.now() - datetime.timedelta(days=310),
@@ -646,6 +681,7 @@ class TestCommandSendUsersToBrevo:
         )
         # Employer diagnosis: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=timezone.now(),
             from_employer=True,
@@ -655,6 +691,7 @@ class TestCommandSendUsersToBrevo:
             sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             job_seeker=IAEEligibilityDiagnosisFactory(
+                job_seeker__date_joined=long_ago,
                 job_seeker__with_verified_email=True,
                 job_seeker__last_login=timezone.now(),
                 from_prescriber=True,
@@ -662,26 +699,19 @@ class TestCommandSendUsersToBrevo:
         )
         # Job seeker is not autonomous: ignored
         IAEEligibilityDiagnosisFactory(
+            job_seeker__date_joined=long_ago,
             job_seeker__with_verified_email=True,
             job_seeker__last_login=None,
             from_prescriber=True,
         )
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
 
         call_command("send_users_to_brevo", wet_run=True)
 
+        assert "Job seekers count: 1" in caplog.messages
         # Employers and prescribers are created by the factories, ignore them.
-        assert "Job seekers count: 5" in caplog.messages
-        assert "Autonomous job seekers with IAE diag and no accepted applications count: 1" in caplog.messages
-        [autonomous_job_seeker_mock_call] = [
-            call
-            for call in import_mock.calls
-            if json.loads(call.request.content)["listIds"] == [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC]
-        ]
-        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
-            "listIds": [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC],
+        [job_seekers_import] = [payload for payload in self.imports() if payload["listIds"] == [BrevoListID.CANDIDATS]]
+        assert job_seekers_import == {
+            "listIds": [BrevoListID.CANDIDATS],
             "emailBlacklist": False,
             "smsBlacklist": False,
             "updateExistingContacts": False,
@@ -692,16 +722,17 @@ class TestCommandSendUsersToBrevo:
                     "attributes": {
                         "prenom": "Willy",
                         "nom": "BOO",
-                        "date_inscription": "2025-06-25",
+                        "date_inscription": "2025-01-01",
                         "departement": "67",
-                        "id": billy.pk,
+                        "id": willy.pk,
+                        "_PIXEL_TRACKING_CONSENT": "No",
                     },
                 },
             ],
         }
 
     @freeze_time("2023-05-02")
-    def test_wet_run_batch(self, caplog, respx_mock, mocker, snapshot):
+    def test_wet_run_batch(self, caplog, mocker, snapshot):
         annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
@@ -715,14 +746,11 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
 
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(202, json={"processId": 106})
-        )
         mocker.patch("itou.users.management.commands.send_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
@@ -737,6 +765,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "AMMA",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -755,6 +784,7 @@ class TestCommandSendUsersToBrevo:
                             "nom": "BAILEY",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
@@ -763,20 +793,18 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_batch")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_errors(self, caplog, respx_mock, snapshot):
+    def test_wet_run_errors(self, caplog, snapshot):
         annie = ProfessionalFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
-        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
-            return_value=httpx.Response(400, json={})
-        )
+        self.import_mock.mock(return_value=httpx.Response(400, json={}))
 
         call_command("send_users_to_brevo", wet_run=True)
 
-        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+        assert self.imports() == [
             {
                 "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
@@ -791,12 +819,143 @@ class TestCommandSendUsersToBrevo:
                             "nom": "AMMA",
                             "date_inscription": "2023-05-02",
                             "type": "employeur",
+                            "_PIXEL_TRACKING_CONSENT": "No",
                         },
                     },
                 ],
             },
         ]
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_errors")
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_job_seekers(self, caplog):
+        now = timezone.now()
+        long_ago = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
+        # Not part of the daily import, sent all the same
+        annie = JobSeekerFactory(
+            first_name="Annie",
+            last_name="Amma",
+            email="annie.amma@mailinator.com",
+            date_joined=long_ago,
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+            email_tracking_consent=True,
+            email_tracking_consent_updated_at=now - datetime.timedelta(days=1),
+        )
+        never_answered = JobSeekerFactory(with_verified_email=True, email_tracking_consent_updated_at=None)
+        # Answered before the update window: already sent to Brevo
+        JobSeekerFactory(
+            date_joined=long_ago,
+            with_verified_email=True,
+            email_tracking_consent_updated_at=now - datetime.timedelta(days=3),
+        )
+        # Inactive users are ignored
+        JobSeekerFactory(date_joined=long_ago, with_verified_email=True, is_active=False)
+        # Email not verified, and no SSO to verify it: ignored
+        JobSeekerFactory(date_joined=long_ago, identity_provider=IdentityProvider.DJANGO)
+        # Part of the daily import too
+        bob = JobSeekerFactory(
+            first_name="Bob",
+            last_name="Bailey",
+            email="bob.bailey@mailinator.com",
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+        )
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert "Job seekers with a recent email tracking consent answer count: 2" in caplog.messages
+        assert self.imports(update_existing_contacts=True) == [
+            {
+                "listIds": [BrevoListID.CANDIDATS],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": True,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "annie.amma@mailinator.com",
+                        "attributes": {
+                            "prenom": "Annie",
+                            "nom": "AMMA",
+                            "date_inscription": "2024-01-01",
+                            "departement": "67",
+                            "id": annie.pk,
+                            "_PIXEL_TRACKING_CONSENT": "Yes",
+                        },
+                    },
+                    {
+                        "email": "bob.bailey@mailinator.com",
+                        "attributes": {
+                            "prenom": "Bob",
+                            "nom": "BAILEY",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": bob.pk,
+                            "_PIXEL_TRACKING_CONSENT": "No",
+                        },
+                    },
+                ],
+            },
+        ]
+        # Contacts created by the daily import get the consent attribute, only when the user answered
+        [daily_import] = self.imports()
+        attributes_by_email = {contact["email"]: contact["attributes"] for contact in daily_import["jsonBody"]}
+        assert attributes_by_email[bob.email]["_PIXEL_TRACKING_CONSENT"] == "No"
+        assert "_PIXEL_TRACKING_CONSENT" not in attributes_by_email[never_answered.email]
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_professionals(self, caplog, snapshot):
+        CompanyMembershipFactory(
+            user__email="employer@mailinator.com",
+            user__email_tracking_consent=True,
+            company__kind=CompanyKind.EI,
+        )
+        CompanyMembershipFactory(
+            user__email="former.employer@mailinator.com",
+            company__kind=CompanyKind.EI,
+            is_active=False,
+        )
+        PrescriberMembershipFactory(
+            user__email="former.prescriber@mailinator.com",
+            organization__authorized=True,
+            is_active=False,
+        )
+        PrescriberMembershipFactory(
+            user__email="former.orienteur@mailinator.com",
+            organization__kind=PrescriberOrganizationKind.OTHER,
+            is_active=False,
+        )
+        # Former employer now in a prescriber organization: only sent to its list
+        now_prescriber = PrescriberMembershipFactory(
+            user__email="now.prescriber@mailinator.com",
+            organization__authorized=True,
+        ).user
+        CompanyMembershipFactory(user=now_prescriber, company__kind=CompanyKind.EI, is_active=False)
+        # Never SIAE or prescriber members, so never sent to Brevo: ignored
+        InstitutionMembershipFactory()
+        CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        ProfessionalFactory()
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert [
+            (
+                payload["listIds"],
+                [
+                    (contact["email"], contact["attributes"]["type"], contact["attributes"]["_PIXEL_TRACKING_CONSENT"])
+                    for contact in payload["jsonBody"]
+                ],
+            )
+            for payload in self.imports(update_existing_contacts=True)
+        ] == [
+            ([BrevoListID.EMPLOYERS], [("employer@mailinator.com", "employeur", "Yes")]),
+            ([BrevoListID.PRESCRIBERS], [("now.prescriber@mailinator.com", "prescripteur habilité", "No")]),
+            ([BrevoListID.EMPLOYERS], [("former.employer@mailinator.com", "employeur", "No")]),
+            ([BrevoListID.PRESCRIBERS], [("former.prescriber@mailinator.com", "prescripteur habilité", "No")]),
+            ([BrevoListID.PRESCRIBERS], [("former.orienteur@mailinator.com", "orienteur", "No")]),
+        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_email_tracking_consents_professionals")
 
 
 @freeze_time("2022-09-13")
