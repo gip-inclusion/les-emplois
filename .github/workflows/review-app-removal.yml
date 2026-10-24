@@ -49,11 +49,12 @@ jobs:
         prune-cache: true
 
     - name: 🗑 Delete S3 bucket
-      run: uv run --script scripts/delete-buckets --use-case=review_app
+      run: |
+        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l uv run --script scripts/delete-buckets --use-case=review_app --app
 
     - name: 🗑 Delete the review app
       run: |
-        $CLEVER_CLI delete --yes
+        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l $CLEVER_CLI delete --yes --app
 
     - name: 🗑 Delete the review app database
       run: |
