@@ -61,7 +61,8 @@ services:
       - ITOU_LOG_LEVEL=DEBUG
       - CELLAR_ADDON_HOST=rustfs:${RUSTFS_PORT_ON_DOCKER_HOST:-9000}
       - VIRTUAL_ENV=/app/.venv-docker
-      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - postgres
     build:

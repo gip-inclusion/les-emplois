@@ -553,12 +553,10 @@ SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 # Slack notifications sent by check_inconsistencies cronjobs.
 SLACK_INCONSISTENCIES_WEBHOOK_URL = os.getenv("SLACK_INCONSISTENCIES_WEBHOOK_URL")
 
-# Production instances (`PROD`, `DEMO`, `PENTEST`, ...) share the same redis but different DB
-redis_url = os.environ["REDIS_URL"]
-redis_db = os.environ["REDIS_DB"]
 redis_common_django_settings = {
     "BACKEND": "itou.utils.cache.UnclearableCache",
-    "LOCATION": f"{redis_url}?db={redis_db}",
+    # Production instances (`PROD`, `DEMO`, `PENTEST`, ...) share the same redis but different DB
+    "LOCATION": f"redis://:{os.environ['REDIS_PASSWORD']}@{os.environ['REDIS_HOST']}:{os.environ['REDIS_PORT']}?db={os.environ['REDIS_DB']}",
     "KEY_PREFIX": "django",
 }
 
@@ -588,10 +586,15 @@ HUEY = {
     "name": os.getenv("HUEY_QUEUE_NAME", DATABASES["default"]["NAME"]) or "huey",
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{redis_url}/?db={redis_db}",
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
+    },
+    "connection": {
+        "host": os.environ["REDIS_HOST"],
+        "port": os.environ["REDIS_PORT"],
+        "db": os.environ["REDIS_DB"],
+        "password": os.environ["REDIS_PASSWORD"],
     },
 }
 
