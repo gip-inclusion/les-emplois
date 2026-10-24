@@ -876,13 +876,19 @@ class TestEditUserInfoView:
             IdentityProvider.FRANCE_CONNECT: (
                 "Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté "
                 "(impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service "
-                "partenaire, elles seront automatiquement répercutées ici lors de votre prochaine connexion."
+                "partenaire. <br> "
+                "Lors de votre prochaine connexion, saisissez votre <strong>ancienne adresse e-mail</strong> "
+                "(celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors "
+                "automatiquement répercutées ici."
             ),
             IdentityProvider.FT_CONNECT: (
                 "Pour les modifier, rendez-vous directement sur "
                 '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
                 'class="has-external-link">France Travail</a>. '
-                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion. <br> "
+                "Lors de votre prochaine connexion, saisissez votre <strong>ancienne adresse e-mail</strong> "
+                "(celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors "
+                "automatiquement répercutées ici."
             ),
             IdentityProvider.PRO_CONNECT: (
                 "Pour les modifier, rendez-vous directement sur votre compte "
