@@ -35,13 +35,15 @@ jobs:
       run:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
-    - name: 🤝 Find the application on Clever Cloud
+    - name: 🌐 Download Clever Cloud CLI
       run: |
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
+
+    - name: 🤝 Login to Clever Cloud
+      run: |
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: 💂 Install Python
       uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
@@ -50,11 +52,12 @@ jobs:
         prune-cache: true
 
     - name: 🗑 Delete S3 bucket
-      run: uv run --script scripts/delete-buckets --use-case=review_app
+      run: |
+        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l uv run --script scripts/delete-buckets --use-case=review_app --app
 
     - name: 🗑 Delete the review app
       run: |
-        $CLEVER_CLI delete --yes
+        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l $CLEVER_CLI delete --yes --app
 
     - name: 🗑 Delete the review app database
       run: |
