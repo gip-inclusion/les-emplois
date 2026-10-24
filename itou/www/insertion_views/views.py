@@ -295,6 +295,8 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
                 },
             ),
             "matomo_custom_title": "Orientation service - rechercher un usager",
+            # FIXME(vperron): remove this modal once the DORA migration is over (added 2026-10-23).
+            "show_dora_modal": self.request.GET.get("mtm_campaign") == "DORA",
         }
 
 
