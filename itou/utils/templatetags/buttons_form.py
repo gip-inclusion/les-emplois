@@ -13,6 +13,7 @@ def itou_buttons_form(
     primary_url=None,
     primary_name=None,
     primary_value=None,
+    primary_id=None,
     primary_aria_label="Passer à l’étape suivante",
     reset_url=reverse_lazy("dashboard:index"),
     show_mandatory_fields_mention=True,
@@ -67,6 +68,9 @@ def itou_buttons_form(
         primary_name & primary_value
             If set together, the name and value for the primary button.
 
+        primary_id
+            If set, the id for the primary button.
+
         secondary_name & secondary_value
             If set together, the name and value for the secondary button.
 
@@ -105,6 +109,7 @@ def itou_buttons_form(
         "primary_label": primary_label,
         "primary_name": primary_name,
         "primary_value": primary_value,
+        "primary_id": primary_id,
         "primary_url": primary_url,
         "reset_url": reset_url,
         "secondary_label": secondary_label,
