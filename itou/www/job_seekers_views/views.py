@@ -37,6 +37,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
@@ -272,7 +273,7 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
             applications_qs = self.object.job_applications.prescriptions_of(
                 self.request.user,
                 self.request.current_organization,
-            )
+            ) | xp_ref_iae_job_applications(self.request, self.object.job_applications)
         if can_view_external:
             applications = self.object.job_applications.annotate(
                 user_can_see_details=Exists(applications_qs.filter(pk=OuterRef("pk"))),
@@ -607,6 +608,17 @@ def archive_assignment(request, public_id, assignment_pk):
         messages.success(request, "Accompagnement archivé", extra_tags="toast")
 
     return HttpResponseRedirect(next_url)
+
+
+def xp_ref_iae_job_applications(request, job_applications):
+    if (
+        request.from_authorized_prescriber
+        and request.current_organization.kind == PrescriberOrganizationKind.FT
+        and request.current_organization.department == settings.XP_REF_IAE_DEPARTMENT
+        and timezone.localdate() <= settings.XP_REF_IAE_END_DATE
+    ):
+        return job_applications.filter(to_company__department=settings.XP_REF_IAE_DEPARTMENT)
+    return job_applications.none()
 
 
 def can_view_external_actions(job_seeker, request):

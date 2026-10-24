@@ -963,6 +963,10 @@ NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 OVERVIEW_TAB_TEST_DEPARTMENT = "13" if SHOW_DEMO_ACCOUNTS_BANNER else "93"
 OVERVIEW_TAB_CONTROL_DEPARTMENT = "13"
 
+# Experiment: France Travail agents of this department can view every job application, until the end date (inclusive).
+XP_REF_IAE_DEPARTMENT = "83"
+XP_REF_IAE_END_DATE = datetime.date(2026, 12, 31)
+
 # This API seems to be rarely used (which is understandable) and will soon have to be dropped
 API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT = (
     os.getenv("API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT", "False") == "True"

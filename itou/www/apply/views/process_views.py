@@ -39,7 +39,7 @@ from itou.www.apply.forms import (
 )
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_FOR_EMPLOYERS
-from itou.www.job_seekers_views.views import get_last_assignment
+from itou.www.job_seekers_views.views import get_last_assignment, xp_ref_iae_job_applications
 
 
 logger = logging.getLogger(__name__)
@@ -329,7 +329,9 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     - to update start date of a contract (provided given date is in the future),
     - to give an answer.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    job_applications = JobApplication.objects.prescriptions_of(
+        request.user, request.current_organization
+    ) | xp_ref_iae_job_applications(request, JobApplication.objects)
 
     queryset = (
         job_applications.with_upcoming_participations_count()
@@ -415,6 +417,7 @@ def resume_download(request, job_application_id):
         )
         | Exists(CompanyMembership.objects.filter(user=user, company=OuterRef("sender_company")))
     )
+    queryset |= xp_ref_iae_job_applications(request, JobApplication.objects)
     job_application = get_object_or_404(queryset.select_related("resume"), id=job_application_id)
     if job_application.resume_id is None:
         raise Http404
