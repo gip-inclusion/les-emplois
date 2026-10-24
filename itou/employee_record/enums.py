@@ -33,7 +33,7 @@ class Status(models.TextChoices):
             if enum
             not in (
                 Status.ARCHIVED,
-                Status.MODIFICATION_PENDING,
+                # Those 2 modification states are merged with SENT and REJECTED (in the filter)
                 Status.MODIFICATION_SENT,
                 Status.MODIFICATION_REJECTED,
             )

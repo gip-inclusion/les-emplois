@@ -141,7 +141,9 @@ class TestListEmployeeRecords:
                 ready_for_transfer=True, job_application__to_company=self.company
             ).job_application.approval.number
         )
-        no_results_statuses = set(Status) - {Status.NEW, Status.READY}
+        no_results_statuses = (
+            set(Status) - {Status.NEW, Status.READY} - {Status.MODIFICATION_REJECTED, Status.MODIFICATION_SENT}
+        )
         client.force_login(self.user)
 
         # With a single status
@@ -151,17 +153,9 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": Status.READY})
         assertContains(response, approval_number_for_ready)
 
-        blocked_statuses = {
-            # ARCHIVED is a reserved status
-            Status.ARCHIVED,
-            # TODO(xfernandez): remove modification statuses when they are usable
-            Status.MODIFICATION_PENDING,
-            Status.MODIFICATION_REJECTED,
-            Status.MODIFICATION_SENT,
-        }
         for status in no_results_statuses:
             response = client.get(self.URL, data={"status": status})
-            if status in blocked_statuses:
+            if status is Status.ARCHIVED:  # ARCHIVED is a reserved status
                 assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
             else:
                 assertNotContains(response, approval_number_for_new)
@@ -175,9 +169,65 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": list(no_results_statuses)})  # ARCHIVED is still reserved
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
-        response = client.get(self.URL, data={"status": list(no_results_statuses - blocked_statuses)})
+        response = client.get(self.URL, data={"status": list(no_results_statuses - {Status.ARCHIVED})})
         assertNotContains(response, approval_number_for_new)
         assertNotContains(response, approval_number_for_ready)
+
+    def test_merged_status_filter(self, client):
+        approval_number_for_new = format_filters.format_approval_number(
+            self.employee_record.job_application.approval.number
+        )
+        approval_number_for_rejected = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True,
+                job_application__to_company=self.company,
+                status=Status.REJECTED,
+            ).job_application.approval.number
+        )
+        approval_number_for_modification_rejected = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True,
+                job_application__to_company=self.company,
+                status=Status.MODIFICATION_REJECTED,
+            ).job_application.approval.number
+        )
+        approval_number_for_sent = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True,
+                job_application__to_company=self.company,
+                status=Status.SENT,
+            ).job_application.approval.number
+        )
+        approval_number_for_modification_sent = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True,
+                job_application__to_company=self.company,
+                status=Status.MODIFICATION_SENT,
+            ).job_application.approval.number
+        )
+        client.force_login(self.user)
+
+        def check_expected_numbers(filter_data, expected_numbers):
+            response = client.get(self.URL, data=filter_data)
+            for number in [
+                approval_number_for_new,
+                approval_number_for_rejected,
+                approval_number_for_modification_rejected,
+                approval_number_for_sent,
+                approval_number_for_modification_sent,
+            ]:
+                if number in expected_numbers:
+                    assertContains(response, number)
+                else:
+                    assertNotContains(response, number)
+
+        check_expected_numbers({"status": Status.NEW}, [approval_number_for_new])
+        check_expected_numbers(
+            {"status": Status.REJECTED}, [approval_number_for_rejected, approval_number_for_modification_rejected]
+        )
+        check_expected_numbers(
+            {"status": Status.SENT}, [approval_number_for_sent, approval_number_for_modification_sent]
+        )
 
     def test_job_seeker_filter(self, client):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
@@ -331,14 +381,8 @@ class TestListEmployeeRecords:
         status = random.choice(
             list(
                 set(Status)
-                - {
-                    Status.PROCESSED,
-                    Status.ARCHIVED,
-                    # TODO(xfernandez): include modification statuses when they are usable
-                    Status.MODIFICATION_PENDING,
-                    Status.MODIFICATION_REJECTED,
-                    Status.MODIFICATION_SENT,
-                }
+                - {Status.PROCESSED, Status.ARCHIVED}
+                - {Status.MODIFICATION_REJECTED, Status.MODIFICATION_SENT}
             )
         )
 
@@ -356,16 +400,7 @@ class TestListEmployeeRecords:
     def test_no_alert_when_siret_has_not_changed(self, client):
         client.force_login(self.user)
         status = random.choice(
-            list(
-                set(Status)
-                - {
-                    Status.ARCHIVED,
-                    # TODO(xfernandez): remove modification statuses when they are usable
-                    Status.MODIFICATION_PENDING,
-                    Status.MODIFICATION_REJECTED,
-                    Status.MODIFICATION_SENT,
-                }
-            )
+            list(set(Status) - {Status.ARCHIVED} - {Status.MODIFICATION_REJECTED, Status.MODIFICATION_SENT})
         )
 
         self.employee_record.status = status

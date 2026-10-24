@@ -120,6 +120,9 @@ class Command(BaseCommand):
                     "Could not automatically make employee_record=%s ready - exc=%s", employee_record.pk, exc
                 )
 
+    def _schedule_modifications(self):
+        EmployeeRecord.objects.schedule_modifications()
+
     @dry_runnable
     def handle(self, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
@@ -127,5 +130,6 @@ class Command(BaseCommand):
         self._check_approvals()
         self._check_missed_notifications()
         self._handle_3437_errors()
+        self._schedule_modifications()
 
         self.logger.info("Employee records sanitizing done. Have a great day!")

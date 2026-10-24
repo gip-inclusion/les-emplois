@@ -164,17 +164,12 @@ class TestDashboardView:
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
-        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
-        # You can't create 2 employee records with the same job application
-        # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
-        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=company, status=Status.MODIFICATION_REJECTED)
 
-        other_job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, with_approval=True, to_company=other_company
-        )
-        EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=other_company, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application__to_company=other_company, status=Status.MODIFICATION_REJECTED)
 
         session = client.session
 
@@ -183,14 +178,14 @@ class TestDashboardView:
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
-        assert response.context["num_rejected_employee_records"] == 2
+        assert response.context["num_rejected_employee_records"] == 3
 
         # select the second company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.organization_switch_key
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
-        assert response.context["num_rejected_employee_records"] == 1
+        assert response.context["num_rejected_employee_records"] == 2
 
         # select the third company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_company.organization_switch_key
