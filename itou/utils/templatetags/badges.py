@@ -1,11 +1,13 @@
 from django import template
 from django.template.loader import get_template
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import ApprovalStatus
 from itou.insertion.enums import OrientationStatus
 from itou.job_applications.enums import JobApplicationState
+from itou.rdv_insertion.enums import ParticipationStatus
 
 
 register = template.Library()
@@ -181,3 +183,30 @@ def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
 
     badge = f"<span {' '.join(attrs)}>{label}</span>"
     return mark_safe(badge)
+
+
+def _participation_status_label(status, start_at):
+    if status == ParticipationStatus.UNKNOWN:
+        return "RDV à venir" if start_at > timezone.now() else "Statut du RDV à préciser"
+    return ParticipationStatus(status).label
+
+
+def _participation_status_classes(status, start_at):
+    if status == ParticipationStatus.UNKNOWN:
+        return "bg-info-lighter text-info" if start_at > timezone.now() else "bg-light text-primary"
+    return {
+        ParticipationStatus.SEEN: "bg-success-lighter text-success",
+        ParticipationStatus.REVOKED: "bg-warning-lighter text-warning",
+        ParticipationStatus.EXCUSED: "bg-warning-lighter text-warning",
+        ParticipationStatus.NOSHOW: "bg-danger-lighter text-danger",
+    }[status]
+
+
+@register.simple_tag
+def participation_status_badge(status, start_at, *, extra_classes="badge-sm"):
+    return format_html(
+        '<span class="badge {} rounded-pill {}">{}</span>',
+        extra_classes,
+        _participation_status_classes(status, start_at),
+        _participation_status_label(status, start_at),
+    )

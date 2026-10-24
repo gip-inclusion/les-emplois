@@ -1,15 +1,24 @@
+import dataclasses
+import datetime
+import logging
 import uuid
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
 from itou.rdv_insertion.enums import (
+    RSA_MOTIF_CATEGORY_TYPES,
+    AppointmentCreatedBy,
+    AppointmentLocationType,
     InvitationRequestReasonCategory,
     InvitationStatus,
     InvitationType,
+    MotifCategoryType,
     ParticipationStatus,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class InvitationRequest(models.Model):
@@ -162,22 +171,6 @@ class Participation(models.Model):
         verbose_name = "participation à un événement RDV-I"
         verbose_name_plural = "participations aux événements RDV-I"
 
-    def get_status_display(self):
-        if self.status == self.Status.UNKNOWN:
-            if self.appointment.start_at > timezone.now():
-                return "RDV à venir"
-            return "Statut du RDV à préciser"
-        return self._get_FIELD_display(field=self._meta.get_field("status"))
-
-    def get_status_class_name(self):
-        return {
-            self.Status.UNKNOWN: "bg-important-lightest text-important",
-            self.Status.SEEN: "bg-success-lighter text-success",
-            self.Status.REVOKED: "bg-warning-lighter text-warning",
-            self.Status.EXCUSED: "bg-warning-lighter text-warning",
-            self.Status.NOSHOW: "bg-danger-lighter text-danger",
-        }.get(self.status)
-
 
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -213,3 +206,91 @@ class WebhookEvent(models.Model):
     @property
     def for_invitation(self):
         return self.body["meta"]["model"].lower() == "invitation"
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class AppointmentAgentData:
+    first_name: str | None
+    last_name: str | None
+    email: str
+
+    def get_full_name(self):
+        full_name = f"{(self.first_name or '').strip().title()} {(self.last_name or '').upper()}"
+        return full_name.strip()
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class JobSeekerAppointmentData:
+    """A job seeker's appointment, from rdv-insertion's API or the invitation experiment. Not stored."""
+
+    rdv_insertion_id: int
+    status: ParticipationStatus
+    start_at: datetime.datetime
+    theme: str
+    reason: str
+    organization_name: str
+    location_type: AppointmentLocationType | None
+    location_name: str | None
+    address: str | None
+    agents: tuple[AppointmentAgentData, ...]
+    created_by: AppointmentCreatedBy | None
+
+    @classmethod
+    def from_api(cls, participation, *, theme):
+        rdv = participation["rdv"]
+        lieu = rdv["lieu"]
+        return cls(
+            rdv_insertion_id=rdv["id"],
+            status=ParticipationStatus(participation["status"]),
+            start_at=datetime.datetime.fromisoformat(participation["starts_at"]),
+            theme=theme,
+            reason=rdv["motif"]["name"],
+            organization_name=rdv["organisation"]["name"],
+            location_type=AppointmentLocationType(rdv["motif"]["location_type"]),
+            location_name=lieu["name"] if lieu else None,
+            address=lieu["address"] if lieu else rdv["address"],
+            agents=tuple(
+                AppointmentAgentData(
+                    first_name=agent["first_name"], last_name=agent["last_name"], email=agent["email"]
+                )
+                for agent in rdv["agents"]
+            ),
+            created_by=AppointmentCreatedBy(participation["created_by"]),
+        )
+
+    @classmethod
+    def list_from_api(cls, follow_ups):
+        """Appointments of the RSA follow-ups returned by rdv-insertion's API."""
+        try:
+            return [
+                cls.from_api(
+                    participation, theme=MotifCategoryType(follow_up["motif_category"]["motif_category_type"]).label
+                )
+                for follow_up in follow_ups
+                # SIAE appointments are only shown when stored by the invitation experiment,
+                # the only source that links them to their company
+                if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
+                for participation in follow_up["participations"]
+            ]
+        except KeyError, TypeError, ValueError:
+            logger.exception("Unexpected rdv-insertion data")
+            return []
+
+    @classmethod
+    def from_stored_participation(cls, participation):
+        appointment = participation.appointment
+        location = appointment.location
+        return cls(
+            rdv_insertion_id=appointment.rdv_insertion_id,
+            status=ParticipationStatus(participation.status),
+            start_at=appointment.start_at,
+            theme="Suite à une candidature",
+            reason=appointment.reason,
+            organization_name=appointment.company.display_name,
+            location_name=location.name if location else None,
+            address=location.address if location else appointment.address,
+            # Not stored by the invitation experiment
+            location_type=None,
+            agents=(),
+            created_by=None,
+        )
