@@ -25,7 +25,8 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.test
       # Shorten tracebacks to one line per failure to keep the CI logs readable.
       PYTEST_ADDOPTS: --tb=line
-      REDIS_URL: redis://127.0.0.1:6379
+      REDIS_HOST: "127.0.0.1"
+      REDIS_PORT: 6379
       REQUIREMENTS_PATH: requirements/test.txt
     concurrency:
       group: ${{ github.workflow }}-test-${{ matrix.shard }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
