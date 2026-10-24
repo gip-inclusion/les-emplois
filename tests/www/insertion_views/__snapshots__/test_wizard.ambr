@@ -765,7 +765,7 @@
                       <p>
                           Dans le menu déroulant ci-dessous, vous trouverez la liste de vos usagers.
                       </p>
-                      <form class="c-form js-prevent-multiple-submit" method="post">
+                      <form class="js-prevent-multiple-submit" data-create-job-seeker-url="/job-seekers/start?tunnel=orientation&from_url=%2Finsertion%2Fservices%2Ftest-orientation-wizard-uid%2F&service_uid=test-orientation-wizard-uid" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <div class="form-group form-group-input-w-lg-66 form-group-required">
                               <label class="form-label" for="id_job_seeker">
@@ -816,7 +816,7 @@
                       </a>
                   </div>
               </div>
-              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-hand-heart-line">
