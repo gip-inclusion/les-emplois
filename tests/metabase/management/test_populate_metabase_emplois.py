@@ -1278,18 +1278,30 @@ def test_populate_companies(snapshot):
     # both should be ignored in total_members aggregation
     CompanyMembershipFactory(company=company, is_active=False)
     CompanyMembershipFactory(company=company, user__is_active=False)
+    # Companies that are not active are also exported
+    inactive_convention_company = CompanyFactory(kind=CompanyKind.EI, convention__is_active=False)
+    geiq = CompanyFactory(kind=CompanyKind.GEIQ)
+    unsearchable_opcs = CompanyFactory(kind=CompanyKind.OPCS, is_searchable=False)
 
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="companies")
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM structures_v0 ORDER BY id")
+        cursor.execute("SELECT id, type, convention_asp_active FROM structures_v0 ORDER BY id")
+        assert cursor.fetchall() == [
+            (company.pk, "EI", True),
+            (inactive_convention_company.pk, "EI", False),
+            (geiq.pk, "GEIQ", None),
+            (unsearchable_opcs.pk, "OPCS", None),
+        ]
+        cursor.execute("SELECT * FROM structures_v0 WHERE id = %s", [company.pk])
         rows = cursor.fetchall()
         assert rows == [
             (
                 company.pk,
                 company.uid,
                 company.convention.asp_id,
+                True,
                 "ACME Inc.",
                 f"EI - ID {company.pk} - ACME Inc.",
                 "",

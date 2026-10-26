@@ -180,7 +180,7 @@ class Command(BaseCommand):
     def populate_companies(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
-            Company.objects.active()
+            Company.objects.all()
             .select_related("convention", "insee_city")
             .prefetch_related(
                 Prefetch(
@@ -295,6 +295,7 @@ class Command(BaseCommand):
                 "uid",
                 "convention",
                 "convention__asp_id",
+                "convention__is_active",
                 "kind",
                 "brand",  # Company.display_name
                 "name",  # Company.display_name
