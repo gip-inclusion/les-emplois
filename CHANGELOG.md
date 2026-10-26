@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2026-10-26
+
+### Ajouté
+
+- [Institutions : Lister les organisations du territoire des DDETS et DREETS IAE](https://github.com/gip-inclusion/les-emplois/pull/9124)
+- [Metabase : Ajout d'un booléen indiquant si le pro a renseigné un numéro de téléphone](https://github.com/gip-inclusion/les-emplois/pull/9113)
+- [PASS IAE : Empêcher les suspensions à tort grâce aux données ASP](https://github.com/gip-inclusion/les-emplois/pull/9114)
+
+### Modifié
+
+- [Connexion : MàJ login pour la redirection des prescripteurs DORA](https://github.com/gip-inclusion/les-emplois/pull/9074)
+
+### Tech
+
+- [Tech : Ne plus masquer l’erreur réelle derrière "Converter 'siret' is already registered"](https://github.com/gip-inclusion/les-emplois/pull/9137)
+
 ## 2026-10-19
 
 ### Ajouté
