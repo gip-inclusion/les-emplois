@@ -15,7 +15,7 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.db import connection, models, transaction
 from django.db.models import (
     Avg,
@@ -30,7 +30,8 @@ from django.db.models import (
     TextField,
     Value,
 )
-from django.db.models.functions import Concat
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Concat, Greatest, Round
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -41,6 +42,7 @@ from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.emails.utils import get_email_message
 from itou.files.models import File
+from itou.insertion import search as insertion_search
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     GenericReferenceItemKind,
@@ -50,7 +52,6 @@ from itou.insertion.enums import (
     OrientationStatus,
     OrientationTransition,
 )
-from itou.insertion.search import CONCATENATED_ALIASES, CONCATENATED_TOKEN_PREFIX, SINGLE_WORD_ALIASES
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
@@ -284,6 +285,49 @@ class ServiceQuerySet(models.QuerySet):
             .order_by("-is_in_person", "distance", "pk")
         )
 
+    def keyword_search(self, q):
+        """Ranked like data·inclusion's search, on the index built by `update_search_index`."""
+        # Why: typo tolerance as recommended by https://www.postgresql.org/docs/current/pgtrgm.html#PGTRGM-TEXT-SEARCH
+        # Each rare lexeme of `q` is OR-ed with its closest lexicon words, leaning towards frequent ones.
+        # Thresholds come from data·inclusion's data analysis.
+        query = SearchQuery(
+            RawSQL(
+                """
+                (
+                    SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
+                    FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
+                    LEFT JOIN insertion_searchlexeme AS common_word
+                        ON common_word.word = lexeme AND common_word.ndoc >= 100
+                    CROSS JOIN LATERAL (
+                        SELECT string_agg(quote_literal(closest.word), '|') AS variants
+                        FROM (
+                            SELECT word
+                            FROM insertion_searchlexeme
+                            WHERE common_word.word IS NULL AND length(lexeme) >= 4 AND word %% lexeme
+                            ORDER BY similarity(word, lexeme) + 0.05 * ln(ndoc + 1) DESC
+                            LIMIT 4
+                        ) AS closest
+                    ) AS expansion
+                )
+                """,
+                [q],
+            ),
+            config="simple",
+            search_type="raw",
+        )
+        rank = SearchRank(F("search_vector"), query, normalization=32, cover_density=True)
+        if " " in q.strip():
+            concatenated_query = SearchQuery(insertion_search.concatenated_token(q), config="simple")
+            rank = Greatest(
+                rank, SearchRank(F("search_vector"), concatenated_query, normalization=32, cover_density=True)
+            )
+            query |= concatenated_query
+        return (
+            self.filter(search_vector=query)
+            .annotate(search_score=Round(rank, 2))
+            .order_by(Round(F("search_score") * 10).desc(), F("score_qualite").desc(), "pk")
+        )
+
     @transaction.atomic
     def update_search_index(self):
         """Weighted like data·inclusion's `build_search_index`."""
@@ -296,7 +340,7 @@ class ServiceQuerySet(models.QuerySet):
                         text=Concat(
                             "genericreferenceitem__label",
                             Value(" "),
-                            _aliases(SINGLE_WORD_ALIASES),
+                            _aliases(insertion_search.SINGLE_WORD_ALIASES),
                             output_field=TextField(),
                         )
                     )
@@ -305,7 +349,11 @@ class ServiceQuerySet(models.QuerySet):
                 config="french_unaccent",
                 weight="A",
             )
-            + SearchVector(_joined(thematics.values(text=_aliases(CONCATENATED_ALIASES))), config="simple", weight="A")
+            + SearchVector(
+                _joined(thematics.values(text=_aliases(insertion_search.CONCATENATED_ALIASES))),
+                config="simple",
+                weight="A",
+            )
             + SearchVector(
                 _joined(
                     Structure.reseaux_porteurs.through.objects.filter(structure=OuterRef("structure")).values(
@@ -337,7 +385,7 @@ class ServiceQuerySet(models.QuerySet):
                 SELECT word, ndoc FROM ts_stat('SELECT search_vector FROM insertion_service WHERE is_active')
                 WHERE word NOT LIKE %(prefix)s
                 """,
-                {"prefix": f"{CONCATENATED_TOKEN_PREFIX}%"},
+                {"prefix": f"{insertion_search.CONCATENATED_TOKEN_PREFIX}%"},
             )
 
 
