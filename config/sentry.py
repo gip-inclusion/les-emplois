@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import re
@@ -14,6 +15,7 @@ from sentry_sdk.scrubber import DEFAULT_DENYLIST, DEFAULT_PII_DENYLIST
 from itou.utils.redaction import (
     ANONYMOUS_USER_ID,
     REDACTED,
+    can_hold_personal_data,
     redact_keyed_values,
     redact_personal_data,
     redact_query_values,
@@ -136,7 +138,9 @@ _SENSITIVE_NAMES = (
     SENSITIVE_API_PARAMETERS | SENSITIVE_API_RESPONSE_FIELDS | SENSITIVE_VARIABLE_NAMES | SENSITIVE_CREDENTIAL_NAMES
 )
 _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
-_SENSITIVE_FRAGMENTS = SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS
+_SENSITIVE_FRAGMENTS_RE = re.compile(
+    "|".join(re.escape(fragment) for fragment in sorted(SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS))
+)
 # What `EventScrubber` used to match before `data_collection` disabled it, whole keys only
 _SDK_DENYLIST = frozenset(key.lower() for key in DEFAULT_DENYLIST + DEFAULT_PII_DENYLIST)
 
@@ -177,6 +181,8 @@ EVENT_PII_FREE_KEYS = [
 ]
 
 
+# The keys repeat heavily, from one span or one frame to the next
+@functools.lru_cache(maxsize=4096)
 def _is_sensitive_key(key):
     """Whether a mapping key, a variable name or a query parameter names something private.
 
@@ -189,11 +195,7 @@ def _is_sensitive_key(key):
     key = key.lower()
     if key in NON_SENSITIVE_KEYS:
         return False
-    return (
-        key in _SENSITIVE_NAMES_LOWER
-        or key in _SDK_DENYLIST
-        or any(fragment in key for fragment in _SENSITIVE_FRAGMENTS)
-    )
+    return key in _SENSITIVE_NAMES_LOWER or key in _SDK_DENYLIST or bool(_SENSITIVE_FRAGMENTS_RE.search(key))
 
 
 def _scrub_dict_value(key, value):
@@ -218,6 +220,8 @@ def scrub_sensitive_data(value):
     """
     match value:
         case str():
+            if not can_hold_personal_data(value):
+                return value
             value = redact_personal_data(value)
             # Catches the query strings that `redact_personal_data` misses because no `https://host`
             # precedes them, such as our own request's `query_string` or a relative

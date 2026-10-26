@@ -55,6 +55,8 @@ _URL_WITH_QUERY_RE = re.compile(r"(?P<base>https?://[^\s'\"?]+\?)(?P<query>[^\s'
 # Wherever it appears: in a log message, in the path of a URL (Brevo addresses a contact as
 # /v3/contacts/someone@example.com), percent-encoded or not
 _EMAIL_RE = re.compile(r"[\w.+%-]+(?:@|%40)(?:[\w-]+\.)+[A-Za-z]{2,}")
+# Every pattern of this module needs one of these to match, so a text holding none is left as is
+_REDACTABLE_RE = re.compile(r"""[=@]|%40|['"]:""")
 
 
 def redact_query_params(url):
@@ -105,6 +107,17 @@ def redact_keyed_values(text, is_sensitive):
         return match[0]
 
     return KEYED_VALUE_RE.sub(redact, text)
+
+
+def can_hold_personal_data(text):
+    """Whether `text` holds a character that one of the patterns of this module needs.
+
+    A cheap test, which lets a caller scrubbing many strings skip most of them.
+
+    Example:
+        `GET /api/v1/jobs` ➜ `False`, `nom=Dupont` ➜ `True`
+    """
+    return bool(_REDACTABLE_RE.search(text))
 
 
 def redact_query_values_by_default(query_string):
