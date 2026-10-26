@@ -233,6 +233,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."search_vector",
                  "insertion_service"."extra"
           FROM "insertion_orientation"
           INNER JOIN "users_user" ON ("insertion_orientation"."beneficiary_id" = "users_user"."id")

@@ -266,6 +266,7 @@
     "ADDED item key=('dora--blacklisted-service',) data=['updated_on']",
     "ADDED item key=('dora--allowed-service-structure-no-email',) data=['updated_on']",
     'SUMMARY Service current_collection_keys_count=0 comparative_collection_keys_count=7 common_keys_count=0 added_keys_count=7 updated_keys_count=0 removed_keys_count=0',
+    'Updating services search index',
     'Setting transaction to be rollback as wet_run=False',
   ])
 # ---
@@ -298,11 +299,12 @@
     'Importing services',
     'HTTP Request: GET https://api.data.inclusion.gouv.fr/api/v1/services?sources=action-logement&sources=agefiph&sources=carif-oref&sources=cd35&sources=dora&sources=france-travail&sources=fredo&sources=ma-boussole-aidants&sources=mediation-numerique&sources=mes-aides&sources=mission-locale&sources=monenfant&sources=reseau-alpha&sources=soliguide&extra=true&page=1&size=1000 "HTTP/1.1 200 OK"',
     'SUMMARY Service current_collection_keys_count=7 comparative_collection_keys_count=7 common_keys_count=7 added_keys_count=0 updated_keys_count=0 removed_keys_count=0',
+    'Updating services search index',
   ])
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 60,
+    'num_queries': 65,
     'queries': list([
       dict({
         'origin': list([
@@ -1034,8 +1036,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1082,8 +1085,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1130,8 +1134,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1349,8 +1354,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1447,8 +1453,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1537,8 +1544,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1635,8 +1643,9 @@
                                            "is_active",
                                            "created_at",
                                            "updated_at",
+                                           "search_vector",
                                            "extra")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1703,6 +1712,102 @@
           SET "is_active" = %s
           WHERE NOT "insertion_service"."is_active"
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceQuerySet.update_search_index[insertion/models.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_service"
+          SET "search_vector" = (((setweight(to_tsvector(%s::regconfig, COALESCE(array_to_string(ARRAY
+                                                                                                   (SELECT (COALESCE(U2."label", %s) || COALESCE((COALESCE(%s, %s) || COALESCE(jsonb_extract_path_text(%s, U2."value"), %s)), %s)) AS "text"
+                                                                                                    FROM "insertion_service_thematics" U0
+                                                                                                    INNER JOIN "insertion_genericreferenceitem" U2 ON (U0."genericreferenceitem_id" = U2."id")
+                                                                                                    WHERE U0."service_id" = ("insertion_service"."id")
+                                                                                                    ORDER BY RANDOM() ASC), %s), %s) || ' ' || COALESCE("insertion_service"."name", %s)), %s) || setweight(to_tsvector(%s::regconfig, COALESCE(array_to_string(ARRAY
+                                                                                                                                                                                                                                                                 (SELECT jsonb_extract_path_text(%s, U2."value") AS "text"
+                                                                                                                                                                                                                                                                  FROM "insertion_service_thematics" U0
+                                                                                                                                                                                                                                                                  INNER JOIN "insertion_genericreferenceitem" U2 ON (U0."genericreferenceitem_id" = U2."id")
+                                                                                                                                                                                                                                                                  WHERE U0."service_id" = ("insertion_service"."id")
+                                                                                                                                                                                                                                                                  ORDER BY RANDOM() ASC), %s), %s)), %s)) || setweight(to_tsvector(%s::regconfig, COALESCE(array_to_string(ARRAY
+                                                                                                                                                                                                                                                                                                                                                                             (SELECT U2."label" AS "genericreferenceitem__label"
+                                                                                                                                                                                                                                                                                                                                                                              FROM "insertion_structure_reseaux_porteurs" U0
+                                                                                                                                                                                                                                                                                                                                                                              INNER JOIN "insertion_genericreferenceitem" U2 ON (U0."genericreferenceitem_id" = U2."id")
+                                                                                                                                                                                                                                                                                                                                                                              WHERE U0."structure_id" = ("insertion_service"."structure_id")
+                                                                                                                                                                                                                                                                                                                                                                              ORDER BY RANDOM() ASC), %s), %s) || ' ' || COALESCE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                    (SELECT U0."name" AS "name"
+                                                                                                                                                                                                                                                                                                                                                                                                                                     FROM "insertion_structure" U0
+                                                                                                                                                                                                                                                                                                                                                                                                                                     WHERE U0."id" = ("insertion_service"."structure_id")
+                                                                                                                                                                                                                                                                                                                                                                                                                                     ORDER BY RANDOM() ASC), %s) || ' ' || COALESCE("insertion_service"."description", %s) || ' ' || COALESCE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (SELECT U0."description" AS "description"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 FROM "insertion_structure" U0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE U0."id" = ("insertion_service"."structure_id")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ORDER BY RANDOM() ASC), %s)), %s)) || setweight(to_tsvector(%s::regconfig, COALESCE(array_to_string(ARRAY
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       (SELECT U2."label" AS "genericreferenceitem__label"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        FROM "insertion_service_publics" U0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        INNER JOIN "insertion_genericreferenceitem" U2 ON (U0."genericreferenceitem_id" = U2."id")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        WHERE U0."service_id" = ("insertion_service"."id")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ORDER BY RANDOM() ASC), %s), %s) || ' ' || COALESCE("insertion_service"."publics_details", %s)), %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ServiceQuerySet.update_search_index[insertion/models.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "insertion_searchlexeme"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ServiceQuerySet.update_search_index[insertion/models.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          
+          INSERT INTO insertion_searchlexeme (word, ndoc)
+          SELECT word,
+                 ndoc
+          FROM ts_stat('SELECT search_vector FROM insertion_service WHERE is_active')
+          WHERE word NOT LIKE %(prefix)s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1995,5 +2100,6 @@
     "ADDED item key=('dora--blacklisted-service',) data=['updated_on']",
     "ADDED item key=('dora--allowed-service-structure-no-email',) data=['updated_on']",
     'SUMMARY Service current_collection_keys_count=0 comparative_collection_keys_count=7 common_keys_count=0 added_keys_count=7 updated_keys_count=0 removed_keys_count=0',
+    'Updating services search index',
   ])
 # ---

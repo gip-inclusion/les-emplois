@@ -12,9 +12,25 @@ from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.db.models import Avg, BooleanField, Exists, F, OuterRef, Q, Value
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.db import connection, models, transaction
+from django.db.models import (
+    Avg,
+    BooleanField,
+    Exists,
+    F,
+    Func,
+    JSONField,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    Value,
+)
+from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -34,6 +50,7 @@ from itou.insertion.enums import (
     OrientationStatus,
     OrientationTransition,
 )
+from itou.insertion.search import CONCATENATED_ALIASES, CONCATENATED_TOKEN_PREFIX, SINGLE_WORD_ALIASES
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
@@ -267,6 +284,75 @@ class ServiceQuerySet(models.QuerySet):
             .order_by("-is_in_person", "distance", "pk")
         )
 
+    @transaction.atomic
+    def update_search_index(self):
+        """Weighted like data·inclusion's `build_search_index`."""
+        thematics = self.model.thematics.through.objects.filter(service=OuterRef("pk"))
+        structure = Structure.include_inactive.filter(pk=OuterRef("structure"))
+        self.update(
+            search_vector=SearchVector(
+                _joined(
+                    thematics.values(
+                        text=Concat(
+                            "genericreferenceitem__label",
+                            Value(" "),
+                            _aliases(SINGLE_WORD_ALIASES),
+                            output_field=TextField(),
+                        )
+                    )
+                ),
+                "name",
+                config="french_unaccent",
+                weight="A",
+            )
+            + SearchVector(_joined(thematics.values(text=_aliases(CONCATENATED_ALIASES))), config="simple", weight="A")
+            + SearchVector(
+                _joined(
+                    Structure.reseaux_porteurs.through.objects.filter(structure=OuterRef("structure")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                Subquery(structure.values("name")),
+                "description",
+                Subquery(structure.values("description")),
+                config="french_unaccent",
+                weight="B",
+            )
+            + SearchVector(
+                _joined(
+                    self.model.publics.through.objects.filter(service=OuterRef("pk")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                "publics_details",
+                config="french_unaccent",
+                weight="C",
+            )
+        )
+        SearchLexeme.objects.all().delete()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO insertion_searchlexeme (word, ndoc)
+                SELECT word, ndoc FROM ts_stat('SELECT search_vector FROM insertion_service WHERE is_active')
+                WHERE word NOT LIKE %(prefix)s
+                """,
+                {"prefix": f"{CONCATENATED_TOKEN_PREFIX}%"},
+            )
+
+
+def _joined(queryset):
+    return Func(ArraySubquery(queryset), Value(" "), function="array_to_string", output_field=TextField())
+
+
+def _aliases(aliases_by_thematic):
+    return Func(
+        Value(aliases_by_thematic, output_field=JSONField()),
+        "genericreferenceitem__value",
+        function="jsonb_extract_path_text",
+        output_field=TextField(),
+    )
+
 
 class ServiceManager(models.Manager.from_queryset(ServiceQuerySet)):
     def get_queryset(self):
@@ -396,6 +482,8 @@ class Service(GeolocatedAddressMixin, models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
+    search_vector = SearchVectorField(null=True)  # Updated by ServiceQuerySet.update_search_index().
+
     # Opaque data·inclusion payload (`GET /services?extra=true`), outside the v1 schema.
     # DORA currently sends funding_labels, online_form, and forms: [{name, url}]
     # where url is a DORA S3 object key (e.g. production/<uuid>/file.pdf), not an HTTP URL.
@@ -455,6 +543,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         verbose_name = "service d'insertion"
         verbose_name_plural = "services d'insertion"
         base_manager_name = "include_inactive"
+        indexes = [GinIndex(fields=["search_vector"])]
 
     def __str__(self):
         return self.uid
@@ -474,6 +563,20 @@ class Service(GeolocatedAddressMixin, models.Model):
     @property
     def is_local(self):
         return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
+
+
+class SearchLexeme(models.Model):
+    """Words of the services search index, used to correct typos in searches."""
+
+    word = models.CharField(verbose_name="mot", primary_key=True)
+    ndoc = models.PositiveIntegerField(verbose_name="nombre de services")
+
+    class Meta:
+        verbose_name = "mot de l'index de recherche"
+        indexes = [GinIndex(fields=["word"], name="%(class)s_word_gin", opclasses=["gin_trgm_ops"])]
+
+    def __str__(self):
+        return self.word
 
 
 class MobilizationEventManager(models.Manager):
