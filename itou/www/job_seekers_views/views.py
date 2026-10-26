@@ -156,7 +156,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
 
     @cached_property
     def appointments(self):
-        return get_job_seeker_appointments(self.request, self.object)
+        return _get_job_seeker_appointments(self.request, self.object)
 
     def get_context_data(self, **kwargs):
         fallback_back_url = (
@@ -480,7 +480,7 @@ def appointment_details(
 ):
     job_seeker = get_object_or_404(User, kind=UserKind.JOB_SEEKER, public_id=public_id)
     appointment = next(
-        (a for a in get_job_seeker_appointments(request, job_seeker) if a.rdv_insertion_id == rdv_insertion_id), None
+        (a for a in _get_job_seeker_appointments(request, job_seeker) if a.rdv_insertion_id == rdv_insertion_id), None
     )
     if appointment is None:
         raise Http404
@@ -495,7 +495,7 @@ def appointment_details(
     return render(request, template_name, context)
 
 
-def get_job_seeker_appointments(request, job_seeker):
+def _get_job_seeker_appointments(request, job_seeker):
     """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
     if can_view_external_actions(job_seeker, request):
         api_appointments = JobSeekerAppointmentData.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
@@ -581,7 +581,7 @@ def job_seeker_overview(request, public_id, template_name="job_seekers_views/ove
         "can_view_external_job_applications": can_view_external_actions(job_seeker, request),
         "matomo_custom_title": "Synthèse usager",
         "show_overview_tab": True,
-        "show_appointments_tab": bool(get_job_seeker_appointments(request, job_seeker)),
+        "show_appointments_tab": bool(_get_job_seeker_appointments(request, job_seeker)),
         "has_applied_for_job_seeker": has_applied_for_job_seeker,
         "suspension": None,  # Not handled yet
         "prolongation": None,  # Not handled yet
