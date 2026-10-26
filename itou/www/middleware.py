@@ -1,3 +1,4 @@
+import weakref
 from math import ceil
 
 import sentry_sdk
@@ -13,7 +14,55 @@ from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
 from itou.utils.legal_terms import terms_acceptance_required
+from itou.utils.logging import current_organization_info
+from itou.utils.redaction import ANONYMOUS_USER_ID
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
+
+
+def sentry_user_id(get_response):
+    """Attach the ID of the current user (and nothing else about them) to Sentry events.
+
+    The user is read when the event is built rather than when the request comes in: the API
+    authenticates inside the view, long after this middleware ran, and hijack and
+    `AutoLoginMiddleware` replace `request.user` along the way. So this middleware does not
+    need `request.user` to exist yet, and comes first to cover the errors of every other one.
+    So the lookup has no ordering constraint: this middleware comes first and covers the
+    errors of every other one.
+    """
+
+    def middleware(request):
+        # weak reference so the processor, which Sentry keeps on its scope, doesn't keep the request alive
+        # after the response: the processor then returns the event untouched if the request is gone
+        weak_request = weakref.ref(request)
+
+        def user_id_event_processor(event, _hint):
+            request = weak_request()
+            if request is None:
+                return event
+            user = getattr(request, "user", None)
+            if user is None or not user.is_authenticated:
+                user_id = ANONYMOUS_USER_ID
+            elif user.pk is None:
+                # itou.api.auth.ServiceAccount is authenticated by token, without a database row
+                user_id = "api_service_account"
+            else:
+                user_id = str(user.pk)
+            event["user"] = {"id": user_id}
+            # The facts `ItouDataDogJSONFormatter` already records as `usr.kind` and
+            # `usr.organization_id`: they say who ran into the error without naming anyone
+            tags = event.setdefault("tags", {})
+            if kind := getattr(user, "kind", None):
+                tags["user_kind"] = kind
+            tags.update({key: str(value) for key, value in current_organization_info(request).items()})
+            return event
+
+        # The isolation scope is forked for each request by the SDK's WSGI middleware,
+        # so this processor does not leak to the next one
+        # https://docs.sentry.io/platforms/python/enriching-events/event-processors/
+        sentry_sdk.get_isolation_scope().add_event_processor(user_id_event_processor)
+        return get_response(request)
+
+    return middleware
 
 
 def never_cache(get_response):

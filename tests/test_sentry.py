@@ -9,6 +9,12 @@ import pytest
 import respx
 import sentry_sdk
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
+from django.http import HttpResponseServerError
+from django.urls import include, path
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.test import APIClient
+from rest_framework.views import APIView
 from sentry_sdk.utils import AnnotatedValue, iter_event_frames
 
 from config.sentry import (
@@ -17,14 +23,19 @@ from config.sentry import (
     _is_sensitive_key,
     scrub_sensitive_data,
 )
+from itou.api.auth import ServiceTokenAuthentication
+from itou.api.models import ServiceToken
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
+from itou.nexus.enums import Service
+from itou.users.enums import UserKind
 from itou.utils.apis import api_particulier
 from itou.utils.apis.france_travail_agent import get_user_data
 from itou.utils.apis.geocoding import call_ban_geocoding_api
 from itou.utils.apis.pole_emploi import Endpoints, PoleEmploiAPIException, PoleEmploiRoyaumePartenaireApiClient
 from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
-from itou.utils.redaction import REDACTED
+from itou.utils.redaction import ANONYMOUS_USER_ID, REDACTED
+from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -45,7 +56,7 @@ API_PARAMETER_SPELLINGS = frozenset(
 
 @pytest.fixture(name="clean_sentry_scope")
 def clean_sentry_scope_fixture():
-    """Isolate the test from the breadcrumbs left behind by the previous ones.
+    """Isolate the test from the breadcrumbs and event processors left behind by the previous ones.
 
     The SDK keeps its scopes for the whole process, and an event is built from the
     breadcrumbs of the isolation scope *and* of the current one. Without forking
@@ -56,6 +67,9 @@ def clean_sentry_scope_fixture():
     with sentry_sdk.isolation_scope() as isolation_scope, sentry_sdk.new_scope() as scope:
         for forked_scope in (isolation_scope, scope):
             forked_scope.clear()  # clear the entire scope, including breadcrumbs, tags, extras, etc.
+            # `clear()` keeps the event processors. The test client bypasses the per-request fork
+            # of the SDK, so those added by `sentry_user_id` in earlier tests are still there
+            forked_scope._event_processors.clear()
         yield
 
 
@@ -454,3 +468,98 @@ def test_log_event_keeps_its_message_template(captured_event):
     event = captured_event()
     assert event["logentry"]["message"] == "Request failed for %s"
     assert "TARDIVEAU" not in event_payload(event)
+
+
+@login_not_required
+def boom_view(request):
+    raise RuntimeError("boom")
+
+
+class BoomAPIView(APIView):
+    authentication_classes = [ServiceTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        raise RuntimeError("boom")
+
+
+@login_not_required
+def boom_error_view(request):
+    # The real 500 page renders `layout/base.html`, which this URLconf has no context for.
+    return HttpResponseServerError("boom")
+
+
+# `ROOT_URLCONF` points at this module in the tests below, which need a view that fails. The real
+# URLs are included as well: some middlewares reverse them on every request, such as
+# `itou.audit_trail.middleware.browser_id_cookie`.
+urlpatterns = [
+    path("boom", boom_view),
+    path("boom-api", BoomAPIView.as_view()),
+    path("", include("config.urls")),
+]
+handler500 = boom_error_view
+
+
+@pytest.fixture(name="failing_urlconf")
+def failing_urlconf_fixture(settings, client):
+    settings.ROOT_URLCONF = __name__
+    # Without this, the test client re-raises the exception before the assertions run
+    client.raise_request_exception = False
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_only_the_user_id_is_reported_for_an_authenticated_user(client, captured_event):
+    """An error names the user by ID, never by identity."""
+    job_seeker = JobSeekerFactory(first_name="Jean-Michel", last_name="Tardiveau")
+    client.force_login(job_seeker)
+
+    client.get("/boom")
+
+    event = captured_event()
+    assert event["user"] == {"id": str(job_seeker.pk)}
+    payload = event_payload(event)
+    for pii in [job_seeker.email, job_seeker.first_name, job_seeker.last_name]:
+        assert pii.upper() not in payload.upper()
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_user_kind_and_organization_are_reported_as_tags(client, captured_event):
+    """They say who ran into the error without naming anyone, as the logs already do."""
+    membership = CompanyMembershipFactory()
+    client.force_login(membership.user)
+
+    client.get("/boom")
+
+    event = captured_event()
+    assert event["user"] == {"id": str(membership.user.pk)}
+    assert event["tags"]["user_kind"] == UserKind.PROFESSIONAL
+    assert event["tags"]["organization_type"] == "companies.Company"
+    assert event["tags"]["organization_id"] == str(membership.company_id)
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_anonymous_user_is_reported_as_anonymous(client, captured_event):
+    client.get("/boom")
+
+    assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+def test_error_raised_before_authentication_reports_a_user(client, mocker, captured_event):
+    """The health check answers before `AuthenticationMiddleware` runs, and reports its own errors."""
+    mocker.patch("itou.www.middleware.default_storage").exists.side_effect = OSError("S3 is down")
+
+    response = client.get("/check-health")
+
+    assert response.status_code == 500
+    assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_token_authenticated_request_is_reported_as_an_api_service_account(captured_event):
+    """The API authenticates inside the view: the user is only known once the event is built."""
+    token = ServiceToken.objects.create(service=Service.DATA_INCLUSION)
+    api_client = APIClient(headers={"Authorization": f"Token {token.key}"}, raise_request_exception=False)
+
+    api_client.get("/boom-api")
+
+    assert captured_event()["user"] == {"id": "api_service_account"}

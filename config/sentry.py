@@ -10,6 +10,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.redis import RedisIntegration
 
 from itou.utils.redaction import (
+    ANONYMOUS_USER_ID,
     REDACTED,
     redact_personal_data,
     redact_query_values,
@@ -169,17 +170,14 @@ def scrub_sensitive_data(value):
 
 
 def anonymize_user(event):
-    """Keep the user ID, drop everything else identifying them."""
+    """Reduce the user of an event to its ID.
+
+    `itou.www.middleware.sentry_user_id` only ever sets the ID. This is the safety net, should
+    the SDK or another integration attach more: keeping the ID rather than dropping known keys
+    also drops `name`, `geo`, `segment` or whatever comes next.
+    """
     if "user" in event:
-        # Unfortunately this does not work for the IP address
-        # which keeps appearing. ¯\_(ツ)_/¯
-        keys_to_delete_if_present = ["email", "username", "ip_address"]
-        for key in keys_to_delete_if_present:
-            if key in event["user"]:
-                del event["user"][key]
-        # Identify clearly users who have not logged in.
-        if "id" not in event["user"]:
-            event["user"]["id"] = "anonymous"
+        event["user"] = {"id": event["user"].get("id", ANONYMOUS_USER_ID)}
 
 
 def _failed_scrubbing_event():
