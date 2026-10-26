@@ -15,7 +15,7 @@ SEARCH_URL = "https://rdv-insertion.fake/api/plateforme_inclusion/users/search"
 NIR = "285032612345653"
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def rdvi_settings(settings):
     settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_BASE_URL = "https://rdv-insertion.fake/api/plateforme_inclusion/"
     settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = "S3cr3t!"
@@ -28,7 +28,7 @@ def test_improperly_configured(rdvi_settings):
         rdv_insertion.get_client()
 
 
-def test_search_user_by_nir(respx_mock, rdvi_settings):
+def test_search_user_by_nir(respx_mock):
     respx_mock.post(SEARCH_URL, json={"nir": NIR}, headers={"Authorization": "Bearer S3cr3t!"}).respond(
         200, json={"user": {"id": 1, "follow_ups": []}}
     )
@@ -42,12 +42,12 @@ def test_search_user_by_nir(respx_mock, rdvi_settings):
         (409, "Plusieurs usagers correspondent à ce NIR"),
     ],
 )
-def test_search_user_by_nir_not_found_or_several(respx_mock, rdvi_settings, status_code, error):
+def test_search_user_by_nir_not_found_or_several(respx_mock, status_code, error):
     respx_mock.post(SEARCH_URL).respond(status_code, json={"errors": [error]})
     assert rdv_insertion.get_client().search_user_by_nir(NIR) is None
 
 
-def test_search_user_by_nir_errors(respx_mock, rdvi_settings):
+def test_search_user_by_nir_errors(respx_mock):
     client = rdv_insertion.get_client()
 
     respx_mock.post(SEARCH_URL).mock(side_effect=httpx.ReadTimeout)
@@ -75,7 +75,7 @@ def test_search_user_by_nir_errors(respx_mock, rdvi_settings):
         (404, {"errors": ["Aucun usager ne correspond à ce NIR"]}, [], datetime.timedelta(days=1)),
     ],
 )
-def test_get_follow_ups_is_cached(respx_mock, rdvi_settings, status_code, body, expected_follow_ups, expected_ttl):
+def test_get_follow_ups_is_cached(respx_mock, status_code, body, expected_follow_ups, expected_ttl):
     job_seeker = JobSeekerFactory(jobseeker_profile__nir=NIR)
     route = respx_mock.post(SEARCH_URL).respond(status_code, json=body)
 
@@ -89,12 +89,12 @@ def test_get_follow_ups_is_cached(respx_mock, rdvi_settings, status_code, body, 
     assert route.call_count == 1
 
 
-def test_get_follow_ups_without_nir(respx_mock, rdvi_settings):
+def test_get_follow_ups_without_nir(respx_mock):
     # No route: any request to rdv-insertion would fail the test
     assert rdv_insertion.get_follow_ups(JobSeekerFactory(jobseeker_profile__nir="")) == []
 
 
-def test_get_follow_ups_when_rdv_insertion_is_unavailable(respx_mock, rdvi_settings, caplog):
+def test_get_follow_ups_when_rdv_insertion_is_unavailable(respx_mock, caplog):
     route = respx_mock.post(SEARCH_URL).respond(500)
     job_seeker = JobSeekerFactory(jobseeker_profile__nir=NIR)
 
@@ -112,7 +112,7 @@ def test_get_follow_ups_when_rdv_insertion_is_unavailable(respx_mock, rdvi_setti
     assert route.call_count == 2
 
 
-def test_get_follow_ups_after_nir_correction(respx_mock, rdvi_settings):
+def test_get_follow_ups_after_nir_correction(respx_mock):
     route = respx_mock.post(SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
     job_seeker = JobSeekerFactory(jobseeker_profile__nir=NIR)
     assert rdv_insertion.get_follow_ups(job_seeker) == RDV_INSERTION_USER_SEARCH_BODY["user"]["follow_ups"]
