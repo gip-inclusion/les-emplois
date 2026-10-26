@@ -1,11 +1,9 @@
 import logging
 
-import httpx
-from django.conf import settings
 from django_datadog_logger.formatters.datadog import get_wsgi_request_user
 from itoutils.django.logging import DataDogJSONFormatter
 
-from itou.utils.redaction import REDACTED, redact_query_params
+from itou.utils.redaction import redact_personal_data
 
 
 logger = logging.getLogger(__name__)
@@ -15,6 +13,15 @@ NO_RECURSIVE_LOG_FLAG = "_no_recursive_log_flag"
 
 
 class ItouDataDogJSONFormatter(DataDogJSONFormatter):
+    # The entries most likely to quote an outgoing URL or an email address. Not exhaustive, but much
+    # cheaper than redacting every nested string of the entry
+    # See also django_datadog_logger/formatters/datadog.py
+    REDACTED_LOG_KEYS = ["message", "error.message", "error.stack"]
+
+    def __init__(self, *args, redact=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.redact = redact
+
     def json_record(self, message, extra, record):
         log_entry_dict = super().json_record(message, extra, record)
         wsgi_request = self.get_wsgi_request()
@@ -42,24 +49,18 @@ class ItouDataDogJSONFormatter(DataDogJSONFormatter):
             if session := getattr(wsgi_request, "session", None):
                 if hijack_history := session.get("hijack_history", []):
                     log_entry_dict["usr.hijack_history"] = hijack_history
+        if self.redact:
+            self._redact_entry(log_entry_dict)
         return log_entry_dict
 
+    def _redact_entry(self, log_entry_dict):
+        """Redact the email addresses and the query strings of the outgoing URLs of a log entry.
 
-class HTTPXFilter(logging.Filter):
-    def filter(self, record):
-        new_args = []
-        for arg in record.args:
-            # We could add more sensitive urls to redact: add them here
-            # In the future, we might want to parametrize this filter but YAGNI
-
-            if isinstance(arg, httpx.URL):
-                if settings.API_PARTICULIER_BASE_URL and str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
-                    arg = redact_query_params(arg)
-                elif str(arg).startswith(f"{settings.BREVO_API_URL}/contacts/"):
-                    identifier = arg.path.removeprefix("/v3/contacts/")
-                    if "@" in identifier:
-                        # This is an email address, redact it
-                        arg = arg.copy_with(path=f"/v3/contacts/{REDACTED}")
-            new_args.append(arg)
-        record.args = tuple(new_args)
-        return super().filter(record)
+        Done on the output rather than on the record, which a filter would have to rewrite for
+        every handler: the logging integration of Sentry reads the same record afterwards, and
+        groups its events by message template. It also reaches the traceback, which the record
+        only holds as an exception, and a message that is not a string, such as `logger.error(exc)`.
+        """
+        for key in self.REDACTED_LOG_KEYS:
+            if isinstance(value := log_entry_dict.get(key), str):
+                log_entry_dict[key] = redact_personal_data(value)

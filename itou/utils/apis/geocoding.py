@@ -41,6 +41,9 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
     query_string = urlencode(args)
     url = f"{api_url}?{query_string}"
 
+    # TODO: the two messages below quote `url`, whose query string holds the home address and the
+    # post code of the job seeker. This logger writes to the `console_unredacted` handler, so both
+    # are logged in clear: move it to `console` asap
     try:
         r = httpx.get(url).raise_for_status()
     except httpx.HTTPError as e:
