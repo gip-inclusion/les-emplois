@@ -50,6 +50,7 @@ pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
 from config.sentry import sentry_init
 from itou.emails.markdown import known_domains
 from itou.utils import faker_providers
+from itou.utils.brevo import BrevoClient
 from itou.utils.cache import UnclearableCache
 from itou.utils.storage.s3 import (
     NoObjectsInBucket,
@@ -917,6 +918,12 @@ def github_respx_mock_fixture(respx_mock):
 def api_particulier_settings(settings):
     settings.API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/"
     settings.API_PARTICULIER_TOKEN = "test"
+
+
+@pytest.fixture(name="brevo_client")
+def brevo_client_fixture(settings):
+    settings.BREVO_API_KEY = "BREVO_API_KEY"
+    return BrevoClient()
 
 
 @pytest.fixture(name="pro_connect")

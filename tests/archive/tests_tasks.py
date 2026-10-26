@@ -3,7 +3,6 @@ import pytest
 from django.conf import settings
 
 from itou.archive.tasks import async_delete_contact
-from tests.utils.test_brevo import brevo_client_fixture  # noqa: F401
 
 
 @pytest.mark.parametrize("status_code", [204, 404])

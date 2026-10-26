@@ -2,14 +2,8 @@ import httpx
 import pytest
 from django.conf import settings
 
-from itou.utils.brevo import BrevoClient, MalformedResponseException
+from itou.utils.brevo import MalformedResponseException
 from tests.users.factories import JobSeekerFactory
-
-
-@pytest.fixture(name="brevo_client")
-def brevo_client_fixture(settings):
-    settings.BREVO_API_KEY = "BREVO_API_KEY"
-    return BrevoClient()
 
 
 @pytest.fixture(name="mock_httpx_client")
