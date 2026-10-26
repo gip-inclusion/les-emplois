@@ -41,8 +41,9 @@ class MotifCategoryType(models.TextChoices):
     SIAE = "siae", "SIAE"
     AUTRE = "autre", "Autre"
 
-
-RSA_MOTIF_CATEGORY_TYPES = {MotifCategoryType.RSA_ORIENTATION, MotifCategoryType.RSA_ACCOMPAGNEMENT}
+    @classmethod
+    def rsa_types(cls):
+        return {cls.RSA_ORIENTATION, cls.RSA_ACCOMPAGNEMENT}
 
 
 class InvitationRequestReasonCategory(models.TextChoices):

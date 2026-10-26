@@ -7,7 +7,6 @@ from django.conf import settings
 from django.db import models
 
 from itou.rdv_insertion.enums import (
-    RSA_MOTIF_CATEGORY_TYPES,
     AppointmentCreatedBy,
     AppointmentLocationType,
     InvitationRequestReasonCategory,
@@ -269,7 +268,7 @@ class JobSeekerAppointmentData:
                 for follow_up in follow_ups
                 # SIAE appointments are only shown when stored by the invitation experiment,
                 # the only source that links them to their company
-                if follow_up["motif_category"]["motif_category_type"] in RSA_MOTIF_CATEGORY_TYPES
+                if follow_up["motif_category"]["motif_category_type"] in MotifCategoryType.rsa_types()
                 for participation in follow_up["participations"]
             ]
         except KeyError, TypeError, ValueError:
