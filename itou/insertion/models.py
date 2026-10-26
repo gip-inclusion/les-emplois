@@ -389,6 +389,7 @@ class Service(GeolocatedAddressMixin, models.Model):
     )
 
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
+    score_qualite = models.FloatField(verbose_name="score de qualité data·inclusion")
 
     is_active = models.BooleanField(verbose_name="actif", default=True)
 

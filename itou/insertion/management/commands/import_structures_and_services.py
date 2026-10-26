@@ -295,6 +295,7 @@ class Command(BaseCommand):
         service.extra = data.get("extra")
 
         service.updated_on = data["date_maj"]
+        service.score_qualite = data["score_qualite"]
 
         service.save()  # Save to have a PK for ManyToManyField fields
 

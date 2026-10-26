@@ -104,6 +104,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     description = "Description du service."
     contact_email = "contact@email.fake"
     updated_on = datetime.date(2025, 1, 1)
+    score_qualite = 0.5
 
     class Params:
         for_snapshot = factory.Trait(

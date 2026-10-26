@@ -63,6 +63,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         "funding_labels": ["France Travail", "Conseil départemental"],
     }
     assert Service.objects.get(uid="emplois-de-linclusion--null").extra is None
+    assert Service.objects.get(uid="emplois-de-linclusion--null").score_qualite == 0.25
 
     assert (
         Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd").opening_hours
