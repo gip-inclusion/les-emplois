@@ -10,10 +10,13 @@
         {% fragment as c_title__main %}
             <h1>
                 Candidature de
-                {% if with_job_seeker_detail_url|default:False %}
-                    <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</a>
+                {% if request.user.is_job_seeker %}
+                    {% partialdef job_seeker_name inline %}
+                        {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
+                    {% endpartialdef %}
                 {% else %}
-                    {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
+                    <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn-link">{% partial job_seeker_name %}</a>
                 {% endif %}
                 {% job_application_state_badge job_application extra_classes="badge-base" %}
             </h1>

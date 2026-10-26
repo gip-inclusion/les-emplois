@@ -395,7 +395,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "display_refusal_info": display_refusal_info,
         "refused_by": refused_by,
         "refusal_contact_email": refusal_contact_email,
-        "with_job_seeker_detail_url": True,
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
         "last_user_assignment": get_last_assignment(request, job_application.job_seeker),
     }
