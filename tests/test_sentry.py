@@ -10,7 +10,7 @@ from config.sentry import HTTP_QUERY_SENSITIVE_KEYS
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.utils.apis import api_particulier
-from itou.utils.logging import REDACTED
+from itou.utils.redaction import REDACTED
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 
 
