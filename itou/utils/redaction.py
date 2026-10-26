@@ -1,4 +1,4 @@
-"""Redaction helpers shared by the logging filters and the Sentry event scrubbers.
+"""Redaction helpers shared by the logging formatter and the Sentry event scrubbers.
 
 This module must stay free of Django imports: `config.sentry` imports it while
 `config.settings` is still being loaded, before Django is set up.
@@ -62,7 +62,7 @@ def redact_query_values(text, is_sensitive):
     """Replace the value of every query parameter whose key `is_sensitive`, keeping the keys.
 
     Works on a bare query string as well as on free text holding a URL, so that one rule covers
-    the Sentry event and its breadcrumbs.
+    the Sentry event, its breadcrumbs, and the log records.
 
     Example:
         With `is_sensitive` true for `nom` only:
@@ -117,6 +117,9 @@ def redact_urls_in_text(text):
 
 def redact_personal_data(text):
     """Redact the email addresses and the query strings of the outgoing URLs found in `text`.
+
+    The rules that hold for any free text, whatever produced it: a log message, a traceback, or
+    a string of a Sentry event.
 
     Example:
         `Sync of jean@example.com failed: https://api.example.com/search?nom=Dupont`

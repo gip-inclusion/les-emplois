@@ -359,14 +359,16 @@ X_FRAME_OPTIONS = "DENY"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "filters": {
-        "httpx_filter": {"()": "itou.utils.logging.HTTPXFilter"},
-    },
     "formatters": {
+        # Redacts the email addresses and the query strings of outgoing URLs, see `ItouDataDogJSONFormatter`
         "json": {"()": "itou.utils.logging.ItouDataDogJSONFormatter"},
+        "json_unredacted": {"()": "itou.utils.logging.ItouDataDogJSONFormatter", "redact": False},
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "json"},
+        # Same output as `console`, with no redaction. Only for the logger listed below, while
+        # its messages are being reviewed: nothing new should be pointed at it.
+        "console_unredacted": {"class": "logging.StreamHandler", "formatter": "json_unredacted"},
         "null": {"class": "logging.NullHandler"},
     },
     "loggers": {
@@ -397,9 +399,8 @@ LOGGING = {
             # We'll still get the logs since they will propagate to root handlers
             "handlers": ["null"],
         },
-        "httpx": {
-            "filters": ["httpx_filter"],
-        },
+        # TODO: logged in clear on purpose for now, see `itou.utils.apis.geocoding.call_ban_geocoding_api`
+        "itou.utils.apis.geocoding": {"handlers": ["console_unredacted"], "propagate": False},
     },
 }
 

@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 import re
 import urllib.parse
 
@@ -437,3 +438,19 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
 )
 def test_is_sensitive_key(key, expected):
     assert _is_sensitive_key(key) is expected
+
+
+def test_log_event_keeps_its_message_template(captured_event):
+    """Sentry groups the events of a log without a traceback by their message template.
+
+    The console handler redacts its own output and leaves the record alone, so the Sentry logging
+    integration, which reads the same record, still gets the template and its arguments. A redacted
+    message would split the events into one issue per URL.
+    """
+    url = httpx.URL("https://particulier.api.gouv.fr/v3/dss/identite?nomNaissance=TARDIVEAU")
+
+    logging.getLogger("itou.utils.apis.some_client").error("Request failed for %s", url)
+
+    event = captured_event()
+    assert event["logentry"]["message"] == "Request failed for %s"
+    assert "TARDIVEAU" not in event_payload(event)
