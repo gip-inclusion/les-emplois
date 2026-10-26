@@ -29,7 +29,7 @@ from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
-from itou.users.models import IdentityCertification
+from itou.users.models import IdentityCertification, User
 from itou.utils.apis import enums as api_enums
 from itou.utils.apis.pole_emploi import (
     DATE_FORMAT,
@@ -117,6 +117,9 @@ class ApprovalQuerySet(models.QuerySet):
 
     def starts_in_the_future(self):
         return self.filter(Q(start_at__gt=timezone.localdate()))
+
+    def for_job_seekers_assigned_to(self, user, organization):
+        return self.filter(user__in=User.objects.assigned_job_seeker_ids(user, organization, archived=False))
 
     def delete(self, enable_mass_delete=False):
         # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to

@@ -1,7 +1,9 @@
 import logging
 
+from itou.approvals.models import Approval
 from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User
+from itou.utils.perms.prescriber import is_authorized_ft_prescriber
 from itou.utils.tokens import prolongation_derogation_token_generator
 
 
@@ -9,6 +11,25 @@ logger = logging.getLogger(__name__)
 
 PERMS_READ = "read"
 PERMS_READ_AND_WRITE = "read_and_write"
+
+
+def is_ft_prescriber_allowed_to_suspend(request, approval):
+    """Whether the current user is an authorized FT prescriber allowed to suspend the given approval."""
+    return (
+        is_authorized_ft_prescriber(request)
+        and Approval.objects.for_job_seekers_assigned_to(request.user, request.current_organization)
+        .filter(pk=approval.pk)
+        .exists()
+    )
+
+
+def is_ft_prescriber_allowed_to_manage_suspension(request, suspension):
+    """Whether the current user is an authorized FT prescriber allowed to edit/delete the given suspension."""
+    return (
+        is_authorized_ft_prescriber(request)
+        and suspension.prescriber_organization_id == request.current_organization.pk
+        and suspension.is_in_progress
+    )
 
 
 def can_view_approval_details(request, approval):
