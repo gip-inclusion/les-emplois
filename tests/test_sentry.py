@@ -563,3 +563,35 @@ def test_token_authenticated_request_is_reported_as_an_api_service_account(captu
     api_client.get("/boom-api")
 
     assert captured_event()["user"] == {"id": "api_service_account"}
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_submitted_form_values_are_allowlisted(client, captured_event):
+    """The body of a submission is attached to the event whatever `send_default_pii` says.
+
+    Its field names are ours, and they carry an identity far more often than not, so this is the
+    one channel where the values are redacted unless the field is known to name nobody. The names
+    all survive: which fields were submitted, and which were left blank, is the debuggable part.
+    """
+    client.post(
+        "/boom",
+        {
+            "email": "jean-michel@example.com",
+            "nir": "180081380021",
+            "birth_place": "75056",
+            "city": "Paris",
+            "company_id": "42",
+            "pole_emploi_id": "12345678901",  # an `_id`, yet no foreign key
+            "kind": "employer",
+        },
+    )
+
+    assert captured_event()["request"]["data"] == {
+        "email": REDACTED,
+        "nir": REDACTED,
+        "birth_place": REDACTED,
+        "city": REDACTED,
+        "company_id": "42",
+        "pole_emploi_id": REDACTED,
+        "kind": "employer",
+    }

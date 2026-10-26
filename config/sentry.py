@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import traceback
 
 import sentry_sdk
@@ -100,6 +101,22 @@ NON_SENSITIVE_KEYS = {
 _SENSITIVE_NAMES = SENSITIVE_API_PARAMETERS | SENSITIVE_API_RESPONSE_FIELDS | SENSITIVE_VARIABLE_NAMES
 _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
 
+# The only form fields whose value is sent to Sentry, all others being redacted by
+# `scrub_request_data`. Keep it short: forms of this app mostly collect personal data, so only
+# add a field whose value can never describe a person (IDs, pagination, routing, SIRET).
+READABLE_FORM_FIELDS = re.compile(
+    r"""^(
+        (.+_)?u?ids?  # the objects the submission points at
+        | (.+_)?pks?
+        | page
+        | next(_url)?
+        | action | kind | role | status | type
+        | siret
+        | form-(TOTAL|INITIAL|MIN_NUM|MAX_NUM)_FORMS  # what a formset says about its own size
+    )$""",
+    re.VERBOSE | re.IGNORECASE,
+)
+
 PII_SCRUBBING_FAILED = "PII scrubbing failed"
 # Where the scrubbing code lives, and so the frame that says why it failed
 _SCRUBBING_FILES = ("config/sentry.py", "itou/utils/redaction.py")
@@ -169,6 +186,28 @@ def scrub_sensitive_data(value):
     return value
 
 
+def scrub_request_data(event):
+    """Redact the values of a submitted form, keeping its field names.
+
+    Which fields were submitted, and which were left blank, is what makes a failed submission
+    debuggable: their values describe a person far more often than not. So this one channel is
+    the reverse of the denylist used everywhere else, which is only tenable because the field
+    names are ours.
+    """
+    request = event.get("request")
+    if not isinstance(request, dict) or "data" not in request:
+        return
+    data = request["data"]
+    if isinstance(data, dict):
+        request["data"] = {key: value if _is_readable_form_field(key) else REDACTED for key, value in data.items()}
+    elif data:  # A raw body the SDK could not parse, so there is no field name to decide on
+        request["data"] = REDACTED
+
+
+def _is_readable_form_field(key):
+    return isinstance(key, str) and bool(READABLE_FORM_FIELDS.match(key)) and not _is_sensitive_key(key)
+
+
 def anonymize_user(event):
     """Reduce the user of an event to its ID.
 
@@ -232,6 +271,7 @@ def strip_sentry_sensitive_data(event, _hint):
     """
     try:
         anonymize_user(event)
+        scrub_request_data(event)
         return scrub_sensitive_data(event)
     except Exception as exc:
         try:
