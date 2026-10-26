@@ -24,6 +24,12 @@ TABLE.add_columns(
             "comment": "ID de la structure ASP correspondante",
             "fn": lambda o: o.convention.asp_id if o.convention else None,
         },
+        {
+            "name": "convention_asp_active",
+            "type": "boolean",
+            "comment": "Convention ASP active (vide si la structure n'a pas de convention)",
+            "fn": lambda o: o.convention.is_active if o.convention else None,
+        },
         {"name": "nom", "type": "varchar", "comment": "Nom de la structure", "fn": attrgetter("display_name")},
         {
             "name": "nom_complet",
