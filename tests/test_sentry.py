@@ -8,6 +8,7 @@ import httpx
 import pytest
 import respx
 import sentry_sdk
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseServerError
@@ -786,3 +787,19 @@ def test_cookies_are_not_collected(client, captured_event):
     client.get("/boom")
 
     assert "cookies" not in captured_event()["request"]
+
+
+def test_classification_of_the_model_field_names(snapshot):
+    """Whether the value of each model field is redacted from the events.
+
+    The fragments match more than a list of names would, on purpose, and still miss what nobody
+    spelled yet. This makes the classification of a new field show up in review rather than in
+    Sentry: after a `--snapshot-update`, check the lines it added.
+    """
+    names = {
+        name
+        for model in apps.get_models()
+        for field in [*model._meta.concrete_fields, *model._meta.many_to_many]
+        for name in (field.name, field.attname)
+    }
+    assert {name: _is_sensitive_key(name) for name in sorted(names)} == snapshot
