@@ -229,6 +229,7 @@
                  "insertion_service"."contact_phone",
                  "insertion_service"."average_orientation_response_delay_days",
                  "insertion_service"."updated_on",
+                 "insertion_service"."score_qualite",
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",

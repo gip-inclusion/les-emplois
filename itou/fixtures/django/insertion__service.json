@@ -39,6 +39,7 @@
       "receptions": [
         131
       ],
+      "score_qualite": 0.5,
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-technique-en-compensation-du-handicap",
       "structure": 1,
@@ -102,6 +103,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/adrec-clea-numerique-ojwn",
       "structure": 4,
@@ -162,6 +164,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/association-transiti-mediation-numerique",
       "structure": 3,
@@ -218,6 +221,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ctre-formation-appre-dispositif-de-format-jysj",
       "structure": 2,
@@ -286,6 +290,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ecloson-francais-langue-etra",
       "structure": 7,
@@ -349,6 +354,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-pour-droit-a-l-i-sfka-",
       "structure": 5,
@@ -409,6 +415,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ca-pau-bearn-pyrenee-plateforme-devaluati",
       "structure": 6,
@@ -466,6 +473,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ctre-formation-appre-dispositif-de-format-eyvm",
       "structure": 2,
@@ -527,6 +535,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/association-transiti-plateforme-mobilite-",
       "structure": 3,
@@ -590,6 +599,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_32e65fb4-ac9a-49c9-9c8a-b267006fdc25__dora_dora--0c1f1dd9-f5e9-47d7-ac74-56067ad00ba2/details",
       "structure": 8,
@@ -652,6 +662,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_41706857-c31b-435e-8ea9-122f56ac2c5c/details",
       "structure": 9,
@@ -716,6 +727,7 @@
       "receptions": [
         131
       ],
+      "score_qualite": 0.5,
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-aux-deplacements",
       "structure": 10,
@@ -772,6 +784,7 @@
       "receptions": [
         131
       ],
+      "score_qualite": 0.5,
       "source": 229,
       "source_link": "https://www.agefiph.fr/aides-financieres/aide-humaine-en-compensation-du-handicap",
       "structure": 10,
@@ -835,6 +848,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-pour-droit-a-l-i-rdkx-",
       "structure": 15,
@@ -899,6 +913,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/aim-actions-inter-me-auto-ecole-sociale-e",
       "structure": 14,
@@ -960,6 +975,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-formation-educat-hsp-socle-2025-2027",
       "structure": 16,
@@ -1021,6 +1037,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/ass-dinformation-et--bridge",
       "structure": 12,
@@ -1094,6 +1111,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/la-fourmiliere-du-gr-aide-aux-demarches-a",
       "structure": 11,
@@ -1160,6 +1178,7 @@
       "receptions": [
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/cc-du-sud-messin-mediation-numerique",
       "structure": 13,
@@ -1222,6 +1241,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 235,
       "source_link": "https://cartographie.societenumerique.gouv.fr/cartographie/Coop-num%C3%A9rique_a01902e8-1e9d-493d-94b6-c9936dec6818/details",
       "structure": 17,
@@ -1297,6 +1317,7 @@
         131,
         132
       ],
+      "score_qualite": 0.5,
       "source": 231,
       "source_link": "https://dora.inclusion.gouv.fr/services/mission-locale",
       "structure": 2,

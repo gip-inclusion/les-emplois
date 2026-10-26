@@ -8,6 +8,7 @@
       "description": "Description du service 'emplois-de-linclusion-null'",
       "lien_source": null,
       "date_maj": "2026-02-10",
+      "score_qualite": 0.25,
       "type": null,
       "thematiques": null,
       "frais": null,
@@ -43,6 +44,7 @@
       "description": "",
       "lien_source": "",
       "date_maj": "2026-02-10",
+      "score_qualite": 0.5,
       "type": null,
       "thematiques": [],
       "frais": null,
@@ -78,6 +80,7 @@
       "description": "## **En tant que prescripteur :**\n\n- Vous trouvez les opportunités de travail à destination des publics éloignés de l'emploi (Contrats d'insertion, contrats en entreprise adaptée, contrats d'alternance en Geiq, contrats dans le cadre des clauses d'insertion…).\n\n- Vous orientez vos publics en difficulté auprès des employeurs solidaires et suivez les résultats des candidatures (embauches, refus…).\n\n\n<!-- -->\n\n## En tant qu'employeur solidaire : \n\n- Vous publiez vos besoins en recrutement afin de recevoir des candidatures.\n\n- Vous disposez d'un tableau de bord pour gérer vos candidatures et vos embauches.\n\n- Dans le cadre des contrats en structure d'insertion, vous obtenez le PASS IAE afin de faciliter vos démarches liées à l'aide au poste.\n\n\n<!-- -->\n\n## En tant que candidat : \n\n- Vous trouvez les employeurs solidaires près de chez vous\n\n- Vous pouvez postuler directement auprès des employeurs solidaires ou faire le choix d'être orienté par votre conseiller à l'emploi ou accompagnateur social.\n\n\n<!-- -->",
       "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-les-emplois-de-lincl",
       "date_maj": "2026-02-10",
+      "score_qualite": 0.5,
       "type": "atelier",
       "thematiques": [
         "trouver-un-emploi--repondre-a-des-offres-demploi",
@@ -137,6 +140,7 @@
       "description": "Nous proposons un moteur de recherche simple pour trouver et entrer en relation avec une entreprise susceptible d'accueillir en immersion.\n\nNous proposons également un formulaire en ligne pour initier votre demande de convention d'immersion.\n\n[Accéder au service](<https://immersion-facile.beta.gouv.fr/?mtm_campaign=ReferencementIFDORA>)",
       "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee",
       "date_maj": "2026-02-13",
+      "score_qualite": 0.5,
       "type": "formation",
       "thematiques": [
         "choisir-un-metier--connaitre-les-opportunites-demploi",
@@ -186,6 +190,7 @@
       "description": "Description du service avec lien de mobilisation",
       "lien_source": null,
       "date_maj": "2026-02-10",
+      "score_qualite": 0.5,
       "type": null,
       "thematiques": null,
       "frais": null,
@@ -223,6 +228,7 @@
       "description": "This service should not be orientable with a form.",
       "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee",
       "date_maj": "2026-02-13",
+      "score_qualite": 0.5,
       "type": "formation",
       "thematiques": [
         "choisir-un-metier--connaitre-les-opportunites-demploi",
@@ -272,6 +278,7 @@
       "description": "This service should be orientable with a form.",
       "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee",
       "date_maj": "2026-02-13",
+      "score_qualite": 0.5,
       "type": "formation",
       "thematiques": [
         "choisir-un-metier--connaitre-les-opportunites-demploi",

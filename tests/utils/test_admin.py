@@ -157,6 +157,7 @@ def test_all_admin(admin_client, mocker, subtests, chunk):
         name="Service DORA",
         description="Description service DORA",
         updated_on="2000-01-01",
+        score_qualite=0.5,
     )
 
     # Call factories that need parameters
