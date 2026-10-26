@@ -307,6 +307,26 @@ def test_no_pii_in_event_when_france_travail_user_data_fails(captured_event):
     )
 
 
+def test_no_credential_in_a_json_body_held_as_a_string(respx_mock, captured_event):
+    """httpx holds the body it sends as a string, which no key based scrubbing reads.
+
+    Such as the old and new passwords of `itou.utils.apis.api_entreprise.renew_password`.
+    """
+    respx_mock.post("https://api.insee.fake/renew").mock(side_effect=httpx.ConnectTimeout("timed out"))
+
+    try:
+        httpx.post(
+            "https://api.insee.fake/renew",
+            content=json.dumps({"oldPassword": "0ld-s3cr3t", "newPassword": "n3w-s3cr3t"}),
+        )
+    except httpx.ConnectTimeout:
+        sentry_sdk.capture_exception()
+
+    payload = event_payload(captured_event())
+    assert "oldPassword" in payload  # guard against a false negative
+    assert_no_pii(payload, "0ld-s3cr3t", "n3w-s3cr3t")
+
+
 def test_no_pii_in_event_when_geocoding_fails(respx_mock, settings, captured_event):
     """The home address of the job seeker travels in the query string of the geocoding call.
 

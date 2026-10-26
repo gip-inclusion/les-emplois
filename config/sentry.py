@@ -14,6 +14,7 @@ from sentry_sdk.scrubber import DEFAULT_DENYLIST, DEFAULT_PII_DENYLIST
 from itou.utils.redaction import (
     ANONYMOUS_USER_ID,
     REDACTED,
+    redact_keyed_values,
     redact_personal_data,
     redact_query_values,
     redact_query_values_by_default,
@@ -221,7 +222,8 @@ def scrub_sensitive_data(value):
             # Catches the query strings that `redact_personal_data` misses because no `https://host`
             # precedes them, such as our own request's `query_string` or a relative
             # `next=/path?nir=...`.
-            return redact_query_values(value, _is_sensitive_key)
+            value = redact_query_values(value, _is_sensitive_key)
+            return redact_keyed_values(value, _is_sensitive_key)
         case dict():
             return {key: _scrub_dict_value(key, item) for key, item in value.items()}
         case list():
