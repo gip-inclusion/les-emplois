@@ -26,15 +26,22 @@ from itou.utils.redaction import (
 logger = logging.getLogger(__name__)
 
 # A key holding one of these is sensitive whatever is spelled around it: `birth_place`,
-# `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `date_naissance`…
+# `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `referent_first_name`…
 # `nom` and `name` are deliberately absent: they sit inside `denomination`, `nombre`,
 # `template_name` or `model_name`, and those are the variables that make a traceback readable.
+# The identity spellings are enumerated in the lists below, or caught by `first_name`,
+# `last_name`, `full_name` and `_nom`, which ends the French field names (`candidat_nom`).
 SENSITIVE_KEY_FRAGMENTS = {
+    "_nom",
     "address",
     "adresse",
     "birth",
     "email",
+    "first_name",
     "france_travail_id",
+    "full_name",
+    "hexa_",  # the components of an address in the format of the ASP, see itou.users.models.JobSeekerProfile
+    "last_name",
     "naissance",
     "nir",
     "phone",
@@ -65,11 +72,11 @@ SENSITIVE_CREDENTIAL_FRAGMENTS = {
     "xsrf",
 }
 
-# Whole names, for what no fragment above can catch without redacting far more than intended
+# Whole names, for what no fragment above can catch without redacting far more than intended:
+# as fragments, `ft_id` would redact `draft_id` and `ip` would redact `description`
 SENSITIVE_VARIABLE_NAMES = {
-    "first_name",
     "ft_id",
-    "last_name",
+    "ip",  # see itou.audit_trail.models.AuditTrail
 }
 
 # Credential terms the SDK matches as fragments in the headers it collects, matched here as whole

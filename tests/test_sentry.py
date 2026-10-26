@@ -511,6 +511,14 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("address_line_1", True),
         ("contact_phone", True),
         ("client_secret", True),
+        # Names, whatever prefixes them
+        ("referent_first_name", True),
+        ("user_first_name", True),
+        ("job_seeker_last_name", True),
+        ("candidat_nom", True),
+        ("contact_full_name", True),
+        ("hexa_lane_name", True),
+        ("ip", True),
         # The France Travail identifier, under each of its names
         ("pole_emploi_id", True),
         ("job_seeker_france_travail_id", True),
@@ -530,6 +538,8 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("draft_id", False),
         ("author", False),
         ("denominationUniteLegale", False),
+        ("nombre", False),
+        ("description", False),
         ("siret", False),
         ("email_id", False),
         ("lack_of_nir_reason", False),
