@@ -23,6 +23,8 @@ from config.sentry import (
     SENSITIVE_KEY_FRAGMENTS,
     _is_sensitive_key,
     scrub_sensitive_data,
+    scrubbed_repr,
+    strip_sentry_sensitive_data,
     strip_sentry_sensitive_data_from_transaction,
 )
 from itou.api.auth import ServiceTokenAuthentication
@@ -305,6 +307,26 @@ def test_no_pii_in_event_when_france_travail_user_data_fails(captured_event):
         address["complementAdresse"],
         address["libelleCommune"],
     )
+
+
+def test_no_pii_in_a_mapping_nested_deeper_than_the_sdk_serializes(captured_event):
+    """Past 5 levels, the SDK serializes a mapping as its repr: a string, where keys are text.
+
+    The value of a sensitive key can be a mapping itself, whose own keys name nobody, so it is
+    only redacted as long as the keys are keys.
+    """
+    response = {
+        "data": {"individu": {"etatCivil": {"identite": {"nom": "TARDIVEAU", "adresse": {"ligne": "Croix-Nivert"}}}}}
+    }
+
+    try:
+        response["data"]["individu"]["statut"]
+    except KeyError:
+        sentry_sdk.capture_exception()
+
+    payload = event_payload(captured_event())
+    assert "{'nom': " in payload  # guard against a false negative: the mapping did become a string
+    assert_no_pii(payload, "TARDIVEAU", "Croix-Nivert")
 
 
 def test_no_credential_in_a_json_body_held_as_a_string(respx_mock, captured_event):
@@ -603,6 +625,14 @@ def test_transaction_is_dropped_when_scrubbing_fails(mocker, caplog):
     assert record.name == "config.sentry"
     assert record.getMessage().startswith("Dropped a transaction, scrubbing it raised RuntimeError at sentry.py:")
     assert "jean-michel" not in caplog.text
+
+
+def test_scrubbing_hooks_are_registered():
+    """The tests above call the hooks directly or go through the client: this ties both together."""
+    options = sentry_sdk.get_client().options
+    assert options["before_send"] is strip_sentry_sensitive_data
+    assert options["before_send_transaction"] is strip_sentry_sensitive_data_from_transaction
+    assert options["custom_repr"] is scrubbed_repr
 
 
 def test_log_event_keeps_its_message_template(captured_event):

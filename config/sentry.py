@@ -237,6 +237,18 @@ def scrub_sensitive_data(value):
     return value
 
 
+def scrubbed_repr(value):
+    """`custom_repr` hook to scrub a container before the SDK turns it into a string.
+
+    The SDK serializes a mapping nested deeper than `MAX_DATABAG_DEPTH` (5) as its repr, which
+    `scrub_sensitive_data` could only read as text. Scrubbing it first keeps a sensitive key
+    redacted whatever its value holds. Anything else gets the SDK's own repr.
+    """
+    if isinstance(value, (dict, list, tuple)):
+        return repr(scrub_sensitive_data(value))
+    return None
+
+
 def scrub_request_data(event):
     """Redact the values of a submitted form, keeping its field names.
 
@@ -423,6 +435,8 @@ def sentry_init():
         # https://docs.sentry.io/platforms/python/configuration/filtering/
         before_send=strip_sentry_sensitive_data,
         before_send_transaction=strip_sentry_sensitive_data_from_transaction,
+        # https://docs.sentry.io/platforms/python/configuration/options/#custom_repr
+        custom_repr=scrubbed_repr,
         **shutdown_timeout_option,
     )
     ignore_logger("django.security.DisallowedHost")
