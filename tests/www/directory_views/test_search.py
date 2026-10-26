@@ -195,7 +195,7 @@ def test_people_search_displays_membership_count(client):
     selected_person = autocomplete_response.json()["results"][0]
     response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
 
-    assertContains(response, "Membre de 2 structures")
+    assertContains(response, "(+ 1 autres structures)")
 
 
 def test_directory_nav_is_visible_for_flagged_city(client):
