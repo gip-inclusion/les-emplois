@@ -934,7 +934,7 @@
 # ---
 # name: test_populate_companies
   dict({
-    'num_queries': 62,
+    'num_queries': 64,
     'queries': list([
       dict({
         'origin': list([
@@ -1001,18 +1001,7 @@
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,
-                                                            %s))
-                    AND ("companies_company"."kind" IN (%s,
-                                                        %s)
-                         OR ("companies_company"."is_searchable"
-                             AND "companies_company"."kind" = %s)
-                         OR "companies_company"."source" = %s
-                         OR EXISTS
-                           (SELECT %s AS "a"
-                            FROM "companies_siaeconvention" U0
-                            WHERE (U0."id" = ("companies_company"."convention_id")
-                                   AND U0."is_active")
-                            LIMIT 1)))
+                                                            %s)))
              GROUP BY "companies_company"."id") subquery
         ''',
       }),
@@ -1042,7 +1031,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_structures_v0" ("id" integer,"uid" UUID,
-                                                                               "id_asp" integer,"nom" varchar,"nom_complet" varchar,"description" text,"type" varchar,"siret" varchar,"source" varchar,"code_naf" varchar,"email_public" varchar,"email_authentification" varchar,"convergence_france" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"adresse_ligne_1_c1" varchar,"adresse_ligne_2_c1" varchar,"code_postal_c1" varchar,"code_commune_c1" varchar,"ville_c1" varchar,"longitude_c1" double precision,"latitude_c1" double precision,"département_c1" varchar,"nom_département_c1" varchar,"région_c1" varchar,"date_inscription" date,"total_membres" integer,"total_candidatures" integer,"total_candidatures_30j" integer,"total_embauches" integer,"total_embauches_30j" integer,"taux_conversion_30j" double precision,"total_auto_prescriptions" integer,"total_candidatures_autonomes" integer,"total_candidatures_via_prescripteur" integer,"total_candidatures_non_traitées" integer,"total_candidatures_en_étude" integer,"date_dernière_connexion" date,"active" integer,"date_dernière_évolution_candidature" date,"total_fiches_de_poste_actives" integer,"total_fiches_de_poste_inactives" integer,"date_mise_à_jour_metabase" date)
+                                                                               "id_asp" integer,"convention_asp_active" integer,"nom" varchar,"nom_complet" varchar,"description" text,"type" varchar,"siret" varchar,"source" varchar,"code_naf" varchar,"email_public" varchar,"email_authentification" varchar,"convergence_france" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"adresse_ligne_1_c1" varchar,"adresse_ligne_2_c1" varchar,"code_postal_c1" varchar,"code_commune_c1" varchar,"ville_c1" varchar,"longitude_c1" double precision,"latitude_c1" double precision,"département_c1" varchar,"nom_département_c1" varchar,"région_c1" varchar,"date_inscription" date,"total_membres" integer,"total_candidatures" integer,"total_candidatures_30j" integer,"total_embauches" integer,"total_embauches_30j" integer,"taux_conversion_30j" double precision,"total_auto_prescriptions" integer,"total_candidatures_autonomes" integer,"total_candidatures_via_prescripteur" integer,"total_candidatures_non_traitées" integer,"total_candidatures_en_étude" integer,"date_dernière_connexion" date,"active" integer,"date_dernière_évolution_candidature" date,"total_fiches_de_poste_actives" integer,"total_fiches_de_poste_inactives" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -1080,6 +1069,18 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."id_asp" IS \'ID de la structure ASP correspondante\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."convention_asp_active" IS \'Convention ASP active (vide si la structure n\'\'a pas de convention)\'',
       }),
       dict({
         'origin': list([
@@ -1764,24 +1765,13 @@
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."asp_id"
           FROM "companies_company"
-          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("companies_company"."id" = "job_applications_jobapplication"."to_company_id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
           LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
-                 AND ("companies_company"."kind" IN (%s,
-                                                     %s)
-                      OR ("companies_company"."is_searchable"
-                          AND "companies_company"."kind" = %s)
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1)))
+                                                         %s)))
           GROUP BY "companies_company"."id",
                    "cities_city"."id",
                    "companies_siaeconvention"."id"
@@ -1823,6 +1813,27 @@
       }),
       dict({
         'origin': list([
+          '<lambda>[metabase/tables/companies.py]',
+          'convert_boolean_to_int[metabase/utils.py]',
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."is_active"
+          FROM "companies_siaeconvention"
+          WHERE "companies_siaeconvention"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
           'get_code_commune[metabase/tables/utils.py]',
           '<lambda>[metabase/tables/utils.py]',
@@ -1859,6 +1870,7 @@
           COPY "z_new_structures_v0" ("id",
                                       "uid",
                                       "id_asp",
+                                      "convention_asp_active",
                                       "nom",
                                       "nom_complet",
                                       "description",
