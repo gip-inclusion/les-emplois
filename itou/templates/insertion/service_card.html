@@ -288,10 +288,10 @@
                                     <small>Durée de la prestation</small>
                                     <strong>
                                         {# djlint:off #}
-                                        {% if service.volume_horaire_hebdomadaire %}{{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heures par semaine{% endif %}{% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}, pendant{% endif %}
+                                        {% if service.volume_horaire_hebdomadaire %}{{ service.volume_horaire_hebdomadaire|floatformat:"-1" }} heure{{service.volume_horaire_hebdomadaire|floatformat:"-1"|pluralizefr }} par semaine{% endif %}{% if service.nombre_semaines and service.volume_horaire_hebdomadaire %}, pendant{% endif %}
                                         {# djlint:on #}
                                         {% if service.nombre_semaines %}
-                                            {{ service.nombre_semaines }} semaines
+                                            {{ service.nombre_semaines }} semaine{{ service.nombre_semaines|pluralizefr }}
                                         {% endif %}
                                     </strong>
                                 </li>
