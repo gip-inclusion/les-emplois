@@ -1,9 +1,14 @@
 import copy
+import datetime
+import logging
 import re
 import textwrap
 
+import dns.resolver
 from django.conf import settings
 from django.core import mail
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.urls import reverse
 from markdownify.templatetags.markdownify import markdownify
@@ -11,6 +16,9 @@ from markdownify.templatetags.markdownify import markdownify
 from itou.utils import constants as global_constants
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
 
 
 def remove_extra_line_breaks(text):
@@ -89,3 +97,62 @@ def redact_email_address(email):
     else:
         redacted_domain = redact_part(domain_part)
     return f"{redacted_user}@{redacted_domain}"
+
+
+def _accept_domain_based_on_mx(domain):
+    """Tell if the given domain looks to have an MX record.
+
+    In doubt (temporary error / timeout / …) returns True, to avoid
+    false negatives.
+
+    Only cache good answers:
+    - They cover the biggest part of the queries.
+    - We don’t want to cache a false negative.
+
+    We store the actual response in the cache while we have it in case
+    someone wants to debug an answer.
+    """
+    domain = domain.lower()
+    cache_key = f"domain_has_mx({domain!r})"
+    if cache.get(cache_key):
+        return True
+    try:
+        mail_exchange_servers = [rdata.to_text() for rdata in dns.resolver.resolve(domain, "MX")]
+    except dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.exception.FormError, dns.exception.SyntaxError:
+        return False
+    except (dns.resolver.LifetimeTimeout, dns.resolver.NoResolverConfiguration) as err:
+        cache.set(cache_key, str(err), 3600)
+        return True  # Maybe a temporary failure, in doubt: accept the address.
+    except dns.resolver.DNSException:
+        logger.exception("Unexpected error resolving MX domain")
+        return True
+    cache.set(cache_key, mail_exchange_servers, datetime.timedelta(days=7).total_seconds())
+    return True
+
+
+def email_address_is_valid(email):
+    """Ensure the given email address is valid.
+
+    Writing a regex to check email address is known to be hard and
+    does not protect against typos like john.doe@gmali.com.
+
+    In comparison querying the DNS to check if an MX exists for it is easy.
+
+    But it has false positives too: someone has registered hotmai.com
+    and hotmali.com, probably in the hope of intercepting emails.
+
+    But having a few false positives (allowing someone to register
+    with a bad email address) is better than having false negatives
+    (blocking someone to register with a good email address).
+    """
+    if "@" not in email:
+        return False
+    _user_part, domain_part = email.rsplit("@", 1)
+    if not domain_part:
+        return False
+    return _accept_domain_based_on_mx(domain_part)
+
+
+def validate_email_address(email):
+    if not email_address_is_valid(email):
+        raise ValidationError("Cette adresse e-mail ne semble pas valide (probablement une faute de frappe).")

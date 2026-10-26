@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.emails.utils import validate_email_address
 from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, Title, UserKind
@@ -117,6 +118,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
+        validate_email_address(email)
         if User.objects.filter(email=email).exists():
             self._email_submitted = email
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")
