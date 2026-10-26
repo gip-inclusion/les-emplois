@@ -11,12 +11,15 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
+from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -52,6 +55,7 @@ class TestApprovalSuspendView:
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["preview"] is False
+        assertContains(response, "pourra être levée en cas d’embauche par un autre employeur.")
 
         start_at = today
         end_at = today + relativedelta(days=10)
@@ -405,6 +409,323 @@ class TestApprovalSuspendView:
         # ...while the other reason must stay disabled.
         assert form.fields["reason"].widget.disabled_values == {Suspension.Reason.FINISHED_CONTRACT.value}
 
+    @staticmethod
+    def _ft_prescriber_approval(assigned=True, kind=PrescriberOrganizationKind.FT):
+        """An approval (a.k.a. PASS IAE) whose jobseeker is (by default) assigned to an authorized FT prescriber."""
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__kind=kind,
+            with_approval=True,
+            with_job_seeker_assignment=assigned,
+            hiring_start_at=today - relativedelta(days=1),
+        )
+        return job_application.approval, job_application.sender, job_application.sender_prescriber_organization
+
+    def test_suspend_approval_as_ft_prescriber(self, client, caplog):
+        today = timezone.localdate()
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        assert organization.kind == PrescriberOrganizationKind.FT
+        assert organization.is_authorized
+
+        client.force_login(prescriber)
+        back_url = reverse("dashboard:index")
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        url = f"{url}?{urlencode({'back_url': back_url})}"
+
+        response = client.get(url)
+        assert response.status_code == 200
+        assertContains(response, "pourra être levée en cas d’embauche par un employeur.")
+
+        start_at = today
+        end_at = today + relativedelta(days=10)
+        post_data = {
+            "start_at": start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": Suspension.Reason.SUSPENDED_CONTRACT,
+            "reason_explanation": "",
+            "save": 1,
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, back_url)
+
+        suspension = approval.suspension_set.get()
+        assert suspension.created_by == prescriber
+        assert suspension.prescriber_organization == organization
+        assert suspension.siae is None
+        assert (
+            f"user={prescriber.pk} created suspension={suspension.pk} (approval={approval.pk}) "
+            f"from {start_at} to {end_at}"
+        ) in caplog.messages
+
+    def test_suspend_approval_as_ft_prescriber_when_hired_by_other_siae(self, client):
+        # Unlike employers, an authorized FT prescriber may suspend an approval regardless of the last hiring SIAE.
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        first_siae = approval.jobapplication_set.get().to_company
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
+            approval=approval,
+            job_seeker=approval.user,
+            to_company__subject_to_iae_rules=True,
+        )
+        assert not approval.can_be_suspended_by_siae(first_siae)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 200
+
+        today = timezone.localdate()
+        response = client.post(
+            url,
+            data={
+                "start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": (today + relativedelta(days=10)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": Suspension.Reason.SUSPENDED_CONTRACT,
+                "reason_explanation": "",
+                "save": 1,
+            },
+        )
+        assert response.status_code == 302
+        suspension = approval.suspension_set.get()
+        assert suspension.prescriber_organization == organization
+        assert suspension.siae is None
+
+    def test_suspend_not_found_for_non_ft_authorized_prescriber(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval(kind=PrescriberOrganizationKind.CAP_EMPLOI)
+        assert organization.is_authorized
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 404
+        assert client.post(url, data={}).status_code == 404
+
+    def test_suspend_not_found_for_ft_prescriber_without_assignment(self, client):
+        approval, prescriber, _ = self._ft_prescriber_approval(assigned=False)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 404
+        assert client.post(url, data={}).status_code == 404
+
+    def test_contract_reasons_disabled_for_ft_prescriber_with_ongoing_contract(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        ContractFactory(job_seeker=approval.user, end_date=None)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        response = client.get(url)
+        assertContains(response, self.ALERT_TEXT)
+
+        # BROKEN and FINISHED reasons cannot be chosen if jobseeker has an ongoing contract.
+        today = timezone.localdate()
+        form = SuspensionForm(
+            approval=approval,
+            prescriber_organization=organization,
+            data={
+                "start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": (today + relativedelta(days=10)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": random.choice([Suspension.Reason.BROKEN_CONTRACT, Suspension.Reason.FINISHED_CONTRACT]),
+                "reason_explanation": "",
+            },
+        )
+        assert not form.is_valid()
+        assert "reason" in form.errors
+        # The CONTRAT_PASSERELLE reason (reserved to ACI/EI employers) is never offered to prescribers.
+        assert Suspension.Reason.CONTRAT_PASSERELLE.value not in dict(form.fields["reason"].choices)
+
+    def test_suspend_button_visible_on_details_for_ft_prescriber(self, client):
+        approval, prescriber, _ = self._ft_prescriber_approval()
+        suspend_url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        details_url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
+
+        client.force_login(prescriber)
+        assertContains(client.get(details_url), suspend_url)
+
+    def test_suspend_button_hidden_on_details_for_non_ft_prescriber(self, client):
+        # A non-FT authorized prescriber may view the approval but must not see the "Suspendre" button.
+        approval, prescriber, _ = self._ft_prescriber_approval(kind=PrescriberOrganizationKind.CAP_EMPLOI)
+        suspend_url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        details_url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
+
+        client.force_login(prescriber)
+        response = client.get(details_url)
+        assert response.status_code == 200
+        assertNotContains(response, suspend_url)
+
+    @staticmethod
+    def _handle_urls(suspension):
+        """URLs of the views to edit or delete a suspension."""
+        return [
+            reverse(f"approvals:{url_name}", kwargs={"suspension_id": suspension.pk})
+            for url_name in [
+                "suspension_update",
+                "suspension_update_enddate",
+                "suspension_action_choice",
+                "suspension_delete",
+            ]
+        ]
+
+    def _authored_suspension(self, approval, organization):
+        """An ongoing suspension created by the given FT prescriber organization."""
+        today = timezone.localdate()
+        return SuspensionFactory(
+            approval=approval,
+            start_at=today,
+            end_at=today + relativedelta(days=10),
+            siae=None,
+            prescriber_organization=organization,
+        )
+
+    def test_update_suspension_as_ft_prescriber_author(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
+        assert client.get(url).status_code == 200
+
+        new_end_at = suspension.end_at + relativedelta(days=5)
+        response = client.post(
+            url,
+            data={
+                "start_at": suspension.start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": new_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": suspension.reason,
+                "reason_explanation": suspension.reason_explanation,
+                "save": 1,
+            },
+        )
+        assert response.status_code == 302
+        suspension.refresh_from_db()
+        assert suspension.end_at == new_end_at
+        assert suspension.updated_by == prescriber
+
+    def test_update_enddate_as_ft_prescriber_author(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.pk})
+        assert client.get(url).status_code == 200
+
+        first_day_back = timezone.localdate() + relativedelta(days=2)
+        response = client.post(
+            url,
+            data={"first_day_back_to_work": first_day_back.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)},
+        )
+        assert response.status_code == 302
+        suspension.refresh_from_db()
+        assert suspension.end_at == first_day_back - relativedelta(days=1)
+        assert suspension.updated_by == prescriber
+
+    def test_delete_suspension_as_ft_prescriber_author(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+
+        client.force_login(prescriber)
+        assert (
+            client.get(
+                reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension.pk})
+            ).status_code
+            == 200
+        )
+        response = client.post(
+            reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk}),
+            data={"confirm": "true"},
+        )
+        assert response.status_code == 302
+        assert not Suspension.objects.filter(pk=suspension.pk).exists()
+
+    def test_handle_forbidden_for_non_author_ft_prescriber(self, client):
+        approval, _, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+
+        # Another authorized FT prescriber who DID NOT create the suspension.
+        other_org = PrescriberOrganizationFactory(
+            authorized=True, kind=PrescriberOrganizationKind.FT, with_membership=True
+        )
+        client.force_login(other_org.members.first())
+
+        for url in self._handle_urls(suspension):
+            assert client.get(url).status_code == 404, url
+
+    def test_modification_buttons_visible_on_details_for_ft_prescriber_author(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+        details_url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
+        update_url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
+        action_url = reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension.pk})
+
+        client.force_login(prescriber)
+        response = client.get(details_url)
+        assertContains(response, update_url)
+        assertContains(response, action_url)
+
+    def test_suspend_forbidden_for_ft_prescriber_if_suspended_approval(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        self._authored_suspension(approval, organization)
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 403
+        assert client.post(url, data={}).status_code == 403
+
+    def test_suspend_forbidden_for_ft_prescriber_if_expired_approval(self, client):
+        approval, prescriber, _ = self._ft_prescriber_approval()
+        today = timezone.localdate()
+        approval.start_at = today - relativedelta(years=3)
+        approval.end_at = today - relativedelta(years=1)
+        approval.save()
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 403
+        assert client.post(url, data={}).status_code == 403
+
+    def test_ft_prescriber_without_authorization(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+        # The organization lost its authorization after the suspension was created.
+        organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
+        organization.save()
+
+        client.force_login(prescriber)
+        url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
+        assert client.get(url).status_code == 404
+        assert client.post(url, data={}).status_code == 404
+        for url in self._handle_urls(suspension):
+            assert client.get(url).status_code == 404, url
+
+    def test_employer_can_update_suspension_created_by_ft_prescriber(self, client):
+        # The hiring SIAE may handle any ongoing suspension, including one created by an authorized FT prescriber.
+        approval, _, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+        employer = approval.jobapplication_set.get().to_company.members.first()
+
+        client.force_login(employer)
+        url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
+        assert client.get(url).status_code == 200
+
+        new_end_at = suspension.end_at + relativedelta(days=5)
+        response = client.post(
+            url,
+            data={
+                "start_at": suspension.start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "end_at": new_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": suspension.reason,
+                "reason_explanation": suspension.reason_explanation,
+                "save": 1,
+            },
+        )
+        assert response.status_code == 302
+        suspension.refresh_from_db()
+        assert suspension.end_at == new_end_at
+        assert suspension.updated_by == employer
+        # The suspension keeps its original author.
+        assert suspension.prescriber_organization == organization
+        assert suspension.siae is None
+
 
 class TestApprovalSuspendActionChoiceView:
     @pytest.fixture(autouse=True)
@@ -427,6 +748,7 @@ class TestApprovalSuspendActionChoiceView:
         client.force_login(JobSeekerFactory())
 
         response = client.get(self.url)
+        # A user who is neither the hiring employer nor the FT authorized prescriber cannot even see the suspension.
         assert response.status_code == 404
 
     def test_not_current_suspension(self, client):
@@ -535,6 +857,7 @@ class TestApprovalSuspendUpdateEndDateView:
         client.force_login(JobSeekerFactory())
 
         response = client.get(self.url)
+        # A user who is neither the hiring employer nor the authorized FT prescriber cannot even see the suspension.
         assert response.status_code == 404
 
     def test_not_current_suspension(self, client):
