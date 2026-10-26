@@ -23,6 +23,7 @@ from config.sentry import (
     SENSITIVE_KEY_FRAGMENTS,
     _is_sensitive_key,
     scrub_sensitive_data,
+    strip_sentry_sensitive_data_from_transaction,
 )
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.models import ServiceToken
@@ -547,6 +548,41 @@ def test_failing_task_reports_its_arguments_without_the_personal_ones(
         breadcrumb_messages = [breadcrumb["message"] for breadcrumb in event["breadcrumbs"]["values"]]
         assert f"Attempting to delete email {REDACTED}, remaining 0 retries" in breadcrumb_messages
         assert email.upper() not in event_payload(event).upper()
+
+
+def test_transaction_spans_are_scrubbed():
+    """Span data carries the query string of outgoing requests, and has its own callback."""
+    transaction = {
+        "type": "transaction",
+        "user": {"email": "someone@example.com", "id": 1},
+        "spans": [
+            {
+                "op": "http.client",
+                "data": {
+                    "http.query": "nomNaissance=TARDIVEAU&prenoms%5B%5D=JEAN-MICHEL&recipient=13003013300016",
+                },
+            }
+        ],
+    }
+
+    scrubbed = strip_sentry_sensitive_data_from_transaction(transaction, {})
+
+    assert scrubbed["spans"][0]["data"]["http.query"] == (
+        f"nomNaissance={REDACTED}&prenoms%5B%5D={REDACTED}&recipient={REDACTED}"
+    )
+    assert scrubbed["user"] == {"id": 1}
+
+
+def test_transaction_is_dropped_when_scrubbing_fails(mocker, caplog):
+    """Losing a transaction loses no alert, but why it was lost must be told somewhere."""
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
+
+    assert strip_sentry_sensitive_data_from_transaction({"type": "transaction", "spans": []}, {}) is None
+
+    [record] = caplog.records
+    assert record.name == "config.sentry"
+    assert record.getMessage().startswith("Dropped a transaction, scrubbing it raised RuntimeError at sentry.py:")
+    assert "jean-michel" not in caplog.text
 
 
 def test_log_event_keeps_its_message_template(captured_event):

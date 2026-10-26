@@ -63,7 +63,7 @@ def redact_query_values(text, is_sensitive):
     """Replace the value of every query parameter whose key `is_sensitive`, keeping the keys.
 
     Works on a bare query string as well as on free text holding a URL, so that one rule covers
-    the Sentry event, its breadcrumbs, and the log records.
+    the Sentry event, its breadcrumbs and span data, and the log records.
 
     Example:
         With `is_sensitive` true for `nom` only:

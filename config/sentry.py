@@ -20,6 +20,8 @@ from itou.utils.redaction import (
 )
 
 
+logger = logging.getLogger(__name__)
+
 # A key holding one of these is sensitive whatever is spelled around it: `birth_place`,
 # `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `date_naissance`…
 # `nom` and `name` are deliberately absent: they sit inside `denomination`, `nombre`,
@@ -207,7 +209,7 @@ def _scrub_dict_value(key, value):
 def scrub_sensitive_data(value):
     """Redact personal data anywhere in a Sentry event.
 
-    This includes: the message of an exception, the log entry, breadcrumbs, and
+    This includes: the message of an exception, the log entry, breadcrumbs, span data, and
     the local variables of the stack frames.
 
     It is the only layer to do so: `data_collection` disables the SDK's `EventScrubber`, so
@@ -302,6 +304,13 @@ def degraded_event(event, exc):
     return degraded
 
 
+def scrub_event(event):
+    """Remove personal data from an event, whether an error or a transaction."""
+    anonymize_user(event)
+    scrub_request_data(event)
+    return scrub_sensitive_data(event)
+
+
 def strip_sentry_sensitive_data(event, _hint):
     """`before_send` hook to remove personal data from Sentry events.
 
@@ -313,9 +322,7 @@ def strip_sentry_sensitive_data(event, _hint):
     debugger here.
     """
     try:
-        anonymize_user(event)
-        scrub_request_data(event)
-        return scrub_sensitive_data(event)
+        return scrub_event(event)
     except Exception as exc:
         try:
             return degraded_event(event, exc)
@@ -323,6 +330,26 @@ def strip_sentry_sensitive_data(event, _hint):
             # The fallback itself must not raise: the SDK would drop the event, leaving nothing
             # but a `callback_error` in the client reports of the project.
             return {"event_id": event["event_id"], "level": "error", **_failed_scrubbing_event()}
+
+
+def strip_sentry_sensitive_data_from_transaction(event, _hint):
+    """`before_send_transaction` hook to remove personal data from Sentry transactions.
+
+    Spans carry the query string of outgoing HTTP requests. The user is anonymized as for
+    errors, which the performance product did not use to get.
+
+    On failure the transaction is dropped: unlike an error, losing it loses no alert, and
+    the degraded shape above is not a valid transaction anyway. Why it failed is logged, which
+    Sentry ignores: the client reports would otherwise be the only trace of it.
+    """
+    try:
+        return scrub_event(event)
+    except Exception as exc:
+        logger.warning(
+            "Dropped a transaction, scrubbing it raised %(pii_scrubbing_error)s at %(pii_scrubbing_location)s",
+            _scrubbing_failure(exc),
+        )
+        return None
 
 
 def sentry_init():
@@ -349,9 +376,7 @@ def sentry_init():
             # Hardcoded CACHES.*.KEY_PREFIX to not depend on Django being setup
             RedisIntegration(cache_prefixes=["django:"]),
         ],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
+        # https://docs.sentry.io/platforms/python/sampling/
         traces_sample_rate=traces_sample_rate,
         # What the integrations are allowed to collect, category by category. It replaces
         # `send_default_pii`, deprecated since sentry-sdk 2.72.0, which must stay unset, and it
@@ -391,7 +416,10 @@ def sentry_init():
         # https://docs.sentry.io/platforms/python/data-management/sensitive-data/#before-send-before-send-transaction--before-send-span
         # https://docs.sentry.io/platforms/python/configuration/filtering/
         before_send=strip_sentry_sensitive_data,
+        before_send_transaction=strip_sentry_sensitive_data_from_transaction,
         **shutdown_timeout_option,
     )
     ignore_logger("django.security.DisallowedHost")
     ignore_logger("django_datadog_logger.middleware.request_log")
+    # Its warnings are about the scrubbing itself, which they would only go through again
+    ignore_logger(__name__)
