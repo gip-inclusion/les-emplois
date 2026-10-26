@@ -401,6 +401,18 @@ class TestServices:
                 [],
                 id="both",
             ),
+            pytest.param(
+                1,
+                1,
+                [
+                    "Durée de la prestation",
+                    "1 heure par semaine",
+                    ", pendant",
+                    "1 semaine",
+                ],
+                [],
+                id="singular",
+            ),
             pytest.param(None, None, [], ["Durée de la prestation"], id="neither"),
         ],
     )
