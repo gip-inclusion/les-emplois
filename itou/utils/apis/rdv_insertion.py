@@ -13,7 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger(__name__)
 
-API_TIMEOUT_SECONDS = 1.0
+API_TIMEOUT_SECONDS = 2.0
 CACHE_TIMEOUT_FOUND = datetime.timedelta(hours=1).total_seconds()
 CACHE_TIMEOUT_NOT_FOUND = datetime.timedelta(days=1).total_seconds()
 # Short, so that pages don't wait for the timeout each time while rdv-insertion is unavailable
