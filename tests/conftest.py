@@ -40,6 +40,7 @@ from factory import Faker
 from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
+import itou.emails.utils
 from tests.openid_connect.pro_connect.testing import ProConnectSetup
 
 
@@ -1031,3 +1032,10 @@ def mailoutbox(mailoutbox):
                 for link in links:
                     domain = urlsplit(link).netloc
                     assert domain in known_domains()
+
+
+@pytest.fixture(autouse=True)
+def short_circuit_accept_domain_based_on_mx_function(request, monkeypatch):
+    if "do_not_patch_accept_domain_based_on_mx" in request.keywords:
+        return
+    monkeypatch.setattr(itou.emails.utils, "_accept_domain_based_on_mx", lambda _email: True)

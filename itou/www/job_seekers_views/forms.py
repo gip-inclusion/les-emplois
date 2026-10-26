@@ -21,7 +21,7 @@ from itou.companies.enums import (
     ProSupportReportSolution,
 )
 from itou.companies.models import ProSupportReport
-from itou.emails.utils import redact_email_address
+from itou.emails.utils import redact_email_address, validate_email_address
 from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import (
@@ -334,6 +334,7 @@ class JobSeekerExistsForm(forms.Form):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un usager.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un usager.")
+        validate_email_address(email)
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:

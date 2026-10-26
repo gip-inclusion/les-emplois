@@ -12,6 +12,7 @@ from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.directory.models import DirectoryProfile
+from itou.emails.utils import validate_email_address
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
@@ -180,6 +181,7 @@ class EditUserEmailForm(forms.Form):
             raise ValidationError("Veuillez indiquer une adresse différente de l'actuelle.")
         if EmailAddress.objects.filter(email=email).exclude(user=self.user).exists():
             raise ValidationError("Cette adresse est déjà utilisée par un autre utilisateur.")
+        validate_email_address(email)
         return email
 
     def clean_password(self):
