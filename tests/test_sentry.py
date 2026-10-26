@@ -20,11 +20,13 @@ from sentry_sdk.utils import AnnotatedValue, iter_event_frames
 from config.sentry import (
     PII_SCRUBBING_FAILED,
     SENSITIVE_API_PARAMETERS,
+    SENSITIVE_KEY_FRAGMENTS,
     _is_sensitive_key,
     scrub_sensitive_data,
 )
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.models import ServiceToken
+from itou.archive.tasks import async_delete_contact
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.nexus.enums import Service
@@ -374,6 +376,22 @@ def test_contact_details_are_scrubbed_wherever_they_are_keyed():
     }
 
 
+def test_credentials_are_scrubbed():
+    """The OIDC token exchanges keep their `client_secret` in a frame local while they raise.
+
+    A leaked secret is a rotation incident rather than a privacy one, but it reaches Sentry the
+    same way. `DEFAULT_DENYLIST` matches keys exactly, so its `secret` never covered this one.
+    """
+    data = {"client_id": "itou", "client_secret": "s3cr3t", "code": "abc", "grant_type": "authorization_code"}
+
+    assert scrub_sensitive_data(data) == {
+        "client_id": "itou",
+        "client_secret": REDACTED,
+        "code": "abc",
+        "grant_type": "authorization_code",
+    }
+
+
 def test_degraded_event_when_scrubbing_fails(mocker, captured_event):
     """A crash in the scrubber must not leak the event, nor silence the alert."""
     mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
@@ -421,6 +439,21 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
     assert transport.capture_envelope.call_count == 1
 
 
+def test_scrubbing_reaches_nested_frame_variables():
+    """`before_send` is the only scrubbing layer, so it has to reach every depth on its own.
+
+    Setting `data_collection` disables the SDK's `EventScrubber`, which used to run first and
+    which this asserted on. Nothing else looks inside the params dict a frame holds.
+    """
+    assert sentry_sdk.get_client().options["event_scrubber"] is None
+    frame = {"vars": {"nir": "180081380021", "params": {"nomNaissance": "TARDIVEAU"}}}
+
+    scrubbed = scrub_sensitive_data({"exception": {"values": [{"stacktrace": {"frames": [frame]}}]}})
+
+    scrubbed_frame = scrubbed["exception"]["values"][0]["stacktrace"]["frames"][0]
+    assert scrubbed_frame["vars"] == {"nir": REDACTED, "params": {"nomNaissance": REDACTED}}
+
+
 @pytest.mark.parametrize(
     "key,expected",
     [
@@ -433,14 +466,25 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
         ("numeroTelephone", True),
         ("address_line_1", True),
         ("contact_phone", True),
+        ("client_secret", True),
         # The France Travail identifier, under each of its names
         ("pole_emploi_id", True),
         ("job_seeker_france_travail_id", True),
         ("ft_id", True),
+        # Credentials, which `data_collection` stopped the SDK from scrubbing for us
+        ("password", True),
+        ("authorization", True),
+        ("sessionid", True),
+        ("x_forwarded_for", True),
+        ("key", True),  # the TOTP secret of the OTP views
+        ("sid", True),
         # Ordinary words a fragment must not swallow, and the exceptions to it
         ("template_name", False),
         ("model_name", False),
+        ("cache_key", False),
+        ("residence", False),
         ("draft_id", False),
+        ("author", False),
         ("denominationUniteLegale", False),
         ("siret", False),
         ("email_id", False),
@@ -452,6 +496,57 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
 )
 def test_is_sensitive_key(key, expected):
     assert _is_sensitive_key(key) is expected
+
+
+def test_data_collection_leaves_no_category_to_its_default():
+    """Opting into `data_collection` makes every field left out fall back to collecting.
+
+    Asserting the whole resolved mapping is what stops a later edit, or an SDK upgrade adding a
+    category, from quietly turning collection back on.
+    """
+    assert sentry_sdk.get_client().options["data_collection"] == {
+        "provided_by_user": True,
+        "user_info": False,
+        "cookies": {"mode": "off"},
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "http_bodies": ["incoming_request"],
+        "url_query_params": {"mode": "denylist", "terms": sorted(SENSITIVE_KEY_FRAGMENTS)},
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "stack_frame_variables": True,
+        "frame_context_lines": 5,
+        "queues": True,
+    }
+
+
+def test_failing_task_reports_its_arguments_without_the_personal_ones(
+    respx_mock, django_capture_on_commit_callbacks, brevo_client, prepare_event_spy
+):
+    """Which record a task was working on is the first thing to know when it fails.
+
+    `data_collection["queues"]` is what puts the arguments back, and passing the personal ones
+    by keyword is what lets the scrubbing reach them: `args` is a bare list of values. The last
+    attempt also logs the email, which rides along as a breadcrumb, where no key protects it.
+    """
+    email = "jean-michel@example.com"
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        side_effect=httpx.ConnectTimeout("timed out")
+    )
+
+    with django_capture_on_commit_callbacks(execute=True):
+        async_delete_contact(email=email, retries=0)
+
+    # Every event captured while the task runs carries its arguments, dropped ones excepted
+    events = [event for event in prepare_event_spy.spy_return_list if event]
+    assert events  # guard against a false negative
+    for event in events:
+        huey_job = event["extra"]["huey-job"]
+        assert huey_job["task"] == "async_delete_contact"
+        assert huey_job["kwargs"]["email"] == REDACTED
+        breadcrumb_messages = [breadcrumb["message"] for breadcrumb in event["breadcrumbs"]["values"]]
+        assert f"Attempting to delete email {REDACTED}, remaining 0 retries" in breadcrumb_messages
+        assert email.upper() not in event_payload(event).upper()
 
 
 def test_log_event_keeps_its_message_template(captured_event):
@@ -567,7 +662,7 @@ def test_token_authenticated_request_is_reported_as_an_api_service_account(captu
 
 @pytest.mark.usefixtures("failing_urlconf")
 def test_submitted_form_values_are_allowlisted(client, captured_event):
-    """The body of a submission is attached to the event whatever `send_default_pii` says.
+    """The body of a submission is attached to the event whatever `data_collection` says.
 
     Its field names are ours, and they carry an identity far more often than not, so this is the
     one channel where the values are redacted unless the field is known to name nobody. The names
@@ -595,3 +690,13 @@ def test_submitted_form_values_are_allowlisted(client, captured_event):
         "pole_emploi_id": REDACTED,
         "kind": "employer",
     }
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_cookies_are_not_collected(client, captured_event):
+    """`data_collection["cookies"]` gates the cookies of the request, session included."""
+    client.force_login(JobSeekerFactory())
+
+    client.get("/boom")
+
+    assert "cookies" not in captured_event()["request"]
