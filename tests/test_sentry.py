@@ -11,6 +11,7 @@ from django.conf import settings
 from sentry_sdk.utils import AnnotatedValue, iter_event_frames
 
 from config.sentry import (
+    PII_SCRUBBING_FAILED,
     SENSITIVE_API_PARAMETERS,
     _is_sensitive_key,
     scrub_sensitive_data,
@@ -356,6 +357,53 @@ def test_contact_details_are_scrubbed_wherever_they_are_keyed():
         "birth_date": REDACTED,
         "address": REDACTED,
     }
+
+
+def test_degraded_event_when_scrubbing_fails(mocker, captured_event):
+    """A crash in the scrubber must not leak the event, nor silence the alert."""
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
+
+    try:
+        raise ValueError("original error")
+    except ValueError:
+        sentry_sdk.capture_exception()
+
+    event = captured_event()
+    assert event["message"] == PII_SCRUBBING_FAILED
+    assert event["tags"]["pii_scrubbing"] == "failed"
+    assert event["tags"]["exception_type"] == "ValueError"
+    # Why the scrubber failed, but not its message, which can quote what it was scrubbing
+    assert event["tags"]["pii_scrubbing_error"] == "RuntimeError"
+    assert event["tags"]["pii_scrubbing_location"].startswith("sentry.py:")
+    # Grouped by the original error, so that muting one issue does not mute them all
+    assert event["fingerprint"] == ["pii-scrubbing-failed", "ValueError"]
+    assert event["event_id"]  # `capture_event` reads it to build the envelope header
+    payload = event_payload(event)
+    # The stack frames are the whole point: they are what carries the local variables.
+    assert '"vars"' not in payload
+    assert "jean-michel" not in payload
+
+
+def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_event):
+    """The fallback of the fallback must still be an event Sentry can send."""
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom"))
+    mocker.patch("config.sentry.degraded_event", side_effect=RuntimeError("boom too"))
+    transport = mocker.patch.object(sentry_sdk.get_client(), "transport")
+
+    try:
+        raise ValueError("original error")
+    except ValueError:
+        event_id = sentry_sdk.capture_exception()
+
+    assert captured_event() == {
+        "event_id": event_id,
+        "message": PII_SCRUBBING_FAILED,
+        "level": "error",
+        "tags": {"pii_scrubbing": "failed"},
+    }
+    # Without `event_id`, `capture_event` raises while building the envelope header and
+    # `capture_internal_exceptions` swallows it: the alert would be lost just as silently.
+    assert transport.capture_envelope.call_count == 1
 
 
 @pytest.mark.parametrize(

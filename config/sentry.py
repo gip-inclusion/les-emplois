@@ -1,5 +1,6 @@
 import logging
 import os
+import traceback
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -98,6 +99,26 @@ NON_SENSITIVE_KEYS = {
 _SENSITIVE_NAMES = SENSITIVE_API_PARAMETERS | SENSITIVE_API_RESPONSE_FIELDS | SENSITIVE_VARIABLE_NAMES
 _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
 
+PII_SCRUBBING_FAILED = "PII scrubbing failed"
+# Where the scrubbing code lives, and so the frame that says why it failed
+_SCRUBBING_FILES = ("config/sentry.py", "itou/utils/redaction.py")
+
+# Event fields that never carry personal data: the only ones kept when scrubbing fails
+EVENT_PII_FREE_KEYS = [
+    "dist",
+    "environment",
+    "event_id",
+    "level",
+    "logger",
+    "platform",
+    "release",
+    "sdk",
+    "server_name",
+    "timestamp",
+    "transaction",
+    "type",
+]
+
 
 def _is_sensitive_key(key):
     """Whether a mapping key, a variable name or a query parameter names something private.
@@ -161,18 +182,66 @@ def anonymize_user(event):
             event["user"]["id"] = "anonymous"
 
 
+def _failed_scrubbing_event():
+    """The part of the event sent when scrubbing failed that does not depend on the event."""
+    return {"message": PII_SCRUBBING_FAILED, "tags": {"pii_scrubbing": "failed"}}
+
+
+def _scrubbing_failure(exc):
+    """Describe why scrubbing failed by the type of the exception and the line raising it.
+
+    That is what fixing the scrubber takes, whereas the message of the exception can quote the
+    very value being scrubbed, so it is never reported.
+    """
+    frames = [frame for frame in traceback.extract_tb(exc.__traceback__) if frame.filename.endswith(_SCRUBBING_FILES)]
+    location = f"{os.path.basename(frames[-1].filename)}:{frames[-1].lineno}" if frames else "unknown"
+    return {"pii_scrubbing_error": type(exc).__qualname__, "pii_scrubbing_location": location}
+
+
+def degraded_event(event, exc):
+    """Reduce an event to the fields that cannot carry personal data, once scrubbing failed.
+
+    Rather than silencing the error or letting personal data through, keep the alert firing.
+    The message is hardcoded to give the issue a stable, greppable title instead of
+    “<unlabeled event>”. The exception types are the one detail of the event known to be safe,
+    and they also group the degraded events, so that muting one of their issues does not hide
+    every later failure. Everything else goes, `contexts` included, and with it the trace that
+    would link this event to its transaction.
+    """
+    degraded = _failed_scrubbing_event()
+    degraded.update({key: event[key] for key in EVENT_PII_FREE_KEYS if key in event})
+    exception_types = [
+        value["type"]
+        for value in event.get("exception", {}).get("values", [])
+        if isinstance(value, dict) and "type" in value
+    ]
+    if exception_types:
+        degraded["tags"]["exception_type"] = ",".join(exception_types)
+    degraded["tags"].update(_scrubbing_failure(exc))
+    degraded["fingerprint"] = ["pii-scrubbing-failed", *exception_types]
+    return degraded
+
+
 def strip_sentry_sensitive_data(event, _hint):
     """`before_send` hook to remove personal data from Sentry events.
 
     Breadcrumbs only leave the process inside an error event, so this is also what scrubs them:
     no `before_breadcrumb` hook is needed.
 
-    Be very cautious about not raising any exception in this method. Indeed, when it happens,
-    the initial 500 error never reaches the sentry servers and it could take months before we
-    realize a real error was silenced. Also, you cannot use the debugger here.
+    When scrubbing raises, the event is not sent as it is but reduced by `degraded_event`: a bug
+    in the scrubber costs the details of the event, not the alert. Also, you cannot use the
+    debugger here.
     """
-    anonymize_user(event)
-    return scrub_sensitive_data(event)
+    try:
+        anonymize_user(event)
+        return scrub_sensitive_data(event)
+    except Exception as exc:
+        try:
+            return degraded_event(event, exc)
+        except Exception:
+            # The fallback itself must not raise: the SDK would drop the event, leaving nothing
+            # but a `callback_error` in the client reports of the project.
+            return {"event_id": event["event_id"], "level": "error", **_failed_scrubbing_event()}
 
 
 def sentry_init():
