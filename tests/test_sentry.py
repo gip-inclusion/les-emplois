@@ -526,6 +526,7 @@ def test_scrubbing_reaches_nested_frame_variables():
         # Credentials, which `data_collection` stopped the SDK from scrubbing for us
         ("password", True),
         ("authorization", True),
+        ("proxy_authorization", True),
         ("sessionid", True),
         ("x_forwarded_for", True),
         ("key", True),  # the TOTP secret of the OTP views
@@ -546,6 +547,11 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("lack_of_pole_emploi_id_reason", False),
         ("pe_obfuscated_nir", False),
         ("require_phone_interview", False),
+        ("authorization_status", False),  # the habilitation of a prescriber organization, not a credential
+        ("training_session", False),
+        ("email_address_id", False),
+        ("email_address", True),  # the allauth `EmailAddress` that the ID above points at
+        ("email_tracking_consent", False),
     ],
 )
 def test_is_sensitive_key(key, expected):
