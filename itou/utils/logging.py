@@ -5,17 +5,13 @@ from django.conf import settings
 from django_datadog_logger.formatters.datadog import get_wsgi_request_user
 from itoutils.django.logging import DataDogJSONFormatter
 
+from itou.utils.redaction import REDACTED, redact_query_params
+
 
 logger = logging.getLogger(__name__)
 
 
 NO_RECURSIVE_LOG_FLAG = "_no_recursive_log_flag"
-REDACTED = "_REDACTED_"
-
-
-def redact_query_params(url):
-    """Replace every query parameter value of an httpx.URL with a placeholder, keeping the keys."""
-    return url.copy_with(params=[(key, REDACTED) for key, _value in url.params.multi_items()])
 
 
 class ItouDataDogJSONFormatter(DataDogJSONFormatter):
