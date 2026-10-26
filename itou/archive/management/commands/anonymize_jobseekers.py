@@ -382,7 +382,7 @@ class Command(BaseCommand):
     def _delete_jobseekers_with_related_objects(self, users):
         User.objects.filter(id__in=[user.id for user in users]).delete()
         for user in users:
-            async_delete_contact(user.email)
+            async_delete_contact(email=user.email)
 
     def _delete_jobapplications_with_related_objects(self, jobapplications):
         resume_pks = list(File.objects.filter(jobapplication__in=jobapplications).values_list("pk", flat=True))
