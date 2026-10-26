@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
     def remove_from_contact(self, users):
         for user in users:
-            async_delete_contact(user.email)
+            async_delete_contact(email=user.email)
 
     @monitor(
         monitor_slug="anonymize_professionals",

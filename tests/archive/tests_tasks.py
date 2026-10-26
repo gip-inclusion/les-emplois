@@ -13,7 +13,7 @@ def test_delete_contact(respx_mock, django_capture_on_commit_callbacks, status_c
     )
 
     with django_capture_on_commit_callbacks(execute=True):
-        async_delete_contact(email)
+        async_delete_contact(email=email)
 
     assert [record.levelname for record in caplog.records] == ["INFO"]
 
@@ -28,7 +28,7 @@ def test_async_delete_contact_retries_warning(
     )
 
     with django_capture_on_commit_callbacks(execute=True):
-        async_delete_contact(email, retries=retries)
+        async_delete_contact(email=email, retries=retries)
 
     assert respx_mock.calls.called
 
@@ -51,5 +51,5 @@ def test_async_delete_contact_does_not_send_HTTP_request(respx_mock, django_capt
             return_value=httpx.Response(status_code=204)
         )
         with django_capture_on_commit_callbacks(execute=True):
-            async_delete_contact(email)
+            async_delete_contact(email=email)
         assert respx_mock.calls.called is called

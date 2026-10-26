@@ -245,7 +245,7 @@ def ft_connect_callback(request):
     # Fetch external data if birthdate or address is missing
     if not user.jobseeker_profile.birthdate or not user.address_on_one_line:
         triggers_context = triggers.get_current_context() or {}
-        huey_import_user_ft_data(user, access_token, triggers_context=triggers_context)
+        huey_import_user_ft_data(user, token=access_token, triggers_context=triggers_context)
 
     # Keep token_data["id_token"] to logout from France Travail Connect
     request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]

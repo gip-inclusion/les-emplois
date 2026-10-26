@@ -5,6 +5,9 @@ from itou.utils import triggers
 
 
 # TODO: drop pe_data_import arg in a future commit
+# Callers pass the token by keyword so that Sentry sees it as a task *kwarg*: task args are a
+# bare list of values, which no key based scrubbing can reach. See config.sentry.
+# TODO: make it keyword-only once deployed, after the tasks enqueued with a positional token have run.
 @on_commit_task()
 def huey_import_user_ft_data(user, token, pe_data_import=None, triggers_context=None):
     # The triggers_context is provided by the view triggering this task

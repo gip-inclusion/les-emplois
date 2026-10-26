@@ -101,7 +101,7 @@ class Command(BaseCommand):
                     if wet_run:
                         if verbosity > 1:
                             self.logger.info("Deleting contact: %s", email)
-                        async_delete_contact(email)
+                        async_delete_contact(email=email)
                     else:
                         self.logger.info("[DRY RUN] Would delete contact: %s", email)
 
