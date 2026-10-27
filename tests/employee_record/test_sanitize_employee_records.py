@@ -18,12 +18,19 @@ def command_fixture():
     return sanitize_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
 
 
-def test_handle_dry_run(mocker, command, caplog):
-    mocker.patch.object(command, "_check_approvals")
-    mocker.patch.object(command, "_check_missed_notifications")
+def process_output(caplog_messages):
+    assert caplog_messages[-1].startswith(
+        "Management command itou.employee_record.management.commands.sanitize_employee_records succeeded in "
+    )
+    return [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog_messages[:-1]]
 
-    command.handle(wet_run=False)
-    assert caplog.messages == [
+
+def test_handle_dry_run(mocker, caplog):
+    mocker.patch.object(sanitize_employee_records.Command, "_check_approvals")
+    mocker.patch.object(sanitize_employee_records.Command, "_check_missed_notifications")
+    call_command("sanitize_employee_records", wet_run=False)
+
+    assert process_output(caplog.messages) == [
         "Command launched with wet_run=False",
         "Checking employee records coherence before transferring to ASP",
         "Employee records sanitizing done. Have a great day!",
@@ -31,17 +38,17 @@ def test_handle_dry_run(mocker, command, caplog):
     ]
 
 
-def test_missing_approvals(command, caplog):
+def test_missing_approvals(caplog):
     # Check for employee record without approval (through job application)
 
     employee_record = factories.EmployeeRecordFactory()
     employee_record.job_application.approval = None
     employee_record.job_application.save()
 
-    command.handle(wet_run=True)
+    call_command("sanitize_employee_records", wet_run=True)
 
     assert models.EmployeeRecord.objects.count() == 0
-    assert caplog.messages == [
+    assert process_output(caplog.messages) == [
         "Checking employee records coherence before transferring to ASP",
         "found 1 employee records with missing approval",
         "deleted 1/1 employee records with missing approval",
@@ -52,7 +59,7 @@ def test_missing_approvals(command, caplog):
     assert not models.EmployeeRecord.objects.filter(pk=employee_record.pk).exists()
 
 
-def test_missed_notifications(command, faker, caplog, snapshot):
+def test_missed_notifications(faker, caplog, snapshot):
     # Approval() with watched_data_updated_at are what we want
     employee_record_with_watched_data_updated_at = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
@@ -74,25 +81,25 @@ def test_missed_notifications(command, faker, caplog, snapshot):
     )
 
     # Various cases are now set up, finally check the behavior
-    command.handle(wet_run=True)
+    call_command("sanitize_employee_records", wet_run=True)
     assert employee_record_with_watched_data_updated_at.update_notifications.count() == 1
     employee_record_with_watched_data_updated_at.refresh_from_db()
     assert employee_record_with_watched_data_updated_at.status != Status.ARCHIVED
-    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
+    assert process_output(caplog.messages) == snapshot()
 
 
-def test_missed_notifications_limit(mocker, snapshot, command, caplog):
-    mocker.patch.object(command, "MAX_MISSED_NOTIFICATIONS_CREATED", 2)
+def test_missed_notifications_limit(mocker, snapshot, caplog):
+    mocker.patch.object(sanitize_employee_records.Command, "MAX_MISSED_NOTIFICATIONS_CREATED", 2)
     factories.EmployeeRecordFactory.create_batch(
         3,
         status=models.Status.ARCHIVED,
         watched_data_updated_at=timezone.now(),
     )
 
-    command.handle(wet_run=True)
+    call_command("sanitize_employee_records", wet_run=True)
 
     assert models.EmployeeRecordUpdateNotification.objects.count() == 2
-    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
+    assert process_output(caplog.messages) == snapshot()
 
 
 def test_handle_3437_errors(mailoutbox, django_capture_on_commit_callbacks):
