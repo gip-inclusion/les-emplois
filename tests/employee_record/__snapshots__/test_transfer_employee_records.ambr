@@ -65,7 +65,7 @@
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
@@ -78,6 +78,20 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'EmployeeRecordQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records.py]',
+          'Command.download_json_file[employee_record/common_management.py]',
+          'Command.download[employee_record/management/commands/transfer_employee_records.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

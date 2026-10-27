@@ -18,7 +18,7 @@ from itou.employee_record.models import (
 )
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.job_applications.enums import JobApplicationState
-from itou.utils import asp as asp_utils
+from itou.utils import asp as asp_utils, triggers
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -204,7 +204,7 @@ class Command(EmployeeRecordTransferCommand):
         elif parse_file:
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
             # so use an atomic block to avoid creating more incoherence when something breaks.
-            with transaction.atomic():
+            with transaction.atomic(), triggers.context(**self.get_trigger_context()):
                 self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
         elif upload or download:
             if not settings.ASP_SFTP_HOST:

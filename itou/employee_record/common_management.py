@@ -11,6 +11,7 @@ from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.job_applications.enums import JobApplicationState
+from itou.utils import triggers
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.command import BaseCommand
 
@@ -117,7 +118,11 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
             self.logger.info("Fetching file: %s", filename)
             try:
-                with sftp.file(filename, mode="r") as result_file, transaction.atomic():
+                with (
+                    sftp.file(filename, mode="r") as result_file,
+                    transaction.atomic(),
+                    triggers.context(**self.get_trigger_context()),
+                ):
                     # Parse and update employee records with feedback
                     self._parse_feedback_file(filename, parser.parse(result_file), dry_run)
             except IgnoreFile as ex:
