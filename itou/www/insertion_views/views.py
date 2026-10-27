@@ -1,6 +1,7 @@
 import datetime
 import enum
 import functools
+import hashlib
 import logging
 from collections import defaultdict
 
@@ -480,9 +481,11 @@ class OrientationWizardView(WizardView):
             orientation.notification_new_for_sender.send()
 
             # Link the originating iMER to the created Orientation.
+            hashed_session_key = hashlib.sha256(request.session.session_key.encode()).hexdigest()
             event = (
                 insertion_models.MobilizationEvent.objects.filter(
                     kind=MobilizationEventKind.SERVICE_ORIENTATION,
+                    hashed_session_key=hashed_session_key,
                     service=self.service,
                     user=request.user,
                     orientation__isnull=True,
