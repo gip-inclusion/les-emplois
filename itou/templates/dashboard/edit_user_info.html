@@ -109,12 +109,15 @@
                                                     {% bootstrap_form membership_form %}
                                                 {% endfor %}
                                             </div>
-                                            <button class="btn btn-link has-collapse-caret"
+                                            <button class="btn btn-link has-collapse-caret btn-block collapsed mt-3"
                                                     type="button"
+                                                    data-it-collapse-text-show="Voir"
+                                                    data-it-collapse-text-hide="Masquer"
                                                     data-bs-toggle="collapse"
                                                     data-bs-target="#collapse-more-memberships"
                                                     aria-expanded="false"
-                                                    aria-controls="collapse-more-memberships">
+                                                    aria-controls="collapse-more-memberships"
+                                                    aria-label="Voir ou masquer les autres structures">
                                                 {% with hidden_count=membership_forms|length|add:"-3" %}
                                                     {{ hidden_count }} autre{{ hidden_count|pluralize }} structure{{ hidden_count|pluralize }}
                                                 {% endwith %}
