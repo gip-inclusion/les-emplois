@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 import math
 import secrets
@@ -489,6 +490,7 @@ class MobilizationEventManager(models.Manager):
 
         MobilizationEvent(
             session_key=session_key,
+            hashed_session_key=hashlib.sha256(session_key.encode()).hexdigest(),
             kind=kind,
             user=user if user.is_authenticated else None,
             prescriber_organization=prescriber_organization,
@@ -500,7 +502,10 @@ class MobilizationEventManager(models.Manager):
 
 
 class MobilizationEvent(models.Model):
-    session_key = models.CharField(verbose_name="clé de session", max_length=40)
+    session_key = models.CharField(verbose_name="clé de session", max_length=40, blank=True, db_default="")
+    hashed_session_key = models.CharField(
+        verbose_name="hash de la clé de session", max_length=64, blank=True, db_default=""
+    )
     kind = models.CharField(verbose_name="type", choices=MobilizationEventKind)
     user = models.ForeignKey(User, verbose_name="utilisateur", on_delete=models.CASCADE, null=True, related_name="+")
     prescriber_organization = models.ForeignKey(

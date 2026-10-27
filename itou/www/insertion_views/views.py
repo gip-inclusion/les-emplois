@@ -481,7 +481,6 @@ class OrientationWizardView(WizardView):
             event = (
                 insertion_models.MobilizationEvent.objects.filter(
                     kind=MobilizationEventKind.SERVICE_ORIENTATION,
-                    session_key=request.session.session_key,
                     service=self.service,
                     user=request.user,
                     orientation__isnull=True,

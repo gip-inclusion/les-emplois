@@ -1532,7 +1532,7 @@ def test_populate_mobilization_events(snapshot):
         {
             "id": structure_mobilization_event.pk,
             "date": structure_mobilization_event.created_at,
-            "user_session": structure_mobilization_event.session_key,
+            "user_session": structure_mobilization_event.hashed_session_key,
             "user_kind": "emplois_anonymous",
             "user_id": None,
             "user_prescriber_organization_id": None,
@@ -1549,7 +1549,7 @@ def test_populate_mobilization_events(snapshot):
         {
             "id": structure_mobilization_event_by_job_seeker.pk,
             "date": structure_mobilization_event_by_job_seeker.created_at,
-            "user_session": structure_mobilization_event_by_job_seeker.session_key,
+            "user_session": structure_mobilization_event_by_job_seeker.hashed_session_key,
             "user_kind": "emplois_job_seeker",
             "user_id": job_seeker.pk,
             "user_prescriber_organization_id": None,
@@ -1566,7 +1566,7 @@ def test_populate_mobilization_events(snapshot):
         {
             "id": service_mobilization_event.pk,
             "date": service_mobilization_event.created_at,
-            "user_session": service_mobilization_event.session_key,
+            "user_session": service_mobilization_event.hashed_session_key,
             "user_kind": "emplois_" + KIND_PRESCRIBER,
             "user_id": service_mobilization_event.user_id,
             "user_prescriber_organization_id": service_mobilization_event.prescriber_organization_id,
@@ -1583,7 +1583,7 @@ def test_populate_mobilization_events(snapshot):
         {
             "id": ext_orientation_mobilization_event.pk,
             "date": ext_orientation_mobilization_event.created_at,
-            "user_session": ext_orientation_mobilization_event.session_key,
+            "user_session": ext_orientation_mobilization_event.hashed_session_key,
             "user_kind": "emplois_" + KIND_EMPLOYER,
             "user_id": ext_orientation_mobilization_event.user_id,
             "user_prescriber_organization_id": None,
@@ -1600,7 +1600,7 @@ def test_populate_mobilization_events(snapshot):
         {
             "id": orientation_mobilization_event.pk,
             "date": orientation_mobilization_event.created_at,
-            "user_session": orientation_mobilization_event.session_key,
+            "user_session": orientation_mobilization_event.hashed_session_key,
             "user_kind": "emplois_" + KIND_PRESCRIBER,
             "user_id": orientation_mobilization_event.user_id,
             "user_prescriber_organization_id": orientation_mobilization_event.prescriber_organization_id,

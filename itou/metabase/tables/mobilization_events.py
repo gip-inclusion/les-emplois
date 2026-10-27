@@ -20,7 +20,7 @@ TABLE.add_columns(
     [
         get_column_from_field(get_model_field(MobilizationEvent, "pk"), "id"),
         get_column_from_field(get_model_field(MobilizationEvent, "created_at"), name="date"),
-        get_column_from_field(get_model_field(MobilizationEvent, "session_key"), name="user_session"),
+        get_column_from_field(get_model_field(MobilizationEvent, "hashed_session_key"), name="user_session"),
         {"name": "user_kind", "type": "varchar", "comment": "Type d’utilisateur", "fn": get_user_kind},
         get_column_from_field(get_model_field(MobilizationEvent, "user"), name="user_id"),
         get_column_from_field(
