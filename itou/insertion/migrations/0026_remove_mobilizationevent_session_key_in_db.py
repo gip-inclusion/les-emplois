@@ -11,10 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            database_operations=[
-                migrations.RunSQL("ALTER TABLE insertion_mobilizationevent DROP COLUMN session_key;")
-            ],
-            state_operations=[],
+        migrations.RunSQL(
+            "ALTER TABLE insertion_mobilizationevent DROP COLUMN IF EXISTS session_key;",
+            migrations.RunSQL.noop,
+            elidable=True,
         ),
     ]
