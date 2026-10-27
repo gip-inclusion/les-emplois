@@ -130,7 +130,8 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
 def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
     mailoutbox, django_capture_on_commit_callbacks
 ):
-    prolongation_request = ProlongationRequestFactory()
+    now = timezone.localtime()  # due to time change and the way relativedelta works, we need to work in our timezone
+    ProlongationRequestFactory(created_at=now)
 
     specs = [
         (0, 0),
@@ -146,7 +147,7 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
         (40, 3),
     ]
     for days_ago, expected in specs:
-        with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
+        with freeze_time(now + relativedelta(days=days_ago)):
             with django_capture_on_commit_callbacks(execute=True):
                 call_command("prolongation_requests_chores", "email_reminder", wet_run=True)
         assert len(mailoutbox) == expected
