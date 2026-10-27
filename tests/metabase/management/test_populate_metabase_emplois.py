@@ -30,6 +30,7 @@ from itou.metabase.tables import (
     geiq_assessments,
     job_applications,
     job_seeker_assignments,
+    mobilization_emails,
     mobilization_events,
     orientations,
     services,
@@ -56,7 +57,12 @@ from tests.geiq_assessments.factories import (
     EmployeeFactory,
 )
 from tests.geo.factories import create_qpv
-from tests.insertion.factories import MobilizationEventFactory, OrientationFactory, ServiceFactory
+from tests.insertion.factories import (
+    MobilizationEmailFactory,
+    MobilizationEventFactory,
+    OrientationFactory,
+    ServiceFactory,
+)
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -1483,6 +1489,63 @@ def test_populate_services(snapshot):
             "duration_weeks": None,
             "is_active": False,
             "code_insee": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_mobilization_emails(snapshot):
+    company_membership = CompanyMembershipFactory()
+    prescriber_membership = PrescriberMembershipFactory()
+    creation_date = datetime.datetime(2023, 1, 1, 12, 30, tzinfo=datetime.UTC)
+
+    with freeze_time(creation_date):
+        unanswered_mobilization_email = MobilizationEmailFactory(
+            sender=company_membership.user,
+            sender_prescriber_organization=None,
+            sender_company=company_membership.company,
+        )
+        answered_mobilization_email = MobilizationEmailFactory(
+            sender=prescriber_membership.user,
+            sender_prescriber_organization=prescriber_membership.organization,
+            sender_company=None,
+            mobilization_event=MobilizationEventFactory(),
+        )
+    answered_mobilization_email.answered_at = datetime.datetime(2026, 2, 1, 12, tzinfo=datetime.UTC)
+    answered_mobilization_email.save(update_fields=["answered_at"])
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="mobilization_emails")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {mobilization_emails.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": unanswered_mobilization_email.pk,
+            "sent_at": creation_date,
+            "answered_at": None,
+            "user_kind": "emplois_employer",
+            "user_id": unanswered_mobilization_email.sender.pk,
+            "user_prescriber_organization_id": None,
+            "user_company_id": unanswered_mobilization_email.sender_company_id,
+            "imer_id": None,
+            "service_id": unanswered_mobilization_email.service.uid,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": answered_mobilization_email.pk,
+            "sent_at": creation_date,
+            "answered_at": datetime.datetime(2026, 2, 1, 12, tzinfo=datetime.UTC),
+            "user_kind": "emplois_prescriber",
+            "user_id": answered_mobilization_email.sender.pk,
+            "user_prescriber_organization_id": answered_mobilization_email.sender_prescriber_organization_id,
+            "user_company_id": None,
+            "imer_id": answered_mobilization_email.mobilization_event_id,
+            "service_id": answered_mobilization_email.service.uid,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
