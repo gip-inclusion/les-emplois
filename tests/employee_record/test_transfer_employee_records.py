@@ -13,7 +13,6 @@ from itoutils.django.testing import assertSnapshotQueries
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.job_applications.enums import JobApplicationState
-from itou.utils import triggers
 from itou.utils.admin import get_admin_url
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
@@ -260,8 +259,7 @@ def test_3437_automatic_processing(sftp_directory):
     )
     process_incoming_file(sftp_directory, "3437", processing_label)
 
-    with triggers.fake_context():  # Needed because the test wasn't using call_command and would fail without it
-        call_command("transfer_employee_records", upload=False, download=True, preflight=False, wet_run=True)
+    call_command("transfer_employee_records", upload=False, download=True, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
     assert employee_record.status == Status.READY
     assert employee_record.asp_processing_code == "3437"
