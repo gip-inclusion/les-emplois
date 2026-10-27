@@ -689,15 +689,12 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             return
         # The label looks like: "Un salarié existe déjà pour cette structure avec un identifiant Plate-forme
         # de l'inclusion différent. (ASP_UID)"
-        match = re.search(r"\(([^)]+)\)", self.asp_processing_label)
+        match = re.search(r"\(([0-9a-f]{30})\)", self.asp_processing_label)
         if match is None:
             logger.error("Could not extract asp_uid from asp_processing_label of employee_record=%s", self.pk)
             return
 
         asp_uid = match.group(1)
-        if not re.match(r"^[0-9a-f]{30}$", asp_uid):
-            logger.error("Could not extract asp_uid from asp_processing_label of employee_record=%s", self.pk)
-            return
         if asp_uid_profile := JobSeekerProfile.objects.filter(asp_uid=asp_uid).first():
             if asp_uid_profile.user_id != self.job_application.job_seeker_id:
                 # We have a duplicate job seeker to handle manually
