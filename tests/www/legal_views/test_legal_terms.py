@@ -68,6 +68,7 @@ def test_legal_terms_post_updates_timestamp_when_accepted_terms_are_outdated(cli
         ("2024-02-05", "05/02/2024", "« L’Employeur inclusif »"),
         ("2025-10-15", "15/10/2025", "« Le bénéficiaire du parcours »"),
         ("2026-03-16", "16/03/2026", "bilan d’exécution annuel validé par sa DDETS et DREETS"),
+        ("2026-10-16", "16/10/2026", "un accès continu aux Téléservices"),
     ],
 )
 def test_previous_legal_terms_versions_are_accessible_and_public(client, slug, date, content):
@@ -75,7 +76,7 @@ def test_previous_legal_terms_versions_are_accessible_and_public(client, slug, d
     assertNotContains(response, CGU_FORM_BTN)
     assertContains(response, f"Version du {date}")
     assertContains(response, content)
-    if slug == "2026-03-16":
+    if slug == "2026-10-16":
         assertContains(response, "vous consultez la dernière version")
     else:
         assertContains(response, "version actuellement consultée")
