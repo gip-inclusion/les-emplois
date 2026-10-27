@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 from unittest.mock import patch
 
 import pytest
@@ -349,8 +350,10 @@ class TestMobilizationEvent:
         user = user_factory() if user_factory else AnonymousUser()
         service = service_factory() if service_factory else None
         organization = organization_factory() if organization_factory else None
+        session_key = "session123"
+        hashed_session_key = hashlib.sha256(session_key.encode()).hexdigest()
         MobilizationEvent.objects.create_mobilization_event(
-            session_key="session123",
+            session_key=session_key,
             user=user,
             kind=kind,
             organization=organization,
@@ -358,7 +361,7 @@ class TestMobilizationEvent:
             service=service,
         )
 
-        assert MobilizationEvent.objects.filter(session_key="session123", kind=kind).count() == 1
+        assert MobilizationEvent.objects.filter(hashed_session_key=hashed_session_key, kind=kind).count() == 1
 
     def test_create_mobilization_event_bad_user_kind(self):
         for user in [ItouStaffFactory(), ProfessionalFactory()]:
