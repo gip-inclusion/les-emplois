@@ -1,3 +1,4 @@
+import hashlib
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -672,10 +673,10 @@ def test_orientation_wizard_links_latest_unlinked_mobilization_event(client):
         },
     )
 
-    session_key = client.session.session_key
+    hashed_session_key = hashlib.sha256(client.session.session_key.encode()).hexdigest()
     event_kwargs = {
         "kind": MobilizationEventKind.SERVICE_ORIENTATION,
-        "session_key": session_key,
+        "hashed_session_key": hashed_session_key,
         "user": prescriber,
         "prescriber_organization": organization,
     }
