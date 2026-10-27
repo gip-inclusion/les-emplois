@@ -1,4 +1,5 @@
 {% extends "layout/base_email_text_body.md" %}
+{% load tz %}
 
 {# context
     user: User
@@ -9,9 +10,9 @@
 {% block body %}
 Bonjour {{ user.get_full_name }},
 
-Nous n’avons détecté aucune activité sur votre compte sur {% brand %} associé à l’adresse {{ user.email }} depuis le {{ inactivity_since|date:"d/m/Y" }}.
+Nous n’avons détecté aucune activité sur votre compte sur {% brand %} associé à l’adresse {{ user.email }} depuis le {{ inactivity_since|localtime|date:"d/m/Y" }}.
 
-Sans connexion de votre part avant le {{ end_of_grace_period|date:"d/m/Y" }}, votre compte sera supprimé ainsi que toutes les données associées.
+Sans connexion de votre part avant le {{ end_of_grace_period|localtime|date:"d/m/Y" }}, votre compte sera supprimé ainsi que toutes les données associées.
 
 Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur {{ base_url }}
 {% endblock body %}
