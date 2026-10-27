@@ -132,7 +132,6 @@ class MobilizationEventFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = MobilizationEvent
 
-    session_key = factory.LazyFunction(lambda: str(uuid.uuid4()).replace("-", ""))
     hashed_session_key = factory.LazyFunction(lambda: hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest())
     kind = MobilizationEventKind.STRUCTURE_CONTACT
     structure = factory.SubFactory(StructureFactory)

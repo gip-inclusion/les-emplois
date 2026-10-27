@@ -8423,7 +8423,6 @@
         ]),
         'sql': '''
           SELECT "insertion_mobilizationevent"."id",
-                 "insertion_mobilizationevent"."session_key",
                  "insertion_mobilizationevent"."hashed_session_key",
                  "insertion_mobilizationevent"."kind",
                  "insertion_mobilizationevent"."user_id",
