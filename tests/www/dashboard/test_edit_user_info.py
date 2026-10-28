@@ -17,7 +17,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
@@ -29,6 +29,7 @@ class TestEditUserInfoView:
     LACK_OF_NIR_FIELD_ID = "id_lack_of_nir"
     LACK_OF_NIR_REASON_FIELD_ID = "id_lack_of_nir_reason"
     BIRTHDATE_FIELD_NAME = "birthdate"
+    DIRECTORY_OPT_OUT_FIELD_ID = "id_is_directory_opted_out"
 
     @pytest.fixture(autouse=True)
     def setup_method(self, mocker):
@@ -819,6 +820,20 @@ class TestEditUserInfoView:
         assert updated_user.first_name == original_user.first_name
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [JobSeekerFactory, PrescriberFactory, EmployerFactory, LaborInspectorFactory],
+    )
+    def test_directory_opt_out_field_displayed_for_professional(self, client, user_factory):
+        user = user_factory()
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = client.get(url)
+        if user.is_professional:
+            assertContains(response, self.DIRECTORY_OPT_OUT_FIELD_ID)
+        else:
+            assertNotContains(response, self.DIRECTORY_OPT_OUT_FIELD_ID)
 
     def test_professional_can_opt_out_of_directory(self, client):
         user = PrescriberFactory()
