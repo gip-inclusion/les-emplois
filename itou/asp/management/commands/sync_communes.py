@@ -1,6 +1,7 @@
 import csv
 import json
 from datetime import datetime
+from operator import itemgetter
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.serializers.json import DjangoJSONEncoder
@@ -53,6 +54,40 @@ def guess_commune(code, name, at=None):
     )
 
 
+def detect_inconsistencies(commune_infos):
+    def format_inconsistency(problem, code, dates):
+
+        formatted_dates = "\n".join(
+            f"- [{start.isoformat()}, {end.isoformat() + ']' if end else 'NULL)'}: {name}"
+            for start, end, name in dates
+        )
+        return f"{problem} for {code}:\n{formatted_dates}"
+
+    inconsistencies = []
+
+    code_to_dates = {}
+    for commune_info in commune_infos:
+        code_to_dates.setdefault(commune_info["code"], []).append(
+            (commune_info["start_date"], commune_info["end_date"], commune_info["name"])
+        )
+    for code, dates in code_to_dates.items():
+        sorted_dates = sorted(dates, key=itemgetter(0))  # Only sort based on start_date
+        (start, end) = sorted_dates[0][:2]
+        if end and start > end:
+            inconsistencies.append(format_inconsistency("Impossible dates", code, sorted_dates))
+            continue
+
+        for next_start, next_end, _name in sorted_dates[1:]:
+            if next_end and next_start > next_end:
+                inconsistencies.append(format_inconsistency("Impossible dates", code, sorted_dates))
+                break
+            if end is None or next_start <= end:
+                inconsistencies.append(format_inconsistency("Overlapping dates", code, sorted_dates))
+                break
+            start, end = next_start, next_end
+    return inconsistencies
+
+
 class Command(BaseCommand):
     ATOMIC_HANDLE = True
 
@@ -77,6 +112,11 @@ class Command(BaseCommand):
 
     def handle(self, *, file_path, file_encoding, wet_run, **options):
         communes_from_csv = list(csv_import_communes(file_path, file_encoding))
+        inconsistencies = detect_inconsistencies(communes_from_csv)
+        if inconsistencies:
+            for inconsistency in inconsistencies:
+                self.stdout.write(f"{inconsistency}\n")
+            raise RuntimeError("Inconsistent data in csv")
 
         communes_added_by_csv = []
         communes_updated_by_csv = []
