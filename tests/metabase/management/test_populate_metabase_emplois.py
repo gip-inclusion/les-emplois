@@ -14,7 +14,14 @@ from itoutils.django.testing import assertSnapshotQueries
 from itou.approvals.enums import Origin
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import (
+    CompanyKind,
+    ContractType,
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
+)
 from itou.companies.models import JobDescription, SiaeACIConvergencePHC
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
@@ -32,6 +39,7 @@ from itou.metabase.tables import (
     job_seeker_assignments,
     mobilization_events,
     orientations,
+    pro_support_reports,
     services,
 )
 from itou.metabase.tables.utils import hash_content
@@ -47,7 +55,12 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.cities.factories import create_city_vannes
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    JobDescriptionFactory,
+    ProSupportReportFactory,
+)
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geiq_assessments.factories import (
     AssessmentCampaignFactory,
@@ -71,7 +84,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory, ProfessionalFactory
 
 
 @freeze_time("2023-03-10")
@@ -1147,6 +1160,83 @@ def test_populate_job_seeker_assignments(snapshot):
         },
     ]
     assert reason not in itertools.chain.from_iterable(row.values() for row in rows)
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_pro_support_reports(snapshot):
+    other_barrier = "Some text that should not be exported"  # may contain sensitive personal data
+    report_with_solution = ProSupportReportFactory(
+        contract__pk=2**31,  # ASP contract IDs are big integers
+        notified_prescriber=PrescriberFactory(),
+        barriers=[ProSupportReportBarrier.HEALTH, ProSupportReportBarrier.LEGAL],
+        other_barrier=other_barrier,
+        autonomy=ProSupportReportAutonomy.AUTONOMOUS,
+        solution=ProSupportReportSolution.LASTING_JOB,
+        orientation="",
+    )
+    report_with_orientation = ProSupportReportFactory(
+        barriers=[ProSupportReportBarrier.MOBILITY],
+        autonomy=ProSupportReportAutonomy.STEP_BY_STEP,
+        orientation=ProSupportReportOrientation.SOCIAL,
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="pro_support_reports")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {pro_support_reports.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": report_with_solution.pk,
+            "uid": report_with_solution.public_id,
+            "date_de_création": report_with_solution.created_at,
+            "id_candidat": report_with_solution.job_seeker_id,
+            "id_structure": report_with_solution.company_id,
+            "id_auteur": report_with_solution.author_id,
+            "id_prescripteur_prévenu": report_with_solution.notified_prescriber_id,
+            "id_contrat_asp": report_with_solution.contract_id,
+            "date_fin_contrat": report_with_solution.contract_end_date,
+            "frein_santé": True,
+            "frein_mobilité": False,
+            "frein_situation_familiale": False,
+            "frein_situation_financière": False,
+            "frein_numérique": False,
+            "frein_administratif_ou_juridique": True,
+            "frein_français_ou_calcul": False,
+            "autre_frein_renseigné": True,
+            "autonomie": ProSupportReportAutonomy.AUTONOMOUS.value,
+            "solution_envisagée": ProSupportReportSolution.LASTING_JOB.label,
+            "orientation_recommandée": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": report_with_orientation.pk,
+            "uid": report_with_orientation.public_id,
+            "date_de_création": report_with_orientation.created_at,
+            "id_candidat": report_with_orientation.job_seeker_id,
+            "id_structure": report_with_orientation.company_id,
+            "id_auteur": report_with_orientation.author_id,
+            "id_prescripteur_prévenu": None,
+            "id_contrat_asp": report_with_orientation.contract_id,
+            "date_fin_contrat": report_with_orientation.contract_end_date,
+            "frein_santé": False,
+            "frein_mobilité": True,
+            "frein_situation_familiale": False,
+            "frein_situation_financière": False,
+            "frein_numérique": False,
+            "frein_administratif_ou_juridique": False,
+            "frein_français_ou_calcul": False,
+            "autre_frein_renseigné": False,
+            "autonomie": ProSupportReportAutonomy.STEP_BY_STEP.value,
+            "solution_envisagée": None,
+            "orientation_recommandée": ProSupportReportOrientation.SOCIAL.label,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+    assert other_barrier not in itertools.chain.from_iterable(row.values() for row in rows)
 
 
 @freeze_time("2023-02-02")

@@ -31,7 +31,7 @@ from itou.approvals.models import Approval, Prolongation, ProlongationRequest, S
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.companies.enums import ContractType
-from itou.companies.models import Company, CompanyMembership, JobDescription
+from itou.companies.models import Company, CompanyMembership, JobDescription, ProSupportReport
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, EmployeeContract
@@ -61,6 +61,7 @@ from itou.metabase.tables import (
     mobilization_events,
     organizations,
     orientations,
+    pro_support_reports,
     prolongation_requests,
     prolongations,
     rome_codes,
@@ -156,6 +157,7 @@ class Command(BaseCommand):
             "users": self.populate_users,
             "memberships": self.populate_memberships,
             "job_seeker_assignments": self.populate_job_seeker_assignments,
+            "pro_support_reports": self.populate_pro_support_reports,
             "services": self.populate_services,
             "mobilization_events": self.populate_mobilization_events,
             "orientations": self.populate_orientations,
@@ -645,6 +647,12 @@ class Command(BaseCommand):
         queryset = JobSeekerAssignment.objects.all()
         metabase_db.populate_table(
             job_seeker_assignments.TABLE, batch_size=20_000, querysets=[queryset], schema="raw_emplois"
+        )
+
+    def populate_pro_support_reports(self):
+        queryset = ProSupportReport.objects.all()
+        metabase_db.populate_table(
+            pro_support_reports.TABLE, batch_size=10_000, querysets=[queryset], schema="raw_emplois"
         )
 
     def populate_references(self):
