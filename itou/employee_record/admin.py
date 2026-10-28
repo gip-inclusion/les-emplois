@@ -3,14 +3,17 @@ import itertools
 import xworkflows
 from django import forms
 from django.contrib import admin, messages
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.shortcuts import render
+from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from itoutils.urls import add_url_params
 
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from itou.utils.admin import (
     ItouModelAdmin,
@@ -51,7 +54,66 @@ class EmployeeRecordAdminForm(forms.ModelForm):
             ).order_by("-number")
 
 
+def _compute_model_stats(model, list_url):
+
+    def _format_value(value, total):
+        if not value:
+            return str(value)
+        if not total:
+            return "-"
+        return f"{value} ({100 * value / total:.2f} %)"
+
+    status_enum = NotificationStatus if model == EmployeeRecordUpdateNotification else Status
+    status_aggregates = {str(status): Count("pk", filter=Q(status=status)) for status in status_enum}
+
+    counts = model.objects.aggregate(
+        total=Count("pk"),
+        # Count by status
+        **status_aggregates,
+    )
+    errors_infos = {}
+    for error_code, count in sorted(
+        model.objects.filter(status=getattr(status_enum, "REJECTED"))
+        .values_list("asp_processing_code")
+        .annotate(count=Count("pk"))
+    ):
+        errors_infos[error_code] = {
+            "count": count,
+            "value": _format_value(count, counts[getattr(status_enum, "REJECTED")]),
+            "url": add_url_params(
+                list_url, {"status": getattr(status_enum, "REJECTED"), "asp_processing_code": error_code}
+            ),
+        }
+
+    stats = {
+        "total": counts["total"],
+        "infos": {},
+    }
+    for status in status_enum:
+        stats["infos"][status.label] = {
+            "value": _format_value(counts[status], counts["total"]),
+            "infos": errors_infos if status == getattr(status_enum, "REJECTED") else {},
+            "url": add_url_params(list_url, {"status": status}),
+        }
+    return stats
+
+
+def stats(request, model_admin):
+    context_data = {
+        **admin.site.each_context(request),
+        "title": f"Statistiques {model_admin.model._meta.verbose_name}",
+        "subtitle": None,
+        "statistic": _compute_model_stats(
+            model_admin.model,
+            list_url=reverse(f"admin:{model_admin.opts.app_label}_{model_admin.opts.model_name}_changelist"),
+        ),
+    }
+    return render(request, "admin/employee_record/stats.html", context_data)
+
+
 class ASPExchangeInformationAdminMixin:
+    change_list_template = "admin/employee_record/change_list_with_stats.html"
+
     @admin.display(description="dernier mouvement")
     def last_movement(self, obj):
         movement = sorted(
@@ -98,6 +160,21 @@ class ASPExchangeInformationAdminMixin:
         start = obj.archived_json["personnePhysique"]["passDateDeb"]
         end = obj.archived_json["personnePhysique"]["passDateFin"]
         return f"{number} ({start} – {end})"
+
+    @property
+    def stats_url(self):
+        return reverse(f"admin:{self.opts.app_label}_{self.opts.model_name}_stats")
+
+    def get_urls(self):
+        additional_urls = [
+            path(
+                "stats",
+                self.admin_site.admin_view(stats),
+                name=f"{self.opts.app_label}_{self.opts.model_name}_stats",
+                kwargs={"model_admin": self},
+            ),
+        ]
+        return additional_urls + super().get_urls()
 
 
 class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
