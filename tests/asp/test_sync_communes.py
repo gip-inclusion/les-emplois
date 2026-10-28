@@ -1,16 +1,13 @@
 import datetime
 import re
 
-import pytest
 from django.core import management
-from django.db import IntegrityError
 
 from itou.asp.models import Commune
 from itou.cities.models import City
 from tests.users.factories import JobSeekerFactory
 
 
-@pytest.mark.xfail(raises=IntegrityError, reason="Unmaintained management command")
 def test_sync_commune(snapshot, capsys):
     management.call_command(
         "sync_communes",

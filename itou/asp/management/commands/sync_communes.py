@@ -7,7 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
 from itou.utils.command import BaseCommand
@@ -124,6 +124,7 @@ class Command(BaseCommand):
                     for obj in exc.restricted_objects:
                         if obj.birth_place == commune:
                             obj.birth_place = None
+                            obj.birth_country = None  # To respect jobseekerprofile_birth_country_and_place constraint
                             setattr(obj, "_birth_place", (commune.code, commune.name))
                         if obj.hexa_commune == commune:
                             obj.hexa_commune = None
@@ -131,7 +132,7 @@ class Command(BaseCommand):
                         profiles_to_remap.append(obj)
                     JobSeekerProfile.objects.bulk_update(
                         exc.restricted_objects,
-                        fields=["birth_place", "hexa_commune"],
+                        fields=["birth_country", "birth_place", "hexa_commune"],
                     )
                     commune.delete()
             self.stdout.write(f"> successfully deleted count={len(communes_removed_by_csv)} communes")
@@ -176,6 +177,7 @@ class Command(BaseCommand):
                             )
                             has_raised = True
                         else:
+                            profile.birth_country_id = Country.FRANCE_ID
                             profile.birth_place = new_commune
 
                     if old_commune_info := getattr(profile, "_hexa_commune", None):
@@ -201,6 +203,6 @@ class Command(BaseCommand):
 
                 n_objs = JobSeekerProfile.objects.bulk_update(
                     profiles_to_remap,
-                    fields=["birth_place", "hexa_commune"],
+                    fields=["birth_country", "birth_place", "hexa_commune"],
                 )
                 self.stdout.write(f"> realigned count={n_objs} JobSeeker profiles with updated communes.")
