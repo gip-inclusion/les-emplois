@@ -175,3 +175,15 @@ def test_get_geiq_df(sftp_directory, faker):
         "rows_after_deduplication": rows - duplicated_sirets,
         "rows_with_empty_email": rows_with_empty_email,
     }
+
+
+def test_get_geiq_df_from_legacy_xls():
+    # The FFGEIQ export is a legacy .xls file, unlike the xlsx content written by the other tests
+    df, info_stats = get_geiq_df("tests/data/geiq_export.xls")
+    assert df.shape == (173, 8)
+    assert info_stats == {
+        "rows_in_file": 191,
+        "rows_with_a_siret": 186,
+        "rows_after_deduplication": 183,
+        "rows_with_empty_email": 10,
+    }
