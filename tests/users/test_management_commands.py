@@ -21,7 +21,6 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
-from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.models import NirModificationRequest, User
 from itou.utils import triggers
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
@@ -1013,25 +1012,27 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
 
             yield
 
-    @pytest.fixture(name="command")
-    def command_fixture(self):
-        return send_check_authorized_members_email.Command()
+    def process_output(self, caplog_messages):
+        assert caplog_messages[-1].startswith(
+            "Management command itou.users.management.commands.send_check_authorized_members_email succeeded in "
+        )
+        return caplog_messages[:-1]
 
     def test_send_check_authorized_members_email_management_command_not_enough_members(
-        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
+        self, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
         # Nothing to do (only one member per organization)
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 0
-        assert caplog.messages == [
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
         ]
 
     def test_send_check_authorized_members_email_management_command_created_at(
-        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
+        self, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
         employer_2 = CompanyMembershipFactory(company=self.employer_1.company)
         prescriber_2 = PrescriberMembershipFactory(organization=self.prescriber_1.organization)
@@ -1041,8 +1042,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Employer's company has been created today
         # Labor inspector's institution has been created less than 3 months ago
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 1 prescriber organizations",
             f"Sent reminder notification to user {self.prescriber_1.user_id} "
@@ -1056,8 +1057,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Subsequent calls should not send other notifications
         caplog.clear()
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1071,8 +1072,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         self.labor_inspector_1.institution.created_at -= relativedelta(months=5)
         self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 1 companies",
             f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
             f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
@@ -1090,7 +1091,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert len(mailoutbox) == 6
 
     def test_send_check_authorized_members_email_management_command_active_members_email_reminder_last_sent_at(
-        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
+        self, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
         employer_2 = CompanyMembershipFactory(company=self.employer_1.company)
         prescriber_2 = PrescriberMembershipFactory(organization=self.prescriber_1.organization)
@@ -1120,8 +1121,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
 
         # Should send 4 notifications to the 2 employers and the 2 labor inspectors
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 1 companies",
             f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
             f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
@@ -1141,8 +1142,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Subsequent calls should not send other notifications
         caplog.clear()
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1155,8 +1156,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         self.prescriber_1.organization.created_at -= relativedelta(days=1)
         self.prescriber_1.organization.save(update_fields=["created_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1169,8 +1170,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         self.prescriber_1.organization.active_members_email_reminder_last_sent_at -= relativedelta(days=1)
         self.prescriber_1.organization.save(update_fields=["active_members_email_reminder_last_sent_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
-        assert caplog.messages == [
+            call_command("send_check_authorized_members_email")
+        assert self.process_output(caplog.messages) == [
             "Processing 0 companies",
             "Processing 1 prescriber organizations",
             (
@@ -1186,13 +1187,13 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert len(mailoutbox) == 6
 
     def test_check_authorized_members_email_content_two_admins(
-        self, django_capture_on_commit_callbacks, command, snapshot, mailoutbox
+        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
     ):
         PrescriberMembershipFactory(organization=self.prescriber_1.organization)
 
         # Should send 2 notifications to the 2 prescribers
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 2
         assert (
             mailoutbox[0].subject
@@ -1201,13 +1202,13 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert mailoutbox[0].body == snapshot
 
     def test_check_authorized_members_email_content_one_admin(
-        self, django_capture_on_commit_callbacks, command, snapshot, mailoutbox
+        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
     ):
         PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
 
         # Should send 1 notification to the only one admin prescriber
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 1
         assert (
             mailoutbox[0].subject
@@ -1216,7 +1217,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert mailoutbox[0].body == snapshot
 
     def test_check_authorized_members_email_content_members_link(
-        self, django_capture_on_commit_callbacks, command, snapshot, mailoutbox
+        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
     ):
         CompanyMembershipFactory(company=self.employer_1.company, is_admin=False)
         PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
@@ -1227,14 +1228,14 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
 
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 3
         assert mailoutbox[0].body == snapshot(name="company")
         assert mailoutbox[1].body == snapshot(name="prescriber_organization")
         assert mailoutbox[2].body == snapshot(name="institution")
 
     def test_check_authorized_members_with_users_admins_of_multiple_organizations(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, mailoutbox
     ):
         CompanyMembershipFactory(company=self.employer_1.company, is_admin=False)
         PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
@@ -1262,7 +1263,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         InstitutionMembershipFactory(institution=other_labor_inspector.institution, is_admin=False)
 
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 6
         expected_organization_names = [
             "Company 1",
@@ -1279,7 +1280,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             )
 
     def test_check_authorized_members_with_disabled_admin_companies(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, mailoutbox
     ):
         self.employer_1.company.created_at -= relativedelta(months=3)
         self.employer_1.company.save(update_fields=["created_at", "updated_at"])
@@ -1305,7 +1306,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         CompanyMembershipFactory(user=inactive_admin, company=company_2)
 
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 3
         expected_memberships = [self.employer_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
@@ -1316,7 +1317,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             assert mailoutbox[idx].to == [expected_membership.user.email]
 
     def test_check_authorized_members_with_disabled_admin_organizations(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, mailoutbox
     ):
         self.prescriber_1.organization.created_at -= relativedelta(months=3)
         self.prescriber_1.organization.save(update_fields=["created_at", "updated_at"])
@@ -1346,7 +1347,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         PrescriberMembershipFactory(user=inactive_admin, organization=organization_2)
 
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 3
         expected_memberships = [self.prescriber_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
@@ -1357,7 +1358,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             assert mailoutbox[idx].to == [expected_membership.user.email]
 
     def test_check_authorized_members_with_disabled_admin_institution(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, mailoutbox
     ):
         self.labor_inspector_1.institution.created_at -= relativedelta(months=3)
         self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
@@ -1389,7 +1390,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         InstitutionMembershipFactory(user=inactive_admin, institution=institution_2)
 
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle()
+            call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 3
         expected_memberships = [self.labor_inspector_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
