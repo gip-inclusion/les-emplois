@@ -105,3 +105,30 @@ def test_inconsistent_dates(capsys, tmp_path):
         "- [2000-01-01, NULL): MONTSERIE",
         "- [2000-01-01, 2006-12-31]: MONTSERIE",
     ]
+
+
+def test_ignore_communes(tmp_path):
+    # Some communes have been flagged as ignored to avoid issues with the ASP
+    # Cf commits 731a8686d & f6296a959
+    ignored_communes_csv = tmp_path / "data.csv"
+    ignored_communes_csv.write_text(
+        dedent("""\
+        code_com_insee;lib_com;date_deb_insee;date_fin_insee
+        98501;ACOUA;01/01/1900;30/03/2011
+    """)
+    )
+    management.call_command(
+        "sync_communes",
+        file_path=ignored_communes_csv,
+        wet_run=True,
+    )
+    acoua = Commune.objects.get(code="98501")
+    acoua.ignore = True
+    acoua.save()
+    management.call_command(
+        "sync_communes",
+        file_path=ignored_communes_csv,
+        wet_run=True,
+    )
+    acoua = Commune.unfiltered_objects.get(pk=acoua.pk)
+    assert acoua.ignore
