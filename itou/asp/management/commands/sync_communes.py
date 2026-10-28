@@ -125,7 +125,7 @@ class Command(BaseCommand):
         for item in yield_sync_diff(
             communes_from_csv,
             ("code", "start_date"),
-            Commune.objects.all(),
+            Commune.unfiltered_objects.all(),
             ("code", "start_date"),
             [
                 ("name", "name"),
@@ -142,6 +142,7 @@ class Command(BaseCommand):
                     end_date=item.raw["end_date"],
                     city=city,  # all of the deactivated Communes will have None here.
                 )
+                # The ignore field is kept untouched by edition since bulk_update doesn't reference it
                 if item.kind == DiffItemKind.EDITION:
                     commune.pk = item.db_obj.pk
                     communes_updated_by_csv.append(commune)
@@ -157,7 +158,7 @@ class Command(BaseCommand):
         if wet_run:
             profiles_to_remap = []
             for pk in communes_removed_by_csv:
-                commune = Commune.objects.get(pk=pk)
+                commune = Commune.unfiltered_objects.get(pk=pk)
                 try:
                     commune.delete()
                 except RestrictedError as exc:
