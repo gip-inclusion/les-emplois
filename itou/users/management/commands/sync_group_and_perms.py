@@ -98,6 +98,7 @@ def get_permissions_dict():
         geiq_assessments_models.EmployeePrequalification: PERMS_READ,
         geiq_assessments_models.LabelInfos: PERMS_READ,
         insertion_models.GenericReferenceItem: PERMS_READ,
+        insertion_models.MobilizationEmail: PERMS_READ,
         insertion_models.MobilizationEvent: PERMS_READ,
         insertion_models.Orientation: PERMS_EDIT,
         insertion_models.OrientationProcessLink: PERMS_ADD | PERMS_DELETE,
