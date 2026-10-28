@@ -8,10 +8,10 @@ class MailboxSerializer(serializers.Serializer):
 
 class AttachmentSerializer(serializers.Serializer):
     Name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    ContentType = serializers.CharField()
-    ContentLength = serializers.IntegerField(min_value=0)
-    ContentID = serializers.CharField()
-    DownloadToken = serializers.CharField()
+    ContentType = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    ContentLength = serializers.IntegerField(min_value=0, required=False, allow_null=True)
+    ContentID = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    DownloadToken = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 
 class RecipientField(serializers.Field):
