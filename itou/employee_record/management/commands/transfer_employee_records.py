@@ -197,14 +197,20 @@ class Command(EmployeeRecordTransferCommand):
         self.logger.info("Starting UPLOAD of %d employee record(s)", len(batch))
         self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
+    def handle(
+        self, *, upload, download, parse_file_name=None, preflight, wet_run, asp_test=False, debug=False, **options
+    ):
         if preflight:
             self.logger.info("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
-        elif parse_file:
+        elif parse_file_name:
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
             # so use an atomic block to avoid creating more incoherence when something breaks.
-            with transaction.atomic(), triggers.context(**self.get_trigger_context()):
+            with (
+                open(parse_file_name, "rb") as parse_file,
+                transaction.atomic(),
+                triggers.context(**self.get_trigger_context()),
+            ):
                 self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
         elif upload or download:
             if not settings.ASP_SFTP_HOST:

@@ -1,4 +1,3 @@
-import argparse
 from io import BytesIO
 from itertools import batched
 
@@ -38,8 +37,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         )
         parser.add_argument(
             "--parse-file",
-            dest="parse_file",
-            type=argparse.FileType(mode="rb"),
+            dest="parse_file_name",
             help="Parse an employee records feedback file",
         )
         parser.add_argument(

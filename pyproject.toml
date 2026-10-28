@@ -51,7 +51,6 @@ python_files = ["tests*.py", "test_*.py"]
 filterwarnings = [
     "error",
     "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
-    "ignore:.*FileType is deprecated.*:PendingDeprecationWarning:",
 ]
 addopts = [
     "--reuse-db",
