@@ -1,6 +1,8 @@
 import datetime
 import re
+from textwrap import dedent
 
+import pytest
 from django.core import management
 
 from itou.asp.models import Commune
@@ -72,3 +74,34 @@ def test_sync_commune(snapshot, capsys):
     js.jobseeker_profile.refresh_from_db()
     assert js.jobseeker_profile.hexa_commune.start_date == datetime.date(1942, 1, 1)
     assert js.jobseeker_profile.birth_place.start_date == datetime.date(1942, 1, 1)
+
+
+def test_inconsistent_dates(capsys, tmp_path):
+    inconsistent_csv = tmp_path / "data.csv"
+    inconsistent_csv.write_text(
+        dedent("""\
+        code_com_insee;lib_com;date_deb_insee;date_fin_insee
+        28238;MARVILLE-LES-BOIS;20/12/1972;19/12/1972
+        38063;BURCIN;01/01/2000;
+        65323;MONTSERIE;01/01/2000;
+        65323;MONTSERIE;01/01/1900;31/12/1999
+        65323;MONTSERIE;01/01/2000;31/12/2006
+    """)
+    )
+
+    with pytest.raises(RuntimeError, match="Inconsistent data in csv"):
+        management.call_command(
+            "sync_communes",
+            file_path=inconsistent_csv,
+            wet_run=True,
+        )
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == [
+        "Impossible dates for 28238:",
+        "- [1972-12-20, 1972-12-19]: MARVILLE-LES-BOIS",
+        "Overlapping dates for 65323:",
+        "- [1900-01-01, 1999-12-31]: MONTSERIE",
+        "- [2000-01-01, NULL): MONTSERIE",
+        "- [2000-01-01, 2006-12-31]: MONTSERIE",
+    ]
