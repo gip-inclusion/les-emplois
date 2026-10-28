@@ -109,6 +109,19 @@ class TestEmployeeRecordPersonSerializer:
             "codeComInsee": None,
         }
 
+    def test_serialization_missing_birth_country(self):
+        employee_record = EmployeeRecordWithProfileFactory(
+            job_application__job_seeker__jobseeker_profile__birth_place=None,
+            job_application__job_seeker__jobseeker_profile__birth_country=None,
+        )
+        serialized = _PersonSerializer(employee_record).data
+        assert serialized["codeInseePays"] is None
+        assert serialized["codeGroupePays"] is None
+        assert serialized["codeComInsee"] == {
+            "codeDpt": "099",
+            "codeComInsee": None,
+        }
+
 
 class TestEmployeeRecordAddressSerializer:
     def test_hexa_additional_address(self):

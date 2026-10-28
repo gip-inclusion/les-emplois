@@ -36,8 +36,11 @@ class _PersonSerializer(serializers.Serializer):
     codeComInsee = serializers.SerializerMethodField()  # Required if the birth country is France
     codeInseePays = serializers.SerializerMethodField(allow_null=True)  # Required
     codeGroupePays = serializers.CharField(
-        source="job_application.job_seeker.jobseeker_profile.birth_country.group"
-    )  # Required
+        source="job_application.job_seeker.jobseeker_profile.birth_country.group",
+        # It is required by the ASP, but we'd rather receive an error from the ASP than crash the
+        # serialization of the whole batch
+        allow_null=True,
+    )
 
     passDateDeb = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.start_at")  # Required
     passDateFin = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.end_at")  # Required
