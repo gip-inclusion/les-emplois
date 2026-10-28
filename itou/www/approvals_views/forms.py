@@ -592,10 +592,8 @@ class SuspensionEndDateForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, approval, instance, siae=None, prescriber_organization=None, **kwargs):
+    def __init__(self, *args, approval, instance, **kwargs):
         self.approval = approval
-        self.siae = siae
-        self.prescriber_organization = prescriber_organization
         self.instance = instance
         super().__init__(*args, **kwargs)
 

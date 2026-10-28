@@ -899,7 +899,6 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         approval=suspension.approval,
         instance=suspension,
         data=request.POST or None,
-        **_suspension_author_kwargs(request),
     )
 
     back_url = get_safe_url(

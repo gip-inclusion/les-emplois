@@ -922,7 +922,6 @@ class TestApprovalSuspendUpdateEndDateView:
 
         form = response.context["form"]
         assert form.initial["first_day_back_to_work"] == timezone.localdate()
-        assert form.siae == self.job_application.to_company
         assert form.approval == self.approval
         assert form.instance == self.suspension
         assert form.fields["first_day_back_to_work"].widget.attrs == {
