@@ -56,11 +56,7 @@ def get_geiq_df(filename):
     df = df[~df.siret.isnull()]
     info_stats["rows_with_a_siret"] = len(df)
 
-    df.drop_duplicates(
-        subset=["siret"],
-        keep="first",
-        inplace=True,
-    )
+    df = df.drop_duplicates(subset=["siret"], keep="first")
     info_stats["rows_after_deduplication"] = len(df)
 
     # Drop rows without auth_email.

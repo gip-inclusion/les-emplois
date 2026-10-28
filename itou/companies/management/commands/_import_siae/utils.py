@@ -71,10 +71,7 @@ def remap_columns(df, column_mapping):
         if column_name not in df.columns.tolist():
             raise ValueError(f"FATAL ERROR: {column_name} column absent in dataframe.")
 
-    df.rename(
-        columns=column_mapping,
-        inplace=True,
-    )
+    df = df.rename(columns=column_mapping)
 
     # Keep only the columns we need.
     df = df[column_mapping.values()]
