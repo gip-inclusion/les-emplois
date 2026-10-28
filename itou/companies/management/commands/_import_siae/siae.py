@@ -61,7 +61,7 @@ def build_siae(row, kind, *, is_active):
         siae.address_line_2 = ""
 
     siae.city = row.city
-    siae.post_code = row.post_code
+    siae.post_code = row.post_code or ""
     siae.department = department_from_postcode(siae.post_code)
 
     if is_active:
