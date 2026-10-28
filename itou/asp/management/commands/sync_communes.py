@@ -195,7 +195,7 @@ class Command(BaseCommand):
             self.stdout.write(f"> successfully created count={len(objs)} new communes")
 
             if profiles_to_remap:
-                has_raised = False
+                not_found = set()
                 for profile in profiles_to_remap:
                     if old_commune_info := getattr(profile, "_birth_place", None):
                         try:
@@ -216,7 +216,7 @@ class Command(BaseCommand):
                                 f"at={profile.birthdate} "
                                 f"name={old_commune_info[1]} not found ! Resolve manually."
                             )
-                            has_raised = True
+                            not_found.add(old_commune_info)
                         else:
                             profile.birth_country_id = Country.FRANCE_ID
                             profile.birth_place = new_commune
@@ -235,12 +235,12 @@ class Command(BaseCommand):
                                 f"! new commune for code={old_commune_info[0]} "
                                 f"name={old_commune_info[1]} not found ! Resolve manually."
                             )
-                            has_raised = True
+                            not_found.add(old_commune_info)
                         else:
                             profile.hexa_commune = new_commune
 
-                if has_raised:
-                    raise Exception("Some communes could not be found. Please resolve manually.")
+                if not_found:
+                    raise Exception(f"Some communes could not be found. Please resolve manually. {not_found}")
 
                 n_objs = JobSeekerProfile.objects.bulk_update(
                     profiles_to_remap,
