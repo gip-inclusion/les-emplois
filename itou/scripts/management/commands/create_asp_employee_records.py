@@ -1,4 +1,3 @@
-import argparse
 import csv
 
 from django.core.exceptions import ValidationError
@@ -22,13 +21,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "file",
-            type=argparse.FileType(mode="r"),
+            "file_name",
             help="The filled CSV file sent to ASP",
         )
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def handle(self, file, *, wet_run=False, **options):
+    def handle(self, file_name, *, wet_run=False, **options):
+        with open(file_name) as file:
+            self._handle_file(file, wet_run=wet_run)
+
+    def _handle_file(self, file, *, wet_run):
         now = timezone.now()
         siret_to_siaes = {}
         siret_without_convention = set()
