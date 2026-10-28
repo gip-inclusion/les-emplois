@@ -8,6 +8,8 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
