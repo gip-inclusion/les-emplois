@@ -447,7 +447,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
         """
-        self.clean()
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
