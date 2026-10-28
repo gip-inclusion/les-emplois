@@ -250,7 +250,40 @@ class TestBrevoInboundParsing:
             "inbound parsing address (kind=nomatch, key=rand0m) matched no inbound parsing kind" in caplog.messages[0]
         )
 
-    def test_inbound_parsing_dont_process_any_mails_if_exception(self, caplog):
+    @pytest.mark.parametrize(
+        "attachment_payload",
+        [
+            {
+                "Name": "cv.pdf",
+                "ContentType": "application/pdf",
+                "ContentLength": 1024,
+                "ContentID": "someId",
+                "DownloadToken": "t0k3n",
+            },
+            {},
+            {
+                "Name": "cv.pdf",
+                "SomethingElse": 1,
+            },
+        ],
+    )
+    def test_inbound_parsing_service_answer_with_attachments(
+        self, django_capture_on_commit_callbacks, mailoutbox, attachment_payload
+    ):
+        mobilization_email = MobilizationEmailFactory(inbound_parsing_key=self.inbound_parsing_key)
+
+        payload = self._payload({"Attachments": [attachment_payload]})
+        with django_capture_on_commit_callbacks(execute=True):
+            response = self.authenticated_client.post(self.WEBHOOK_URL, payload, format="json")
+        assert response.json() == {"msg": "ok"}
+
+        mobilization_email.refresh_from_db()
+        assert mobilization_email.answered_at is not None
+
+        # The email is forwarded
+        assert len(mailoutbox) == 1
+
+    def test_inbound_parsing_dont_process_any_mails_if_exception(self):
         mobilization_email = MobilizationEmailFactory(
             inbound_parsing_key=self.inbound_parsing_key,
             service=ServiceFactory(contact_email="not_brigitte@domain.fake"),
