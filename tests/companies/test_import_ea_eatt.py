@@ -33,9 +33,9 @@ def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     return command
 
 
-@pytest.fixture(name="archive_file")
-def archive_file_fixture():
-    archive = io.BytesIO()
+@pytest.fixture(name="archive_file_name")
+def archive_file_name_fixture(tmp_path):
+    file_name = tmp_path / "archive.zip"
 
     data = [
         # File header
@@ -66,18 +66,16 @@ def archive_file_fixture():
         # File footer
         "Z|ASP|EA|20241231|235959|4|7|",
     ]
-    with zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
+    with open(file_name, "wb") as archive, zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
         fp.setpassword(b"password")
         fp.writestr("EA2_ITOU.txt", data="\n".join(data))
 
-    archive.seek(0)
-    return archive
+    return file_name
 
 
-@pytest.fixture(name="archive_file_without_companies")
-def archive_file_without_companies_fixture():
-    archive = io.BytesIO()
-
+@pytest.fixture(name="archive_file_name_without_companies")
+def archive_file_name_without_companies_fixture(tmp_path):
+    file_name = tmp_path / "archive.zip"
     data = [
         # File header
         "L|ASP|EA|V1.0|20260105|092352|",
@@ -89,12 +87,11 @@ def archive_file_without_companies_fixture():
         # File footer
         "Z|ASP|EA|20260105|092352|0|3|",
     ]
-    with zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
+    with open(file_name, "wb") as archive, zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
         fp.setpassword(b"password")
         fp.writestr("EA2_ITOU.txt", data="\n".join(data))
 
-    archive.seek(0)
-    return archive
+    return file_name
 
 
 def extract_logs(caplog, *, extra_keys=None):
@@ -182,12 +179,12 @@ def test_clean_old_archives_dry_run(caplog, snapshot, faker, mocker, sftp_direct
     assert extract_logs(caplog) == snapshot(name="logs")
 
 
-def test_process_file_from_archive(caplog, snapshot, settings, command, archive_file):
+def test_process_file_from_archive(caplog, snapshot, settings, command, archive_file_name):
     settings.ASP_EA2_UNZIP_PASSWORD = "password"
 
     CompanyFactory(kind=CompanyKind.EA, siret="00000000000003")
 
-    command.handle(from_archive=archive_file, wet_run=True)
+    command.handle(from_archive_name=archive_file_name, wet_run=True)
 
     assert extract_logs(caplog, extra_keys=["info_stats"]) == snapshot(name="logs")
 
@@ -210,11 +207,11 @@ def test_process_file_from_archive(caplog, snapshot, settings, command, archive_
 
 
 def test_process_file_when_there_is_no_company_rows(
-    caplog, snapshot, settings, command, archive_file_without_companies
+    caplog, snapshot, settings, command, archive_file_name_without_companies
 ):
     settings.ASP_EA2_UNZIP_PASSWORD = "password"
 
-    command.handle(from_archive=archive_file_without_companies, wet_run=True)
+    command.handle(from_archive_name=archive_file_name_without_companies, wet_run=True)
 
     assert extract_logs(caplog, extra_keys=["info_stats"]) == snapshot(name="logs")
     assert Company.objects.all().count() == 0
