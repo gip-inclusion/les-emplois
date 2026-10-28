@@ -6,7 +6,7 @@ from operator import attrgetter
 
 import unidecode
 from django.conf import settings
-from django.db.models import JSONField
+from django.db.models import BigIntegerField, JSONField
 from django.db.models.fields import (
     AutoField,
     BooleanField,
@@ -57,6 +57,8 @@ def get_field_type_from_field(field):
         return "varchar"
     if isinstance(field, TextField):
         return "text"
+    if isinstance(field, BigIntegerField):
+        return "bigint"
     if isinstance(field, IntegerField):
         return "integer"
     if isinstance(field, DecimalField):
