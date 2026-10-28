@@ -243,7 +243,7 @@ class ContractFactory(factory.django.DjangoModelFactory):
         model = models.Contract
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    company = factory.SubFactory(CompanyFactory)
+    company = factory.SubFactory(CompanyFactory, subject_to_iae_rules=True)
     start_date = factory.Faker("date_between", start_date="-1y", end_date="-1m")
     end_date = factory.Faker("date_between", start_date="-1m", end_date="+1m")
 
