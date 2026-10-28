@@ -19,7 +19,7 @@ class CodeTest(models.TextChoices):
 
 @pytest.fixture(name="command")
 def command_fixture(mocker):
-    command = collect_analytics_data.Command()
+    command = collect_analytics_data.Command
     mocker.patch.object(command, "_get_data", return_value={})
     mocker.spy(command, "show_data")
     mocker.spy(command, "save_data")
@@ -27,16 +27,25 @@ def command_fixture(mocker):
     return command
 
 
+def process_output(caplog_messages):
+    assert caplog_messages[-1].startswith(
+        "Management command itou.analytics.management.commands.collect_analytics_data succeeded in "
+    )
+    return caplog_messages[:-1]
+
+
 @freeze_time("2022-01-01")
 def test_handle_default_options(command, caplog):
-    command.handle(save=False, offset=0)
+    call_command("collect_analytics_data", save=False, offset=0)
 
     assert command._get_data.call_args_list == [
         unittest.mock.call(timezone.now().replace(hour=0, minute=0, second=0, microsecond=0))
     ]
-    assert command.show_data.call_args_list == [unittest.mock.call({})]
+    [single_show_data_call_args] = command.show_data.call_args_list
+    # Ignore first arg being the command instance/self
+    assert single_show_data_call_args.args[1:] == ({},)
     assert command.save_data.call_args_list == []
-    assert caplog.messages == [
+    assert process_output(caplog.messages) == [
         "Collecting analytics data before '2022-01-01 00:00:00+00:00'.",
         "Analytics data computed.",
     ]
@@ -44,25 +53,25 @@ def test_handle_default_options(command, caplog):
 
 @freeze_time()
 def test_handle_save_option(command):
-    command.handle(save=True, offset=0)
+    call_command("collect_analytics_data", save=True, offset=0)
+    [single_call_args] = command.save_data.call_args_list
 
-    assert command.save_data.call_args_list == [
-        unittest.mock.call({}, timezone.now().replace(hour=0, minute=0, second=0, microsecond=0))
-    ]
+    # Ignore first arg being the command instance/self
+    assert single_call_args.args[1:] == ({}, timezone.now().replace(hour=0, minute=0, second=0, microsecond=0))
 
 
 @freeze_time("2022-01-01")
 def test_handle_offset_option(command, caplog):
-    command.handle(save=False, offset=7)
+    call_command("collect_analytics_data", save=False, offset=7)
 
-    assert caplog.messages == [
+    assert process_output(caplog.messages) == [
         "Collecting analytics data before '2021-12-25 00:00:00+00:00'.",
         "Analytics data computed.",
     ]
 
 
 def test_show_data(command, caplog):
-    command.show_data({CodeTest.CODE_001: 42, CodeTest.CODE_002: 21})
+    command().show_data({CodeTest.CODE_001: 42, CodeTest.CODE_002: 21})
 
     assert caplog.messages == [
         "Premier code de test (CODE-001): 42",
@@ -71,7 +80,7 @@ def test_show_data(command, caplog):
 
 
 def test_save_data(command, caplog):
-    command.save_data(
+    command().save_data(
         {CodeTest.CODE_001: 42, CodeTest.CODE_002: 21},
         datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
@@ -92,7 +101,7 @@ def test_save_data(command, caplog):
 def test_save_data_with_an_integrity_error(command, caplog):
     factories.DatumFactory(code=CodeTest.CODE_001, bucket="2021-12-31")
 
-    command.save_data(
+    command().save_data(
         {CodeTest.CODE_001: 42, CodeTest.CODE_002: 21},
         datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
@@ -109,7 +118,7 @@ def test_save_data_with_an_integrity_error(command, caplog):
 
 
 def test_save_data_with_a_float(command, caplog):
-    command.save_data(
+    command().save_data(
         {CodeTest.CODE_001: 42.5, CodeTest.CODE_002: 21},
         datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
