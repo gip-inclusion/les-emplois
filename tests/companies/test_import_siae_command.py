@@ -18,6 +18,7 @@ from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
+    build_siae,
     check_whether_signup_is_possible_for_all_siaes,
     cleanup_siaes_after_grace_period,
     create_new_siaes,
@@ -272,6 +273,16 @@ class TestImportSiaeManagementCommands:
             with pytest.raises(AssertionError, match=error_message):
                 create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
         assert not Company.objects.filter(siret=new_siret).exists()
+
+    def test_build_siae_with_empty_post_code(self):
+        row = next(iter(get_siret_to_siae_row(get_vue_structure_df()).values()))
+        # Empty fields read through read_csv() converters are NaN since pandas 3.1, hence None
+        row["post_code"] = None
+
+        siae = build_siae(row, CompanyKind.ACI, is_active=False)
+        assert siae.post_code == ""
+        assert siae.department == ""
+        siae.save()
 
     def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self, monkeypatch):
         clever_user_id = f"user_{uuid.uuid4()}"
