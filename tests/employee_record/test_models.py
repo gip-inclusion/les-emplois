@@ -150,6 +150,22 @@ class TestEmployeeRecordModel:
             employee_record = EmployeeRecord.from_job_application(job_application)
             employee_record.ready()
 
+    def test_failed_ready_when_missing_birth_country(self):
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            for_employee_record=True,
+        )
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        profile = job_application.job_seeker.jobseeker_profile
+        profile.birth_country = None
+        profile.birth_place = None
+        with triggers.fake_context():
+            profile.save(update_fields={"birth_country", "birth_place"})
+
+        with pytest.raises(ValidationError, match="Le pays de naissance est obligatoire"):
+            employee_record.ready()
+
     def test_ready_fill_denormalized_fields(self):
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,

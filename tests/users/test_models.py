@@ -776,6 +776,7 @@ class TestJobSeekerProfileModel:
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
             jobseeker_profile__education_level=random.choice(EducationLevel.values),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
+            born_outside_france=True,
         )
         self.profile = self.user.jobseeker_profile
 
@@ -903,7 +904,10 @@ class TestJobSeekerProfileModel:
         self.profile.education_level = "00"
         self.profile._clean_job_seeker_details()
 
-        # Birth place / birth country are checked in User tests
+        # No birth country provided
+        self.profile.birth_country = None
+        with pytest.raises(ValidationError):
+            self.profile._clean_job_seeker_details()
 
     @pytest.mark.parametrize(
         "birthdate,expected_age",
