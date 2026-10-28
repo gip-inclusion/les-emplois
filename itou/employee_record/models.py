@@ -463,7 +463,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         Update status after an ASP rejection of the employee record
         """
-        self.clean()
         self.set_asp_processing_information(code, label, archive)
 
     @xwf_models.transition()
@@ -495,7 +494,12 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         if as_duplicate and code != self.ASP_DUPLICATE_ERROR_CODE:
             raise ValueError(f"Code needs to be {self.ASP_DUPLICATE_ERROR_CODE} and not {code} when {as_duplicate=}")
 
-        self.clean()
+        try:
+            self.clean()
+        except ValidationError as exc:
+            # This shouldn't happen but it shouldn't either block the processing of the record batch
+            # Log to Sentry
+            logger.error("employee_record=%d was processed despite not being clean: %s", self.pk, exc)
         self.processed_at = timezone.now()
         self.processed_as_duplicate = as_duplicate
         self.set_asp_processing_information(

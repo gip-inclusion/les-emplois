@@ -2,6 +2,7 @@ import datetime
 import functools
 import itertools
 import random
+import re
 from contextlib import nullcontext
 from datetime import timedelta
 from unittest import mock
@@ -503,8 +504,48 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.asp_processing_label == "JSON Invalide"
         assert self.employee_record.archived_json == {}
 
+    def test_state_rejected_with_unclean_job_seeker(self, faker):
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_country = None
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_place = None
+        with triggers.fake_context():
+            self.employee_record.job_application.job_seeker.jobseeker_profile.save(
+                update_fields={"birth_country", "birth_place"}
+            )
+        # If the job seeker isn't "clean" but the record has been sent nonetheless
+        # we still want to store the result of the ASP processing (and not crash the whole batch)
+        self.employee_record.reject(
+            code="3309", label="Le champ Code insee pays de naissance est obligatoire", archive={}
+        )
+        assert self.employee_record.status == Status.REJECTED
+        assert self.employee_record.asp_processing_code == "3309"
+        assert self.employee_record.asp_processing_label == "Le champ Code insee pays de naissance est obligatoire"
+        assert self.employee_record.archived_json == {}
+
     def test_state_processed(self, faker):
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        self.employee_record.process(code=process_code, label=process_message, archive={})
+
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == {}
+
+    def test_state_processed_with_unclean_job_seeker(self, faker, caplog):
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_country = None
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_place = None
+        with triggers.fake_context():
+            self.employee_record.job_application.job_seeker.jobseeker_profile.save(
+                update_fields={"birth_country", "birth_place"}
+            )
+
+        # If the job seeker isn't "clean" but the record has been sent nonetheless
+        # we still want to store the result of the ASP processing (and not crash the whole batch)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -516,6 +557,14 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.asp_processing_code == process_code
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json == {}
+        assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == [
+            "[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)",
+            (
+                f"employee_record={self.employee_record.pk} was processed despite not being clean: "
+                "['Le pays de naissance est obligatoire']"
+            ),
+            "[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.process (SENT -> PROCESSED)",
+        ]
 
     def test_state_processed_when_archive_is_none(self, faker):
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
