@@ -1208,8 +1208,12 @@ class SiaeFinancialAnnex(models.Model):
 
 class ContractQuerySet(models.QuerySet):
     def ongoing(self):
-        """Contracts still running according to the ASP data (no end date, or ending today or later)."""
-        return self.filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.localdate()))
+        """Contracts still running according to the ASP data :
+        - no end date, or ending today or later
+        - for an active siae."""
+        return self.filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.localdate())).filter(
+            Exists(Company.objects.active().filter(pk=OuterRef("company_id"))),
+        )
 
 
 class Contract(models.Model):

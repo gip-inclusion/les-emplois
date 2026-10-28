@@ -190,3 +190,9 @@ class TestCanCloseApproval:
         _make_long_suspension(approval)
         ContractFactory(end_date=None)  # different job_seeker
         assert can_close_approval(approval) is True
+
+    def test_contract_of_inactive_companies_ignored(self):
+        approval = ApprovalFactory(with_jobapplication=True)
+        _make_long_suspension(approval)
+        ContractFactory(job_seeker=approval.user, end_date=None, company__convention__is_active=False)
+        assert can_close_approval(approval) is True

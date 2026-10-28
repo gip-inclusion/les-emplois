@@ -328,7 +328,7 @@ class TestApprovalSuspendView:
         "with_contract",
         [
             pytest.param(False, id="no_contract"),
-            pytest.param(True, id="ended_contract"),
+            pytest.param(True, id="with_ignored_contract"),
         ],
     )
     def test_contract_reasons_enabled_without_ongoing_contract(self, client, with_contract):
@@ -340,9 +340,16 @@ class TestApprovalSuspendView:
         )
         approval = job_application.approval
         if with_contract:
+            # Ended contract
             ContractFactory(
                 job_seeker=approval.user,
                 end_date=today - relativedelta(days=1),
+            )
+            # ongoing contract on an inactive siae
+            ContractFactory(
+                job_seeker=approval.user,
+                company__convention__is_active=False,
+                end_date=None,
             )
 
         employer = job_application.to_company.members.first()
