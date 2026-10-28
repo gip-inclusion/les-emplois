@@ -95,7 +95,7 @@ def get_vue_af_df():
     df["is_active"] = df.has_active_state & df.ends_in_the_future
 
     # Drop identical duplicate rows.
-    df.drop_duplicates(inplace=True)
+    df = df.drop_duplicates()
 
     # Considering only active AFs, their number is unique.
     active_rows = df[df.is_active]
@@ -117,21 +117,16 @@ def get_vue_af_df():
 
     # Sort dataframe in a smart way before we drop duplicates by
     # keeping the first occurence in this order.
-    df.sort_values(
+    df = df.sort_values(
         # In case of duplicates, we will keep:
         # - the active one if there is one
         # - if there is no active one, the one with an active state and the latest end_date
         # - if there is none with an active state, the one with any state and the latest end_date
         by=["is_active", "has_active_state", "end_at"],
         ascending=[False, False, False],
-        inplace=True,
     )
 
-    df.drop_duplicates(
-        subset=["number"],
-        keep="first",
-        inplace=True,
-    )
+    df = df.drop_duplicates(subset=["number"], keep="first")
 
     assert df.number.is_unique
 
