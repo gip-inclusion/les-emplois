@@ -928,6 +928,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     ERROR_HEXA_POST_CODE = "Le code postal est obligatoire"
     ERROR_HEXA_COMMUNE = "La commune INSEE est obligatoire"
 
+    ERROR_JOBSEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
     ERROR_JOBSEEKER_TITLE = "La civilité du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_EDUCATION_LEVEL = "Le niveau de formation du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_PE_FIELDS = "L'identifiant et la durée d'inscription à France Travail vont de pair"
@@ -1417,6 +1418,8 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
 
         if not self.education_level:
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
+        if not self.birth_country:
+            raise ValidationError(self.ERROR_JOBSEEKER_BIRTH_COUNTRY)
 
     def _clean_job_seeker_hexa_address(self):
         # Check if any fields of the hexa address is filled
