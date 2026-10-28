@@ -1,5 +1,3 @@
-import argparse
-
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.employee_record.constants import get_availability_date_for_kind
@@ -14,13 +12,17 @@ class Command(BaseCommand):
         super().add_arguments(parser)
 
         parser.add_argument(
-            "approvals_list_file",
-            type=argparse.FileType(mode="r"),
+            "approvals_list_file_name",
         )
         parser.add_argument("siret", type=str, nargs="+")
         parser.add_argument("--wet-run", action="store_true")
 
-    def handle(self, *, approvals_list_file, siret, wet_run=False, **options):
+    def handle(self, *, approvals_list_file_name, siret, wet_run=False, **options):
+        with open(approvals_list_file_name) as approvals_list_file:
+            self._handle_file(approvals_list_file=approvals_list_file, siret=siret, wet_run=wet_run)
+
+    def _handle_file(self, *, approvals_list_file, siret, wet_run):
+
         approvals_number = []
         for line in approvals_list_file:
             approval_number = line.strip().replace(" ", "")
