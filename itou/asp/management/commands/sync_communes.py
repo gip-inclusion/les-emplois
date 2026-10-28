@@ -17,8 +17,8 @@ from itou.utils.sync import DiffItemKind, yield_sync_diff
 ASP_DATE_FORMAT = "%d/%m/%Y"
 
 
-def csv_import_communes(filename):
-    with open(filename, encoding="utf-8") as f:
+def csv_import_communes(filename, file_encoding):
+    with open(filename, encoding=file_encoding) as f:
         reader = csv.reader(f, delimiter=";")
         next(reader)
         for line_number, line in enumerate(reader, start=2):
@@ -67,9 +67,16 @@ class Command(BaseCommand):
             action="store",
             help="Path of the ASP CSV file to import",
         )
+        parser.add_argument(
+            "--file-encoding",
+            dest="file_encoding",
+            default="utf-8",
+            action="store",
+            help="Encoding of the file (default: %(default)s)",
+        )
 
-    def handle(self, *, file_path, wet_run, **options):
-        communes_from_csv = list(csv_import_communes(file_path))
+    def handle(self, *, file_path, file_encoding, wet_run, **options):
+        communes_from_csv = list(csv_import_communes(file_path, file_encoding))
 
         communes_added_by_csv = []
         communes_updated_by_csv = []
