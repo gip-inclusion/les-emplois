@@ -478,6 +478,22 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.asp_batch_line_number == 42
         assert self.employee_record.archived_json == {}
 
+    def test_state_sent_with_unclean_job_seeker(self, faker):
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_country = None
+        self.employee_record.job_application.job_seeker.jobseeker_profile.birth_place = None
+        with triggers.fake_context():
+            self.employee_record.job_application.job_seeker.jobseeker_profile.save(
+                update_fields={"birth_country", "birth_place"}
+            )
+        # Since wait_for_asp_response is called after actually sending the file to ASP, we don't want this transition
+        # to fail if someone edits the job seeker after completing the employee record:
+        # it will simply come back with an error
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=42, archive={})
+
+        assert self.employee_record.status == Status.SENT
+        assert self.employee_record.asp_batch_line_number == 42
+        assert self.employee_record.archived_json == {}
+
     def test_state_rejected(self, faker):
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
