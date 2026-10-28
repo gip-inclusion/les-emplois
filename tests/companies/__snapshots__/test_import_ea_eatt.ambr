@@ -141,6 +141,12 @@
       'message': '[chan 0] sftp session closed.',
       'module': 'sftp',
     }),
+    dict({
+      'funcName': 'execute',
+      'levelno': 40,
+      'message': 'Error when executing itou.companies.management.commands.import_ea_eatt',
+      'module': 'commands',
+    }),
   ])
 # ---
 # name: test_command_errors[monday][logs]
