@@ -16,6 +16,7 @@ env:
   CLEVER_SECRET: ${{ secrets.DEMO_CLEVER_SECRET }}
   CLEVER_TOKEN: ${{ secrets.DEMO_CLEVER_TOKEN }}
   DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
+  BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
 
 jobs:
   reset:
@@ -39,6 +40,6 @@ jobs:
           $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
           OUTPUT_FILE=$(mktemp)
           # Always returns error code 0, as the SSH command succeeds.
-          echo "source .bashrc && cd app_* && scripts/reset --bucket-name $BUCKET_NAME --admin-password $ADMIN_PASSWORD --dora-token $DORA_TOKEN" | \
+          echo "source .bashrc && cd app_* && scripts/reset --bucket-name $BUCKET_NAME --admin-password $ADMIN_PASSWORD --dora-token $DORA_TOKEN --brevo-token $BREVO_TOKEN" | \
               $CLEVER_CLI ssh --alias demo-app | tee $OUTPUT_FILE
           grep --quiet "Reset of DEMO environment completed successfully." $OUTPUT_FILE

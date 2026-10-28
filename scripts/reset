@@ -12,6 +12,8 @@ from django.conf import settings
 from django.core.management import call_command
 from django_redis.cache import RedisCache
 
+from itou.api.models import BrevoToken
+
 
 def clear_bucket(bucket_name):
     from itou.utils.storage.s3 import s3_client
@@ -28,7 +30,7 @@ def clear_bucket(bucket_name):
             )
 
 
-def main(bucket_name, admin_password, dora_token):
+def main(bucket_name, admin_password, dora_token, brevo_token):
     from django.core.cache import caches
     from django.db import connection
 
@@ -76,6 +78,7 @@ def main(bucket_name, admin_password, dora_token):
         u.save(update_fields=["password"])
 
     ServiceToken.objects.create(key=dora_token, service=Service.DORA, purpose="Pour l'API nexus")
+    BrevoToken.objects.create(key=brevo_token, purpose="Authentification du webhook Brevo d’inbound parsing")
 
     for cache_name in caches:
         cache = caches[cache_name]
@@ -96,5 +99,6 @@ if __name__ == "__main__":
     parser.add_argument("--bucket-name", required=True)
     parser.add_argument("--admin-password", required=True)
     parser.add_argument("--dora-token", required=True)
+    parser.add_argument("--brevo-token", required=True)
     args = parser.parse_args()
     main(args.bucket_name, args.admin_password, args.dora_token)
