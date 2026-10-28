@@ -18,7 +18,7 @@ from itou.utils.validators import validate_siret
 def get_geiq_df(filename):
     info_stats = {}
 
-    df = pd.read_excel(filename, converters={"siret": str, "zip": str})
+    df = pd.read_excel(filename, engine="calamine", converters={"siret": str, "zip": str})
     info_stats["rows_in_file"] = len(df)
 
     column_mapping = {
