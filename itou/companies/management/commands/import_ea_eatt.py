@@ -1,4 +1,3 @@
-import argparse
 import io
 import zipfile
 
@@ -74,9 +73,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument(
-            "--from-archive", dest="from_archive", type=argparse.FileType(mode="rb"), help="The ZIP file"
-        )
+        group.add_argument("--from-archive", dest="from_archive_name", help="The ZIP file")
         group.add_argument("--from-asp", dest="from_asp", action="store_true")
 
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
@@ -238,14 +235,20 @@ class Command(BaseCommand):
             "timezone": "UTC",
         },
     )
-    def handle(self, *, from_archive=None, from_asp=False, wet_run=False, **options):
-        try:
-            archive = self.retrieve_archive_of_the_week() if from_asp else from_archive
-        except FileOfTheWeekNotFound:
-            if timezone.localdate().isoweekday() >= 5:  # Only raise at end of week (friday)
-                raise RuntimeError("No file for this week")
-            self.logger.info("No file found, nothing to be done")
-            return
+    def handle(self, *, from_archive_name=None, from_asp=False, wet_run=False, **options):
+        if from_asp:
+            try:
+                archive = self.retrieve_archive_of_the_week()
+            except FileOfTheWeekNotFound:
+                if timezone.localdate().isoweekday() >= 5:  # Only raise at end of week (friday)
+                    raise RuntimeError("No file for this week")
+                self.logger.info("No file found, nothing to be done")
+                return
+        elif from_archive_name:
+            with open(from_archive_name, "rb") as from_archive:
+                archive = io.BytesIO(from_archive.read())
+        else:
+            raise RuntimeError("You need to specify either --from-asp or --from-archive")
 
         with zipfile.ZipFile(archive).open("EA2_ITOU.txt", pwd=settings.ASP_EA2_UNZIP_PASSWORD.encode()) as f:
             self.process_file(io.TextIOWrapper(f, encoding="utf-8", newline="\n"), wet_run=wet_run)
