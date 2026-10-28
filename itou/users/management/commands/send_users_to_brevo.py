@@ -22,6 +22,34 @@ from itou.utils.command import BaseCommand
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
 
 
+def verified_email_or_sso(identity_providers):
+    """Condition on users having a verified primary email, or an account from an SSO, which verifies emails itself."""
+    has_verified_primary_email = Exists(
+        EmailAddress.objects.filter(
+            user_id=OuterRef("pk"),
+            email=OuterRef("email"),
+            primary=True,
+            verified=True,
+        )
+    )
+    return has_verified_primary_email | Q(identity_provider__in=identity_providers)
+
+
+def has_siae_membership():
+    """Condition on users being members of an SIAE, as opposed to other kinds of companies."""
+    return Exists(
+        CompanyMembership.objects.filter(
+            user_id=OuterRef("pk"),
+            company__kind__in=CompanyKind.siae_kinds(),
+        )
+    )
+
+
+def has_prescriber_membership(**filters):
+    """Condition on users being members of a prescriber organization, matching the given filters."""
+    return Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"), **filters))
+
+
 def professional_serializer(user, brevo_type):
     return {
         "email": user.email,
@@ -83,85 +111,54 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *args, wet_run, **options):
-        client = BrevoClient()
-        self.import_professionals(client, wet_run=wet_run)
-        self.import_job_seekers(client, wet_run=wet_run)
-
-    def import_professionals(self, client, *, wet_run):
-        professional_qs = (
-            User.objects.filter(kind=UserKind.PROFESSIONAL)
-            .filter(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-                | Q(identity_provider=IdentityProvider.PRO_CONNECT),  # the SSO verifies emails on its own
-                is_active=True,
-            )
-            .order_by("email")
-        )
-        self.import_employers(client, professional_qs, wet_run=wet_run)
-        self.import_prescribers(client, professional_qs, wet_run=wet_run)
-
-    def import_employers(self, client, professional_qs, *, wet_run):
-        employers = list(
-            professional_qs.filter(
-                Exists(
-                    CompanyMembership.objects.filter(
-                        user_id=OuterRef("pk"),
-                        company__kind__in=CompanyKind.siae_kinds(),
-                    )
-                )
-            )
-        )
-        self.logger.info("SIAE users count: %d", len(employers))
-        if wet_run:
-            client.import_users(employers, BrevoListID.EMPLOYERS, employer_serializer)
-
-    def import_prescribers(self, client, professional_qs, *, wet_run):
-        all_prescribers = professional_qs.filter(Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"))))
-
-        authorized_prescriber_memberships = PrescriberMembership.objects.filter(
-            user_id=OuterRef("pk"),
-            organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-        )
-        authorized_prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
-
-        self.logger.info("Prescribers count: %d", len(authorized_prescribers))
-        if wet_run:
-            client.import_users(authorized_prescribers, BrevoListID.PRESCRIBERS, authorized_prescriber_serializer)
-
-        orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
-        self.logger.info("Orienteurs count: %d", len(orienteurs))
-        if wet_run:
-            client.import_users(orienteurs, BrevoListID.PRESCRIBERS, prescriber_serializer)
-
-    def import_job_seekers(self, client, *, wet_run):
+        self.client = BrevoClient()
+        self.wet_run = wet_run
+        professionals = User.objects.filter(
+            verified_email_or_sso([IdentityProvider.PRO_CONNECT]),
+            kind=UserKind.PROFESSIONAL,
+            is_active=True,
+        ).order_by("email")
         job_seekers = User.objects.filter(
-            Q(
-                Exists(
-                    EmailAddress.objects.filter(
-                        user_id=OuterRef("pk"),
-                        email=OuterRef("email"),
-                        primary=True,
-                        verified=True,
-                    )
-                )
-            )
-            | Q(
-                identity_provider__in=[
-                    IdentityProvider.FRANCE_CONNECT,
-                    IdentityProvider.FT_CONNECT,
-                ]
-            ),
+            verified_email_or_sso([IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]),
             kind=UserKind.JOB_SEEKER,
             is_active=True,
         ).order_by("pk")
+        self.import_professionals(professionals)
+        self.import_job_seekers(job_seekers)
 
+    def import_users(self, name, users, list_id, serializer):
+        """Log the number of users, and import them into a Brevo list on a wet run."""
+        users = list(users)
+        self.logger.info("%s count: %d", name, len(users))
+        if self.wet_run:
+            self.client.import_users(users, list_id, serializer)
+
+    def import_professionals(self, professionals):
+        """Import the SIAE members into the employers list, and the prescriber members into the prescribers list."""
+        authorized_prescriber = has_prescriber_membership(
+            organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+        self.import_users(
+            "SIAE users",
+            professionals.filter(has_siae_membership()),
+            BrevoListID.EMPLOYERS,
+            employer_serializer,
+        )
+        self.import_users(
+            "Prescribers",
+            professionals.filter(authorized_prescriber),
+            BrevoListID.PRESCRIBERS,
+            authorized_prescriber_serializer,
+        )
+        self.import_users(
+            "Orienteurs",
+            professionals.filter(has_prescriber_membership()).exclude(authorized_prescriber),
+            BrevoListID.PRESCRIBERS,
+            prescriber_serializer,
+        )
+
+    def import_job_seekers(self, job_seekers):
+        """Import the job seekers recently joined, stalled, or autonomous and waiting for a job."""
         midnight_today = datetime.datetime.combine(
             timezone.localdate(),
             datetime.time.min,
@@ -188,6 +185,4 @@ class Command(BaseCommand):
             | JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
             | autonomous_with_recent_diagnosis_and_no_accepted_application
         )
-        self.logger.info("Job seekers count: %d", len(job_seekers_to_import))
-        if wet_run:
-            client.import_users(job_seekers_to_import, BrevoListID.CANDIDATS, job_seeker_serializer)
+        self.import_users("Job seekers", job_seekers_to_import, BrevoListID.CANDIDATS, job_seeker_serializer)
