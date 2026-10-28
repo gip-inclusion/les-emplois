@@ -291,7 +291,7 @@ class TestApprovalSuspendView:
         )
         approval = job_application.approval
         end_date = today + end_date_offset if end_date_offset is not None else None
-        ContractFactory(job_seeker=approval.user, company=job_application.to_company, end_date=end_date)
+        ContractFactory(job_seeker=approval.user, end_date=end_date)
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -342,7 +342,6 @@ class TestApprovalSuspendView:
         if with_contract:
             ContractFactory(
                 job_seeker=approval.user,
-                company=job_application.to_company,
                 end_date=today - relativedelta(days=1),
             )
 
