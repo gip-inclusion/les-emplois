@@ -57,15 +57,17 @@
                                             {{ appointment.reason }}
                                         </a>
                                     </td>
-                                    <td>{% participation_status_badge appointment.status appointment.start_at extra_classes="badge-xs" %}</td>
+                                    <td>{% participation_status_badge appointment.status appointment.start_at extra_classes="badge-sm" %}</td>
                                     <td>{{ appointment.start_at|date:"d/m/Y · G\hi" }}</td>
                                     <td>{{ appointment.theme }}</td>
                                     <td>
                                         {% for agent in appointment.agents %}
-                                            <span class="d-block">{{ agent.get_full_name }}</span>
+                                            <span class="d-block">{{ agent.get_inverted_full_name }}</span>
                                             {% if agent.email|lower == request.user.email|lower %}
                                                 <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
                                             {% endif %}
+                                        {% empty %}
+                                            <i class="text-disabled">Non renseigné</i>
                                         {% endfor %}
                                     </td>
                                     <td>
