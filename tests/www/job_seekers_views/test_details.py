@@ -2432,8 +2432,22 @@ class TestAppointmentsTab:
         )
         assertContains(response, "Suite à une candidature")
         # Not stored by the invitation experiment
-        assertNotContains(response, "Modalité")
-        assertNotContains(response, "Pris par")
+        assertContains(
+            response, '<li><small>Modalité</small><i class="text-disabled">Non renseignée</i></li>', html=True
+        )
+        assertContains(
+            response, '<li><small>Pris par</small><i class="text-disabled">Non renseigné</i></li>', html=True
+        )
+        assertContains(
+            response,
+            f"""
+            <div>
+                <span>{membership.company.display_name}</span>
+                <i class="d-block text-disabled">Non renseigné</i>
+            </div>
+            """,
+            html=True,
+        )
 
     def test_appointment_details_not_visible(self, client, respx_mock, job_seeker):
         # Organized by another company

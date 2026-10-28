@@ -213,8 +213,8 @@ class AppointmentAgentData:
     last_name: str | None
     email: str
 
-    def get_full_name(self):
-        full_name = f"{(self.first_name or '').strip().title()} {(self.last_name or '').upper()}"
+    def get_inverted_full_name(self):
+        full_name = f"{(self.last_name or '').upper()} {(self.first_name or '').strip().title()}"
         return full_name.strip()
 
 

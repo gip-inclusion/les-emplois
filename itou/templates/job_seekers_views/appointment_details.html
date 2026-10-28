@@ -31,6 +31,10 @@
                         <h2 class="h3">Informations</h2>
                         <ul class="list-data">
                             <li>
+                                <small>Usager</small>
+                                <strong>{{ job_seeker.get_inverted_full_name }}</strong>
+                            </li>
+                            <li>
                                 <small>Thématique</small>
                                 <strong>{{ appointment.theme }}</strong>
                             </li>
@@ -38,21 +42,25 @@
                                 <small>Motif</small>
                                 <strong>{{ appointment.reason }}</strong>
                             </li>
-                            {% if appointment.location_type %}
-                                <li>
-                                    <small>Modalité</small>
+                            <li>
+                                <small>Modalité</small>
+                                {% if appointment.location_type %}
                                     <strong>{{ appointment.location_type.label }}</strong>
-                                </li>
-                            {% endif %}
-                            {% if appointment.created_by %}
-                                <li>
-                                    <small>Pris par</small>
+                                {% else %}
+                                    <i class="text-disabled">Non renseignée</i>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <small>Pris par</small>
+                                {% if appointment.created_by %}
                                     <strong>{{ appointment.created_by.label }}</strong>
-                                </li>
-                            {% endif %}
-                            {% if appointment.location_name or appointment.address %}
-                                <li>
-                                    <small>Lieu</small>
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <small>Lieu</small>
+                                {% if appointment.location_name or appointment.address %}
                                     <strong>
                                         {% if appointment.location_name %}
                                             <span class="d-block">{{ appointment.location_name }}</span>
@@ -61,27 +69,45 @@
                                             <span class="d-block">{{ appointment.address }}</span>
                                         {% endif %}
                                     </strong>
-                                </li>
-                            {% endif %}
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
                         </ul>
                     </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
-                    <div class="c-box mb-3 mb-md-4">
-                        <h2 class="h3">Reçu par</h2>
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex">
-                                <i class="ri-community-line me-2" aria-hidden="true"></i>
-                                <span>{{ appointment.organization_name }}</span>
-                            </li>
-                            {% for agent in appointment.agents %}
-                                <li class="mt-3">
-                                    <strong class="d-block">{{ agent.get_full_name }}</strong>
-                                    <a href="mailto:{{ agent.email }}" class="text-break">{{ agent.email }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    {% for agent in appointment.agents %}
+                        <div class="c-box c-box--organization mb-3 mb-md-4">
+                            <div class="c-box--organization__summary">
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ appointment.organization_name }}</span>
+                                    <span class="d-block h3">{{ agent.get_inverted_full_name }}</span>
+                                </div>
+                            </div>
+                            <div class="c-box--organization__detail">
+                                <hr class="my-4">
+                                <ul class="c-box--organization__list-contact">
+                                    <li>
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <span class="text-break">{{ agent.email }}</span>
+                                        {% include "includes/copy_to_clipboard.html" with content=agent.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="c-box c-box--organization mb-3 mb-md-4">
+                            <div class="c-box--organization__summary">
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ appointment.organization_name }}</span>
+                                    <i class="d-block text-disabled">Non renseigné</i>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

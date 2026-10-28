@@ -1945,6 +1945,14 @@
                           <ul class="list-data">
                               <li>
                                   <small>
+                                      Usager
+                                  </small>
+                                  <strong>
+                                      DOE Jane
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
                                       Thématique
                                   </small>
                                   <strong>
@@ -1992,27 +2000,38 @@
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2 class="h3">
-                              Reçu par
-                          </h2>
-                          <ul class="list-unstyled mb-0">
-                              <li class="d-flex">
-                                  <i aria-hidden="true" class="ri-community-line me-2">
-                                  </i>
+                      <div class="c-box c-box--organization mb-3 mb-md-4">
+                          <div class="c-box--organization__summary">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
                                   <span>
                                       Plateforme Insertion Valence
                                   </span>
-                              </li>
-                              <li class="mt-3">
-                                  <strong class="d-block">
-                                      Claire DURAND
-                                  </strong>
-                                  <a class="text-break" href="mailto:claire.durand@drome.fr">
-                                      claire.durand@drome.fr
-                                  </a>
-                              </li>
-                          </ul>
+                                  <span class="d-block h3">
+                                      DURAND Claire
+                                  </span>
+                              </div>
+                          </div>
+                          <div class="c-box--organization__detail">
+                              <hr class="my-4"/>
+                              <ul class="c-box--organization__list-contact">
+                                  <li>
+                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                      </i>
+                                      <span class="text-break">
+                                          claire.durand@drome.fr
+                                      </span>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="claire.durand@drome.fr" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -2158,7 +2177,7 @@
                                   </a>
                               </td>
                               <td>
-                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                       RDV honoré
                                   </span>
                               </td>
@@ -2170,7 +2189,7 @@
                               </td>
                               <td>
                                   <span class="d-block">
-                                      Claire DURAND
+                                      DURAND Claire
                                   </span>
                               </td>
                               <td>
@@ -2192,7 +2211,7 @@
                                   </a>
                               </td>
                               <td>
-                                  <span class="badge badge-xs rounded-pill bg-light text-primary">
+                                  <span class="badge badge-sm rounded-pill bg-light text-primary">
                                       Statut du RDV à préciser
                                   </span>
                               </td>
@@ -2203,6 +2222,9 @@
                                   Suite à une candidature
                               </td>
                               <td>
+                                  <i class="text-disabled">
+                                      Non renseigné
+                                  </i>
                               </td>
                               <td>
                                   <i aria-hidden="true" class="ri-community-line">
