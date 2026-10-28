@@ -66,6 +66,7 @@ class ImportACIConvergencePHCForm(forms.Form):
             siret_replace_re = re.compile(r"[^0-9]*")
             df = pandas.read_excel(
                 file,
+                engine="calamine",
                 converters={siret_column: lambda siret: siret_replace_re.sub("", siret)},
                 sheet_name=None,
                 usecols=[siret_column],
