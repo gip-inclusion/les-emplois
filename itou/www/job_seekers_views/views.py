@@ -37,6 +37,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.insertion.models import Orientation
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.job_applications.utils import xp_ref_iae_job_applications
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
@@ -288,7 +289,7 @@ class JobApplicationTabView(BaseJobSeekerDetailView):
             applications_qs = self.object.job_applications.prescriptions_of(
                 self.request.user,
                 self.request.current_organization,
-            )
+            ) | xp_ref_iae_job_applications(self.request).filter(job_seeker=self.object)
         if can_view_external:
             applications = self.object.job_applications.annotate(
                 user_can_see_details=Exists(applications_qs.filter(pk=OuterRef("pk"))),

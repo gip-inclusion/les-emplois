@@ -30,7 +30,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.prescribers.enums import PrescriberAuthorizationStatus
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason
 from itou.utils import constants as global_constants, triggers
@@ -2933,3 +2933,82 @@ class TestResumeDownload:
         response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 302
         assert "X-Amz-Signature" in response.url
+
+
+class TestXpRefIae:
+    @pytest.fixture(autouse=True)
+    def setup_experiment(self, settings):
+        settings.XP_REF_IAE_DEPARTMENT = "83"
+        settings.XP_REF_IAE_END_DATE = timezone.localdate()
+
+    def create_job_application(self, department="83", is_siae=True):
+        return JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            to_company__department=department,
+            **{f"to_company__{'' if is_siae else 'not_'}subject_to_iae_rules": True},
+        )
+
+    def login_ft_agent(self, client, department="83"):
+        membership = PrescriberMembershipFactory(
+            organization__france_travail=True, organization__department=department
+        )
+        client.force_login(membership.user)
+
+    def get_details(self, client, job_application):
+        return client.get(reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}))
+
+    def get_resume(self, client, job_application):
+        return client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+
+    def test_access(self, client):
+        job_application = self.create_job_application()
+        self.login_ft_agent(client)
+        assert self.get_details(client, job_application).status_code == 200
+        assert self.get_resume(client, job_application).status_code == 302
+        url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application.job_seeker.public_id})
+        details_url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        assertContains(client.get(url), details_url)
+
+    def test_job_seeker_tab_only_lists_their_job_applications(self, client):
+        job_application = self.create_job_application()
+        other_job_application = self.create_job_application()
+        self.login_ft_agent(client)
+        url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application.job_seeker.public_id})
+        other_details_url = reverse(
+            "apply:details_for_prescriber", kwargs={"job_application_id": other_job_application.pk}
+        )
+        assertNotContains(client.get(url), other_details_url)
+
+    def test_no_access_to_a_company_other_than_siae(self, client):
+        job_application = self.create_job_application(is_siae=False)
+        self.login_ft_agent(client)
+        assert self.get_details(client, job_application).status_code == 404
+        assert self.get_resume(client, job_application).status_code == 404
+
+    def test_no_access_to_a_company_from_another_department(self, client):
+        job_application = self.create_job_application(department="06")
+        self.login_ft_agent(client)
+        assert self.get_details(client, job_application).status_code == 404
+        assert self.get_resume(client, job_application).status_code == 404
+
+    def test_no_access_from_another_department(self, client):
+        job_application = self.create_job_application()
+        self.login_ft_agent(client, department="06")
+        assert self.get_details(client, job_application).status_code == 404
+        assert self.get_resume(client, job_application).status_code == 404
+
+    def test_no_access_from_another_organization_kind(self, client):
+        job_application = self.create_job_application()
+        membership = PrescriberMembershipFactory(
+            organization__kind=PrescriberOrganizationKind.CAP_EMPLOI,
+            organization__authorized=True,
+            organization__department="83",
+        )
+        client.force_login(membership.user)
+        assert self.get_details(client, job_application).status_code == 404
+
+    def test_no_access_after_end_date(self, client, settings):
+        settings.XP_REF_IAE_END_DATE = timezone.localdate() - datetime.timedelta(days=1)
+        job_application = self.create_job_application()
+        self.login_ft_agent(client)
+        assert self.get_details(client, job_application).status_code == 404
