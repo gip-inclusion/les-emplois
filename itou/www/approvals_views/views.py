@@ -766,6 +766,16 @@ def close(request, approval_id, template_name="approvals/close.html"):
     return render(request, template_name, context)
 
 
+def _transfer_suspension_to_employer_if_applicable(request, suspension):
+    """
+    When an employer edits a suspension issued by an authorized FT prescriber, the employer's SIAE becomes its manager,
+    so the prescriber organization (i.e. France Travail) loses the ability to edit or delete the suspension.
+    The prescriber organization is kept in order to remember when the suspension was initially created by FT.
+    """
+    if request.from_employer and suspension.prescriber_organization_id and not suspension.siae_id:
+        suspension.siae = request.current_organization
+
+
 def _suspension_author_kwargs(request):
     if request.from_employer:
         return {"siae": request.current_organization}
@@ -776,7 +786,7 @@ def _get_suspension(request, suspension_id):
     """Fetch the given suspension the current user is allowed to edit or delete, or raise 404/403.
 
     A suspension can be managed either by the SIAE currently hiring the jobseeker or by the
-    authorized France Travail prescriber organization that created it.
+    authorized France Travail prescriber organization that created it, until an employer takes it over.
     """
     qs = Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set")
     if request.from_employer:
@@ -801,7 +811,7 @@ def _get_suspension(request, suspension_id):
     if not is_authorized_ft_prescriber(request):
         raise Http404
     return get_object_or_404(
-        qs.in_progress().filter(prescriber_organization=request.current_organization),
+        qs.in_progress().filter(prescriber_organization=request.current_organization, siae__isnull=True),
         pk=suspension_id,
     )
 
@@ -864,6 +874,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) dates from %s to %s",
@@ -904,6 +915,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         previous_end_at = suspension.end_at
         suspension.end_at = form.cleaned_data["first_day_back_to_work"] - timedelta(days=1)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) end date from %s to %s",

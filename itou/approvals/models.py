@@ -1177,6 +1177,9 @@ class Suspension(models.Model):
         on_delete=models.RESTRICT,  # Prevent a soft lock, also for traceability and accountability
         related_name="approvals_suspended",
     )
+    # The author is `prescriber_organization` if set, else `siae`.
+    # The current manager is `siae` if set, else `prescriber_organization`.
+    # An employer can take over a suspension created by an authorized France Travail prescriber.
     prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
         verbose_name="organisation prescriptrice",
