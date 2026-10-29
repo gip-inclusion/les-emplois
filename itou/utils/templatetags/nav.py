@@ -364,9 +364,9 @@ def nav(request):
             if request.current_organization.kind in [InstitutionKind.DDETS_IAE, InstitutionKind.DREETS_IAE]:
                 menu_items.append(
                     NavGroup(
-                        label="Mon territoire",
-                        icon="ri-road-map-line",
                         items=[NAV_ENTRIES["institutional-organizations-list"]],
+                        label="Territoire",
+                        icon="ri-global-line",
                     )
                 )
             menu_items.append(
