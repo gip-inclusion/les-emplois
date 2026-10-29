@@ -3,6 +3,7 @@ from operator import attrgetter
 from itou.companies.models import JobDescription
 from itou.metabase.tables.utils import (
     MetabaseTable,
+    get_code_commune,
     get_column_from_field,
     get_department_and_region_columns,
     get_model_field,
@@ -61,6 +62,18 @@ TABLE.add_columns(
 
 TABLE.add_columns(
     [
+        {
+            "name": "code_insee",
+            "type": "varchar",
+            "comment": "Code INSEE de la commune de la fiche de poste",
+            "fn": lambda o: o.location.code_insee if o.location else None,
+        },
+        {
+            "name": "code_insee_employeur",
+            "type": "varchar",
+            "comment": "Code INSEE de la commune de l’entreprise",
+            "fn": lambda o: get_code_commune(o.company),
+        },
         {
             "name": "total_candidatures",
             "type": "integer",

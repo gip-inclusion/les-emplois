@@ -324,7 +324,9 @@ class Command(BaseCommand):
         queryset = (
             JobDescription.objects.select_related(
                 "company",
+                "company__insee_city",
                 "appellation__rome",
+                "location",
             )
             .filter(company_id__in=Company.objects.active())
             .with_job_applications_count()
