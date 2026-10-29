@@ -47,13 +47,13 @@
                                     {% endwith %}
                                 {% endif %}
                                 {% if job_seeker.jobseeker_profile.is_considered_stalled %}
-                                    <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Usager sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Usager sans solution" data-bs-toggle="tooltip"></i></span>
+                                    <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning" aria-label="Usager sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Usager sans solution" data-bs-toggle="tooltip"></i></span>
                                 {% endif %}
                             </td>
                             {% if request.from_iae_actor %}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
+                                        {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
                                         {% if job_seeker.has_valid_approval and job_seeker.latest_approval.state == "SUSPENDED" %}
                                             <i class="ms-1 ri-information-line text-info"
                                                aria-label="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter cet usager sans restriction."

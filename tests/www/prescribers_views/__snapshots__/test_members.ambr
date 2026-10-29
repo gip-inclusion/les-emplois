@@ -94,7 +94,7 @@
                                   <tr>
                                       <td>
                                           DUPONT Pierre
-                                          <button class="badge badge-xs rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
+                                          <button class="badge badge-sm rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
                                               Admin
                                               <span class="visually-hidden">
                                                   istrateur de la structure

@@ -67,7 +67,7 @@
                             {% else %}
                                 {{ job_application.sender.get_inverted_full_name }}
                                 {% if job_application.sender == request.user %}
-                                    <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
+                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-info">C’est vous</span>
                                 {% endif %}
                             {% endif %}
                         </td>

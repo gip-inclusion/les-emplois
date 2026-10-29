@@ -4837,7 +4837,7 @@
               </td>
               <td>
                   <div class="d-flex align-items-center">
-                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                      <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                           <i aria-hidden="true" class="ri-error-warning-line">
                           </i>
                           Éligibilité IAE à valider
@@ -4886,7 +4886,7 @@
               </td>
               <td>
                   <div class="d-flex align-items-center">
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                           <i aria-hidden="true" class="ri-check-line">
                           </i>
                           Éligible à l’IAE
@@ -4932,14 +4932,14 @@
                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
                       YGREC Bernard
                   </a>
-                  <span aria-label="Usager sans solution" class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span aria-label="Usager sans solution" class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       <i aria-hidden="true" class="ri-user-forbid-line" data-bs-title="Usager sans solution" data-bs-toggle="tooltip">
                       </i>
                   </span>
               </td>
               <td>
                   <div class="d-flex align-items-center">
-                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                      <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                           <i aria-hidden="true" class="ri-error-warning-line">
                           </i>
                           Éligibilité IAE à valider
@@ -4995,7 +4995,7 @@
               </td>
               <td>
                   <div class="d-flex align-items-center">
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                           <i aria-hidden="true" class="ri-pass-valid-line">
                           </i>
                           PASS IAE valide
@@ -5045,14 +5045,14 @@
                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">
                       ZORRO Alain
                   </a>
-                  <span aria-label="Usager sans solution" class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span aria-label="Usager sans solution" class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       <i aria-hidden="true" class="ri-user-forbid-line" data-bs-title="Usager sans solution" data-bs-toggle="tooltip">
                       </i>
                   </span>
               </td>
               <td>
                   <div class="d-flex align-items-center">
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                           <i aria-hidden="true" class="ri-check-line">
                           </i>
                           Éligible à l’IAE
@@ -5973,7 +5973,7 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       <i aria-hidden="true" class="ri-error-warning-line">
                       </i>
                       Éligibilité IAE à valider
@@ -6022,7 +6022,7 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       <i aria-hidden="true" class="ri-check-line">
                       </i>
                       Éligible à l’IAE
@@ -6071,7 +6071,7 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       <i aria-hidden="true" class="ri-error-warning-line">
                       </i>
                       Éligibilité IAE à valider
