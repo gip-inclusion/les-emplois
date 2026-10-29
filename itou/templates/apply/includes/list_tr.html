@@ -171,9 +171,9 @@
         {% endif %}
     {% endif %}
 
-    <td class="text-end w-50px align-middle">
+    <td class="text-end w-50px">
         {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico-only"
                href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                data-bs-toggle="tooltip"
                data-bs-title="Voir ma candidature"
@@ -181,7 +181,7 @@
                 <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir ma candidature"></i>
             </a>
         {% else %}
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico-only"
                href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                data-bs-toggle="tooltip"
                data-bs-title="Voir sa candidature"

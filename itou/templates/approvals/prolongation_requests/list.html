@@ -82,7 +82,7 @@
                                             <td>{{ prolongation_request.assigned_to.get_full_name }}</td>
                                             <td>{% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-sm" %}</td>
                                             <td class="text-end w-50px">
-                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                <a class="btn btn-sm btn-secondary btn-ico-only"
                                                    href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}"
                                                    data-bs-toggle="tooltip"
                                                    {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}data-bs-title="Traiter"{% else %}data-bs-title="Ouvrir"{% endif %}>

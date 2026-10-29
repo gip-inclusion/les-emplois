@@ -9,7 +9,7 @@
 <form hx-post="{{ hx_post_url }}" hx-swap="outerHTML" class="{{ for_detail|yesno:',d-inline' }}">
     {% csrf_token %}
 
-    <button type="submit" class="btn btn-sm btn-link p-0">
+    <button type="submit" class="btn btn-sm btn-secondary btn-ico-only">
         <div class="stable-text">
             <i class="ri-refresh-line fw-normal"
                data-bs-toggle="tooltip"

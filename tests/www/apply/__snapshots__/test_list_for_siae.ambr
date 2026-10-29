@@ -6378,7 +6378,7 @@
                   1
               </td>
               <td class="text-end w-50px">
-                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Télécharger (.xlsx)" data-bs-toggle="tooltip" data-matomo-action="exports" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="export-siae" href="/apply/siae/list/exports/download">
+                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Télécharger (.xlsx)" data-bs-toggle="tooltip" data-matomo-action="exports" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="export-siae" href="/apply/siae/list/exports/download">
                       <i aria-label="Télécharger cet export SIAE de toutes les candidatures au format .xlsx" class="ri-download-line">
                       </i>
                   </a>
@@ -6392,7 +6392,7 @@
                   1
               </td>
               <td class="text-end w-50px">
-                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Télécharger (.xlsx)" data-bs-toggle="tooltip" data-matomo-action="exports" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="export-siae" href="/apply/siae/list/exports/download/2026-02">
+                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Télécharger (.xlsx)" data-bs-toggle="tooltip" data-matomo-action="exports" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="export-siae" href="/apply/siae/list/exports/download/2026-02">
                       <i aria-label="Télécharger cet export SIAE de Février 2026 au format .xlsx" class="ri-download-line">
                       </i>
                   </a>
@@ -8300,8 +8300,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8350,8 +8350,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8402,8 +8402,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8610,8 +8610,8 @@
                                   Éligibilité validée par votre entreprise
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de VOITURE Béatrice" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8658,8 +8658,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de MARTIN Martine" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8708,8 +8708,8 @@
                                   Éligibilité validée par un employeur
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de BATO Aline" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8765,8 +8765,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8822,8 +8822,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8879,8 +8879,8 @@
                                   Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
@@ -8929,8 +8929,8 @@
                                   Un diagnostic doit être réalisé
                               </span>
                           </td>
-                          <td class="text-end w-50px align-middle">
-                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
+                          <td class="text-end w-50px">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">
                                   <i aria-label="Gérer la candidature de DIAGNOSTIQUE Pas De" class="ri-arrow-drop-right-line fs-lg">
                                   </i>
                               </a>
