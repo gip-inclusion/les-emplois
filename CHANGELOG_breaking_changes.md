@@ -1,5 +1,12 @@
 # Journal des changements techniques majeurs
 
+# 2026-10-29
+
+- Gestion des dépendances Python avec uv : `pyproject.toml` et `uv.lock` remplacent `requirements/`.
+    1. Mettre à jour le _virtual env_ : `make venv`
+    2. Pour ajouter une dépendance : `uv add <paquet>` (avec `--group test` ou `--group dev` pour un outil de test ou de développement). Les dépendances directes sont épinglées : pour en mettre une à jour, `uv add <paquet>==<version>` (avec le même `--group`). Pour une sous-dépendance : `uv lock --upgrade-package <paquet>`. `make compile-deps` n’existe plus.
+    3. Les branches qui modifient `requirements/` : `git rebase main` s’arrête sur des conflits dans ce dossier. Les résoudre avec `git rm -r requirements/`, puis refaire les changements avec `uv add` une fois le rebase terminé.
+
 # 2026-10-15
 
 - Remplacement de MinIO par RustFS dans l'environnement de développement:
