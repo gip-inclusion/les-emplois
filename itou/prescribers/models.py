@@ -137,6 +137,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         default=False,
         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
+    # XXX surveiller le champ
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="e-mail", blank=True)
     website = models.URLField(verbose_name="site web", blank=True)
@@ -183,6 +184,8 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         blank=True,
         on_delete=models.RESTRICT,  # Only staff can update it, and we shouldn't delete one of those accounts
     )
+    # XXX Maybe add a way to keep track of refused authorizations to display them in the authorization list
+    # either a initial_kind, or a authorization_updated_organization and authorization_updated_institution
 
     # Use the generic relation to let NotificationSettings being collected on deletion
     notification_settings = GenericRelation(
