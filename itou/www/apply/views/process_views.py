@@ -22,6 +22,7 @@ from django_xworkflows import models as xwf_models
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
+from itou.job_applications.utils import xp_ref_iae_job_applications
 from itou.prescribers.models import PrescriberMembership
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
@@ -329,7 +330,9 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     - to update start date of a contract (provided given date is in the future),
     - to give an answer.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    job_applications = JobApplication.objects.prescriptions_of(
+        request.user, request.current_organization
+    ) | xp_ref_iae_job_applications(request)
 
     queryset = (
         job_applications.with_upcoming_participations_count()
@@ -415,6 +418,7 @@ def resume_download(request, job_application_id):
         )
         | Exists(CompanyMembership.objects.filter(user=user, company=OuterRef("sender_company")))
     )
+    queryset |= xp_ref_iae_job_applications(request)
     job_application = get_object_or_404(queryset.select_related("resume"), id=job_application_id)
     if job_application.resume_id is None:
         raise Http404
