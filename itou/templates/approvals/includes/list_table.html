@@ -2,7 +2,7 @@
 {% load format_filters %}
 {% load matomo %}
 
-<table class="table table-hover table-sortable">
+<table class="table table-hover">
     <caption class="visually-hidden">Liste des PASS IAE</caption>
     <thead>
         <tr>
@@ -38,8 +38,8 @@
                     {% include "includes/copy_to_clipboard.html" with content=approval.number css_classes="btn-link btn-sm" only_icon=True %}
                 </td>
                 <td>{{ approval.get_remainder_display }}</td>
-                <td class="text-end w-50px align-middle">
-                    <a class="btn btn-sm btn-link btn-ico-only"
+                <td class="text-end w-50px">
+                    <a class="btn btn-sm btn-secondary btn-ico-only"
                        href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                        {% matomo_event "salaries" "clic" "pass-iae-tableau" %}
                        data-bs-toggle="tooltip"

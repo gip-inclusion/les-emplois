@@ -59,7 +59,7 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico-only"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
@@ -263,7 +263,7 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico-only"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"

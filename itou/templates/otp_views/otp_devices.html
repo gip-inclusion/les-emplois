@@ -63,11 +63,25 @@
                                                 {{ device.last_used_at|default:'<i class="text-disabled">jamais</i>' }}
                                             </td>
                                             <td class="text-end w-50px">
-                                                <button class="btn btn-sm btn-link {% if user.otp_device == device %}disabled{% endif %}"
-                                                        type="button"
-                                                        {% if user.otp_device == device %}data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter."{% else %}data-bs-toggle="modal" data-bs-target="#delete_{{ device.pk }}_modal" aria-label="Supprimer l’appareil {{ device.name }}"{% endif %}>
-                                                    <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
-                                                </button>
+                                                {% if user.otp_device == device %}
+                                                    <span class="btn btn-sm btn-secondary btn-ico-only disabled"
+                                                          data-bs-toggle="tooltip"
+                                                          tabindex="0"
+                                                          data-bs-placement="top"
+                                                          data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter."
+                                                          aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter.">
+                                                        <i class="ri-arrow-drop-right-line fs-lg"
+                                                           aria-hidden="true"></i>
+                                                    </span>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-secondary btn-ico-only"
+                                                            type="button"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_{{ device.pk }}_modal"
+                                                            aria-label="Supprimer l’appareil {{ device.name }}">
+                                                        <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
+                                                    </button>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                     {% endfor %}

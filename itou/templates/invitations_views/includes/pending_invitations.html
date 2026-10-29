@@ -13,7 +13,7 @@
                     <th scope="col">Email</th>
                     <th scope="col">Date d'ajout</th>
                     <th scope="col">Expiration du lien</th>
-                    <th scope="col">Lien d'activation</th>
+                    <th scope="col" class="text-end w-50px">Lien d'activation</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,8 +25,8 @@
                         </td>
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
                         <td>{{ invitation.expiration_date|date:"d F Y à H:i" }}</td>
-                        <td>
-                            {% include "includes/copy_to_clipboard.html" with content=invitation.acceptance_link css_classes="btn btn-ico btn-link btn-sm" %}
+                        <td class="text-end w-50px">
+                            {% include "includes/copy_to_clipboard.html" with content=invitation.acceptance_link css_classes="btn btn-ico btn-secondary btn-sm" %}
                         </td>
                     </tr>
                 {% endfor %}

@@ -59,7 +59,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
     assertContains(
         response,
         f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
+            <a class="btn btn-sm btn-secondary btn-ico-only"
                 data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true"
