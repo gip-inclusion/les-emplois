@@ -2443,7 +2443,7 @@ class TestAppointmentsTab:
             f"""
             <div>
                 <span>{membership.company.display_name}</span>
-                <i class="d-block text-disabled">Non renseigné</i>
+                <i class="d-block text-disabled h3 fw-normal">Non renseigné</i>
             </div>
             """,
             html=True,
