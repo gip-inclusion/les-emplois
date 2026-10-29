@@ -2,5 +2,5 @@
 
 {% block body %}{% endblock %}
 
-{% include "layout/base_email_signature.txt" with display_gdpr=True %}
+{% include "layout/includes/base_email_signature.txt" with display_gdpr=True %}
 {% endautoescape %}
