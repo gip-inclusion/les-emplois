@@ -1,8 +1,11 @@
+import io
+
 import pytest
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from itou.files.forms import ItouFileInput, ItouMultiFileField, ItouMultiFileInput
+from itou.files.forms import ItouFileInput, ItouMultiFileField, ItouMultiFileInput, XlsxValidator
+from itou.utils.export import generate_excel_sheet
 
 
 ALLOWED_EXTENSIONS = ["pdf", "png"]
@@ -63,3 +66,18 @@ def test_clean_rejects_oversized_file():
     field = _create_multifile_input(max_upload_size=10)
     with pytest.raises(forms.ValidationError):
         field.clean([SimpleUploadedFile("a.pdf", b"x" * 11)])
+
+
+def _xlsx_upload(content):
+    return SimpleUploadedFile("a.xlsx", content, content_type=XlsxValidator.content_type)
+
+
+def test_xlsx_validator_accepts_valid_file():
+    buffer = io.BytesIO()
+    generate_excel_sheet(["SIRET"], [["12345678900012"]]).save(buffer)
+    XlsxValidator()(_xlsx_upload(buffer.getvalue()))
+
+
+def test_xlsx_validator_rejects_corrupt_file():
+    with pytest.raises(forms.ValidationError, match="fichier Excel"):
+        XlsxValidator()(_xlsx_upload(b"not a spreadsheet"))
