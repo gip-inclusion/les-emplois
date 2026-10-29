@@ -41,27 +41,21 @@
                                     {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}
                                 </a>
                             </td>
-
                             <td>{% orientation_state_badge orientation extra_classes="badge-sm" %}</td>
-
                             <td>{{ orientation.created_at|date:"d/m/Y" }}</td>
-
                             <td>{{ orientation.updated_at|date:"d/m/Y" }}</td>
-
                             <td>
                                 <i class="ri-user-line me-1" aria-hidden="true"></i>
                                 {{ orientation.sender.get_inverted_full_name }}
                             </td>
-
                             <td>
                                 <span class="d-block">{{ orientation.service.name }}</span>
                                 <span class="d-block">
                                     <i class="ri-community-line" aria-hidden="true"></i>
                                 {{ orientation.service.structure.name }}</span>
                             </td>
-
-                            <td>
-                                <a class="btn btn-sm btn-link btn-ico-only"
+                            <td class="text-end w-50px">
+                                <a class="btn btn-sm btn-secondary btn-ico-only"
                                    href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Voir l’orientation"

@@ -5103,18 +5103,20 @@
                       <td>
                           Une SIAE
                       </td>
-                      <td>
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
-                              <i aria-hidden="true" class="ri-pencil-line fw-medium">
-                              </i>
-                              <span class="visually-hidden">
-                                  Modifier la suspension
-                              </span>
-                          </a>
-                          <a class="btn btn-sm btn-link btn-ico-only" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">
-                              <i aria-label="Supprimer la suspension" class="ri-delete-bin-line" data-bs-title="Supprimer la suspension" data-bs-toggle="tooltip">
-                              </i>
-                          </a>
+                      <td class="text-end w-100px">
+                          <div aria-label="Actions rapides sur les suspensions" class="d-flex justify-content-end gap-2" role="group">
+                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
+                                  <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Modifier la suspension
+                                  </span>
+                              </a>
+                              <a class="btn btn-sm btn-secondary btn-ico-only" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">
+                                  <i aria-label="Supprimer la suspension" class="ri-delete-bin-line" data-bs-title="Supprimer la suspension" data-bs-toggle="tooltip">
+                                  </i>
+                              </a>
+                          </div>
                       </td>
                   </tr>
                   <tr>
@@ -5135,7 +5137,7 @@
                       <td>
                           Une autre SIAE
                       </td>
-                      <td>
+                      <td class="text-end w-100px">
                       </td>
                   </tr>
               </tbody>
@@ -5226,7 +5228,7 @@
                       <td>
                           Une SIAE
                       </td>
-                      <td>
+                      <td class="text-end w-100px">
                       </td>
                   </tr>
                   <tr>
@@ -5247,7 +5249,7 @@
                       <td>
                           Une autre SIAE
                       </td>
-                      <td>
+                      <td class="text-end w-100px">
                       </td>
                   </tr>
               </tbody>
@@ -5329,7 +5331,7 @@
                       <td>
                           Une SIAE
                       </td>
-                      <td>
+                      <td class="text-end w-100px">
                       </td>
                   </tr>
                   <tr>
@@ -5350,7 +5352,7 @@
                       <td>
                           Une autre SIAE
                       </td>
-                      <td>
+                      <td class="text-end w-100px">
                       </td>
                   </tr>
               </tbody>
