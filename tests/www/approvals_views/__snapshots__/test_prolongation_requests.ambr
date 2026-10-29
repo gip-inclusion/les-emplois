@@ -1110,7 +1110,7 @@
                                       Pierre DUPONT
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">
+                                      <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
                                           À traiter
                                       </span>
                                   </td>
@@ -1630,7 +1630,7 @@
                                       Pierre DUPONT
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">
+                                      <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
                                           À traiter
                                       </span>
                                   </td>

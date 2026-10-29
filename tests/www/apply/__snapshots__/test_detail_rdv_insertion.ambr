@@ -26,7 +26,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -138,7 +138,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -250,7 +250,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -362,7 +362,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -444,7 +444,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -556,7 +556,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -638,7 +638,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -750,7 +750,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -832,7 +832,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -944,7 +944,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -1026,7 +1026,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1108,7 +1108,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -1190,7 +1190,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -1272,7 +1272,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
@@ -1384,7 +1384,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -1466,7 +1466,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1548,7 +1548,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -1630,7 +1630,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -1712,7 +1712,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
@@ -1824,7 +1824,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -1906,7 +1906,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1988,7 +1988,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -2070,7 +2070,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -2152,7 +2152,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
