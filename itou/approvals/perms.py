@@ -28,6 +28,7 @@ def is_ft_prescriber_allowed_to_manage_suspension(request, suspension):
     return (
         is_authorized_ft_prescriber(request)
         and suspension.prescriber_organization_id == request.current_organization.pk
+        and suspension.siae_id is None
         and suspension.is_in_progress
     )
 
