@@ -5869,7 +5869,7 @@
 # ---
 # name: test_populate_job_descriptions
   dict({
-    'num_queries': 26,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -5936,7 +5936,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_fiches_de_poste" ("id" integer,"code_rome" varchar,"nom_rome" varchar,"recrutement_ouvert" integer,"type_contrat" varchar,"id_employeur" integer,"type_employeur" varchar,"siret_employeur" varchar,"nom_employeur" varchar,"mises_a_jour_champs" JSONB,
-                                                                                                                                                                                                                                                                                              "département_employeur" varchar,"nom_département_employeur" varchar,"région_employeur" varchar,"total_candidatures" integer,"date_création" date,"date_dernière_modification" date,"date_mise_à_jour_metabase" date)
+                                                                                                                                                                                                                                                                                              "département_employeur" varchar,"nom_département_employeur" varchar,"région_employeur" varchar,"code_insee" varchar,"code_insee_employeur" varchar,"total_candidatures" integer,"date_création" date,"date_dernière_modification" date,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -6105,6 +6105,30 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."code_insee" IS \'Code INSEE de la commune de la fiche de poste\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."code_insee_employeur" IS \'Code INSEE de la commune de l’entreprise\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."total_candidatures" IS \'Total de candidatures reçues\'',
       }),
       dict({
@@ -6224,12 +6248,36 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at",
+                 T8."id",
+                 T8."name",
+                 T8."normalized_name",
+                 T8."slug",
+                 T8."department",
+                 T8."post_codes",
+                 T8."code_insee",
+                 T8."siren_epci",
+                 T8."coords",
+                 T8."edition_mode",
+                 T8."last_synced_at"
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
+          LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
+          LEFT OUTER JOIN "cities_city" T8 ON ("companies_jobdescription"."location_id" = T8."id")
           WHERE (NOT ("companies_company"."kind" IN (%s,
                                                      %s))
                  AND "companies_jobdescription"."company_id" IN
@@ -6252,7 +6300,9 @@
           GROUP BY "companies_jobdescription"."id",
                    "jobs_appellation"."code",
                    "jobs_rome"."code",
-                   "companies_company"."id"
+                   "companies_company"."id",
+                   "cities_city"."id",
+                   T8."id"
         ''',
       }),
       dict({
@@ -6280,6 +6330,8 @@
                                         "département_employeur",
                                         "nom_département_employeur",
                                         "région_employeur",
+                                        "code_insee",
+                                        "code_insee_employeur",
                                         "total_candidatures",
                                         "date_création",
                                         "date_dernière_modification",
