@@ -93,7 +93,7 @@ $ apt-get install gdal-bin
 #### Virtualenv
 
 La commande `make` suivante crée un
-[`virtualenv`](https://docs.astral.sh/uv/pip/environments/) et installe les
+[`virtualenv`](https://docs.astral.sh/uv/concepts/projects/layout/#the-project-environment) et installe les
 dépendances pour le développement. Elle peut être exécutée régulièrement pour
 s’assurer que les dépendances sont bien à jour.
 
@@ -155,9 +155,9 @@ Vous pouvez y accéder à l'adresse http://100.1.2.3:8000/ depuis n'importe quel
 
 ## Utiliser les commandes `make` sans connexion à internet
 
-Si vous développez hors ligne et que le fichier de dépendances
-(`requirements/dev.txt`) a changé, les commandes `make` vont planter, puisque
-lorsque ce fichier change, `uv` va être lancé pour mettre à jour les dépendances
+Si vous développez hors ligne et que les fichiers de dépendances
+(`pyproject.toml` ou `uv.lock`) ont changé, les commandes `make` vont planter, puisque
+lorsque ces fichiers changent, `uv` va être lancé pour mettre à jour les dépendances
 dans le `.venv`.
 
 Pour passer outre, vous pouvez utiliser `make` avec la variable `NETWORK_MODE` :
@@ -214,13 +214,26 @@ pytest tests/utils/tests.py::TestJSON::test_encoder
 
 ## Mettre à jour les dépendances Python
 
-La liste des dépendances est consignée dans les fichiers `requirements/*.in`.
-Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
-[pip-tools](https://pypi.org/project/pip-tools/). La commande suivante permet
-de mettre à jour une dépendance, par exemple `django` :
+Les dépendances sont déclarées dans `pyproject.toml` : celles de l’application dans `[project]`, celles des tests et du développement dans `[dependency-groups]`. Chacune y est épinglée à une version exacte, pour qu’une PR de mise à jour fige exactement la version qu’elle annonce. `uv.lock` fige en plus les versions des sous-dépendances, et [uv](https://docs.astral.sh/uv/concepts/projects/dependencies/) le met à jour.
+
+Pour ajouter une dépendance, épinglée à sa dernière version (avec `--group test` ou `--group dev` pour un outil de test ou de développement) :
 
 ```sh
-$ make compile-deps PIP_COMPILE_OPTIONS="-P django"
+$ uv add <paquet>
+```
+
+Pour mettre à jour une dépendance, par exemple `django` (avec le même `--group` que lors de son ajout) :
+
+```sh
+$ uv add django==6.0.10
+```
+
+`itoutils` est déclaré deux fois, à la même version : `itoutils[django]` dans `[project]` et `itoutils[django-testing]` dans le groupe `test`. `uv add` ne modifiant qu’une des deux lignes, il échouerait sur deux épinglages différents : pour mettre `itoutils` à jour, modifier les deux à la main, puis lancer `uv lock`.
+
+Pour mettre à jour une sous-dépendance :
+
+```sh
+$ uv lock --upgrade-package <paquet>
 ```
 
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et

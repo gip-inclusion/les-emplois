@@ -2,7 +2,6 @@
 """Runs every week to reset https://demo.plateforme.inclusion.gouv.fr/"""
 
 import argparse
-import os
 import pathlib
 import subprocess
 import sys
@@ -68,9 +67,9 @@ def main(bucket_name, admin_password, dora_token, brevo_token):
         c.execute("DROP TEXT SEARCH CONFIGURATION french_unaccent")
         c.execute("DROP TEXT SEARCH CONFIGURATION simple_unaccent")
     call_command("migrate")
-    env = os.environ.copy()
-    env["REQUIREMENTS_PATH"] = "requirements/base.txt"
-    subprocess.run(["make", "populate_db"], check=True, env=env)
+    # Clever Cloud manages the virtualenv, skip its sync. An environment variable would not
+    # override the Makefile's assignment.
+    subprocess.run(["make", "populate_db", "NETWORK_MODE=offline"], check=True)
 
     for admin in "admin", "itouadmin":
         u = User.objects.get(username=admin)
