@@ -762,6 +762,16 @@ def close(request, approval_id, template_name="approvals/close.html"):
     return render(request, template_name, context)
 
 
+def _transfer_suspension_to_employer_if_applicable(request, suspension):
+    """
+    When an employer edits a suspension issued by an authorized FT prescriber, the employer's SIAE becomes its issuer,
+    so the prescriber organization (i.e. France Travail) loses the ability to edit or delete the suspension.
+    """
+    if request.from_employer and suspension.prescriber_organization_id:
+        suspension.siae = request.current_organization
+        suspension.prescriber_organization = None
+
+
 def _suspension_author_kwargs(request):
     if request.from_employer:
         return {"siae": request.current_organization}
@@ -860,6 +870,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) dates from %s to %s",
@@ -901,6 +912,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         previous_end_at = suspension.end_at
         suspension.end_at = form.cleaned_data["first_day_back_to_work"] - timedelta(days=1)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) end date from %s to %s",

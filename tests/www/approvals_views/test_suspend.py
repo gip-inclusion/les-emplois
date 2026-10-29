@@ -699,7 +699,7 @@ class TestApprovalSuspendView:
 
     def test_employer_can_update_suspension_created_by_ft_prescriber(self, client):
         # The hiring SIAE may handle any ongoing suspension, including one created by an authorized FT prescriber.
-        approval, _, organization = self._ft_prescriber_approval()
+        approval, prescriber, organization = self._ft_prescriber_approval()
         suspension = self._authored_suspension(approval, organization)
         employer = approval.jobapplication_set.get().to_company.members.first()
 
@@ -722,9 +722,37 @@ class TestApprovalSuspendView:
         suspension.refresh_from_db()
         assert suspension.end_at == new_end_at
         assert suspension.updated_by == employer
-        # The suspension keeps its original author.
-        assert suspension.prescriber_organization == organization
-        assert suspension.siae is None
+        # The employer's SIAE becomes the new issuer of the suspension.
+        assert suspension.siae == approval.jobapplication_set.get().to_company
+        assert suspension.prescriber_organization is None
+
+        # While the FT prescriber can no longer manage it.
+        client.force_login(prescriber)
+        for url in self._handle_urls(suspension):
+            assert client.get(url).status_code == 404, url
+
+    def test_employer_update_enddate_of_suspension_created_by_ft_prescriber(self, client):
+        approval, prescriber, organization = self._ft_prescriber_approval()
+        suspension = self._authored_suspension(approval, organization)
+        employer_company = approval.jobapplication_set.get().to_company
+
+        client.force_login(employer_company.members.first())
+        url = reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.pk})
+        first_day_back = timezone.localdate() + relativedelta(days=2)
+        response = client.post(
+            url,
+            data={"first_day_back_to_work": first_day_back.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)},
+        )
+        assert response.status_code == 302
+        suspension.refresh_from_db()
+        assert suspension.end_at == first_day_back - relativedelta(days=1)
+        # The employer's SIAE becomes the new issuer of the suspension.
+        assert suspension.siae == employer_company
+        assert suspension.prescriber_organization is None
+
+        client.force_login(prescriber)
+        for url in self._handle_urls(suspension):
+            assert client.get(url).status_code == 404, url
 
 
 class TestApprovalSuspendActionChoiceView:
