@@ -1,10 +1,10 @@
 import pypdf
 import pypdf.errors
+import python_calamine
 from django import forms
 from django.core.validators import FileExtensionValidator
 from django.utils.formats import localize
 from django.utils.html import format_html
-from openpyxl import load_workbook
 
 from itou.utils.constants import ITOU_HELP_CENTER_URL, MB
 from itou.utils.templatetags.matomo import matomo_event
@@ -75,8 +75,8 @@ class XlsxValidator(ContentTypeValidator):
 
     def validate(self, data):
         try:
-            load_workbook(data, read_only=True)
-        except ValueError:
+            python_calamine.CalamineWorkbook.from_filelike(data)
+        except python_calamine.CalamineError:
             raise forms.ValidationError("Le fichier doit être un fichier Excel (extension .xlsx) valide.")
 
 
