@@ -350,7 +350,7 @@ class TestOrganizationListView:
                 assert response.status_code == 403, f"kind={kind} should not grant access to organizations_list"
 
     def test_nav_entry(self, client):
-        MENU_STR = "Mon territoire"
+        MENU_STR = "Territoire"
         user = LaborInspectorFactory()
         institution = Institution.objects.get()
         client.force_login(user)
