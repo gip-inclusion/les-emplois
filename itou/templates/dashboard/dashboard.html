@@ -245,9 +245,7 @@
                                     {% if request.current_organization.is_authorized %}
                                         {% include "dashboard/includes/prescriber_job_seekers_card.html" %}
                                     {% endif %}
-                                    {% if request.current_organization %}
-                                        {% include "dashboard/includes/prescriber_organisation_card.html" %}
-                                    {% endif %}
+                                    {% include "dashboard/includes/prescriber_organisation_card.html" %}
                                 {% endif %}
                                 {# end of if request.from_prescriber #}
 
