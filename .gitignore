@@ -10,6 +10,8 @@ docker/dev/postgres/
 docker/prod/
 
 # Project specific
+# Exported from uv.lock by clevercloud/pre_build.sh
+requirements.txt
 itou/static_collected/
 itou/approvals/management/commands/data/
 itou/companies/management/commands/data/
