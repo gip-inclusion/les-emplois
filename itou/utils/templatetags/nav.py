@@ -269,6 +269,14 @@ NAV_ENTRIES = {
         matomo_event_option="geiq-bilan-execution",
     ),
     # Institutionals.
+    "institutional-authorizations-list": NavItem(
+        label="Gestion des habilitations",
+        target=reverse_lazy("institutions_views:authorizations_list"),
+        active_view_names=["institutions_views:authorizations_list"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="institution-liste-habilitations",
+    ),
     "institutional-organizations-list": NavItem(
         label="Liste des organisations",
         target=reverse_lazy("institutions_views:organizations_list"),
@@ -383,12 +391,17 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.from_institution:
+            territory_items = []
+            if request.current_organization.kind == InstitutionKind.DDETS_IAE:
+                territory_items.append(NAV_ENTRIES["institutional-authorizations-list"])
             if request.current_organization.kind in [InstitutionKind.DDETS_IAE, InstitutionKind.DREETS_IAE]:
+                territory_items.append(NAV_ENTRIES["institutional-organizations-list"])
+            if territory_items:
                 menu_items.append(
                     NavGroup(
-                        items=[NAV_ENTRIES["institutional-organizations-list"]],
                         label="Territoire",
                         icon="ri-global-line",
+                        items=territory_items,
                     )
                 )
             menu_items.append(

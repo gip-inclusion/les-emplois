@@ -268,7 +268,7 @@
 
                                 {% if request.from_institution %}
                                     {% if request.current_organization.kind == InstitutionKind.DDETS_IAE or request.current_organization.kind == InstitutionKind.DREETS_IAE %}
-                                        {% include "dashboard/includes/institution_territory.html" only %}
+                                        {% include "dashboard/includes/institution_territory.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/institution_organization_card.html" %}
                                     {% if active_campaigns or closed_campaigns %}

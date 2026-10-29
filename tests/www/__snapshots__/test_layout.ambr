@@ -908,6 +908,11 @@
                       <div class="collapse" id="collapse-nav-territoire">
                           <ul>
                               <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="institution-liste-habilitations" href="/institutions/authorizations-list">
+                                      Gestion des habilitations
+                                  </a>
+                              </li>
+                              <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="liste-organisations" href="/institutions/organizations-list">
                                       Liste des organisations
                                   </a>
