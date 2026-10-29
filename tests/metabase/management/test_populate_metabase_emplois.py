@@ -1292,6 +1292,7 @@ def test_populate_companies(snapshot):
                 company.pk,
                 company.uid,
                 company.convention.asp_id,
+                True,
                 "ACME Inc.",
                 f"EI - ID {company.pk} - ACME Inc.",
                 "",
@@ -1360,6 +1361,22 @@ def test_populate_companies_convergence(settings):
             (convergence_company.siret, True),
             (aci_non_convergence_company.siret, False),
             (non_convergence_company.siret, False),
+        ]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_populate_companies_convention_asp_active():
+    active_company = CompanyFactory(kind=CompanyKind.EI)
+    inactive_company = CompanyFactory(kind=CompanyKind.EI, convention__is_active=False)
+    geiq = CompanyFactory(kind=CompanyKind.GEIQ)
+
+    management.call_command("populate_metabase_emplois", mode="companies")
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, convention_asp_active FROM structures_v0 ORDER BY id")
+        assert cursor.fetchall() == [
+            (active_company.pk, True),
+            (inactive_company.pk, False),
+            (geiq.pk, None),
         ]
 
 
