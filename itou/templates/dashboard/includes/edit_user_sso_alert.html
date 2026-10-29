@@ -15,8 +15,12 @@
             {% fragment as content %}
                 {% if viewing_self %}
                     Pour les modifier, rendez-vous directement sur <a href="https://candidat.francetravail.fr/espacepersonnel/" class="has-external-link">France Travail</a>. Les changements seront automatiquement répercutés ici lors de votre prochaine connexion.
+                    <br>
+                    Lors de votre prochaine connexion, saisissez votre <strong>ancienne adresse e-mail</strong> (celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors automatiquement répercutées ici.
                 {% else %}
                     Invitez-le à effectuer les modifications directement sur <a href="https://candidat.francetravail.fr/espacepersonnel/" class="has-external-link">France Travail</a>. Les changements seront automatiquement répercutés ici lors de sa prochaine connexion.
+                    <br>
+                    Lors de sa prochaine connexion, l'usager devra saisir son <strong>ancienne adresse e-mail</strong> (celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors automatiquement répercutées ici.
                 {% endif %}
             {% endfragment %}
         {% endcomponent_alert %}
@@ -27,9 +31,13 @@
             {% endfragment %}
             {% fragment as content %}
                 {% if viewing_self %}
-                    Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté (impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service partenaire, elles seront automatiquement répercutées ici lors de votre prochaine connexion.
+                    Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté (impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service partenaire.
+                    <br>
+                    Lors de votre prochaine connexion, saisissez votre <strong>ancienne adresse e-mail</strong> (celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors automatiquement répercutées ici.
                 {% else %}
-                    Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr, Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service partenaire, elles seront automatiquement répercutées ici lors de sa prochaine connexion.
+                    Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr, Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service partenaire.
+                    <br>
+                    Lors de sa prochaine connexion, l'usager devra saisir son <strong>ancienne adresse e-mail</strong> (celle affichée sur cette page) pour être reconnu par la plateforme, les modifications seront alors automatiquement répercutées ici.
                 {% endif %}
             {% endfragment %}
         {% endcomponent_alert %}
