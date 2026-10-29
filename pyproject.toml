@@ -1,7 +1,174 @@
 [project]
 name = "les-emplois"
-dynamic = ["version"]
+# Not distributed, only there because PEP 621 requires a version
+version = "0"
 requires-python = ">=3.14"
+dependencies = [
+    "html5lib==1.1",  # https://github.com/html5lib/html5lib-python
+    "psycopg[binary]==3.2.12",  # https://github.com/psycopg/psycopg
+    "requests==2.34.2",  # https://github.com/psf/requests
+    "python-dateutil==2.9.0.post0",  # https://pypi.org/project/python-dateutil/
+    "openpyxl==3.1.5",  # https://openpyxl.readthedocs.io/en/stable/
+    "pypdf==6.21.2",  # https://github.com/py-pdf/pypdf/
+    # lxml improves performance of Excel file generation with openpyxl
+    "lxml==6.1.3",  # https://lxml.de/
+    "unidecode==1.4.0",  # https://github.com/avian2/unidecode
+    "tenacity==9.2.1",  # https://github.com/jd/tenacity
+    "gunicorn==26.2.0",  # https://github.com/benoitc/gunicorn/
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Django ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "django==6.0.9",  # https://www.djangoproject.com/
+    # django-allauth
+    "django-allauth==65.20.1",  # https://codeberg.org/allauth/django-allauth/
+    # django-anymail
+    "django-anymail==15.2",  # https://github.com/anymail/django-anymail
+    "django-citext==1.0.3",  # https://github.com/voiio/django-citext
+    # django-pgtrigger (PostgreSQL triggers in models)
+    "django-pgtrigger==4.17.0",  # https://github.com/Opus10/django-pgtrigger
+    # Django-XWorkflows
+    "django-xworkflows==1.0.0",  # https://github.com/rbarrois/django_xworkflows
+    # DRF (Django Rest Framework)
+    "djangorestframework==3.18.3",  # https://www.django-rest-framework.org/
+    # DRF-Spectacular (Django Rest Framework Spectacular, open API schema browser)
+    "drf-spectacular==0.30.0",  # https://github.com/tfranzel/drf-spectacular
+    # Django filter (filtering/ordering of API results)
+    "django-filter==26.2",  # https://django-filter.readthedocs.io/en/stable/
+    # Preview and multi-steps/wizard forms for Django
+    "django-formtools==2.7",  # https://django-formtools.readthedocs.io/en/latest/
+    # Django storages (storing files on S3-like services)
+    "django-storages==1.14.6",  # https://github.com/jschneier/django-storages
+    # Datadog logger (who could have guessed?!)
+    "django-datadog-logger==0.9.2",
+    # django-redis (full featured cache backend)
+    "django-redis==7.0.0",  # https://github.com/jazzband/django-redis
+    # django-markdownify (to render only a set of HTML tags)
+    "django-markdownify==0.9.7",  # https://github.com/erwinmatijsen/django-markdownify
+    # Provide encrypted model fields
+    "django-fernet-encrypted-fields==0.4.0",  # https://github.com/jazzband/django-fernet-encrypted-fields
+    # Our utils library for Django
+    "itoutils[django]==26.10.14.0",
+    # Pillow (image manipulation)
+    "pillow==13.0.0",  # https://python-pillow.org/
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Front-end ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    # Bootstrap 5 for Django
+    "django-bootstrap5==26.4",  # https://github.com/zostera/django-bootstrap5
+    # Enhance select fields in forms with jQuery Select plugin
+    "django-select2==8.6.1",  # https://github.com/codingjoe/django-select2
+    # Render Markdown in HTML
+    "markdown==3.11.2",  # https://github.com/Python-Markdown/markdown
+    # Easy JS
+    "django-htmx==1.29.0",  # https://github.com/adamchainz/django-htmx
+    # Easy Components
+    "slippers==0.7.1",  # https://mitchel.me/slippers
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Data management ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    # Manipulate ASP CSV exports having many columns
+    "pandas==3.1.0",  # https://github.com/pandas-dev/pandas
+    # Read Excel files with Pandas (pandas.read_excel)
+    "python-calamine==0.9.0",  # https://github.com/dimastbk/python-calamine
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Third-party applications ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    # Django dependency that we directly use for a future-proof threading.local equivalent
+    "asgiref==3.13.0",  # https://github.com/django/asgiref/
+    # Huey for async processing
+    # https://huey.readthedocs.io/en/latest/
+    "huey==3.5.3",  # https://github.com/coleifer/huey
+    "redis==8.1.0",  # https://github.com/redis/redis-py
+    # https://docs.djangoproject.com/en/stable/topics/cache/#redis
+    # > Installing hiredis-py is also recommended.
+    "hiredis==3.5.0",  # https://github.com/redis/hiredis-py
+    # Embedding Metabase signed dashboards
+    "pyjwt==2.15.1",  # https://github.com/jpadilla/pyjwt
+    # Requests alternative including a default time out
+    "httpx==0.28.1",  # https://github.com/encode/httpx/
+    # SFTP file transfer for ASP
+    # We need rsa signing compatibility (see PR https://github.com/gip-inclusion/les-emplois/pull/8071)
+    "paramiko==4.0.0",  # https://github.com/paramiko/paramiko
+    "pyzipper==0.4.0",  # https://github.com/danifus/pyzipper
+    # Stream XLSX files
+    "xlsx-streaming==2.0.1",  # https://github.com/Polyconseil/xlsx_streaming
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ S3 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    # Our S3 provider does not provide a UI to manage the S3 bucket. Use this CLI instead.
+    "boto3==1.40.76",  # https://github.com/boto/boto3
+    # boto3 does require botocore which gets compiled in our dependencies. Bump it when bumping boto3.
+    "botocore==1.40.76",  # https://github.com/boto/botocore
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ API ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    # For automatic OpenAPI schema generation
+    "uritemplate==4.2.0",  # https://github.com/python-hyper/uritemplate
+    "pyyaml==6.0.3",  # https://github.com/yaml/pyyaml
+    # To impersonate users from the admin
+    "django-hijack==3.8.0",  # https://github.com/django-hijack/django-hijack
+    # To automatically load .env files at the root of the project
+    "python-dotenv==1.2.4",  # https://github.com/theskumar/python-dotenv
+    "data-inclusion-schema==1.0.10",  # https://github.com/gip-inclusion/data-inclusion-schema
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Production requirements ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "sentry-sdk==2.71.0",  # https://github.com/getsentry/sentry-python
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 2FA ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "django-otp==1.7.5",  # https://github.com/django-otp/django-otp
+    "segno==1.6.6",  # https://github.com/heuer/segno
+]
+
+[dependency-groups]
+test = [
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Code quality ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "djlint==1.47.1",  # https://www.djlint.com
+    "ruff==0.17.3",  # https://github.com/charliermarsh/ruff
+    "shellcheck-py==0.11.0.1",  # https://github.com/shellcheck-py/shellcheck-py
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Test & Mock ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "beautifulsoup4==4.15.0",  # https://code.launchpad.net/beautifulsoup
+    "factory-boy==3.3.3",  # https://github.com/FactoryBoy/factory_boy
+    "freezegun==1.5.5",  # https://github.com/spulec/freezegun
+    "itoutils[django-testing]==26.10.14.0",
+    "patchy==3.1.0",  # https://github.com/adamchainz/patchy
+    "pytest==9.1.1",  # https://github.com/pytest-dev/pytest
+    "pytest-django==4.14.0",  # https://github.com/pytest-dev/pytest-django/
+    "pytest-mock==3.17.0",  # https://github.com/pytest-dev/pytest-mock/
+    "pytest-randomly==5.0.0",  # https://github.com/pytest-dev/pytest-randomly
+    "pytest-xdist==3.8.0",  # https://pypi.org/project/pytest-xdist/
+    "python-crontab==3.4.0",  # https://gitlab.com/doctormo/python-crontab/
+    # Mock Anymail requests.
+    "requests-mock==1.12.1",  # https://github.com/jamielennox/requests-mock
+    "respx==0.23.1",  # https://lundberg.github.io/respx/
+    "syrupy==6.1.1",  # https://github.com/tophat/syrupy
+]
+dev = [
+    {include-group = "test"},
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Utils ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "ipdb==0.13.13",  # https://github.com/gotcha/ipdb
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Code quality ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "pre-commit==4.7.0",  # https://github.com/pre-commit/pre-commit
+    # ╔════════════════════════════════════════════════════════════════════════════╗
+    # ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Django ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    # ╚════════════════════════════════════════════════════════════════════════════╝
+    "django-debug-toolbar==8.0.0",  # https://github.com/jazzband/django-debug-toolbar
+]
+
+[tool.uv]
+# An application, not a library: uv must not build or install it
+package = false
+# Makes `uv add` pin new dependencies, like the others
+add-bounds = "exact"
 
 [tool.mypy]
 ignore_missing_imports = true
