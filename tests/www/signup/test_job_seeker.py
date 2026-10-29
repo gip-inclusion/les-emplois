@@ -20,7 +20,7 @@ from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, ProfessionalFactory
-from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
+from tests.utils.testing import email_tracking_consent_url, parse_response_to_soup, pretty_indented, reload_module
 
 
 class TestJobSeekerSignup:
@@ -141,9 +141,14 @@ class TestJobSeekerSignup:
 
         # Confirm email + auto login.
         response = client.get(confirm_email_url)
-        assertRedirects(response, reverse("welcoming_tour:index"))
+        welcoming_tour_url = reverse("welcoming_tour:index")
+        assertRedirects(response, welcoming_tour_url, fetch_redirect_response=False)
         user_email = user.emailaddress_set.first()
         assert user_email.verified
+
+        # The new user is asked about email open tracking before anything else
+        response = client.get(welcoming_tour_url)
+        assertRedirects(response, email_tracking_consent_url(welcoming_tour_url), fetch_redirect_response=False)
 
         response = client.get(confirm_email_url)
         # Uses the custom template to display errors.
@@ -505,8 +510,8 @@ class TestJobSeekerSignup:
         fc_url = reverse("france_connect:authorize")
         assertContains(response, fc_url)
 
-        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        # A new user answers the email tracking consent question first
+        mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
@@ -549,8 +554,8 @@ class TestJobSeekerSignup:
         fc_url = reverse("france_connect:authorize")
         assertContains(response, fc_url)
 
-        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        # A new user answers the email tracking consent question first
+        mock_oauth_dance(client, expected_url=email_tracking_consent_url())
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile

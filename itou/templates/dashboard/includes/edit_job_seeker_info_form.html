@@ -42,6 +42,12 @@
     {% bootstrap_field form.fill_mode %}
     {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
+    {% if form.has_email_tracking_consent_field %}
+        <hr class="my-4">
+        <h2 class="h3" id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</h2>
+        {% include "dashboard/includes/email_tracking_consent_explanation.html" %}
+        {% bootstrap_field form.email_tracking_consent %}
+    {% endif %}
 
     {% itou_buttons_form primary_label=submit_label primary_name="preview" primary_value="1" reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_name="edit_jobseeker_infos_submit" %}
 

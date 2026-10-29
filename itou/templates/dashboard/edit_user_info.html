@@ -72,6 +72,12 @@
                                     Vos coordonnées professionnelles peuvent apparaître dans l’annuaire afin que d’autres professionnels puissent vous contacter.
                                 </p>
                                 {% bootstrap_field form.is_directory_opted_out %}
+                                {% if form.has_email_tracking_consent_field %}
+                                    <hr class="my-4">
+                                    <h2 class="h3" id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</h2>
+                                    {% include "dashboard/includes/email_tracking_consent_explanation.html" %}
+                                    {% bootstrap_field form.email_tracking_consent %}
+                                {% endif %}
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                                 {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=prev_url %}

@@ -13,6 +13,7 @@ urlpatterns = [
     path("edit_user_email", views.edit_user_email, name="edit_user_email"),
     path("edit_user_info", views.edit_user_info, name="edit_user_info"),
     path("edit_user_notifications", views.edit_user_notifications, name="edit_user_notifications"),
+    path("email_tracking_consent", views.email_tracking_consent, name="email_tracking_consent"),
     path("edit_job_seeker_info/<uuid:job_seeker_public_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch-organization", views.switch_organization, name="switch_organization"),
     path(

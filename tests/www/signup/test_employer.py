@@ -22,7 +22,12 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import get_tally_form_url, get_zendesk_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import JobSeekerFactory, ProfessionalFactory
-from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    accept_legal_terms,
+    answer_email_tracking_consent,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestCompanySignup:
@@ -236,6 +241,7 @@ class TestCompanySignup:
         )
         response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, response)
+        response = answer_email_tracking_consent(client, response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         # Check `User` state.

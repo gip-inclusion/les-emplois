@@ -63,7 +63,7 @@ from tests.users.factories import (
     ProfessionalFactory,
     UserFactory,
 )
-from tests.utils.testing import normalize_fields_history
+from tests.utils.testing import email_tracking_consent_url, normalize_fields_history
 
 
 ERROR_LOG_NOT_PROFESSIONAL = "We should not try to add a JobSeekerAssignment on user=%s"
@@ -442,8 +442,12 @@ class TestModel:
         password_change_url_with_hidden_key = response.url
         post_data = {"password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD}
         response = client.post(password_change_url_with_hidden_key, data=post_data)
-        assertRedirects(response, reverse("welcoming_tour:index"))
+        welcoming_tour_url = reverse("welcoming_tour:index")
+        assertRedirects(response, welcoming_tour_url, fetch_redirect_response=False)
         assert user.has_verified_email
+        # The proxy could not answer for the job seeker: they are asked when taking control of their account
+        response = client.get(welcoming_tour_url)
+        assertRedirects(response, email_tracking_consent_url(welcoming_tour_url), fetch_redirect_response=False)
         client.logout()
 
         # E-mail already exists, this should raise an error.

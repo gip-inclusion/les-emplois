@@ -1,8 +1,10 @@
+import json
+
 import httpx
 import pytest
 from django.conf import settings
 
-from itou.utils.brevo import MalformedResponseException
+from itou.utils.brevo import BrevoClient, MalformedResponseException
 from tests.users.factories import JobSeekerFactory
 
 
@@ -31,42 +33,119 @@ def test_brevo_client_context_manager_with_exception(mock_httpx_client, caplog, 
     assert "An exception occurred in BrevoClient: Test exception" in error_record.message
 
 
-@pytest.mark.parametrize("status_code,content", [(202, "OK"), (400, "Bad Request"), (500, "Internal Server Error")])
-def test_import_users(respx_mock, caplog, status_code, content, brevo_client):
+@pytest.fixture(name="no_retry_wait")
+def no_retry_wait_fixture(mocker):
+    return mocker.patch("tenacity.nap.time.sleep")
+
+
+IMPORT_PAYLOAD = {
+    "listIds": [31],
+    "emailBlacklist": False,
+    "smsBlacklist": False,
+    "updateExistingContacts": False,
+    "emptyContactsAttributes": False,
+    "jsonBody": [{"email": "user@example.com"}],
+}
+
+
+def import_one_user(brevo_client):
+    brevo_client.import_users([{"email": "user@example.com"}], 31, lambda x: x)
+
+
+def import_errors(caplog):
+    return [record.message for record in caplog.records if record.levelname == "ERROR"]
+
+
+def import_retries(caplog):
+    return [record.message for record in caplog.records if record.levelname == "WARNING"]
+
+
+def test_import_users(respx_mock, caplog, brevo_client):
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import", json=IMPORT_PAYLOAD).mock(
+        return_value=httpx.Response(202)
+    )
+
+    import_one_user(brevo_client)
+
+    assert route.call_count == 1
+    assert import_errors(caplog) == []
+
+
+def test_import_users_client_error_is_not_retried(respx_mock, caplog, brevo_client, no_retry_wait):
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+        return_value=httpx.Response(400, content="Bad Request")
+    )
+
+    import_one_user(brevo_client)
+
+    assert route.call_count == 1
+    assert import_retries(caplog) == []
+    assert import_errors(caplog) == ["Brevo API: Some emails were not imported, status_code=400, content=Bad Request"]
+
+
+def test_import_users_server_error_is_retried(respx_mock, caplog, brevo_client, no_retry_wait):
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+        return_value=httpx.Response(500, content="Internal Server Error")
+    )
+
+    import_one_user(brevo_client)
+
+    assert route.call_count == BrevoClient.IMPORT_ATTEMPTS
+    assert len(import_retries(caplog)) == BrevoClient.IMPORT_ATTEMPTS - 1
+    assert import_errors(caplog) == [
+        "Brevo API: Some emails were not imported, status_code=500, content=Internal Server Error"
+    ]
+
+
+def test_import_users_succeeds_after_rate_limiting(respx_mock, caplog, brevo_client, no_retry_wait):
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import", json=IMPORT_PAYLOAD).mock(
+        side_effect=[httpx.Response(429), httpx.Response(202)]
+    )
+
+    import_one_user(brevo_client)
+
+    assert route.call_count == 2
+    [retry] = import_retries(caplog)
+    assert "429 Too Many Requests" in retry
+    assert import_errors(caplog) == []
+    assert no_retry_wait.call_args_list == [((2,),)]
+
+
+def test_import_users_succeeds_after_timeout(respx_mock, caplog, brevo_client, no_retry_wait):
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+        side_effect=[httpx.ConnectTimeout("Connection timed out"), httpx.Response(202)]
+    )
+
+    import_one_user(brevo_client)
+
+    assert route.call_count == 2
+    assert import_errors(caplog) == []
+
+
+def test_import_users_update_existing_contacts(respx_mock, brevo_client):
     user = JobSeekerFactory()
-    payload = {
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(return_value=httpx.Response(202))
+
+    brevo_client.import_users([user], 31, lambda x: {"email": x.email}, update_existing_contacts=True)
+
+    assert json.loads(route.calls.last.request.content) == {
         "listIds": [31],
         "emailBlacklist": False,
         "smsBlacklist": False,
-        "updateExistingContacts": False,
+        "updateExistingContacts": True,
         "emptyContactsAttributes": False,
         "jsonBody": [{"email": user.email}],
     }
 
-    respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import", json=payload).mock(
-        return_value=httpx.Response(status_code, content=content)
-    )
 
-    brevo_client.import_users([user], 31, lambda x: {"email": x.email})
+def test_import_contacts_request_error(mocker, caplog, brevo_client, no_retry_wait):
+    post = mocker.patch("itou.utils.brevo.httpx.Client.post", side_effect=httpx.ConnectTimeout("Connection timed out"))
 
-    assert respx_mock.calls.called
+    with pytest.raises(httpx.ConnectTimeout):
+        brevo_client.import_users([{"email": "user1@example.com"}], 1, lambda x: x)
 
-    if status_code != 202:
-        error_record = next(record for record in caplog.records if record.levelname == "ERROR")
-        assert (
-            f"Brevo API: Some emails were not imported, status_code={status_code}, content={content}"
-            in error_record.message
-        )
-
-
-def test_import_contacts_request_error(mocker, caplog, brevo_client):
-    mocker.patch("itou.utils.brevo.httpx.Client.post", side_effect=httpx.RequestError("Connection timed out"))
-
-    with pytest.raises(httpx.RequestError):
-        brevo_client._import_contacts([{"email": "user1@example.com"}], 1, lambda x: x)
-
-    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
-    assert error_record.message == "Brevo API: Request failed: Connection timed out"
+    assert post.call_count == BrevoClient.IMPORT_ATTEMPTS
+    assert import_errors(caplog) == ["Brevo API: Request failed: Connection timed out"]
 
 
 def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
@@ -155,3 +234,16 @@ def test_list_contacts_malformed_response(respx_mock, caplog, brevo_client):
         brevo_client.list_contacts()
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == "Unexpected response format from Brevo API /contacts, limit: 1000, offset: 0"
+
+
+def test_import_users_pauses_between_requests(mocker, respx_mock, brevo_client):
+    sleep = mocker.patch("itou.utils.brevo.time.sleep")
+    mocker.patch.object(BrevoClient, "IMPORT_BATCH_SIZE", 1)
+    route = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(return_value=httpx.Response(202))
+
+    # Two batches in a single call, then another request from a second call: both are spaced out
+    brevo_client.import_users([{"email": "user1@example.com"}, {"email": "user2@example.com"}], 31, lambda x: x)
+    brevo_client.import_users([{"email": "user3@example.com"}], 32, lambda x: x)
+
+    assert route.call_count == 3
+    assert sleep.call_args_list == [mocker.call(BrevoClient.IMPORT_BATCH_DELAY)] * 2
