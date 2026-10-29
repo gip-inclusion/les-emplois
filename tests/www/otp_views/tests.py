@@ -20,6 +20,7 @@ from pytest_django.asserts import (
 
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
+from itou.www.otp_views.enums import DeviceType
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
@@ -52,7 +53,8 @@ OTP_URL_NAMES = [
     "otp_devices",
     "enrollment_step_0_intro",
     "enrollment_step_1_choose_device_type",
-    "enrollment_step_2_and_3_confirm_device",
+    "enrollment_step_2_download_app",
+    "enrollment_step_3_and_4_confirm_device",
     "verify_otp",
     "login_with_backup_code",
 ]
@@ -84,7 +86,7 @@ class TestPermissions:
         client.force_login(user)
         attach_device_to_user_session(client, ItouTOTPDeviceFactory(user=user))
         response = client.get(reverse(f"otp_views:{url_name}"))
-        if url_name == "enrollment_step_2_and_3_confirm_device":
+        if url_name in ("enrollment_step_2_download_app", "enrollment_step_3_and_4_confirm_device"):
             # without a `device_type` query param it redirects to step-1
             assert response.status_code == 302
         else:
@@ -103,7 +105,7 @@ class TestPermissions:
         device.save(update_fields=["disabled_at"])
 
         response = client.get(reverse(f"otp_views:{url_name}"))
-        if url_name == "enrollment_step_2_and_3_confirm_device":
+        if url_name in ("enrollment_step_2_download_app", "enrollment_step_3_and_4_confirm_device"):
             # without a `device_type` query param it redirects to step-1
             assert response.status_code == 302
         elif url_name in ENROLLMENT_URL_NAMES:
@@ -282,7 +284,7 @@ def test_enrollment_step_1_choose_device_type(client, settings):
     client.force_login(user)
     url = reverse("otp_views:enrollment_step_1_choose_device_type")
     response = client.get(url)
-    assertContains(response, "<strong>Étape 1</strong>/3 : Choisissez votre méthode")
+    assertContains(response, "<strong>Étape 1</strong>/4 : choisissez votre méthode")
 
 
 class TestEnrollmentSteps2And3ConfirmDevice:
@@ -301,11 +303,11 @@ class TestEnrollmentSteps2And3ConfirmDevice:
     def test_get_known_device_type(self, client, device_type, should_show_qr_code):
         user = random_pro_user_factory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
 
         response = client.get(url, query_params={"device_type": device_type})
 
-        assertContains(response, "<strong>Étape 2</strong>/3 : Associez votre compte")
+        assertContains(response, "<strong>Étape 3</strong>/4 : associez votre compte")
         qr_code_text = "scannez ce QR code"
         if should_show_qr_code:
             assertContains(response, qr_code_text)
@@ -315,7 +317,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
     def test_post_valid_totp(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
         fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         data = {
@@ -349,7 +351,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         existing_device = ItouTOTPDeviceFactory(user=user)
         client.force_login(user)  # authenticated but NOT OTP-verified: no device attached to session
 
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
         fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
         data = {
             "name": "attacker device",
@@ -368,7 +370,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
     def test_post_invalid_totp(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
         fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         expired_token = TOTP(fake_device.bin_key, drift=100).token()
@@ -387,7 +389,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
     def test_post_name_already_used(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
         existing_user_device = ItouTOTPDeviceFactory(
             name="existing",
             user=user,
@@ -420,17 +422,29 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         assert device.name == data["name"]
 
     @pytest.mark.parametrize("key", ["", "not-base32!", None])
-    def test_post_invalid_key_redirects(self, client, key):
+    @pytest.mark.parametrize(
+        "device_type,expected_redirection",
+        [
+            (
+                DeviceType.SMARTPHONE,
+                add_url_params(
+                    reverse("otp_views:enrollment_step_2_download_app"), {"device_type": DeviceType.SMARTPHONE}
+                ),
+            ),
+            (DeviceType.DESKTOP, reverse("otp_views:enrollment_step_1_choose_device_type")),
+        ],
+    )
+    def test_post_invalid_key_redirects(self, client, key, device_type, expected_redirection):
         user = random_pro_user_factory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
 
-        data = {"name": "whatever", "device_type": "smartphone", "otp_token": "123456"}
+        data = {"name": "whatever", "device_type": device_type, "otp_token": "123456"}
         if key is not None:
             data["key"] = key
         response = client.post(url, data)
 
-        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assertRedirects(response, expected_redirection)
         assert user.itou_totp_devices.count() == 0
 
 
@@ -460,7 +474,7 @@ class TestLogin:
         # The user should not be able to access the setup otp pages
         response = client.get(setup_otp_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
-        setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
         response = client.get(setup_otp_confirm_device_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
 

@@ -42,7 +42,8 @@ class ConfirmTOTPDeviceForm(forms.Form):
                 if device_type == DeviceType.SMARTPHONE
                 else "dans votre gestionnaire de mots de passe."
             )
-            + "<br>Reportez-le ici :"
+            + "<br>Attention, ce code change toutes les 30 secondes : "
+            "vérifiez que vous saisissez bien le code actuellement affiché."
         )
 
     def clean(self):
@@ -54,7 +55,12 @@ class ConfirmTOTPDeviceForm(forms.Form):
             )
 
         if self.device.verify_token(cleaned_data["otp_token"]) is False:
-            self.add_error("otp_token", "Le code unique de validation (OTP) n’est pas correct.")
+            self.add_error(
+                "otp_token",
+                "Le code saisi est incorrect ou a expiré. "
+                "Vérifiez le code à 6 chiffres affiché dans votre application et réessayez. "
+                "Il change toutes les 30 secondes.",
+            )
 
         return cleaned_data
 
@@ -104,8 +110,11 @@ class VerifyOTPForm(forms.Form):
         device = verify_token_for_user(self.user, otp_token)
         if device is None:
             logger.info("User %s failed 2FA verification", self.user.id)
-            raise forms.ValidationError("Le code de validation unique (OTP) n’est pas correct.")
-
+            raise forms.ValidationError(
+                "Le code saisi est incorrect ou a expiré. "
+                "Vérifiez le code à 6 chiffres affiché dans votre application et réessayez. "
+                "Il change toutes les 30 secondes.",
+            )
         self.user.otp_device = device
         logger.info("User %s authenticated with 2FA", self.user.id)
         return otp_token

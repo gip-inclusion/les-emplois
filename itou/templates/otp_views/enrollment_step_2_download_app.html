@@ -1,0 +1,90 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+
+{% block global_messages %}
+    {% include "includes/demo_accounts.html" %}
+{% endblock %}
+
+{% block title %}Sécurisez votre accès {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Sécurisez votre accès</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="c-stepper mb-3 mb-md-4">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-50"
+                                 role="progressbar"
+                                 aria-valuenow="50"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-labelledby="currentProgressState"></div>
+                        </div>
+                        <p id="currentProgressState">
+                            <strong>Étape 2</strong>/4 : téléchargez l’application
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="c-form">
+                        <form method="get" action="{{ next_step_url }}" role="form" id="otp_form">
+                            <input type="hidden" name="device_type" value="{{ device_type }}">
+                            <fieldset>
+                                <legend class="h3">Cette étape se fait sur votre téléphone</legend>
+                                <p>
+                                    <strong>
+                                        Scannez ce code avec l’appareil photo de votre téléphone,
+                                        ou avec une application de lecture de QR code si votre
+                                        appareil photo ne le propose pas.
+                                    </strong>
+                                </p>
+                                <p>
+                                    Ce QR code vous amène directement vers les bonnes applications (Google Authenticator, Aegis, …).
+                                    <br>
+                                    Pas de recherche à faire : la page propose des applications gratuites.
+                                </p>
+                                <a href="{{ link_to_list_of_apps }}">
+                                    <img src="{{ qrcode }}"
+                                         width="250"
+                                         alt="QR code pour le téléchargement d’une application de génération de TOTP">
+                                </a>
+                                <p>
+                                    Ou ouvrez ce lien depuis votre téléphone :
+                                    <br>
+                                    <a href="{{ link_to_list_of_apps }}" class="btn-link">{{ link_to_list_of_apps }}</a>
+                                </p>
+                                <div class="form-check">
+                                    <input type="checkbox" id="confirmation-checkbox" class="form-check-input" required>
+                                    <label class="form-check-label" for="confirmation-checkbox">J’ai téléchargé une application de double authentification et je peux passer à l’étape suivante.</label>
+                                </div>
+                            </fieldset>
+                            {% itou_buttons_form primary_disabled=True primary_id="next_step_button" primary_label="Passer à l’étape suivante" secondary_label="Revenir à l’étape précédente" secondary_url=previous_step_url reset_url=None %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ csp_nonce }}">
+        document.getElementById("confirmation-checkbox").addEventListener("change", (event) => {
+            const button = document.getElementById("next_step_button");
+            button.classList.toggle("disabled", !event.target.checked); // no-typography-rule-check
+        })
+    </script>
+{% endblock %}
