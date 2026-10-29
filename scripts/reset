@@ -101,4 +101,4 @@ if __name__ == "__main__":
     parser.add_argument("--dora-token", required=True)
     parser.add_argument("--brevo-token", required=True)
     args = parser.parse_args()
-    main(args.bucket_name, args.admin_password, args.dora_token)
+    main(args.bucket_name, args.admin_password, args.dora_token, args.brevo_token)
