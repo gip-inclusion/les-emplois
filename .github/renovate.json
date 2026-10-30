@@ -1,0 +1,58 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "enabledManagers": ["pep621", "github-actions"],
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "5 days",
+  "prConcurrentLimit": 20,
+  "prHourlyLimit": 0,
+  "commitMessageAction": "bump",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "from {{currentVersion}} to {{newVersion}}",
+  "packageRules": [
+    {
+      "description": "pyproject.toml pins the dependencies: each PR rewrites a pin, so uv locks exactly the version the PR names",
+      "matchManagers": ["pep621"],
+      "rangeStrategy": "pin",
+      "commitMessagePrefix": "requirement:",
+      "addLabels": ["python"]
+    },
+    {
+      "description": "Python upgrades are done by hand, cf. CHANGELOG_breaking_changes.md: requires-python and the setup-python versions",
+      "matchDepNames": ["python"],
+      "enabled": false
+    },
+    {
+      "description": "The images of the workflow services (postgis, redis) follow production by hand, PostgreSQL 17 in particular",
+      "matchManagers": ["github-actions"],
+      "matchDatasources": ["docker"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "commitMessagePrefix": "chore(deps):",
+      "addLabels": ["github_actions"]
+    },
+    {
+      "description": "Our own library, no need to wait",
+      "matchPackageNames": ["itoutils"],
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Only renames group:boto of config:recommended, which groups boto3 with the botocore it requires: boto is another package",
+      "groupName": "boto3",
+      "matchPackageNames": ["boto3", "botocore"]
+    },
+    {
+      "description": "We need rsa signing compatibility, see https://github.com/gip-inclusion/les-emplois/pull/8071",
+      "matchPackageNames": ["paramiko"],
+      "allowedVersions": "<5"
+    },
+    {
+      "description": "Django feature releases need a planned upgrade: open their PR from the Dependency Dashboard",
+      "matchPackageNames": ["django"],
+      "matchUpdateTypes": ["major", "minor"],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

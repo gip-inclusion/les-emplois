@@ -237,6 +237,8 @@ $ uv lock --upgrade-package <paquet>
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 *commit*.
 
+[Renovate](https://docs.renovatebot.com/) ouvre une PR par mise à jour d’une dépendance de `pyproject.toml`, 5 jours après sa publication, et l’issue *Dependency Dashboard* liste les mises à jour en attente. Ses PR de sécurité n’attendent pas. Les sous-dépendances ne sont pas mises à jour automatiquement : elles changent quand une dépendance directe l’exige, ou à la main avec `uv lock --upgrade-package <paquet>`, par exemple après une alerte Dependabot. `uv tree --outdated` signale celles qui ont une version plus récente.
+
 ## Front-end
 
 - https://github.com/gip-inclusion/itou-theme
