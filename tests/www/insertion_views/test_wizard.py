@@ -895,5 +895,6 @@ def test_orientation_create_job_seeker_starts_with_search_by_email(client):
             kwargs={"session_uuid": job_seeker_session_name},
         ),
     )
-    assertContains(response, "<title>Orienter", html=False)
-    assertContains(response, "<h1>Orienter</h1>", html=True)
+    assertContains(response, "<title>Orienter vers un service d'insertion", html=False)
+    assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
+    assertContains(response, '<div class="form-text mt-n2 mb-2">Par exemple\xa0: julie@example.com</div>', html=True)

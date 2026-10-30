@@ -1122,7 +1122,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
-            "orientation_process": self.is_orientation,
         }
 
     def get_active_assignment(self, job_seeker):
@@ -1345,6 +1344,11 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "active_assignment": active_assignment,
             }
         )
+
+    def get_template_names(self):
+        if self.is_orientation:
+            return ["job_seekers_views/create_job_seeker_for_orientation/search_by_email.html"]
+        return super().get_template_names()
 
     def get_back_url(self):
         if self.is_orientation:
@@ -1661,9 +1665,6 @@ class CreateJobSeekerStep1ForOrientationView(CreateJobSeekerStep1ForSenderView):
     previous_apply_url = "job_seekers_views:search_by_email_for_sender"
     next_apply_url = "job_seekers_views:create_job_seeker_step_2_for_orientation"
 
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"progress": "50"}
-
 
 class CreateJobSeekerStep2ForOrientationView(CreateJobSeekerStepEndForSenderView):
     template_name = "job_seekers_views/create_job_seeker_for_orientation/step_2.html"
@@ -1697,7 +1698,7 @@ class CreateJobSeekerStep2ForOrientationView(CreateJobSeekerStepEndForSenderView
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"form": self.form, "progress": "100"}
+        return super().get_context_data(**kwargs) | {"form": self.form}
 
 
 class UpdateJobSeekerStartView(View):
