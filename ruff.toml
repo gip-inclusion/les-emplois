@@ -1,0 +1,20 @@
+line-length = 119
+
+[lint]
+# see prefixes in https://beta.ruff.rs/docs/rules/
+select = [
+    "F",  # pyflakes
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "I",  # isort
+    "UP",  # pyupgrade
+    "TID",  # flake8-tidy-imports
+]
+
+[lint.isort]
+combine-as-imports = true
+known-first-party = ["itou"]
+lines-after-imports = 2
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
