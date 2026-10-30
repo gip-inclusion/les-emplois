@@ -1,13 +1,15 @@
 import csv
+import functools
 import json
 from datetime import datetime
+from operator import itemgetter
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
 from itou.utils.command import BaseCommand
@@ -17,8 +19,8 @@ from itou.utils.sync import DiffItemKind, yield_sync_diff
 ASP_DATE_FORMAT = "%d/%m/%Y"
 
 
-def csv_import_communes(filename):
-    with open(filename, encoding="utf-8") as f:
+def csv_import_communes(filename, file_encoding):
+    with open(filename, encoding=file_encoding) as f:
         reader = csv.reader(f, delimiter=";")
         next(reader)
         for line_number, line in enumerate(reader, start=2):
@@ -53,6 +55,40 @@ def guess_commune(code, name, at=None):
     )
 
 
+def detect_inconsistencies(commune_infos):
+    def format_inconsistency(problem, code, dates):
+
+        formatted_dates = "\n".join(
+            f"- [{start.isoformat()}, {end.isoformat() + ']' if end else 'NULL)'}: {name}"
+            for start, end, name in dates
+        )
+        return f"{problem} for {code}:\n{formatted_dates}"
+
+    inconsistencies = []
+
+    code_to_dates = {}
+    for commune_info in commune_infos:
+        code_to_dates.setdefault(commune_info["code"], []).append(
+            (commune_info["start_date"], commune_info["end_date"], commune_info["name"])
+        )
+    for code, dates in code_to_dates.items():
+        sorted_dates = sorted(dates, key=itemgetter(0))  # Only sort based on start_date
+        (start, end) = sorted_dates[0][:2]
+        if end and start > end:
+            inconsistencies.append(format_inconsistency("Impossible dates", code, sorted_dates))
+            continue
+
+        for next_start, next_end, _name in sorted_dates[1:]:
+            if next_end and next_start > next_end:
+                inconsistencies.append(format_inconsistency("Impossible dates", code, sorted_dates))
+                break
+            if end is None or next_start <= end:
+                inconsistencies.append(format_inconsistency("Overlapping dates", code, sorted_dates))
+                break
+            start, end = next_start, next_end
+    return inconsistencies
+
+
 class Command(BaseCommand):
     ATOMIC_HANDLE = True
 
@@ -67,9 +103,21 @@ class Command(BaseCommand):
             action="store",
             help="Path of the ASP CSV file to import",
         )
+        parser.add_argument(
+            "--file-encoding",
+            dest="file_encoding",
+            default="utf-8",
+            action="store",
+            help="Encoding of the file (default: %(default)s)",
+        )
 
-    def handle(self, *, file_path, wet_run, **options):
-        communes_from_csv = list(csv_import_communes(file_path))
+    def handle(self, *, file_path, file_encoding, wet_run, **options):
+        communes_from_csv = list(csv_import_communes(file_path, file_encoding))
+        inconsistencies = detect_inconsistencies(communes_from_csv)
+        if inconsistencies:
+            for inconsistency in inconsistencies:
+                self.stdout.write(f"{inconsistency}\n")
+            raise RuntimeError("Inconsistent data in csv")
 
         communes_added_by_csv = []
         communes_updated_by_csv = []
@@ -78,7 +126,7 @@ class Command(BaseCommand):
         for item in yield_sync_diff(
             communes_from_csv,
             ("code", "start_date"),
-            Commune.objects.all(),
+            Commune.unfiltered_objects.all(),
             ("code", "start_date"),
             [
                 ("name", "name"),
@@ -95,6 +143,7 @@ class Command(BaseCommand):
                     end_date=item.raw["end_date"],
                     city=city,  # all of the deactivated Communes will have None here.
                 )
+                # The ignore field is kept untouched by edition since bulk_update doesn't reference it
                 if item.kind == DiffItemKind.EDITION:
                     commune.pk = item.db_obj.pk
                     communes_updated_by_csv.append(commune)
@@ -110,13 +159,14 @@ class Command(BaseCommand):
         if wet_run:
             profiles_to_remap = []
             for pk in communes_removed_by_csv:
-                commune = Commune.objects.get(pk=pk)
+                commune = Commune.unfiltered_objects.get(pk=pk)
                 try:
                     commune.delete()
                 except RestrictedError as exc:
                     for obj in exc.restricted_objects:
                         if obj.birth_place == commune:
                             obj.birth_place = None
+                            obj.birth_country = None  # To respect jobseekerprofile_birth_country_and_place constraint
                             setattr(obj, "_birth_place", (commune.code, commune.name))
                         if obj.hexa_commune == commune:
                             obj.hexa_commune = None
@@ -124,7 +174,7 @@ class Command(BaseCommand):
                         profiles_to_remap.append(obj)
                     JobSeekerProfile.objects.bulk_update(
                         exc.restricted_objects,
-                        fields=["birth_place", "hexa_commune"],
+                        fields=["birth_country", "birth_place", "hexa_commune"],
                     )
                     commune.delete()
             self.stdout.write(f"> successfully deleted count={len(communes_removed_by_csv)} communes")
@@ -146,7 +196,13 @@ class Command(BaseCommand):
             self.stdout.write(f"> successfully created count={len(objs)} new communes")
 
             if profiles_to_remap:
-                has_raised = False
+                should_raise = set()
+
+                @functools.lru_cache
+                def cached_guess_commune(code, name):
+                    # Cached function defined inside handle to avoid shared cache between command runs
+                    return guess_commune(code, name)
+
                 for profile in profiles_to_remap:
                     if old_commune_info := getattr(profile, "_birth_place", None):
                         try:
@@ -167,13 +223,14 @@ class Command(BaseCommand):
                                 f"at={profile.birthdate} "
                                 f"name={old_commune_info[1]} not found ! Resolve manually."
                             )
-                            has_raised = True
+                            should_raise.add(old_commune_info)
                         else:
+                            profile.birth_country_id = Country.FRANCE_ID
                             profile.birth_place = new_commune
 
                     if old_commune_info := getattr(profile, "_hexa_commune", None):
                         try:
-                            new_commune = guess_commune(*old_commune_info)
+                            new_commune = cached_guess_commune(*old_commune_info)
                             self.stdout.write(
                                 f"> REALIGN hexa_commune for code={old_commune_info[0]} "
                                 f"name={old_commune_info[1]} "
@@ -185,15 +242,15 @@ class Command(BaseCommand):
                                 f"! new commune for code={old_commune_info[0]} "
                                 f"name={old_commune_info[1]} not found ! Resolve manually."
                             )
-                            has_raised = True
+                            should_raise.add(old_commune_info)
                         else:
                             profile.hexa_commune = new_commune
 
-                if has_raised:
-                    raise Exception("Some communes could not be found. Please resolve manually.")
+                if should_raise:
+                    raise Exception(f"Some communes could not be found. Please resolve manually. {should_raise}")
 
                 n_objs = JobSeekerProfile.objects.bulk_update(
                     profiles_to_remap,
-                    fields=["birth_place", "hexa_commune"],
+                    fields=["birth_country", "birth_place", "hexa_commune"],
                 )
                 self.stdout.write(f"> realigned count={n_objs} JobSeeker profiles with updated communes.")
