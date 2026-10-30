@@ -286,12 +286,22 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
 
 def test_start_without_mobilization_link_uses_wizard(client):
     prescriber = PrescriberFactory()
-    service = ServiceFactory(contact_email="")
+    service = ServiceFactory()
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
     client.force_login(prescriber)
 
     response = client.get(start_url)
     assert response.status_code == 302
+
+
+def test_start_without_mobilization_link_nor_contact_email_stops(client):
+    prescriber = PrescriberFactory()
+    service = ServiceFactory(contact_email="")
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    client.force_login(prescriber)
+
+    response = client.get(start_url)
+    assert response.status_code == 404
 
 
 def test_start_orientation_redirects_when_external_link_preferred(client, settings):

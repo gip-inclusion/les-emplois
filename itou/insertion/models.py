@@ -422,7 +422,11 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def is_orientable_via_internal_form(self) -> bool:
-        return not self.should_mobilize_via_external_link and not self.from_non_orientable_di_source
+        return (
+            bool(self.contact_email)
+            and not self.should_mobilize_via_external_link
+            and not self.from_non_orientable_di_source
+        )
 
     @property
     def display_mobilization_modes(self) -> list[str]:

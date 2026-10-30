@@ -762,28 +762,12 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
 
-    def test_detail_without_mobilization_link_uses_wizard_regardless_of_dora_orientability(self, client, snapshot):
-        user = PrescriberFactory()
-        service = ServiceFactory(
-            uid="test-not-orientable-uid",
-            name="Service orientable via le formulaire interne",
-            updated_on="2025-01-15",
-            contact_email="",
-            source__value="dora",
-            structure__uid="test-structure-not-orientable-uid",
-            structure__updated_on="2025-01-15",
-        )
-        client.force_login(user)
-        response = client.get(self.get_service_url(service))
-        assertContains(response, self.ORIENT_BTN_LABEL)
-        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
-
-    def test_detail_without_mobilization_link_uses_wizard_without_contact_email(self, client):
+    def test_detail_without_mobilization_link_cannot_use_wizard_without_contact_email(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(contact_email="", contact_full_name="Ludwig B.", contact_phone="3949")
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
 
     def test_detail_non_orientable_di_sources(self, client, settings):
         user = PrescriberFactory()
@@ -820,7 +804,7 @@ class TestServices:
         assertContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, f'href="{external_link}"')
 
-    def test_detail_without_contact_info_still_uses_wizard(self, client):
+    def test_detail_without_contact_info_still_cannot_use_wizard(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-no-contact-uid",
@@ -834,7 +818,7 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
-        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
         assertNotContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_contact_button_shown_when_authenticated(self, client):

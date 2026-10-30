@@ -100,17 +100,21 @@ def test_address_on_one_line_incomplete_returns_none(address_kwargs):
 
 
 @pytest.mark.parametrize(
-    "lien_mobilisation, non_orientable_sources, expected",
+    "contact_email,lien_mobilisation, non_orientable_sources, expected",
     [
-        ("", [], True),
-        ("https://ext.link", [], False),
-        ("", ["blacklisted-source"], False),
-        ("https://ext.link", ["blacklisted-source"], False),
+        ("contact@example.com", "", [], True),
+        ("", "", [], False),
+        ("", "https://ext.link", [], False),
+        ("", "", ["blacklisted-source"], False),
+        ("", "https://ext.link", ["blacklisted-source"], False),
+        ("contact@example.com", "https://ext.link", ["blacklisted-source"], False),
     ],
 )
-def test_is_orientable_via_internal_form(lien_mobilisation, non_orientable_sources, expected, settings):
+def test_is_orientable_via_internal_form(contact_email, lien_mobilisation, non_orientable_sources, expected, settings):
     settings.NON_ORIENTABLE_DI_SOURCES = non_orientable_sources
-    service = ServiceFactory(lien_mobilisation=lien_mobilisation, source__value="blacklisted-source")
+    service = ServiceFactory(
+        contact_email=contact_email, lien_mobilisation=lien_mobilisation, source__value="blacklisted-source"
+    )
 
     assert service.is_orientable_via_internal_form is expected
 
@@ -136,7 +140,7 @@ def test_lien_mobilisation_must_be_url():
         pytest.param(
             "", False, "3949", "contact@email.fake", ["Formulaire", "Téléphone", "Email"], id="full_with_form"
         ),
-        pytest.param("", False, "", "", ["Formulaire"], id="form_only"),
+        pytest.param("", False, "", "contact@example.com", ["Formulaire", "Email"], id="form_and_email"),
         pytest.param("", True, "3949", "contact@email.fake", ["Téléphone", "Email"], id="no_ext_link_no_form"),
         pytest.param("", True, "", "", [], id="nothing"),
     ],
