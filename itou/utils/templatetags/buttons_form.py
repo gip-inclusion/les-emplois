@@ -16,6 +16,7 @@ def itou_buttons_form(
     primary_aria_label="Passer à l’étape suivante",
     reset_url=reverse_lazy("dashboard:index"),
     show_mandatory_fields_mention=True,
+    show_separator=True,
     secondary_label="Retour",
     secondary_url=None,
     secondary_aria_label="Retourner à l’étape précédente",
@@ -61,6 +62,9 @@ def itou_buttons_form(
         show_mandatory_fields_mention
             If True, show the mention "champs obligatoires" on the form.
 
+        show_separator
+            If True, show the horizontal rule above the buttons.
+
         primary_disabled
             If True, the primary button is disabled.
 
@@ -99,6 +103,7 @@ def itou_buttons_form(
 
     return {
         "show_mandatory_fields_mention": show_mandatory_fields_mention,
+        "show_separator": show_separator,
         "ask_confirmation_before_reset": ask_confirmation_before_reset,
         "primary_aria_label": primary_aria_label,
         "primary_disabled": primary_disabled,

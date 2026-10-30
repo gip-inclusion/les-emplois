@@ -1027,8 +1027,13 @@ class TestCreateForOrientation:
         assertRedirects(response, step_1_url)
 
         response = client.get(step_1_url)
-        assertContains(response, "Étape 1</strong>/2")
-        assertContains(response, "michel.durant@example.com")
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
+        assertNotContains(response, "Étape 1")
+        assertNotContains(response, "michel.durant@example.com")
+        assertContains(response, 'id="id_first_name"')
+        assertContains(response, 'id="id_last_name"')
+        assertContains(response, 'name="birthdate"')
+        assertNotContains(response, 'id="id_email"')
         assertNotContains(response, 'id="id_title"')
         assertNotContains(response, 'id="id_nir"')
 
@@ -1042,7 +1047,9 @@ class TestCreateForOrientation:
         assertRedirects(response, step_2_url)
 
         response = client.get(step_2_url)
-        assertContains(response, "Étape 2</strong>/2")
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
+        assertNotContains(response, "Étape 2")
+        assertNotContains(response, "Compléter les informations de l’usager")
         assertNotContains(response, 'id="id_birthdate"')
 
         geispolsheim = create_city_geispolsheim()
@@ -1101,9 +1108,7 @@ class TestCreateForOrientation:
         )
 
         assertContains(response, "Email existant")
-        assertContains(
-            response, f"<h1>Orienter {mask_unless(job_seeker.get_inverted_full_name(), False)}</h1>", html=True
-        )
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
         assertContains(
             response,
             f"""

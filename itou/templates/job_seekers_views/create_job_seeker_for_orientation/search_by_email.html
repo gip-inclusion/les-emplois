@@ -1,0 +1,71 @@
+{% extends "insertion/orientation_base.html" %}
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <form method="post" class="js-prevent-multiple-submit">
+                        <div class="c-form">
+                            <h3 class="h3">Adresse e-mail personnelle de l'usager*</h3>
+                            {% csrf_token %}
+                            {% bootstrap_field form.email show_label=False show_help=False %}
+                            <div class="mb-3">
+                                {% include "signup/includes/no_email_link.html" with link_text="L’usager n'a pas d'e-mail ?" only %}
+                            </div>
+                            {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" reset_url=reset_url %}
+                        </div>
+                        {% if preview_mode %}
+                            <div class="modal"
+                                 id="email-confirmation-modal"
+                                 tabindex="-1"
+                                 role="dialog"
+                                 aria-labelledby="email-confirmation-label"
+                                 aria-modal="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                <b>L'adresse {{ form.email.value }} est associée au compte de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}.</b>
+                                            </p>
+                                            <p>
+                                                Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                                « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager que vous souhaitez orienter.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            {% bootstrap_button "Ce n'est pas mon usager" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if preview_mode %}
+        <script nonce="{{ csp_nonce }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");
+            emailConfirmationModal.show();
+        </script>
+    {% endif %}
+{% endblock %}
