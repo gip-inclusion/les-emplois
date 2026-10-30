@@ -3,61 +3,10 @@ name = "les-emplois"
 dynamic = ["version"]
 requires-python = ">=3.14"
 
-[tool.ruff]
-line-length = 119
-
 [tool.mypy]
 ignore_missing_imports = true
 disable_error_code = [
     "misc",
     "var-annotated",
     "attr-defined",
-]
-
-[tool.ruff.lint]
-# see prefixes in https://beta.ruff.rs/docs/rules/
-select = [
-    "F",  # pyflakes
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "I",  # isort
-    "UP",  # pyupgrade
-    "TID",  # flake8-tidy-imports
-]
-
-[tool.ruff.lint.isort]
-combine-as-imports = true
-known-first-party = ["itou"]
-lines-after-imports = 2
-
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
-
-[tool.djlint]
-profile="django"
-ignore="H006,H014,H017,H030,H031,T003"
-custom_blocks="buttons,component_alert,component_alert_global,component_box_dashboard,component_box_nexus_activated_service,component_info,component_navinfo,component_title,endbuttons,fragment"
-max_attribute_length=200
-preserve_blank_lines=true
-extend_exclude = "itou/static_collected,itou/templates/utils/widgets/duet_date_picker_widget.html"
-format_css = true
-format_js = true
-no_indent_inner_html=false
-
-[tool.pytest]
-minversion = "9.0"
-DJANGO_SETTINGS_MODULE = "config.settings.test"
-python_files = ["tests*.py", "test_*.py"]
-filterwarnings = [
-    "error",
-    "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
-]
-addopts = [
-    "--reuse-db",
-    "--strict-markers",
-]
-markers = [
-    "no_django_db: mark tests that should not be marked with django_db.",
-    "slow: slow tests that are skipped unless pytest is run with `--runslow`",
-    "do_not_patch_accept_domain_based_on_mx: disable auto-patching of itou.emails.utils._accept_domain_based_on_mx",
 ]
