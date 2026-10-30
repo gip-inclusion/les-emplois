@@ -12422,6 +12422,7 @@
                  "approvals_suspension"."start_at",
                  "approvals_suspension"."end_at",
                  "approvals_suspension"."siae_id",
+                 "approvals_suspension"."prescriber_organization_id",
                  "approvals_suspension"."reason",
                  "approvals_suspension"."reason_explanation",
                  "approvals_suspension"."created_at",

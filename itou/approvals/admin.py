@@ -118,7 +118,7 @@ class SuspensionInline(ReadonlyMixin, ItouTabularInline):
     extra = 0
     show_change_link = True
     fields = ("start_at", "end_at", "duration", "reason", "created_by", "siae")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+    raw_id_fields = ("approval", "siae", "prescriber_organization", "created_by", "updated_by")
     readonly_fields = ("duration",)
 
     @admin.display(description="Durée")
@@ -496,7 +496,7 @@ class SuspensionAdmin(
         "is_in_progress",
     )
     list_display_links = ("pk", "approval")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+    raw_id_fields = ("approval", "siae", "prescriber_organization", "created_by", "updated_by")
     list_filter = (
         IsInProgressFilter,
         "reason",

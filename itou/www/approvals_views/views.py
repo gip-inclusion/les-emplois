@@ -27,8 +27,11 @@ from itou.approvals.models import (
 )
 from itou.approvals.perms import (
     PERMS_READ_AND_WRITE,
+    approvals_suspendable_by_ft_prescriber,
     can_declare_prolongation,
     can_view_approval_details,
+    is_ft_prescriber_allowed_to_manage_suspension,
+    is_ft_prescriber_allowed_to_suspend,
     prolongation_derogation_session_key,
 )
 from itou.approvals.utils import can_close_approval, close_approval, last_hire_was_made_by_siae
@@ -48,7 +51,7 @@ from itou.utils.db import (
 )
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.prescriber import get_current_org_or_404, is_authorized_ft_prescriber
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
@@ -203,7 +206,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         # Useful for get_suspensions method and the approval remainder field
         Prefetch(
             "suspension_set",
-            queryset=Suspension.objects.select_related("siae"),
+            queryset=Suspension.objects.select_related("siae", "prescriber_organization"),
         ),
     )
     template_name = "approvals/details.html"
@@ -253,7 +256,9 @@ class ApprovalDetailView(BaseApprovalDetailView):
                     self.request.current_organization
                 )
             else:
-                suspension.can_be_handled_by_current_user = False
+                suspension.can_be_handled_by_current_user = is_ft_prescriber_allowed_to_manage_suspension(
+                    self.request, suspension
+                )
         return suspensions
 
     def get_context_data(self, **kwargs):
@@ -266,9 +271,13 @@ class ApprovalDetailView(BaseApprovalDetailView):
             getattr(prolongation, "status", None) == approvals_enums.ProlongationRequestStatus.PENDING
             for prolongation in context["prolongations"]
         )
-        context["can_be_suspended_by_current_user"] = self.request.from_employer and approval.can_be_suspended_by_siae(
-            self.request.current_organization
+        is_ft_prescriber_eligible = is_ft_prescriber_allowed_to_suspend(self.request, approval)
+        context["can_manage_suspensions"] = (
+            context["is_employer_with_accepted_application"] or is_ft_prescriber_eligible
         )
+        context["can_be_suspended_by_current_user"] = (
+            self.request.from_employer and approval.can_be_suspended_by_siae(self.request.current_organization)
+        ) or (is_ft_prescriber_eligible and approval.can_be_suspended)
         context["can_be_prolonged_by_current_user"] = (
             self.request.from_employer
             and self.request.current_organization.is_subject_to_iae_rules
@@ -648,27 +657,33 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
-    siae = get_current_company_or_404(request)
-    approval = get_object_or_404(
-        Approval.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("pk"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
+    # An approval (a.k.a. PASS IAE) can be suspended either by the SIAE currently hiring the jobseeker or by an
+    # authorized France Travail prescriber to whom the jobseeker is assigned.
+    if request.from_employer:
+        siae = get_current_company_or_404(request)
+        approval = get_object_or_404(
+            Approval.objects.filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        approval=OuterRef("pk"),
+                        to_company=siae,
+                        state=JobApplicationState.ACCEPTED,
+                    )
                 )
-            )
-        ),
-        pk=approval_id,
-    )
-
-    if not approval.can_be_suspended_by_siae(siae):
-        raise PermissionDenied()
+            ),
+            pk=approval_id,
+        )
+        if not approval.can_be_suspended_by_siae(siae):
+            raise PermissionDenied()
+    else:
+        approval = get_object_or_404(approvals_suspendable_by_ft_prescriber(request), pk=approval_id)
+        if not approval.can_be_suspended:
+            raise PermissionDenied()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
 
-    form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
+    form = SuspensionForm(approval=approval, data=request.POST or None, **_suspension_author_kwargs(request))
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
@@ -747,26 +762,59 @@ def close(request, approval_id, template_name="approvals/close.html"):
     return render(request, template_name, context)
 
 
-@http_methods(db_readonly=["GET", "HEAD", "POST"])
-def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
+def _transfer_suspension_to_employer_if_applicable(request, suspension):
+    """
+    When an employer edits a suspension issued by an authorized FT prescriber, the employer's SIAE becomes its issuer,
+    so the prescriber organization (i.e. France Travail) loses the ability to edit or delete the suspension.
+    """
+    if request.from_employer and suspension.prescriber_organization_id:
+        suspension.siae = request.current_organization
+        suspension.prescriber_organization = None
+
+
+def _suspension_author_kwargs(request):
+    if request.from_employer:
+        return {"siae": request.current_organization}
+    return {"prescriber_organization": request.current_organization}
+
+
+def _get_suspension(request, suspension_id):
+    """Fetch the given suspension the current user is allowed to edit or delete, or raise 404/403.
+
+    A suspension can be managed either by the SIAE currently hiring the jobseeker or by the
+    authorized France Travail prescriber organization that created it.
+    """
+    qs = Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set")
+    if request.from_employer:
+        siae = get_current_company_or_404(request)
+        suspension = get_object_or_404(
+            qs.filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        approval=OuterRef("approval_id"),
+                        to_company=siae,
+                        state=JobApplicationState.ACCEPTED,
+                    )
                 )
-            )
+            ),
+            pk=suspension_id,
         )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
+        if not suspension.can_be_handled_by_siae(siae):
+            raise PermissionDenied()
+        return suspension
+
+    # We make sure an unauthorized user always gets a 404 so that the existence of a suspension cannot be probed.
+    if not is_authorized_ft_prescriber(request):
+        raise Http404
+    return get_object_or_404(
+        qs.in_progress().filter(prescriber_organization=request.current_organization),
         pk=suspension_id,
     )
 
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
+def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(
         request,
@@ -808,37 +856,21 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     Edit the given suspension.
     """
 
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     form = SuspensionForm(
         approval=suspension.approval,
-        siae=siae,
         instance=suspension,
         data=request.POST or None,
+        **_suspension_author_kwargs(request),
     )
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) dates from %s to %s",
@@ -861,28 +893,10 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     form = SuspensionEndDateForm(
         approval=suspension.approval,
-        siae=siae,
         instance=suspension,
         data=request.POST or None,
     )
@@ -897,6 +911,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         previous_end_at = suspension.end_at
         suspension.end_at = form.cleaned_data["first_day_back_to_work"] - timedelta(days=1)
         suspension.updated_by = request.user
+        _transfer_suspension_to_employer_if_applicable(request, suspension)
         suspension.save()
         logger.info(
             "user=%s updated suspension=%s (approval=%s) end date from %s to %s",
@@ -927,24 +942,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     Delete the given suspension.
     """
 
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(
         request,
