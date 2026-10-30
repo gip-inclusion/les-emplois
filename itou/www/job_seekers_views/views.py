@@ -1144,7 +1144,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
-            "orientation_process": self.is_orientation,
         }
 
     def get_active_assignment(self, job_seeker):
@@ -1367,6 +1366,11 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "active_assignment": active_assignment,
             }
         )
+
+    def get_template_names(self):
+        if self.is_orientation:
+            return ["job_seekers_views/create_job_seeker_for_orientation/search_by_email.html"]
+        return super().get_template_names()
 
     def get_back_url(self):
         if self.is_orientation:
