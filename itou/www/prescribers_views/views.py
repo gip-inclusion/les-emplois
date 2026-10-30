@@ -1,9 +1,13 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import BadRequest, PermissionDenied
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic import ListView
 
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -12,6 +16,7 @@ from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_DIAGNOSTIC_URL
+from itou.utils.pagination import ItouPaginator
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -108,28 +113,28 @@ def update_admin_role(request, action, public_id, template_name="prescribers/upd
     )
 
 
-def list_accredited_organizations(request, template_name="prescribers/list_accredited_organizations.html"):
-    """
-    List organizations accredited by a departmental council ("Conseil Départemental").
-    """
-    prescriber_org = get_current_org_or_404(request)
+class AuthorizationsListView(UserPassesTestMixin, ListView):
+    template_name = "prescribers/list_authorizations.html"
+    paginate_by = settings.PAGE_SIZE_DEFAULT
+    paginator_class = ItouPaginator
+    model = PrescriberOrganization
+    ordering = ("authorization_status", "name")
 
-    required_permissions = [
-        prescriber_org.is_authorized,
-        prescriber_org.kind == PrescriberOrganizationKind.DEPT,
-        request.is_current_organization_admin,
-    ]
+    def get_filters(self):
+        if (
+            self.request.from_prescriber
+            and self.request.current_organization.kind == PrescriberOrganizationKind.DEPT
+            and self.request.is_current_organization_admin
+        ):
+            return Q(
+                Q(is_brsa=True) | Q(kind=PrescriberOrganizationKind.ODC),
+                department=self.request.current_organization.department,
+            )
 
-    if not all(required_permissions):
-        raise PermissionDenied
+    def test_func(self):
+        return self.get_filters() is not None
 
-    accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(
-        prescriber_org
-    ).prefetch_active_memberships()
-
-    context = {
-        "prescriber_org": prescriber_org,
-        "accredited_orgs": accredited_orgs,
-        "back_url": get_safe_url(request, "back_url"),
-    }
-    return render(request, template_name, context)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # XXX Add filtering
+        return queryset.filter(self.get_filters()).select_related("created_by")

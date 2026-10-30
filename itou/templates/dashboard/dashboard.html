@@ -121,7 +121,7 @@
         {% component_alert content=content variant="warning" dismissible=True %}
             {% fragment as content %}
                 <p class="mb-0">
-                    Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des usagers.
+                    Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par {{ request.current_organization.authorization_validator }}. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des usagers.
                 </p>
                 {% if request.current_organization.requires_authorization_proof %}
                     <p class="mb-0">
@@ -202,6 +202,7 @@
 
 {% block content %}
     {% enums "institutions" "InstitutionKind" as InstitutionKind %}
+    {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
@@ -245,8 +246,9 @@
                                     {% if request.current_organization.is_authorized %}
                                         {% include "dashboard/includes/prescriber_job_seekers_card.html" %}
                                     {% endif %}
-                                    {% if request.current_organization %}
-                                        {% include "dashboard/includes/prescriber_organisation_card.html" %}
+                                    {% include "dashboard/includes/prescriber_organisation_card.html" %}
+                                    {% if request.current_organization.kind == PrescriberOrganizationKind.DEPT and request.is_current_organization_admin %}
+                                        {% include "dashboard/includes/prescribers_territory.html" %}
                                     {% endif %}
                                 {% endif %}
                                 {# end of if request.from_prescriber #}
@@ -266,7 +268,7 @@
 
                                 {% if request.from_institution %}
                                     {% if request.current_organization.kind == InstitutionKind.DDETS_IAE or request.current_organization.kind == InstitutionKind.DREETS_IAE %}
-                                        {% include "dashboard/includes/institution_territory.html" only %}
+                                        {% include "dashboard/includes/institution_territory.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/institution_organization_card.html" %}
                                     {% if active_campaigns or closed_campaigns %}

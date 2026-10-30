@@ -3,9 +3,17 @@
 <div class="col mb-3 mb-md-4">
     {% component_box_dashboard title=title list=list %}
         {% fragment as title %}
-            Mon territoire
+            Territoire
         {% endfragment %}
         {% fragment as list %}
+            {% if request.current_organization.kind == InstitutionKind.DDETS_IAE %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'institutions_views:authorizations_list' %}" class="btn-link btn-ico">
+                        <i class="ri-shield-check-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Gestion des habilitations</span>
+                    </a>
+                </li>
+            {% endif %}
             <li class="d-flex justify-content-between align-items-center mb-3">
                 <a href="{% url 'institutions_views:organizations_list' %}" class="btn-link btn-ico">
                     <i class="ri-list-view ri-lg fw-normal" aria-hidden="true"></i>
