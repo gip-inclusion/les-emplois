@@ -161,7 +161,7 @@ class AsyncEmailBackend(BaseEmailBackend):
                 email = Email.from_email_message(mjemail)
                 email.save()
                 if not [*mjemail.to, *mjemail.cc, *mjemail.bcc]:
-                    logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
+                    warnings.warn(f"Email {email.pk} has no recipients, ignoring.")
                     continue
                 if log_warning:
                     if settings.ITOU_ENVIRONMENT == ItouEnvironment.TEST:
