@@ -1027,6 +1027,7 @@ class TestCreateForOrientation:
         assertRedirects(response, step_1_url)
 
         response = client.get(step_1_url)
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
         assertContains(response, "Étape 1</strong>/2")
         assertContains(response, "michel.durant@example.com")
         assertNotContains(response, 'id="id_title"')
@@ -1042,6 +1043,7 @@ class TestCreateForOrientation:
         assertRedirects(response, step_2_url)
 
         response = client.get(step_2_url)
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
         assertContains(response, "Étape 2</strong>/2")
         assertNotContains(response, 'id="id_birthdate"')
 
@@ -1101,9 +1103,7 @@ class TestCreateForOrientation:
         )
 
         assertContains(response, "Email existant")
-        assertContains(
-            response, f"<h1>Orienter {mask_unless(job_seeker.get_inverted_full_name(), False)}</h1>", html=True
-        )
+        assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
         assertContains(
             response,
             f"""

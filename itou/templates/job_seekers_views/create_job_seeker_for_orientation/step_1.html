@@ -1,25 +1,103 @@
-{% extends "job_seekers_views/create_or_update_job_seeker/step_1.html" %}
+{% extends "insertion/orientation_base.html" %}
+{% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load support %}
 
-{% block progress_title %}
-    <strong>Étape 1</strong>/2 : Créer l’usager
-{% endblock %}
-{% block step_title %}
-    Quelle est l’identité de l’usager ?
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="c-stepper mb-3 mb-md-4">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-{{ progress }}"
+                                 role="progressbar"
+                                 aria-valuenow="{{ progress }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-labelledby="currentProgressState"></div>
+                        </div>
+                        <p id="currentProgressState">
+                            <strong>Étape 1</strong>/2 : Créer l’usager
+                        </p>
+                    </div>
+                    <form method="post"
+                          class="js-prevent-multiple-submit"
+                          {% if matomo_form_name|default:"" %} data-matomo-name="{{ matomo_form_name }}"{% endif %}>
+                        <div class="c-form">
+                            <h2 class="h3">Quelle est l’identité de l’usager ?</h2>
+                            {% csrf_token %}
+                            {% bootstrap_form_errors form type="all" %}
+                            {% component_alert content=content variant="info" extra_classes="mb-3" %}
+                                {% fragment as content %}
+                                    <p class="mb-0">Ces informations vous permettent d’avoir un tableau de suivi des orientations plus complet.</p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                            <fieldset>
+                                <legend class="visually-hidden">Identité de l’usager</legend>
+                                {% bootstrap_field form.email %}
+                                {% bootstrap_field form.first_name %}
+                                {% bootstrap_field form.last_name %}
+                                {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
+                            </fieldset>
+                            {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                        </div>
+                        {% if job_seeker_already_exists %}
+                            <div class="modal"
+                                 id="job-seeker-already-exists-modal"
+                                 tabindex="-1"
+                                 role="dialog"
+                                 aria-labelledby="job-seeker-already-exists-label"
+                                 aria-modal="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title"
+                                                id="job-seeker-already-exists-label">Compte usager déjà existant</h3>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                <strong>
+                                                    Les informations saisies correspondent à un compte existant,
+                                                    associé à l’adresse {{ redacted_existing_email }}.
+                                                </strong>
+                                            </p>
+                                            <p>
+                                                La création d’un second compte pour cet usager n’est pas autorisée.
+                                                Pour poursuivre, veuillez renseigner l’adresse email associée à ce compte.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{% zendesk_form_url request=request subject=support_subject description=support_description %}"
+                                               class="btn btn-link btn-ico has-external-link ps-lg-0 w-100 w-lg-auto"
+                                               target="_blank">Je ne connais pas cette adresse</a>
+                                            <a href="{{ back_url }}"
+                                               class="btn btn-sm btn-primary">Renseigner l’adresse email</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
-{% block fields %}
-    {% component_alert content=content variant="info" extra_classes="mb-3" %}
-        {% fragment as content %}
-            <p class="mb-0">Ces informations vous permettent d’avoir un tableau de suivi des orientations plus complet.</p>
-        {% endfragment %}
-    {% endcomponent_alert %}
-    <fieldset>
-        <legend class="visually-hidden">Identité de l’usager</legend>
-        {% bootstrap_field form.email %}
-        {% bootstrap_field form.first_name %}
-        {% bootstrap_field form.last_name %}
-        {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
-    </fieldset>
+{% block script %}
+    {{ block.super }}
+    {% if job_seeker_already_exists %}
+        <script nonce="{{ csp_nonce }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const jobSeekerAlreadyExistsModal = new bootstrap.Modal("#job-seeker-already-exists-modal");
+            jobSeekerAlreadyExistsModal.show();
+        </script>
+    {% endif %}
 {% endblock %}
