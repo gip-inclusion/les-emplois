@@ -160,9 +160,6 @@ class AsyncEmailBackend(BaseEmailBackend):
                 # retries the failed email.
                 email = Email.from_email_message(mjemail)
                 email.save()
-                if not [*mjemail.to, *mjemail.cc, *mjemail.bcc]:
-                    logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
-                    continue
                 if log_warning:
                     if settings.ITOU_ENVIRONMENT == ItouEnvironment.TEST:
                         if email.subject not in {
