@@ -329,7 +329,8 @@ Pierre DUPONT"""
     assert email.body == snapshot(name="body")
 
 
-def test_free_form_email_to_sender(snapshot):
+@pytest.mark.parametrize("from_name", ["", None, "Jean DUSERVICE"])
+def test_free_form_email_to_sender(snapshot, from_name):
     mobilization_email = MobilizationEmailFactory(
         sender__for_snapshot=True,
         sender_prescriber_organization__for_snapshot=True,
@@ -342,7 +343,9 @@ Bien reçu.
 
 Cordialement,
 Jean DUSERVICE"""
-    email = mobilization_email.free_form_email_to_sender(body_message, from_email, reply_to=reply_to)
+    email = mobilization_email.free_form_email_to_sender(
+        body_message, from_email, reply_to=reply_to, from_name=from_name
+    )
 
     assert email.from_email == from_email
     assert email.to == [mobilization_email.sender.email]

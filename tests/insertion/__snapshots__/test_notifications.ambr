@@ -12,7 +12,7 @@
   Nous vous souhaitons une bonne continuation.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
   Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
   Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
@@ -38,7 +38,7 @@
   - service.contact@email.fake
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -59,7 +59,7 @@
   - service.contact@email.fake
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -80,7 +80,7 @@
   - service.contact@email.fake
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -101,7 +101,7 @@
   - service.contact@email.fake
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -132,7 +132,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -164,7 +164,7 @@
   - 01 02 03 04 05
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
   Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
   Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
@@ -191,7 +191,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -213,7 +213,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -235,7 +235,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -257,7 +257,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -286,7 +286,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -294,39 +294,47 @@
 # name: test_expired_orientation_for_structure[subject]
   '[TEST] Cette demande d’orientation a expiré'
 # ---
-# name: test_free_form_email_to_sender[body]
+# name: test_free_form_email_to_sender[Jean DUSERVICE][body]
   '''
-  Bonjour,
-  
-  Bien reçu.
-  
-  Cordialement,
-  Jean DUSERVICE
-  
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]Ce message vous a été envoyépar Jean DUSERVICE via La plateforme de l’inclusion.
+  Vous pouvez répondre directement à ce mail.
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
 # ---
-# name: test_free_form_email_to_sender[subject]
+# name: test_free_form_email_to_sender[Jean DUSERVICE][subject]
+  '[TEST] Re: Pierre DUPONT de la structure Pres. Org. souhaite vous adresser un usager'
+# ---
+# name: test_free_form_email_to_sender[None][body]
+  '''
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]Ce message vous a été envoyé via La plateforme de l’inclusion.
+  Vous pouvez répondre directement à ce mail.
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_free_form_email_to_sender[None][subject]
+  '[TEST] Re: Pierre DUPONT de la structure Pres. Org. souhaite vous adresser un usager'
+# ---
+# name: test_free_form_email_to_sender[][body]
+  '''
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]Ce message vous a été envoyé via La plateforme de l’inclusion.
+  Vous pouvez répondre directement à ce mail.
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_free_form_email_to_sender[][subject]
   '[TEST] Re: Pierre DUPONT de la structure Pres. Org. souhaite vous adresser un usager'
 # ---
 # name: test_free_form_email_to_service[body]
   '''
-  Bonjour,
-  
-  Je souhaiterais orienter un usager vers votre service "SERVICE".
-  
-  Mon usager a 33 ans et habite à Vannes (56).
-  
-  Plusieurs retours à la ligne non pris en compte.
-  
-  Cordialement,
-  Pierre DUPONT
-  
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]Ce message vous a été envoyépar Pierre DUPONT via La plateforme de l’inclusion.
+  Vous pouvez répondre directement à ce mail.Les pièces-jointes ne sont pas supportées.
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -355,7 +363,7 @@
   La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
   Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
   Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
@@ -384,7 +392,7 @@
   La structure Les joies de l’apprentissage ou la personne qui vous accompagne vous contacteront pour donner suite à la demande.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
   Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
   Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
@@ -417,7 +425,7 @@
   En cas d’absence de réponse dans un délai de 30 jours, cette demande sera automatiquement annulée.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -443,7 +451,7 @@
   En cas d’absence de réponse dans un délai de 30 jours, cette demande sera automatiquement annulée.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -471,7 +479,7 @@
   En cas d’absence de réponse dans un délai de 30 jours, cette demande sera automatiquement annulée.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -499,7 +507,7 @@
   En cas d’absence de réponse dans un délai de 30 jours, cette demande sera automatiquement annulée.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -527,7 +535,7 @@
   En cas d’absence de réponse dans un délai de 30 jours, cette demande sera automatiquement annulée.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -552,7 +560,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -577,7 +585,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -604,7 +612,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -631,7 +639,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -661,7 +669,7 @@
   - 01 02 03 04 05
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion est une application portée par le GIP « Plateforme de l’inclusion ». Les documents listés plus haut ont été communiqués à une structure proposant un service répondant à vos besoins.
   Vous pouvez néanmoins vous opposer à tout moment ici et vos données seront supprimées : rgpd@inclusion.gouv.fr
   Si vous estimez que vos droits ne sont pas respectés, vous pouvez à tout moment introduire une réclamation auprès de la CNIL.
@@ -703,7 +711,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -740,7 +748,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -777,7 +785,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -814,7 +822,7 @@
   http://localhost:8000/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''
@@ -862,7 +870,7 @@
   DORA reste l’annuaire de référence pour toute offre de service d'insertion.
   
   -- 
-  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  % include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}
   La plateforme de l’inclusion
   http://localhost:8000/
   '''

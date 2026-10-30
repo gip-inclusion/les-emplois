@@ -1,0 +1,6 @@
+
+-- {# Use dash-dash-space https://en.wikipedia.org/wiki/Signature_block#Standard_delimiter #}
+{% spaceless %}{% include "layout/includes/base_email_signature_environment_warning.txt" with itou_environment=itou_environment only %}{% endspaceless %}Ce message vous a été envoyé{% if sender_name %}par {{ sender_name }}{% endif %} {% brand "via" %}.
+Vous pouvez répondre directement à ce mail.{% if display_attachment_warning|default:False %}Les pièces-jointes ne sont pas supportées.{% endif%}
+{% brand %}
+{{ base_url }}

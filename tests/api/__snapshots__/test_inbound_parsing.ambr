@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestBrevoInboundParsing.test_inbound_parsing_service_answer[SQL queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -198,77 +198,13 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'handle_service_answer_email[api/inbound_parsing/views.py]',
-          'BrevoInboundParsingView.post[api/inbound_parsing/views.py]',
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "body_html",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
-                                                                                                            "emails_email"."body_html"
-        ''',
+        'sql': 'ROLLBACK TO SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          '_async_send_message[emails/tasks.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          '_async_send_message[emails/tasks.py]',
-        ]),
-        'sql': '''
-          SELECT "emails_email"."id",
-                 "emails_email"."to",
-                 "emails_email"."cc",
-                 "emails_email"."bcc",
-                 "emails_email"."subject",
-                 "emails_email"."body_text",
-                 "emails_email"."body_html",
-                 "emails_email"."from_email",
-                 "emails_email"."reply_to",
-                 "emails_email"."created_at",
-                 "emails_email"."esp_response"
-          FROM "emails_email"
-          WHERE "emails_email"."id" = %s
-          LIMIT 21
-          FOR NO KEY
-          UPDATE OF "emails_email"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          '_async_send_message[emails/tasks.py]',
-        ]),
-        'sql': '''
-          UPDATE "emails_email"
-          SET "esp_response" = NULL
-          WHERE "emails_email"."id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          '_async_send_message[emails/tasks.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
