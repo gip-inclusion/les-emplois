@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load static %}
 {% load str_filters %}
 
 {% block title %}Gestion des habilitations {{ block.super }}{% endblock %}
@@ -19,7 +20,11 @@
 {% endblock %}
 
 {% block title_extra %}
-    {# XXX Wait for the new activity tab #}
+    {% if request.from_prescriber %}
+        {# XXX Wait for the new activity tab #}
+    {% else %}
+        {% include "institutions/includes/territory_nav_tabs.html" with active_tab="authorizations_list" only %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -46,4 +51,11 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
