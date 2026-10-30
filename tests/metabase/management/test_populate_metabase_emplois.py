@@ -55,7 +55,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     SuspensionFactory,
 )
-from tests.cities.factories import create_city_vannes
+from tests.cities.factories import create_city_geispolsheim, create_city_vannes
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -1289,14 +1289,21 @@ def test_populate_enums(snapshot):
 @pytest.mark.django_db(transaction=True)
 def test_populate_job_descriptions(snapshot):
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
+    vannes = create_city_vannes()
+    geispolsheim = create_city_geispolsheim()
     company = CompanyFactory(
         for_snapshot=True,
         siret="12989128580059",
         # also means that the SIAE will be active, thus the job description also will be.
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
+        insee_city=vannes,
+        city="Vannes",
+        post_code="56000",
+        department="56",
     )
-    job = JobDescriptionFactory(is_active=False, company=company)
+    job = JobDescriptionFactory(is_active=False, company=company, location=None)
+    job_with_location = JobDescriptionFactory(is_active=True, company=company, location=geispolsheim)
 
     # trigger the first .from_db() call and populate _old_is_active.
     # please note that .refresh_from_db() would call .from_db() but _old_is_active
@@ -1336,9 +1343,32 @@ def test_populate_job_descriptions(snapshot):
                 "12989128580059",
                 "ACME Inc.",
                 '[{"at": "2023-02-02T00:00:00Z", "to": true, "from": false, "field": "is_active"}]',
-                "75",
-                "75 - Paris",
-                "Île-de-France",
+                "56",
+                "56 - Morbihan",
+                "Bretagne",
+                None,
+                "56260",
+                0,
+                datetime.date(2023, 2, 2),
+                datetime.date(2023, 2, 2),
+                datetime.date(2023, 2, 2),
+            ),
+            (
+                job_with_location.pk,
+                "M1805",
+                "Études et développement informatique",
+                1,
+                job_with_location.contract_type,
+                company.pk,
+                "GEIQ",
+                "12989128580059",
+                "ACME Inc.",
+                "[]",
+                "56",
+                "56 - Morbihan",
+                "Bretagne",
+                "67152",
+                "56260",
                 0,
                 datetime.date(2023, 2, 2),
                 datetime.date(2023, 2, 2),
