@@ -18,13 +18,13 @@
                                 {% endfragment %}
                             {% endcomponent_alert %}
                             <fieldset>
-                                <legend class="h4">Compléter l’état civil</legend>
+                                <legend class="h4 w-100 border-bottom pb-2 mb-3">Compléter l’état civil</legend>
                                 {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
                                 {% bootstrap_field form.birth_country %}
                                 {% bootstrap_field form.birth_place %}
                             </fieldset>
                             <fieldset>
-                                <legend class="h4">Compléter les coordonnées</legend>
+                                <legend class="h4 w-100 border-bottom pb-2 mb-3">Compléter les coordonnées</legend>
                                 {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
                                 {% bootstrap_field form.address_for_autocomplete %}
                                 {% bootstrap_field form.address_line_1 %}
@@ -36,7 +36,7 @@
                                 {% bootstrap_field form.fill_mode %}
                             </fieldset>
                             <fieldset>
-                                <legend class="h4">Compléter la situation</legend>
+                                <legend class="h4 w-100 border-bottom pb-2 mb-3">Compléter la situation</legend>
                                 {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
                             </fieldset>
                             {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}

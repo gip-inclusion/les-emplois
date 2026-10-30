@@ -78,7 +78,7 @@ class OrientationSelectJobSeekerForm(forms.Form):
 class OrientationConformityForm(forms.Form):
     confirms_conditions = forms.BooleanField(
         required=True,
-        label="Je confirme que la situation de l'usager répond à ces conditions.",
+        label="Je confirme que la situation de l'usager répond à ces conditions",
     )
 
     def __init__(self, job_seeker, *args, **kwargs):
