@@ -8,8 +8,8 @@
 # =============================================================================
 LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
-REQUIREMENTS_PATH ?= requirements/dev.txt
-PIP_COMPILE_OPTIONS :=
+# For example `--no-dev --group test` to leave out the development tools
+UV_SYNC_FLAGS ?=
 NETWORK_MODE := online
 
 ifdef $(XDG_CACHE_HOME)
@@ -22,16 +22,17 @@ DBDUMP ?= $(CACHEDIR)/development_db.dump
 
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
+# uv ignores VIRTUAL_ENV and syncs .venv by default
+export UV_PROJECT_ENVIRONMENT := $(VIRTUAL_ENV)
 
-.PHONY: runserver venv buckets quality fix compile-deps update_snapshots
+.PHONY: runserver venv buckets quality fix update_snapshots
 
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
 
-$(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
+$(VIRTUAL_ENV): uv.lock
 ifeq "$(NETWORK_MODE)" "online"
-	uv venv --clear
-	uv pip sync --require-hashes $^
+	uv sync --locked $(UV_SYNC_FLAGS)
 	touch $@
 else
 	@echo "Skipping virtualenv dependencies sync due to NETWORK_MODE=$(NETWORK_MODE)."
@@ -41,12 +42,6 @@ venv: $(VIRTUAL_ENV)
 
 buckets: $(VIRTUAL_ENV)
 	python manage.py configure_buckets
-
-PIP_COMPILE_FLAGS := --directory requirements/ --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
-compile-deps: $(VIRTUAL_ENV)
-	uv pip compile $(PIP_COMPILE_FLAGS) -o base.txt base.in
-	uv pip compile $(PIP_COMPILE_FLAGS) -o test.txt test.in
-	uv pip compile $(PIP_COMPILE_FLAGS) -o dev.txt dev.in
 
 quality: $(VIRTUAL_ENV)
 	ruff format --check $(LINTER_CHECKED_DIRS)

@@ -11,8 +11,8 @@ updates:
     cooldown:
       default-days: 5
 
-  - package-ecosystem: "pip"
-    directory: "/requirements/"
+  - package-ecosystem: "uv"
+    directory: "/"
     schedule:
       interval: "daily"
     cooldown:
@@ -22,14 +22,23 @@ updates:
     commit-message:
       prefix: "requirement"
       prefix-development: "dev requirement"
-    # Only allow updates to the lockfile for pip and
-    # ignore any version updates that affect the manifest
-    versioning-strategy: lockfile-only
+    # pyproject.toml pins the direct dependencies: rewrite the pin, uv.lock follows
+    versioning-strategy: increase
     # Allow up to 20 concurrent open PRs
     open-pull-requests-limit: 20
     allow:
       # Allow both direct and indirect updates for all packages
       - dependency-type: all
+    ignore:
+      # Feature releases need a planned upgrade
+      - dependency-name: "django"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      # We need rsa signing compatibility, see https://github.com/gip-inclusion/les-emplois/pull/8071
+      - dependency-name: "paramiko"
+        versions:
+          - ">=5"
     groups:
       psycopg:
         patterns:

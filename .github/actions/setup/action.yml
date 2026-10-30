@@ -72,7 +72,7 @@ runs:
       with:
         enable-cache: true
         prune-cache: true
-        cache-dependency-glob: "requirements/test.txt"
+        cache-dependency-glob: "uv.lock"
     - name: 📥 Install dependencies
       run: |
         make venv
