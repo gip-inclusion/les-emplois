@@ -11,7 +11,7 @@ And ordered lists:
 2. β
 
 Email addresses are highlighted contact@inclusion.gouv.fr
-So are links (in the allowlist) https://diagoriente.beta.gouv.fr/path/to/somewhere
+So are links (in the allowlist) https://diagoriente.fr/path/to/somewhere
 
 # Heading 1
 ## Heading 2

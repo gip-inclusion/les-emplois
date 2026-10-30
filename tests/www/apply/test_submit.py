@@ -2977,7 +2977,7 @@ class TestApplicationView:
     DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
         "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
     )
-    DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr/services/plateforme"
+    DIAGORIENTE_URL = "https://diagoriente.fr/services/plateforme"
 
     spontaneous_application_field = "spontaneous_application"
     spontaneous_application_label = "Candidature spontanée"
