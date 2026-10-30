@@ -32,7 +32,7 @@ runs:
       shell: bash
     - name: 💾 Restore spatial libraries cache
       id: apt-cache
-      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # https://github.com/actions/cache v6.1.0
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         key: ${{ steps.apt-cache-key.outputs.key }}
         path: ~/apt-cache/
@@ -48,7 +48,7 @@ runs:
     - name: 💾 Save spatial libraries cache
       if: steps.apt-cache.outputs.cache-hit != 'true'
       # Right away rather than at the end of the job, which failing tests would prevent
-      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # https://github.com/actions/cache v6.1.0
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         key: ${{ steps.apt-cache-key.outputs.key }}
         path: ~/apt-cache/
