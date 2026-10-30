@@ -95,7 +95,7 @@
                                         <td>{{ total_job_applications }}</td>
                                         <td class="text-end w-50px">
                                             {% if export_for == "siae" %}
-                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                <a class="btn btn-sm btn-secondary btn-ico-only"
                                                    {% matomo_event "candidature" "exports" "export-siae" %}
                                                    href="{% url 'apply:list_for_siae_exports_download' %}"
                                                    data-bs-toggle="tooltip"
@@ -104,7 +104,7 @@
                                                        aria-label="Télécharger cet export SIAE de toutes les candidatures au format .xlsx"></i>
                                                 </a>
                                             {% else %}
-                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                <a class="btn btn-sm btn-secondary btn-ico-only"
                                                    {% matomo_event "candidature" "exports" "export-prescripteur" %}
                                                    href="{% url 'apply:list_prescriptions_exports_download' %}"
                                                    data-bs-toggle="tooltip"
@@ -121,7 +121,7 @@
                                             <td>{{ month.c }}</td>
                                             <td class="text-end w-50px">
                                                 {% if export_for == "siae" %}
-                                                    <a class="btn btn-sm btn-link btn-ico-only"
+                                                    <a class="btn btn-sm btn-secondary btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-siae" %}
                                                        href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}"
                                                        data-bs-toggle="tooltip"
@@ -130,7 +130,7 @@
                                                            aria-label="Télécharger cet export SIAE de {{ month.month|date:"F Y"|capfirst }} au format .xlsx"></i>
                                                     </a>
                                                 {% else %}
-                                                    <a class="btn btn-sm btn-link btn-ico-only"
+                                                    <a class="btn btn-sm btn-secondary btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-prescripteur" %}
                                                        href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}"
                                                        data-bs-toggle="tooltip"
@@ -147,7 +147,7 @@
                         </div>
                         {% if export_for == "siae" %}
                             <p>
-                                Les informations détaillées sur la conservation des candidatures sont disponibles dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank">notre documentation</a>.
+                                Les informations détaillées sur la conservation des candidatures sont disponibles dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank" class="has-external-link">notre documentation</a>.
                             </p>
                         {% endif %}
                     {% endif %}

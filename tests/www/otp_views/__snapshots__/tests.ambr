@@ -136,10 +136,10 @@
                                       11 mars 2025 06:20
                                   </td>
                                   <td class="text-end w-50px">
-                                      <button aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
-                                          <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
+                                      <span aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-secondary btn-ico-only disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" tabindex="0">
+                                          <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
                                           </i>
-                                      </button>
+                                      </span>
                                   </td>
                               </tr>
                               <tr>
@@ -157,7 +157,7 @@
                                       </i>
                                   </td>
                                   <td class="text-end w-50px">
-                                      <button aria-label="Supprimer l’appareil bitwarden" class="btn btn-sm btn-link" data-bs-target="#delete_[PK of device_2]_modal" data-bs-toggle="modal" type="button">
+                                      <button aria-label="Supprimer l’appareil bitwarden" class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#delete_[PK of device_2]_modal" data-bs-toggle="modal" type="button">
                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
                                           </i>
                                       </button>
@@ -235,10 +235,10 @@
                                       11 mars 2025 06:18
                                   </td>
                                   <td class="text-end w-50px">
-                                      <button aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
-                                          <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
+                                      <span aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-secondary btn-ico-only disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" tabindex="0">
+                                          <i aria-hidden="true" class="ri-arrow-drop-right-line fs-lg">
                                           </i>
-                                      </button>
+                                      </span>
                                   </td>
                               </tr>
                           </tbody>

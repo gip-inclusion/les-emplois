@@ -34,7 +34,7 @@
                             {{ member.user.get_inverted_full_name }}
                             {% if member.user in active_admin_members %}
                                 <button type="button"
-                                        class="badge badge-xs rounded-pill bg-info"
+                                        class="badge badge-sm rounded-pill bg-info"
                                         data-bs-toggle="tooltip"
                                         data-bs-title="Administrateur de la structure">
                                     Admin<span class="visually-hidden">istrateur de la structure</span>
@@ -49,7 +49,7 @@
                             <td class="text-end w-50px">
                                 {% if member.user != user %}
                                     <button id="dropdown_{{ forloop.counter }}_action_menu"
-                                            class="btn btn-sm btn-link btn-ico-only"
+                                            class="btn btn-sm btn-secondary btn-ico-only"
                                             type="button"
                                             data-bs-toggle="dropdown"
                                             aria-haspopup="true"
@@ -70,12 +70,13 @@
                                         {% endif %}
                                     </div>
                                 {% else %}
-                                    <button type="button"
-                                            class="btn btn-sm btn-link btn-ico-only disabled"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Aucune action possible">
-                                        <i class="ri-more-2-fill" aria-label="Aucune action possible"></i>
-                                    </button>
+                                    <span class="btn btn-sm btn-secondary btn-ico-only disabled"
+                                          data-bs-toggle="tooltip"
+                                          tabindex="0"
+                                          aria-label="Aucune action possible"
+                                          data-bs-title="Aucune action possible">
+                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                    </span>
                                 {% endif %}
                             </td>
                         {% endif %}

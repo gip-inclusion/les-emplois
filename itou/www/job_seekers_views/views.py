@@ -928,6 +928,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ).with_last_contract_has_pro_support_report(siae=request.current_organization)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
+    has_job_seekers_with_more_actions = False
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
         job_seeker.pro_support_request_mailto = None
@@ -955,6 +956,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or bool(job_seeker.pro_support_request_mailto)
             or job_seeker.show_create_pro_support_report
         )
+        has_job_seekers_with_more_actions = has_job_seekers_with_more_actions or job_seeker.show_more_actions
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
 
     context = {
@@ -963,6 +965,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "list_organization": list_organization,
         "filters_form": form,
         "filters_counter": filters_counter,
+        "has_job_seekers_with_more_actions": has_job_seekers_with_more_actions,
         "order": order,
         "page_obj": page_obj,
         "show_end_of_contracts_banner": show_end_of_contracts_banner,

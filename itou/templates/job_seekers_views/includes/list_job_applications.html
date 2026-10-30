@@ -54,24 +54,19 @@
                                 {% partial selected_jobs %}
                             {% endif %}
                         </td>
-
                         <td>{{ job_application.to_company.display_name }}</td>
-
                         <td>{% job_application_state_badge job_application extra_classes="badge-sm" %}</td>
-
                         <td>{{ job_application.created_at|date:"d/m/Y" }}</td>
-
                         <td>
                             {% if job_application.sender.is_job_seeker %}
                                 {{ job_application.sender.get_inverted_full_name|mask_unless:can_view_personal_information }}
                             {% else %}
                                 {{ job_application.sender.get_inverted_full_name }}
                                 {% if job_application.sender == request.user %}
-                                    <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
+                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-info">C’est vous</span>
                                 {% endif %}
                             {% endif %}
                         </td>
-
                         <td>
                             {% if job_application.sender.is_job_seeker %}
                                 -
@@ -82,10 +77,9 @@
                                 Aucune structure associée
                             {% endif %}
                         </td>
-
-                        <td>
+                        <td class="text-end w-50px">
                             {% if job_application.user_can_see_details %}
-                                <a class="btn btn-sm btn-link btn-ico-only"
+                                <a class="btn btn-sm btn-secondary btn-ico-only"
                                    href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Voir la candidature"
@@ -94,7 +88,7 @@
                                        aria-label="Voir la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}"></i>
                                 </a>
                             {% elif job_application.sender.is_job_seeker %}
-                                <span class="btn btn-sm btn-link btn-ico-only disabled"
+                                <span class="btn btn-sm btn-secondary btn-ico-only disabled"
                                       data-bs-toggle="tooltip"
                                       tabindex="0"
                                       aria-label="Candidature réalisée par {{ job_application.job_seeker.get_inverted_full_name }}"
@@ -102,7 +96,7 @@
                                     <i class="ri-arrow-drop-right-line fs-lg" aria-hidden="true"></i>
                                 </span>
                             {% else %}
-                                <span class="btn btn-sm btn-link btn-ico-only disabled"
+                                <span class="btn btn-sm btn-secondary btn-ico-only disabled"
                                       data-bs-toggle="tooltip"
                                       tabindex="0"
                                       aria-label="Candidature réalisée par une personne extérieure à votre organisation"

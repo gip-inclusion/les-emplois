@@ -789,8 +789,8 @@
                           </i>
                           Pres. Org.
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -816,8 +816,8 @@
                           </i>
                           ACME Inc.
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -841,8 +841,8 @@
                       <td>
                           Vous
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-candidat" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
                               <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>

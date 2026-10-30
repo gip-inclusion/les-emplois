@@ -2701,8 +2701,8 @@
                                                   Structure à cuire
                                               </span>
                                           </td>
-                                          <td>
-                                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/00000000-1111-2222-3333-444444444444/?back_url=/insertion/orientations/">
+                                          <td class="text-end w-50px">
+                                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/00000000-1111-2222-3333-444444444444/?back_url=/insertion/orientations/">
                                                   <i aria-label="Voir l’orientation de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                                                   </i>
                                               </a>
@@ -2740,8 +2740,8 @@
                                                   Structure gonflable
                                               </span>
                                           </td>
-                                          <td>
-                                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/00000000-1111-2222-3333-555555555555/?back_url=/insertion/orientations/">
+                                          <td class="text-end w-50px">
+                                              <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir l’orientation" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir_orientation" href="/insertion/orientations/00000000-1111-2222-3333-555555555555/?back_url=/insertion/orientations/">
                                                   <i aria-label="Voir l’orientation de ASTELL Mary" class="ri-arrow-drop-right-line fs-lg">
                                                   </i>
                                               </a>

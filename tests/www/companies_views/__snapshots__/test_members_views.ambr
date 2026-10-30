@@ -135,7 +135,7 @@
                                   <tr>
                                       <td>
                                           MICHEL Jean
-                                          <button class="badge badge-xs rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
+                                          <button class="badge badge-sm rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
                                               Admin
                                               <span class="visually-hidden">
                                                   istrateur de la structure
@@ -151,10 +151,10 @@
                                           12 juillet 2025 à 12:40
                                       </td>
                                       <td class="text-end w-50px">
-                                          <button class="btn btn-sm btn-link btn-ico-only disabled" data-bs-title="Aucune action possible" data-bs-toggle="tooltip" type="button">
-                                              <i aria-label="Aucune action possible" class="ri-more-2-fill">
+                                          <span aria-label="Aucune action possible" class="btn btn-sm btn-secondary btn-ico-only disabled" data-bs-title="Aucune action possible" data-bs-toggle="tooltip" tabindex="0">
+                                              <i aria-hidden="true" class="ri-more-2-fill">
                                               </i>
-                                          </button>
+                                          </span>
                                       </td>
                                   </tr>
                               </tbody>

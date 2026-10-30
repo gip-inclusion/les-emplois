@@ -5820,8 +5820,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DIAGNOSTIQUE Pas De" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -5874,8 +5874,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -5928,8 +5928,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -5982,8 +5982,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6029,8 +6029,8 @@
                               Éligibilité validée par un employeur
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de BATO Aline" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6081,8 +6081,8 @@
                               Éligibilité validée par un employeur
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de NAVIRE Alain" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6126,8 +6126,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de MARTIN Martine" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6173,8 +6173,8 @@
                               Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ PAR PRESCRIPTEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6218,8 +6218,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de SANS DIAG GEIQ Jean" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6263,8 +6263,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ DIAG GEIQ Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6308,8 +6308,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ EXPIRÉ PAR EMPLOYEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6353,8 +6353,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ EXPIRÉ PAR EMPLOYEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6450,8 +6450,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DIAGNOSTIQUE Pas De" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6504,8 +6504,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6558,8 +6558,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6612,8 +6612,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6659,8 +6659,8 @@
                               Éligibilité validée par un employeur
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de BATO Aline" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6704,8 +6704,8 @@
                               Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de MARTIN Martine" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6749,8 +6749,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de MARTIN Martine" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6794,8 +6794,8 @@
                               Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6841,8 +6841,8 @@
                               Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ PAR PRESCRIPTEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6888,8 +6888,8 @@
                               Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ PAR PRESCRIPTEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6933,8 +6933,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de SANS DIAG GEIQ Jean" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -6978,8 +6978,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ EXPIRÉ PAR PRESCRIPTEUR Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -7025,8 +7025,8 @@
                               Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ EXPIRÉ PAR PRESCRIPTEUR SUR CANDIDATURE Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -7070,8 +7070,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ DIAG GEIQ Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
@@ -7115,8 +7115,8 @@
                               Un diagnostic doit être réalisé
                           </span>
                       </td>
-                      <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
+                      <td class="text-end w-50px">
+                          <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Forder%3Dcreated_at">
                               <i aria-label="Gérer la candidature de GEIQ SANS AIDE Jean-Diag" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>

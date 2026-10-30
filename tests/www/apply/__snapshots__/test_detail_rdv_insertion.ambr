@@ -26,7 +26,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -37,7 +37,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -138,7 +138,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -149,7 +149,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -250,7 +250,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -261,7 +261,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -362,7 +362,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -373,7 +373,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -444,7 +444,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -455,7 +455,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 juin 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -556,7 +556,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -567,7 +567,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -638,7 +638,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -649,7 +649,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 juin 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -750,7 +750,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -761,7 +761,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -832,7 +832,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       Statut du RDV à préciser
                   </span>
               </td>
@@ -843,7 +843,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 juin 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -944,7 +944,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -955,7 +955,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1026,7 +1026,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1037,7 +1037,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 4 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1108,7 +1108,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -1119,7 +1119,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-33333333-3333-3333-3333-333333333333-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 3 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1190,7 +1190,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -1201,7 +1201,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-44444444-4444-4444-4444-444444444444-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 2 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1272,7 +1272,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
@@ -1283,7 +1283,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-55555555-5555-5555-5555-555555555555-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1384,7 +1384,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -1395,7 +1395,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1466,7 +1466,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1477,7 +1477,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 4 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1548,7 +1548,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -1559,7 +1559,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-33333333-3333-3333-3333-333333333333-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 3 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1630,7 +1630,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -1641,7 +1641,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-44444444-4444-4444-4444-444444444444-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 2 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1712,7 +1712,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
@@ -1723,7 +1723,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-55555555-5555-5555-5555-555555555555-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1824,7 +1824,7 @@
       <tbody>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-important-lightest text-important">
+                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">
                       RDV à venir
                   </span>
               </td>
@@ -1835,7 +1835,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1906,7 +1906,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                       RDV honoré
                   </span>
               </td>
@@ -1917,7 +1917,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 4 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -1988,7 +1988,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative du service
                   </span>
               </td>
@@ -1999,7 +1999,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-33333333-3333-3333-3333-333333333333-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 3 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -2070,7 +2070,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                       RDV annulé à l’initiative de l’usager
                   </span>
               </td>
@@ -2081,7 +2081,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-44444444-4444-4444-4444-444444444444-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 2 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -2152,7 +2152,7 @@
           </tr>
           <tr>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">
+                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                       Absence non excusée au RDV
                   </span>
               </td>
@@ -2163,7 +2163,7 @@
                   Entretien d'embauche
               </td>
               <td class="text-end w-50px" id="participation-55555555-5555-5555-5555-555555555555-row">
-                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+                  <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
                       <i aria-label="Voir la participation commençant à 1 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
                       </i>
                   </button>
@@ -2240,7 +2240,7 @@
 # name: TestRdvInsertionAppointmentsList.test_appointments_tooltips[employer-apply:details_for_company]
   '''
   <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-      <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+      <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
           <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
           </i>
       </button>
@@ -2314,7 +2314,7 @@
 # name: TestRdvInsertionAppointmentsList.test_appointments_tooltips[job_seeker-apply:details_for_jobseeker]
   '''
   <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-      <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+      <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
           <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
           </i>
       </button>
@@ -2388,7 +2388,7 @@
 # name: TestRdvInsertionAppointmentsList.test_appointments_tooltips[prescriber-apply:details_for_prescriber]
   '''
   <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
-      <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
+      <button class="btn btn-sm btn-secondary btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
           <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip">
           </i>
       </button>

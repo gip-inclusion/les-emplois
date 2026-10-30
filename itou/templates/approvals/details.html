@@ -124,22 +124,27 @@
                                                         -
                                                     {% endif %}
                                                 </td>
-                                                <td>
+                                                <td class="text-end w-100px">
                                                     {% if suspension.can_be_handled_by_current_user %}
-                                                        <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                                                           class="btn btn-sm btn-link btn-ico-only"
-                                                           data-bs-toggle="tooltip"
-                                                           data-bs-title="Modifier la suspension">
-                                                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
-                                                            <span class="visually-hidden">Modifier la suspension</span>
-                                                        </a>
-                                                        <a class="btn btn-sm btn-link btn-ico-only"
-                                                           href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                                            <i class="ri-delete-bin-line"
+                                                        <div class="d-flex justify-content-end gap-2"
+                                                             role="group"
+                                                             aria-label="Actions rapides sur les suspensions">
+                                                            <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                                                               class="btn btn-sm btn-secondary btn-ico-only"
                                                                data-bs-toggle="tooltip"
-                                                               data-bs-title="Supprimer la suspension"
-                                                               aria-label="Supprimer la suspension"></i>
-                                                        </a>
+                                                               data-bs-title="Modifier la suspension">
+                                                                <i class="ri-pencil-line fw-medium"
+                                                                   aria-hidden="true"></i>
+                                                                <span class="visually-hidden">Modifier la suspension</span>
+                                                            </a>
+                                                            <a class="btn btn-sm btn-secondary btn-ico-only"
+                                                               href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                                                <i class="ri-delete-bin-line"
+                                                                   data-bs-toggle="tooltip"
+                                                                   data-bs-title="Supprimer la suspension"
+                                                                   aria-label="Supprimer la suspension"></i>
+                                                            </a>
+                                                        </div>
                                                     {% endif %}
                                                 </td>
                                             </tr>

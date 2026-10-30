@@ -1110,12 +1110,12 @@
                                       Pierre DUPONT
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">
+                                      <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
                                           À traiter
                                       </span>
                                   </td>
                                   <td class="text-end w-50px">
-                                      <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
+                                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
                                           <i aria-label="Traiter la prolongation de DOE Jane" class="ri-pencil-line">
                                           </i>
                                       </a>
@@ -1630,12 +1630,12 @@
                                       Pierre DUPONT
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">
+                                      <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
                                           À traiter
                                       </span>
                                   </td>
                                   <td class="text-end w-50px">
-                                      <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
+                                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
                                           <i aria-label="Traiter la prolongation de DOE Jane" class="ri-pencil-line">
                                           </i>
                                       </a>
