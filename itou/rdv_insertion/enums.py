@@ -22,6 +22,30 @@ class ParticipationStatus(models.TextChoices):
     NOSHOW = "noshow", "Absence non excusée au RDV"
 
 
+class AppointmentCreatedBy(models.TextChoices):
+    AGENT = "agent", "Un agent (convocation)"
+    USER = "user", "L’usager"
+    PRESCRIPTEUR = "prescripteur", "Un prescripteur"
+
+
+class AppointmentLocationType(models.TextChoices):
+    PUBLIC_OFFICE = "public_office", "Sur place"
+    PHONE = "phone", "Par téléphone"
+    HOME = "home", "À domicile"
+    VISIO = "visio", "Par visioconférence"
+
+
+class MotifCategoryType(models.TextChoices):
+    RSA_ORIENTATION = "rsa_orientation", "RSA orientation"
+    RSA_ACCOMPAGNEMENT = "rsa_accompagnement", "RSA accompagnement"
+    SIAE = "siae", "SIAE"
+    AUTRE = "autre", "Autre"
+
+    @classmethod
+    def rsa_types(cls):
+        return {cls.RSA_ORIENTATION, cls.RSA_ACCOMPAGNEMENT}
+
+
 class InvitationRequestReasonCategory(models.TextChoices):
     RSA_DROITS_DEVOIRS = "rsa_droits_devoirs", "RSA - droits et devoirs"
     RSA_ORIENTATION = "rsa_orientation", "RSA orientation"
