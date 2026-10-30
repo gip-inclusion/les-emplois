@@ -8,7 +8,6 @@
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="c-form">
-            <h2 class="h3">Créer un compte pour votre usager</h2>
             {% if nir %}
                 <div class="form-group form-group-required form-group-input-w-lg-66">
                     <label for="id_nir">Numéro de sécurité sociale de l’usager</label>
@@ -24,10 +23,12 @@
                     {% endfragment %}
                 {% endcomponent_alert %}
             {% endif %}
-
             {% csrf_token %}
-
-            {% bootstrap_form form alert_error_type="all" %}
+            <div class="form-group form-group-required">
+                {% bootstrap_label form.email.label label_for=form.email.id_for_label %}
+                <div class="form-text mt-n2 mb-2">{{ form.email.help_text }}</div>
+                {% bootstrap_field form.email show_label=False show_help=False %}
+            </div>
 
             <div class="mb-3">
                 {% include "signup/includes/no_email_link.html" with link_text="L’usager n'a pas d'e-mail ?" only %}
@@ -67,9 +68,6 @@
                                     {% else %}
                                         Vous pouvez vous désigner comme accompagnateur et ajouter votre intervention auprès de cet usager.
                                     {% endif %}
-                                {% elif orientation_process %}
-                                    Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
-                                    « Ce n'est pas mon usager » afin de saisir l’adresse email de l’usager que vous souhaitez orienter.
                                 {% else %}
                                     L'identité de l’usager est une information clé pour la structure.
                                     Si votre usager n'est pas <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
