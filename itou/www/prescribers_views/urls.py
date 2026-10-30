@@ -13,4 +13,5 @@ urlpatterns = [
     path("<int:org_id>/card", views.card, name="card"),
     path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
     path("admin_role/<str:action>/<uuid:public_id>", views.update_admin_role, name="update_admin_role"),
+    path("authorizations-list", views.AuthorizationsListView.as_view(), name="authorizations_list"),
 ]

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 
 from itou.institutions.enums import InstitutionKind
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
@@ -158,6 +159,14 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="collaborateurs",
     ),
+    "prescriber-authorizations-list": NavItem(
+        label="Gestion des habilitations",
+        target=reverse_lazy("prescribers_views:authorizations_list"),
+        active_view_names=["prescribers_views:authorizations_list"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="prescribers-liste-habilitations",
+    ),
     # Employers.
     "employer-job-apps": NavItem(
         label="Demandes reçues",
@@ -302,6 +311,19 @@ def nav(request):
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:
+            if (
+                request.current_organization.kind == PrescriberOrganizationKind.DEPT
+                and request.is_current_organization_admin
+            ):
+                menu_items.append(
+                    NavGroup(
+                        label="Territoire",
+                        icon="ri-global-line",
+                        items=[
+                            NAV_ENTRIES["prescriber-authorizations-list"],
+                        ],
+                    )
+                )
             menu_items.append(
                 NavGroup(
                     label="Demandes envoyées",

@@ -1,0 +1,8 @@
+{% load enums %}
+{% enums "prescribers" "PrescriberAuthorizationStatus" as PrescriberAuthorizationStatus %}
+
+{% if organization.authorization_status == PrescriberAuthorizationStatus.NOT_SET %}
+    <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">En attente</span>
+{% elif organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED %}
+    <span class="badge rounded-pill badge-sm bg-success">Validée</span>
+{% endif %}

@@ -202,6 +202,7 @@
 
 {% block content %}
     {% enums "institutions" "InstitutionKind" as InstitutionKind %}
+    {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
@@ -246,6 +247,9 @@
                                         {% include "dashboard/includes/prescriber_job_seekers_card.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/prescriber_organisation_card.html" %}
+                                    {% if request.current_organization.kind == PrescriberOrganizationKind.DEPT and request.is_current_organization_admin %}
+                                        {% include "dashboard/includes/prescribers_territory.html" %}
+                                    {% endif %}
                                 {% endif %}
                                 {# end of if request.from_prescriber #}
 
