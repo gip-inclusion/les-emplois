@@ -16,7 +16,7 @@ from itou.utils import triggers
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.nexus.factories import NexusMembershipFactory, NexusUserFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import ProfessionalFactory
+from tests.users.factories import JobSeekerFactory, ProfessionalFactory
 
 
 def test(tmp_path):
@@ -195,6 +195,15 @@ def test(tmp_path):
         source=Service.DORA,
         structure__siret=None,
     )
+
+    # NexusUser matching a job seeker in les empls:  ignore him
+    nexus_user_11 = NexusUserFactory(source=Service.DORA)
+    NexusMembershipFactory(
+        user=nexus_user_11,
+        source=Service.DORA,
+        structure__kind=random.choice(matching_company_kinds),
+    )
+    JobSeekerFactory(email=nexus_user_11.email)
 
     # ---------------------------------------------------
     # Run the command

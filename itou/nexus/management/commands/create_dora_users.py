@@ -159,6 +159,10 @@ class Command(BaseCommand):
         # -----------------------------------------------------------------------------------------
 
         if emplois_user is None:
+            if email in self.non_pro_emplois_users:
+                log += "   COMPTE CANDIDAT: ON L'IGNORE !"
+                self.logs[Scenario.MISSING_MATCH_NO_MEMBERSHIP].append(log)
+                return
             # We need to create a user
             emplois_user = self.build_user(nexus_user)
             self.users_to_create.append(emplois_user)
@@ -307,10 +311,15 @@ class Command(BaseCommand):
         # To know which users are missing, and to fill user_id fields in new memberships
         self.emplois_users = {
             user.email.lower(): user
-            for user in User.objects.filter(email__in=dora_emails).prefetch_related(
+            for user in User.objects.filter(email__in=dora_emails, kind=UserKind.PROFESSIONAL).prefetch_related(
                 "prescribermembership_set", "companymembership_set"
             )
         }
+        self.non_pro_emplois_users = list(
+            User.objects.filter(email__in=dora_emails)
+            .exclude(kind=UserKind.PROFESSIONAL)
+            .values_list("email", flat=True)
+        )
 
         # Build a dict with of all prescriber organizations and companies using the (siret, kind) tuple as dict key
         # -----------------------------------------------------------------------------------------
