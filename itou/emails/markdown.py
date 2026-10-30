@@ -6,7 +6,7 @@ def known_domains():
     return frozenset(
         [
             *settings.ALLOWED_HOSTS,
-            "diagoriente.beta.gouv.fr",
+            "diagoriente.fr",
             "cloud.info.afpa.fr",
         ]
     )

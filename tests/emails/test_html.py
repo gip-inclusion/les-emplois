@@ -31,7 +31,7 @@ def test_domain_allowlist(settings):
     [html_attachment] = email.alternatives
     html = parse_html(html_attachment.content)
     assert [str(link) for link in html.find_all("a")] == [
-        '<a href="https://diagoriente.beta.gouv.fr/">https://diagoriente.beta.gouv.fr/</a>',
+        '<a href="https://diagoriente.fr/">https://diagoriente.fr/</a>',
         '<a href="https://example.org/">https://example.org/</a>',
     ]
 

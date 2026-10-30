@@ -776,7 +776,7 @@ class TestDashboardView:
         assertContains(response, "Créez-en un grâce à notre partenaire Diagoriente.")
         assertContains(
             response,
-            "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-candidat",
+            "https://diagoriente.fr/services/plateforme?utm_source=emploi-inclusion-candidat",
         )
 
     def test_dashboard_prescriber_suspend_link(self, client):

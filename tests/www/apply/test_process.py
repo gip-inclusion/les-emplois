@@ -118,14 +118,14 @@ class TestProcessViews:
     )
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 = (
         "Vous pourrez lui créer un compte en cliquant sur ce lien : "
-        "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
+        "https://diagoriente.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1 = (
         "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser vos expériences."
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 = (
         "Vous pourrez créer votre compte en cliquant sur ce lien : "
-        "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
+        "https://diagoriente.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     REFUSAL_REASON_JOB_SEEKER_MENTION = "<small>Motif de refus</small><strong>Autre</strong>"
     REFUSAL_REASON_SHARED_MENTION = "<small>Motif de refus partagé avec l’usager</small><strong>Autre</strong>"
