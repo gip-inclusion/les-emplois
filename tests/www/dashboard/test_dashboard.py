@@ -1119,8 +1119,30 @@ class TestDashboardView:
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, selector="#geiq-eligibility-diagnosis")) == snapshot
 
+    def test_prescriber_with_authorization_pending_warning_message(self, client, subtests):
+        prescriber_org = prescribers_factories.PrescriberOrganizationFactory(
+            with_pending_authorization=True,
+            with_membership=True,
+        )
+
+        prescriber = prescriber_org.members.first()
+        client.force_login(prescriber)
+
+        mapping = {
+            PrescriberOrganizationKind.OHPD: "votre DDETS",
+            PrescriberOrganizationKind.ODC: "le service social du Conseil départemental",
+        }
+
+        for kind in PrescriberOrganizationKind:
+            with subtests.test(kind=kind):
+                prescriber_org.kind = kind
+                prescriber_org.save()
+                response = client.get(reverse("dashboard:index"))
+                display_name = mapping.get(kind, "notre équipe")
+                assertContains(response, f"est en cours de vérification par {display_name}.")
+
     @override_settings(TALLY_URL="http://tally.fake")
-    def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
+    def test_prescriber_other_kind_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
         prescriber_org = prescribers_factories.PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.OTHER,
             with_pending_authorization=True,
