@@ -2,7 +2,7 @@ import dns
 import dns.resolver
 import pytest
 
-from itou.emails.utils import email_address_is_valid
+from itou.emails.utils import email_address_is_valid, get_email_message
 
 
 VALID_ADDRS = [
@@ -74,3 +74,10 @@ def test_check_email_should_not_even_query(mocker, addr):
     mocker.patch("dns.resolver._Resolution.next_request")
     assert not email_address_is_valid(addr)
     dns.resolver._Resolution.next_request.assert_not_called()
+
+
+def test_log_error_if_no_recipients(template_dir_fixture, caplog):
+    email = get_email_message(to=[], context={}, subject="subject.txt", body="markdown_body.md")
+    assert email.send() == 0
+
+    assert "Trying to send an email without recipients, ignoring." in caplog.messages
