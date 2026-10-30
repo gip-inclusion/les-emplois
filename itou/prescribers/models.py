@@ -281,6 +281,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         return self.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     @property
+    def authorization_validator(self):
+        if self.kind == PrescriberOrganizationKind.ODC:
+            return "le service social du Conseil départemental"
+        if self.kind == PrescriberOrganizationKind.OHPD:
+            return "votre DDETS"
+        return "notre équipe"
+
+    @property
     def accompaniment_categories(self):
         return categories_for_kind(self.kind)
 
