@@ -10,9 +10,9 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <form method="post" class="js-prevent-multiple-submit">
                         <div class="c-form">
-                            <h2 class="h3">Créer un compte pour votre usager</h2>
+                            <h3 class="h3">Adresse e-mail personnelle de l'usager*</h3>
                             {% csrf_token %}
-                            {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_field form.email show_label=False show_help=False %}
                             <div class="mb-3">
                                 {% include "signup/includes/no_email_link.html" with link_text="L’usager n'a pas d'e-mail ?" only %}
                             </div>

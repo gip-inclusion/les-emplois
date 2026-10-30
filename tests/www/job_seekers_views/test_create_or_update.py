@@ -1028,8 +1028,12 @@ class TestCreateForOrientation:
 
         response = client.get(step_1_url)
         assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
-        assertContains(response, "Étape 1</strong>/2")
-        assertContains(response, "michel.durant@example.com")
+        assertNotContains(response, "Étape 1")
+        assertNotContains(response, "michel.durant@example.com")
+        assertContains(response, 'id="id_first_name"')
+        assertContains(response, 'id="id_last_name"')
+        assertContains(response, 'name="birthdate"')
+        assertNotContains(response, 'id="id_email"')
         assertNotContains(response, 'id="id_title"')
         assertNotContains(response, 'id="id_nir"')
 
@@ -1044,7 +1048,8 @@ class TestCreateForOrientation:
 
         response = client.get(step_2_url)
         assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
-        assertContains(response, "Étape 2</strong>/2")
+        assertNotContains(response, "Étape 2")
+        assertNotContains(response, "Compléter les informations de l’usager")
         assertNotContains(response, 'id="id_birthdate"')
 
         geispolsheim = create_city_geispolsheim()

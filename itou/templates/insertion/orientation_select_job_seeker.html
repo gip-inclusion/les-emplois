@@ -10,14 +10,14 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <div class="c-form mb-5">
-                        <h2 class="h3">Rechercher ou créer un usager</h2>
+                        <h2 class="h3">Rechercher ou créer un usager*</h2>
                         <p>Commencez à saisir un nom</p>
                         <form method="post"
                               class="js-prevent-multiple-submit"
                               data-create-job-seeker-url="{{ create_job_seeker_url }}">
                             {% csrf_token %}
                             {% bootstrap_form_errors form type="all" %}
-                            {% bootstrap_field form.job_seeker wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% bootstrap_field form.job_seeker wrapper_class="form-group form-group-input-w-lg-66" show_label=False %}
                             {% itou_buttons_form reset_url=reset_url primary_label="Suivant" %}
                         </form>
                     </div>

@@ -374,8 +374,6 @@ class CreateJobSeekerForOrientationStep1Form(JobSeekerProfileModelForm):
     PROFILE_FIELDS = ["birthdate"]
     REQUIRED_FIELDS = ["first_name", "last_name", "birthdate"]
 
-    email = forms.EmailField(label="Adresse électronique personnelle", disabled=True)
-
     class Meta(JobSeekerProfileModelForm.Meta):
         fields = ["first_name", "last_name"]
 
