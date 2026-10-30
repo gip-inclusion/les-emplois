@@ -336,6 +336,11 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
     def get_form_kwargs(self):
         return super().get_form_kwargs() | {"request": self.request}
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["job_seeker"].widget.attrs["data-placeholder"] = ""
+        return form
+
     def form_valid(self, form):
         return HttpResponseRedirect(
             reverse(
