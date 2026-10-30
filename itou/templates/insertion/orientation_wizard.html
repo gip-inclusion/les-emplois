@@ -87,8 +87,9 @@
                                     <p class="fw-bold mb-2">Conditions requises</p>
                                     {% include "insertion/includes/access_conditions_di.html" with service=service extra_classes="mb-3 mb-md-4" only %}
                                 {% endif %}
+                                <hr class="mb-3">
                                 {% bootstrap_field form.confirms_conditions wrapper_class="form-group form-group-required-check" %}
-                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields matomo_category="orientation" matomo_action="submit" matomo_name=matomo_event_name %}
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields show_separator=False matomo_category="orientation" matomo_action="submit" matomo_name=matomo_event_name %}
                             </form>
                         </div>
 

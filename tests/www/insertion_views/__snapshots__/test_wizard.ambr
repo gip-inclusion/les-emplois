@@ -48,17 +48,17 @@
                           <h2 class="h3">
                               Critères et conditions d'accès
                           </h2>
+                          <hr class="mb-3"/>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
                                   <input checked="" class="form-check-input is-valid" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que la situation de l'usager répond à ces conditions.
+                                      Je confirme que la situation de l'usager répond à ces conditions
                                   </label>
                               </div>
                           </div>
                           <div class="row">
                               <div class="col-12">
-                                  <hr class="mb-3"/>
                                   <small class="d-inline-block mb-3">
                                       * champs obligatoires
                                   </small>
@@ -200,17 +200,17 @@
           <h2 class="h3">
               Critères et conditions d'accès
           </h2>
+          <hr class="mb-3"/>
           <div class="form-group form-group-required-check form-group-required">
               <div class="form-check">
                   <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                   <label class="form-check-label" for="id_confirms_conditions">
-                      Je confirme que la situation de l'usager répond à ces conditions.
+                      Je confirme que la situation de l'usager répond à ces conditions
                   </label>
               </div>
           </div>
           <div class="row">
               <div class="col-12">
-                  <hr class="mb-3"/>
                   <small class="d-inline-block mb-3">
                       * champs obligatoires
                   </small>
@@ -362,17 +362,17 @@
                                   </strong>
                               </p>
                           </div>
+                          <hr class="mb-3"/>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
                                   <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que la situation de l'usager répond à ces conditions.
+                                      Je confirme que la situation de l'usager répond à ces conditions
                                   </label>
                               </div>
                           </div>
                           <div class="row">
                               <div class="col-12">
-                                  <hr class="mb-3"/>
                                   <small class="d-inline-block mb-3">
                                       * champs obligatoires
                                   </small>
@@ -726,7 +726,7 @@
                       <h2 class="h3">
                           Rechercher ou créer un usager*
                       </h2>
-                      <p>
+                      <p class="text-muted">
                           Commencez à saisir un nom
                       </p>
                       <form class="js-prevent-multiple-submit" data-create-job-seeker-url="/job-seekers/start?tunnel=orientation&from_url=%2Finsertion%2Fservices%2Ftest-orientation-wizard-uid%2F&service_uid=test-orientation-wizard-uid" method="post">
