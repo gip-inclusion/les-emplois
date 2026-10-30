@@ -7830,7 +7830,7 @@
 # ---
 # name: test_populate_memberships
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -7910,7 +7910,7 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
-        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_collaborations" ("id_utilisateur" integer,"administrateur" integer,"id_structure" integer,"id_organisation" integer,"id_institution" integer,"date_mise_à_jour_metabase" date)',
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_collaborations" ("id_utilisateur" integer,"administrateur" integer,"id_structure" integer,"id_organisation" integer,"id_institution" integer,"fonction" varchar,"date_mise_à_jour_metabase" date)',
       }),
       dict({
         'origin': list([
@@ -7982,6 +7982,18 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_collaborations"."fonction" IS \'Fonction occupée dans la structure ou l\'\'organisation prescripteur\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_collaborations"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
       }),
       dict({
@@ -8003,7 +8015,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function"
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
@@ -8028,6 +8041,7 @@
                                        "id_structure",
                                        "id_organisation",
                                        "id_institution",
+                                       "fonction",
                                        "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
@@ -8051,7 +8065,8 @@
                  "prescribers_prescribermembership"."created_at",
                  "prescribers_prescribermembership"."updated_at",
                  "prescribers_prescribermembership"."organization_id",
-                 "prescribers_prescribermembership"."updated_by_id"
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescribermembership"."function"
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
@@ -8076,6 +8091,7 @@
                                        "id_structure",
                                        "id_organisation",
                                        "id_institution",
+                                       "fonction",
                                        "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
@@ -8124,6 +8140,7 @@
                                        "id_structure",
                                        "id_organisation",
                                        "id_institution",
+                                       "fonction",
                                        "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',

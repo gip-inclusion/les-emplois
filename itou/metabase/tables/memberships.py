@@ -28,5 +28,11 @@ TABLE.add_columns(
             "comment": "ID institution",
             "fn": lambda o: o.institution_id if isinstance(o, InstitutionMembership) else None,
         },
+        {
+            "name": "fonction",
+            "type": "varchar",
+            "comment": "Fonction occupée dans la structure ou l'organisation prescripteur",
+            "fn": lambda o: (o.function or None) if isinstance(o, (CompanyMembership, PrescriberMembership)) else None,
+        },
     ]
 )

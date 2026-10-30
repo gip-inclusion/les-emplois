@@ -1046,7 +1046,7 @@ def test_populate_users(snapshot):
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 def test_populate_memberships(snapshot):
-    company_membership = CompanyMembershipFactory()
+    company_membership = CompanyMembershipFactory(function="Directeur")
     CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
     CompanyMembershipFactory(user__is_active=False)  # memberships of inactive users are also ignored
     prescriber_membership = PrescriberMembershipFactory()
@@ -1069,6 +1069,7 @@ def test_populate_memberships(snapshot):
                 company_membership.company_id,
                 None,
                 None,
+                "Directeur",
                 datetime.date(2023, 2, 2),
             ),
             (
@@ -1076,6 +1077,7 @@ def test_populate_memberships(snapshot):
                 True,
                 None,
                 prescriber_membership.organization_id,
+                None,
                 None,
                 datetime.date(2023, 2, 2),
             ),
@@ -1085,6 +1087,7 @@ def test_populate_memberships(snapshot):
                 None,
                 None,
                 institution_membership.institution_id,
+                None,
                 datetime.date(2023, 2, 2),
             ),
         ]
