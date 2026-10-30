@@ -1,4 +1,5 @@
 import csv
+import functools
 import json
 from datetime import datetime
 from operator import itemgetter
@@ -196,6 +197,12 @@ class Command(BaseCommand):
 
             if profiles_to_remap:
                 should_raise = set()
+
+                @functools.lru_cache
+                def cached_guess_commune(code, name):
+                    # Cached function defined inside handle to avoid shared cache between command runs
+                    return guess_commune(code, name)
+
                 for profile in profiles_to_remap:
                     if old_commune_info := getattr(profile, "_birth_place", None):
                         try:
@@ -223,7 +230,7 @@ class Command(BaseCommand):
 
                     if old_commune_info := getattr(profile, "_hexa_commune", None):
                         try:
-                            new_commune = guess_commune(*old_commune_info)
+                            new_commune = cached_guess_commune(*old_commune_info)
                             self.stdout.write(
                                 f"> REALIGN hexa_commune for code={old_commune_info[0]} "
                                 f"name={old_commune_info[1]} "
