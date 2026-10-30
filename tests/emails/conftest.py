@@ -1,3 +1,6 @@
+import copy
+from pathlib import Path
+
 import pytest
 
 
@@ -61,3 +64,10 @@ def mailjet_messagehistory_response():
         ],
         "Total": 1,
     }
+
+
+@pytest.fixture
+def template_dir_fixture(settings):
+    [template_engine] = copy.deepcopy(settings.TEMPLATES)
+    template_engine["DIRS"].insert(0, str(Path(__file__).parent / "templates"))
+    settings.TEMPLATES = [template_engine]

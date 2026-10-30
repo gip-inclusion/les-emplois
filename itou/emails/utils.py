@@ -71,6 +71,9 @@ def get_email_message(
         body=body_text,
     )
     email.attach_alternative(generate_html_alternative(body_text), "text/html")
+    if not to and not cc and not bcc:
+        # EmailMessage.send() just returns 0 if there are no recipients, we need to alert before.
+        logger.error("Trying to send an email without recipients, ignoring.", stack_info=True)
     return email
 
 
