@@ -1,5 +1,33 @@
 # Journal des modifications
 
+## 2026-11-02
+
+### Ajouté
+
+- [Accompagnements : Remplir un bilan d’accompagnement de fin de parcours et le partager avec le prescripteur](https://github.com/gip-inclusion/les-emplois/pull/8951)
+- [Admin : Ajout d'une fonctionnalité de transfert des données d'organisations de prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/9029)
+- [Insertion : Enregistrement des mises en relation par email via inbound parsing (suivi d’emails)](https://github.com/gip-inclusion/les-emplois/pull/9033)
+- [Usagers : Ajout d'un champ "Nationalité"](https://github.com/gip-inclusion/les-emplois/pull/9089)
+
+### Modifié
+
+- [Entreprises : Amélioration de la prise en comptes des contrats pour la cloture des PASS et les causes de suspensions](https://github.com/gip-inclusion/les-emplois/pull/9174)
+- [Fiche salarié : Traitement automatique des erreurs 3437 lors de leur réception et notification du support](https://github.com/gip-inclusion/les-emplois/pull/9099)
+- [Insertion : Afficher une popup d'information qui explique la migration à La plateforme](https://github.com/gip-inclusion/les-emplois/pull/9138)
+- [Insertion : Bloquer le formulaire d’orientation pour les services sans email de contact](https://github.com/gip-inclusion/les-emplois/pull/9200)
+- [Insertion : Création d'usagers "light"](https://github.com/gip-inclusion/les-emplois/pull/9103)
+- [Prescripteur : Repérer les bénéficiaires dont le contrat a pris fin et demander leur bilan](https://github.com/gip-inclusion/les-emplois/pull/9051)
+
+### Supprimé
+
+- [Interface : Suppression de l'encart "Cette page vous est-elle utile ?" dans l'onglet accompagnateurs](https://github.com/gip-inclusion/les-emplois/pull/9111)
+
+### Tech
+
+- [Tech : Ajout des orientations aux objets transférables](https://github.com/gip-inclusion/les-emplois/pull/9192)
+- [Tech : Passer les arguments des tâches Huey par mot-clé](https://github.com/gip-inclusion/les-emplois/pull/9161)
+- [Tech : Préparer la montée de version de pandas 3.1](https://github.com/gip-inclusion/les-emplois/pull/9191)
+
 ## 2026-10-26
 
 ### Ajouté
