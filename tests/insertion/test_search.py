@@ -1,6 +1,6 @@
 import pytest
 
-from itou.insertion.models import Service
+from itou.insertion.models import Service, WordFrequency
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
 
 
@@ -39,6 +39,23 @@ def test_update_search_index_without_thematics_nor_publics():
 
     service.refresh_from_db()
     assert "'garag':1A" in service.search_vector
+
+
+def test_update_search_index_refreshes_word_frequencies():
+    WordFrequency.objects.create(stem="obsolete", service_count=1)
+    ServiceFactory(
+        name="Garage solidaire", description="", structure__name="Garage", structure__description="", thematics=[]
+    )
+    ServiceFactory(name="Garage", description="", structure__name="Mobilité", structure__description="", thematics=[])
+    ServiceFactory(name="Inactif", is_active=False, thematics=[])
+
+    Service.include_inactive.update_search_index()
+
+    assert dict(WordFrequency.objects.values_list("stem", "service_count")) == {
+        "garag": 2,
+        "mobilit": 1,
+        "solidair": 1,
+    }
 
 
 @pytest.mark.parametrize(
@@ -176,3 +193,32 @@ def test_keyword_search_ranks_multi_word_aliases_as_thematics():
     Service.include_inactive.update_search_index()
 
     assert list(Service.objects.keyword_search("titre de séjour")) == [in_thematic_aliases, in_publics_details]
+
+
+@pytest.mark.parametrize(
+    "name,q",
+    [
+        ("Lutte contre l'illettrisme", "illetrisme"),
+        ("Garage solidaire", "garage solidiare"),
+    ],
+)
+def test_keyword_search_tolerates_typos(name, q):
+    service = ServiceFactory(name=name)
+    Service.include_inactive.update_search_index()
+
+    assert list(Service.objects.keyword_search(q)) == [service]
+
+
+def test_keyword_search_with_typo_also_matches_the_typo():
+    correct = ServiceFactory(name="Illettrisme")
+    misspelled = ServiceFactory(name="Illetrisme")
+    Service.include_inactive.update_search_index()
+
+    assert set(Service.objects.keyword_search("illetrisme")) == {correct, misspelled}
+
+
+def test_keyword_search_with_typo_still_requires_every_word():
+    ServiceFactory(name="Garage solidaire")
+    Service.include_inactive.update_search_index()
+
+    assert not Service.objects.keyword_search("garage tracteur").exists()
