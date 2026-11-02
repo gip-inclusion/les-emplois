@@ -61,3 +61,4 @@ markers = [
     "slow: slow tests that are skipped unless pytest is run with `--runslow`",
     "do_not_patch_accept_domain_based_on_mx: disable auto-patching of itou.emails.utils._accept_domain_based_on_mx",
 ]
+parametrize_long_str_id_strategy = "disallow"
