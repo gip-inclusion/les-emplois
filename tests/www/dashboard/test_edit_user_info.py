@@ -744,7 +744,12 @@ class TestEditUserInfoView:
         assert user.title != post_data["title"]
         assert user.email != post_data["email"]
         assert user.jobseeker_profile.birthdate != birthdate
-        assert user.jobseeker_profile.birth_name != post_data["birth_name"]
+        if identity_provider == IdentityProvider.FT_CONNECT:
+            # FT Connect does not return the birth name. It can be
+            # modified here.
+            assert user.jobseeker_profile.birth_name == post_data["birth_name"]
+        else:
+            assert user.jobseeker_profile.birth_name != post_data["birth_name"]
 
     def test_edit_without_title(self, client, snapshot):
         MISSING_INFOS_WARNING_ID = "missing-infos-warning"
