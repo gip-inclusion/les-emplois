@@ -1714,8 +1714,8 @@ class TestProcessViews:
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
         [
-            ("subject_to_iae_rules", IAE_CANCELLATION_CONFIRMATION),
-            ("not_subject_to_iae_rules", NON_IAE_CANCELLATION_CONFIRMATION),
+            pytest.param("subject_to_iae_rules", IAE_CANCELLATION_CONFIRMATION, id="iae"),
+            pytest.param("not_subject_to_iae_rules", NON_IAE_CANCELLATION_CONFIRMATION, id="not-iae"),
         ],
     )
     def test_cancel(self, client, eligibility_trait, expected_msg):

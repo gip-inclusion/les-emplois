@@ -148,13 +148,15 @@ def test_create_request_without_rationale(client, data):
 @pytest.mark.parametrize(
     "rationale,err_message",
     [
-        (
+        pytest.param(
             "a" * (NirModificationRequest.MIN_RATIONALE_LENGTH - 1),
             f"Veuillez fournir des détails (au moins {NirModificationRequest.MIN_RATIONALE_LENGTH} caractères).",
+            id="at-least",
         ),
-        (
+        pytest.param(
             "a" * (NirModificationRequest.MAX_RATIONALE_LENGTH + 1),
             f"Assurez-vous que cette valeur comporte au plus {NirModificationRequest.MAX_RATIONALE_LENGTH} caractères",
+            id="at-most",
         ),
     ],
 )

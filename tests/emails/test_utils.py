@@ -28,13 +28,13 @@ BAD_ADDRS = [
 VERY_BAD_ADDRS = [
     # Those email adresses are so bad hitting the network is not
     # needed to tell they are wrong.
-    "testemail",  # Not even an at sign!
-    "testemail@",  # missing domain
-    "john@foo..com",  # empty label
-    "john@" + "x" * 64 + ".com",  # label too long
-    "john@" + ".".join(["a" * 63, "a" * 63, "a" * 63, "a" * 63]) + ".com",  # name too long
-    r"john@a.b\0q1.c.com",  # bad escape
-    r"john@\300.com",  # bad escape (byte > 255)
+    pytest.param("testemail", id="not-even-an-at-sign!"),
+    pytest.param("testemail@", id="missing-domain"),
+    pytest.param("john@foo..com", id="empty-label"),
+    pytest.param("john@" + "x" * 64 + ".com", id="label-too-long"),
+    pytest.param("john@" + ".".join(["a" * 63, "a" * 63, "a" * 63, "a" * 63]) + ".com", id="name-too-long"),
+    pytest.param(r"john@a.b\0q1.c.com", id="bad-escape"),
+    pytest.param(r"john@\300.com", id="bad-escape(byte>255)"),
 ]
 
 

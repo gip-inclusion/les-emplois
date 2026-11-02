@@ -274,7 +274,7 @@ class TestSiaeJobApplicationListView:
     @pytest.mark.parametrize(
         "state,approval_number,expected_jobapp_html,expected_criteria_html",
         [
-            (
+            pytest.param(
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
                 "XXXXX2412345",
                 '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
@@ -286,8 +286,9 @@ class TestSiaeJobApplicationListView:
                 </p>
                 <p class="mb-1"><strong>Bénéficiaire du RSA</strong></p>
                 """,
+                id="accepted",
             ),
-            (
+            pytest.param(
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
                 "XXXXX2423456",
                 SIAE_JOB_APPLICATION_LIST_REFUSED_HTML,
@@ -299,6 +300,7 @@ class TestSiaeJobApplicationListView:
                 </p>
                 <p class="mb-1"><strong>Bénéficiaire du RSA</strong></p>
                 """,
+                id="refused",
             ),
         ],
     )

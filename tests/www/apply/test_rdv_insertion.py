@@ -103,7 +103,7 @@ class TestRdvInsertionView:
     @pytest.mark.parametrize(
         "response_code,response_body",
         [
-            [
+            pytest.param(
                 422,
                 json.dumps(
                     {
@@ -116,9 +116,10 @@ class TestRdvInsertionView:
                         ],
                     },
                 ),
-            ],
-            [422, "not a JSON-encoded response"],
-            [500, json.dumps(RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY)],
+                id="422-validation-error",
+            ),
+            pytest.param(422, "not a JSON-encoded response", id="422-not-json"),
+            pytest.param(500, json.dumps(RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY), id="500-server-error"),
         ],
     )
     @respx.mock
