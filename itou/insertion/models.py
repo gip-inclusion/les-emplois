@@ -15,6 +15,7 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres import search as postgres_search
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -269,6 +270,9 @@ class ServiceQuerySet(models.QuerySet):
             .order_by("-is_in_person", "distance", "pk")
         )
 
+    def keyword_search(self, q):
+        return self.filter(search_vector=postgres_search.SearchQuery(q, config="french_unaccent"))
+
     def update_search_index(self):
         structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
         self.update(
@@ -497,6 +501,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         verbose_name = "service d'insertion"
         verbose_name_plural = "services d'insertion"
         base_manager_name = "include_inactive"
+        indexes = [GinIndex(fields=["search_vector"])]
 
     def __str__(self):
         return self.uid
