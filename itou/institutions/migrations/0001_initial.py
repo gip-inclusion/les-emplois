@@ -209,6 +209,7 @@ class Migration(migrations.Migration):
                             ("Réseau IAE", "Réseau employeur de l'insertion par l'activité économique"),
                             ("CONVERGENCE", "Convergence France"),
                             ("FFGEIQ", "Fédération Française des GEIQ"),
+                            ("Réseau PH", "Réseau prescripteur habilité"),
                             ("Autre", "Autre"),
                         ],
                         default="Autre",

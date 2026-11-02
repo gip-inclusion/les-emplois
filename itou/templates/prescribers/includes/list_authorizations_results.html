@@ -1,0 +1,12 @@
+<div id="authorizations-list">
+    {% if not prescriberorganization_list %}
+        <div class="c-box c-box--results my-3 my-md-4">
+            <div class="c-box--results__body">
+                <p class="mb-0">Aucune organisation pour le moment.</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="table-responsive mt-3 mt-md-4">{% include "prescribers/includes/list_authorizations_table.html" %}</div>
+        {% include "includes/pagination.html" with page=page_obj request=request only %}
+    {% endif %}
+</div>

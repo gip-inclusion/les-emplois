@@ -159,13 +159,13 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="collaborateurs",
     ),
-    "prescriber-accredited-organizations": NavItem(
-        label="Organisations conventionnées",
-        target=reverse_lazy("prescribers_views:list_accredited_organizations"),
-        active_view_names=["prescribers_views:list_accredited_organizations"],
+    "prescriber-authorizations-list": NavItem(
+        label="Gestion des habilitations",
+        target=reverse_lazy("prescribers_views:authorizations_list"),
+        active_view_names=["prescribers_views:authorizations_list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
-        matomo_event_option="prescribers-list-accredited-organizations",
+        matomo_event_option="prescribers-liste-habilitations",
     ),
     # Employers.
     "employer-job-apps": NavItem(
@@ -269,6 +269,14 @@ NAV_ENTRIES = {
         matomo_event_option="geiq-bilan-execution",
     ),
     # Institutionals.
+    "institutional-authorizations-list": NavItem(
+        label="Gestion des habilitations",
+        target=reverse_lazy("institutions_views:authorizations_list"),
+        active_view_names=["institutions_views:authorizations_list"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="institution-liste-habilitations",
+    ),
     "institutional-organizations-list": NavItem(
         label="Liste des organisations",
         target=reverse_lazy("institutions_views:organizations_list"),
@@ -311,6 +319,19 @@ def nav(request):
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:
+            if (
+                request.current_organization.kind == PrescriberOrganizationKind.DEPT
+                and request.is_current_organization_admin
+            ):
+                menu_items.append(
+                    NavGroup(
+                        label="Territoire",
+                        icon="ri-global-line",
+                        items=[
+                            NAV_ENTRIES["prescriber-authorizations-list"],
+                        ],
+                    )
+                )
             menu_items.append(
                 NavGroup(
                     label="Demandes envoyées",
@@ -335,11 +356,6 @@ def nav(request):
                 ),
                 NAV_ENTRIES["prescriber-members"],
             ]
-            if (
-                request.current_organization.kind == PrescriberOrganizationKind.DEPT
-                and request.is_current_organization_admin
-            ):
-                organization_items.append(NAV_ENTRIES["prescriber-accredited-organizations"])
             menu_items.append(
                 NavGroup(
                     label="Organisation",
@@ -375,12 +391,17 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.from_institution:
+            territory_items = []
+            if request.current_organization.kind == InstitutionKind.DDETS_IAE:
+                territory_items.append(NAV_ENTRIES["institutional-authorizations-list"])
             if request.current_organization.kind in [InstitutionKind.DDETS_IAE, InstitutionKind.DREETS_IAE]:
+                territory_items.append(NAV_ENTRIES["institutional-organizations-list"])
+            if territory_items:
                 menu_items.append(
                     NavGroup(
-                        label="Mon territoire",
-                        icon="ri-road-map-line",
-                        items=[NAV_ENTRIES["institutional-organizations-list"]],
+                        label="Territoire",
+                        icon="ri-global-line",
+                        items=territory_items,
                     )
                 )
             menu_items.append(

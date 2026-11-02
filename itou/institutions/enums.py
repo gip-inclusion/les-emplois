@@ -39,6 +39,7 @@ class InstitutionKind(models.TextChoices):
     IAE_NETWORK = ("Réseau IAE", "Réseau employeur de l'insertion par l'activité économique")
     CONVERGENCE = ("CONVERGENCE", "Convergence France")
     FFGEIQ = ("FFGEIQ", "Fédération Française des GEIQ")
+    PRESCRIBER_NETWORK = "Réseau PH", "Réseau prescripteur habilité"
 
     OTHER = ("Autre", "Autre")
 

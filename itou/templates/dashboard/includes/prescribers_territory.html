@@ -1,0 +1,20 @@
+{% load components %}
+
+<div class="col mb-3 mb-md-4">
+    {% component_box_dashboard title=title list=list %}
+        {% fragment as title %}
+            Territoire
+        {% endfragment %}
+        {% fragment as list %}
+            {% if request.current_organization.kind == PrescriberOrganizationKind.DEPT and request.is_current_organization_admin %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'prescribers_views:authorizations_list' %}" class="btn-link btn-ico">
+                        <i class="ri-shield-check-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Gestion des habilitations</span>
+                        {# FIXME : Add net_set count #}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
+</div>

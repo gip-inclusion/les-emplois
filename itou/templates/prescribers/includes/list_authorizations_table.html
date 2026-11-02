@@ -1,0 +1,42 @@
+{% load matomo %}
+
+<table class="table table-hover table-sortable">
+    <caption class="visually-hidden">Liste des habilitations</caption>
+    <thead>
+        <tr>
+            <th scope="col" class="text-nowrap">Structure</th>
+            <th scope="col">Ville</th>
+            <th scope="col">Émetteur</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Date de validation</th>
+            <th scope="col" class="text-end w-50px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for organization in object_list %}
+            <tr>
+                <td>
+                    {# FIXME: Add link #}
+                    <a href="?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn-link"
+                       {% matomo_event "habilitations" "clic" "détail-organisation" %}>{{ organization.name }}</a>
+                </td>
+                <td>{{ organization.city|title }} ({{ organization.department }})</td>
+                <td>{% if organization.created_by.is_staff %}Plateforme de l'inclsion{% else %}{{ organization.created_by.get_full_name }}{% endif %}</td>
+                <td>{% include "prescribers/includes/authorization_badge.html" with organization=organization only %}</td>
+                <td>{% if organization.authorization_updated_at %}{{ organization.authorization_updated_at|date:"d/m/Y" }} {% else %}-{% endif %}</td>
+                <td class="text-end w-50px align-middle">
+                    <a class="btn btn-sm btn-link btn-ico-only"
+                       {# FIXME: Add link #}
+                       href="?back_url={{ request.get_full_path|urlencode }}"
+                       {% matomo_event "habilitations" "clic" "détail-organisation" %}
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Voir la structure {{ organization.name }}">
+                        <i class="ri-arrow-drop-right-line fs-lg"
+                           aria-label="Voir la structure {{ organization.name }}"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

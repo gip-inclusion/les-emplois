@@ -1,11 +1,14 @@
 from django.core.exceptions import BadRequest, PermissionDenied
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.institutions.enums import InstitutionKind
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.models import User
 from itou.utils.auth import check_request
+from itou.www.prescribers_views import views as prescribers_views
 from itou.www.stats.views import render_stats_ddets, render_stats_dreets_iae
 
 
@@ -62,3 +65,12 @@ def organizations_list(request):
             page_title="Liste des organisations",
         )
     raise PermissionDenied
+
+
+class AuthorizationsListView(prescribers_views.AuthorizationsListView):
+    def get_filters(self):
+        if self.request.from_institution and self.request.current_organization.kind == InstitutionKind.DDETS_IAE:
+            return Q(
+                department=self.request.current_organization.department,
+                kind=PrescriberOrganizationKind.OHPD,
+            )
