@@ -14,7 +14,6 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Avg, BooleanField, Exists, F, OuterRef, Q, Value
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -200,13 +199,13 @@ class ServiceQuerySet(models.QuerySet):
         thematic_ids = list(GenericReferenceItem.objects.filter(value__in=thematics).values_list("id", flat=True))
         eligibility_codes = [code for code in [city.code_insee, city.department, city.siren_epci, "france"] if code]
         # An empty eligibility zone means national availability (aligned on data·inclusion).
-        eligibility_filter = Q(eligibility_zones__overlap=eligibility_codes) | Q(eligibility_zones=[])
+        eligibility_filter = models.Q(eligibility_zones__overlap=eligibility_codes) | models.Q(eligibility_zones=[])
         queryset = (
             self.annotate(
                 distance=Distance("coordinates", city.coords) / 1000,
-                has_thematic=Exists(
+                has_thematic=models.Exists(
                     self.model.thematics.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=thematic_ids,
                     )
                 ),
@@ -227,8 +226,8 @@ class ServiceQuerySet(models.QuerySet):
                 )
                 .filter(eligibility_filter)
                 .annotate(
-                    is_in_person=Value(True, output_field=BooleanField()),
-                    is_remote=Value(False, output_field=BooleanField()),
+                    is_in_person=models.Value(True, output_field=models.BooleanField()),
+                    is_remote=models.Value(False, output_field=models.BooleanField()),
                 )
                 .order_by("distance", "pk")
             )
@@ -238,30 +237,31 @@ class ServiceQuerySet(models.QuerySet):
                 queryset.filter(receptions__id__in=GenericReferenceItem.remote_reception_ids())
                 .filter(eligibility_filter)
                 .annotate(
-                    is_in_person=Value(False, output_field=BooleanField()),
-                    is_remote=Value(True, output_field=BooleanField()),
+                    is_in_person=models.Value(False, output_field=models.BooleanField()),
+                    is_remote=models.Value(True, output_field=models.BooleanField()),
                 )
                 .order_by("distance", "pk")
             )
 
         return (
             queryset.annotate(
-                is_in_person=Exists(
+                is_in_person=models.Exists(
                     self.model.receptions.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
                     )
                 ),
-                is_remote=Exists(
+                is_remote=models.Exists(
                     self.model.receptions.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
                     )
                 ),
             )
             .filter(
-                Q(is_in_person=True) & Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
-                | Q(is_remote=True)
+                models.Q(is_in_person=True)
+                & models.Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
+                | models.Q(is_remote=True)
             )
             .filter(eligibility_filter)
             .order_by("-is_in_person", "distance", "pk")
@@ -778,12 +778,12 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    Q(
+                    models.Q(
                         sender_kind=SenderKind.PRESCRIBER,
                         sender_prescriber_organization__isnull=False,
                         sender_company__isnull=True,
                     )
-                    | Q(
+                    | models.Q(
                         sender_kind=SenderKind.EMPLOYER,
                         sender_company__isnull=False,
                         sender_prescriber_organization__isnull=True,
@@ -792,8 +792,12 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
                 name="orientation_sender_organization_consistent",
             ),
             models.CheckConstraint(
-                condition=(Q(status=OrientationStatus.REFUSED) & ~Q(refusal_reasons=[]) & ~Q(refusal_details=""))
-                | (~Q(status=OrientationStatus.REFUSED) & Q(refusal_reasons=[], refusal_details="")),
+                condition=(
+                    models.Q(status=OrientationStatus.REFUSED)
+                    & ~models.Q(refusal_reasons=[])
+                    & ~models.Q(refusal_details="")
+                )
+                | (~models.Q(status=OrientationStatus.REFUSED) & models.Q(refusal_reasons=[], refusal_details="")),
                 name="orientation_refusal_status_and_reasons_consistent",
             ),
         ]
@@ -862,7 +866,9 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             status__in=[OrientationStatus.ACCEPTED, OrientationStatus.REFUSED],
             processing_date__isnull=False,
         )
-        avg_response_delay = orientations.aggregate(avg=Avg(F("processing_date") - F("created_at")))["avg"]
+        avg_response_delay = orientations.aggregate(
+            avg=models.Avg(models.F("processing_date") - models.F("created_at"))
+        )["avg"]
         if avg_response_delay is None:
             average_days = None
         else:
