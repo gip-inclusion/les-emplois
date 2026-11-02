@@ -68,6 +68,16 @@ def handle_service_answer_email(email):
         mobilization_email.pk,
     )
 
+    # Log if the email contains attachments to know if we should support them.
+    if attachments := email.get("Attachments"):
+        # Ignore attachments with `ContentID` as they probably are in the signature.
+        has_non_inline_attachments = any([attachment.get("ContentID") == "" for attachment in attachments])
+        if has_non_inline_attachments:
+            logger.info(
+                "received an email in reply to mobilization_email=%d that contained attachments",
+                mobilization_email.pk,
+            )
+
 
 KIND_MAPPING = {InboundParsingKind.SERVICE_ANSWER: handle_service_answer_email}
 
