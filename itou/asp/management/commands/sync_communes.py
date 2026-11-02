@@ -249,8 +249,10 @@ class Command(BaseCommand):
                 if not_found:
                     raise Exception(f"Some communes could not be found. Please resolve manually. {not_found}")
 
+                self.stdout.write(f"Final bulk_update for {len(profiles_to_remap)} profiles")
                 n_objs = JobSeekerProfile.objects.bulk_update(
                     profiles_to_remap,
                     fields=["birth_country", "birth_place", "hexa_commune"],
+                    batch_size=1_000,
                 )
                 self.stdout.write(f"> realigned count={n_objs} JobSeeker profiles with updated communes.")
