@@ -173,7 +173,7 @@ def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.h
                 queryset=AssessmentInstitutionLink.objects.select_related("institution"),
             ),
         )
-        .order_by("created_at", "pk")  # pk to stabilize order on exceptionnal created_at duplicates
+        .order_by("created_at", "pk")  # pk to stabilize order on exceptional created_at duplicates
     )
     context = {
         "assessments": assessments,

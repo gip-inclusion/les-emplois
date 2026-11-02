@@ -107,7 +107,7 @@ def compute_hexa_address(obj):
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée"
         or LaneType.with_similar_value(lane_type)
-        # Maybe the geo API mispelled the lane type (happens sometimes)
+        # Maybe the geo API misspelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
         or find_lane_type_aliases(lane)

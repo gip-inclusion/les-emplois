@@ -13,8 +13,8 @@ from itou.utils.command import BaseCommand
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
-# Wait a bit before deleting a unknown file from S3 in case the database File is still not commited
-# Also Wait a bit before deleting a orphan File since it might have ben created outside an atomic transation
+# Wait a bit before deleting a unknown file from S3 in case the database File is still not committed
+# Also Wait a bit before deleting a orphan File since it might have ben created outside an atomic transaction
 CLEANING_DELAY = datetime.timedelta(days=1)
 
 

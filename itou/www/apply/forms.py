@@ -460,7 +460,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 },
             )
             # Set dynamically in a custom form field,
-            # otherwise choices values are overriden at every HTMX reload
+            # otherwise choices values are overridden at every HTMX reload
             self.fields["qualification_level"].choices = (
                 BLANK_CHOICE_DASH + job_applications_enums.QualificationLevel.choices
             )

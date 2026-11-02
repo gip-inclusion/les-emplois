@@ -129,7 +129,7 @@ def france_connect_callback(request):
         "redirect_uri": redirect_uri,
     }
 
-    # Exceptions catched by Sentry
+    # Exceptions caught by Sentry
     url = constants.FRANCE_CONNECT_ENDPOINT_TOKEN
     response = httpx.post(url, data=data, timeout=30)
 
@@ -243,7 +243,7 @@ def france_connect_callback(request):
 
 @login_not_required
 def france_connect_logout(request):
-    # The user can be authentified on FC w/o a session on itou.
+    # The user can be authenticated on FC w/o a session on itou.
     # https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service#sign_out
     id_token = request.GET.get("id_token")
     if not id_token:

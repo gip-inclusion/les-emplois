@@ -258,7 +258,7 @@ def company_select(request, template_name="signup/company_select.html"):
     if next_url:
         data.pop("next")
 
-    # Form with required field is validated on GET, so instanciate the form with None when there's no querystring
+    # Form with required field is validated on GET, so instantiate the form with None when there's no querystring
     siren_form = forms.CompanySearchBySirenForm(data=data or None)
     company_select_form = None
 
