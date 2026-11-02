@@ -17,8 +17,10 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.db.models.functions import Concat, Greatest
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 from django_xworkflows import models as xwf_models
 from xworkflows import after_transition, before_transition
 
@@ -27,6 +29,7 @@ from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.emails.utils import get_email_message
 from itou.files.models import File
+from itou.insertion import search as insertion_search
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     GenericReferenceItemKind,
@@ -273,28 +276,43 @@ class ServiceQuerySet(models.QuerySet):
     def keyword_search(self, q):
         """Ranked like data·inclusion's search."""
         query = postgres_search.SearchQuery(q, config="french_unaccent")
-        return (
-            self.filter(search_vector=query)
-            .annotate(
-                search_score=postgres_search.SearchRank(
-                    models.F("search_vector"), query, normalization=32, cover_density=True
-                )
+        rank = postgres_search.SearchRank(models.F("search_vector"), query, normalization=32, cover_density=True)
+        if " " in q.strip():
+            multi_word_query = postgres_search.SearchQuery(
+                insertion_search.MULTI_WORD_PREFIX + slugify(q).replace("-", ""), config="simple"
             )
-            .order_by("-search_score", "pk")
-        )
+            rank = Greatest(
+                rank,
+                postgres_search.SearchRank(
+                    models.F("search_vector"), multi_word_query, normalization=32, cover_density=True
+                ),
+            )
+            query |= multi_word_query
+        return self.filter(search_vector=query).annotate(search_score=rank).order_by("-search_score", "pk")
 
     def update_search_index(self):
         """Weighted like data·inclusion's `build_search_index`."""
+        thematics = self.model.thematics.through.objects.filter(service=models.OuterRef("pk"))
         structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
         self.update(
             search_vector=postgres_search.SearchVector(
                 _joined(
-                    self.model.thematics.through.objects.filter(service=models.OuterRef("pk")).values(
-                        "genericreferenceitem__label"
+                    thematics.values(
+                        text=Concat(
+                            "genericreferenceitem__label",
+                            models.Value(" "),
+                            _aliases(insertion_search.SINGLE_WORD_ALIASES),
+                            output_field=models.TextField(),
+                        )
                     )
                 ),
                 "name",
                 config="french_unaccent",
+                weight="A",
+            )
+            + postgres_search.SearchVector(
+                _joined(thematics.values(text=_aliases(insertion_search.MULTI_WORD_ALIASES))),
+                config="simple",
                 weight="A",
             )
             + postgres_search.SearchVector(
@@ -325,6 +343,15 @@ class ServiceQuerySet(models.QuerySet):
 def _joined(queryset):
     return models.Func(
         ArraySubquery(queryset), models.Value(" "), function="array_to_string", output_field=models.TextField()
+    )
+
+
+def _aliases(aliases_by_thematic):
+    return models.Func(
+        models.Value(aliases_by_thematic, output_field=models.JSONField()),
+        "genericreferenceitem__value",
+        function="jsonb_extract_path_text",
+        output_field=models.TextField(),
     )
 
 
