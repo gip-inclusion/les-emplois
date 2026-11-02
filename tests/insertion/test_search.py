@@ -12,7 +12,13 @@ def test_update_search_index():
         structure__name="Agefiph",
         structure__description="Insertion des personnes handicapées",
         structure__reseaux_porteurs=[GenericReferenceItemFactory(kind="NETWORK", label="France Travail")],
-        thematics=[GenericReferenceItemFactory(kind="THEMATIC", label="Découvrir un métier")],
+        thematics=[
+            GenericReferenceItemFactory(
+                kind="THEMATIC",
+                value="choisir-un-metier--decouvrir-un-metier-ou-un-secteur-dactivite",
+                label="Découvrir un métier",
+            )
+        ],
         publics=[GenericReferenceItemFactory(kind="PUBLIC", label="Jeunes")],
     )
 
@@ -20,8 +26,9 @@ def test_update_search_index():
 
     service.refresh_from_db()
     assert service.search_vector == (
-        "'agefiph':8B 'decouvr':1A 'emploi':19C 'franc':6B 'garag':4A 'handicape':15B 'insert':12B 'jeun':16C "
-        "'meti':3A 'person':14B,17C 'repar':9B 'san':18C 'solidair':5A 'travail':7B 'vehicul':11B"
+        "'agefiph':11B 'decouvr':1A 'emploi':22C 'franc':9B 'garag':5A 'handicape':18B 'insert':15B 'jeun':19C "
+        "'meti':3A 'person':17B,20C 'reconvers':4A 'repar':12B 'san':21C 'solidair':6A 'travail':10B 'vehicul':14B "
+        "'zzdecouvertemetier':7A 'zzforummetiers':8A"
     )
 
 
@@ -129,3 +136,43 @@ def test_keyword_search_ranks_thematics_first():
     Service.include_inactive.update_search_index()
 
     assert list(Service.objects.keyword_search("soutien aux aidants")) == [in_thematics, in_structure_name]
+
+
+@pytest.mark.parametrize(
+    "q,expected",
+    [
+        ("naturalisation", True),
+        ("titre de séjour", True),
+        ("Titre de Séjour", True),
+        ("titre", False),
+    ],
+)
+def test_keyword_search_thematic_aliases(q, expected):
+    ServiceFactory(
+        thematics=[
+            GenericReferenceItemFactory(
+                kind="THEMATIC",
+                value="difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
+                label="Citoyenneté",
+            )
+        ],
+    )
+    Service.include_inactive.update_search_index()
+
+    assert Service.objects.keyword_search(q).exists() is expected
+
+
+def test_keyword_search_ranks_multi_word_aliases_as_thematics():
+    in_publics_details = ServiceFactory(publics_details="Titre de séjour")
+    in_thematic_aliases = ServiceFactory(
+        thematics=[
+            GenericReferenceItemFactory(
+                kind="THEMATIC",
+                value="difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
+                label="Citoyenneté",
+            )
+        ],
+    )
+    Service.include_inactive.update_search_index()
+
+    assert list(Service.objects.keyword_search("titre de séjour")) == [in_thematic_aliases, in_publics_details]
