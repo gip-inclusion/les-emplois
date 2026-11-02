@@ -59,7 +59,9 @@ def handle_service_answer_email(email):
         display_name=f"{from_name} {product_name('via')}" if from_name else "", addr_spec=settings.DEFAULT_FROM_EMAIL
     )
     reply_to = Address(display_name=from_name or "", addr_spec=from_email_address)
-    mobilization_email.free_form_email_to_sender(body_message=message, from_email=from_email, reply_to=reply_to).send()
+    mobilization_email.free_form_email_to_sender(
+        body_message=message, from_email=from_email, from_name=from_name, reply_to=reply_to
+    ).send()
     logger.info(
         "forwarded email from service=%s in reply to mobilization_email=%d",
         mobilization_email.service.uid,

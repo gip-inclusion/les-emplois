@@ -612,18 +612,30 @@ class MobilizationEmail(models.Model):
                 display_name=f"{self.sender.get_full_name()} {product_name('via')}", addr_spec=inbound_parsing_email
             )
         ]
-        context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
+        context = {
+            "sender": self.sender,
+            "sender_organization": sender_organization,
+            "body_message": body_message,
+            "sender_name": self.sender.get_full_name(),
+            "display_attachment_warning": True,
+        }
 
         subject = "insertion/email/free_form_email_to_service_subject.txt"
         body = "insertion/email/free_form_email_body.md"
         return get_email_message(to, context, subject, body, from_email=from_email, reply_to=reply_to)
 
-    def free_form_email_to_sender(self, body_message, from_email, reply_to):
+    def free_form_email_to_sender(self, body_message, from_email, from_name, reply_to):
         sender_organization = self.sender_prescriber_organization or self.sender_company
 
         to = [self.sender.email]
         reply_to = [reply_to]
-        context = {"sender": self.sender, "sender_organization": sender_organization, "body_message": body_message}
+        context = {
+            "sender": self.sender,
+            "sender_organization": sender_organization,
+            "body_message": body_message,
+            "sender_name": from_name,
+            "display_attachment_warning": False,
+        }
 
         subject = "insertion/email/free_form_email_to_sender_subject.txt"
         body = "insertion/email/free_form_email_body.md"
