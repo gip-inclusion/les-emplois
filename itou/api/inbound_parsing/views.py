@@ -59,12 +59,24 @@ def handle_service_answer_email(email):
         display_name=f"{from_name} {product_name('via')}" if from_name else "", addr_spec=settings.DEFAULT_FROM_EMAIL
     )
     reply_to = Address(display_name=from_name or "", addr_spec=from_email_address)
-    mobilization_email.free_form_email_to_sender(body_message=message, from_email=from_email, reply_to=reply_to).send()
+    mobilization_email.free_form_email_to_sender(
+        body_message=message, from_email=from_email, from_name=from_name, reply_to=reply_to
+    ).send()
     logger.info(
         "forwarded email from service=%s in reply to mobilization_email=%d",
         mobilization_email.service.uid,
         mobilization_email.pk,
     )
+
+    # Log if the email contains attachments to know if we should support them.
+    if attachments := email.get("Attachments"):
+        # Ignore attachments with `ContentID` as they probably are in the signature.
+        has_non_inline_attachments = any([attachment.get("ContentID") == "" for attachment in attachments])
+        if has_non_inline_attachments:
+            logger.info(
+                "received an email in reply to mobilization_email=%d that contained attachments",
+                mobilization_email.pk,
+            )
 
 
 KIND_MAPPING = {InboundParsingKind.SERVICE_ANSWER: handle_service_answer_email}
