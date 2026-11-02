@@ -44,6 +44,7 @@ class OrientationSelectJobSeekerForm(forms.Form):
                 kind=UserKind.JOB_SEEKER,
                 pk__in=job_seekers_ids,
             )
+            .annotate_with_last_name_for_display()
             .exclude(
                 # FIXME: will be fixed when last_name (soon: birth_name)
                 # and first_name are enforced by a SQL constraint
@@ -52,7 +53,7 @@ class OrientationSelectJobSeekerForm(forms.Form):
                 jobseeker_profile__birth_name="",
             )
             .select_related("jobseeker_profile")
-            .order_by("last_name", "first_name")
+            .order_by("last_name_for_display", "first_name")
         )
         self.valid_public_ids = set()
         choices = [("", "---------")]
