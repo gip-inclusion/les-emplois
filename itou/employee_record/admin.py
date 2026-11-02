@@ -272,7 +272,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         ),
     )
 
-    change_form_template = "admin/employee_records/employeerecord_change_form.html"
+    change_form_template = "admin/employee_record/employeerecord_change_form.html"
 
     @admin.display(description="Nom")
     def employee_full_name(self, obj):
