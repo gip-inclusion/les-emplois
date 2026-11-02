@@ -16,7 +16,8 @@ from django.contrib.postgres import search as postgres_search
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
-from django.db import models
+from django.db import connection, models, transaction
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat, Greatest
 from django.urls import reverse
 from django.utils import timezone
@@ -275,7 +276,34 @@ class ServiceQuerySet(models.QuerySet):
 
     def keyword_search(self, q):
         """Ranked like data·inclusion's search."""
-        query = postgres_search.SearchQuery(q, config="french_unaccent")
+        # Why: typo tolerance as recommended by https://www.postgresql.org/docs/current/pgtrgm.html#PGTRGM-TEXT-SEARCH
+        # Each rare lexeme of `q` is OR-ed with its closest lexicon words, leaning towards frequent ones.
+        # Thresholds come from data·inclusion's data analysis.
+        query = postgres_search.SearchQuery(
+            RawSQL(
+                """
+                (
+                    SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
+                    FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
+                    LEFT JOIN insertion_wordfrequency AS common_word
+                        ON common_word.stem = lexeme AND common_word.service_count >= 100
+                    CROSS JOIN LATERAL (
+                        SELECT string_agg(quote_literal(closest.stem), '|') AS variants
+                        FROM (
+                            SELECT stem
+                            FROM insertion_wordfrequency
+                            WHERE common_word.stem IS NULL AND length(lexeme) >= 4 AND stem %% lexeme
+                            ORDER BY similarity(stem, lexeme) + 0.05 * ln(service_count + 1) DESC
+                            LIMIT 4
+                        ) AS closest
+                    ) AS expansion
+                )
+                """,
+                [q],
+            ),
+            config="simple",
+            search_type="raw",
+        )
         rank = postgres_search.SearchRank(models.F("search_vector"), query, normalization=32, cover_density=True)
         if " " in q.strip():
             multi_word_query = postgres_search.SearchQuery(
@@ -290,6 +318,7 @@ class ServiceQuerySet(models.QuerySet):
             query |= multi_word_query
         return self.filter(search_vector=query).annotate(search_score=rank).order_by("-search_score", "pk")
 
+    @transaction.atomic
     def update_search_index(self):
         """Weighted like data·inclusion's `build_search_index`."""
         thematics = self.model.thematics.through.objects.filter(service=models.OuterRef("pk"))
@@ -338,6 +367,16 @@ class ServiceQuerySet(models.QuerySet):
                 weight="C",
             )
         )
+        WordFrequency.objects.all().delete()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO insertion_wordfrequency (stem, service_count)
+                SELECT word, ndoc FROM ts_stat('SELECT search_vector FROM insertion_service WHERE is_active')
+                WHERE word NOT LIKE %(prefix)s
+                """,
+                {"prefix": f"{insertion_search.MULTI_WORD_PREFIX}%"},
+            )
 
 
 def _joined(queryset):
@@ -568,6 +607,20 @@ class Service(GeolocatedAddressMixin, models.Model):
     @property
     def is_local(self):
         return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
+
+
+class WordFrequency(models.Model):
+    """Used to correct typos in keyword searches."""
+
+    stem = models.CharField(verbose_name="radical", primary_key=True)
+    service_count = models.PositiveIntegerField(verbose_name="nombre de services contenant le mot")
+
+    class Meta:
+        verbose_name = "fréquence d'apparition d'un mot dans les services et structures"
+        indexes = [GinIndex(fields=["stem"], name="%(class)s_stem_gin", opclasses=["gin_trgm_ops"])]
+
+    def __str__(self):
+        return self.stem
 
 
 class MobilizationEventManager(models.Manager):
