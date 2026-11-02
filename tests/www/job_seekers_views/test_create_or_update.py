@@ -1041,7 +1041,12 @@ class TestCreateForOrientation:
 
         response = client.post(
             step_1_url,
-            data={"first_name": "Michel", "last_name": "Durant", "birthdate": datetime.date(1978, 12, 20)},
+            data={
+                "first_name": "Michel",
+                "birth_name": "Dupond",
+                "last_name": "Durant",
+                "birthdate": datetime.date(1978, 12, 20),
+            },
         )
         step_2_url = reverse(
             "job_seekers_views:create_job_seeker_step_2_for_orientation", kwargs={"session_uuid": session_name}
@@ -1081,6 +1086,7 @@ class TestCreateForOrientation:
         assert session_name not in client.session
         assert (job_seeker.first_name, job_seeker.last_name) == ("Michel", "Durant")
         assert job_seeker.created_by == prescriber
+        assert job_seeker.jobseeker_profile.birth_name == "Dupond"
         assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 12, 20)
         assert job_seeker.jobseeker_profile.nir == ""
         assert job_seeker.jobseeker_profile.creation_source == "orientation"
@@ -1139,6 +1145,7 @@ class TestCreateForOrientation:
             ),
             data={
                 "first_name": job_seeker.first_name,
+                "birth_name": job_seeker.jobseeker_profile.birth_name,
                 "last_name": job_seeker.last_name,
                 "birthdate": datetime.date(1978, 12, 20),
             },
