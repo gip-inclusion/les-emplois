@@ -12,8 +12,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django_redis.cache import RedisCache
 
-from itou.api.models import BrevoToken
-
 
 def clear_bucket(bucket_name):
     from itou.utils.storage.s3 import s3_client
@@ -34,7 +32,7 @@ def main(bucket_name, admin_password, dora_token, brevo_token):
     from django.core.cache import caches
     from django.db import connection
 
-    from itou.api.models import ServiceToken
+    from itou.api.models import BrevoToken, ServiceToken
     from itou.nexus.enums import Service
     from itou.users.models import User
     from itou.utils.cache import UnclearableCache
