@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Case, Exists, F, OuterRef, Q, Subquery, When
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
@@ -22,7 +22,7 @@ from itou.emails.utils import get_email_message
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
-from itou.users.models import JobSeekerProfile
+from itou.users.models import JobSeekerProfile, UserQuerySet
 from itou.utils.admin import get_admin_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
@@ -239,16 +239,8 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
     def with_job_seeker_last_name_for_display(self):
-        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
         return self.annotate(
-            job_seeker_last_name_for_display=Case(
-                When(
-                    job_application__job_seeker__last_name="",
-                    then=F("job_application__job_seeker__jobseeker_profile__birth_name"),
-                ),
-                default=F("job_application__job_seeker__last_name"),
-                output_field=models.CharField(),
-            )
+            job_seeker_last_name_for_display=UserQuerySet.last_name_annotation(prefix="job_application__job_seeker")
         )
 
 

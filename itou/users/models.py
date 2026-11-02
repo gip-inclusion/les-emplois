@@ -17,6 +17,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, OuterRef, Q, Subquery, When
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -94,6 +95,23 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    @staticmethod
+    def last_name_annotation(*, prefix=""):
+        def apply_prefix(lookup: str):
+            if prefix:
+                return f"{prefix}{LOOKUP_SEP}{lookup}"
+            return lookup
+
+        lookups = {
+            apply_prefix("last_name"): "",
+            apply_prefix("kind"): UserKind.JOB_SEEKER,
+        }
+        return Case(
+            When(**lookups, then=F(apply_prefix("jobseeker_profile__birth_name"))),
+            default=F(apply_prefix("last_name")),
+            output_field=models.CharField(),
+        )
 
     def with_advisors_count(self, active=True):
         status_filter = Q()
@@ -178,16 +196,7 @@ class UserQuerySet(models.QuerySet):
         See `User.get_last_name_for_display()` for the equivalent in
         Python for a single object.
         """
-        # Must be kept in sync with
-        # `JobApplicationQuerySet.with_job_seeker_last_name_for_display()`. and
-        # `EmployeeRecordQuerySet.with_job_seeker_last_name_for_display()`.
-        return self.annotate(
-            last_name_for_display=Case(
-                When(last_name="", kind=UserKind.JOB_SEEKER, then=F("jobseeker_profile__birth_name")),
-                default=F("last_name"),
-                output_field=models.CharField(),
-            )
-        )
+        return self.annotate(last_name_for_display=self.last_name_annotation())
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):

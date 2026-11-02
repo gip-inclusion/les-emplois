@@ -47,7 +47,7 @@ from itou.job_applications.enums import (
 from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import KIND_EMPLOYER, ActionKind, LackOfPoleEmploiId, UserKind
-from itou.users.models import JobSeekerAssignment
+from itou.users.models import JobSeekerAssignment, UserQuerySet
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url
@@ -479,17 +479,7 @@ class JobApplicationQuerySet(models.QuerySet):
         )
 
     def with_job_seeker_last_name_for_display(self):
-        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
-        return self.annotate(
-            job_seeker_last_name_for_display=Case(
-                When(
-                    job_seeker__last_name="",
-                    then=F("job_seeker__jobseeker_profile__birth_name"),
-                ),
-                default=F("job_seeker__last_name"),
-                output_field=models.CharField(),
-            )
-        )
+        return self.annotate(job_seeker_last_name_for_display=UserQuerySet.last_name_annotation(prefix="job_seeker"))
 
     # Employee record querysets
     def eligible_as_employee_record(self, siae):

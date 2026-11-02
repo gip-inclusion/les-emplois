@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Case, Count, Exists, F, OuterRef, Prefetch, Q, When
+from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -21,6 +21,7 @@ from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.users.enums import KIND_EMPLOYER
+from itou.users.models import UserQuerySet
 from itou.utils.models import InclusiveDateRangeField, check_nullable_date_order_constraint
 from itou.utils.validators import validate_html
 
@@ -726,16 +727,8 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
         return self.filter(evaluated_siae__evaluation_campaign__in=viewable_campaigns)
 
     def with_job_seeker_last_name_for_display(self):
-        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
         return self.annotate(
-            job_seeker_last_name_for_display=Case(
-                When(
-                    job_application__job_seeker__last_name="",
-                    then=F("job_application__job_seeker__jobseeker_profile__birth_name"),
-                ),
-                default=F("job_application__job_seeker__last_name"),
-                output_field=models.CharField(),
-            )
+            job_seeker_last_name_for_display=UserQuerySet.last_name_annotation(prefix="job_application__job_seeker")
         )
 
 
