@@ -260,14 +260,13 @@ class TestBrevoInboundParsing:
                 "ContentID": "someId",
                 "DownloadToken": "t0k3n",
             },
-            {},
             {
                 "Name": "cv.pdf",
                 "SomethingElse": 1,
             },
         ],
     )
-    def test_inbound_parsing_service_answer_with_attachments(
+    def test_inbound_parsing_service_answer_with_attachments_forwards_without_attachment(
         self, django_capture_on_commit_callbacks, mailoutbox, attachment_payload
     ):
         mobilization_email = MobilizationEmailFactory(inbound_parsing_key=self.inbound_parsing_key)
@@ -280,8 +279,9 @@ class TestBrevoInboundParsing:
         mobilization_email.refresh_from_db()
         assert mobilization_email.answered_at is not None
 
-        # The email is forwarded
-        assert len(mailoutbox) == 1
+        # The email is forwarded without attachment
+        [email] = mailoutbox
+        assert email.attachments == []
 
     def test_inbound_parsing_dont_process_any_mails_if_exception(self):
         mobilization_email = MobilizationEmailFactory(
