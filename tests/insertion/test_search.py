@@ -222,3 +222,16 @@ def test_keyword_search_with_typo_still_requires_every_word():
     Service.include_inactive.update_search_index()
 
     assert not Service.objects.keyword_search("garage tracteur").exists()
+
+
+def test_keyword_search_also_ranks_by_quality():
+    slightly_more_relevant = ServiceFactory(name="Garage solidaire", description="Garage", score_qualite=0.2)
+    better_quality = ServiceFactory(name="Garage solidaire", score_qualite=0.9)
+    far_less_relevant = ServiceFactory(publics_details="Garage solidaire", score_qualite=1)
+    Service.include_inactive.update_search_index()
+
+    assert list(Service.objects.keyword_search("garage solidaire")) == [
+        better_quality,
+        slightly_more_relevant,
+        far_less_relevant,
+    ]
