@@ -271,9 +271,20 @@ class ServiceQuerySet(models.QuerySet):
         )
 
     def keyword_search(self, q):
-        return self.filter(search_vector=postgres_search.SearchQuery(q, config="french_unaccent"))
+        """Ranked like data·inclusion's search."""
+        query = postgres_search.SearchQuery(q, config="french_unaccent")
+        return (
+            self.filter(search_vector=query)
+            .annotate(
+                search_score=postgres_search.SearchRank(
+                    models.F("search_vector"), query, normalization=32, cover_density=True
+                )
+            )
+            .order_by("-search_score", "pk")
+        )
 
     def update_search_index(self):
+        """Weighted like data·inclusion's `build_search_index`."""
         structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
         self.update(
             search_vector=postgres_search.SearchVector(
@@ -283,6 +294,10 @@ class ServiceQuerySet(models.QuerySet):
                     )
                 ),
                 "name",
+                config="french_unaccent",
+                weight="A",
+            )
+            + postgres_search.SearchVector(
                 _joined(
                     Structure.reseaux_porteurs.through.objects.filter(structure=models.OuterRef("structure")).values(
                         "genericreferenceitem__label"
@@ -291,6 +306,10 @@ class ServiceQuerySet(models.QuerySet):
                 models.Subquery(structure.values("name")),
                 "description",
                 models.Subquery(structure.values("description")),
+                config="french_unaccent",
+                weight="B",
+            )
+            + postgres_search.SearchVector(
                 _joined(
                     self.model.publics.through.objects.filter(service=models.OuterRef("pk")).values(
                         "genericreferenceitem__label"
@@ -298,6 +317,7 @@ class ServiceQuerySet(models.QuerySet):
                 ),
                 "publics_details",
                 config="french_unaccent",
+                weight="C",
             )
         )
 

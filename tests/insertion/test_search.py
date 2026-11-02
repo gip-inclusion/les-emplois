@@ -20,8 +20,8 @@ def test_update_search_index():
 
     service.refresh_from_db()
     assert service.search_vector == (
-        "'agefiph':8 'decouvr':1 'emploi':19 'franc':6 'garag':4 'handicape':15 'insert':12 'jeun':16 'meti':3 "
-        "'person':14,17 'repar':9 'san':18 'solidair':5 'travail':7 'vehicul':11"
+        "'agefiph':8B 'decouvr':1A 'emploi':19C 'franc':6B 'garag':4A 'handicape':15B 'insert':12B 'jeun':16C "
+        "'meti':3A 'person':14B,17C 'repar':9B 'san':18C 'solidair':5A 'travail':7B 'vehicul':11B"
     )
 
 
@@ -31,7 +31,7 @@ def test_update_search_index_without_thematics_nor_publics():
     Service.include_inactive.update_search_index()
 
     service.refresh_from_db()
-    assert "'garag':1" in service.search_vector
+    assert "'garag':1A" in service.search_vector
 
 
 @pytest.mark.parametrize(
@@ -104,3 +104,28 @@ def test_keyword_search_without_any_word(q):
     Service.include_inactive.update_search_index()
 
     assert not Service.objects.keyword_search(q).exists()
+
+
+@pytest.mark.parametrize(
+    "best_field,other_field",
+    [
+        ("name", "structure__name"),
+        ("structure__name", "publics_details"),
+    ],
+)
+def test_keyword_search_ranks_by_field_weight(best_field, other_field):
+    other = ServiceFactory(**{other_field: "Agefiph"})
+    best = ServiceFactory(**{best_field: "Agefiph"})
+    Service.include_inactive.update_search_index()
+
+    assert list(Service.objects.keyword_search("agefiph")) == [best, other]
+
+
+def test_keyword_search_ranks_thematics_first():
+    in_structure_name = ServiceFactory(structure__name="Soutien aux aidants")
+    in_thematics = ServiceFactory(
+        thematics=[GenericReferenceItemFactory(kind="THEMATIC", label="Soutien aux aidants")],
+    )
+    Service.include_inactive.update_search_index()
+
+    assert list(Service.objects.keyword_search("soutien aux aidants")) == [in_thematics, in_structure_name]
