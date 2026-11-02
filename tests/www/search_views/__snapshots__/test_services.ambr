@@ -183,6 +183,7 @@
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
+                 "insertion_service"."search_vector",
                  "insertion_service"."extra",
                  (ST_Distance("insertion_service"."coordinates", %s) / %s) AS "distance",
                  EXISTS
@@ -243,7 +244,7 @@
                                                                         %s])::varchar[]
                       OR "insertion_service"."eligibility_zones" = %s::varchar[])
                  AND ("insertion_service"."extra" -> %s) ? | %s)
-          ORDER BY 35 ASC,
+          ORDER BY 36 ASC,
                    "insertion_service"."id" ASC
           LIMIT 1
         ''',
