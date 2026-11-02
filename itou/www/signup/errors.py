@@ -85,8 +85,8 @@ class JobSeekerSignupConflictModalResolver:
             last_name=compare_name("last_name"),
             birth_name="birth_name" in cleaned_data
             and (
-                cleaned_data["birth_name"].lower() == self.existing_user.jobseeker_profile.birth_name.lower()
-                or cleaned_data["birth_name"].lower() == self.existing_user.last_name.lower()
+                cleaned_data["birth_name"].casefold() == self.existing_user.jobseeker_profile.birth_name.casefole()
+                or cleaned_data["birth_name"].casefold() == self.existing_user.last_name.casefold()
             ),
             birthdate=(
                 "birthdate" in cleaned_data
