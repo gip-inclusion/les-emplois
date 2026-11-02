@@ -12,6 +12,8 @@ from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+from django.contrib.postgres import search as postgres_search
+from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
@@ -267,6 +269,40 @@ class ServiceQuerySet(models.QuerySet):
             .order_by("-is_in_person", "distance", "pk")
         )
 
+    def update_search_index(self):
+        structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
+        self.update(
+            search_vector=postgres_search.SearchVector(
+                _joined(
+                    self.model.thematics.through.objects.filter(service=models.OuterRef("pk")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                "name",
+                _joined(
+                    Structure.reseaux_porteurs.through.objects.filter(structure=models.OuterRef("structure")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                models.Subquery(structure.values("name")),
+                "description",
+                models.Subquery(structure.values("description")),
+                _joined(
+                    self.model.publics.through.objects.filter(service=models.OuterRef("pk")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                "publics_details",
+                config="french_unaccent",
+            )
+        )
+
+
+def _joined(queryset):
+    return models.Func(
+        ArraySubquery(queryset), models.Value(" "), function="array_to_string", output_field=models.TextField()
+    )
+
 
 class ServiceManager(models.Manager.from_queryset(ServiceQuerySet)):
     def get_queryset(self):
@@ -395,6 +431,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    search_vector = postgres_search.SearchVectorField(null=True)
 
     # Opaque data·inclusion payload (`GET /services?extra=true`), outside the v1 schema.
     # DORA currently sends funding_labels, online_form, and forms: [{name, url}]

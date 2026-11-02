@@ -372,3 +372,6 @@ class Command(BaseCommand):
 
             if ArgumentData.SERVICES in data:
                 self.import_services(di_client, sources_except_emplois, force_update=force_update)
+
+            self.logger.info("Updating services search index")
+            Service.include_inactive.update_search_index()
