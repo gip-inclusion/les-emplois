@@ -82,7 +82,7 @@ class StructureFactory(factory.django.DjangoModelFactory):
     uid = factory.Sequence(lambda n: f"structure-uid-{n}")
     source = factory.SubFactory(GenericReferenceItemFactory)
     name = factory.Faker("company", locale="fr_FR")
-    description = factory.Faker("paragraph", locale="fr_FR")
+    description = "Description de la structure."
     updated_on = factory.LazyFunction(timezone.localdate)
 
     class Params:
