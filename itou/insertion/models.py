@@ -18,7 +18,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import connection, models, transaction
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Concat, Greatest
+from django.db.models.functions import Concat, Greatest, Round
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -316,7 +316,11 @@ class ServiceQuerySet(models.QuerySet):
                 ),
             )
             query |= multi_word_query
-        return self.filter(search_vector=query).annotate(search_score=rank).order_by("-search_score", "pk")
+        return (
+            self.filter(search_vector=query)
+            .annotate(search_score=Round(rank, 2))
+            .order_by(Round(models.F("search_score") * 10).desc(), models.F("score_qualite").desc(), "pk")
+        )
 
     @transaction.atomic
     def update_search_index(self):
