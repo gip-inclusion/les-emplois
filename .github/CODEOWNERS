@@ -1,6 +1,8 @@
 # Allow GitHub branch protection to enforce review by at least one member of @gip-inclusion/admins-les-emplois.
 * @gip-inclusion/admins-les-emplois
 
-# Dependabot PRs (requirements/) don't need CODEOWNERS review.
+# Dependency bot PRs (pyproject.toml, uv.lock) don't need CODEOWNERS review.
 # Only the current supportix is required to review these PRs.
-requirements/
+# The ruff, pytest and djlint configs live in their own files, so they still need it.
+/pyproject.toml
+/uv.lock

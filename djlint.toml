@@ -1,0 +1,9 @@
+profile="django"
+ignore="H006,H014,H017,H030,H031,T003"
+custom_blocks="buttons,component_alert,component_alert_global,component_box_dashboard,component_box_nexus_activated_service,component_info,component_navinfo,component_title,endbuttons,fragment"
+max_attribute_length=200
+preserve_blank_lines=true
+extend_exclude = "itou/static_collected,itou/templates/utils/widgets/duet_date_picker_widget.html"
+format_css = true
+format_js = true
+no_indent_inner_html=false
