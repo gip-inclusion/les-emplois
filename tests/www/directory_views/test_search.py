@@ -57,7 +57,7 @@ def test_people_search_filters_and_htmx(client):
     )
 
     update_page_with_htmx(page, "#people-search-form", response)
-    assert [heading.text for heading in page.select("#people-search-results h3")] == ["Alice Martin"]
+    assert [heading.text for heading in page.select("#people-search-results h3")] == ["MARTIN Alice"]
     assert page.select_one(f'#people-search-form select[name="q"] option[value="{person.public_id}"][selected]')
     assert page.select_one("#people-search-count")
     assert page.select_one('#people-search-form input[name="types"]')
@@ -122,7 +122,7 @@ def test_people_search_includes_nearby_other_city(client):
         organization=PrescriberOrganizationFactory(coords=neighboring_city.coords, insee_city=neighboring_city),
     )
     response = client.get(reverse("directory:people_results"))
-    assertContains(response, "<h3>Claire Dupont</h3>", count=1)
+    assertContains(response, "<h3>DUPONT Claire</h3>", count=1)
 
 
 def test_people_search_shows_nearest_structure_after_type_filter(client):
@@ -134,7 +134,7 @@ def test_people_search_shows_nearest_structure_after_type_filter(client):
 
     response = client.get(reverse("directory:people_results"), {"types": NexusStructureKind.EI})
 
-    assertContains(response, "Alice Martin")
+    assertContains(response, "MARTIN Alice")
     assertContains(response, "Mission locale de Vannes")
     assertNotContains(response, "Atelier EI")
 

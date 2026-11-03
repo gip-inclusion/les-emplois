@@ -33,7 +33,7 @@ def test_directory_people_merge_memberships_by_email():
 
     [person] = get_directory_people(ORIGIN)
 
-    assert person.full_name == "Alice Martin"
+    assert person.full_name == "MARTIN Alice"
     assert person.kind == NexusUserKind.FACILITY_MANAGER
     assert person.phone == ""
     assert person.public_id == user.public_id
@@ -69,7 +69,7 @@ def test_directory_people_keeps_structures_within_radius():
 
     people = get_directory_people(ORIGIN)
 
-    assert [person.full_name for person in people] == ["Near By"]
+    assert [person.full_name for person in people] == ["BY Near"]
 
 
 def test_directory_people_dedupes_organizations_by_siret():

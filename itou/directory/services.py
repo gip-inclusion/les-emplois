@@ -45,7 +45,8 @@ class DirectoryPerson:
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip()
+        # Follows User.get_inverted_full_name().
+        return f"{self.last_name.upper()} {self.first_name.strip().title()}".strip()
 
     @property
     def kind_label(self):
