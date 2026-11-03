@@ -2,6 +2,7 @@ from django import forms
 from django.urls import reverse_lazy
 
 from itou.directory.enums import ContactSubject
+from itou.directory.models import ContactMessage
 from itou.nexus.enums import NexusStructureKind
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
@@ -39,17 +40,18 @@ class PeopleSearchForm(forms.Form):
         )
 
 
-class ContactMessageForm(forms.Form):
-    subject = forms.ChoiceField(
-        label="Objet",
-        choices=[("", "Choisir un objet…")] + list(ContactSubject.choices),
-    )
-    custom_subject = forms.CharField(label="Précisez l'objet", required=False, max_length=255)
+class ContactMessageForm(forms.ModelForm):
     body = forms.CharField(
         label="Message",
         widget=forms.Textarea(attrs={"placeholder": "Votre message…", "rows": 6}),
-        max_length=5000,
     )
+
+    class Meta:
+        model = ContactMessage
+        fields = ["subject", "custom_subject"]
+        labels = {
+            "custom_subject": "Précisez l’objet",
+        }
 
     def clean(self):
         cleaned_data = super().clean()
