@@ -43,6 +43,10 @@ class FindExistingUserViaEmailForm(forms.Form):
                         "assurez-vous de saisir correctement votre adresse e-mail.</p>"
                         "<p>Si vous n'êtes pas encore inscrit(e), "
                         "nous vous invitons à cliquer sur Inscription pour créer votre compte.</p>"
+                        "<p>Si vous avez déjà un compte candidat et que vous avez changé votre adresse email "
+                        "sur FranceTravail Connect ou France Connect, veuillez saisir votre "
+                        "<strong>ancienne adresse e-mail</strong> pour être redirigé vers FranceTravail Connect "
+                        "ou France Connect et que cela mette à jour votre adresse e-mail sur la plateforme."
                     ),
                     reverse("signup:choose_user_kind"),
                     "Inscription",
