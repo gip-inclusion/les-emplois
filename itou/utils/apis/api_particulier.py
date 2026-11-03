@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 import logging
 
@@ -23,10 +24,15 @@ UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE = "37999"
 UNKNOWN_RESPONSE_FROM_PROVIDER_SECURITE_SOCIALE_ERROR_CODE = "36999"
 
 
-def client():
+# Same value as the httpx default. Callers blocking a page render should shorten it.
+DEFAULT_TIMEOUT = httpx.Timeout(5.0)
+
+
+def client(timeout: httpx.Timeout | float = DEFAULT_TIMEOUT) -> httpx.Client:
     return httpx.Client(
         base_url=settings.API_PARTICULIER_BASE_URL,
         headers={"Authorization": f"Bearer {settings.API_PARTICULIER_TOKEN}"},
+        timeout=timeout,
     )
 
 
@@ -103,3 +109,21 @@ def certify_criteria(criteria, client, job_seeker):
         ),
         "raw_response": response,
     }
+
+
+@dataclasses.dataclass
+class RSASituation:
+    # None means the API could not tell us: the identity was not found.
+    is_beneficiary: bool | None
+    start_date: datetime.date | None
+
+
+def fetch_rsa_situation(client: httpx.Client, job_seeker) -> RSASituation:
+    """
+    Current RSA situation of a job seeker, without any side effect on their eligibility diagnosis.
+    """
+    data = _request(client, ENDPOINTS[AdministrativeCriteriaKind.RSA], job_seeker)["data"]
+    return RSASituation(
+        is_beneficiary=data["est_beneficiaire"],
+        start_date=(datetime.date.fromisoformat(data["date_debut_droit"]) if data["est_beneficiaire"] else None),
+    )
