@@ -1,3 +1,4 @@
+{% load str_filters %}
 {% if request.htmx %}
     {% include "directory/includes/people_counter.html" with results=results request=request only %}
 {% endif %}
@@ -26,7 +27,7 @@
                         <small>Structure</small>
                         <strong>
                             {{ person.main_organization.name }}
-                            {% if person.other_organizations_count %}(+ {{ person.other_organizations_count }} autres structures){% endif %}
+                            {% if person.other_organizations_count %}(+ {{ person.other_organizations_count }} {{ person.other_organizations_count|pluralizefr:"autre structure,autres structures" }}){% endif %}
                         </strong>
                     </li>
                     {% if person.main_organization.kind_label %}

@@ -150,7 +150,7 @@ def test_people_search_displays_membership_count(client):
     CompanyMembershipFactory(user=target, company=company)
 
     response = client.get(reverse("directory:people_results"))
-    assertContains(response, "<strong>Les petits paniers (+ 1 autres structures)</strong>", html=True, count=1)
+    assertContains(response, "<strong>Les petits paniers (+ 1 autre structure)</strong>", html=True, count=1)
 
 
 def test_directory_nav_is_visible_for_flagged_city(client):
