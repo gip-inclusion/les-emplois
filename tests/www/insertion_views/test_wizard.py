@@ -18,12 +18,14 @@ from pytest_django.asserts import (
 )
 
 from itou.asp.models import Country
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.files.models import File
 from itou.geo.utils import coords_to_geometry
 from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKind, Orientation, OrientationProcessLink
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
+from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -898,3 +900,103 @@ def test_orientation_create_job_seeker_starts_with_search_by_email(client):
     assertContains(response, "<title>Orienter vers un service d'insertion", html=False)
     assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
     assertContains(response, '<div class="form-text mt-n2 mb-2">Par exemple\xa0: julie@example.com</div>', html=True)
+
+
+@pytest.mark.usefixtures("api_particulier_settings")
+@freeze_time("2025-01-06 11:11:11")
+def test_conformity_step_refreshes_rsa_rights(client, respx_mock):
+    response_json = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"]
+    rsa_mock = respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+        200, json=response_json
+    )
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=membership.user)
+    service = ServiceFactory()
+
+    client.force_login(membership.user)
+    select_job_seeker_url = reverse(
+        "insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}
+    )
+    # The POST redirects to start_orientation, which is what creates the wizard session.
+    response = client.post(select_job_seeker_url, data={"job_seeker": job_seeker.public_id}, follow=True)
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+    assert response.request["PATH_INFO"] == conformity_url
+
+    assert len(rsa_mock.calls) == 1
+    assertContains(response, "Droits BRSA")
+    assertContains(response, "<strong>Ouverts depuis le 01/08/2024</strong>", html=True)
+    # Rights open since date_debut_droit, plus the day we asked the API.
+    assertContains(response, "vérifié le 06/01/2025")
+    job_seeker.jobseeker_profile.refresh_from_db()
+    assert job_seeker.jobseeker_profile.rsa_certified_beneficiary is True
+
+    # Rights are not refreshed again on the next visit.
+    client.get(conformity_url)
+    assert len(rsa_mock.calls) == 1
+
+
+@pytest.mark.usefixtures("api_particulier_settings")
+@freeze_time("2025-01-06 11:11:11")
+def test_conformity_step_when_job_seeker_has_no_rsa(client, respx_mock):
+    response_json = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"]
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+        200, json=response_json
+    )
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=membership.user)
+    service = ServiceFactory()
+
+    client.force_login(membership.user)
+    response = client.post(
+        reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}),
+        data={"job_seeker": job_seeker.public_id},
+        follow=True,
+    )
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    assert response.request["PATH_INFO"] == reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    assertContains(response, "Droits BRSA")
+    assertContains(response, "<strong>Fermés</strong>", html=True)
+    # No start date to show, but the user needs to know when we asked.
+    assertContains(response, "vérifié le 06/01/2025")
+    assertNotContains(response, "Ouverts depuis le")
+    job_seeker.jobseeker_profile.refresh_from_db()
+    assert job_seeker.jobseeker_profile.rsa_certified_beneficiary is False
+    assert job_seeker.jobseeker_profile.rsa_certified_start_date is None
+
+
+@pytest.mark.usefixtures("api_particulier_settings")
+def test_conformity_step_when_api_particulier_is_down(client, respx_mock):
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(503, json={})
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=membership.user)
+    service = ServiceFactory()
+
+    client.force_login(membership.user)
+    response = client.post(
+        reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}),
+        data={"job_seeker": job_seeker.public_id},
+        follow=True,
+    )
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    assert response.request["PATH_INFO"] == reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Droits BRSA")
+    assertContains(response, "Non renseigné", html=True)
+    job_seeker.jobseeker_profile.refresh_from_db()
+    assert job_seeker.jobseeker_profile.rsa_certified_beneficiary is None
+    assert job_seeker.jobseeker_profile.rsa_certification_checked_at is None

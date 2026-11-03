@@ -1,0 +1,17 @@
+{% load format_filters %}
+
+<small>Droits BRSA</small>
+<div class="flex flex-row align-items-center">
+    <strong>{% if profile.rsa_certified_beneficiary %}Ouverts depuis le {{ profile.rsa_certified_start_date|date:"d/m/Y" }}
+    {% elif profile.rsa_certified_beneficiary is False %}
+        <strong>Fermés</strong>
+    {% else %}
+        {{ ""|strong_or_disabled_non_filled }}
+    {% endif %}
+</strong>
+{% if profile.rsa_certification_checked_at %}
+    <span class="mx-sm-2 badge-sm rounded-pill bg-info-lighter text-info fw-normal">
+        vérifié le {{ profile.rsa_certification_checked_at|date:"d/m/Y" }}
+    </span>
+{% endif %}
+</div>

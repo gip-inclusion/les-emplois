@@ -132,6 +132,22 @@
                         </ul>
                     </div>
 
+                    {% if can_view_personal_information %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <div class="row mb-3">
+                                <div class="col-12 col-sm">
+                                    <h2 class="h3">Situation de l'usager</h2>
+                                    <ul class="list-data">
+                                        <li>
+                                            {% include "insertion/includes/rsa_rights.html" with profile=orientation.beneficiary.jobseeker_profile only %}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endif %}
+
                     {# Prerequisites #}
                     {% if orientation.service.has_prerequisites %}
                         <div class="c-box mb-3 mb-md-4">

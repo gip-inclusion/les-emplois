@@ -44,6 +44,7 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_register_mobilization_event,
 )
+from itou.users.utils import refresh_rsa_certification
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -425,6 +426,10 @@ class OrientationWizardView(WizardView):
             self.service.uid,
             self.job_seeker.public_id,
         )
+        if self.step == OrientationStep.CONFORMITY:
+            # The RSA situation is displayed on this step, and is only refreshed when orienting:
+            # the agreement with API Particulier limits the number of calls we can make.
+            refresh_rsa_certification(self.job_seeker)
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
