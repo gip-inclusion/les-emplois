@@ -1,3 +1,5 @@
+import datetime
+
 import httpx
 import pytest
 from django.conf import settings
@@ -116,3 +118,49 @@ def test_http_status_error_does_not_leak_pii(respx_mock):
     # the request the exception carries is redacted as well: Sentry serializes its repr
     assert last_name.upper() not in repr(exception.request).upper()
     assert last_name.upper() not in repr(exception.response.request).upper()
+
+
+@pytest.mark.parametrize(
+    "response_kind,expected",
+    [
+        pytest.param(
+            ResponseKind.CERTIFIED,
+            api_particulier.RSASituation(is_beneficiary=True, start_date=datetime.date(2024, 8, 1)),
+            id="beneficiary",
+        ),
+        pytest.param(
+            ResponseKind.NOT_CERTIFIED,
+            api_particulier.RSASituation(is_beneficiary=False, start_date=None),
+            id="not_beneficiary",
+        ),
+    ],
+)
+def test_fetch_rsa_situation(response_kind, expected, respx_mock):
+    response = RESPONSES[AdministrativeCriteriaKind.RSA][response_kind]
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+        response["status_code"], json=response["json"]
+    )
+    job_seeker = JobSeekerFactory(born_in_france=True)
+
+    with api_particulier.client() as client:
+        assert api_particulier.fetch_rsa_situation(client, job_seeker) == expected
+
+    assert len(respx_mock.calls) == 1
+
+
+def test_fetch_rsa_situation_does_not_leak_pii(respx_mock, caplog):
+    response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+        response["status_code"], json=response["json"]
+    )
+    first_name, last_name = "Jean-Michel", "Tardiveau"
+    job_seeker = JobSeekerFactory(first_name=first_name, last_name=last_name, born_in_france=True)
+
+    with api_particulier.client() as client, pytest.raises(httpx.HTTPStatusError) as exc_info:
+        api_particulier.fetch_rsa_situation(client, job_seeker)
+
+    exception = exc_info.value
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in str(exception)
+    assert last_name.upper() not in str(exception).upper()
+    assert last_name.upper() not in repr(exception.request).upper()
+    assert last_name.upper() not in caplog.text.upper()
