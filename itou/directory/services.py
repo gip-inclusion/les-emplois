@@ -65,10 +65,6 @@ def _as_km(distance):
     return float(getattr(distance, "km", distance))
 
 
-def _address(obj):
-    return " ".join(part for part in [obj.address_line_1, obj.address_line_2, obj.post_code, obj.city] if part)
-
-
 def _native_organization(obj, distance):
     kind = STRUCTURE_KIND_MAPPING[Service.EMPLOIS].get(obj.kind, "")
     return DirectoryOrganization(
@@ -76,7 +72,7 @@ def _native_organization(obj, distance):
         name=obj.display_name if isinstance(obj, Company) else obj.name,
         kind=kind,
         kind_label=NexusStructureKind(kind).label if kind else obj.get_kind_display(),
-        address=_address(obj),
+        address=obj.address_on_one_line,
         phone=obj.phone,
         email=obj.email,
         website=obj.website,
@@ -99,7 +95,7 @@ def _nexus_organization(structure, dora_structure, distance):
         name=obj.name,
         kind=structure.kind,
         kind_label=NexusStructureKind(structure.kind).label if structure.kind else "",
-        address=_address(obj),
+        address=obj.address_on_one_line,
         phone=obj.phone,
         email=obj.email,
         website=obj.website,
