@@ -8,14 +8,24 @@ from tests.www.directory_views.helpers import get_target_person, setup_directory
 
 def test_person_detail_preserves_back_url_and_hides_contact(client):
     _, _, target_organization, person = get_target_person(client)
-    back_url = f"{reverse('directory:people_results')}?q=Alice"
+    back_url = f"{reverse('directory:people_results')}?q={person.public_id}"
 
     response = client.get(
         reverse("directory:person_detail", kwargs={"public_id": person.public_id}),
         {"back_url": back_url},
     )
 
-    assert response.context["back_url"] == back_url
+    assertContains(
+        response,
+        f"""
+        <a href="{back_url}" class="btn btn-ico btn-link ps-0" aria-label="Retour à la page précédente">
+            <i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>
+            <span>Retour</span>
+        </a>
+        """,
+        html=True,
+        count=1,
+    )
     assertContains(response, "Afficher l’adresse e-mail")
     assertContains(response, "Afficher le téléphone")
     assertContains(response, target_organization.get_card_url())
