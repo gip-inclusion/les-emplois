@@ -46,7 +46,7 @@ def test_access_requires_organization_coords(client):
     assert response.status_code == 403
 
 
-def test_people_search_filters_and_htmx(client, snapshot):
+def test_people_search_filters_and_htmx(client):
     _, _, _, person = get_target_person(client)
     page = parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.recipient_id}))
 
