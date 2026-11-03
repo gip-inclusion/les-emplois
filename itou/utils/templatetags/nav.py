@@ -2,10 +2,10 @@ from django import template
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 
-from itou.cities.cache import get_directory_active_city_ids
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
+from itou.www.directory_views.perms import can_access_directory
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
     employer_has_access_to_assessments,
@@ -404,13 +404,7 @@ def nav(request):
             )
             if request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST:
                 menu_items.append(NAV_ENTRIES["institutional-geiq-assessments"])
-        if (
-            request.user.is_professional
-            and request.current_organization
-            and request.current_organization.coords
-            and request.current_organization.insee_city_id
-            and request.current_organization.insee_city_id in get_directory_active_city_ids()
-        ):
+        if can_access_directory(request):
             menu_items.append(NAV_ENTRIES["professional-directory"])
         menu_items.append(
             NavGroup(

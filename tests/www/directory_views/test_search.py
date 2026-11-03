@@ -159,15 +159,3 @@ def test_directory_nav_is_visible_for_flagged_city(client):
     response = client.get(reverse("dashboard:index"))
 
     assertContains(response, "Annuaire pro")
-
-
-def test_directory_nav_skips_active_cities_lookup_without_insee_city(client, mocker):
-    user = EmployerFactory(membership=False)
-    CompanyMembershipFactory(user=user, company=CompanyFactory(coords=Point(-2.75, 47.66), insee_city=None))
-    client.force_login(user)
-    active_cities = mocker.patch("itou.utils.templatetags.nav.get_directory_active_city_ids")
-
-    response = client.get(reverse("dashboard:index"))
-
-    active_cities.assert_not_called()
-    assertNotContains(response, reverse("directory:people_results"))

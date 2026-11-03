@@ -9,7 +9,6 @@ from django.urls import reverse
 from itoutils.urls import add_url_params
 
 from itou.api.throttling import FailSafeUserRateThrottle
-from itou.cities.cache import get_directory_active_city_ids
 from itou.directory.enums import ContactSubject
 from itou.directory.models import ContactMessage
 from itou.directory.services import get_directory_people, get_directory_person
@@ -19,21 +18,11 @@ from itou.utils.pagination import pager
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.directory_views.forms import ContactMessageForm, PeopleSearchForm
+from itou.www.directory_views.perms import can_access_directory
 
 
 MESSAGE_RATE_LIMIT = 50
 MESSAGE_RATE_LIMIT_PERIOD = int(timedelta(days=1).total_seconds())
-
-
-def can_access_directory(request):
-    organization = getattr(request, "current_organization", None)
-    return bool(
-        request.user.is_professional
-        and organization
-        and organization.coords
-        and organization.insee_city_id
-        and organization.insee_city_id in get_directory_active_city_ids()
-    )
 
 
 def _filter_people(people, form):
