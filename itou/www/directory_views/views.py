@@ -132,8 +132,8 @@ def send_message(request, public_id):
                 from_email=formataddr(
                     (f"{request.user.get_full_name()} (via la Plateforme de l’inclusion)", settings.DEFAULT_FROM_EMAIL)
                 ),
+                reply_to=[request.user.email],
             )
-            email.reply_to = [request.user.email]
             email.send()
             messages.success(request, "Votre message a bien été envoyé.")
             detail_url = reverse("directory:person_detail", kwargs={"public_id": public_id})
