@@ -157,23 +157,28 @@ class Command(BaseCommand):
                 self.stdout.write(f"\tREMOVED {json.dumps(data, ensure_ascii=False, cls=DjangoJSONEncoder)}")
 
         if wet_run:
-            profiles_to_remap = []
+            profiles_to_remap = {}
             for pk in communes_removed_by_csv:
                 commune = Commune.unfiltered_objects.get(pk=pk)
                 try:
                     commune.delete()
                 except RestrictedError as exc:
+                    restricted_objects = []
                     for obj in exc.restricted_objects:
-                        if obj.birth_place == commune:
-                            obj.birth_place = None
-                            obj.birth_country = None  # To respect jobseekerprofile_birth_country_and_place constraint
-                            setattr(obj, "_birth_place", (commune.code, commune.name))
-                        if obj.hexa_commune == commune:
-                            obj.hexa_commune = None
-                            setattr(obj, "_hexa_commune", (commune.code, commune.name))
-                        profiles_to_remap.append(obj)
+                        # Retrieve possibly already updated profile (for another Commune deletion)
+                        profile_to_remap = profiles_to_remap.get(obj.pk, obj)
+                        if profile_to_remap.birth_place == commune:
+                            profile_to_remap.birth_place = None
+                            # To respect jobseekerprofile_birth_country_and_place constraint
+                            profile_to_remap.birth_country = None
+                            setattr(profile_to_remap, "_birth_place", (commune.code, commune.name))
+                        if profile_to_remap.hexa_commune == commune:
+                            profile_to_remap.hexa_commune = None
+                            setattr(profile_to_remap, "_hexa_commune", (commune.code, commune.name))
+                        profiles_to_remap[profile_to_remap.pk] = profile_to_remap
+                        restricted_objects.append(profile_to_remap)
                     JobSeekerProfile.objects.bulk_update(
-                        exc.restricted_objects,
+                        restricted_objects,
                         fields=["birth_country", "birth_place", "hexa_commune"],
                     )
                     commune.delete()
@@ -203,7 +208,7 @@ class Command(BaseCommand):
                     # Cached function defined inside handle to avoid shared cache between command runs
                     return guess_commune(code, name)
 
-                for profile in profiles_to_remap:
+                for profile in profiles_to_remap.values():
                     if old_commune_info := getattr(profile, "_birth_place", None):
                         try:
                             new_commune = guess_commune(
@@ -251,7 +256,7 @@ class Command(BaseCommand):
 
                 self.stdout.write(f"Final bulk_update for {len(profiles_to_remap)} profiles")
                 n_objs = JobSeekerProfile.objects.bulk_update(
-                    profiles_to_remap,
+                    profiles_to_remap.values(),
                     fields=["birth_country", "birth_place", "hexa_commune"],
                     batch_size=1_000,
                 )

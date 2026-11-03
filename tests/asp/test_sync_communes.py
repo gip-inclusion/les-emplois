@@ -5,7 +5,7 @@ from textwrap import dedent
 import pytest
 from django.core import management
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from tests.users.factories import JobSeekerFactory
 
@@ -132,3 +132,30 @@ def test_ignore_communes(tmp_path):
     )
     acoua = Commune.unfiltered_objects.get(pk=acoua.pk)
     assert acoua.ignore
+
+
+def test_double_delete(tmp_path):
+    previous_ville_a = Commune.objects.create(code="12345", start_date=datetime.date(2000, 1, 1), name="VILLE-A")
+    previous_ville_b = Commune.objects.create(code="54321", start_date=datetime.date(2000, 1, 1), name="VILLE-B")
+    new_communes_csv = tmp_path / "data.csv"
+    new_communes_csv.write_text(
+        dedent("""\
+        code_com_insee;lib_com;date_deb_insee;date_fin_insee
+        12345;VILLE-A;01/01/1900;
+        54321;VILLE-B;01/01/1900;
+    """)
+    )
+    profile = JobSeekerFactory(
+        jobseeker_profile__hexa_commune=previous_ville_a,
+        jobseeker_profile__birth_place=previous_ville_b,
+        jobseeker_profile__birth_country_id=Country.FRANCE_ID,
+    ).jobseeker_profile
+    profile.refresh_from_db()
+    management.call_command(
+        "sync_communes",
+        file_path=new_communes_csv,
+        wet_run=True,
+    )
+    profile.refresh_from_db()
+    assert profile.hexa_commune.start_date.year == 1900
+    assert profile.birth_place.start_date.year == 1900
