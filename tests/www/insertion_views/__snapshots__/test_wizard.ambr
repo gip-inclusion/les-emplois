@@ -194,6 +194,18 @@
                           Non renseigné
                       </i>
                   </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Droits BRSA
+                      </small>
+                      <div class="flex flex-row align-items-center">
+                          <strong>
+                              <i class="text-disabled">
+                                  Non renseigné
+                              </i>
+                          </strong>
+                      </div>
+                  </li>
               </ul>
           </div>
           <hr class="my-3"/>
@@ -323,6 +335,18 @@
                                       <strong>
                                           5555555A
                                       </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Droits BRSA
+                                      </small>
+                                      <div class="flex flex-row align-items-center">
+                                          <strong>
+                                              <i class="text-disabled">
+                                                  Non renseigné
+                                              </i>
+                                          </strong>
+                                      </div>
                                   </li>
                               </ul>
                           </div>

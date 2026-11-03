@@ -1381,6 +1381,68 @@ class TestOrientationDetailsForSender:
     def get_job_seeker_details_url(self, job_seeker):
         return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
+    CHECKED_AT = datetime.datetime(2026, 11, 5, tzinfo=datetime.UTC)
+
+    @pytest.mark.parametrize(
+        "profile_kwargs,expected,not_expected",
+        [
+            pytest.param(
+                {
+                    "jobseeker_profile__rsa_certified_beneficiary": True,
+                    "jobseeker_profile__rsa_certified_start_date": datetime.date(2024, 8, 1),
+                    "jobseeker_profile__rsa_certification_checked_at": CHECKED_AT,
+                },
+                ["Ouverts depuis le 01/08/2024", "vérifié le 05/11/2026"],
+                ["Fermés"],
+                id="beneficiary",
+            ),
+            pytest.param(
+                {
+                    "jobseeker_profile__rsa_certified_beneficiary": False,
+                    "jobseeker_profile__rsa_certification_checked_at": CHECKED_AT,
+                },
+                ["Fermés", "vérifié le 05/11/2026"],
+                ["Ouverts depuis le 01/08/2024"],
+                id="not_beneficiary",
+            ),
+            pytest.param(
+                {},
+                ["Non renseigné"],
+                ["Ouverts depuis le 01/08/2024", "Fermés", "vérifié le 05/11/2026"],
+                id="never_checked",
+            ),
+            pytest.param(
+                # Identity not found by API Particulier: checked, but still no answer.
+                {"jobseeker_profile__rsa_certification_checked_at": CHECKED_AT},
+                ["vérifié le 05/11/2026"],
+                [
+                    "Ouverts depuis le 01/08/2024",
+                    "Fermés",
+                ],
+                id="checked_without_answer",
+            ),
+        ],
+    )
+    def test_rsa_rights_are_displayed(self, client, profile_kwargs, expected, not_expected):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True, **profile_kwargs)
+        orientation = OrientationFactory(
+            beneficiary=beneficiary,
+            sender=membership.user,
+            sender_prescriber_organization=membership.organization,
+            sender_kind=SenderKind.PRESCRIBER,
+        )
+        assert orientation.status != OrientationStatus.ACCEPTED
+
+        client.force_login(membership.user)
+        response = client.get(self.get_orientation_url(orientation))
+
+        assertContains(response, "Droits BRSA")
+        for fragment in expected:
+            assertContains(response, fragment, html=fragment.startswith("<"))
+        for fragment in not_expected:
+            assertNotContains(response, fragment, html=fragment.startswith("<"))
+
     @freeze_time("2026-07-24")
     def test_detail_basic_dora(self, client, snapshot):
         service = ServiceFactory(
