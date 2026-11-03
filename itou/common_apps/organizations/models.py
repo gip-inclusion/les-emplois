@@ -179,6 +179,17 @@ class OrganizationAbstract(models.Model):
         membership.is_admin = admin
         membership.updated_by = updated_by
         membership.save(update_fields=["is_admin", "updated_by", "updated_at"])
+        logger.info(
+            "User %(updated_by)s set admin role for %(membership)s of organization_id=%(organization_id)d: "
+            "user_id=%(user_id)d is_admin=%(is_admin)s.",
+            {
+                "updated_by": updated_by.pk,
+                "membership": self.members.through._meta.label,
+                "organization_id": self.pk,
+                "user_id": membership.user_id,
+                "is_admin": admin,
+            },
+        )
         if admin:
             self.add_admin_email(membership.user).send()
         else:
