@@ -1,10 +1,9 @@
-import unicodedata
 from datetime import timedelta
 from email.utils import formataddr
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from itoutils.urls import add_url_params
@@ -35,18 +34,6 @@ def can_access_directory(request):
         and organization.insee_city_id
         and organization.insee_city_id in get_directory_active_city_ids()
     )
-
-
-def _normalize_name(value):
-    normalized = unicodedata.normalize("NFKD", value.casefold())
-    without_diacritics = "".join(character for character in normalized if not unicodedata.combining(character))
-    return " ".join(without_diacritics.replace("-", " ").split())
-
-
-def _matches_name(person, query):
-    normalized_name = _normalize_name(person.full_name)
-    # Accept name tokens in any order, including parts of hyphenated names.
-    return all(token in normalized_name for token in _normalize_name(query).split())
 
 
 def _filter_people(people, form):
@@ -84,17 +71,6 @@ def people_results(request, template_name="directory/people_results.html"):
         "directory/includes/people_results.html" if request.htmx else template_name,
         context,
     )
-
-
-@check_request(can_access_directory)
-@readonly_view
-def people_autocomplete(request):
-    term = request.GET.get("term", "").strip()
-    people = get_directory_people(request.current_organization.coords) if term else []
-    results = [
-        {"id": person.recipient_id, "text": person.full_name} for person in people if _matches_name(person, term)
-    ][:20]
-    return JsonResponse({"results": results})
 
 
 def _get_person(request, key):

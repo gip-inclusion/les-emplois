@@ -1,10 +1,9 @@
 from django import forms
-from django.urls import reverse_lazy
+from django_select2.forms import Select2Widget
 
 from itou.directory.enums import ContactSubject
 from itou.directory.models import ContactMessage
 from itou.nexus.enums import NexusStructureKind
-from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
 class PeopleSearchForm(forms.Form):
@@ -12,14 +11,8 @@ class PeopleSearchForm(forms.Form):
         label="Rechercher une personne",
         required=False,
         choices=(),
-        widget=RemoteAutocompleteSelect2Widget(
+        widget=Select2Widget(
             attrs={
-                "data-ajax--cache": "true",
-                "data-ajax--delay": 250,
-                "data-ajax--type": "GET",
-                "data-ajax--url": reverse_lazy("directory:people_autocomplete"),
-                "data-allow-clear": "true",
-                "data-minimum-input-length": 1,
                 "data-placeholder": "Nom ou prénom",
             }
         ),
@@ -31,13 +24,9 @@ class PeopleSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, *args, people=(), **kwargs):
+    def __init__(self, *args, people, **kwargs):
         super().__init__(*args, **kwargs)
-        selected_key = self.data.get(self.add_prefix("q")) if self.is_bound else self.initial.get("q")
-        selected_person = next((person for person in people if person.recipient_id == selected_key), None)
-        self.fields["q"].choices = (
-            [(selected_person.recipient_id, selected_person.full_name)] if selected_person else []
-        )
+        self.fields["q"].choices = ((person.recipient_id, person.full_name) for person in people)
 
 
 class ContactMessageForm(forms.ModelForm):

@@ -107,7 +107,7 @@ def test_people_search_pagination_replaces_results_container(client, mocker):
 
 
 def test_people_search_includes_nearby_other_city(client):
-    _, _, _, city = setup_directory(client)
+    setup_directory(client)
     neighboring_city = City.objects.create(
         name="Ville voisine",
         slug="ville-voisine-56",
@@ -121,56 +121,8 @@ def test_people_search_includes_nearby_other_city(client):
         user=neighbor,
         organization=PrescriberOrganizationFactory(coords=neighboring_city.coords, insee_city=neighboring_city),
     )
-
-    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Claire"})
-    selected_person = autocomplete_response.json()["results"][0]
-    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
-
-    assertContains(response, "Claire Dupont")
-
-
-def test_people_autocomplete_matches_accents_and_hyphenated_name(client):
-    city = create_city_vannes()
-    DirectoryActiveCity.objects.create(city=city)
-    current_user = EmployerFactory(membership=False)
-    CompanyMembershipFactory(user=current_user, company=CompanyFactory(coords=city.coords, insee_city=city))
-    target = PrescriberFactory(
-        membership=False,
-        first_name="Jean-Éloïse",
-        last_name="Martin",
-        email="jean-philippe@example.com",
-        phone="0601020304",
-    )
-    PrescriberMembershipFactory(
-        user=target,
-        organization=PrescriberOrganizationFactory(coords=city.coords, insee_city=city),
-    )
-    client.force_login(current_user)
-
-    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Jean Eloise"})
-    selected_person = autocomplete_response.json()["results"][0]
-    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
-
-    assertContains(response, "Jean-Éloïse Martin")
-
-
-def test_people_autocomplete_is_restricted(client):
-    response = client.get(reverse("directory:people_autocomplete"))
-    assertRedirects(response, f"{reverse('account_login')}?next={reverse('directory:people_autocomplete')}")
-
-
-def test_people_search_filters_by_structure_type(client):
-    _, _, _, city = setup_directory(client)
-    employer = EmployerFactory(membership=False, first_name="Bob", last_name="Durand")
-    CompanyMembershipFactory(
-        user=employer,
-        company=CompanyFactory(kind=CompanyKind.EI, coords=city.coords, insee_city=city, name="Atelier EI"),
-    )
-
-    response = client.get(reverse("directory:people_results"), {"types": NexusStructureKind.EI})
-
-    assertContains(response, "Bob Durand")
-    assertNotContains(response, "Alice Martin")
+    response = client.get(reverse("directory:people_results"))
+    assertContains(response, "<h3>Claire Dupont</h3>", count=1)
 
 
 def test_people_search_shows_nearest_structure_after_type_filter(client):
@@ -189,13 +141,11 @@ def test_people_search_shows_nearest_structure_after_type_filter(client):
 
 def test_people_search_displays_membership_count(client):
     _, target, _, city = setup_directory(client)
-    CompanyMembershipFactory(user=target, company=CompanyFactory(coords=city.coords, insee_city=city))
+    company = CompanyFactory(coords=city.coords, insee_city=city)
+    CompanyMembershipFactory(user=target, company=company)
 
-    autocomplete_response = client.get(reverse("directory:people_autocomplete"), {"term": "Alice"})
-    selected_person = autocomplete_response.json()["results"][0]
-    response = client.get(reverse("directory:people_results"), {"q": selected_person["id"]})
-
-    assertContains(response, "(+ 1 autres structures)")
+    response = client.get(reverse("directory:people_results"))
+    assertContains(response, f"<strong>{company.display_name} (+ 1 autres structures)</strong>", html=True, count=1)
 
 
 def test_directory_nav_is_visible_for_flagged_city(client):
