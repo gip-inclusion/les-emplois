@@ -489,5 +489,32 @@
     },
     "model": "insertion.structure",
     "pk": 17
+  },
+  {
+    "fields": {
+      "accessibilite_lieu": "",
+      "address_line_1": "10 place de l'Eglise",
+      "address_line_2": "",
+      "city": "Lamanon",
+      "coordinates": "SRID=4326;POINT (5.0889 43.6997)",
+      "created_at": "2026-06-22T15:38:20.920Z",
+      "description": "L’association La Belle Verte accompagne les personnes éloignées de l’emploi du pays salonais : apprentissage du français, accompagnement des jeunes et levée des freins périphériques.",
+      "email": "demo.emplois+orienteur@inclusion.gouv.fr",
+      "insee_city": null,
+      "is_active": true,
+      "name": "Association La Belle Verte",
+      "opening_hours": "Mo 08:00-12:00,13:00-17:00;Tu 08:00-12:00,13:00-17:00;We 08:00-12:00,13:00-17:00;Th 08:00-12:00,13:00-17:00;Fr 08:00-12:00,13:00-17:00",
+      "phone": "0100000000",
+      "post_code": "13113",
+      "reseaux_porteurs": [],
+      "siret": "99244211432786",
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/structures/association-la-belle-verte",
+      "uid": "dora--b7e1c4a2-5d93-4f0e-a8c1-2e6b9d4f7a10",
+      "updated_on": "2025-02-17",
+      "website": ""
+    },
+    "model": "insertion.structure",
+    "pk": 18
   }
 ]

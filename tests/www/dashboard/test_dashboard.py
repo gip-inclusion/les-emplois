@@ -19,6 +19,8 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.employee_record.enums import Status
+from itou.insertion.enums import OrientationStatus
+from itou.insertion.models import Orientation
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -33,6 +35,7 @@ from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactor
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
+from tests.insertion.factories import OrientationFactory, ServiceFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
@@ -1242,3 +1245,33 @@ def test_stalled_job_seekers_box(client):
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1
     assertContains(response, "<span>Usager sans solution</span>", count=1)
+
+
+class TestReceivedOrientationsCard:
+    def test_card_displayed_for_matching_organization(self, client):
+        membership = PrescriberMembershipFactory()
+        client.force_login(membership.user)
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, "Orientations reçues")
+
+        service = ServiceFactory(structure__siret=membership.organization.siret)
+        response = client.get(reverse("dashboard:index"))
+        assert self.pending_box_text(response) == "0 orientation à traiter Aucune demande en attente"
+
+        OrientationFactory(service=service)
+        OrientationFactory(
+            service=service,
+            created_at=timezone.now() - timedelta(days=Orientation.REMINDER_EMAIL_DELAY_DAYS + 1),
+        )
+        OrientationFactory(service=service, status=OrientationStatus.ACCEPTED)
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, "Orientations reçues")
+        assertContains(response, reverse("insertion_views:received_orientations"))
+        assertContains(response, '<span class="badge rounded-pill badge-sm bg-info">2 à traiter</span>', html=True)
+        assert self.pending_box_text(response) == (
+            "2 orientations à traiter dont 1 en attente depuis plus de 10 jours"
+        )
+
+    @staticmethod
+    def pending_box_text(response):
+        return " ".join(parse_response_to_soup(response, selector="#received-orientations-pending").get_text().split())

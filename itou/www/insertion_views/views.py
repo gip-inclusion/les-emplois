@@ -3,6 +3,7 @@ import enum
 import functools
 import hashlib
 import logging
+import types
 from collections import defaultdict
 
 from data_inclusion.schema.v1.thematiques import Categorie
@@ -10,14 +11,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import mark_safe
-from django.utils.http import content_disposition_header
+from django.utils.http import content_disposition_header, urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
@@ -34,6 +35,7 @@ from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
     get_orient_for_job_seeker_context,
+    get_received_orientations_structures,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
@@ -57,6 +59,7 @@ from itou.www.insertion_views.forms import (
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
     OrientationsFilterForm,
+    ReceivedOrientationsFilterForm,
     RefusalOrientationForm,
     SendEmailForm,
 )
@@ -718,11 +721,150 @@ def orientation_details_for_service_provider(request):
         "can_view_personal_information": True,
         "can_process": True,
         "has_actions": has_actions,
-        "back_url": None,
+        "back_url": get_safe_url(request, "back_url"),
         "matomo_custom_title": "Détail d’une orientation pour offreur de service",
     }
 
     return render(request, template_name, context)
+
+
+def _valid_process_links():
+    return insertion_models.OrientationProcessLink.objects.filter(
+        created_at__gte=timezone.now()
+        - datetime.timedelta(seconds=insertion_models.OrientationProcessLink.MAX_VALIDITY_SECONDS)
+    ).order_by("-created_at")
+
+
+@readonly_view
+@login_not_required
+def received_orientations(request):
+    """Dashboard listing the orientations received by insertion structures (mockup).
+
+    Reachable either:
+    - by a member of an organization whose SIRET matches insertion structures,
+    - with a process link token: scoped to the structure of the link's orientation.
+    """
+    template_name = "insertion/orientations/received_list.html"
+
+    link = None
+    if token := request.GET.get("token"):
+        link = get_object_or_404(
+            insertion_models.OrientationProcessLink.objects.select_related("orientation__service"),
+            id=token,
+        )
+        if not link.is_valid:
+            # Let the orientation details page offer to generate a new link.
+            return HttpResponseRedirect(
+                reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
+            )
+        structures = insertion_models.Structure.include_inactive.filter(pk=link.orientation.service.structure_id)
+    else:
+        structures = get_received_orientations_structures(request)
+    structures = list(structures.order_by("name"))
+    if not structures:
+        raise Http404
+
+    all_orientations = insertion_models.Orientation.objects.filter(service__structure__in=structures)
+    orientations = all_orientations.select_related(
+        "beneficiary", "sender", "sender_prescriber_organization", "sender_company", "service"
+    ).order_by("-created_at", "-pk")
+    if link:
+        orientations = orientations.prefetch_related(
+            Prefetch("process_links", queryset=_valid_process_links(), to_attr="valid_process_links")
+        )
+
+    filters_form = ReceivedOrientationsFilterForm(all_orientations, request.GET)
+    filters_counter = 0
+    selected_statuses, selected_services = [], []
+    if filters_form.is_valid():
+        orientations = filters_form.filter(orientations)
+        filters_counter = filters_form.get_qs_filters_counter()
+        selected_statuses = filters_form.cleaned_data["statuses"]
+        selected_services = filters_form.cleaned_data["services"]
+
+    # Status counters act as tabs: they follow the services filter, and keep it in their links.
+    counted_orientations = all_orientations
+    if selected_services:
+        counted_orientations = counted_orientations.filter(service__in=selected_services)
+    counts = dict(counted_orientations.values_list("status").annotate(count=Count("pk")).order_by())
+    base_query = {**({"token": link.pk} if link else {}), "services": selected_services}
+
+    def counter_url(**query):
+        return "?" + urlencode({**base_query, **query}, doseq=True)
+
+    total_counter = types.SimpleNamespace(
+        count=sum(counts.values()), selected=not selected_statuses, url=counter_url()
+    )
+    # SimpleNamespace: orientation_state_badge reads a `status` attribute.
+    status_counters = [
+        types.SimpleNamespace(
+            status=status,
+            count=counts.get(status, 0),
+            selected=selected_statuses == [status],
+            url=counter_url(statuses=status.value),
+        )
+        for status in OrientationStatus
+    ]
+    reminder_threshold = timezone.now() - datetime.timedelta(
+        days=insertion_models.Orientation.REMINDER_EMAIL_DELAY_DAYS
+    )
+
+    back_url = request.get_full_path()
+    orientations_page = pager(orientations, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
+    for orientation in orientations_page:
+        if link is None:
+            orientation.details_url = reverse(
+                "insertion_views:open_received_orientation",
+                kwargs={"orientation_id": orientation.pk},
+                query={"back_url": back_url},
+            )
+        elif orientation.valid_process_links:
+            orientation.details_url = reverse(
+                "insertion_views:orientation_details_for_service_provider",
+                query={"token": orientation.valid_process_links[0].pk, "back_url": back_url},
+            )
+        else:
+            orientation.details_url = None
+        orientation.pending_days = (
+            (timezone.now() - orientation.created_at).days
+            if orientation.status == OrientationStatus.PENDING and orientation.created_at < reminder_threshold
+            else None
+        )
+
+    context = {
+        "link": link,
+        "structures": structures,
+        "reset_url": "?" + urlencode({"token": link.pk}) if link else request.path,
+        "orientations_page": orientations_page,
+        "status_counters": status_counters,
+        "total_counter": total_counter,
+        "selected_statuses": selected_statuses,
+        "reminder_delay_days": insertion_models.Orientation.REMINDER_EMAIL_DELAY_DAYS,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
+        "matomo_custom_title": "Orientations reçues par une structure",
+    }
+    return render(
+        request,
+        "insertion/includes/orientations/received_list_orientations.html" if request.htmx else template_name,
+        context,
+    )
+
+
+def open_received_orientation(request, orientation_id):
+    """Give a member of the receiving structure access to the service provider process page."""
+    orientation = get_object_or_404(
+        insertion_models.Orientation,
+        pk=orientation_id,
+        service__structure__in=get_received_orientations_structures(request),
+    )
+    link = _valid_process_links().filter(orientation=orientation).first()
+    if link is None:
+        link = insertion_models.OrientationProcessLink.objects.create(orientation=orientation)
+    query = {"token": link.pk}
+    if back_url := get_safe_url(request, "back_url"):
+        query["back_url"] = back_url
+    return HttpResponseRedirect(reverse("insertion_views:orientation_details_for_service_provider", query=query))
 
 
 @readonly_view

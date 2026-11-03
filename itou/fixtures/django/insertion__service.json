@@ -1309,5 +1309,131 @@
     },
     "model": "insertion.service",
     "pk": 21
+  },
+  {
+    "fields": {
+      "access_conditions_di": "",
+      "address_line_1": "10 place de l'Eglise",
+      "address_line_2": "",
+      "average_orientation_response_delay_days": null,
+      "city": "Lamanon",
+      "contact_email": "demo.emplois+orienteur@inclusion.gouv.fr",
+      "contact_full_name": "Olivier Dupuy",
+      "contact_phone": "0100000000",
+      "coordinates": "SRID=4326;POINT (5.0889 43.6997)",
+      "created_at": "2026-07-06T07:38:01.652Z",
+      "description": "Ateliers collectifs d’apprentissage du français à visée sociale et professionnelle, deux demi-journées par semaine.",
+      "eligibility_zones": "[]",
+      "extra": null,
+      "fee": 1,
+      "fee_details": "",
+      "insee_city": null,
+      "is_active": true,
+      "kind": 137,
+      "lien_mobilisation": "",
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "mobilizations_details": "",
+      "name": "Ateliers sociolinguistiques (ASL)",
+      "nombre_semaines": null,
+      "opening_hours": "",
+      "post_code": "13113",
+      "publics": [
+        130
+      ],
+      "publics_details": "",
+      "receptions": [
+        132
+      ],
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/dora--c2a9e5f1-7b48-4d36-9e0a-3f1b8c6d2e22",
+      "structure": 18,
+      "thematics": [
+        143,
+        146,
+        166,
+        167,
+        184,
+        186,
+        188,
+        198
+      ],
+      "uid": "dora--c2a9e5f1-7b48-4d36-9e0a-3f1b8c6d2e22",
+      "updated_on": "2025-04-24",
+      "volume_horaire_hebdomadaire": null
+    },
+    "model": "insertion.service",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "access_conditions_di": "",
+      "address_line_1": "10 place de l'Eglise",
+      "address_line_2": "",
+      "average_orientation_response_delay_days": null,
+      "city": "Lamanon",
+      "contact_email": "demo.emplois+orienteur@inclusion.gouv.fr",
+      "contact_full_name": "Olivier Dupuy",
+      "contact_phone": "0100000000",
+      "coordinates": "SRID=4326;POINT (5.0889 43.6997)",
+      "created_at": "2026-07-06T07:38:01.652Z",
+      "description": "Accompagnement renforcé des 16-25 ans : projet professionnel, démarches administratives, mobilité et mises en situation professionnelle.",
+      "eligibility_zones": "[]",
+      "extra": null,
+      "fee": 1,
+      "fee_details": "",
+      "insee_city": null,
+      "is_active": true,
+      "kind": 137,
+      "lien_mobilisation": "",
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "mobilizations_details": "",
+      "name": "Accompagnement global des jeunes vers l’emploi",
+      "nombre_semaines": null,
+      "opening_hours": "",
+      "post_code": "13113",
+      "publics": [
+        130
+      ],
+      "publics_details": "",
+      "receptions": [
+        132
+      ],
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/dora--d4f6a8b0-1c3e-4a5b-8d7f-9e0a1b2c3d23",
+      "structure": 18,
+      "thematics": [
+        143,
+        146,
+        166,
+        167,
+        184,
+        186,
+        188,
+        198
+      ],
+      "uid": "dora--d4f6a8b0-1c3e-4a5b-8d7f-9e0a1b2c3d23",
+      "updated_on": "2025-04-24",
+      "volume_horaire_hebdomadaire": null
+    },
+    "model": "insertion.service",
+    "pk": 23
   }
 ]

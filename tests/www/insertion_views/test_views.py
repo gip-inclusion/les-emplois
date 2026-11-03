@@ -2748,3 +2748,193 @@ class TestRegisterMobilizationEvent:
         if message:
             assert json.loads(response.content.decode()) == {"message": message}
         assert MobilizationEvent.objects.exists() is expected_exists
+
+
+class TestReceivedOrientations:
+    @staticmethod
+    def get_url(link, **query):
+        return reverse("insertion_views:received_orientations", query={"token": link.pk, **query})
+
+    def test_invalid_token(self, client):
+        response = client.get(reverse("insertion_views:received_orientations", query={"token": "nope"}))
+        assert response.status_code == 404
+
+    def test_no_matching_structure(self, client):
+        response = client.get(reverse("insertion_views:received_orientations"))
+        assert response.status_code == 404
+
+        membership = PrescriberMembershipFactory()
+        StructureFactory(siret="")  # empty SIRET never matches
+        client.force_login(membership.user)
+        response = client.get(reverse("insertion_views:received_orientations"))
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize("from_employer", [True, False])
+    def test_member_of_matching_organization(self, client, from_employer):
+        membership = CompanyMembershipFactory() if from_employer else PrescriberMembershipFactory()
+        organization = membership.company if from_employer else membership.organization
+        orientation = OrientationFactory(service__structure__siret=organization.siret, beneficiary__first_name="Reçue")
+        OrientationFactory(beneficiary__first_name="AutreStructure")
+        client.force_login(membership.user)
+
+        url = reverse("insertion_views:received_orientations")
+        response = client.get(url)
+        assertContains(response, orientation.beneficiary.get_inverted_full_name())
+        assertNotContains(response, "AutreStructure")
+        open_url = reverse(
+            "insertion_views:open_received_orientation",
+            kwargs={"orientation_id": orientation.pk},
+            query={"back_url": url},
+        )
+        assertContains(response, open_url.replace("&", "&amp;"))
+
+        # Opening an orientation creates a process link and redirects to the process page
+        response = client.get(open_url)
+        link = OrientationProcessLink.objects.get(orientation=orientation)
+        assertRedirects(
+            response,
+            reverse(
+                "insertion_views:orientation_details_for_service_provider",
+                query={"token": link.pk, "back_url": url},
+            ),
+            fetch_redirect_response=False,
+        )
+        # A valid link is reused
+        client.get(open_url)
+        assert OrientationProcessLink.objects.filter(orientation=orientation).count() == 1
+
+    def test_open_orientation_of_another_structure(self, client):
+        membership = PrescriberMembershipFactory()
+        orientation = OrientationFactory()
+        client.force_login(membership.user)
+        response = client.get(
+            reverse("insertion_views:open_received_orientation", kwargs={"orientation_id": orientation.pk})
+        )
+        assert response.status_code == 404
+        assert not OrientationProcessLink.objects.exists()
+
+    def test_expired_token(self, client):
+        link = OrientationProcessLinkFactory(
+            created_at=timezone.now() - datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDITY_SECONDS + 1)
+        )
+        response = client.get(self.get_url(link))
+        assertRedirects(
+            response,
+            reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.pk}),
+            fetch_redirect_response=False,
+        )
+
+    def test_lists_only_structure_orientations(self, client):
+        link = OrientationProcessLinkFactory(orientation__beneficiary__first_name="Origine")
+        structure = link.orientation.service.structure
+        other_service_orientation = OrientationFactory(
+            service=ServiceFactory(structure=structure),
+            beneficiary__first_name="MêmeStructure",
+            status=OrientationStatus.ACCEPTED,
+        )
+        OrientationFactory(beneficiary__first_name="AutreStructure")
+
+        response = client.get(self.get_url(link))
+        assertContains(response, link.orientation.beneficiary.get_inverted_full_name())
+        assertContains(response, other_service_orientation.beneficiary.get_inverted_full_name())
+        assertNotContains(response, "AutreStructure")
+        assertContains(response, "2 résultats")
+
+    def test_details_link_only_with_valid_process_link(self, client):
+        link = OrientationProcessLinkFactory()
+        structure = link.orientation.service.structure
+        without_link = OrientationFactory(service__structure=structure)
+        OrientationProcessLinkFactory(
+            orientation=without_link,
+            id="expired-link",
+            created_at=timezone.now() - datetime.timedelta(seconds=OrientationProcessLink.MAX_VALIDITY_SECONDS + 1),
+        )
+
+        response = client.get(self.get_url(link))
+        details_url = reverse("insertion_views:orientation_details_for_service_provider")
+        assertContains(response, f"{details_url}?token={link.pk}&amp;back_url=")
+        assertNotContains(response, f"{details_url}?token=expired-link")
+
+    def test_filters_and_counters(self, client):
+        link = OrientationProcessLinkFactory(orientation__beneficiary__first_name="EnAttente")
+        structure = link.orientation.service.structure
+        other_service = ServiceFactory(structure=structure, name="Autre service")
+        OrientationFactory(service=other_service, status=OrientationStatus.REFUSED, beneficiary__first_name="Déclinée")
+        OrientationFactory(
+            service=link.orientation.service, status=OrientationStatus.ACCEPTED, beneficiary__first_name="Validée"
+        )
+
+        response = client.get(self.get_url(link))
+        soup = parse_response_to_soup(response, selector="#received-orientations-counters")
+        counters = [" ".join(box.get_text().split()) for box in soup.select(".c-box")]
+        assert counters == [
+            "Total 3",
+            "En cours de traitement 1",
+            "Validée 1",
+            "Expirée 0",
+            "Déclinée 1",
+        ]
+
+        response = client.get(self.get_url(link, statuses=OrientationStatus.REFUSED))
+        assertContains(response, "1 résultat")
+        assertContains(response, "Déclinée")
+        assertNotContains(response, "EnAttente")
+
+        response = client.get(self.get_url(link, services=other_service.pk))
+        assertContains(response, "1 résultat")
+        soup = parse_response_to_soup(response, selector="#received-orientations-counters")
+        counters = [" ".join(box.get_text().split()) for box in soup.select(".c-box")]
+        assert counters == [
+            "Total 1",
+            "En cours de traitement 0",
+            "Validée 0",
+            "Expirée 0",
+            "Déclinée 1",
+        ]
+        # Counter links keep the services filter
+        assertContains(response, f"services={other_service.pk}&amp;statuses=")
+        assertNotContains(response, "Validée</a>")
+
+    def test_late_pending_orientation(self, client):
+        link = OrientationProcessLinkFactory(
+            orientation__created_at=timezone.now() - datetime.timedelta(days=Orientation.REMINDER_EMAIL_DELAY_DAYS + 1)
+        )
+        response = client.get(self.get_url(link))
+        assertContains(response, f"Depuis {Orientation.REMINDER_EMAIL_DELAY_DAYS + 1} jours")
+
+    def test_details_page_links_to_dashboard(self, client):
+        link = OrientationProcessLinkFactory()
+        response = client.get(
+            reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.pk})
+        )
+        assertContains(response, f"{reverse('insertion_views:received_orientations')}?token={link.pk}")
+
+    @freeze_time("2026-07-24")
+    def test_display(self, client, snapshot):
+        structure = StructureFactory(name="Structure à cuire")
+        link = OrientationProcessLinkFactory(
+            id="1111111111zzzzzzzzzz3333333333_4",
+            orientation__id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            orientation__for_snapshot=True,
+            orientation__service__structure=structure,
+            orientation__created_at=datetime.datetime(2026, 7, 1, tzinfo=datetime.UTC),
+        )
+        OrientationFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-555555555555"),
+            service=ServiceFactory(structure=structure, name="Sers vis"),
+            beneficiary__first_name="Mary",
+            beneficiary__last_name="Astell",
+            sender=link.orientation.sender,
+            sender_prescriber_organization=link.orientation.sender_prescriber_organization,
+            status=OrientationStatus.ACCEPTED,
+            created_at=datetime.datetime(2026, 7, 20, tzinfo=datetime.UTC),
+            processing_date=datetime.datetime(2026, 7, 22, tzinfo=datetime.UTC),
+        )
+
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(reverse("insertion_views:received_orientations", query={"token": link.pk}))
+        soup = parse_response_to_soup(response, selector="#main")
+        for option in soup.select("input[name=services]"):
+            if option["value"]:
+                option["value"] = "[PK of Service]"
+        assert pretty_indented(soup) == snapshot(name="page")

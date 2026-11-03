@@ -2,7 +2,7 @@ import datetime
 
 from django.utils import timezone
 
-from itou.insertion.models import Orientation
+from itou.insertion.models import Orientation, OrientationProcessLink
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 
@@ -20,7 +20,22 @@ ORIENTATION_AGES_IN_DAYS = {
     "d2a7c93e-15f8-4b60-8e4d-9b3f0a61c5e8": (30, 27, 27),
     "6e19b4d0-a3c7-4f85-b2d1-3c8e7f0a9d46": (12, 8, 8),
     "f3c05d8a-9e21-4a7b-b64f-0d2e8c17a593": (50, 20, None),
+    # Orientations received by "Association La Belle Verte" (organization of the demo orienteur account),
+    # for the service provider dashboard
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d01": (1, 1, None),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d02": (4, 4, None),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d03": (13, 13, None),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d04": (18, 8, None),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d05": (21, 17, 17),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d06": (9, 6, 6),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d07": (35, 30, 30),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d08": (16, 12, 12),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d09": (7, 5, 5),
+    "a1f3c2d4-0b5e-4c6a-9d7e-1f2a3b4c5d10": (40, 10, None),
 }
+
+# Process links giving access to the service provider dashboard in demo environments
+DEMO_PROCESS_LINK_PREFIX = "demo-"
 
 
 def update_orientation_dates():
@@ -41,6 +56,9 @@ def update_orientation_dates():
             updated_at=days_ago(updated),
             processing_date=days_ago(processed),
         )
+
+    # Keep demo process links valid after each demo reset
+    OrientationProcessLink.objects.filter(pk__startswith=DEMO_PROCESS_LINK_PREFIX).update(created_at=now)
 
     for assignment in JobSeekerAssignment.objects.filter(last_action_kind=ActionKind.ORIENT):
         last_orientation = (

@@ -50,7 +50,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -327,6 +327,19 @@
           FROM "search_savedsearch"
           WHERE "search_savedsearch"."user_id" = %s
           ORDER BY "search_savedsearch"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "insertion_structure"
+          WHERE ("insertion_structure"."is_active"
+                 AND "insertion_structure"."siret" = %s)
+          LIMIT 1
         ''',
       }),
       dict({

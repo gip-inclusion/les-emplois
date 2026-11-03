@@ -1,0 +1,72 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+
+{% block meta_robots %}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+{% block title %}Orientations reçues {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Orientations reçues</h1>
+            <p>
+                {% for structure in structures %}
+                    {{ structure.name }}
+                    {% if not forloop.last %}·{% endif %}
+                {% endfor %}
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% component_alert content=content variant="info" %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Retrouvez ici toutes les demandes d’orientation reçues par les services de votre structure, ainsi que leur statut.
+                Les demandes en attente depuis plus de {{ reminder_delay_days }} jours sont signalées.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    {% include "insertion/includes/orientations/received_list_counters.html" %}
+
+                    {# Filters #}
+                    <form hx-get="{{ request.path }}"
+                          hx-trigger="change delay:.5s"
+                          hx-indicator="#received-orientations-section"
+                          hx-target="#received-orientations-section"
+                          hx-swap="outerHTML"
+                          hx-push-url="true">
+                        {% if link %}{{ filters_form.token }}{% endif %}
+                        {% for status in selected_statuses %}<input type="hidden" name="statuses" value="{{ status }}">{% endfor %}
+                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                            {% if filters_form.services.field.choices|length > 1 %}
+                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.services only %}
+                            {% endif %}
+                            {% include "insertion/includes/orientations/received_list_reset_filters.html" with filters_counter=filters_counter reset_url=reset_url request=request only %}
+                        </div>
+                    </form>
+
+                    {% include "insertion/includes/orientations/received_list_orientations.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+{% endblock %}

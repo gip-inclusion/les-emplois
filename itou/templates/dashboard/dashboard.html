@@ -240,6 +240,10 @@
                                 {% endif %}
                                 {# end of if user.is_job_seeker #}
 
+                                {% if received_orientations_pending_count is not None %}
+                                    {% include "dashboard/includes/received_orientations_card.html" with pending_count=received_orientations_pending_count late_count=received_orientations_late_count reminder_delay_days=received_orientations_reminder_delay_days only %}
+                                {% endif %}
+
                                 {% if request.from_prescriber %}
                                     {% include "dashboard/includes/prescriber_job_applications_card.html" %}
                                     {% if request.current_organization.is_authorized %}

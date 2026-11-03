@@ -5,7 +5,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.files.forms import ItouMultiFileField
 from itou.insertion.enums import OrientationRefusalReason, OrientationStatus
-from itou.insertion.models import Orientation
+from itou.insertion.models import Orientation, Service
 from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -214,6 +214,34 @@ class OrientationsFilterForm(forms.Form):
 
     def get_qs_filters_counter(self):
         return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+
+
+class ReceivedOrientationsFilterForm(forms.Form):
+    token = forms.CharField(required=False, widget=forms.HiddenInput)
+    statuses = forms.MultipleChoiceField(
+        label="Statut", required=False, choices=OrientationStatus, widget=forms.CheckboxSelectMultiple
+    )
+    services = forms.MultipleChoiceField(label="Service", required=False, widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, orientations_qs, data, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
+        # Only offer services which received orientations.
+        self.fields["services"].choices = list(
+            Service.include_inactive.filter(pk__in=orientations_qs.values("service"))
+            .order_by("name")
+            .values_list("pk", "name")
+        )
+
+    def filter(self, queryset):
+        filters = []
+        if statuses := self.cleaned_data.get("statuses"):
+            filters.append(Q(status__in=statuses))
+        if services := self.cleaned_data.get("services"):
+            filters.append(Q(service__in=services))
+        return queryset.filter(*filters)
+
+    def get_qs_filters_counter(self):
+        return sum(bool(self.cleaned_data.get(name)) for name in ("statuses", "services"))
 
 
 class RefusalOrientationForm(forms.ModelForm):

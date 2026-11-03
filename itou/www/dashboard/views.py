@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
-from django.db.models import F, Value
+from django.db.models import Count, F, Q, Value
 from django.db.models.base import Coalesce
 from django.db.models.functions import NullIf
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
@@ -29,6 +29,9 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.insertion.enums import OrientationStatus
+from itou.insertion.models import Orientation
+from itou.insertion.utils import get_received_orientations_structures
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
@@ -174,7 +177,19 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "siae_suspension_text_with_dates": None,
         "company_search_form": CompanySearchForm(),
         "stalled_job_seekers_count": None,
+        "received_orientations_pending_count": None,
     }
+
+    if request.from_employer or request.from_prescriber:
+        received_orientations_structures = get_received_orientations_structures(request)
+        if received_orientations_structures.exists():
+            reminder_threshold = timezone.now() - timezone.timedelta(days=Orientation.REMINDER_EMAIL_DELAY_DAYS)
+            counts = Orientation.objects.filter(
+                service__structure__in=received_orientations_structures, status=OrientationStatus.PENDING
+            ).aggregate(pending=Count("pk"), late=Count("pk", filter=Q(created_at__lt=reminder_threshold)))
+            context["received_orientations_pending_count"] = counts["pending"]
+            context["received_orientations_late_count"] = counts["late"]
+            context["received_orientations_reminder_delay_days"] = Orientation.REMINDER_EMAIL_DELAY_DAYS
 
     if request.from_employer:
         context.update(_employer_dashboard_context(request))

@@ -35,6 +35,14 @@
             <p>Demande d’orientation - Émise le {{ orientation.created_at|date:"d/m/Y" }}</p>
         {% endfragment %}
         {% fragment as c_title__cta %}
+            {% if can_process %}
+                <a href="{% url "insertion_views:received_orientations" %}?token={{ link.pk }}"
+                   class="btn btn-lg btn-ico btn-secondary"
+                   {% matomo_event "orientation-detail" "clic" "voir-orientations-recues" %}>
+                    <i class="ri-inbox-line ri-lg" aria-hidden="true"></i>
+                    <span>Toutes les orientations reçues</span>
+                </a>
+            {% endif %}
             {% if orientation.service.is_active %}
                 <a href="{% url "insertion_views:service_detail" service_uid=orientation.service.uid %}?back_url={{ request.get_full_path|urlencode }}"
                    class="btn btn-lg btn-secondary"

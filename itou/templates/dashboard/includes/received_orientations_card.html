@@ -1,0 +1,38 @@
+{% load components %}
+{% load str_filters %}
+
+<div class="col mb-3 mb-md-4">
+    {% component_box_dashboard title=title title_badge=title_badge extra_boxes=extra_boxes cta=cta %}
+        {% fragment as title %}
+            Orientations reçues
+        {% endfragment %}
+        {% fragment as title_badge %}
+            {% if pending_count %}<span class="badge rounded-pill badge-sm bg-info">{{ pending_count }} à traiter</span>{% endif %}
+        {% endfragment %}
+        {% fragment as cta %}
+            <a href="{% url 'insertion_views:received_orientations' %}?statuses=OUVERTE"
+               class="d-flex align-items-center gap-3 p-3 rounded {% if pending_count %}bg-danger-lightest border border-2 border-danger{% else %}bg-emploi-lightest{% endif %} text-reset text-decoration-none mb-3"
+               id="received-orientations-pending">
+                <span class="h1 mb-0 lh-1 {% if pending_count %}text-danger{% endif %}">{{ pending_count }}</span>
+                <span>
+                    <span class="d-block fw-bold{% if pending_count %} text-danger{% endif %}">orientation{{ pending_count|pluralizefr }} à traiter</span>
+                    {% if late_count %}
+                        <span class="d-block fs-sm text-secondary">
+                            <i class="ri-time-line" aria-hidden="true"></i>
+                            dont {{ late_count }} en attente depuis plus de {{ reminder_delay_days }} jours
+                        </span>
+                    {% elif not pending_count %}
+                        <span class="d-block fs-sm">Aucune demande en attente</span>
+                    {% endif %}
+                </span>
+            </a>
+        {% endfragment %}
+        {% fragment as extra_boxes %}
+            <a href="{% url 'insertion_views:received_orientations' %}"
+               class="btn btn-outline-primary btn-block btn-ico">
+                <i class="ri-inbox-line ri-lg fw-normal" aria-hidden="true"></i>
+                <span>Voir toutes les orientations reçues</span>
+            </a>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
+</div>

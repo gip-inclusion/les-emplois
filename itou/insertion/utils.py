@@ -3,6 +3,7 @@ import contextlib
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
+from itou.insertion.models import Structure
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.users.perms import can_orient_towards_insertion_service
@@ -52,3 +53,14 @@ def get_orient_for_job_seeker_context(request) -> dict:
         "can_view_personal_information": can_view,
         "can_orient_towards_insertion_service": can_orient_towards_insertion_service(request),
     }
+
+
+def get_received_orientations_structures(request):
+    """Insertion structures whose received orientations the current organization may see.
+
+    Organizations and insertion structures are not linked yet: match them on SIRET.
+    """
+    organization = getattr(request, "current_organization", None)
+    if not request.user.is_authenticated or organization is None or not organization.siret:
+        return Structure.objects.none()
+    return Structure.objects.filter(siret=organization.siret)

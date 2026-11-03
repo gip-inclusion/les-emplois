@@ -1,0 +1,33 @@
+{% load badges %}
+
+{# Status counters, acting as a status filter #}
+<nav aria-label="Filtrer par statut"
+     id="received-orientations-counters"
+     {% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <ul class="list-unstyled row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-3 mb-md-4">
+        <li class="col">
+            <div class="c-box h-100 position-relative{% if total_counter.selected %} border-primary{% endif %}">
+                <p class="fs-sm fw-bold mb-2">Total</p>
+                <p class="h2 mb-0">
+                    <a href="{{ total_counter.url }}"
+                       class="stretched-link text-reset text-decoration-none"
+                       aria-label="Afficher toutes les orientations"
+                       {% if total_counter.selected %}aria-current="true"{% endif %}>{{ total_counter.count }}</a>
+                </p>
+            </div>
+        </li>
+        {% for counter in status_counters %}
+            <li class="col">
+                <div class="c-box h-100 position-relative{% if counter.selected %} border-primary{% endif %}">
+                    <p class="mb-2">{% orientation_state_badge counter extra_classes="badge-xs" %}</p>
+                    <p class="h2 mb-0">
+                        <a href="{{ counter.url }}"
+                           class="stretched-link text-reset text-decoration-none"
+                           aria-label="Afficher les orientations au statut {{ counter.status.label }}"
+                           {% if counter.selected %}aria-current="true"{% endif %}>{{ counter.count }}</a>
+                    </p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
