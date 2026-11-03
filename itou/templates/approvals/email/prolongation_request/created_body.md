@@ -23,7 +23,7 @@ L'employeur souhaite vous apporter des explications supplémentaires par télép
 - Motif de prolongation : {{ prolongation_request.get_reason_display }}
 {% if prolongation_request.report_file %}- Fiche bilan : {{ report_file_url }}{% endif %}
 
-Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur {{ prolongation_request.prescriber_organization.display_name }} sur {% brand %}, à la rubrique "Gérer mes prolongations de PASS IAE".
+Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur {{ prolongation_request.prescriber_organization.display_name }} sur {% brand %} : depuis la page d’accueil, rendez-vous dans la rubrique « Accompagnements », puis « Prolongations de PASS IAE ».
 
 Précisions en cas de refus :
 
