@@ -141,11 +141,16 @@ def test_people_search_shows_nearest_structure_after_type_filter(client):
 
 def test_people_search_displays_membership_count(client):
     _, target, _, city = setup_directory(client)
-    company = CompanyFactory(coords=city.coords, insee_city=city)
+    company = CompanyFactory(
+        coords=city.coords,
+        insee_city=city,
+        # Sorts before Mission Locale de Vannes.
+        name="Les petits paniers",
+    )
     CompanyMembershipFactory(user=target, company=company)
 
     response = client.get(reverse("directory:people_results"))
-    assertContains(response, f"<strong>{company.display_name} (+ 1 autres structures)</strong>", html=True, count=1)
+    assertContains(response, "<strong>Les petits paniers (+ 1 autres structures)</strong>", html=True, count=1)
 
 
 def test_directory_nav_is_visible_for_flagged_city(client):
