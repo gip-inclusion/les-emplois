@@ -1107,6 +1107,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "rsa_allocation_since",
                     "ass_allocation_since",
                     "aah_allocation_since",
+                    "rsa_certified_beneficiary",
+                    "rsa_certified_start_date",
+                    "rsa_certification_checked_at",
+                    "rsa_last_certification_attempt_at",
                 )
             },
         ),
@@ -1176,6 +1180,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             "disabled_notifications",
             "creation_source",
             "fields_history_formatted",
+            "rsa_certified_beneficiary",
+            "rsa_certified_start_date",
+            "rsa_certification_checked_at",
+            "rsa_last_certification_attempt_at",
         ]
 
     def get_search_fields(self, request):
