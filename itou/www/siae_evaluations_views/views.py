@@ -499,6 +499,7 @@ def evaluated_job_application(
             "job_application",
             "job_application__approval",
             "job_application__job_seeker",
+            "job_application__job_seeker__jobseeker_profile",
         )
         .select_related("evaluated_siae__evaluation_campaign", "evaluated_siae__siae"),
         pk=evaluated_job_application_pk,
@@ -645,6 +646,7 @@ def siae_job_applications_list(
             "evaluated_siae__siae",
             "job_application",
             "job_application__job_seeker",
+            "job_application__job_seeker__jobseeker_profile",
             "job_application__approval",
         )
         .prefetch_related("evaluated_administrative_criteria")

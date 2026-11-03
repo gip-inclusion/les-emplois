@@ -85,7 +85,8 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
 
         job_seeker_public_id = self.hire_session.get("job_seeker_public_id") or request.GET.get("job_seeker_public_id")
         self.job_seeker = get_object_or_404(
-            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+            User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
+            public_id=job_seeker_public_id,
         )
         if "job_seeker_public_id" not in self.hire_session:
             self.hire_session.set("job_seeker_public_id", job_seeker_public_id)

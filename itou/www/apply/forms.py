@@ -1024,7 +1024,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         ),
     )
     job_seeker = forms.ModelChoiceField(
-        queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
+        queryset=User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
         label="Nom de l’usager",
         required=False,
         widget=RemoteAutocompleteSelect2Widget(
