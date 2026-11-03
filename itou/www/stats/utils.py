@@ -8,6 +8,7 @@ from itou.institutions.models import Institution
 from itou.metabase.models import DatumKey
 from itou.prescribers.enums import DTFT_SAFIR_CODE_TO_DEPARTMENTS, PrescriberOrganizationKind
 from itou.users.enums import UserKind
+from itou.utils.perms.prescriber import is_authorized_ft_prescriber
 
 
 STATS_PH_ORGANISATION_KIND_WHITELIST = [
@@ -82,7 +83,7 @@ def can_view_stats_cd(request):
 
 
 def can_view_stats_ft(request):
-    return request.from_authorized_prescriber and request.current_organization.kind == PrescriberOrganizationKind.FT
+    return is_authorized_ft_prescriber(request)
 
 
 def can_view_stats_ph(request):

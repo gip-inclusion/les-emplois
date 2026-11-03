@@ -497,10 +497,13 @@ class SuspensionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
-        self.siae = kwargs.pop("siae")
+        # A suspension is created either by an employer (cf. siae) or by an authorized FT prescriber
+        # (cf. prescriber_organization); exactly one of them is set.
+        self.siae = kwargs.pop("siae", None)
+        self.prescriber_organization = kwargs.pop("prescriber_organization", None)
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
-        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices(self.siae)
 
         # When the jobseeker has an ongoing contract (according to ASP data), the suspension must not indicate that the
         # contract is broken or finished.
@@ -531,6 +534,7 @@ class SuspensionForm(forms.ModelForm):
             referent_date = today
             suspension_pk = None
             self.instance.siae = self.siae
+            self.instance.prescriber_organization = self.prescriber_organization
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
@@ -588,9 +592,8 @@ class SuspensionEndDateForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, approval, instance, siae, **kwargs):
+    def __init__(self, *args, approval, instance, **kwargs):
         self.approval = approval
-        self.siae = siae
         self.instance = instance
         super().__init__(*args, **kwargs)
 
