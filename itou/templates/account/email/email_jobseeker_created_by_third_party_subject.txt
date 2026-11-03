@@ -1,1 +1,2 @@
-Création de votre compte usager
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}Création de votre compte usager{% endblock %}

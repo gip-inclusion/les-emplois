@@ -1,6 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-
-    Vous venez de valider une demande 🎉
-
-{% endblock %}
+{% block subject %}Vous venez de valider une demande 🎉{% endblock %}
