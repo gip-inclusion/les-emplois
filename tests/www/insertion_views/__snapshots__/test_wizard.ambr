@@ -212,6 +212,16 @@
                           Non renseigné
                       </i>
                   </li>
+                  <li class="has-forced-line-break">
+                      <small>
+                          Droits BRSA
+                      </small>
+                      <strong>
+                          <i class="text-disabled">
+                              Non renseigné
+                          </i>
+                      </strong>
+                  </li>
               </ul>
           </div>
           <hr class="my-3"/>
@@ -358,6 +368,16 @@
                                       </small>
                                       <strong>
                                           5555555A
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Droits BRSA
+                                      </small>
+                                      <strong>
+                                          <i class="text-disabled">
+                                              Non renseigné
+                                          </i>
                                       </strong>
                                   </li>
                               </ul>
