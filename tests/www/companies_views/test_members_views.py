@@ -349,7 +349,7 @@ class TestUserMembershipDeactivation:
 
 
 class TestCompanyAdminMembersManagement:
-    def test_add_admin(self, client, mailoutbox):
+    def test_add_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to add another admin to the company
         """
@@ -371,7 +371,12 @@ class TestCompanyAdminMembersManagement:
         company.refresh_from_db()
         assert_set_admin_role_creation(guest, company, mailoutbox)
 
-    def test_remove_admin(self, client, mailoutbox):
+        assert (
+            f"User {admin.pk} set admin role for companies.CompanyMembership of "
+            f"organization_id={company.pk}: user_id={guest.pk} is_admin=True."
+        ) in caplog.messages
+
+    def test_remove_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
         """
@@ -397,6 +402,11 @@ class TestCompanyAdminMembersManagement:
 
         company.refresh_from_db()
         assert_set_admin_role_removal(guest, company, mailoutbox)
+
+        assert (
+            f"User {admin.pk} set admin role for companies.CompanyMembership of "
+            f"organization_id={company.pk}: user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
     def test_admin_management_permissions(self, client):
         """

@@ -127,7 +127,7 @@ class TestMembers:
         response = client.get(url)
         assertContains(response, self.MORE_ADMIN_MSG)
 
-    def test_add_admin(self, client, mailoutbox):
+    def test_add_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to add another admin to the company
         """
@@ -148,6 +148,11 @@ class TestMembers:
 
         institution.refresh_from_db()
         assert_set_admin_role_creation(guest, institution, mailoutbox)
+
+        assert (
+            f"User {admin.pk} set admin role for institutions.InstitutionMembership of "
+            f"organization_id={institution.pk}: user_id={guest.pk} is_admin=True."
+        ) in caplog.messages
 
     def test_deactivate_user(self, caplog, client, mailoutbox, snapshot):
         institution = InstitutionFactory(name="DDETS 14")
@@ -276,7 +281,7 @@ class TestMembers:
         invitation.refresh_from_db()
         assert invitation.has_expired is True
 
-    def test_remove_admin(self, client, mailoutbox):
+    def test_remove_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
         """
@@ -304,6 +309,11 @@ class TestMembers:
 
         institution.refresh_from_db()
         assert_set_admin_role_removal(guest, institution, mailoutbox)
+
+        assert (
+            f"User {admin.pk} set admin role for institutions.InstitutionMembership of "
+            f"organization_id={institution.pk}: user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
     def test_suspicious_action(self, client):
         suspicious_action = "h4ckm3"

@@ -6,7 +6,7 @@ from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFac
 
 
 class TestPrescribersOrganizationAdminMembersManagement:
-    def test_add_admin(self, client, mailoutbox):
+    def test_add_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to add another admin to the organization
         """
@@ -28,7 +28,12 @@ class TestPrescribersOrganizationAdminMembersManagement:
         organization.refresh_from_db()
         assert_set_admin_role_creation(guest, organization, mailoutbox)
 
-    def test_remove_admin(self, client, mailoutbox):
+        assert (
+            f"User {admin.pk} set admin role for prescribers.PrescriberMembership of "
+            f"organization_id={organization.pk}: user_id={guest.pk} is_admin=True."
+        ) in caplog.messages
+
+    def test_remove_admin(self, caplog, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
         """
@@ -54,6 +59,11 @@ class TestPrescribersOrganizationAdminMembersManagement:
 
         organization.refresh_from_db()
         assert_set_admin_role_removal(guest, organization, mailoutbox)
+
+        assert (
+            f"User {admin.pk} set admin role for prescribers.PrescriberMembership of "
+            f"organization_id={organization.pk}: user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
     def test_admin_management_permissions(self, client):
         """
