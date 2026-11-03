@@ -1275,14 +1275,22 @@ class TestCanViewExternalAction(TestCase):
 class TestContracts:
     @freeze_time("2025-08-07")
     @pytest.mark.parametrize(
-        "user_factory",
+        "user_factory,has_ongoing_contract",
         [
-            partial(PrescriberFactory, membership__organization__authorized=True),
-            partial(EmployerFactory, membership__company__subject_to_iae_rules=True),
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(EmployerFactory, membership__company__subject_to_iae_rules=True), False),
+            (
+                partial(
+                    EmployerFactory,
+                    membership__company__kind=CompanyKind.EI,
+                    membership__company__name="Hair Jordan",
+                ),
+                True,
+            ),
         ],
-        ids=["authorized prescriber", "siae"],
+        ids=["authorized prescriber", "siae without ongoing contract", "siae with ongoing contract"],
     )
-    def test_for_authorized_prescriber_or_employer(self, client, snapshot, user_factory):
+    def test_for_authorized_prescriber_or_employer(self, client, snapshot, user_factory, has_ongoing_contract):
         approval = ApprovalFactory(
             for_snapshot=True,
             start_at="2025-01-01",
@@ -1326,6 +1334,15 @@ class TestContracts:
             company__kind=CompanyKind.EI,
         )  # approval inside contract dates
 
+        # An employer needs an ongoing contract with the job seeker to view their contracts
+        if (company := user.company_set.first()) and has_ongoing_contract:
+            ContractFactory(
+                company=company,
+                job_seeker=job_seeker,
+                start_date="2024-10-01",
+                end_date=None,
+            )
+
         client.force_login(user)
         response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
         assert (
@@ -1362,7 +1379,7 @@ class TestContracts:
         # Not displayed contract (ended more than 2 years ago)
         ContractFactory(end_date="2024-11-03")
 
-        # Displayed contract
+        # Displayed contracts
         ContractFactory(
             company__name="Tif'any",
             job_seeker=job_seeker,
@@ -1370,6 +1387,14 @@ class TestContracts:
             end_date="2025-08-07",
             company__kind=CompanyKind.EI,
         )
+
+        if company := user.company_set.first():
+            ContractFactory(
+                company=company,
+                job_seeker=job_seeker,
+                start_date="2025-02-01",
+                end_date=None,
+            )
 
         client.force_login(user)
         response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))

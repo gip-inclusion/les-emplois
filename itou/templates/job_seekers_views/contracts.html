@@ -24,58 +24,71 @@
         <div class="s-section__container container">
             <h2>Contrats IAE</h2>
 
-            {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
-                {% fragment as title %}
-                    Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
-                {% endfragment %}
-                {% fragment as content %}
-                    <p class="mb-0">Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.</p>
-                {% endfragment %}
-            {% endcomponent_alert %}
-
-            {% if approval_missing_or_expired %}
-                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
-                    {% fragment as c_info__summary %}
-                        Cette personne n’a pas de PASS IAE en cours de validité.
+            {% if request.from_authorized_prescriber or has_ongoing_contract %}
+                {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
                     {% endfragment %}
-                    {% fragment as c_info__detail %}
-                        <p class="mb-0">Seuls les contrats IAE de l’usager des 2 dernières années sont affichés.</p>
+                    {% fragment as content %}
+                        <p class="mb-0">Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.</p>
                     {% endfragment %}
-                {% endcomponent_info %}
-            {% endif %}
+                {% endcomponent_alert %}
 
-            {% for contract in contracts %}
-                <div class="c-box c-box--results mb-3 mb-md-4">
-                    <div class="c-box--results__header">
-                        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                            <div class="c-box--results__summary flex-grow-1">
-                                <i class="{{ contract.company.icon }}" aria-hidden="true"></i>
-                                <div>
-                                    <span>{{ contract.company.kind }}</span>
-                                    <h3>{{ contract.company.display_name }}</h3>
+                {% if approval_missing_or_expired %}
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Cette personne n’a pas de PASS IAE en cours de validité.
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
+                            <p class="mb-0">Seuls les contrats IAE de l’usager des 2 dernières années sont affichés.</p>
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                {% endif %}
+
+                {% for contract in contracts %}
+                    <div class="c-box c-box--results mb-3 mb-md-4">
+                        <div class="c-box--results__header">
+                            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                <div class="c-box--results__summary flex-grow-1">
+                                    <i class="{{ contract.company.icon }}" aria-hidden="true"></i>
+                                    <div>
+                                        <span>{{ contract.company.kind }}</span>
+                                        <h3>{{ contract.company.display_name }}</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="align-self-center">
-                                <span>
-                                    <i class="ri-calendar-line ri-lg fw-normal" aria-hidden="true"></i>
+                                <div class="align-self-center">
+                                    <span>
+                                        <i class="ri-calendar-line ri-lg fw-normal" aria-hidden="true"></i>
 
-                                    {% if contract.end_date %}
-                                        Du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}
-                                    {% else %}
-                                        Depuis le {{ contract.start_date|date:"d/m/Y" }}
-                                    {% endif %}
-                                </span>
+                                        {% if contract.end_date %}
+                                            Du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}
+                                        {% else %}
+                                            Depuis le {{ contract.start_date|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% empty %}
-                <div class="c-box c-box--results mb-3 mb-md-4">
-                    <div class="c-box--results__body">
-                        <p class="mb-0">Aucun contrat IAE n’a été trouvé. Cela peut s’expliquer par l’absence d’enregistrement dans l’Extranet ou par une impossibilité de récupération des données.</p>
+                {% empty %}
+                    <div class="c-box c-box--results mb-3 mb-md-4">
+                        <div class="c-box--results__body">
+                            <p class="mb-0">Aucun contrat IAE n’a été trouvé. Cela peut s’expliquer par l’absence d’enregistrement dans l’Extranet ou par une impossibilité de récupération des données.</p>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
+                        Les contrats IAE sont consultables par les prescripteurs habilités et par l’employeur de cet usager.
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            Pour l’employeur, ces informations sont consultables une fois le contrat récupéré depuis l’ASP et ne le sont plus lorsque le contrat est terminé.
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
         </div>
     </section>
 {% endblock %}
