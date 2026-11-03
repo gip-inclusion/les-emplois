@@ -1,0 +1,8 @@
+{% extends "insertion/orientations/details.html" %}
+
+{% block title_content %}
+    {{ block.super }}
+    {% if peut_traiter or accompagnement %}
+        {% include "inclusion_pass/offreur/_orientation_actions.html" with orientation=orientation accompagnement=accompagnement peut_traiter=peut_traiter csrf_token=csrf_token request=request only %}
+    {% endif %}
+{% endblock title_content %}

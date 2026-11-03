@@ -1,0 +1,32 @@
+<div class="c-box">
+    <div class="table-responsive">
+        <table class="table mb-0 position-relative" aria-labelledby="{{ titre_id }}">
+            <thead>
+                <tr>
+                    <th scope="col">Personne</th>
+                    <th scope="col">Début</th>
+                    <th scope="col">Fin</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for accompagnement in accompagnements %}
+                    <tr>
+                        <td>{{ accompagnement.personne.get_full_name }}</td>
+                        <td>{{ accompagnement.started_at|date:"d/m/Y" }}</td>
+                        <td>{{ accompagnement.ended_at|date:"d/m/Y"|default:"-" }}</td>
+                        <td class="text-end text-nowrap">
+                            <a href="{% url 'inclusion_pass:fiche' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Fiche<span class="visually-hidden"> de {{ accompagnement.personne.get_full_name }}</span></a>
+                            ·
+                            <a href="{% url 'inclusion_pass:bilan_intervention' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Bilan<span class="visually-hidden"> de {{ accompagnement.personne.get_full_name }}</span></a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Aucun accompagnement.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

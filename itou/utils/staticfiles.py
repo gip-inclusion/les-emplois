@@ -106,6 +106,20 @@ ASSET_INFOS = {
             ],
         },
     },
+    "chart.js": {
+        "download": {
+            "url": "https://registry.npmjs.org/chart.js/-/chart.js-4.4.7.tgz",
+            "sha256": "af01b7afdbb70017c079b0dc78ef883f860d28fa2644ed78906a39090d07134f",
+        },
+        "extract": {
+            "origin": "package",
+            "destination": "vendor/chart.js",
+            "files": [
+                "LICENSE.md",
+                ("dist/chart.umd.js", "chart.umd.js"),
+            ],
+        },
+    },
     "jquery": {
         "download": {
             "url": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",

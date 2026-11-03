@@ -1,0 +1,22 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}QR code d’accueil{% endblock page_title %}
+{% block h1 %}{{ offreur.nom }}{% endblock h1 %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/_offreur_nav.html" with active="qr_code" offreur=offreur request=request only %}
+{% endblock title_extra %}
+
+{% block pass_content %}
+    <div class="c-box text-center">
+        <h2 class="h3">QR code à afficher dans vos locaux</h2>
+        <p>
+            Le même QR code sert pour toutes les personnes que vous accueillez : imprimez-le et affichez-le à l’accueil.
+            <br class="d-none d-md-inline">
+            Chaque personne le scanne avec son téléphone, se connecte avec FranceConnect et choisit ce qu’elle vous partage.
+        </p>
+        <div class="mb-3">{{ qr_code|safe }}</div>
+        <p class="text-break"><a href="{{ lien }}">{{ lien }}</a></p>
+        <p class="fs-sm text-muted mb-0">Ce QR code ne donne pas accès à votre portefeuille.</p>
+    </div>
+{% endblock pass_content %}

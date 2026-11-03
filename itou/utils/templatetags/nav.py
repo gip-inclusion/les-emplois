@@ -167,6 +167,42 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="prescribers-list-accredited-organizations",
     ),
+    "prescriber-pass-notifications": NavItem(
+        label="Usagers pris en charge",
+        target=reverse_lazy("inclusion_pass:prescripteur_notifications"),
+        active_view_names=["inclusion_pass:prescripteur_notifications"],
+    ),
+    # Service providers (offreurs de service).
+    "offreur-demandes-recues": NavItem(
+        label="Demandes reçues",
+        icon="ri-mail-download-line",
+        target=reverse_lazy("inclusion_pass:demandes_recues"),
+        active_view_names=[
+            "inclusion_pass:demandes_recues",
+            "inclusion_pass:orientation_recue",
+            "inclusion_pass:refuser_orientation",
+        ],
+    ),
+    "offreur-usagers": NavItem(
+        label="Usagers accompagnés",
+        target=reverse_lazy("inclusion_pass:usagers"),
+        active_view_names=["inclusion_pass:usagers", "inclusion_pass:fiche", "inclusion_pass:bilan_intervention"],
+    ),
+    "offreur-presentation": NavItem(
+        label="Fiche de présentation",
+        target=reverse_lazy("inclusion_pass:presentation"),
+        active_view_names=["inclusion_pass:presentation"],
+    ),
+    "offreur-offres": NavItem(
+        label="Offres de service",
+        target=reverse_lazy("inclusion_pass:offres"),
+        active_view_names=["inclusion_pass:offres"],
+    ),
+    "offreur-qr-code": NavItem(
+        label="QR code d’accueil",
+        target=reverse_lazy("inclusion_pass:qr_code_accueil"),
+        active_view_names=["inclusion_pass:qr_code_accueil"],
+    ),
     # Employers.
     "employer-job-apps": NavItem(
         label="Demandes reçues",
@@ -318,6 +354,7 @@ def nav(request):
                     items=[
                         NAV_ENTRIES["prescriber-job-apps"],
                         NAV_ENTRIES["prescriber-orientations"],
+                        NAV_ENTRIES["prescriber-pass-notifications"],
                     ],
                 )
             )
@@ -374,6 +411,22 @@ def nav(request):
             if request.current_organization.convention_can_be_accessed_by(request.user):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
+        elif request.from_offreur:
+            menu_items.append(NAV_ENTRIES["offreur-demandes-recues"])
+            menu_items.append(
+                NavGroup(label="Accompagnements", icon="ri-team-line", items=[NAV_ENTRIES["offreur-usagers"]])
+            )
+            menu_items.append(
+                NavGroup(
+                    label="Structure",
+                    icon="ri-community-line",
+                    items=[
+                        NAV_ENTRIES["offreur-presentation"],
+                        NAV_ENTRIES["offreur-offres"],
+                        NAV_ENTRIES["offreur-qr-code"],
+                    ],
+                )
+            )
         elif request.from_institution:
             if request.current_organization.kind in [InstitutionKind.DDETS_IAE, InstitutionKind.DREETS_IAE]:
                 menu_items.append(

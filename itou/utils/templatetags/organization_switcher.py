@@ -51,6 +51,11 @@ def organization_switcher(context, mode):
                 "icon": "ri-government-line",
                 # kind_display and no_org_display are never used since there's always an organization
             }
+        elif request.from_offreur:
+            userkind_context = {
+                "icon": current_organization.icon,
+                # kind_display and no_org_display are never used since there's always an organization
+            }
         elif request.user.is_professional:
             # This means current organization is None
             userkind_context = {

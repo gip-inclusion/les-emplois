@@ -1,0 +1,50 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+
+{% block title %}Usagers pris en charge {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>Demandes envoyées</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a href="{% url "search:services_results" %}" class="btn btn-lg btn-ico btn-primary">
+                <i aria-hidden="true" class="ri-add-line ri-lg"></i>
+                <span>Orienter un usager</span>
+            </a>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock title_content %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% component_alert content=content variant="info" %}
+        {% fragment as content %}
+            <p class="mb-0">Retrouvez ici les personnes que vous avez orientées et qui ont été prises en charge par une structure, avec leur accord, grâce au pass inclusion.</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endblock title_messages %}
+
+{% block title_extra %}
+    {% include "includes/applications_orientations_tabs.html" with active_tab="prises_en_charge" request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <h2 class="mb-3 mb-md-4">Usagers pris en charge</h2>
+                    {% include "inclusion_pass/prescripteur/_notifications.html" with notifications_page=notifications_page request=request only %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

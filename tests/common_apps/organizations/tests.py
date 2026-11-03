@@ -15,6 +15,7 @@ from itou.companies import enums as companies_enums, models as companies_models
 from itou.eligibility import enums as eligibility_enums
 from itou.employee_record.models import EmployeeRecord
 from itou.geiq_assessments.models import Assessment
+from itou.inclusion_pass.models import Accompagnement, NotificationPrescripteur
 from itou.insertion import models as insertion_models
 from itou.institutions.models import Institution
 from itou.job_applications import models as job_applications_models
@@ -130,6 +131,9 @@ class TestOrganizationTransfer:
                 (users_models.User, "prescriberorganization"),  # handled through `PrescriberMembership`
                 (City, "prescriberorganization"),
                 (NotificationSettings, "prescriber_organization"),
+                # Pass inclusion prototype data, not transferred
+                (Accompagnement, "prescripteur"),
+                (NotificationPrescripteur, "prescripteur"),
             },
         }
 

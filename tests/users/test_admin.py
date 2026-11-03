@@ -158,6 +158,14 @@ def test_get_fields_to_transfer_for_job_seekers():
         "rdvi_invitation_requests",  # InvitationRequest.job_seeker
         "rdvi_participations",  # Participation.job_seeker
         "rdvi_appointments",  # Appointment.company
+        # Pass inclusion prototype: data consented by the person, not transferred
+        "offreur",  # Offreur.members
+        "offreurmembership",  # OffreurMembership.user
+        "updated_offreurmembership_set",  # OffreurMembership.updated_by
+        "pass_acces",  # AccesDonnee.personne
+        "pass_accompagnements",  # Accompagnement.personne
+        "pass_consentements",  # Consentement.personne
+        "pass_donnees",  # DonneePartagee.personne
     }
     fields_to_transfer = {f.name for f in admin.get_fields_to_transfer_for_job_seekers()}
     # Check that all fields have been accounted for

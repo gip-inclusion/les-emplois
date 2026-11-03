@@ -1,0 +1,11 @@
+<span class="d-flex flex-wrap align-items-center gap-2 fs-sm">
+    <span class="badge badge-sm rounded-pill {{ ligne.source.badge }}">
+        <i class="{{ ligne.source.icone }} me-1" aria-hidden="true"></i>{{ ligne.source.libelle }}
+    </span>
+    {% if ligne.statut == "partagee" %}
+        <span class="text-muted">Récupéré le {{ ligne.fetched_at|date:"d/m/Y" }}</span>
+        {% if ligne.erreur %}<span class="text-danger">{{ ligne.erreur }}, valeur précédente affichée</span>{% endif %}
+    {% else %}
+        <span class="text-muted">Non récupéré</span>
+    {% endif %}
+</span>

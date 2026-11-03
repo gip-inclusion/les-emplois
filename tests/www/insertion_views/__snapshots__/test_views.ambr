@@ -2176,6 +2176,11 @@
                                   Orientations vers des services
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/pass/prescripteur/prises-en-charge/">
+                                  Usagers pris en charge
+                              </a>
+                          </li>
                       </ul>
                   </div>
               </div>
@@ -2401,6 +2406,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" href="/insertion/orientations/">
                                   Orientations vers des services
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/pass/prescripteur/prises-en-charge/">
+                                  Usagers pris en charge
                               </a>
                           </li>
                       </ul>

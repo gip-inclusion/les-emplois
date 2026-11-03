@@ -1,0 +1,48 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Choisir ce que je partage{% endblock page_title %}
+{% block h1 %}Choisir ce que je partage{% endblock h1 %}
+{% block subtitle %}
+    <p>avec <strong>{{ offreur.display_name }}</strong>. Rien n’est transmis sans votre accord.</p>
+{% endblock subtitle %}
+
+{% block pass_col_class %}col-12 col-lg-8{% endblock pass_col_class %}
+
+{% block pass_content %}
+    <form method="post">
+        {% csrf_token %}
+        <p>Choisissez, information par information, ce que vous partagez avec la structure.</p>
+        {% for bloc in blocs %}
+            <div class="c-box mb-3 mb-md-4">
+                <fieldset>
+                    <legend class="h3">
+                        <i class="{{ bloc.icone }} me-2" aria-hidden="true"></i>{{ bloc.libelle }}
+                    </legend>
+                    {% for donnee in bloc.donnees %}
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" name="donnees" value="{{ donnee.cle }}" id="donnee-{{ donnee.cle }}" aria-describedby="aide-{{ donnee.cle }}">
+                            <label class="form-check-label fw-bold" for="donnee-{{ donnee.cle }}">{{ donnee.libelle }}</label>
+                            <p class="fs-sm mb-1" id="aide-{{ donnee.cle }}">{{ donnee.description }}</p>
+                            <span class="badge badge-sm rounded-pill {{ donnee.source.badge }}">
+                                <i class="{{ donnee.source.icone }} me-1" aria-hidden="true"></i>{{ donnee.source.libelle }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+            </div>
+        {% endfor %}
+        <div class="c-box mb-3 mb-md-4">
+            <fieldset>
+                <legend class="h3">Autorisations</legend>
+                {% for autorisation in autorisations %}
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" role="switch" name="donnees" value="{{ autorisation.cle }}" id="donnee-{{ autorisation.cle }}" aria-describedby="aide-{{ autorisation.cle }}">
+                        <label class="form-check-label fw-bold" for="donnee-{{ autorisation.cle }}">{{ autorisation.libelle }}</label>
+                        <p class="fs-sm mb-0" id="aide-{{ autorisation.cle }}">{{ autorisation.description }}</p>
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block w-md-auto">Valider mon choix</button>
+    </form>
+{% endblock pass_content %}

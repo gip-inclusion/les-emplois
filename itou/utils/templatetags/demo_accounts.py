@@ -75,6 +75,17 @@ def prescribers_accounts_tag():
 
 
 @register.simple_tag
+def offreurs_accounts_tag():
+    return [
+        {
+            "title": "Offreur de service",
+            "email": "demo.emplois+offreur@inclusion.gouv.fr",
+            "action_url": reverse("login:demo"),
+        },
+    ]
+
+
+@register.simple_tag
 def job_seekers_accounts_tag():
     user_email = "demo.emplois+de@inclusion.gouv.fr"
     action_url = reverse("login:demo")

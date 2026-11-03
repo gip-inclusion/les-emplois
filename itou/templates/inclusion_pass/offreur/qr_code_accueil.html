@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}QR code d’accueil {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    {% include "inclusion_pass/offreur/_structure_titre.html" with request=request only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_structure_onglets.html" with active="qr_code" request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <h2>QR code d’accueil</h2>
+                    <div class="c-box text-center">
+                        <h3>QR code à afficher dans vos locaux</h3>
+                        <p>
+                            Le même QR code sert pour toutes les personnes que vous accueillez : imprimez-le et affichez-le à l’accueil.
+                            <br class="d-none d-md-inline">
+                            Chaque personne le scanne avec son téléphone, se connecte avec FranceConnect et choisit ce qu’elle vous partage.
+                        </p>
+                        <div class="mb-3">{{ qr_code|safe }}</div>
+                        <p class="text-break">
+                            <a href="{{ lien }}">{{ lien }}</a>
+                        </p>
+                        <p class="fs-sm text-muted mb-0">Les personnes qui le scannent apparaissent dans « Nouveaux usagers », sur votre tableau de bord.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

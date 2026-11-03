@@ -1,0 +1,73 @@
+{% load badges %}
+{% load static %}
+
+<section aria-labelledby="orientations-list-count" id="orientations-section">
+    {% if not orientations_page %}
+        <div class="text-center my-3 my-md-4">
+            <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+            <p class="mt-3">
+                <strong>{{ request.GET|yesno:"Aucun résultat avec les filtres actuels,Aucune demande d’orientation pour le moment" }}</strong>
+            </p>
+            {% if not request.GET %}
+                <p class="mb-1 fst-italic">Vous trouverez ici les orientations reçues pour vos offres de service.</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="table-responsive mt-3 mt-md-4">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Orientation de</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Reçue le</th>
+                        <th scope="col">Émetteur</th>
+                        <th scope="col">Service concerné</th>
+                        <th scope="col" class="text-end w-50px">
+                            <span class="visually-hidden">Actions possibles sur les orientations</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orientation in orientations_page %}
+                        {% url "inclusion_pass:orientation_recue" orientation_id=orientation.id as details_url %}
+                        <tr class="align-top">
+                            <td>
+                                <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">{{ orientation.beneficiary.get_inverted_full_name }}</a>
+                                {% if orientation.beneficiary_id in accompagnements %}
+                                    <span class="d-block mt-1"><span class="badge badge-xs rounded-pill bg-success-lighter text-success">Pass inclusion activé</span></span>
+                                {% endif %}
+                            </td>
+                            <td>{% orientation_state_badge orientation extra_classes="badge-sm" %}</td>
+                            <td>{{ orientation.created_at|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="d-block">
+                                    <i class="ri-user-line me-1" aria-hidden="true"></i>
+                                    {{ orientation.sender.get_inverted_full_name }}
+                                </span>
+                                <span class="d-block">
+                                    <i class="ri-home-smile-line me-1" aria-hidden="true"></i>
+                                    {{ orientation.sender_organization.display_name }}
+                                </span>
+                            </td>
+                            <td>{{ orientation.service.name }}</td>
+                            <td>
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir l’orientation">
+                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name }}"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "includes/pagination.html" with page=orientations_page boost=True boost_target="#orientations-section" boost_indicator="#orientations-section" request=request only %}
+    {% endif %}
+</section>
+
+{% if request.htmx %}
+    {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page request=request only %}
+    {% include "inclusion_pass/offreur/_demandes_recues_reset.html" with filters_counter=filters_counter request=request only %}
+{% endif %}

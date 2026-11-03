@@ -1,0 +1,19 @@
+<div id="nouveaux-usagers" hx-get="{% url 'inclusion_pass:nouveaux_usagers' %}" hx-trigger="every 3s" hx-swap="outerHTML">
+    <div aria-live="polite">
+        {% if nouveaux %}
+            <ul class="list-unstyled mb-0">
+                {% for accompagnement in nouveaux %}
+                    <li class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                        <a href="{% url 'inclusion_pass:fiche' accompagnement_id=accompagnement.pk %}" class="btn-link btn-ico">
+                            <i class="ri-user-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>{{ accompagnement.personne.get_inverted_full_name }}</span>
+                        </a>
+                        <span class="badge badge-xs rounded-pill bg-info-lighter text-info text-nowrap">{{ accompagnement.started_at|date:"d/m/Y" }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mb-0 fs-sm">Aucun nouvel usager pour le moment. Ils apparaîtront ici dès qu’ils auront scanné votre QR code d’accueil.</p>
+        {% endif %}
+    </div>
+</div>

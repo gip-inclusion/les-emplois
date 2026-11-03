@@ -7,6 +7,7 @@ from django.urls import reverse
 from itoutils.urls import add_url_params
 
 from itou.companies.models import Company, CompanyMembership
+from itou.inclusion_pass.models import Offreur, OffreurMembership
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.otp.utils import get_user_devices, require_otp
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -23,6 +24,7 @@ def extract_membership_infos_and_update_session(
     company_memberships,
     prescriber_memberships,
     institution_memberships,
+    offreur_memberships,
     session,
 ):
     current_org_key = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
@@ -30,7 +32,7 @@ def extract_membership_infos_and_update_session(
     orgs = []
     current_org = None
     admin_status = {}
-    for membership in company_memberships + prescriber_memberships + institution_memberships:
+    for membership in company_memberships + prescriber_memberships + institution_memberships + offreur_memberships:
         org = membership.get_organization()
         orgs.append(org)
         if org.organization_switch_key == current_org_key:
@@ -85,6 +87,14 @@ def get_active_prescriber_memberships(user):
     )
 
 
+def get_active_offreur_memberships(user):
+    return list(
+        OffreurMembership.include_inactive.filter(user=user, is_active=True)
+        .order_by("joined_at")
+        .select_related("offreur")
+    )
+
+
 def get_active_institution_memberships(user):
     # Do not use the default manager to avoid double checking whether the user is_active.
     # The AuthenticationMiddleware already checked that the user is_active.
@@ -112,6 +122,7 @@ class ItouCurrentOrganizationMiddleware:
         request.from_authorized_prescriber = False
         request.from_institution = False
         request.from_iae_actor = False
+        request.from_offreur = False
 
         if user.is_authenticated:
             logout_warning = None
@@ -121,6 +132,13 @@ class ItouCurrentOrganizationMiddleware:
                 company_memberships = get_active_company_memberships(user)
                 prescriber_memberships = get_active_prescriber_memberships(user)
                 institution_memberships = get_active_institution_memberships(user)
+                # Pass inclusion prototype: offreurs are looked up only for professionals without any other
+                # organization, so that other users do not pay an extra query on every request
+                offreur_memberships = (
+                    []
+                    if company_memberships or prescriber_memberships or institution_memberships
+                    else get_active_offreur_memberships(user)
+                )
 
                 (
                     request.organizations,
@@ -130,6 +148,7 @@ class ItouCurrentOrganizationMiddleware:
                     company_memberships,
                     prescriber_memberships,
                     institution_memberships,
+                    offreur_memberships,
                     request.session,
                 )
 
@@ -153,6 +172,8 @@ class ItouCurrentOrganizationMiddleware:
                             request.from_iae_actor = True
                     elif isinstance(request.current_organization, Institution):
                         request.from_institution = True
+                    elif isinstance(request.current_organization, Offreur):
+                        request.from_offreur = True
 
             # We now check 3 things about the user
             # - do they need mfa ?

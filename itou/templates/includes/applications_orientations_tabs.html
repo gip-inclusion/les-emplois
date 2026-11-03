@@ -7,4 +7,10 @@
         <a class="nav-link{% if active_tab == "orientations" %} active{% endif %}"
            href="{% url 'insertion_views:orientations_list' %}">Orientations vers des services</a>
     </li>
+    {% if request.from_prescriber %}
+        <li class="nav-item">
+            <a class="nav-link{% if active_tab == "prises_en_charge" %} active{% endif %}"
+               href="{% url 'inclusion_pass:prescripteur_notifications' %}">Usagers pris en charge</a>
+        </li>
+    {% endif %}
 </ul>

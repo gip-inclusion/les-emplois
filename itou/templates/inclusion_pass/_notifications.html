@@ -1,0 +1,12 @@
+<div id="notifications" hx-get="{% url 'inclusion_pass:prescripteur' prescripteur_uuid=prescripteur.uuid %}" hx-trigger="every 3s" hx-swap="outerHTML">
+    <div aria-live="polite">
+        {% for notification in notifications %}
+            <div class="c-box mb-3">
+                <p class="fs-sm text-muted mb-1">{{ notification.created_at|date:"d/m/Y à H:i" }}</p>
+                <p class="mb-0">{{ notification.message }}</p>
+            </div>
+        {% empty %}
+            <p>Aucune notification pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>

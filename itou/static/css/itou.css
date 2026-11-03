@@ -382,3 +382,14 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-primary, #000638);
     color: #fff;
 }
+
+/* Pass inclusion: Chart.js needs a sized container to draw responsive charts */
+.pass-graphique {
+    position: relative;
+    height: 16rem;
+}
+
+/* Pass inclusion: data the person did not agree to share, as in the service provider mockup */
+.pass-non-partage {
+    background: repeating-linear-gradient(135deg, var(--bs-gray-100, #f6f6fb), var(--bs-gray-100, #f6f6fb) 8px, #fff 8px, #fff 16px);
+}

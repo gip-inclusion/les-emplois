@@ -1,0 +1,46 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Fiche usager{% endblock page_title %}
+
+{% block title_navinfo %}
+    {% url "inclusion_pass:portefeuille" offreur_uuid=offreur.uuid as back_url %}
+    {% include "layout/previous_step.html" with back_url=back_url request=request only %}
+{% endblock title_navinfo %}
+
+{% block h1 %}{{ accompagnement.personne.get_full_name }}{% endblock h1 %}
+{% block subtitle %}
+    <p>Accompagnement depuis le {{ accompagnement.started_at|date:"d/m/Y" }}{% if accompagnement.prescripteur %}, orientée par {{ accompagnement.prescripteur.nom }}{% endif %}.</p>
+{% endblock subtitle %}
+
+{% block pass_content %}
+    <div class="c-box mb-3 mb-md-4">
+        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-between align-items-md-center mb-3">
+            <h2 class="h3 mb-0">Informations partagées par la personne</h2>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-primary">Actualiser depuis les sources</button>
+            </form>
+        </div>
+        <dl class="mb-0">
+            {% for ligne in lignes %}
+                <div class="border-bottom py-2">
+                    <dt>{{ ligne.libelle }}</dt>
+                    <dd class="mb-0">
+                        {% if ligne.statut == "partagee" %}
+                            {{ ligne.resume }}
+                            <br>
+                            <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Source : {{ ligne.source }}</span>
+                            <span class="fs-sm text-muted">mis à jour le {{ ligne.fetched_at|date:"d/m/Y à H:i" }}</span>
+                            {% if ligne.erreur %}<span class="fs-sm text-danger">({{ ligne.erreur }}, valeur précédente affichée)</span>{% endif %}
+                        {% elif ligne.statut == "retiree" %}
+                            <span class="badge badge-xs rounded-pill bg-danger-lighter text-danger">Accès retiré le {{ ligne.retiree_le|date:"d/m/Y à H:i" }}</span>
+                        {% else %}
+                            <span class="badge badge-xs rounded-pill bg-info-lighter text-info">Non partagée</span>
+                        {% endif %}
+                    </dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </div>
+    <a class="btn btn-primary" href="{% url 'inclusion_pass:bilan_intervention' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Bilan de l’intervention</a>
+{% endblock pass_content %}

@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestCompanySignup.test_company_select_does_not_die_under_requests
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -175,6 +175,38 @@
           WHERE ("institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_offreur_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "inclusion_pass_offreurmembership"."id",
+                 "inclusion_pass_offreurmembership"."user_id",
+                 "inclusion_pass_offreurmembership"."joined_at",
+                 "inclusion_pass_offreurmembership"."is_admin",
+                 "inclusion_pass_offreurmembership"."is_active",
+                 "inclusion_pass_offreurmembership"."created_at",
+                 "inclusion_pass_offreurmembership"."updated_at",
+                 "inclusion_pass_offreurmembership"."offreur_id",
+                 "inclusion_pass_offreurmembership"."updated_by_id",
+                 "inclusion_pass_offreur"."id",
+                 "inclusion_pass_offreur"."name",
+                 "inclusion_pass_offreur"."created_at",
+                 "inclusion_pass_offreur"."updated_at",
+                 "inclusion_pass_offreur"."uid",
+                 "inclusion_pass_offreur"."active_members_email_reminder_last_sent_at",
+                 "inclusion_pass_offreur"."automatic_geocoding_update",
+                 "inclusion_pass_offreur"."structure_id",
+                 "inclusion_pass_offreur"."uuid_accueil",
+                 "inclusion_pass_offreur"."donnees_demandees"
+          FROM "inclusion_pass_offreurmembership"
+          INNER JOIN "inclusion_pass_offreur" ON ("inclusion_pass_offreurmembership"."offreur_id" = "inclusion_pass_offreur"."id")
+          WHERE ("inclusion_pass_offreurmembership"."is_active"
+                 AND "inclusion_pass_offreurmembership"."user_id" = %s)
+          ORDER BY "inclusion_pass_offreurmembership"."joined_at" ASC
         ''',
       }),
       dict({

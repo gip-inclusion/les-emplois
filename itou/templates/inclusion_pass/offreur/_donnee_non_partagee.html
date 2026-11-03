@@ -1,0 +1,10 @@
+<span class="d-inline-flex flex-wrap align-items-center text-muted">
+    <i class="ri-lock-line me-1" aria-hidden="true"></i>
+    {% if ligne.statut == "retiree" %}
+        <strong>Accès retiré</strong>
+        <span class="ms-1">le {{ ligne.retiree_le|date:"d/m/Y à H:i" }}</span>
+    {% else %}
+        <strong>Non partagé</strong>
+        <span class="ms-1">(l’usager n’a pas consenti au partage)</span>
+    {% endif %}
+</span>

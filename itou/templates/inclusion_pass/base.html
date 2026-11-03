@@ -1,0 +1,26 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}{% block page_title %}Pass inclusion{% endblock page_title %} {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    <h1>{% block h1 %}Pass inclusion{% endblock h1 %}</h1>
+    {% block subtitle %}{% endblock subtitle %}
+{% endblock title_content %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col {% block pass_col_class %}col-12{% endblock pass_col_class %}">
+                    {% block pass_content %}{% endblock pass_content %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

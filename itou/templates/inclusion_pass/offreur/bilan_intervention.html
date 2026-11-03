@@ -1,0 +1,70 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Bilan de l’intervention : {{ accompagnement.personne.get_inverted_full_name }} {{ block.super }}{% endblock title %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url request=request only %}
+{% endblock title_navinfo %}
+
+{% block title_content %}
+    {% include "inclusion_pass/offreur/_usager_titre.html" with accompagnement=accompagnement request=request only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_usager_onglets.html" with active="bilan" accompagnement=accompagnement back_url=back_url request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xl-8">
+                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                        <h2 class="mb-0">Bilan de l’intervention</h2>
+                        {% if suivi_autorise %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary btn-ico">
+                                    <i class="ri-time-line fw-medium" aria-hidden="true"></i>
+                                    <span>Simuler 12 mois</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% if not suivi_autorise %}
+                        <div class="alert alert-info" role="status">
+                            <p class="mb-0">La personne n’a pas autorisé le suivi dans le temps : sa situation après l’accompagnement n’est pas connue.</p>
+                        </div>
+                    {% endif %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h3>Parcours</h3>
+                        <ol class="list-step mb-0">
+                            {% for situation in situations reversed %}
+                                <li>
+                                    <small>À {{ situation.mois }} mois{% if situation.simule %} (donnée simulée){% endif %}</small>
+                                    <span><span class="badge badge-sm rounded-pill {% if situation.est_positive %}bg-success-lighter text-primary{% else %}bg-info-lighter text-primary{% endif %}">{{ situation.get_situation_display }}</span></span>
+                                </li>
+                            {% endfor %}
+                            {% if accompagnement.ended_at %}
+                                <li>
+                                    <time datetime="{{ accompagnement.ended_at|date:'Y-m-d' }}">Le {{ accompagnement.ended_at|date:"d/m/Y" }}</time>
+                                    <span>Fin de l’accompagnement</span>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <time datetime="{{ accompagnement.started_at|date:'Y-m-d' }}">Le {{ accompagnement.started_at|date:"d/m/Y" }}</time>
+                                <span>Entrée chez {{ request.current_organization.display_name }}</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

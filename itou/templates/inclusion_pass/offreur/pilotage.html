@@ -1,0 +1,92 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Pilotage {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    {% include "dashboard/includes/dashboard_title_content.html" with request=request user=user only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_dashboard_tabs.html" with active="pilotage" request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <h2 class="mb-0">Pilotage</h2>
+                        <a class="btn btn-outline-primary btn-ico" href="{% url 'inclusion_pass:pilotage_csv' %}">
+                            <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                            <span>Exporter le bilan d’impact</span>
+                        </a>
+                    </div>
+                    <div class="row row-cols-2 row-cols-lg-4 g-3 mb-3 mb-md-4">
+                        <div class="col">
+                            <div class="c-box h-100">
+                                <p class="h1 mb-1">{{ bilan.total }}</p>
+                                <p class="mb-0">personnes accompagnées</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="c-box h-100">
+                                <p class="h1 mb-1">{{ bilan.en_cours }}</p>
+                                <p class="mb-0">accompagnements en cours</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="c-box h-100">
+                                <p class="h1 mb-1">{{ bilan.termines }}</p>
+                                <p class="mb-0">accompagnements terminés</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="c-box h-100">
+                                <p class="h1 mb-1">{{ bilan.duree_moyenne_jours|default:"-" }}</p>
+                                <p class="mb-0">jours d’accompagnement en moyenne</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-cols-1 row-cols-lg-2 g-3 mb-3 mb-md-4">
+                        {% for graphique in graphiques %}
+                            <div class="col{% if graphique.type == 'bar' %} w-100{% endif %}">
+                                <div class="c-box h-100">
+                                    <h3 id="{{ graphique.id }}-titre">{{ graphique.titre }}</h3>
+                                    <div class="pass-graphique">
+                                        <canvas data-pass-graphique="{{ graphique.id }}-donnees" role="img" aria-labelledby="{{ graphique.id }}-titre"></canvas>
+                                    </div>
+                                    {% with donnees_id=graphique.id|add:"-donnees" %}
+                                        {{ graphique|json_script:donnees_id }}
+                                    {% endwith %}
+                                    <table class="visually-hidden">
+                                        <caption>{{ graphique.titre }}</caption>
+                                        <tbody>
+                                            {% for serie in graphique.series %}
+                                                <tr>
+                                                    <th scope="row">{{ serie.libelle }}</th>
+                                                    <td>{{ serie.nombre }}{% if graphique.unite %} {{ graphique.unite }}{% endif %}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="fs-sm text-muted mb-0">
+                        Données agrégées et anonymes. Situations à 3, 6 et 12 mois et résidence en QPV simulées pour la démo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+    <script src="{% static 'vendor/chart.js/chart.umd.js' %}"></script>
+    <script src="{% static 'js/inclusion_pass_graphiques.js' %}"></script>
+{% endblock script %}

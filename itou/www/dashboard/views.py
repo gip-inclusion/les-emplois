@@ -56,6 +56,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
+from itou.www.inclusion_pass_views import views as inclusion_pass_views
 from itou.www.search_views.forms import CompanySearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
@@ -157,6 +158,8 @@ def _employer_dashboard_context(request):
 
 @readonly_view
 def dashboard(request, template_name="dashboard/dashboard.html"):
+    if request.from_offreur:
+        return inclusion_pass_views.vue_ensemble(request)
     saved_searches = SavedSearch.add_city_name_attr(request.user.saved_searches.all())
     context = {
         "active_geiq_campaign": None,
@@ -230,6 +233,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
 
 def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
+    if request.from_offreur:
+        return inclusion_pass_views.pilotage(request)
     if not stats_utils.can_view_stats_dashboard_widget(request):
         return HttpResponseForbidden()
 

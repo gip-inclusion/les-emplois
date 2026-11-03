@@ -1,0 +1,42 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Bilan de l’intervention{% endblock page_title %}
+
+{% block title_navinfo %}
+    {% url "inclusion_pass:fiche" offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk as back_url %}
+    {% include "layout/previous_step.html" with back_url=back_url request=request only %}
+{% endblock title_navinfo %}
+
+{% block h1 %}Bilan de l’intervention : {{ accompagnement.personne.get_full_name }}{% endblock h1 %}
+
+{% block pass_content %}
+    <div class="c-box mb-3 mb-md-4">
+        <h2 class="h3">Parcours</h2>
+        <ol class="list-step mb-0">
+            {% for situation in situations reversed %}
+                <li>
+                    <small>À {{ situation.mois }} mois{% if situation.simule %} (donnée simulée){% endif %}</small>
+                    <span><span class="badge badge-sm rounded-pill {% if situation.est_positive %}bg-success-lighter text-success{% else %}bg-info-lighter text-info{% endif %}">{{ situation.get_situation_display }}</span></span>
+                </li>
+            {% endfor %}
+            {% if accompagnement.ended_at %}
+                <li>
+                    <time datetime="{{ accompagnement.ended_at|date:'Y-m-d' }}">Le {{ accompagnement.ended_at|date:"d/m/Y" }}</time>
+                    <span>Fin de l’accompagnement</span>
+                </li>
+            {% endif %}
+            <li>
+                <time datetime="{{ accompagnement.started_at|date:'Y-m-d' }}">Le {{ accompagnement.started_at|date:"d/m/Y" }}</time>
+                <span>Entrée chez {{ offreur.nom }}</span>
+            </li>
+        </ol>
+    </div>
+    {% if suivi_autorise %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Simuler 12 mois</button>
+        </form>
+    {% else %}
+        <p>La personne n’a pas autorisé le suivi dans le temps.</p>
+    {% endif %}
+{% endblock pass_content %}

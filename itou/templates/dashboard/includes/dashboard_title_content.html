@@ -36,6 +36,8 @@
                 {% elif request.from_employer %}
                     {{ request.current_organization.kind }} -
                     SIRET {{ request.current_organization.siret|format_siret }}
+                {% elif request.from_offreur %}
+                    {{ request.current_organization.kind }}
                 {% endif %}
             </p>
         {% endif %}

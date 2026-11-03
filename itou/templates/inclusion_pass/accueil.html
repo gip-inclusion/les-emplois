@@ -1,0 +1,26 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Activer mon pass inclusion{% endblock page_title %}
+{% block h1 %}Activer mon pass inclusion{% endblock h1 %}
+
+{% block pass_col_class %}col-12 col-lg-8{% endblock pass_col_class %}
+
+{% block pass_content %}
+    <div class="c-box mb-3 mb-md-4">
+        <p class="fs-lg">
+            <strong>{{ offreur.display_name }}</strong> vous propose d’activer votre pass inclusion.
+        </p>
+        <ul>
+            <li>Plus besoin d’apporter vos justificatifs ni de raconter à nouveau votre parcours.</li>
+            <li>Vous choisissez ce que vous partagez, donnée par donnée.</li>
+            <li>Vous voyez qui consulte vos informations et pouvez retirer votre accord à tout moment.</li>
+        </ul>
+        {% include "signup/includes/france_connect_button.html" with request=request only %}
+        {% if connexion_demo %}
+            <form method="post" action="{% url 'inclusion_pass:connexion_demo' %}" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-primary btn-block">Connexion simulée (démo)</button>
+            </form>
+        {% endif %}
+    </div>
+{% endblock pass_content %}

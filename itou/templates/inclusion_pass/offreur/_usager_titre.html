@@ -1,0 +1,17 @@
+{% load components %}
+
+{% component_title c_title__main=c_title__main %}
+    {% fragment as c_title__main %}
+        <h1>{{ accompagnement.personne.get_inverted_full_name }}</h1>
+        <p class="mb-0">
+            {% if accompagnement.orientation %}
+                <span class="badge badge-sm rounded-pill bg-accent-03-lighter text-primary me-2">Orientation reçue</span>
+                Orientée le {{ accompagnement.orientation.created_at|date:"d/m/Y" }} par {{ accompagnement.orientation.sender_organization.display_name }}
+            {% else %}
+                <span class="badge badge-sm rounded-pill bg-info-lighter text-primary me-2">QR code d’accueil</span>
+                Arrivée le {{ accompagnement.started_at|date:"d/m/Y" }}{% if accompagnement.prescripteur %}, orientée par {{ accompagnement.prescripteur.display_name }}{% endif %}
+            {% endif %}
+            {% if accompagnement.ended_at %}· Accompagnement terminé le {{ accompagnement.ended_at|date:"d/m/Y" }}{% endif %}
+        </p>
+    {% endfragment %}
+{% endcomponent_title %}

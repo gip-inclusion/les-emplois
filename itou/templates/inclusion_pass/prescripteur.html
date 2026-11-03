@@ -1,0 +1,9 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Notifications{% endblock page_title %}
+{% block h1 %}{{ prescripteur.nom }}{% endblock h1 %}
+
+{% block pass_content %}
+    <h2 class="h3">Vos orientations abouties</h2>
+    {% include "inclusion_pass/_notifications.html" with prescripteur=prescripteur notifications=notifications request=request only %}
+{% endblock pass_content %}

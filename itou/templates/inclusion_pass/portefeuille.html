@@ -1,0 +1,12 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Portefeuille{% endblock page_title %}
+{% block h1 %}{{ offreur.nom }}{% endblock h1 %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/_offreur_nav.html" with active="portefeuille" offreur=offreur request=request only %}
+{% endblock title_extra %}
+
+{% block pass_content %}
+    {% include "inclusion_pass/_portefeuille.html" with offreur=offreur nouveaux=nouveaux en_cours=en_cours passes=passes bilan=bilan request=request only %}
+{% endblock pass_content %}

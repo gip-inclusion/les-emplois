@@ -80,6 +80,7 @@ urlpatterns = [
     path("geiq-assessments/", include("itou.www.geiq_assessments_views.urls")),
     path("institutions/", include("itou.www.institutions_views.urls")),
     path("invitations/", include("itou.www.invitations_views.urls")),
+    path("pass/", include("itou.www.inclusion_pass_views.urls")),
     path("job-seekers/", include("itou.www.job_seekers_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("search/", include("itou.www.search_views.urls")),

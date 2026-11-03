@@ -1,0 +1,30 @@
+<div class="c-box c-box--action">
+    <h2 class="visually-hidden">Actions rapides</h2>
+    <div class="form-row align-items-center gx-3">
+        {% if peut_traiter %}
+            <div class="form-group col-12 col-lg-auto">
+                <form method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" type="submit" name="action" value="accept">
+                        <i class="ri-check-line fw-medium" aria-hidden="true"></i>
+                        <span>Accepter</span>
+                    </button>
+                </form>
+            </div>
+            <div class="form-group col-12 col-lg-auto">
+                <a href="{% url 'inclusion_pass:refuser_orientation' orientation_id=orientation.id %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                    <i class="ri-close-line fw-medium" aria-hidden="true"></i>
+                    <span>Décliner</span>
+                </a>
+            </div>
+        {% endif %}
+        {% if accompagnement %}
+            <div class="form-group col-12 col-lg-auto">
+                <a href="{% url 'inclusion_pass:fiche' accompagnement_id=accompagnement.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                    <i class="ri-user-line fw-medium" aria-hidden="true"></i>
+                    <span>Voir la fiche usager</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>

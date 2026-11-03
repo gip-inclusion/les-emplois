@@ -1,0 +1,125 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+{% load markdownify %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}Fiche de présentation {{ block.super }}{% endblock title %}
+
+{% block title_content %}
+    {% include "inclusion_pass/offreur/_structure_titre.html" with request=request only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_structure_onglets.html" with active="presentation" request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                        <div>
+                            <h2 class="mb-1">Présentation de la structure</h2>
+                            <p class="fs-sm text-muted mb-0">Informations sur la structure mises à jour le {{ structure.updated_on|date:"d/m/Y" }}</p>
+                        </div>
+                        <a class="btn btn-outline-primary btn-ico" href="{% url 'insertion_views:structure_card' structure_uid=structure.uid %}?back_url={{ request.get_full_path|urlencode }}">
+                            <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
+                            <span>Voir la fiche publique</span>
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                            <div class="c-box h-100">
+                                {% if reseaux_porteurs %}
+                                    <h4>{{ reseaux_porteurs|length|pluralizefr:"Réseau porteur,Réseaux porteurs" }}</h4>
+                                    <p>{{ reseaux_porteurs|join:", " }}</p>
+                                    <hr class="my-4">
+                                {% endif %}
+                                <article>
+                                    {% if structure.description %}
+                                        {{ structure.description|markdownify }}
+                                    {% else %}
+                                        <p class="mb-0 fst-italic">Aucune présentation renseignée.</p>
+                                    {% endif %}
+                                </article>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                            <div class="c-box mb-3 mb-md-4">
+                                <h3 class="mb-3">Informations pratiques</h3>
+                                <ul class="list-data mb-0">
+                                    {% if structure.address_on_one_line %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-map-pin-2-line me-1" aria-hidden="true"></i>Adresse
+                                            </small>
+                                            <address class="m-0 fw-bold">{{ structure.address_on_one_line }}</address>
+                                        </li>
+                                    {% endif %}
+                                    {% if structure.phone %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-phone-line me-1" aria-hidden="true"></i>Téléphone
+                                            </small>
+                                            <a href="tel:{{ structure.phone|cut:' ' }}" class="btn-link fw-bold">{{ structure.phone|format_phone }}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if structure.email %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-mail-line me-1" aria-hidden="true"></i>E-mail
+                                            </small>
+                                            <a href="mailto:{{ structure.email }}" class="btn-link fw-bold text-break">{{ structure.email }}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if structure.website %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-global-line me-1" aria-hidden="true"></i>Site web
+                                            </small>
+                                            <a href="{{ structure.website }}" class="btn-link fw-bold has-external-link text-break" target="_blank" rel="noopener noreferrer" aria-label="{{ structure.website }} (ouverture dans un nouvel onglet)">{{ structure.website }}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if structure.accessibilite_lieu %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-wheelchair-line me-1" aria-hidden="true"></i>Accessibilité
+                                            </small>
+                                            <a href="{{ structure.accessibilite_lieu }}" class="btn-link fw-bold has-external-link" target="_blank" rel="noopener noreferrer" aria-label="Retrouvez toutes les infos via ce lien (ouverture dans un nouvel onglet)">Retrouvez toutes les infos via ce lien</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if structure.opening_hours %}
+                                        <li>
+                                            <small>
+                                                <i class="ri-time-line me-1" aria-hidden="true"></i>Horaires
+                                            </small>
+                                            {% if formatted_opening_hours %}
+                                                <ul class="list-unstyled fw-bold mb-0">
+                                                    {% for entry in formatted_opening_hours.entries %}
+                                                        <li>
+                                                            {{ entry.label }} : {{ entry.hours }}
+                                                            {% if entry.comment %}(<span>{{ entry.comment|lower }}</span>){% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <strong>{{ structure.opening_hours }}</strong>
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

@@ -1,0 +1,60 @@
+{% extends "inclusion_pass/base.html" %}
+
+{% block page_title %}Mon pass inclusion{% endblock page_title %}
+{% block h1 %}Mon pass inclusion{% endblock h1 %}
+
+{% block pass_col_class %}col-12 col-lg-8{% endblock pass_col_class %}
+
+{% block pass_content %}
+    {% if confirmation %}
+        <div class="alert alert-success" role="status">
+            <p class="mb-0">Votre pass est activé. <strong>{{ confirmation.display_name }}</strong> a reçu uniquement les informations que vous avez choisies.</p>
+        </div>
+    {% endif %}
+
+    <h2 class="h3">Qui a accès à mes informations</h2>
+    {% for offreur, consentements in par_offreur.items %}
+        <div class="c-box mb-3 mb-md-4">
+            <h3 class="h4">{{ offreur.display_name }}</h3>
+            <ul class="list-unstyled">
+                {% for consentement in consentements %}
+                    <li class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                        <span>
+                            {{ consentement.libelle }}
+                            <span class="d-block fs-sm text-muted">depuis le {{ consentement.granted_at|date:"d/m/Y à H:i" }}</span>
+                        </span>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="offreur" value="{{ offreur.uid }}">
+                            <input type="hidden" name="donnee" value="{{ consentement.donnee }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Retirer<span class="visually-hidden"> l’accès à {{ consentement.libelle }}</span></button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="offreur" value="{{ offreur.uid }}">
+                <button type="submit" class="btn btn-danger btn-block w-md-auto">Retirer tous les accès de {{ offreur.display_name }}</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Aucune structure n’a accès à vos informations.</p>
+    {% endfor %}
+
+    <h2 class="h3">Journal des accès</h2>
+    <div class="c-box">
+        <ol class="list-unstyled mb-0">
+            {% for acces in journal %}
+                <li class="mb-2">
+                    <time class="fs-sm text-muted" datetime="{{ acces.at.isoformat }}">{{ acces.at|date:"d/m/Y H:i" }}</time>
+                    <br>
+                    <strong>{{ acces.get_action_display }}</strong> : {{ acces.libelle }}{% if acces.offreur %}, {{ acces.offreur.display_name }}{% endif %}
+                    {% if acces.source %}<span class="fs-sm text-muted">(source : {{ acces.source }})</span>{% endif %}
+                </li>
+            {% empty %}
+                <li>Aucun accès pour le moment.</li>
+            {% endfor %}
+        </ol>
+    </div>
+{% endblock pass_content %}

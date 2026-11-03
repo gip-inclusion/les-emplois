@@ -238,6 +238,9 @@ def france_connect_callback(request):
     login(request, user)
 
     next_url = reverse("dashboard:index")
+    # Hackathon: resume the pass inclusion activation started from an offreur reception QR code
+    if uuid_accueil := request.session.get("inclusion_pass_accueil"):
+        next_url = reverse("inclusion_pass:consentement", kwargs={"uuid_accueil": uuid_accueil})
     return HttpResponseRedirect(next_url)
 
 

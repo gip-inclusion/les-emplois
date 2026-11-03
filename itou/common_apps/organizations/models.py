@@ -21,6 +21,7 @@ class OrganizationKind(enum.StrEnum):
     COMPANY = "company"
     PRESCRIBER_ORGANIZATION = "organization"
     INSTITUTION = "institution"
+    OFFREUR = "offreur"
 
 
 class OrganizationQuerySet(models.QuerySet):
@@ -273,6 +274,8 @@ class OrganizationAbstract(models.Model):
                 return "ri-community-line"
             case OrganizationKind.INSTITUTION:
                 return "ri-government-line"
+            case OrganizationKind.OFFREUR:
+                return "ri-community-line"
 
     @property
     def member_kind_display(self):
@@ -285,6 +288,8 @@ class OrganizationAbstract(models.Model):
                 return "employeur"
             case OrganizationKind.INSTITUTION:
                 return "institutionnel"
+            case OrganizationKind.OFFREUR:
+                return "offreur de service"
 
 
 class MembershipQuerySet(models.QuerySet):

@@ -1,0 +1,107 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Profil de {{ accompagnement.personne.get_inverted_full_name }} {{ block.super }}{% endblock title %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url request=request only %}
+{% endblock title_navinfo %}
+
+{% block title_content %}
+    {% include "inclusion_pass/offreur/_usager_titre.html" with accompagnement=accompagnement request=request only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_usager_onglets.html" with active="fiche" accompagnement=accompagnement back_url=back_url request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                        <h2 class="mb-0">Informations générales</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary btn-ico">
+                                <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
+                                <span>Actualiser depuis les sources</span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="alert alert-info" role="status">
+                        <div class="row">
+                            <div class="col-auto pe-0">
+                                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                            </div>
+                            <div class="col">
+                                <p class="mb-0">
+                                    Chaque donnée indique sa <strong>source</strong> et sa <strong>date de récupération</strong>. La mention <strong>« Non partagé »</strong> signifie que l’usager n’a pas consenti au partage de cette donnée avec votre structure.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-xl-8">
+                            {% for bloc in blocs %}
+                                <div class="c-box mb-3 mb-md-4">
+                                    <h3 class="mb-3">
+                                        <i class="{{ bloc.icone }} me-2" aria-hidden="true"></i>{{ bloc.libelle }}
+                                    </h3>
+                                    <ul class="list-data mb-0">
+                                        {% for ligne in bloc.lignes %}
+                                            <li class="p-2 rounded-3{% if ligne.statut != 'partagee' %} pass-non-partage{% endif %}">
+                                                <small>{{ ligne.libelle }}</small>
+                                                <div class="d-flex flex-column gap-1">
+                                                    {% if ligne.statut == "partagee" %}
+                                                        <strong>{{ ligne.texte }}</strong>
+                                                    {% else %}
+                                                        {% include "inclusion_pass/offreur/_donnee_non_partagee.html" with ligne=ligne only %}
+                                                    {% endif %}
+                                                    {% include "inclusion_pass/offreur/_donnee_provenance.html" with ligne=ligne only %}
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if pieces %}
+                            <div class="col-12 col-xl-4">
+                                <div class="c-box mb-3 mb-md-4">
+                                    <h3 class="mb-3">
+                                        <i class="{{ pieces.icone }} me-2" aria-hidden="true"></i>{{ pieces.libelle }}
+                                    </h3>
+                                    <ul class="list-unstyled mb-0">
+                                        {% for ligne in pieces.lignes %}
+                                            <li class="py-3 px-2 rounded-3{% if not forloop.last %} border-bottom{% endif %}{% if ligne.statut != 'partagee' %} pass-non-partage{% endif %}">
+                                                {% if ligne.statut == "partagee" %}
+                                                    <span class="d-block fw-medium">
+                                                        <i class="ri-file-pdf-line me-1" aria-hidden="true"></i>{{ ligne.texte }}
+                                                    </span>
+                                                    <span class="d-block fs-sm text-muted">Document fictif (démo)</span>
+                                                {% else %}
+                                                    <span class="d-block text-disabled">{{ ligne.libelle }}</span>
+                                                    {% include "inclusion_pass/offreur/_donnee_non_partagee.html" with ligne=ligne only %}
+                                                {% endif %}
+                                                <div class="mt-1">
+                                                    {% include "inclusion_pass/offreur/_donnee_provenance.html" with ligne=ligne only %}
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}
