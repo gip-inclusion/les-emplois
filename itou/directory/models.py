@@ -27,6 +27,10 @@ class DirectoryProfile(models.Model):
 
 
 class ContactMessage(models.Model):
+    """
+    This model is for getting a coarse understanding of directory usage.
+    """
+
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="expéditeur",
