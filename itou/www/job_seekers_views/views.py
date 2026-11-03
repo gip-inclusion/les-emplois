@@ -337,9 +337,17 @@ class ContractsTabView(BaseJobSeekerDetailView):
         return get_contracts(self.approval)
 
     def get_context_data(self, **kwargs):
+        contracts = list(self.get_contracts())
+        has_ongoing_contract = self.request.from_employer and any(
+            [
+                (not contract.has_ended) and contract.company_id == self.request.current_organization.pk
+                for contract in contracts
+            ]
+        )
         return super().get_context_data(**kwargs) | {
-            "contracts": self.get_contracts(),
+            "contracts": contracts,
             "approval_missing_or_expired": self.approval_missing_or_expired,
+            "has_ongoing_contract": has_ongoing_contract,
         }
 
 
