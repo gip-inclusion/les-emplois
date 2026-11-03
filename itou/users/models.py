@@ -70,6 +70,14 @@ from itou.utils.validators import validate_birthdate, validate_nir, validate_pol
 
 logger = logging.getLogger(__name__)
 
+# Written by API Particulier only, and reset whenever the identity it was queried with changes.
+RSA_CERTIFICATION_FIELDS = [
+    "rsa_certified_beneficiary",
+    "rsa_certified_start_date",
+    "rsa_certification_checked_at",
+    "rsa_last_certification_attempt_at",
+]
+
 ERROR_UNIQUE_NIR_CODE = "unique_nir_if_not_empty"
 
 
@@ -523,13 +531,20 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
 
-            if self.has_data_changed(["last_name", "first_name"]) and not self._state.adding:
-                self.jobseeker_profile.pe_obfuscated_nir = None
-                self.jobseeker_profile.pe_last_certification_attempt_at = None
-                self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
-                self.jobseeker_profile.identity_certifications.filter(
-                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
-                ).delete()
+            if not self._state.adding:
+                profile_update_fields = set()
+                if self.has_data_changed(["last_name", "first_name"]):
+                    self.jobseeker_profile.pe_obfuscated_nir = None
+                    self.jobseeker_profile.pe_last_certification_attempt_at = None
+                    profile_update_fields |= {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
+                    self.jobseeker_profile.identity_certifications.filter(
+                        certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
+                    ).delete()
+                if self.has_data_changed(["last_name", "first_name", "title"]):
+                    self.jobseeker_profile.reset_rsa_certification()
+                    profile_update_fields |= set(RSA_CERTIFICATION_FIELDS)
+                if profile_update_fields:
+                    self.jobseeker_profile.save(update_fields=profile_update_fields)
 
         self.set_old_values()
 
@@ -1380,6 +1395,16 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                     return True
         return False
 
+    def reset_rsa_certification(self):
+        """
+        The API Particulier query is built from the identity of the job seeker: when it changes,
+        what we stored describes somebody else’s rights.
+        """
+        self.rsa_certified_beneficiary = None
+        self.rsa_certified_start_date = None
+        self.rsa_certification_checked_at = None
+        self.rsa_last_certification_attempt_at = None
+
     def _default_asp_uid(self):
         return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
 
@@ -1396,6 +1421,10 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
             self.identity_certifications.filter(
                 certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
             ).delete()
+        if self.has_data_changed(["birthdate", "birth_country_id", "birth_place_id"]) and not self._state.adding:
+            self.reset_rsa_certification()
+            if update_fields is not None:
+                update_fields = set(update_fields) | set(RSA_CERTIFICATION_FIELDS)
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         self.set_old_values()

@@ -1,6 +1,11 @@
+import datetime
+import logging
 import re
+from json import JSONDecodeError
 
+import httpx
 from allauth.account.models import EmailAddress
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 
@@ -9,7 +14,10 @@ from itou.institutions.models import InstitutionMembership
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import JobSeekerAssignment, User
+from itou.utils.apis import api_particulier
 
+
+logger = logging.getLogger(__name__)
 
 # https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France#Signification_des_chiffres_du_NIR
 NIR_RE = re.compile(
@@ -86,3 +94,92 @@ def deactivate_users(users, *, updated_by=None):
     for user in users:
         user.username = user.deactivated_username
     User.objects.bulk_update(users, ["username"])
+
+
+RSA_CERTIFICATION_FRESHNESS = datetime.timedelta(hours=24)
+# A failed call is not retried before this delay: during an outage, the orientation wizard would
+# otherwise pay the timeout on every single page load.
+RSA_CERTIFICATION_RETRY_DELAY = datetime.timedelta(minutes=15)
+# This call blocks the rendering of the orientation wizard, don’t make the user wait for a slow API.
+RSA_CERTIFICATION_TIMEOUT_SECONDS = 3
+
+
+def refresh_rsa_certification(job_seeker: User) -> None:
+    """
+    Ask API Particulier whether the job seeker currently benefits from the RSA, and store the
+    answer on their profile.
+
+    Deliberately side effect free with regards to the IAE eligibility diagnosis: unlike
+    itou.eligibility.tasks.certify_criterion_with_api_particulier, no criterion, no
+    IdentityCertification and none of the ASP fields (has_rsa_allocation, rsa_allocation_since)
+    are touched.
+
+    Never raises: when the API is unavailable, the fields are left as they are and displayed as
+    missing information.
+    """
+    if settings.API_PARTICULIER_BASE_URL is None:
+        logger.info("API particulier is not configured, RSA certification was skipped.")
+        return
+
+    profile = job_seeker.jobseeker_profile
+    if not api_particulier.has_required_info(job_seeker):
+        logger.info("Skipping job seeker %s, missing required information for API Particulier.", job_seeker.pk)
+        return
+    now = timezone.now()
+    if (
+        profile.rsa_certification_checked_at
+        and now - profile.rsa_certification_checked_at < RSA_CERTIFICATION_FRESHNESS
+    ):
+        return
+    if (
+        profile.rsa_last_certification_attempt_at
+        and now - profile.rsa_last_certification_attempt_at < RSA_CERTIFICATION_RETRY_DELAY
+    ):
+        return
+
+    # Stamped before the call: a failure (or a crash) must not be retried on the next page load.
+    profile.rsa_last_certification_attempt_at = now
+    profile.save(update_fields=["rsa_last_certification_attempt_at"])
+
+    with api_particulier.client(timeout=RSA_CERTIFICATION_TIMEOUT_SECONDS) as client:
+        try:
+            situation = api_particulier.fetch_rsa_situation(client, job_seeker)
+        except httpx.HTTPStatusError as exc:
+            try:
+                body = exc.response.json()
+            except JSONDecodeError:
+                body = {}
+            match exc.response.status_code:
+                case 404 if "errors" in body:
+                    # Found in the SNGI, but no “caisse de rattachement” ⇒ no subsidy.
+                    situation = api_particulier.RSASituation(is_beneficiary=False, start_date=None)
+                case 422 if "errors" in body:
+                    # Identity not found, the query parameters would have to change.
+                    situation = api_particulier.RSASituation(is_beneficiary=None, start_date=None)
+                    logger.warning("The identity of job seeker %s was not found in the API Particulier", job_seeker.pk)
+                case _:
+                    # 409, 429, 502 and any other error: retry on the next visit.
+                    logger.warning(
+                        "Could not refresh the RSA certification of job seeker %s, API Particulier "
+                        "answered with HTTP %s.",
+                        job_seeker.pk,
+                        exc.response.status_code,
+                    )
+                    return
+        except httpx.RequestError:
+            logger.warning(
+                "Could not refresh the RSA certification of job seeker %s, API Particulier is unreachable.",
+                job_seeker.pk,
+            )
+            return
+
+    profile.rsa_certified_beneficiary = situation.is_beneficiary
+    profile.rsa_certified_start_date = situation.start_date
+    profile.rsa_certification_checked_at = now
+    profile.save(
+        update_fields=[
+            "rsa_certified_beneficiary",
+            "rsa_certified_start_date",
+            "rsa_certification_checked_at",
+        ]
+    )
