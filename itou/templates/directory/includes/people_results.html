@@ -15,7 +15,7 @@
                     </div>
                     <div>
                         <a class="btn btn-outline-primary btn-block w-100 w-md-auto stretched-link"
-                           href="{% url 'directory:person_detail' key=person.key %}?back_url={{ request.get_full_path|urlencode }}">Voir ses coordonnées</a>
+                           href="{% url 'directory:person_detail' public_id=person.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir ses coordonnées</a>
                     </div>
                 </div>
             </div>

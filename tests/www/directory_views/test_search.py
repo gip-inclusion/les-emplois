@@ -48,17 +48,17 @@ def test_access_requires_organization_coords(client):
 
 def test_people_search_filters_and_htmx(client):
     _, _, _, person = get_target_person(client)
-    page = parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.recipient_id}))
+    page = parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.public_id}))
 
     response = client.get(
         reverse("directory:people_results"),
-        {"q": person.recipient_id},
+        {"q": person.public_id},
         headers={"HX-Request": "true"},
     )
 
     update_page_with_htmx(page, "#people-search-form", response)
     assert [heading.text for heading in page.select("#people-search-results h3")] == ["Alice Martin"]
-    assert page.select_one(f'#people-search-form select[name="q"] option[value="{person.recipient_id}"][selected]')
+    assert page.select_one(f'#people-search-form select[name="q"] option[value="{person.public_id}"][selected]')
     assert page.select_one("#people-search-count")
     assert page.select_one('#people-search-form input[name="types"]')
     assertTemplateUsed(response, "directory/includes/people_results.html")
@@ -70,11 +70,11 @@ def test_people_search_restores_query_from_url(client):
 
     response = client.get(
         reverse("directory:people_results"),
-        {"q": person.recipient_id, "types": NexusStructureKind.ML},
+        {"q": person.public_id, "types": NexusStructureKind.ML},
     )
 
     page = parse_response_to_soup(response)
-    assert page.select_one(f'select[name="q"] option[value="{person.recipient_id}"][selected]')
+    assert page.select_one(f'select[name="q"] option[value="{person.public_id}"][selected]')
     assert page.select_one(f'input[name=types][value="{NexusStructureKind.ML}"]').has_attr("checked")
     assertContains(response, static("js/directory_feedback.js"))
     assertContains(response, "Annuaire Pro en accès bêta restreint")

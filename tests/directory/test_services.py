@@ -1,9 +1,8 @@
 import pytest
 from django.contrib.gis.geos import Point
-from django.core import signing
 
 from itou.directory.models import DirectoryProfile
-from itou.directory.services import PERSON_KEY_SALT, get_directory_people, get_directory_person
+from itou.directory.services import get_directory_people, get_directory_person
 from itou.nexus.enums import NexusStructureKind, NexusUserKind, Service
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import StructureFactory
@@ -37,12 +36,10 @@ def test_directory_people_merge_memberships_by_email():
     assert person.full_name == "Alice Martin"
     assert person.kind == NexusUserKind.FACILITY_MANAGER
     assert person.phone == ""
-    assert person.recipient_id == f"user-{user.public_id}"
-    assert signing.loads(person.key, salt=PERSON_KEY_SALT) == person.recipient_id
-    assert user.email not in person.key
+    assert person.public_id == user.public_id
     assert len(person.organizations) == 2
     assert person.main_organization.siret == company.siret
-    assert get_directory_person(ORIGIN, person.key).email == user.email
+    assert get_directory_person(ORIGIN, person.public_id).email == user.email
 
 
 def test_directory_people_exclude_opted_out_email_and_distant_structure():
@@ -120,7 +117,7 @@ def test_directory_people_resolves_dora_structure_by_siret():
     assert person.main_organization.name == "Mission locale DORA"
     assert person.main_organization.phone == "0297010203"
     assert dora_structure.uid in person.main_organization.card_url
-    assert get_directory_person(ORIGIN, person.key).recipient_id == person.recipient_id
+    assert get_directory_person(ORIGIN, person.public_id) == person
 
 
 @pytest.mark.parametrize("local_structures_count", [0, 2])
@@ -139,10 +136,10 @@ def test_directory_people_keeps_nexus_data_without_unique_dora_match(local_struc
 
     [person] = get_directory_people(ORIGIN)
 
-    assert person.recipient_id == membership.user_id
+    assert person.public_id == membership.user.public_id
     assert person.main_organization.name == "Nexus structure"
     assert person.main_organization.card_url == "https://dora.example.com/structure"
-    assert get_directory_person(ORIGIN, person.key).email == person.email
+    assert get_directory_person(ORIGIN, person.public_id) == person
 
 
 def test_directory_people_uses_closest_organization_as_main():

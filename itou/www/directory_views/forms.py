@@ -1,3 +1,5 @@
+import uuid
+
 from django import forms
 from django_select2.forms import Select2Widget
 
@@ -7,7 +9,8 @@ from itou.nexus.enums import NexusStructureKind
 
 
 class PeopleSearchForm(forms.Form):
-    q = forms.ChoiceField(
+    q = forms.TypedChoiceField(
+        coerce=uuid.UUID,
         label="Rechercher une personne",
         required=False,
         choices=(),
@@ -26,7 +29,7 @@ class PeopleSearchForm(forms.Form):
 
     def __init__(self, *args, people, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["q"].choices = ((person.recipient_id, person.full_name) for person in people)
+        self.fields["q"].choices = ((str(person.public_id), person.full_name) for person in people)
 
 
 class ContactMessageForm(forms.ModelForm):

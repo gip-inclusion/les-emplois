@@ -40,7 +40,7 @@ def _filter_people(people, form):
     selected_person_key = form.cleaned_data["q"]
     structure_types = set(form.cleaned_data["types"])
     if selected_person_key:
-        people = [person for person in people if person.recipient_id == selected_person_key]
+        people = [person for person in people if person.public_id == selected_person_key]
     if structure_types:
         # Match any affiliation, even if another structure is shown first.
         people = [
@@ -73,11 +73,8 @@ def people_results(request, template_name="directory/people_results.html"):
     )
 
 
-def _get_person(request, key):
-    try:
-        person = get_directory_person(request.current_organization.coords, key)
-    except ValueError as exc:
-        raise Http404 from exc
+def _get_person(request, public_id):
+    person = get_directory_person(request.current_organization.coords, public_id)
     if not person:
         raise Http404
     return person
@@ -100,8 +97,8 @@ def _person_detail_context(request, person, contact_form=None):
 
 @check_request(can_access_directory)
 @readonly_view
-def person_detail(request, key, template_name="directory/person_detail.html"):
-    return render(request, template_name, _person_detail_context(request, _get_person(request, key)))
+def person_detail(request, public_id, template_name="directory/person_detail.html"):
+    return render(request, template_name, _person_detail_context(request, _get_person(request, public_id)))
 
 
 class MessageThrottle(FailSafeUserRateThrottle):
@@ -115,8 +112,8 @@ class MessageThrottle(FailSafeUserRateThrottle):
 
 @check_request(can_access_directory)
 @http_methods(db_write=["POST"])
-def send_message(request, key):
-    person = _get_person(request, key)
+def send_message(request, public_id):
+    person = _get_person(request, public_id)
     form = ContactMessageForm(request.POST)
     if form.is_valid():
         throttle = MessageThrottle()
@@ -129,7 +126,7 @@ def send_message(request, key):
             # Save the contact event, but keep the message body only in the outgoing email.
             ContactMessage.objects.create(
                 sender=request.user,
-                recipient_id=person.recipient_id,
+                recipient_id=person.public_id,
                 subject=subject,
                 custom_subject=custom_subject,
             )
@@ -150,6 +147,6 @@ def send_message(request, key):
             email.reply_to = [request.user.email]
             email.send()
             messages.success(request, "Votre message a bien été envoyé.")
-            detail_url = reverse("directory:person_detail", kwargs={"key": key})
+            detail_url = reverse("directory:person_detail", kwargs={"public_id": public_id})
             return redirect(add_url_params(detail_url, {"back_url": request.POST.get("back_url", "")}))
     return render(request, "directory/person_detail.html", _person_detail_context(request, person, form))

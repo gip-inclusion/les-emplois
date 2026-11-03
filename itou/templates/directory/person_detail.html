@@ -44,7 +44,7 @@
                             {% endcomponent_alert %}
                             <form id="contact-form"
                                   method="post"
-                                  action="{% url 'directory:send_message' key=person.key %}">
+                                  action="{% url 'directory:send_message' public_id=person.public_id %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="back_url" value="{{ back_url }}">
                                 {% bootstrap_form contact_form alert_error_type="all" %}

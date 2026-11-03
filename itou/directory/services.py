@@ -1,24 +1,21 @@
+import uuid
 from dataclasses import dataclass, field
 
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
-from django.core import signing
-from django.core.exceptions import ValidationError
-from django.core.signing import BadSignature
 from django.urls import reverse
 
 from itou.companies.models import Company, CompanyMembership
 from itou.directory.models import DirectoryProfile
 from itou.insertion.models import Structure
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, NexusStructureKind, NexusUserKind, Service
-from itou.nexus.models import NexusMembership, NexusUser
+from itou.nexus.models import NexusMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 
 
 DIRECTORY_RADIUS_KM = 20
-PERSON_KEY_SALT = "directory-person"
 
 
 @dataclass(frozen=True)
@@ -38,17 +35,13 @@ class DirectoryOrganization:
 
 @dataclass
 class DirectoryPerson:
-    recipient_id: str
+    public_id: uuid.UUID
     first_name: str
     last_name: str
     email: str
     phone: str
     kind: str
     organizations: list[DirectoryOrganization] = field(default_factory=list)
-
-    @property
-    def key(self):
-        return signing.dumps(self.recipient_id, salt=PERSON_KEY_SALT)
 
     @property
     def full_name(self):
@@ -65,23 +58,6 @@ class DirectoryPerson:
     @property
     def other_organizations_count(self):
         return max(len(self.organizations) - 1, 0)
-
-
-def get_person_identifier(key):
-    try:
-        return signing.loads(key, salt=PERSON_KEY_SALT)
-    except BadSignature as exc:
-        raise ValueError("Invalid person key") from exc
-
-
-def _get_person_email(identifier):
-    if str(identifier).startswith("user-"):
-        public_id = str(identifier).removeprefix("user-")
-        try:
-            return User.objects.filter(public_id=public_id).values_list("email", flat=True).first()
-        except ValidationError, ValueError:
-            return None
-    return NexusUser.objects.filter(pk=identifier).values_list("email", flat=True).first()
 
 
 def _as_km(distance):
@@ -155,16 +131,16 @@ def _unique_by_siret(objects):
     return by_siret
 
 
-def _add_person(people, user, organization, *, recipient_id, kind):
+def _add_person(people, user, organization, *, kind):
     person = people.setdefault(
         user.email.casefold(),
         DirectoryPerson(
-            recipient_id=recipient_id,
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
             phone=user.phone,
             kind=kind,
+            public_id=user.public_id,
         ),
     )
     person.organizations.append(organization)
@@ -184,7 +160,7 @@ def _nearby_memberships(model, organization_field, users, origin):
     )
 
 
-def get_directory_people(origin, *, email=None):
+def get_directory_people(origin, *, public_id=None):
     """Build one card per email from local professionals, then Nexus memberships.
 
     The first profile wins as a whole: local data takes precedence over Nexus.
@@ -192,8 +168,8 @@ def get_directory_people(origin, *, email=None):
     """
     people = {}
     local_users = User.objects.filter(kind=UserKind.PROFESSIONAL).exclude(directory_profile__is_opted_out=True)
-    if email:
-        local_users = local_users.filter(email__iexact=email)
+    if public_id:
+        local_users = local_users.filter(public_id=public_id)
 
     for model, organization_field in (
         (CompanyMembership, "company"),
@@ -205,7 +181,6 @@ def get_directory_people(origin, *, email=None):
                 people,
                 user,
                 _native_organization(membership.get_organization(), membership.directory_distance),
-                recipient_id=f"user-{user.public_id}",
                 kind=NexusUserKind.FACILITY_MANAGER,
             )
 
@@ -214,8 +189,8 @@ def get_directory_people(origin, *, email=None):
         .select_related("user", "structure")
         .order_by("pk")
     )
-    if email:
-        nexus_memberships = nexus_memberships.filter(user__email__iexact=email)
+    if public_id:
+        nexus_memberships = nexus_memberships.filter(user__public_id=public_id)
     nexus_memberships = list(
         nexus_memberships.annotate(directory_distance=Distance("structure__coords", origin) / 1000)
     )
@@ -250,7 +225,6 @@ def get_directory_people(origin, *, email=None):
             people,
             user,
             organization,
-            recipient_id=user.id,
             kind=user.kind,
         )
 
@@ -262,10 +236,6 @@ def get_directory_people(origin, *, email=None):
     )
 
 
-def get_directory_person(origin, key):
-    identifier = get_person_identifier(key)
-    email = _get_person_email(identifier)
-    if not email:
-        return None
+def get_directory_person(origin, public_id):
     # Rebuild the card for this origin so it still respects distance and opt-outs.
-    return next(iter(get_directory_people(origin, email=email)), None)
+    return next(iter(get_directory_people(origin, public_id=public_id)), None)

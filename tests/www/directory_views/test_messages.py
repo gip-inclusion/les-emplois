@@ -11,8 +11,7 @@ from tests.www.directory_views.helpers import get_target_person
 
 def test_send_message_emails_recipient_and_records_contact(client, mailoutbox):
     sender, _, _, person = get_target_person(client)
-    key = person.key
-    url = reverse("directory:send_message", kwargs={"key": key})
+    url = reverse("directory:send_message", kwargs={"public_id": person.public_id})
     back_url = reverse("dashboard:index")
 
     response = client.post(
@@ -27,12 +26,15 @@ def test_send_message_emails_recipient_and_records_contact(client, mailoutbox):
 
     assertRedirects(
         response,
-        add_url_params(reverse("directory:person_detail", kwargs={"key": key}), {"back_url": back_url}),
+        add_url_params(
+            reverse("directory:person_detail", kwargs={"public_id": person.public_id}),
+            {"back_url": back_url},
+        ),
         fetch_redirect_response=False,
     )
     [message] = ContactMessage.objects.all()
     assert message.sender == sender
-    assert message.recipient_id == person.recipient_id
+    assert message.recipient_id == person.public_id
     assert message.subject == ContactSubject.OTHER
     assert message.custom_subject == "Échange de pratiques"
     [email] = mailoutbox
@@ -53,7 +55,7 @@ def test_custom_subject_is_required(client):
     _, _, _, person = get_target_person(client)
 
     response = client.post(
-        reverse("directory:send_message", kwargs={"key": person.key}),
+        reverse("directory:send_message", kwargs={"public_id": person.public_id}),
         {"subject": ContactSubject.OTHER, "body": "Bonjour", "back_url": ""},
     )
 
@@ -64,9 +66,8 @@ def test_custom_subject_is_required(client):
 def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
     _, _, _, person = get_target_person(client)
 
-    key = person.key
     response = client.post(
-        reverse("directory:send_message", kwargs={"key": key}),
+        reverse("directory:send_message", kwargs={"public_id": person.public_id}),
         {
             "subject": ContactSubject.MEETING,
             "custom_subject": "Objet injecté",
@@ -77,7 +78,7 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
 
     assertRedirects(
         response,
-        add_url_params(reverse("directory:person_detail", kwargs={"key": key}), {"back_url": ""}),
+        add_url_params(reverse("directory:person_detail", kwargs={"public_id": person.public_id}), {"back_url": ""}),
     )
     message = ContactMessage.objects.get()
     assert message.custom_subject == ""
@@ -87,13 +88,12 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
 def test_message_rate_limit(client, mailoutbox, mocker):
     _, _, _, person = get_target_person(client)
     mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "1/day")
-    key = person.key
-    url = reverse("directory:send_message", kwargs={"key": key})
+    url = reverse("directory:send_message", kwargs={"public_id": person.public_id})
     data = {"subject": ContactSubject.MEETING, "body": "Bonjour", "back_url": ""}
 
     assertRedirects(
         client.post(url, data),
-        add_url_params(reverse("directory:person_detail", kwargs={"key": key}), {"back_url": ""}),
+        add_url_params(reverse("directory:person_detail", kwargs={"public_id": person.public_id}), {"back_url": ""}),
     )
     response = client.post(url, data)
 

@@ -1,3 +1,5 @@
+import uuid
+
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
@@ -8,7 +10,10 @@ def test_person_detail_preserves_back_url_and_hides_contact(client):
     _, _, target_organization, person = get_target_person(client)
     back_url = f"{reverse('directory:people_results')}?q=Alice"
 
-    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}), {"back_url": back_url})
+    response = client.get(
+        reverse("directory:person_detail", kwargs={"public_id": person.public_id}),
+        {"back_url": back_url},
+    )
 
     assert response.context["back_url"] == back_url
     assertContains(response, "Afficher l’adresse e-mail")
@@ -20,7 +25,7 @@ def test_person_detail_preserves_back_url_and_hides_contact(client):
 def test_person_detail_displays_missing_phone(client):
     _, _, _, person = get_target_person(client, target_phone="")
 
-    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+    response = client.get(reverse("directory:person_detail", kwargs={"public_id": person.public_id}))
 
     assertContains(response, "Non renseigné", html=True)
 
@@ -28,7 +33,14 @@ def test_person_detail_displays_missing_phone(client):
 def test_person_detail_unknown_key(client):
     setup_directory(client)
 
-    response = client.get(reverse("directory:person_detail", kwargs={"key": "invalid"}))
+    response = client.get(
+        reverse(
+            "directory:person_detail",
+            kwargs={
+                "public_id": str(uuid.UUID("00000000-0000-0000-0000-000000000000")),
+            },
+        )
+    )
 
     assert response.status_code == 404
 
@@ -36,5 +48,5 @@ def test_person_detail_unknown_key(client):
 def test_person_detail_rate_limit(client, mocker):
     _, _, _, person = get_target_person(client)
     mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "0/day")
-    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+    response = client.get(reverse("directory:person_detail", kwargs={"public_id": person.public_id}))
     assertContains(response, "Vous avez atteint la limite de messages envoyés : 0 par jour.")

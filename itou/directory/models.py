@@ -33,7 +33,9 @@ class ContactMessage(models.Model):
         on_delete=models.CASCADE,
         related_name="+",
     )
-    recipient_id = models.CharField(verbose_name="identifiant du destinataire")
+    # Don’t bother using a ForeignKey and adding indices to User and NexusUser,
+    # these relationships aren’t exploited.
+    recipient_id = models.UUIDField(verbose_name="identifiant du destinataire")
     subject = models.CharField(verbose_name="objet", choices=ContactSubject.choices)
     custom_subject = models.CharField(verbose_name="objet personnalisé", blank=True)
     created_at = models.DateTimeField(verbose_name="date d'envoi", auto_now_add=True)

@@ -7,7 +7,7 @@ from tests.www.directory_views.helpers import get_target_person
 def test_contact_feedback_uses_viewer_and_active_organization(client):
     viewer, target, _, person = get_target_person(client)
 
-    response = client.get(reverse("directory:person_detail", kwargs={"key": person.key}))
+    response = client.get(reverse("directory:person_detail", kwargs={"public_id": person.public_id}))
 
     organization = response.wsgi_request.current_organization
     assertContains(response, 'src="https://tally.so/widgets/embed.js"')
