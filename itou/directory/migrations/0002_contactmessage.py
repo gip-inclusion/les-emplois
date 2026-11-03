@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "custom_subject",
-                    models.CharField(blank=True, verbose_name="objet personnalisé"),
+                    models.CharField(blank=True, max_length=250, verbose_name="objet personnalisé"),
                 ),
                 (
                     "created_at",

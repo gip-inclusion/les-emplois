@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from itou.directory.enums import ContactSubject
+from itou.emails.utils import MAX_SUBJECT_LENGTH
 from itou.users.enums import UserKind
 
 
@@ -41,7 +42,7 @@ class ContactMessage(models.Model):
     # these relationships aren’t exploited.
     recipient_id = models.UUIDField(verbose_name="identifiant du destinataire")
     subject = models.CharField(verbose_name="objet", choices=ContactSubject.choices)
-    custom_subject = models.CharField(verbose_name="objet personnalisé", blank=True)
+    custom_subject = models.CharField(verbose_name="objet personnalisé", blank=True, max_length=MAX_SUBJECT_LENGTH)
     created_at = models.DateTimeField(verbose_name="date d'envoi", auto_now_add=True)
 
     class Meta:
