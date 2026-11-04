@@ -54,14 +54,14 @@ def accueil(request, uuid_accueil):
     return render(
         request,
         "inclusion_pass/accueil.html",
-        {"offreur": offreur, "connexion_demo": settings.DEBUG},
+        {"offreur": offreur, "connexion_demo": settings.SHOW_DEMO_ACCOUNTS_BANNER},
     )
 
 
 @login_not_required
 @http_methods(db_write=["POST"])
 def connexion_demo(request):
-    if not settings.DEBUG:
+    if not settings.SHOW_DEMO_ACCOUNTS_BANNER:
         raise Http404
     user = get_object_or_404(User, email=DEMO_PERSONA_EMAIL)
     login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0])

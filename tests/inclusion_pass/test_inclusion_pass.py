@@ -146,7 +146,18 @@ def test_qr_code_sans_orientation_demarche_en_autonomie(client):
     assert personne.pass_accompagnements.get().prescripteur is None
 
 
-@override_settings(DEBUG=True)
+@override_settings(SHOW_DEMO_ACCOUNTS_BANNER=False)
+def test_connexion_demo_indisponible_en_production(client):
+    JobSeekerFactory(email=DEMO_PERSONA_EMAIL)
+    offreur = OffreurFactory()
+
+    response = client.get(reverse("inclusion_pass:accueil", args=[offreur.uuid_accueil]))
+    assertNotContains(response, "Connexion simulée")
+    response = client.post(reverse("inclusion_pass:connexion_demo"))
+    assert response.status_code == 404
+
+
+@override_settings(SHOW_DEMO_ACCOUNTS_BANNER=True)
 def test_parcours_complet(client):
     personne = JobSeekerFactory(email=DEMO_PERSONA_EMAIL)
     membre = OffreurMembershipFactory()
