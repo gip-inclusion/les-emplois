@@ -223,6 +223,7 @@ else:
     db_statement_timeout = int(os.environ.get("SCRIPT_DB_STATEMENT_TIMEOUT", 300_000))
     db_lock_timeout = int(os.environ.get("SCRIPT_DB_LOCK_TIMEOUT", 150_000))
 
+
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": True,
