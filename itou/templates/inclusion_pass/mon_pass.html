@@ -35,7 +35,8 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="offreur" value="{{ offreur.uid }}">
-                <button type="submit" class="btn btn-danger btn-block w-md-auto">Retirer tous les accès de {{ offreur.display_name }}</button>
+                <button type="submit"
+                        class="btn btn-danger btn-block w-md-auto">Retirer tous les accès de {{ offreur.display_name }}</button>
             </form>
         </div>
     {% empty %}
@@ -47,7 +48,8 @@
         <ol class="list-unstyled mb-0">
             {% for acces in journal %}
                 <li class="mb-2">
-                    <time class="fs-sm text-muted" datetime="{{ acces.at.isoformat }}">{{ acces.at|date:"d/m/Y H:i" }}</time>
+                    <time class="fs-sm text-muted"
+                          datetime="{{ acces.at.isoformat }}">{{ acces.at|date:"d/m/Y H:i" }}</time>
                     <br>
                     <strong>{{ acces.get_action_display }}</strong> : {{ acces.libelle }}{% if acces.offreur %}, {{ acces.offreur.display_name }}{% endif %}
                     {% if acces.source %}<span class="fs-sm text-muted">(source : {{ acces.source }})</span>{% endif %}

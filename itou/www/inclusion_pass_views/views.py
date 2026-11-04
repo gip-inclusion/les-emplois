@@ -1,4 +1,5 @@
 import csv
+import datetime
 from urllib.parse import urlencode
 
 import segno
@@ -10,7 +11,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from itou.inclusion_pass import catalogue, connecteurs, services
+from itou.inclusion_pass import catalogue, demo, services
 from itou.inclusion_pass.models import Accompagnement, BilanIntervention, Offreur
 from itou.insertion.enums import OrientationStatus
 from itou.insertion.models import Orientation
@@ -21,13 +22,14 @@ from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.inclusion_pass_views.forms import BilanInterventionForm, DemandesRecuesFilterForm
 from itou.www.insertion_views.forms import RefusalOrientationForm
 from itou.www.job_seekers_views.views import get_assignments_for_display
 
 
 SESSION_ACCUEIL_KEY = "inclusion_pass_accueil"
-DEMO_PERSONA_EMAIL = connecteurs.PERSONA_EMAIL
+VISITEUR_COOKIE = "inclusion_pass_visiteur"
 
 
 def _personne_or_404(request):
@@ -60,14 +62,36 @@ def accueil(request, uuid_accueil):
 
 @login_not_required
 @http_methods(db_write=["POST"])
+@with_triggers_context
 def connexion_demo(request):
+    """Log in a fictitious person, a different one for each device of the audience.
+
+    A cookie keeps the person of the device, also after a logout, so that a phone always gets the same one back.
+    """
     if not settings.SHOW_DEMO_ACCOUNTS_BANNER:
         raise Http404
-    user = get_object_or_404(User, email=DEMO_PERSONA_EMAIL)
-    login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0])
-    if uuid_accueil := request.session.get(SESSION_ACCUEIL_KEY):
-        return redirect("inclusion_pass:consentement", uuid_accueil=uuid_accueil)
-    return redirect("inclusion_pass:mon_pass")
+    uuid_accueil = request.session.get(SESSION_ACCUEIL_KEY)
+    visiteur = User.objects.filter(
+        kind=UserKind.JOB_SEEKER,
+        email__endswith=demo.DEMO_EMAIL_DOMAIN,
+        pk=request.get_signed_cookie(VISITEUR_COOKIE, default=None),
+    ).first()
+    if visiteur is None:
+        visiteur = demo.creer_visiteur(Offreur.objects.filter(uuid_accueil=uuid_accueil).first())
+    login(request, visiteur, backend=settings.AUTHENTICATION_BACKENDS[0])
+    if uuid_accueil:
+        response = redirect("inclusion_pass:consentement", uuid_accueil=uuid_accueil)
+    else:
+        response = redirect("inclusion_pass:mon_pass")
+    response.set_signed_cookie(
+        VISITEUR_COOKIE,
+        visiteur.pk,
+        max_age=datetime.timedelta(days=7),
+        secure=settings.SESSION_COOKIE_SECURE,
+        httponly=True,
+        samesite="Lax",
+    )
+    return response
 
 
 @http_methods(db_readonly=["GET"], db_write=["POST"])

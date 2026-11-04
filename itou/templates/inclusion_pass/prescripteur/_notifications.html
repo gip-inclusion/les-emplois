@@ -1,7 +1,11 @@
 {% load static %}
 {% load str_filters %}
 
-<section id="prises-en-charge-section" aria-labelledby="prises-en-charge-count" hx-get="{% url 'inclusion_pass:prescripteur_notifications' %}" hx-trigger="every 5s" hx-swap="outerHTML">
+<section id="prises-en-charge-section"
+         aria-labelledby="prises-en-charge-count"
+         hx-get="{% url 'inclusion_pass:prescripteur_notifications' %}"
+         hx-trigger="every 5s"
+         hx-swap="outerHTML">
     <p class="mb-0" id="prises-en-charge-count" aria-live="polite">
         {% with notifications_page.paginator.count as counter %}
             {{ counter }} résultat{{ counter|pluralizefr }}

@@ -1,13 +1,12 @@
 import datetime
 import random
 
-from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
 from itou.companies.enums import ProSupportReportBarrier, ProSupportReportOrientation, ProSupportReportSolution
-from itou.inclusion_pass import catalogue, connecteurs, services
+from itou.inclusion_pass import catalogue, connecteurs, demo, services
 from itou.inclusion_pass.models import (
     Accompagnement,
     BilanIntervention,
@@ -15,15 +14,13 @@ from itou.inclusion_pass.models import (
     Offreur,
     SituationSuivi,
 )
-from itou.insertion.enums import GenericReferenceItemKind, OrientationRefusalReason, OrientationStatus
+from itou.insertion.enums import GenericReferenceItemKind, OrientationStatus
 from itou.insertion.models import GenericReferenceItem, Orientation, Service, Structure
-from itou.job_applications.enums import SenderKind
-from itou.users.enums import ActionKind, IdentityProvider, Title, UserKind
-from itou.users.models import JobSeekerAssignment, User
+from itou.users.enums import IdentityProvider, Title, UserKind
+from itou.users.models import User
 from itou.utils.command import BaseCommand
 
 
-DEMO_EMAIL_DOMAIN = "@pass-demo.example.com"
 OFFREUR_EMAIL = "demo.emplois+offreur@inclusion.gouv.fr"
 STRUCTURE_UID = "pass-demo--auto-ecole-solidaire"
 
@@ -39,15 +36,37 @@ ANCIENS = [
     ("Mehdi", "Haddad", Title.M, 2001),
     ("Laura", "Garnier", Title.MME, 1990),
     ("Kevin", "Roux", Title.M, 1985),
+    ("Ray", "Troviseur", Title.M, 1979),
+    ("Sarah", "Lentie", Title.MME, 2002),
+    ("Agnès", "Thésie", Title.MME, 1971),
+    ("Clara", "Vane", Title.MME, 1994),
+    ("Laure", "Ganiser", Title.MME, 1983),
+    ("Jean", "Tilhomme", Title.M, 1966),
+    ("Henri", "Chir", Title.M, 1998),
+    ("Lydia", "Logue", Title.MME, 1987),
+    ("Sam", "Dépanne", Title.M, 2004),
+    ("Anne", "Ticipé", Title.MME, 1992),
+    ("Paul", "Itesse", Title.M, 1981),
 ]
-AUTONOMES = 2
+AUTONOMES = 4
 
-# Orientations received by the structure, besides the persona's one: name, title, status
+# Orientations received by the structure, besides the persona's one: name, title, status, days ago.
+# Pending ones are less than 30 days old, otherwise the expire_orientations cron would expire them
 ORIENTES = [
-    ("Inès", "Faure", Title.MME, OrientationStatus.PENDING),
-    ("Lucas", "Mercier", Title.M, OrientationStatus.PENDING),
-    ("Nadia", "Bouzid", Title.MME, OrientationStatus.ACCEPTED),
-    ("Hugo", "Lemoine", Title.M, OrientationStatus.REFUSED),
+    ("Inès", "Faure", Title.MME, OrientationStatus.PENDING, 2),
+    ("Lucas", "Mercier", Title.M, OrientationStatus.PENDING, 6),
+    ("Nadia", "Bouzid", Title.MME, OrientationStatus.ACCEPTED, 10),
+    ("Hugo", "Lemoine", Title.M, OrientationStatus.REFUSED, 14),
+    ("Jacques", "Célère", Title.M, OrientationStatus.PENDING, 1),
+    ("Marc", "Arrière", Title.M, OrientationStatus.PENDING, 3),
+    ("Lucie", "Dité", Title.MME, OrientationStatus.PENDING, 8),
+    ("Alain", "Térieur", Title.M, OrientationStatus.PENDING, 12),
+    ("Odile", "Igence", Title.MME, OrientationStatus.ACCEPTED, 16),
+    ("Mehdi", "Cament", Title.M, OrientationStatus.REFUSED, 19),
+    ("Phil", "Indienne", Title.M, OrientationStatus.PENDING, 21),
+    ("Élodie", "Vrance", Title.MME, OrientationStatus.ACCEPTED, 25),
+    ("Jean-Michel", "Apeupré", Title.M, OrientationStatus.REFUSED, 31),
+    ("Rémi", "Fasol", Title.M, OrientationStatus.ACCEPTED, 40),
 ]
 
 SERVICES = [
@@ -75,23 +94,6 @@ SERVICES = [
 ]
 
 
-def _job_seeker(email, first_name, last_name, title, birthdate):
-    user = User.objects.create(
-        username=User.generate_unique_username(),
-        kind=UserKind.JOB_SEEKER,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-        title=title,
-        address_line_1="12 rue des Lilas",
-        post_code="59000",
-        city="Lille",
-    )
-    user.jobseeker_profile.birthdate = birthdate
-    user.jobseeker_profile.save(update_fields=["birthdate"])
-    return user
-
-
 def _reference(kind, value):
     return GenericReferenceItem.objects.get(kind=kind, value=value)
 
@@ -109,8 +111,12 @@ class Command(BaseCommand):
             Orientation.objects.filter(service__structure__uid=STRUCTURE_UID).delete()
             Offreur.objects.all().delete()
             Structure.include_inactive.filter(uid=STRUCTURE_UID).delete()
-            User.objects.filter(email__endswith=DEMO_EMAIL_DOMAIN).delete()
+            User.objects.filter(email__endswith=demo.DEMO_EMAIL_DOMAIN).delete()
             User.objects.filter(email__in=[connecteurs.PERSONA_EMAIL, OFFREUR_EMAIL]).delete()
+        elif Structure.include_inactive.filter(uid=STRUCTURE_UID).exists():
+            # Redeploying a review app must not wipe what the audience did during the demo
+            self.stdout.write("Données de démo déjà présentes, utiliser --reset pour les recréer.")
+            return
         self._seed()
 
     def _structure(self):
@@ -177,47 +183,9 @@ class Command(BaseCommand):
             terms_accepted_at=timezone.now(),
             first_login=timezone.now(),
         )
-        user.set_password("password")
-        user.save(update_fields=["password"])
-        EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
+        demo.activer_connexion_par_bandeau(user)
         offreur.memberships.create(user=user, is_admin=True)
         return offreur
-
-    def _orientation(self, structure, prescripteur, sender, beneficiary, status, rng, jours):
-        orientation = Orientation.objects.create(
-            beneficiary=beneficiary,
-            sender=sender,
-            sender_kind=SenderKind.PRESCRIBER,
-            sender_prescriber_organization=prescripteur,
-            service=rng.choice(list(structure.services.all())),
-            referent_first_name=sender.first_name,
-            referent_last_name=sender.last_name,
-            referent_email=sender.email,
-            orientation_reasons="La mobilité est le principal frein à la reprise d’emploi.",
-            data_protection_commitment=True,
-        )
-        created_at = timezone.now() - datetime.timedelta(days=jours)
-        # A queryset update() bypasses auto_now: "Mise à jour le" follows the processing date
-        updates = {"created_at": created_at, "updated_at": created_at}
-        if status == OrientationStatus.ACCEPTED:
-            processing_date = created_at + datetime.timedelta(days=2)
-            updates |= {"status": status, "processing_date": processing_date, "updated_at": processing_date}
-        elif status == OrientationStatus.REFUSED:
-            processing_date = created_at + datetime.timedelta(days=3)
-            updates |= {
-                "status": status,
-                "processing_date": processing_date,
-                "updated_at": processing_date,
-                "refusal_reasons": [OrientationRefusalReason.NOT_REACHABLE],
-                "refusal_details": "Trois appels sans réponse.",
-            }
-        Orientation.objects.filter(pk=orientation.pk).update(**updates)
-        # As in insertion_views: the sender now follows the person, who appears in its job seekers list
-        JobSeekerAssignment.objects.upsert_assignment(beneficiary, sender, prescripteur, ActionKind.ORIENT)
-        JobSeekerAssignment.objects.filter(job_seeker=beneficiary, professional=sender).update(
-            created_at=created_at, last_action_at=created_at, updated_at=created_at
-        )
-        return orientation
 
     def _bilan(self, accompagnement, auteur, rng):
         # The solution planned in the report matches the simulated situation 6 months later
@@ -248,27 +216,29 @@ class Command(BaseCommand):
         sender = User.objects.get(email=services.DEMO_PRESCRIPTEUR_EMAIL) if prescripteur else None
 
         # Pending: activating her pass during the demo validates it
-        persona = _job_seeker(connecteurs.PERSONA_EMAIL, "Sophie", "Leroy", Title.MME, datetime.date(1988, 3, 14))
+        persona = demo.job_seeker(connecteurs.PERSONA_EMAIL, "Sophie", "Leroy", Title.MME, datetime.date(1988, 3, 14))
+        demo.activer_connexion_par_bandeau(persona)
         if prescripteur:
-            self._orientation(structure, prescripteur, sender, persona, OrientationStatus.PENDING, rng, jours=5)
-            for index, (first_name, last_name, title, status) in enumerate(ORIENTES):
-                beneficiary = _job_seeker(
-                    f"{first_name.lower()}.{last_name.lower()}{DEMO_EMAIL_DOMAIN}",
+            demo.orientation(structure, prescripteur, sender, persona, OrientationStatus.PENDING, rng, jours=5)
+            for index, (first_name, last_name, title, status, jours) in enumerate(ORIENTES):
+                beneficiary = demo.job_seeker(
+                    demo.email(first_name, last_name),
                     first_name,
                     last_name,
                     title,
-                    datetime.date(1990 + index, 6, 1),
+                    datetime.date(1970 + 2 * index, 1 + index % 12, 1),
                 )
-                self._orientation(structure, prescripteur, sender, beneficiary, status, rng, jours=2 + 4 * index)
+                refus = demo.REFUS[index % len(demo.REFUS)]
+                demo.orientation(structure, prescripteur, sender, beneficiary, status, rng, jours, refus)
 
         now = timezone.now()
         for index, (first_name, last_name, title, annee) in enumerate(ANCIENS):
-            personne = _job_seeker(
-                f"{first_name.lower()}.{last_name.lower()}{DEMO_EMAIL_DOMAIN}",
+            personne = demo.job_seeker(
+                demo.email(first_name, last_name),
                 first_name,
                 last_name,
                 title,
-                datetime.date(annee, 1 + index, 10),
+                datetime.date(annee, 1 + index % 12, 10),
             )
             cles = [*catalogue.DONNEES, catalogue.SUIVI_LONG]
             if index % 3 == 0:
@@ -277,7 +247,7 @@ class Command(BaseCommand):
             debut = now - relativedelta(months=rng.randint(14, 24))
             if prescripteur and termine:
                 jours = (now - debut).days + 5
-                self._orientation(structure, prescripteur, sender, personne, OrientationStatus.ACCEPTED, rng, jours)
+                demo.orientation(structure, prescripteur, sender, personne, OrientationStatus.ACCEPTED, rng, jours)
             accompagnement = services.accorder(personne, offreur, cles)
             Accompagnement.objects.filter(pk=accompagnement.pk).update(started_at=debut, vu_par_offreur=True)
             accompagnement.refresh_from_db()
@@ -296,6 +266,9 @@ class Command(BaseCommand):
         )
         self.stdout.write(f"  Accueil (QR) : {reverse('inclusion_pass:accueil', args=[offreur.uuid_accueil])}")
         self.stdout.write(
-            f"  Persona      : {connecteurs.PERSONA_EMAIL} (bouton « Connexion simulée » sur la page d’accueil), "
+            f"  Persona      : bandeau DEV > « Usager pass inclusion » ({connecteurs.PERSONA_EMAIL}), "
             "son orientation est validée à l’activation de son pass"
+        )
+        self.stdout.write(
+            "  Public       : le bouton « Connexion simulée » de la page d’accueil crée un usager par appareil"
         )

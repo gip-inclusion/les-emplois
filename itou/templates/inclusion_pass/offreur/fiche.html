@@ -78,16 +78,15 @@
                                             <li class="py-3 px-2 rounded-3{% if not forloop.last %} border-bottom{% endif %}{% if ligne.statut != 'partagee' %} pass-non-partage{% endif %}">
                                                 {% if ligne.statut == "partagee" %}
                                                     <span class="d-block fw-medium">
-                                                        <i class="ri-file-pdf-line me-1" aria-hidden="true"></i>{{ ligne.texte }}
+                                                        <i class="ri-file-pdf-line me-1"
+                                                           aria-hidden="true"></i>{{ ligne.texte }}
                                                     </span>
                                                     <span class="d-block fs-sm text-muted">Document fictif (démo)</span>
                                                 {% else %}
                                                     <span class="d-block text-disabled">{{ ligne.libelle }}</span>
                                                     {% include "inclusion_pass/offreur/_donnee_non_partagee.html" with ligne=ligne only %}
                                                 {% endif %}
-                                                <div class="mt-1">
-                                                    {% include "inclusion_pass/offreur/_donnee_provenance.html" with ligne=ligne only %}
-                                                </div>
+                                                <div class="mt-1">{% include "inclusion_pass/offreur/_donnee_provenance.html" with ligne=ligne only %}</div>
                                             </li>
                                         {% endfor %}
                                     </ul>

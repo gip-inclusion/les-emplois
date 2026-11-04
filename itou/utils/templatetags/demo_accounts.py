@@ -3,6 +3,8 @@ import logging
 from django import template
 from django.urls import reverse
 
+from itou.inclusion_pass import connecteurs
+
 
 logger = logging.getLogger(__name__)
 register = template.Library()
@@ -89,4 +91,7 @@ def offreurs_accounts_tag():
 def job_seekers_accounts_tag():
     user_email = "demo.emplois+de@inclusion.gouv.fr"
     action_url = reverse("login:demo")
-    return [{"title": "Usager", "email": user_email, "action_url": action_url}]
+    return [
+        {"title": "Usager", "email": user_email, "action_url": action_url},
+        {"title": "Usager pass inclusion", "email": connecteurs.PERSONA_EMAIL, "action_url": action_url},
+    ]

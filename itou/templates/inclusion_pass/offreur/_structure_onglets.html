@@ -1,11 +1,19 @@
-<ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="{% if active == 'qr_code' %}2{% elif active == 'offres' %}1{% else %}0{% endif %}">
+<ul class="s-tabs-01__nav nav nav-tabs mb-0"
+    data-it-sliding-tabs="true"
+    data-it-sliding-tabs-startindex="{% if active == 'qr_code' %}2{% elif active == 'offres' %}1{% else %}0{% endif %}">
     <li class="nav-item">
-        <a class="nav-link{% if active == 'presentation' %} active{% endif %}" {% if active == 'presentation' %}aria-current="page"{% endif %} href="{% url 'inclusion_pass:presentation' %}">Fiche de présentation</a>
+        <a class="nav-link{% if active == 'presentation' %} active{% endif %}"
+           {% if active == 'presentation' %}aria-current="page"{% endif %}
+           href="{% url 'inclusion_pass:presentation' %}">Fiche de présentation</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link{% if active == 'offres' %} active{% endif %}" {% if active == 'offres' %}aria-current="page"{% endif %} href="{% url 'inclusion_pass:offres' %}">Offres de service</a>
+        <a class="nav-link{% if active == 'offres' %} active{% endif %}"
+           {% if active == 'offres' %}aria-current="page"{% endif %}
+           href="{% url 'inclusion_pass:offres' %}">Offres de service</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link{% if active == 'qr_code' %} active{% endif %}" {% if active == 'qr_code' %}aria-current="page"{% endif %} href="{% url 'inclusion_pass:qr_code_accueil' %}">QR code d’accueil</a>
+        <a class="nav-link{% if active == 'qr_code' %} active{% endif %}"
+           {% if active == 'qr_code' %}aria-current="page"{% endif %}
+           href="{% url 'inclusion_pass:qr_code_accueil' %}">QR code d’accueil</a>
     </li>
 </ul>

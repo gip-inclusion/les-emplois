@@ -32,7 +32,8 @@
                         {% url "inclusion_pass:orientation_recue" orientation_id=orientation.id as details_url %}
                         <tr class="align-top">
                             <td>
-                                <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">{{ orientation.beneficiary.get_inverted_full_name }}</a>
+                                <a class="btn-link"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">{{ orientation.beneficiary.get_inverted_full_name }}</a>
                                 {% if orientation.beneficiary_id in accompagnements %}
                                     <span class="d-block mt-1"><span class="badge badge-xs rounded-pill bg-success-lighter text-success">Pass inclusion activé</span></span>
                                 {% endif %}
@@ -55,7 +56,8 @@
                                    href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Voir l’orientation">
-                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name }}"></i>
+                                    <i class="ri-arrow-drop-right-line fs-lg"
+                                       aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name }}"></i>
                                 </a>
                             </td>
                         </tr>

@@ -6,11 +6,11 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import ProSupportReportBarrier, ProSupportReportSolution
-from itou.inclusion_pass import catalogue, services
+from itou.inclusion_pass import catalogue, demo, services
 from itou.inclusion_pass.models import AccesDonnee, NotificationPrescripteur
 from itou.insertion.enums import OrientationStatus
 from itou.job_applications.enums import SenderKind
-from itou.www.inclusion_pass_views.views import DEMO_PERSONA_EMAIL
+from itou.users.models import User
 from tests.companies.factories import CompanyMembershipFactory
 from tests.inclusion_pass.factories import (
     AccompagnementFactory,
@@ -22,6 +22,7 @@ from tests.insertion.factories import OrientationFactory, ServiceFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.utils.testing import ItouClient
 
 
 def _statuts(offreur, personne):
@@ -148,28 +149,63 @@ def test_qr_code_sans_orientation_demarche_en_autonomie(client):
 
 @override_settings(SHOW_DEMO_ACCOUNTS_BANNER=False)
 def test_connexion_demo_indisponible_en_production(client):
-    JobSeekerFactory(email=DEMO_PERSONA_EMAIL)
     offreur = OffreurFactory()
 
     response = client.get(reverse("inclusion_pass:accueil", args=[offreur.uuid_accueil]))
     assertNotContains(response, "Connexion simulée")
     response = client.post(reverse("inclusion_pass:connexion_demo"))
     assert response.status_code == 404
+    assert not User.objects.filter(email__endswith=demo.DEMO_EMAIL_DOMAIN).exists()
+
+
+def _prescripteur_de_demo():
+    return PrescriberMembershipFactory(user__email=services.DEMO_PRESCRIPTEUR_EMAIL).organization
+
+
+@override_settings(SHOW_DEMO_ACCOUNTS_BANNER=True)
+def test_connexion_demo_une_personne_par_appareil():
+    prescripteur = _prescripteur_de_demo()
+    offreur = OffreurFactory()
+    ServiceFactory(structure=offreur.structure)
+    accueil_url = reverse("inclusion_pass:accueil", args=[offreur.uuid_accueil])
+    connexion_url = reverse("inclusion_pass:connexion_demo")
+
+    visiteurs = []
+    for _ in range(2):
+        appareil = ItouClient()
+        appareil.get(accueil_url)
+        response = appareil.post(connexion_url)
+        assert response.url == reverse("inclusion_pass:consentement", args=[offreur.uuid_accueil])
+        visiteurs.append(response.wsgi_request.user)
+    assert visiteurs[0] != visiteurs[1]
+    for visiteur in visiteurs:
+        assert visiteur.email.endswith(demo.DEMO_EMAIL_DOMAIN)
+        orientation = visiteur.orientations.get()
+        assert orientation.status == OrientationStatus.PENDING
+        assert orientation.service.structure == offreur.structure
+        assert orientation.sender_prescriber_organization == prescripteur
+
+    # The same device gets its person back after a logout, without a new orientation
+    appareil.post(reverse("account_logout"))
+    response = appareil.post(connexion_url)
+    assert response.wsgi_request.user == visiteurs[1]
+    assert visiteurs[1].orientations.count() == 1
 
 
 @override_settings(SHOW_DEMO_ACCOUNTS_BANNER=True)
 def test_parcours_complet(client):
-    personne = JobSeekerFactory(email=DEMO_PERSONA_EMAIL)
+    prescripteur = _prescripteur_de_demo()
     membre = OffreurMembershipFactory()
     offreur = membre.offreur
-    orientation = OrientationFactory(beneficiary=personne, service=ServiceFactory(structure=offreur.structure))
-    prescripteur = orientation.sender_prescriber_organization
+    ServiceFactory(structure=offreur.structure)
 
     # The person scans the reception QR code, logs in and shares part of the requested data
     response = client.get(reverse("inclusion_pass:accueil", args=[offreur.uuid_accueil]))
     assertContains(response, f"<strong>{offreur.display_name}</strong>")
     response = client.post(reverse("inclusion_pass:connexion_demo"))
     assert response.url == reverse("inclusion_pass:consentement", args=[offreur.uuid_accueil])
+    personne = response.wsgi_request.user
+    orientation = personne.orientations.get()
     response = client.get(response.url)
     assertContains(response, '<legend class="h3">')
     response = client.post(

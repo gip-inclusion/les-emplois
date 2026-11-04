@@ -10,7 +10,8 @@
 {% block pass_content %}
     <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-between align-items-md-center mb-3">
         <h2 class="mb-0">Bilan d’impact</h2>
-        <a class="btn btn-primary" href="{% url 'inclusion_pass:bilan_impact_csv' offreur_uuid=offreur.uuid %}">Exporter en CSV</a>
+        <a class="btn btn-primary"
+           href="{% url 'inclusion_pass:bilan_impact_csv' offreur_uuid=offreur.uuid %}">Exporter en CSV</a>
     </div>
     <div class="c-box mb-3 mb-md-4">
         <h3>Activité</h3>
@@ -22,7 +23,10 @@
         <h3>Sorties positives (emploi ou formation)</h3>
         {% for mois, sortie in bilan.sorties.items %}
             <p class="mb-1" id="sorties-{{ mois }}">À {{ mois }} mois : {% if sortie.taux is not None %}<strong>{{ sortie.taux }} %</strong> ({{ sortie.positives }} sur {{ sortie.suivis }} personnes suivies){% else %}pas encore de données{% endif %}</p>
-            <progress class="pass-progress w-100 mb-3" max="100" value="{{ sortie.taux|default:0 }}" aria-labelledby="sorties-{{ mois }}">{{ sortie.taux|default:0 }} %</progress>
+            <progress class="pass-progress w-100 mb-3"
+                      max="100"
+                      value="{{ sortie.taux|default:0 }}"
+                      aria-labelledby="sorties-{{ mois }}">{{ sortie.taux|default:0 }} %</progress>
         {% endfor %}
         <p class="fs-sm text-muted mb-0">Situations à 3, 6 et 12 mois simulées pour la démo.</p>
     </div>

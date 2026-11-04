@@ -24,7 +24,8 @@
                             <h2 class="mb-1">Présentation de la structure</h2>
                             <p class="fs-sm text-muted mb-0">Informations sur la structure mises à jour le {{ structure.updated_on|date:"d/m/Y" }}</p>
                         </div>
-                        <a class="btn btn-outline-primary btn-ico" href="{% url 'insertion_views:structure_card' structure_uid=structure.uid %}?back_url={{ request.get_full_path|urlencode }}">
+                        <a class="btn btn-outline-primary btn-ico"
+                           href="{% url 'insertion_views:structure_card' structure_uid=structure.uid %}?back_url={{ request.get_full_path|urlencode }}">
                             <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
                             <span>Voir la fiche publique</span>
                         </a>
@@ -63,7 +64,8 @@
                                             <small>
                                                 <i class="ri-phone-line me-1" aria-hidden="true"></i>Téléphone
                                             </small>
-                                            <a href="tel:{{ structure.phone|cut:' ' }}" class="btn-link fw-bold">{{ structure.phone|format_phone }}</a>
+                                            <a href="tel:{{ structure.phone|cut:' ' }}"
+                                               class="btn-link fw-bold">{{ structure.phone|format_phone }}</a>
                                         </li>
                                     {% endif %}
                                     {% if structure.email %}
@@ -71,7 +73,8 @@
                                             <small>
                                                 <i class="ri-mail-line me-1" aria-hidden="true"></i>E-mail
                                             </small>
-                                            <a href="mailto:{{ structure.email }}" class="btn-link fw-bold text-break">{{ structure.email }}</a>
+                                            <a href="mailto:{{ structure.email }}"
+                                               class="btn-link fw-bold text-break">{{ structure.email }}</a>
                                         </li>
                                     {% endif %}
                                     {% if structure.website %}
@@ -79,7 +82,11 @@
                                             <small>
                                                 <i class="ri-global-line me-1" aria-hidden="true"></i>Site web
                                             </small>
-                                            <a href="{{ structure.website }}" class="btn-link fw-bold has-external-link text-break" target="_blank" rel="noopener noreferrer" aria-label="{{ structure.website }} (ouverture dans un nouvel onglet)">{{ structure.website }}</a>
+                                            <a href="{{ structure.website }}"
+                                               class="btn-link fw-bold has-external-link text-break"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               aria-label="{{ structure.website }} (ouverture dans un nouvel onglet)">{{ structure.website }}</a>
                                         </li>
                                     {% endif %}
                                     {% if structure.accessibilite_lieu %}
@@ -87,7 +94,11 @@
                                             <small>
                                                 <i class="ri-wheelchair-line me-1" aria-hidden="true"></i>Accessibilité
                                             </small>
-                                            <a href="{{ structure.accessibilite_lieu }}" class="btn-link fw-bold has-external-link" target="_blank" rel="noopener noreferrer" aria-label="Retrouvez toutes les infos via ce lien (ouverture dans un nouvel onglet)">Retrouvez toutes les infos via ce lien</a>
+                                            <a href="{{ structure.accessibilite_lieu }}"
+                                               class="btn-link fw-bold has-external-link"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               aria-label="Retrouvez toutes les infos via ce lien (ouverture dans un nouvel onglet)">Retrouvez toutes les infos via ce lien</a>
                                         </li>
                                     {% endif %}
                                     {% if structure.opening_hours %}

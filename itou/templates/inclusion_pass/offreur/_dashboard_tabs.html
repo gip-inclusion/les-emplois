@@ -1,8 +1,12 @@
 <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
     <li class="nav-item">
-        <a class="nav-link{% if active == 'ensemble' %} active{% endif %}" {% if active == 'ensemble' %}aria-current="page"{% endif %} href="{% url 'dashboard:index' %}">Vue d’ensemble</a>
+        <a class="nav-link{% if active == 'ensemble' %} active{% endif %}"
+           {% if active == 'ensemble' %}aria-current="page"{% endif %}
+           href="{% url 'dashboard:index' %}">Vue d’ensemble</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link{% if active == 'pilotage' %} active{% endif %}" {% if active == 'pilotage' %}aria-current="page"{% endif %} href="{% url 'dashboard:index_stats' %}">Pilotage</a>
+        <a class="nav-link{% if active == 'pilotage' %} active{% endif %}"
+           {% if active == 'pilotage' %}aria-current="page"{% endif %}
+           href="{% url 'dashboard:index_stats' %}">Pilotage</a>
     </li>
 </ul>

@@ -1,7 +1,11 @@
-<div id="portefeuille" hx-get="{% url 'inclusion_pass:portefeuille' offreur_uuid=offreur.uuid %}" hx-trigger="every 3s" hx-swap="outerHTML">
+<div id="portefeuille"
+     hx-get="{% url 'inclusion_pass:portefeuille' offreur_uuid=offreur.uuid %}"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML">
     <div aria-live="polite">
         {% for accompagnement in nouveaux %}
-            <div class="alert alert-info d-flex flex-column flex-md-row gap-2 justify-content-md-between align-items-md-center" role="status">
+            <div class="alert alert-info d-flex flex-column flex-md-row gap-2 justify-content-md-between align-items-md-center"
+                 role="status">
                 <p class="mb-0"><strong>Nouvel usager :</strong> {{ accompagnement.personne.get_full_name }} a activé son pass inclusion.</p>
                 <a class="btn btn-sm btn-primary" href="{% url 'inclusion_pass:fiche' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Voir la fiche<span class="visually-hidden"> de {{ accompagnement.personne.get_full_name }}</span></a>
             </div>
@@ -9,9 +13,24 @@
     </div>
 
     <div class="row g-3 mb-3 mb-md-4">
-        <div class="col-6 col-md-3"><div class="c-box h-100 text-center"><p class="h2 mb-0">{{ bilan.total }}</p><p class="mb-0">personnes accompagnées</p></div></div>
-        <div class="col-6 col-md-3"><div class="c-box h-100 text-center"><p class="h2 mb-0">{{ bilan.en_cours }}</p><p class="mb-0">en cours</p></div></div>
-        <div class="col-6 col-md-3"><div class="c-box h-100 text-center"><p class="h2 mb-0">{{ bilan.termines }}</p><p class="mb-0">terminés</p></div></div>
+        <div class="col-6 col-md-3">
+            <div class="c-box h-100 text-center">
+                <p class="h2 mb-0">{{ bilan.total }}</p>
+                <p class="mb-0">personnes accompagnées</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="c-box h-100 text-center">
+                <p class="h2 mb-0">{{ bilan.en_cours }}</p>
+                <p class="mb-0">en cours</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="c-box h-100 text-center">
+                <p class="h2 mb-0">{{ bilan.termines }}</p>
+                <p class="mb-0">terminés</p>
+            </div>
+        </div>
         <div class="col-6 col-md-3"><div class="c-box h-100 text-center"><p class="h2 mb-0">{% if bilan.sorties.6.taux is not None %}{{ bilan.sorties.6.taux }} %{% else %}-{% endif %}</p><p class="mb-0">sorties positives à 6 mois</p></div></div>
     </div>
 

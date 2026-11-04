@@ -20,11 +20,19 @@
                     </legend>
                     {% for donnee in bloc.donnees %}
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" role="switch" name="donnees" value="{{ donnee.cle }}" id="donnee-{{ donnee.cle }}" aria-describedby="aide-{{ donnee.cle }}">
-                            <label class="form-check-label fw-bold" for="donnee-{{ donnee.cle }}">{{ donnee.libelle }}</label>
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   role="switch"
+                                   name="donnees"
+                                   value="{{ donnee.cle }}"
+                                   id="donnee-{{ donnee.cle }}"
+                                   aria-describedby="aide-{{ donnee.cle }}">
+                            <label class="form-check-label fw-bold"
+                                   for="donnee-{{ donnee.cle }}">{{ donnee.libelle }}</label>
                             <p class="fs-sm mb-1" id="aide-{{ donnee.cle }}">{{ donnee.description }}</p>
                             <span class="badge badge-sm rounded-pill {{ donnee.source.badge }}">
-                                <i class="{{ donnee.source.icone }} me-1" aria-hidden="true"></i>{{ donnee.source.libelle }}
+                                <i class="{{ donnee.source.icone }} me-1"
+                                   aria-hidden="true"></i>{{ donnee.source.libelle }}
                             </span>
                         </div>
                     {% endfor %}
@@ -36,8 +44,15 @@
                 <legend class="h3">Autorisations</legend>
                 {% for autorisation in autorisations %}
                     <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" role="switch" name="donnees" value="{{ autorisation.cle }}" id="donnee-{{ autorisation.cle }}" aria-describedby="aide-{{ autorisation.cle }}">
-                        <label class="form-check-label fw-bold" for="donnee-{{ autorisation.cle }}">{{ autorisation.libelle }}</label>
+                        <input class="form-check-input"
+                               type="checkbox"
+                               role="switch"
+                               name="donnees"
+                               value="{{ autorisation.cle }}"
+                               id="donnee-{{ autorisation.cle }}"
+                               aria-describedby="aide-{{ autorisation.cle }}">
+                        <label class="form-check-label fw-bold"
+                               for="donnee-{{ autorisation.cle }}">{{ autorisation.libelle }}</label>
                         <p class="fs-sm mb-0" id="aide-{{ autorisation.cle }}">{{ autorisation.description }}</p>
                     </div>
                 {% endfor %}

@@ -1,4 +1,7 @@
-<div id="notifications" hx-get="{% url 'inclusion_pass:prescripteur' prescripteur_uuid=prescripteur.uuid %}" hx-trigger="every 3s" hx-swap="outerHTML">
+<div id="notifications"
+     hx-get="{% url 'inclusion_pass:prescripteur' prescripteur_uuid=prescripteur.uuid %}"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML">
     <div aria-live="polite">
         {% for notification in notifications %}
             <div class="c-box mb-3">

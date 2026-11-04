@@ -42,5 +42,6 @@
             {% endfor %}
         </dl>
     </div>
-    <a class="btn btn-primary" href="{% url 'inclusion_pass:bilan_intervention' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Bilan de l’intervention</a>
+    <a class="btn btn-primary"
+       href="{% url 'inclusion_pass:bilan_intervention' offreur_uuid=offreur.uuid accompagnement_id=accompagnement.pk %}">Bilan de l’intervention</a>
 {% endblock pass_content %}
