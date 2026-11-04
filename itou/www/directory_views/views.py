@@ -137,5 +137,5 @@ def send_message(request, public_id):
             email.send()
             messages.success(request, "Votre message a bien été envoyé.")
             detail_url = reverse("directory:person_detail", kwargs={"public_id": public_id})
-            return redirect(add_url_params(detail_url, {"back_url": request.POST.get("back_url", "")}))
+            return redirect(add_url_params(detail_url, {"back_url": get_safe_url(request, "back_url")}))
     return render(request, "directory/person_detail.html", _person_detail_context(request, person, form))

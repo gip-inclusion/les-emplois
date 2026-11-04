@@ -85,6 +85,26 @@ def test_custom_subject_is_ignored_for_predefined_subject(client, mailoutbox):
     assert "Objet injecté" not in mailoutbox[0].body
 
 
+def test_evil_back_url(client):
+    _, _, _, person = get_target_person(client)
+
+    response = client.post(
+        reverse("directory:send_message", kwargs={"public_id": person.public_id}),
+        {
+            "subject": ContactSubject.MEETING,
+            "body": "Bonjour",
+            "back_url": "https://evil.com/",
+        },
+    )
+
+    assertRedirects(
+        response,
+        reverse("directory:person_detail", kwargs={"public_id": person.public_id}),
+    )
+    message = ContactMessage.objects.get()
+    assert message.custom_subject == ""
+
+
 def test_message_rate_limit(client, mailoutbox, mocker):
     _, _, _, person = get_target_person(client)
     mocker.patch("itou.www.directory_views.views.MessageThrottle.rate", "1/day")
