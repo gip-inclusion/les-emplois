@@ -2,8 +2,8 @@ import pytest
 from django.contrib.gis.geos import Point
 
 from itou.directory.models import DirectoryProfile
-from itou.directory.services import get_directory_people, get_directory_person
 from itou.nexus.enums import NexusStructureKind, NexusUserKind, Service
+from itou.www.directory_views.views import get_directory_people, get_directory_person
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import StructureFactory
 from tests.nexus.factories import NexusMembershipFactory
