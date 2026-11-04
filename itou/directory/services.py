@@ -54,6 +54,8 @@ class DirectoryPerson:
 
     @property
     def main_organization(self):
+        # Populated by get_directory_people, do not access before the directory
+        # is fully constructed.
         return self.organizations[0]
 
     @property
