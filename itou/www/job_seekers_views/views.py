@@ -338,8 +338,8 @@ class ContractsTabView(BaseJobSeekerDetailView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "approval": self.approval,
             "contracts": self.get_contracts(),
+            "approval_missing_or_expired": self.approval_missing_or_expired,
         }
 
 

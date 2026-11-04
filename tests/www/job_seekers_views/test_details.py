@@ -1333,6 +1333,44 @@ class TestContracts:
             == snapshot
         )
 
+    @freeze_time("2026-11-04")
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(
+                EmployerFactory,
+                membership__company__kind=CompanyKind.EI,
+                membership__company__name="Hair Jordan",
+            ),
+        ],
+        ids=["authorized prescriber", "siae"],
+    )
+    def test_display_contracts_when_no_valid_approval(self, client, snapshot, user_factory):
+        expired_approval = ApprovalFactory(
+            for_snapshot=True,
+            start_at="2024-01-01",
+            end_at="2025-12-31",
+        )
+        job_seeker = expired_approval.user
+        user = user_factory()
+
+        # Not displayed contract (ended more than 2 years ago)
+        ContractFactory(end_date="2024-11-03")
+
+        # Displayed contract
+        ContractFactory(
+            company__name="Tif'any",
+            job_seeker=job_seeker,
+            start_date="2025-01-01",
+            end_date="2025-08-07",
+            company__kind=CompanyKind.EI,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
     def test_forbidden(self, client):
         job_seeker = JobSeekerFactory()
         for user, expected_status in [
