@@ -2,22 +2,28 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.templatetags.static import static
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.nexus.enums import NexusStructureKind
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import PrescriberFactory
-from tests.utils.htmx.testing import update_page_with_htmx
+from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup
 from tests.www.directory_views.helpers import get_target_person, setup_directory
 
 
 def test_people_search_filters_and_htmx(client):
-    _, _, _, person = get_target_person(client)
-    page = parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.public_id}))
+    _, _, target_organization, person = get_target_person(client)
+    other_user = EmployerFactory(membership=False, first_name="Julie", last_name="Durand")
+    company = CompanyFactory(
+        coords=target_organization.coords,
+        insee_city=target_organization.insee_city,
+    )
+    CompanyMembershipFactory(user=other_user, company=company)
+    page = parse_response_to_soup(client.get(reverse("directory:people_results")))
 
     response = client.get(
         reverse("directory:people_results"),
@@ -27,11 +33,14 @@ def test_people_search_filters_and_htmx(client):
 
     update_page_with_htmx(page, "#people-search-form", response)
     assert [heading.text for heading in page.select("#people-search-results h3")] == ["MARTIN Alice"]
-    assert page.select_one(f'#people-search-form select[name="q"] option[value="{person.public_id}"][selected]')
-    assert page.select_one("#people-search-count")
-    assert page.select_one('#people-search-form input[name="types"]')
-    assertTemplateUsed(response, "directory/includes/people_results.html")
-    assertNotContains(response, "js/directory_feedback.js")
+    [empty_option] = page.select('#people-search-form select[name="q"] option[value=""]')
+    del empty_option["selected"]
+    [option] = page.select(f'#people-search-form select[name="q"] option[value="{person.public_id}"]')
+    option["selected"] = ""
+    assertSoupEqual(
+        page,
+        parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": person.public_id})),
+    )
 
 
 def test_people_search_restores_query_from_url(client):
