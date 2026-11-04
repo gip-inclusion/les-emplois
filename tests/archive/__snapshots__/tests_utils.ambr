@@ -142,6 +142,11 @@
       'model': 'geiq_assessments.AssessmentTransitionLog',
     }),
     dict({
+      'field': 'auteur',
+      'hidden': True,
+      'model': 'inclusion_pass.BilanIntervention',
+    }),
+    dict({
       'field': 'updated_by',
       'hidden': False,
       'model': 'inclusion_pass.OffreurMembership',

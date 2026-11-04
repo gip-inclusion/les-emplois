@@ -1,9 +1,11 @@
 import factory
 
+from itou.companies.enums import ProSupportReportAutonomy, ProSupportReportSolution
 from itou.inclusion_pass import catalogue
 from itou.inclusion_pass.models import (
     AccesDonnee,
     Accompagnement,
+    BilanIntervention,
     Consentement,
     DonneePartagee,
     NotificationPrescripteur,
@@ -89,3 +91,14 @@ class NotificationPrescripteurFactory(factory.django.DjangoModelFactory):
     prescripteur = factory.SubFactory("tests.prescribers.factories.PrescriberOrganizationFactory")
     accompagnement = factory.SubFactory(AccompagnementFactory)
     message = "Votre orientation a abouti."
+
+
+class BilanInterventionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BilanIntervention
+
+    accompagnement = factory.SubFactory(AccompagnementFactory)
+    auteur = factory.SubFactory("tests.users.factories.ProfessionalFactory")
+    barriers = factory.LazyFunction(list)
+    autonomy = ProSupportReportAutonomy.OCCASIONAL_SUPPORT
+    solution = ProSupportReportSolution.TRAINING

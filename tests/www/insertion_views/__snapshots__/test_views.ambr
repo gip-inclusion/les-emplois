@@ -181,7 +181,7 @@
 # ---
 # name: TestOrientationDetailsForSender.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -356,6 +356,13 @@
                  AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -574,6 +581,32 @@
           WHERE "insertion_orientation_documents"."orientation_id" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          'marquer_notifications_lues[inclusion_pass/services.py]',
+          'orientation_details_for_sender[www/insertion_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          UPDATE "inclusion_pass_notificationprescripteur"
+          SET "lue_le" = %s
+          WHERE "inclusion_pass_notificationprescripteur"."id" IN
+              (SELECT U0."id"
+               FROM "inclusion_pass_notificationprescripteur" U0
+               INNER JOIN "inclusion_pass_accompagnement" U2 ON (U0."accompagnement_id" = U2."id")
+               WHERE (U0."lue_le" IS NULL
+                      AND U0."prescripteur_id" = %s
+                      AND U2."orientation_id" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2176,11 +2209,6 @@
                                   Orientations vers des services
                               </a>
                           </li>
-                          <li class="nav-item">
-                              <a class="nav-link" href="/pass/prescripteur/prises-en-charge/">
-                                  Usagers pris en charge
-                              </a>
-                          </li>
                       </ul>
                   </div>
               </div>
@@ -2406,11 +2434,6 @@
                           <li class="nav-item">
                               <a class="nav-link active" href="/insertion/orientations/">
                                   Orientations vers des services
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" href="/pass/prescripteur/prises-en-charge/">
-                                  Usagers pris en charge
                               </a>
                           </li>
                       </ul>
@@ -2995,9 +3018,9 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U0."beneficiary_id" AS "beneficiary"
-               FROM "insertion_orientation" U0
-               WHERE U0."sender_prescriber_organization_id" = %s)
+              (SELECT V0."beneficiary_id" AS "beneficiary"
+               FROM "insertion_orientation" V0
+               WHERE V0."sender_prescriber_organization_id" = %s)
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -3052,9 +3075,9 @@
           INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           WHERE ("prescribers_prescribermembership"."organization_id" = %s
                  AND "users_user"."id" IN
-                   (SELECT U0."sender_id" AS "sender"
-                    FROM "insertion_orientation" U0
-                    WHERE U0."sender_prescriber_organization_id" = %s))
+                   (SELECT V0."sender_id" AS "sender"
+                    FROM "insertion_orientation" V0
+                    WHERE V0."sender_prescriber_organization_id" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3127,6 +3150,15 @@
                  "insertion_orientation"."last_reminder_email_sent_at",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
+          
+            (SELECT U0."message" AS "message"
+             FROM "inclusion_pass_notificationprescripteur" U0
+             INNER JOIN "inclusion_pass_accompagnement" U1 ON (U0."accompagnement_id" = U1."id")
+             WHERE (U1."orientation_id" = ("insertion_orientation"."id")
+                    AND U0."lue_le" IS NULL
+                    AND U0."prescripteur_id" = ("insertion_orientation"."sender_prescriber_organization_id"))
+             ORDER BY U0."created_at" ASC
+             LIMIT 1) AS "pass_notification",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",

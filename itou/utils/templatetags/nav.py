@@ -167,11 +167,6 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="prescribers-list-accredited-organizations",
     ),
-    "prescriber-pass-notifications": NavItem(
-        label="Usagers pris en charge",
-        target=reverse_lazy("inclusion_pass:prescripteur_notifications"),
-        active_view_names=["inclusion_pass:prescripteur_notifications"],
-    ),
     # Service providers (offreurs de service).
     "offreur-demandes-recues": NavItem(
         label="Demandes reçues",
@@ -186,7 +181,13 @@ NAV_ENTRIES = {
     "offreur-usagers": NavItem(
         label="Usagers accompagnés",
         target=reverse_lazy("inclusion_pass:usagers"),
-        active_view_names=["inclusion_pass:usagers", "inclusion_pass:fiche", "inclusion_pass:bilan_intervention"],
+        active_view_names=[
+            "inclusion_pass:usagers",
+            "inclusion_pass:fiche",
+            "inclusion_pass:accompagnateurs",
+            "inclusion_pass:bilan_intervention",
+            "inclusion_pass:remplir_bilan",
+        ],
     ),
     "offreur-presentation": NavItem(
         label="Fiche de présentation",
@@ -354,7 +355,6 @@ def nav(request):
                     items=[
                         NAV_ENTRIES["prescriber-job-apps"],
                         NAV_ENTRIES["prescriber-orientations"],
-                        NAV_ENTRIES["prescriber-pass-notifications"],
                     ],
                 )
             )

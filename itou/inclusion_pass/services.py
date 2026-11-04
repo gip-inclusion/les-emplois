@@ -2,7 +2,7 @@
 
 import random
 
-from django.db.models import Avg, F
+from django.db.models import Avg, F, OuterRef, Subquery
 from django.utils import timezone
 
 from itou.inclusion_pass import catalogue, connecteurs
@@ -34,10 +34,11 @@ def cles_consenties(personne, offreur):
     )
 
 
-def accorder(personne, offreur, cles, prescripteur_par_defaut=None):
+def accorder(personne, offreur, cles):
     """Record the person's consent for each key, start the follow-up and fetch the data.
 
-    Keys not requested by the offreur (nor in the authorizations catalogue) are ignored.
+    Keys not requested by the offreur (nor in the authorizations catalogue) are ignored. A pending orientation
+    towards the offreur is accepted: activating the pass means the follow-up starts.
     """
     autorisees = set(offreur.donnees_demandees) | set(catalogue.AUTORISATIONS)
     nouvelles = set(cles) & autorisees - cles_consenties(personne, offreur)
@@ -46,14 +47,13 @@ def accorder(personne, offreur, cles, prescripteur_par_defaut=None):
         _journal(personne, offreur, cle, Action.OCTROI)
 
     orientation = orientation_recue(personne, offreur)
+    if orientation and orientation.accept.is_available():
+        orientation.accept()
     accompagnement, created = Accompagnement.objects.get_or_create(
         personne=personne,
         offreur=offreur,
         ended_at=None,
-        defaults={
-            "orientation": orientation,
-            "prescripteur": trouver_prescripteur(personne, orientation) or prescripteur_par_defaut,
-        },
+        defaults={"orientation": orientation, "prescripteur": trouver_prescripteur(personne, orientation)},
     )
     recuperer(personne, offreur)
     if created:
@@ -138,10 +138,20 @@ def donnees_pour_offreur(offreur, personne, journaliser=True):
 
 
 def orientation_recue(personne, offreur):
-    """The most recent orientation of the person towards one of the offreur services, if any."""
+    """The most recent orientation of the person towards one of the offreur services, if any.
+
+    An orientation that already led to an ended follow-up does not count for a new one.
+    """
+    deja_suivies = (
+        Accompagnement.objects.filter(personne=personne, offreur=offreur)
+        .exclude(ended_at=None)
+        .exclude(orientation=None)
+        .values("orientation")
+    )
     return (
         Orientation.objects.filter(beneficiary=personne, service__structure=offreur.structure)
         .exclude(status__in=[OrientationStatus.REFUSED, OrientationStatus.EXPIRED])
+        .exclude(pk__in=deja_suivies)
         .select_related("sender_prescriber_organization")
         .order_by("-created_at")
         .first()
@@ -162,7 +172,7 @@ def trouver_prescripteur(personne, orientation=None):
 
 
 def prescripteur_de_demo():
-    """Organization of the demo prescriber account, notified when no prescriber is found."""
+    """Organization of the demo prescriber account, which sends the orientations of the demo data."""
     membership = (
         PrescriberMembership.objects.filter(user__email=DEMO_PRESCRIPTEUR_EMAIL)
         .select_related("organization")
@@ -173,14 +183,16 @@ def prescripteur_de_demo():
 
 
 def notifier_prescripteur(accompagnement):
-    prescripteur = accompagnement.prescripteur
-    if prescripteur is None:
+    """Notify the prescriber who sent the orientation, shown in its list of sent orientations until opened.
+
+    Without an orientation sent by a prescriber, there is nowhere to show the notification: nothing is sent.
+    """
+    orientation = accompagnement.orientation
+    if orientation is None or orientation.sender_prescriber_organization_id is None:
         return
+    prescripteur = orientation.sender_prescriber_organization
     personne = accompagnement.personne
-    message = (
-        f"{personne.get_full_name()} est accompagnée par {accompagnement.offreur.display_name} "
-        f"depuis le {timezone.localdate(accompagnement.started_at):%d/%m/%Y}. Votre orientation a abouti."
-    )
+    message = f"Pass inclusion activé le {timezone.localdate(accompagnement.started_at):%d/%m/%Y}"
     NotificationPrescripteur.objects.create(prescripteur=prescripteur, accompagnement=accompagnement, message=message)
     _journal(
         personne,
@@ -189,6 +201,37 @@ def notifier_prescripteur(accompagnement):
         Action.NOTIFICATION,
         prescripteur.display_name,
     )
+
+
+def _notifications_non_lues(organisation):
+    return NotificationPrescripteur.objects.filter(prescripteur=organisation, lue_le=None)
+
+
+def avec_notifications(orientations):
+    """Annotate each orientation with ``pass_notification``, the message of its oldest unread notification."""
+    notifications = NotificationPrescripteur.objects.filter(
+        prescripteur=OuterRef("sender_prescriber_organization"),
+        accompagnement__orientation=OuterRef("pk"),
+        lue_le=None,
+    ).order_by("created_at")
+    return orientations.annotate(pass_notification=Subquery(notifications.values("message")[:1]))
+
+
+def nombre_notifications_non_lues(organisation):
+    return _notifications_non_lues(organisation).count()
+
+
+def marquer_notifications_lues(orientation, organisation):
+    _notifications_non_lues(organisation).filter(accompagnement__orientation=orientation).update(lue_le=timezone.now())
+
+
+def envoyer_bilan(bilan):
+    """Save the report of the follow-up, which ends it."""
+    bilan.save()
+    accompagnement = bilan.accompagnement
+    if accompagnement.ended_at is None:
+        accompagnement.ended_at = timezone.now()
+        accompagnement.save(update_fields=["ended_at"])
 
 
 def simuler_suivi(accompagnement, rng=random):
@@ -231,13 +274,17 @@ def _repartition(accompagnements, categorie, ordre):
     return [{"libelle": libelle, "nombre": nombre} for libelle, nombre in comptes.items() if nombre]
 
 
-def bilan_impact(offreur):
-    """Anonymous impact report of the offreur: activity, entry profile and positive exits at 3, 6 and 12 months."""
-    accompagnements = list(
-        offreur.accompagnements.select_related("personne__jobseeker_profile").prefetch_related("situations")
-    )
+def bilan_impact(offreur, accompagnements=None):
+    """Anonymous impact report of the offreur: activity, entry profile and positive exits at 3, 6 and 12 months.
+
+    Args:
+        offreur: The offreur whose follow-ups are counted.
+        accompagnements: A subset of the offreur follow-ups (queryset), all of them by default.
+    """
+    queryset = offreur.accompagnements.all() if accompagnements is None else accompagnements
+    duree = queryset.exclude(ended_at=None).aggregate(d=Avg(F("ended_at") - F("started_at")))["d"]
+    accompagnements = list(queryset.select_related("personne__jobseeker_profile").prefetch_related("situations"))
     termines = [a for a in accompagnements if a.ended_at]
-    duree = offreur.accompagnements.exclude(ended_at=None).aggregate(d=Avg(F("ended_at") - F("started_at")))["d"]
     sorties = {}
     for mois in (3, 6, 12):
         situations = [s for a in termines for s in a.situations.all() if s.mois == mois]
@@ -279,3 +326,85 @@ def bilan_impact(offreur):
             ),
         },
     }
+
+
+MODELES_EXPORT = {
+    "fse": "Reporting FSE",
+    "cd": "Financement du conseil départemental",
+    "complet": "Bilan complet",
+}
+
+
+def _taux(sortie):
+    return "" if sortie["taux"] is None else f"{sortie['taux']}\xa0%"
+
+
+def _nombres(repartition):
+    return {serie["libelle"]: serie["nombre"] for serie in repartition}
+
+
+def _lignes_complet(bilan):
+    lignes = [
+        ["Personnes accompagnées", bilan["total"]],
+        ["Accompagnements en cours", bilan["en_cours"]],
+        ["Accompagnements terminés", bilan["termines"]],
+        ["Durée moyenne (jours)", bilan["duree_moyenne_jours"] or ""],
+        ["Bénéficiaires du RSA à l’entrée", bilan["rsa"]],
+        ["Demandeurs d’emploi à l’entrée", bilan["demandeurs_emploi"]],
+    ]
+    lignes += [[f"Sorties positives à {mois} mois", _taux(sortie)] for mois, sortie in bilan["sorties"].items()]
+    for repartition in bilan["repartitions"].values():
+        lignes += [[serie["libelle"], serie["nombre"]] for serie in repartition]
+    return lignes
+
+
+def _lignes_fse(bilan):
+    # Participant indicators of the FSE+ reporting: entry profile, then situation after the follow-up
+    genres = _nombres(bilan["repartitions"]["genre"])
+    ages = _nombres(bilan["repartitions"]["age"])
+    return [
+        ["Participants", bilan["total"]],
+        *[[genre, genres.get(genre, 0)] for genre in ("Femmes", "Hommes")],
+        *[[age, ages.get(age, 0)] for age in ("Moins de 26 ans", "26 à 44 ans", "45 ans et plus")],
+        ["Demandeurs d’emploi à l’entrée", bilan["demandeurs_emploi"]],
+        ["Bénéficiaires de minima sociaux (RSA) à l’entrée", bilan["rsa"]],
+        ["Résidents QPV", _nombres(bilan["repartitions"]["qpv"]).get("Résident QPV", 0)],
+        ["Participants sortis", bilan["termines"]],
+        *[[f"En emploi ou en formation à {mois} mois", _taux(bilan["sorties"][mois])] for mois in (3, 6)],
+    ]
+
+
+def _lignes_cd(bilan):
+    # The department funds the follow-up of RSA beneficiaries: the report only counts them
+    return [
+        ["Bénéficiaires du RSA accompagnés", bilan["total"]],
+        ["Accompagnements en cours", bilan["en_cours"]],
+        ["Accompagnements terminés", bilan["termines"]],
+        ["Durée moyenne (jours)", bilan["duree_moyenne_jours"] or ""],
+        *[[f"Sorties positives à {mois} mois", _taux(sortie)] for mois, sortie in bilan["sorties"].items()],
+        ["Résidents QPV", _nombres(bilan["repartitions"]["qpv"]).get("Résident QPV", 0)],
+    ]
+
+
+def lignes_export(offreur, modele):
+    """Rows of the impact report export, in the format expected by a funder.
+
+    Args:
+        offreur: The offreur exporting its report.
+        modele: A key of ``MODELES_EXPORT``.
+
+    Returns:
+        A list of ``[indicator, value]`` rows, preceded by the structure, the format and the date.
+    """
+    if modele == "cd":
+        rsa = offreur.accompagnements.filter(**{f"statuts_entree__{catalogue.STATUT_RSA}": True})
+        lignes = _lignes_cd(bilan_impact(offreur, rsa))
+    else:
+        lignes = {"fse": _lignes_fse, "complet": _lignes_complet}[modele](bilan_impact(offreur))
+    return [
+        ["Structure", offreur.display_name],
+        ["Modèle", MODELES_EXPORT[modele]],
+        ["Date d’export", f"{timezone.localdate():%d/%m/%Y}"],
+        ["Indicateur", "Valeur"],
+        *lignes,
+    ]

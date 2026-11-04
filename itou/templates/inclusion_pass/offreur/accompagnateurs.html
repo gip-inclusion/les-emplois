@@ -1,0 +1,52 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Accompagnateurs de {{ accompagnement.personne.get_inverted_full_name }} {{ block.super }}{% endblock title %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url request=request only %}
+{% endblock title_navinfo %}
+
+{% block title_content %}
+    {% include "inclusion_pass/offreur/_usager_titre.html" with accompagnement=accompagnement request=request only %}
+{% endblock title_content %}
+
+{% block title_extra %}
+    {% include "inclusion_pass/offreur/_usager_onglets.html" with active="accompagnateurs" accompagnement=accompagnement back_url=back_url request=request only %}
+{% endblock title_extra %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Accompagnateurs</h2>
+            <form id="display-contact-info-form">
+                {% csrf_token %}{# Used by htmx posts #}
+            </form>
+            <div class="row">
+                <div class="col-12 col-xxl-8 col-xxxl-9">
+                    <p class="h4">Accompagnateurs actuels ({{ active_assignments|length }})</p>
+                    {% for assignment in active_assignments %}
+                        {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
+                    {% empty %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <p class="mb-0">Aucun accompagnateur actuel</p>
+                        </div>
+                    {% endfor %}
+                    <p class="h4">Historique des accompagnateurs ({{ ended_assignments|length }})</p>
+                    {% for assignment in ended_assignments %}
+                        {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
+                    {% empty %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <p class="mb-0">Aucun ancien accompagnateur</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock script %}

@@ -37,40 +37,7 @@
                                     {% endif %}
                                 </strong>
                             </li>
-                            <li>
-                                <small>Freins périphériques</small>
-                                <div>
-                                    {% for barrier in report.get_barriers_display %}
-                                        <strong class="d-block">{{ barrier }}</strong>
-                                    {% endfor %}
-                                    {% if report.other_barrier %}
-                                        <strong class="d-block">Autres freins identifiés : {{ report.other_barrier }}</strong>
-                                    {% elif not report.barriers %}
-                                        <strong>Aucun frein identifié</strong>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li>
-                                <small>Autonomie dans la recherche d’emploi</small>
-                                <div>
-                                    <strong class="d-block">{{ report.autonomy }} sur 5</strong>
-                                    <span>{{ report.get_autonomy_display }}</span>
-                                </div>
-                            </li>
-                            <li>
-                                <small>Solution après le contrat</small>
-                                {% if report.solution %}
-                                    <strong>{{ report.get_solution_display }}</strong>
-                                {% else %}
-                                    <strong>Aucune solution prévue à ce jour</strong>
-                                {% endif %}
-                            </li>
-                            {% if report.orientation %}
-                                <li>
-                                    <small>Orientation la plus adaptée</small>
-                                    <span>La structure recommande une orientation <strong>{{ report.get_orientation_display|lower }}</strong>.</span>
-                                </li>
-                            {% endif %}
+                            {% include "job_seekers_views/includes/pro_support_report_answers.html" with report=report solution_label="Solution après le contrat" only %}
                         </ul>
                     </div>
                     <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"

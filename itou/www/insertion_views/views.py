@@ -27,6 +27,7 @@ from rest_framework import status
 
 from itou.companies.models import Company
 from itou.files.models import File, save_file
+from itou.inclusion_pass import services as inclusion_pass_services
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind, OrientationStatus
@@ -47,7 +48,7 @@ from itou.users.perms import (
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
-from itou.utils.readonly import ReadonlyViewMixin, readonly_view
+from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
@@ -591,6 +592,9 @@ def orientations_list(request):
         .order_by("-updated_at", "-created_at", "-pk")
         .select_related("beneficiary", "sender", "service", "service__structure")
     )
+    if request.from_prescriber:
+        # Pass inclusion prototype: orientations validated when the person activated their pass
+        orientations = inclusion_pass_services.avec_notifications(orientations)
 
     filters_form = OrientationsFilterForm(orientations, request.GET, request)
     filters_counter = 0
@@ -614,7 +618,8 @@ def orientations_list(request):
     )
 
 
-@readonly_view
+# Opening the orientation marks its pass inclusion notifications as read
+@http_methods(db_readonly=["HEAD"], db_write=["GET"])
 @check_request(can_orient_towards_insertion_service)
 def orientation_details_for_sender(request, orientation_id):
     template_name = "insertion/orientations/details.html"
@@ -636,6 +641,9 @@ def orientation_details_for_sender(request, orientation_id):
         sender_prescriber_organization=sender_prescriber_organization,
         sender_company=sender_company,
     )
+    # HEAD stays readonly
+    if sender_prescriber_organization and request.method == "GET":
+        inclusion_pass_services.marquer_notifications_lues(orientation, sender_prescriber_organization)
 
     context = {
         "orientation": orientation,

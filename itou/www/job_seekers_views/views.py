@@ -351,6 +351,71 @@ class ContractsTabView(BaseJobSeekerDetailView):
         }
 
 
+def get_assignments_for_display(job_seeker):
+    """Return the ongoing and the ended assignments of the job seeker, with `is_still_member` filled."""
+    assignments = list(
+        JobSeekerAssignment.objects.filter(job_seeker=job_seeker)
+        .select_related("professional", "company", "prescriber_organization")
+        .order_by(
+            "-ended_at",  # ended assignments are sorted by ended_at field,
+            "-last_action_at",  # ongoing assignments are sorted by last_action_at
+        )
+    )
+
+    if employers_data := [
+        (assignment.professional_id, assignment.company_id) for assignment in assignments if assignment.company
+    ]:
+        employers_ids, companies_ids = zip(*employers_data)
+        companies_memberships = set(
+            (membership.user_id, membership.company_id)
+            for membership in CompanyMembership.objects.filter(
+                user__in=employers_ids,
+                company__in=companies_ids,
+            )
+        )
+    else:
+        companies_memberships = []
+
+    if prescribers_data := [
+        (assignment.professional_id, assignment.prescriber_organization_id)
+        for assignment in assignments
+        if assignment.prescriber_organization
+    ]:
+        prescribers_ids, organizations_ids = zip(*prescribers_data)
+        prescribers_memberships = set(
+            (membership.user_id, membership.organization_id)
+            for membership in PrescriberMembership.objects.filter(
+                user__in=prescribers_ids,
+                organization__in=organizations_ids,
+            )
+        )
+    else:
+        prescribers_memberships = []
+
+    active_assignments = []
+    ended_assignments = []
+    for assignment in assignments:
+        # Fill is_still_member
+        if assignment.company:
+            assignment.is_still_member = (
+                assignment.professional_id,
+                assignment.company_id,
+            ) in companies_memberships
+        elif assignment.prescriber_organization:
+            assignment.is_still_member = (
+                assignment.professional_id,
+                assignment.prescriber_organization_id,
+            ) in prescribers_memberships
+        else:
+            assignment.is_still_member = False
+        # Split ended and ongoing assignments
+        if assignment.ended_at:
+            ended_assignments.append(assignment)
+        else:
+            active_assignments.append(assignment)
+    return active_assignments, ended_assignments
+
+
 class AdvisorsTabView(BaseJobSeekerDetailView):
     queryset = (
         User.objects.select_related("jobseeker_profile")
@@ -361,67 +426,7 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
     template_name = "job_seekers_views/advisors.html"
 
     def get_context_data(self, **kwargs):
-        assignments = list(
-            JobSeekerAssignment.objects.filter(job_seeker=self.object)
-            .select_related("professional", "company", "prescriber_organization")
-            .order_by(
-                "-ended_at",  # ended assignments are sorted by ended_at field,
-                "-last_action_at",  # ongoing assignments are sorted by last_action_at
-            )
-        )
-
-        if employers_data := [
-            (assignment.professional_id, assignment.company_id) for assignment in assignments if assignment.company
-        ]:
-            employers_ids, companies_ids = zip(*employers_data)
-            companies_memberships = set(
-                (membership.user_id, membership.company_id)
-                for membership in CompanyMembership.objects.filter(
-                    user__in=employers_ids,
-                    company__in=companies_ids,
-                )
-            )
-        else:
-            companies_memberships = []
-
-        if prescribers_data := [
-            (assignment.professional_id, assignment.prescriber_organization_id)
-            for assignment in assignments
-            if assignment.prescriber_organization
-        ]:
-            prescribers_ids, organizations_ids = zip(*prescribers_data)
-            prescribers_memberships = set(
-                (membership.user_id, membership.organization_id)
-                for membership in PrescriberMembership.objects.filter(
-                    user__in=prescribers_ids,
-                    organization__in=organizations_ids,
-                )
-            )
-        else:
-            prescribers_memberships = []
-
-        active_assignments = []
-        ended_assignments = []
-        for assignment in assignments:
-            # Fill is_still_member
-            if assignment.company:
-                assignment.is_still_member = (
-                    assignment.professional_id,
-                    assignment.company_id,
-                ) in companies_memberships
-            elif assignment.prescriber_organization:
-                assignment.is_still_member = (
-                    assignment.professional_id,
-                    assignment.prescriber_organization_id,
-                ) in prescribers_memberships
-            else:
-                assignment.is_still_member = False
-            # Split ended and ongoing assignmnts
-            if assignment.ended_at:
-                ended_assignments.append(assignment)
-            else:
-                active_assignments.append(assignment)
-
+        active_assignments, ended_assignments = get_assignments_for_display(self.object)
         return super().get_context_data(**kwargs) | {
             "active_assignments": active_assignments,
             "ended_assignments": ended_assignments,

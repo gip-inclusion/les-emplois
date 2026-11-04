@@ -29,6 +29,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.inclusion_pass import services as inclusion_pass_services
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
@@ -177,12 +178,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "siae_suspension_text_with_dates": None,
         "company_search_form": CompanySearchForm(),
         "stalled_job_seekers_count": None,
+        "pass_notifications_count": None,
     }
 
     if request.from_employer:
         context.update(_employer_dashboard_context(request))
     elif request.from_prescriber:
         if current_org := request.current_organization:
+            context["pass_notifications_count"] = inclusion_pass_services.nombre_notifications_non_lues(current_org)
             context["stalled_job_seekers_count"] = User.objects.assigned_job_seeker_ids(
                 request.user,
                 request.current_organization,

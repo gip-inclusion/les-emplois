@@ -12,5 +12,6 @@ for model in (
     models.AccesDonnee,
     models.SituationSuivi,
     models.NotificationPrescripteur,
+    models.BilanIntervention,
 ):
     admin.site.register(model)

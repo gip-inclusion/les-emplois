@@ -41,7 +41,13 @@
                                     {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}
                                 </a>
                             </td>
-                            <td>{% orientation_state_badge orientation extra_classes="badge-sm" %}</td>
+                            <td>
+                                {% orientation_state_badge orientation extra_classes="badge-sm" %}
+                                {% if orientation.pass_notification %}
+                                    <span class="badge rounded-pill badge-xs bg-warning">Nouveau</span>
+                                    <span class="d-block fs-sm mt-1">{{ orientation.pass_notification }}</span>
+                                {% endif %}
+                            </td>
                             <td>{{ orientation.created_at|date:"d/m/Y" }}</td>
                             <td>{{ orientation.updated_at|date:"d/m/Y" }}</td>
                             <td>

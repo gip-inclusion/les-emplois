@@ -48,7 +48,7 @@
 # ---
 # name: TestSavedSearches.test_display_saved_searches_and_delete_modal[/dashboard/][SQL queries]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -262,6 +262,19 @@
           FROM "cities_city"
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nombre_notifications_non_lues[inclusion_pass/services.py]',
+          'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "inclusion_pass_notificationprescripteur"
+          WHERE ("inclusion_pass_notificationprescripteur"."lue_le" IS NULL
+                 AND "inclusion_pass_notificationprescripteur"."prescripteur_id" = %s)
         ''',
       }),
       dict({

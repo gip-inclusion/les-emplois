@@ -21,12 +21,16 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link{% if not termines %} active{% endif %}" {% if not termines %}aria-current="page"{% endif %} href="{% url 'inclusion_pass:usagers' %}">
+            <a class="nav-link{% if not termines %} active{% endif %}"
+               {% if not termines %}aria-current="page"{% endif %}
+               href="{% url 'inclusion_pass:usagers' %}">
                 En cours <span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-1">{{ nombre_en_cours }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link{% if termines %} active{% endif %}" {% if termines %}aria-current="page"{% endif %} href="{% url 'inclusion_pass:usagers' %}?statut=termines">
+            <a class="nav-link{% if termines %} active{% endif %}"
+               {% if termines %}aria-current="page"{% endif %}
+               href="{% url 'inclusion_pass:usagers' %}?statut=termines">
                 Terminés <span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-1">{{ nombre_termines }}</span>
             </a>
         </li>
@@ -41,7 +45,10 @@
                     <h2 class="mb-3 mb-md-4">Usagers accompagnés</h2>
                     {% if not accompagnements_page %}
                         <div class="text-center my-3 my-md-4">
-                            <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+                            <img class="img-fluid"
+                                 src="{% static 'img/illustration-card-no-result.png' %}"
+                                 alt=""
+                                 loading="lazy">
                             <p class="mb-1 mt-3">
                                 <strong>Aucun usager pour le moment</strong>
                             </p>
@@ -53,7 +60,6 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Nom Prénom</th>
-                                        <th scope="col">Arrivée</th>
                                         <th scope="col">Début</th>
                                         {% if termines %}<th scope="col">Fin</th>{% endif %}
                                         <th scope="col">Orienté par</th>
@@ -67,33 +73,29 @@
                                         {% url "inclusion_pass:fiche" accompagnement_id=accompagnement.pk as fiche_url %}
                                         <tr>
                                             <td>
-                                                <a href="{{ fiche_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ accompagnement.personne.get_inverted_full_name }}</a>
+                                                <a href="{{ fiche_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="btn-link">{{ accompagnement.personne.get_inverted_full_name }}</a>
                                                 {% if not accompagnement.vu_par_offreur %}
                                                     <span class="d-block mt-1"><span class="badge badge-xs rounded-pill bg-info-lighter text-info">Nouvel usager</span></span>
                                                 {% endif %}
                                             </td>
-                                            <td>
-                                                {% if accompagnement.orientation_id %}
-                                                    <span class="badge badge-sm rounded-pill bg-accent-03-lighter text-primary">Orientation reçue</span>
-                                                {% else %}
-                                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-primary">QR code d’accueil</span>
-                                                {% endif %}
-                                            </td>
                                             <td>{{ accompagnement.started_at|date:"d/m/Y" }}</td>
                                             {% if termines %}<td>{{ accompagnement.ended_at|date:"d/m/Y" }}</td>{% endif %}
-                                            <td>{{ accompagnement.prescripteur.display_name|default:"-" }}</td>
+                                            <td>{{ accompagnement.prescripteur.display_name|default:"Démarche en autonomie" }}</td>
                                             <td class="text-end text-nowrap">
                                                 <a class="btn btn-sm btn-link btn-ico-only"
                                                    href="{% url 'inclusion_pass:bilan_intervention' accompagnement_id=accompagnement.pk %}?back_url={{ request.get_full_path|urlencode }}"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-title="Bilan de l’intervention">
-                                                    <i class="ri-line-chart-line fs-lg" aria-label="Bilan de l’intervention de {{ accompagnement.personne.get_inverted_full_name }}"></i>
+                                                    <i class="ri-line-chart-line fs-lg"
+                                                       aria-label="Bilan de l’intervention de {{ accompagnement.personne.get_inverted_full_name }}"></i>
                                                 </a>
                                                 <a class="btn btn-sm btn-link btn-ico-only"
                                                    href="{{ fiche_url }}?back_url={{ request.get_full_path|urlencode }}"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-title="Voir la fiche">
-                                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir la fiche de {{ accompagnement.personne.get_inverted_full_name }}"></i>
+                                                    <i class="ri-arrow-drop-right-line fs-lg"
+                                                       aria-label="Voir la fiche de {{ accompagnement.personne.get_inverted_full_name }}"></i>
                                                 </a>
                                             </td>
                                         </tr>

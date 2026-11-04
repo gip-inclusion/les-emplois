@@ -3,9 +3,16 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationKind
+from itou.companies.enums import (
+    ProSupportReportAutonomy,
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportSolution,
+)
 from itou.inclusion_pass import catalogue
 
 
@@ -169,6 +176,41 @@ class NotificationPrescripteur(models.Model):
     accompagnement = models.ForeignKey(Accompagnement, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
+    # Set when a member of the prescriber organization opens the orientation
+    lue_le = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class BilanIntervention(models.Model):
+    """Report filled by the offreur at the end of the follow-up, in the format of `companies.ProSupportReport`."""
+
+    accompagnement = models.OneToOneField(Accompagnement, on_delete=models.CASCADE, related_name="bilan")
+    auteur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT, related_name="+")
+    created_at = models.DateTimeField(default=timezone.now)
+    # Same fields as ProSupportReport, so that its form and its display can be reused
+    barriers = ArrayField(models.CharField(choices=ProSupportReportBarrier.choices), blank=True, default=list)
+    other_barrier = models.TextField(blank=True, default="")
+    autonomy = models.PositiveSmallIntegerField(choices=ProSupportReportAutonomy.choices)
+    solution = models.CharField(choices=ProSupportReportSolution.choices, blank=True, default="")
+    orientation = models.CharField(choices=ProSupportReportOrientation.choices, blank=True, default="")
+
+    class Meta:
+        verbose_name = "bilan de l’intervention"
+        verbose_name_plural = "bilans de l’intervention"
+        constraints = [
+            models.CheckConstraint(
+                name="%(class)s_autonomy_range",
+                condition=Q(autonomy__range=(1, 5)),
+                violation_error_message="L’autonomie est notée de 1 à 5.",
+            ),
+            models.CheckConstraint(
+                name="%(class)s_solution_or_orientation",
+                condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
+                violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+        ]
+
+    def get_barriers_display(self):
+        return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

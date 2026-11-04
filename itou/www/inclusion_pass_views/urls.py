@@ -23,10 +23,14 @@ urlpatterns = [
     ),
     path("structure/usagers/", views.usagers, name="usagers"),
     path("structure/usagers/<int:accompagnement_id>/", views.fiche, name="fiche"),
+    path(
+        "structure/usagers/<int:accompagnement_id>/accompagnateurs/",
+        views.accompagnateurs,
+        name="accompagnateurs",
+    ),
     path("structure/usagers/<int:accompagnement_id>/bilan/", views.bilan_intervention, name="bilan_intervention"),
+    path("structure/usagers/<int:accompagnement_id>/bilan/remplir/", views.remplir_bilan, name="remplir_bilan"),
     path("structure/presentation/", views.presentation, name="presentation"),
     path("structure/offres/", views.offres, name="offres"),
     path("structure/qr-code/", views.qr_code_accueil, name="qr_code_accueil"),
-    # Prescriber side
-    path("prescripteur/prises-en-charge/", views.prescripteur_notifications, name="prescripteur_notifications"),
 ]

@@ -1,17 +1,27 @@
+from urllib.parse import urlencode
+
 import pytest
 from django.test import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.companies.enums import ProSupportReportBarrier, ProSupportReportSolution
 from itou.inclusion_pass import catalogue, services
 from itou.inclusion_pass.models import AccesDonnee, NotificationPrescripteur
 from itou.insertion.enums import OrientationStatus
+from itou.job_applications.enums import SenderKind
 from itou.www.inclusion_pass_views.views import DEMO_PERSONA_EMAIL
 from tests.companies.factories import CompanyMembershipFactory
-from tests.inclusion_pass.factories import OffreurFactory, OffreurMembershipFactory
+from tests.inclusion_pass.factories import (
+    AccompagnementFactory,
+    BilanInterventionFactory,
+    OffreurFactory,
+    OffreurMembershipFactory,
+)
 from tests.insertion.factories import OrientationFactory, ServiceFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
 
 
 def _statuts(offreur, personne):
@@ -63,15 +73,77 @@ def test_retrait():
 
 
 def test_prescripteur_prevenu_lors_d_un_second_passage():
-    personne = JobSeekerFactory()
     offreur = OffreurFactory()
-    prescripteur = PrescriberMembershipFactory().organization
-    services.accorder(personne, offreur, [], prescripteur_par_defaut=prescripteur)
+    orientation = OrientationFactory(service=ServiceFactory(structure=offreur.structure))
+    personne = orientation.beneficiary
+    services.accorder(personne, offreur, [])
     assert not NotificationPrescripteur.objects.exists()
 
-    services.accorder(personne, offreur, [catalogue.INFORMER_PRESCRIPTEUR], prescripteur_par_defaut=prescripteur)
-    services.accorder(personne, offreur, [catalogue.INFORMER_PRESCRIPTEUR], prescripteur_par_defaut=prescripteur)
-    assert NotificationPrescripteur.objects.filter(prescripteur=prescripteur).count() == 1
+    services.accorder(personne, offreur, [catalogue.INFORMER_PRESCRIPTEUR])
+    services.accorder(personne, offreur, [catalogue.INFORMER_PRESCRIPTEUR])
+    notification = NotificationPrescripteur.objects.get()
+    assert notification.prescripteur == orientation.sender_prescriber_organization
+    assert notification.lue_le is None
+
+
+def test_activation_du_pass_valide_l_orientation_sans_prevenir_le_prescripteur():
+    offreur = OffreurFactory()
+    orientation = OrientationFactory(service=ServiceFactory(structure=offreur.structure))
+    services.accorder(orientation.beneficiary, offreur, [catalogue.IDENTITE])
+
+    orientation.refresh_from_db()
+    assert orientation.status == OrientationStatus.ACCEPTED
+    assert not NotificationPrescripteur.objects.exists()
+
+
+def test_orientation_envoyee_par_un_employeur_ne_notifie_aucun_prescripteur():
+    # The prescriber of a job application cannot see an orientation sent by a company: no notification for it
+    offreur = OffreurFactory()
+    employeur = CompanyMembershipFactory()
+    orientation = OrientationFactory(
+        service=ServiceFactory(structure=offreur.structure),
+        sender=employeur.user,
+        sender_kind=SenderKind.EMPLOYER,
+        sender_company=employeur.company,
+        sender_prescriber_organization=None,
+    )
+    JobApplicationFactory(job_seeker=orientation.beneficiary, sent_by_prescriber=True)
+    services.accorder(orientation.beneficiary, offreur, [catalogue.INFORMER_PRESCRIPTEUR])
+
+    assert not NotificationPrescripteur.objects.exists()
+
+
+def test_nouveau_passage_apres_un_accompagnement_termine():
+    offreur = OffreurFactory()
+    orientation = OrientationFactory(service=ServiceFactory(structure=offreur.structure))
+    personne = orientation.beneficiary
+    premier = services.accorder(personne, offreur, [catalogue.INFORMER_PRESCRIPTEUR])
+    services.envoyer_bilan(BilanInterventionFactory.build(accompagnement=premier, auteur=ProfessionalFactory()))
+
+    # The old orientation led to the ended follow-up: the new one starts without it
+    second = services.accorder(personne, offreur, [])
+    assert second != premier
+    assert second.orientation is None
+    assert NotificationPrescripteur.objects.count() == 1
+
+
+def test_sans_orientation_le_prescripteur_n_est_pas_prevenu():
+    offreur = OffreurFactory()
+    accompagnement = services.accorder(JobSeekerFactory(), offreur, [catalogue.INFORMER_PRESCRIPTEUR])
+
+    assert accompagnement.prescripteur is None
+    assert not NotificationPrescripteur.objects.exists()
+
+
+def test_qr_code_sans_orientation_demarche_en_autonomie(client):
+    # The demo prescriber account must not be used as a default prescriber anymore
+    PrescriberMembershipFactory(user__email=services.DEMO_PRESCRIPTEUR_EMAIL)
+    offreur = OffreurFactory()
+    personne = JobSeekerFactory()
+    client.force_login(personne)
+    client.post(reverse("inclusion_pass:consentement", args=[offreur.uuid_accueil]), {"donnees": [catalogue.IDENTITE]})
+
+    assert personne.pass_accompagnements.get().prescripteur is None
 
 
 @override_settings(DEBUG=True)
@@ -97,6 +169,9 @@ def test_parcours_complet(client):
     accompagnement = personne.pass_accompagnements.get()
     assert accompagnement.orientation == orientation
     assert accompagnement.prescripteur == prescripteur
+    # Activating the pass validates the orientation, without any action from the offreur
+    orientation.refresh_from_db()
+    assert orientation.status == OrientationStatus.ACCEPTED
 
     # The offreur sees the new person and the record, without the mockup "Provenance des données" block
     client.force_login(membre.user)
@@ -117,10 +192,18 @@ def test_parcours_complet(client):
     csv = client.get(reverse("inclusion_pass:pilotage_csv"))
     assert "Sorties positives à 12 mois" in csv.text
 
-    # The prescriber who sent the orientation is notified
+    # The prescriber who sent the orientation is notified in the existing screens, until the orientation is opened
     client.force_login(PrescriberMembershipFactory(organization=prescripteur).user)
-    response = client.get(reverse("inclusion_pass:prescripteur_notifications"))
-    assertContains(response, f"<td>{personne.get_inverted_full_name()}</td>")
+    badge = '<span class="badge rounded-pill badge-xs bg-warning">1</span>'
+    assertContains(client.get(reverse("dashboard:index")), badge)
+    liste_url = reverse("insertion_views:orientations_list")
+    assertContains(client.get(liste_url), "Pass inclusion activé le")
+    details_url = reverse("insertion_views:orientation_details_for_sender", args=[orientation.id])
+    assert client.head(details_url).status_code == 200
+    assertContains(client.get(liste_url), "Pass inclusion activé le")
+    client.get(details_url)
+    assertNotContains(client.get(liste_url), "Pass inclusion activé le")
+    assertNotContains(client.get(reverse("dashboard:index")), badge)
 
 
 def test_qr_code_partage_par_plusieurs_personnes(client):
@@ -182,6 +265,72 @@ def test_usagers_limites_a_l_offreur(client):
     assert client.get(reverse("inclusion_pass:fiche", args=[autre_fiche.pk])).status_code == 404
 
 
+def test_usager_en_demarche_autonome(client):
+    membre = OffreurMembershipFactory()
+    services.accorder(JobSeekerFactory(), membre.offreur, [catalogue.IDENTITE])
+    client.force_login(membre.user)
+
+    response = client.get(reverse("inclusion_pass:usagers"))
+    assertContains(response, "<td>Démarche en autonomie</td>")
+    assertNotContains(response, '<th scope="col">Arrivée</th>')
+
+
+def test_onglet_accompagnateurs(client):
+    membre = OffreurMembershipFactory()
+    accompagnement = AccompagnementFactory(offreur=membre.offreur)
+    prescripteur = PrescriberMembershipFactory()
+    assignment = JobSeekerAssignmentFactory(
+        job_seeker=accompagnement.personne,
+        professional=prescripteur.user,
+        prescriber_organization=prescripteur.organization,
+    )
+    client.force_login(membre.user)
+
+    response = client.get(reverse("inclusion_pass:accompagnateurs", args=[accompagnement.pk]))
+    assertContains(response, "Accompagnateurs actuels (1)")
+    assertContains(response, f"<h3>{assignment.professional.get_full_name()}</h3>")
+    assertContains(response, assignment.prescriber_organization.display_name)
+
+
+def test_bilan_de_l_intervention(client):
+    membre = OffreurMembershipFactory()
+    accompagnement = AccompagnementFactory(offreur=membre.offreur)
+    client.force_login(membre.user)
+    bilan_url = reverse("inclusion_pass:bilan_intervention", args=[accompagnement.pk])
+    remplir_url = reverse("inclusion_pass:remplir_bilan", args=[accompagnement.pk])
+
+    assertContains(client.get(bilan_url), f'href="{remplir_url}')
+    response = client.get(remplir_url)
+    assertContains(response, "L’usager a-t-il des freins périphériques identifiés")
+    assertNotContains(response, ProSupportReportSolution.RENEWAL.label)
+    response = client.post(
+        remplir_url,
+        {
+            "barriers": [ProSupportReportBarrier.MOBILITY],
+            "autonomy": 3,
+            "has_solution": "True",
+            "solution": ProSupportReportSolution.TRAINING,
+        },
+    )
+    assertRedirects(response, f"{bilan_url}?{urlencode({'back_url': reverse('inclusion_pass:usagers')})}")
+
+    # Sending the report ends the follow-up, and the report can no longer be changed
+    accompagnement.refresh_from_db()
+    assert accompagnement.ended_at is not None
+    assert accompagnement.bilan.auteur == membre.user
+    response = client.get(bilan_url)
+    assertContains(response, ProSupportReportBarrier.MOBILITY.label)
+    assertContains(response, "Solution après l’accompagnement")
+    assertContains(response, ProSupportReportSolution.TRAINING.label)
+    assert client.get(remplir_url).status_code == 404
+
+
+def test_bilan_de_l_intervention_deja_rempli():
+    bilan = BilanInterventionFactory(barriers=[ProSupportReportBarrier.DIGITAL])
+
+    assert bilan.get_barriers_display() == [ProSupportReportBarrier.DIGITAL.label]
+
+
 def test_pages_structure(client):
     membre = OffreurMembershipFactory(offreur__structure__description="Une auto-école pour tous")
     service = ServiceFactory(structure=membre.offreur.structure)
@@ -197,9 +346,43 @@ def test_pages_structure(client):
 
 
 @pytest.mark.parametrize(
+    "modele,ligne",
+    [
+        ("fse", "Femmes;1"),
+        ("cd", "Bénéficiaires du RSA accompagnés;1"),
+        ("complet", "Personnes accompagnées;2"),
+    ],
+)
+def test_exports_du_pilotage(client, modele, ligne):
+    membre = OffreurMembershipFactory()
+    AccompagnementFactory(offreur=membre.offreur, personne__title="MME", statuts_entree={catalogue.STATUT_RSA: True})
+    AccompagnementFactory(offreur=membre.offreur, personne__title="M", statuts_entree={catalogue.STATUT_RSA: False})
+    client.force_login(membre.user)
+
+    response = client.get(reverse("inclusion_pass:pilotage_csv"), {"modele": modele})
+    assert response["Content-Disposition"] == f'attachment; filename="bilan-impact-{modele}.csv"'
+    lignes = response.content.decode().splitlines()
+    assert lignes[0] == f"Structure;{membre.offreur.display_name}"
+    assert ligne in lignes
+
+
+def test_export_du_pilotage_inconnu(client):
+    client.force_login(OffreurMembershipFactory().user)
+
+    assert client.get(reverse("inclusion_pass:pilotage_csv"), {"modele": "autre"}).status_code == 404
+
+
+@pytest.mark.parametrize(
     "url_name", ["inclusion_pass:demandes_recues", "inclusion_pass:usagers", "inclusion_pass:presentation"]
 )
 def test_pages_offreur_refusees_aux_autres_professionnels(client, url_name):
     client.force_login(CompanyMembershipFactory().user)
 
     assert client.get(reverse(url_name)).status_code == 403
+
+
+@pytest.mark.parametrize("url_name", ["inclusion_pass:accompagnateurs", "inclusion_pass:remplir_bilan"])
+def test_pages_usager_refusees_aux_autres_professionnels(client, url_name):
+    client.force_login(CompanyMembershipFactory().user)
+
+    assert client.get(reverse(url_name, args=[AccompagnementFactory().pk])).status_code == 403

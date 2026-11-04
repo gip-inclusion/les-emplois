@@ -1,4 +1,5 @@
 import csv
+from urllib.parse import urlencode
 
 import segno
 from django.conf import settings
@@ -10,7 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from itou.inclusion_pass import catalogue, connecteurs, services
-from itou.inclusion_pass.models import Accompagnement, NotificationPrescripteur, Offreur
+from itou.inclusion_pass.models import Accompagnement, BilanIntervention, Offreur
 from itou.insertion.enums import OrientationStatus
 from itou.insertion.models import Orientation
 from itou.insertion.opening_hours import format_osm_hours
@@ -20,8 +21,9 @@ from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
-from itou.www.inclusion_pass_views.forms import DemandesRecuesFilterForm
+from itou.www.inclusion_pass_views.forms import BilanInterventionForm, DemandesRecuesFilterForm
 from itou.www.insertion_views.forms import RefusalOrientationForm
+from itou.www.job_seekers_views.views import get_assignments_for_display
 
 
 SESSION_ACCUEIL_KEY = "inclusion_pass_accueil"
@@ -73,9 +75,7 @@ def consentement(request, uuid_accueil):
     personne = _personne_or_404(request)
     offreur = get_object_or_404(Offreur, uuid_accueil=uuid_accueil)
     if request.method == "POST":
-        cles = request.POST.getlist("donnees")
-        # Demo: without a known prescriber, the organization of the demo prescriber account is notified
-        services.accorder(personne, offreur, cles, prescripteur_par_defaut=services.prescripteur_de_demo())
+        services.accorder(personne, offreur, request.POST.getlist("donnees"))
         request.session.pop(SESSION_ACCUEIL_KEY, None)
         return redirect(f"{reverse('inclusion_pass:mon_pass')}?confirmation={offreur.uid}")
     blocs = [
@@ -175,29 +175,22 @@ def pilotage(request):
             ],
         }
     )
-    return render(request, "inclusion_pass/offreur/pilotage.html", {"bilan": bilan, "graphiques": graphiques})
+    return render(
+        request,
+        "inclusion_pass/offreur/pilotage.html",
+        {"bilan": bilan, "graphiques": graphiques, "modeles_export": services.MODELES_EXPORT},
+    )
 
 
 @readonly_view
 @check_request(_is_offreur)
 def pilotage_csv(request):
-    bilan = services.bilan_impact(request.current_organization)
+    modele = request.GET.get("modele", "complet")
+    if modele not in services.MODELES_EXPORT:
+        raise Http404
     response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="bilan-impact.csv"'
-    writer = csv.writer(response, delimiter=";")
-    writer.writerow(["Indicateur", "Valeur"])
-    writer.writerow(["Personnes accompagnées", bilan["total"]])
-    writer.writerow(["Accompagnements en cours", bilan["en_cours"]])
-    writer.writerow(["Accompagnements terminés", bilan["termines"]])
-    writer.writerow(["Durée moyenne (jours)", bilan["duree_moyenne_jours"] or ""])
-    writer.writerow(["Bénéficiaires du RSA à l’entrée", bilan["rsa"]])
-    writer.writerow(["Demandeurs d’emploi à l’entrée", bilan["demandeurs_emploi"]])
-    for mois, sortie in bilan["sorties"].items():
-        taux = "" if sortie["taux"] is None else f"{sortie['taux']} %"
-        writer.writerow([f"Sorties positives à {mois} mois", taux])
-    for repartition in bilan["repartitions"].values():
-        for serie in repartition:
-            writer.writerow([serie["libelle"], serie["nombre"]])
+    response["Content-Disposition"] = f'attachment; filename="bilan-impact-{modele}.csv"'
+    csv.writer(response, delimiter=";").writerows(services.lignes_export(request.current_organization, modele))
     return response
 
 
@@ -355,6 +348,24 @@ def fiche(request, accompagnement_id):
     )
 
 
+@readonly_view
+@check_request(_is_offreur)
+def accompagnateurs(request, accompagnement_id):
+    accompagnement = _accompagnement(request, accompagnement_id)
+    active_assignments, ended_assignments = get_assignments_for_display(accompagnement.personne)
+    return render(
+        request,
+        "inclusion_pass/offreur/accompagnateurs.html",
+        {
+            "accompagnement": accompagnement,
+            "active_assignments": active_assignments,
+            "ended_assignments": ended_assignments,
+            "back_url": get_safe_url(request, "back_url", fallback_url=reverse("inclusion_pass:usagers")),
+            "matomo_custom_title": "Accompagnateurs d’un usager pour offreur de service",
+        },
+    )
+
+
 @http_methods(db_readonly=["GET"], db_write=["POST"])
 @check_request(_is_offreur)
 def bilan_intervention(request, accompagnement_id):
@@ -365,15 +376,53 @@ def bilan_intervention(request, accompagnement_id):
     if request.method == "POST" and suivi_autorise:
         services.simuler_suivi(accompagnement)
         return redirect("inclusion_pass:bilan_intervention", accompagnement_id=accompagnement.pk)
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("inclusion_pass:usagers"))
     return render(
         request,
         "inclusion_pass/offreur/bilan_intervention.html",
         {
             "accompagnement": accompagnement,
+            "bilan": BilanIntervention.objects.filter(accompagnement=accompagnement).select_related("auteur").first(),
             "situations": accompagnement.situations.all(),
             "suivi_autorise": suivi_autorise,
-            "back_url": get_safe_url(request, "back_url", fallback_url=reverse("inclusion_pass:usagers")),
+            "back_url": back_url,
             "matomo_custom_title": "Bilan de l’intervention pour offreur de service",
+        },
+    )
+
+
+@http_methods(db_readonly=["GET"], db_write=["POST"])
+@check_request(_is_offreur)
+def remplir_bilan(request, accompagnement_id):
+    """Form of the report of the follow-up, in the format of the SIAE pro support report."""
+    accompagnement = _accompagnement(request, accompagnement_id)
+    if BilanIntervention.objects.filter(accompagnement=accompagnement).exists():
+        raise Http404
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("inclusion_pass:usagers"))
+    bilan_url = (
+        reverse("inclusion_pass:bilan_intervention", args=[accompagnement.pk])
+        + "?"
+        + urlencode({"back_url": back_url})
+    )
+    form = BilanInterventionForm(
+        request.path,
+        data=request.POST or None,
+        initial={"has_solution": request.GET.get("has_solution")},
+        instance=BilanIntervention(accompagnement=accompagnement, auteur=request.user),
+    )
+    if request.method == "POST" and form.is_valid():
+        services.envoyer_bilan(form.instance)
+        messages.success(request, "Bilan de l’intervention envoyé", extra_tags="toast")
+        return HttpResponseRedirect(bilan_url)
+    return render(
+        request,
+        "inclusion_pass/offreur/bilan_intervention_form.html",
+        {
+            "form": form,
+            "accompagnement": accompagnement,
+            "back_url": back_url,
+            "reset_url": bilan_url,
+            "matomo_custom_title": "Remplir le bilan de l’intervention",
         },
     )
 
@@ -413,24 +462,3 @@ def qr_code_accueil(request):
     lien = request.build_absolute_uri(reverse("inclusion_pass:accueil", args=[offreur.uuid_accueil]))
     qr_code = segno.make(lien).svg_inline(scale=8, title=f"QR code d’accueil de {offreur.display_name}")
     return render(request, "inclusion_pass/offreur/qr_code_accueil.html", {"lien": lien, "qr_code": qr_code})
-
-
-# Prescriber side
-
-
-@readonly_view
-@check_request(lambda request: request.from_prescriber)
-def prescripteur_notifications(request):
-    notifications = NotificationPrescripteur.objects.filter(prescripteur=request.current_organization).select_related(
-        "accompagnement__personne", "accompagnement__offreur"
-    )
-    template = "inclusion_pass/prescripteur/_notifications.html" if request.htmx else None
-    return render(
-        request,
-        template or "inclusion_pass/prescripteur/notifications.html",
-        {
-            "notifications_page": pager(
-                notifications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT
-            )
-        },
-    )

@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
 
 {% block title %}Bilan de l’intervention : {{ accompagnement.personne.get_inverted_full_name }} {{ block.super }}{% endblock title %}
@@ -20,8 +21,32 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xl-8">
+                    <h2 class="mb-3">Bilan de l’intervention</h2>
+                    {% if bilan %}
+                        <p>Rempli le {{ bilan.created_at|date:"d/m/Y" }} par {{ bilan.auteur.get_full_name }}</p>
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data mb-0">
+                                {% include "job_seekers_views/includes/pro_support_report_answers.html" with report=bilan solution_label="Solution après l’accompagnement" only %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        {% component_alert title=title content=content call_to_action=call_to_action variant="info" extra_classes="mb-3 mb-md-4" %}
+                            {% fragment as title %}
+                                Remplissez le bilan de l’intervention
+                            {% endfragment %}
+                            {% fragment as content %}
+                                <p class="mb-0">
+                                    Faites le point sur les freins, l’autonomie et la suite du parcours de cet usager. Une fois envoyé, le bilan ne pourra plus être modifié et l’accompagnement sera terminé.
+                                </p>
+                            {% endfragment %}
+                            {% fragment as call_to_action %}
+                                <a class="btn btn-sm btn-primary"
+                                   href="{% url 'inclusion_pass:remplir_bilan' accompagnement_id=accompagnement.pk %}?back_url={{ back_url|urlencode }}">Remplir le bilan</a>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    {% endif %}
                     <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
-                        <h2 class="mb-0">Bilan de l’intervention</h2>
+                        <h3 class="mb-0">Suivi dans le temps</h3>
                         {% if suivi_autorise %}
                             <form method="post">
                                 {% csrf_token %}
@@ -38,7 +63,7 @@
                         </div>
                     {% endif %}
                     <div class="c-box mb-3 mb-md-4">
-                        <h3>Parcours</h3>
+                        <h4>Parcours</h4>
                         <ol class="list-step mb-0">
                             {% for situation in situations reversed %}
                                 <li>

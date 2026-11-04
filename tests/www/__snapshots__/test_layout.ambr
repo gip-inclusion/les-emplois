@@ -1198,11 +1198,6 @@
                                       Orientations vers des services
                                   </a>
                               </li>
-                              <li>
-                                  <a href="/pass/prescripteur/prises-en-charge/">
-                                      Usagers pris en charge
-                                  </a>
-                              </li>
                           </ul>
                       </div>
                   </li>
@@ -1534,11 +1529,6 @@
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="orientations-prescripteurs" href="/insertion/orientations/">
                                       Orientations vers des services
-                                  </a>
-                              </li>
-                              <li>
-                                  <a href="/pass/prescripteur/prises-en-charge/">
-                                      Usagers pris en charge
                                   </a>
                               </li>
                           </ul>
