@@ -71,17 +71,18 @@ def test_people_search_has_hidden_clear_button_without_filters(client):
     assert "d-none" in parse_response_to_soup(response).select_one("#people-clear-filters")["class"]
 
 
-def test_people_search_pagination_replaces_results_container(client, mocker):
-    _, _, _, person = get_target_person(client)
-    mocker.patch(
-        "itou.www.directory_views.views.get_directory_people",
-        return_value=[person] * (settings.PAGE_SIZE_SMALL + 1),
-    )
+def test_pagination(client, snapshot):
+    _, _, target_organization, _ = get_target_person(client)
+    for _ in range(settings.PAGE_SIZE_SMALL):
+        employer = EmployerFactory(membership=False)
+        company = CompanyFactory(coords=target_organization.coords, insee_city=target_organization.insee_city)
+        CompanyMembershipFactory(user=employer, company=company)
 
     response = client.get(reverse("directory:people_results"))
 
-    assertContains(response, 'hx-target="#people-search-results"')
-    assertContains(response, 'hx-swap="outerHTML"')
+    page = parse_response_to_soup(response)
+    [pagination] = page.select("ul.pagination")
+    assert pagination.prettify() == snapshot()
 
 
 def test_people_search_includes_nearby_other_city(client):
