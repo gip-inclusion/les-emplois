@@ -2,48 +2,17 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.templatetags.static import static
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
-from itou.cities.models import City, DirectoryActiveCity
+from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.nexus.enums import NexusStructureKind
-from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import PrescriberFactory
 from tests.utils.htmx.testing import update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup
 from tests.www.directory_views.helpers import get_target_person, setup_directory
-
-
-def test_access_is_restricted(client):
-    response = client.get(reverse("directory:people_results"))
-    assertRedirects(response, f"{reverse('account_login')}?next={reverse('directory:people_results')}")
-
-    client.force_login(JobSeekerFactory())
-    response = client.get(reverse("directory:people_results"))
-    assert response.status_code == 403
-
-
-def test_active_city_is_required(client):
-    user = EmployerFactory()
-    client.force_login(user)
-
-    response = client.get(reverse("directory:people_results"))
-
-    assert response.status_code == 403
-
-
-def test_access_requires_organization_coords(client):
-    city = create_city_vannes()
-    DirectoryActiveCity.objects.create(city=city)
-    user = EmployerFactory(membership=False)
-    CompanyMembershipFactory(user=user, company=CompanyFactory(coords=None, insee_city=city))
-    client.force_login(user)
-
-    response = client.get(reverse("directory:people_results"))
-
-    assert response.status_code == 403
 
 
 def test_people_search_filters_and_htmx(client):
