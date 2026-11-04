@@ -168,9 +168,9 @@ def get_directory_people(origin, *, public_id=None):
     if public_id:
         local_users = local_users.filter(public_id=public_id)
 
-    for model, organization_field in (
-        (CompanyMembership, "company"),
-        (PrescriberMembership, "organization"),
+    for model, organization_field, user_kind in (
+        (CompanyMembership, "company", NexusUserKind.FACILITY_MANAGER),
+        (PrescriberMembership, "organization", NexusUserKind.GUIDE),
     ):
         for membership in _nearby_memberships(model, organization_field, local_users, origin):
             user = membership.user
@@ -178,7 +178,7 @@ def get_directory_people(origin, *, public_id=None):
                 people,
                 user,
                 _native_organization(membership.get_organization(), membership.directory_distance),
-                kind=NexusUserKind.FACILITY_MANAGER,
+                kind=user_kind,
             )
 
     nexus_memberships = (
