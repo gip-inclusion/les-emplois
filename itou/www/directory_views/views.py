@@ -165,11 +165,11 @@ def _add_person(people, user, organization, *, kind):
     person.organizations.append(organization)
 
 
-def _nearby_memberships(model, organization_field, users, origin):
+def _nearby_memberships(queryset, organization_field, users, origin):
     # Company and prescriber memberships name their organization field differently.
     coords_field = f"{organization_field}__coords"
     return (
-        model.objects.filter(
+        queryset.filter(
             user__in=users,
             **{f"{coords_field}__dwithin": (origin, D(km=DIRECTORY_RADIUS_KM))},
         )
@@ -190,11 +190,15 @@ def get_directory_people(origin, *, public_id=None):
     if public_id:
         local_users = local_users.filter(public_id=public_id)
 
-    for model, organization_field, user_kind in (
-        (CompanyMembership, "company", NexusUserKind.FACILITY_MANAGER),
-        (PrescriberMembership, "organization", NexusUserKind.GUIDE),
+    for queryset, organization_field, user_kind in (
+        (
+            CompanyMembership.objects.filter(company__in=Company.objects.active()),
+            "company",
+            NexusUserKind.FACILITY_MANAGER,
+        ),
+        (PrescriberMembership.objects.all(), "organization", NexusUserKind.GUIDE),
     ):
-        for membership in _nearby_memberships(model, organization_field, local_users, origin):
+        for membership in _nearby_memberships(queryset, organization_field, local_users, origin):
             user = membership.user
             _add_person(
                 people,

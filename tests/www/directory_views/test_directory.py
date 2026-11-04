@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.gis.geos import Point
 
+from itou.companies.enums import CompanyKind
 from itou.directory.models import DirectoryProfile
 from itou.nexus.enums import NexusStructureKind, NexusUserKind, Service
 from itou.www.directory_views.views import get_directory_people, get_directory_person
@@ -154,3 +155,9 @@ def test_directory_people_uses_closest_organization_as_main():
 
     assert person.main_organization.name == close_company.display_name
     assert person.other_organizations_count == 1
+
+
+def test_directory_people_ignores_inactive_companies():
+    company = CompanyFactory(kind=CompanyKind.EI, convention__is_active=False, coords=ORIGIN)
+    CompanyMembershipFactory(company=company)
+    assert get_directory_people(ORIGIN) == []
