@@ -46,7 +46,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     DEPT = "DEPT", "Service social du conseil départemental"
     SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
 
-    OTHER = "Autre", "Autre organisation (orienteur)"
+    OTHER = "Autre", "Autre"
 
     def to_PE_typologie_prescripteur(self):
         if self in PE_SENSITIVE_PRESCRIBER_KINDS:

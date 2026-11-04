@@ -270,7 +270,7 @@ class Migration(migrations.Migration):
                             ("PREVENTION", "Service ou club de prévention"),
                             ("DEPT", "Service social du conseil départemental"),
                             ("SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"),
-                            ("Autre", "Autre organisation (orienteur)"),
+                            ("Autre", "Autre"),
                         ],
                         default="Autre",
                         max_length=20,
