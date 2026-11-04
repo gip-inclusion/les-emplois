@@ -7,4 +7,5 @@ app_name = "selftest"
 
 urlpatterns = [
     path("headers", views.headers, name="headers"),
+    path("settings", views.settings, name="settings"),
 ]
