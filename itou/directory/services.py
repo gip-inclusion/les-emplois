@@ -105,7 +105,7 @@ def _nexus_organization(structure, dora_structure, distance):
     )
 
 
-def _dedupe_organizations(organizations):
+def _order_and_dedupe_organizations(organizations):
     # Keep the nearest occurrence of each structure; input order breaks ties in distance and name.
     by_identity = {}
     for organization in sorted(organizations, key=lambda item: (item.distance, item.name)):
@@ -226,7 +226,7 @@ def get_directory_people(origin, *, public_id=None):
         )
 
     for person in people.values():
-        person.organizations = _dedupe_organizations(person.organizations)
+        person.organizations = _order_and_dedupe_organizations(person.organizations)
     return sorted(
         people.values(),
         key=lambda person: (person.last_name, person.first_name, person.email),
