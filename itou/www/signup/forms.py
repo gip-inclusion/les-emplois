@@ -18,6 +18,7 @@ from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
+from itou.utils.widgets import RadioSelectWithHelpTexts
 
 
 def _get_organization_data_from_api(siret):
@@ -336,7 +337,15 @@ class PrescriberChooseKindForm(forms.Form):
     kind = forms.ChoiceField(
         label="Pour qui travaillez-vous ?",
         choices=KIND_CHOICES,
-        widget=forms.RadioSelect,
+        widget=RadioSelectWithHelpTexts(
+            help_texts={
+                KIND_AUTHORIZED_ORG: (
+                    "Les organisations habilitées permettent à leurs collaborateurs de valider l'éligibilité "
+                    "d'une personne candidate au dispositif d'Insertion par l'Activité Économique. "
+                    "Cette habilitation est officialisée par arrêté préfectoral."
+                ),
+            }
+        ),
     )
 
 
