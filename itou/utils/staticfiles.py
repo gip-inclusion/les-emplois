@@ -117,6 +117,7 @@ ASSET_INFOS = {
             "files": [
                 "LICENSE.md",
                 ("dist/chart.umd.js", "chart.umd.js"),
+                ("dist/chart.umd.js.map", "chart.umd.js.map"),
             ],
         },
     },
