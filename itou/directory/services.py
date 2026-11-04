@@ -110,7 +110,7 @@ def _nexus_organization(structure, dora_structure, distance):
 def _order_and_dedupe_organizations(organizations):
     # Keep the nearest occurrence of each structure; input order breaks ties in distance and name.
     by_identity = {}
-    for organization in sorted(organizations, key=lambda item: (item.distance, item.name)):
+    for organization in sorted(organizations, key=lambda item: (item.distance, item.name, item.key)):
         by_identity.setdefault(organization.siret or organization.key, organization)
     return list(by_identity.values())
 
