@@ -327,7 +327,17 @@ def temporary_bucket_setup_fixture(temporary_bucket_name, temporary_dora_bucket_
     with override_settings(
         AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_dora_bucket_name
     ):
-        call_command("configure_buckets")
+        from unittest import mock
+
+        # "configure_buckets" uses `pg_advisory_lock` to avoid
+        # simultaneous runs (see `BaseCommand`). That requires a
+        # database connection. Setting one here is complicated. Just
+        # fake the context manager.
+        with mock.patch(
+            "itou.utils.command.pg_advisory_lock",
+            lambda *args, **kwargs: contextlib.nullcontext(),
+        ):
+            call_command("configure_buckets")
     yield temporary_bucket_name
     client = s3_client()
     with contextlib.suppress(NoObjectsInBucket):
