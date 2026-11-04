@@ -8,6 +8,7 @@ import json
 import os
 import pathlib
 import re
+import sys
 
 from botocore.config import Config
 from django.utils.csp import CSP
@@ -214,16 +215,13 @@ TEMPLATES = [
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-try:
-    # This module is only available when running under uWSGI
-    # https://uwsgi-docs.readthedocs.io/en/latest/PythonModule.html
-    import uwsgi  # noqa: F401
-except ImportError:
-    db_statement_timeout = int(os.environ.get("SCRIPT_DB_STATEMENT_TIMEOUT", 300_000))
-    db_lock_timeout = int(os.environ.get("SCRIPT_DB_LOCK_TIMEOUT", 150_000))
-else:
+WEB_SERVER_MODE = any("gunicorn" in arg for arg in sys.argv)
+if WEB_SERVER_MODE:
     db_statement_timeout = int(os.environ.get("WWW_DB_STATEMENT_TIMEOUT", 10_000))
     db_lock_timeout = int(os.environ.get("WWW_DB_LOCK_TIMEOUT", 5_000))
+else:
+    db_statement_timeout = int(os.environ.get("SCRIPT_DB_STATEMENT_TIMEOUT", 300_000))
+    db_lock_timeout = int(os.environ.get("SCRIPT_DB_LOCK_TIMEOUT", 150_000))
 
 DATABASES = {
     "default": {
