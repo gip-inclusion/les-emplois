@@ -2,6 +2,7 @@ import datetime
 import random
 
 from dateutil.relativedelta import relativedelta
+from django.core.management import CommandError
 from django.urls import reverse
 from django.utils import timezone
 
@@ -107,17 +108,22 @@ class Command(BaseCommand):
     ATOMIC_HANDLE = True
 
     def handle(self, *, reset, **options):
-        if reset:
-            Orientation.objects.filter(service__structure__uid=STRUCTURE_UID).delete()
-            Offreur.objects.all().delete()
-            Structure.include_inactive.filter(uid=STRUCTURE_UID).delete()
-            User.objects.filter(email__endswith=demo.DEMO_EMAIL_DOMAIN).delete()
-            User.objects.filter(email__in=[connecteurs.PERSONA_EMAIL, OFFREUR_EMAIL]).delete()
-        elif Structure.include_inactive.filter(uid=STRUCTURE_UID).exists():
-            # Redeploying a review app must not wipe what the audience did during the demo
+        # Redeploying a review app must not wipe what the audience did during the demo. Data seeded without the
+        # demo prescriber has no orientation: it is recreated
+        if not reset and Orientation.objects.filter(service__structure__uid=STRUCTURE_UID).exists():
             self.stdout.write("Données de démo déjà présentes, utiliser --reset pour les recréer.")
             return
-        self._seed()
+        prescripteur = services.prescripteur_de_demo()
+        if prescripteur is None:
+            raise CommandError(
+                f"Prescripteur de démo {services.DEMO_PRESCRIPTEUR_EMAIL} introuvable, lancer `make populate_db`."
+            )
+        Orientation.objects.filter(service__structure__uid=STRUCTURE_UID).delete()
+        Offreur.objects.all().delete()
+        Structure.include_inactive.filter(uid=STRUCTURE_UID).delete()
+        User.objects.filter(email__endswith=demo.DEMO_EMAIL_DOMAIN).delete()
+        User.objects.filter(email__in=[connecteurs.PERSONA_EMAIL, OFFREUR_EMAIL]).delete()
+        self._seed(prescripteur)
 
     def _structure(self):
         dora = _reference(GenericReferenceItemKind.SOURCE, "dora")
@@ -207,29 +213,27 @@ class Command(BaseCommand):
             orientation="" if solution else rng.choice(ProSupportReportOrientation.values),
         )
 
-    def _seed(self):
+    def _seed(self, prescripteur):
         rng = random.Random(42)
         structure = self._structure()
         offreur = self._offreur(structure)
-        prescripteur = services.prescripteur_de_demo()
         # The demo prescriber account sends the orientations, so that they appear in its own lists
-        sender = User.objects.get(email=services.DEMO_PRESCRIPTEUR_EMAIL) if prescripteur else None
+        sender = User.objects.get(email=services.DEMO_PRESCRIPTEUR_EMAIL)
 
         # Pending: activating her pass during the demo validates it
         persona = demo.job_seeker(connecteurs.PERSONA_EMAIL, "Sophie", "Leroy", Title.MME, datetime.date(1988, 3, 14))
         demo.activer_connexion_par_bandeau(persona)
-        if prescripteur:
-            demo.orientation(structure, prescripteur, sender, persona, OrientationStatus.PENDING, rng, jours=5)
-            for index, (first_name, last_name, title, status, jours) in enumerate(ORIENTES):
-                beneficiary = demo.job_seeker(
-                    demo.email(first_name, last_name),
-                    first_name,
-                    last_name,
-                    title,
-                    datetime.date(1970 + 2 * index, 1 + index % 12, 1),
-                )
-                refus = demo.REFUS[index % len(demo.REFUS)]
-                demo.orientation(structure, prescripteur, sender, beneficiary, status, rng, jours, refus)
+        demo.orientation(structure, prescripteur, sender, persona, OrientationStatus.PENDING, rng, jours=5)
+        for index, (first_name, last_name, title, status, jours) in enumerate(ORIENTES):
+            beneficiary = demo.job_seeker(
+                demo.email(first_name, last_name),
+                first_name,
+                last_name,
+                title,
+                datetime.date(1970 + 2 * index, 1 + index % 12, 1),
+            )
+            refus = demo.REFUS[index % len(demo.REFUS)]
+            demo.orientation(structure, prescripteur, sender, beneficiary, status, rng, jours, refus)
 
         now = timezone.now()
         for index, (first_name, last_name, title, annee) in enumerate(ANCIENS):
@@ -245,7 +249,7 @@ class Command(BaseCommand):
                 cles.append(catalogue.INFORMER_PRESCRIPTEUR)
             termine = index < len(ANCIENS) - AUTONOMES
             debut = now - relativedelta(months=rng.randint(14, 24))
-            if prescripteur and termine:
+            if termine:
                 jours = (now - debut).days + 5
                 demo.orientation(structure, prescripteur, sender, personne, OrientationStatus.ACCEPTED, rng, jours)
             accompagnement = services.accorder(personne, offreur, cles)
