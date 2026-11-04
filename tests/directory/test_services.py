@@ -45,6 +45,7 @@ def test_directory_people_merge_memberships_by_email():
 def test_directory_people_exclude_opted_out_email_and_distant_structure():
     opted_out = ProfessionalFactory(email="hidden@example.com")
     DirectoryProfile.objects.create(user=opted_out, is_opted_out=True)
+    # Person has opted out, should be excluded even if they have a NexusMembership.
     NexusMembershipFactory(
         source=Service.DORA,
         user__source=Service.DORA,
