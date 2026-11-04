@@ -333,7 +333,7 @@ class ContractsTabView(BaseJobSeekerDetailView):
         """
         if self.approval_missing_or_expired:
             two_years_ago = timezone.localdate() - relativedelta(years=2)
-            return self.object.contracts.filter(end_date__gte=two_years_ago).order_by("-start_date")
+            return self.object.contracts.exclude(end_date__lt=two_years_ago).order_by("-start_date")
         return get_contracts(self.approval)
 
     def get_context_data(self, **kwargs):
