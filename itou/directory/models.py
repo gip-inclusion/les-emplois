@@ -47,8 +47,8 @@ class ContactMessage(models.Model):
     created_at = models.DateTimeField(verbose_name="date d'envoi", default=timezone.now)
 
     class Meta:
-        verbose_name = "message envoyé via l'annuaire"
-        verbose_name_plural = "messages envoyés via l'annuaire"
+        verbose_name = "message envoyé via l’annuaire"
+        verbose_name_plural = "messages envoyés via l’annuaire"
 
     def __str__(self):
         return f"Message de {self.sender} à {self.recipient_id}"
