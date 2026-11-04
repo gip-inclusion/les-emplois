@@ -37,7 +37,16 @@ def test_person_detail_displays_missing_phone(client):
 
     response = client.get(reverse("directory:person_detail", kwargs={"public_id": person.public_id}))
 
-    assertContains(response, "Non renseigné", html=True)
+    assertContains(
+        response,
+        """
+        <li>
+            <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+            <i class="text-disabled">Non renseigné</i>
+        </li>""",
+        html=True,
+        count=1,
+    )
 
 
 def test_person_detail_unknown_key(client):
