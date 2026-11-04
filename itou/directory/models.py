@@ -48,7 +48,6 @@ class ContactMessage(models.Model):
     class Meta:
         verbose_name = "message envoyé via l'annuaire"
         verbose_name_plural = "messages envoyés via l'annuaire"
-        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Message de {self.sender} à {self.recipient_id}"

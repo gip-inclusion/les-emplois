@@ -68,7 +68,6 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "message envoyé via l'annuaire",
                 "verbose_name_plural": "messages envoyés via l'annuaire",
-                "ordering": ["-created_at"],
             },
         ),
     ]
