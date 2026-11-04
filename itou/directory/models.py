@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from itou.directory.enums import ContactSubject
 from itou.emails.utils import MAX_SUBJECT_LENGTH
@@ -43,7 +44,7 @@ class ContactMessage(models.Model):
     recipient_id = models.UUIDField(verbose_name="identifiant du destinataire")
     subject = models.CharField(verbose_name="objet", choices=ContactSubject.choices)
     custom_subject = models.CharField(verbose_name="objet personnalisé", blank=True, max_length=MAX_SUBJECT_LENGTH)
-    created_at = models.DateTimeField(verbose_name="date d'envoi", auto_now_add=True)
+    created_at = models.DateTimeField(verbose_name="date d'envoi", default=timezone.now)
 
     class Meta:
         verbose_name = "message envoyé via l'annuaire"
