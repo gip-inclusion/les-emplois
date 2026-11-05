@@ -66,29 +66,11 @@ class Command(BaseCommand):
             "%d/%d employee records were unarchived", unarchive_count, len(employee_record_with_missing_notification)
         )
 
-    def _handle_3437_errors(self):
-        # Rejected records with the asp_processing_code 3437
-        # The ASP now returns the "expected" asp_uid that can be handled automatically.
-        # TODO(xfernandez): drop this function after the run of sanitize_employee_records
-        for employee_record in (
-            EmployeeRecord.objects.filter(
-                status=Status.REJECTED,
-                asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
-            )
-            .select_related("job_application__job_seeker__jobseeker_profile")
-            .order_by(
-                "created_at",
-            )
-        ):
-            # This command is called every hour: we don't want to send a new email every hour
-            employee_record.handle_3437_error(send_email_for_duplicate=False)
-
     @dry_runnable
     def handle(self, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
 
         self._check_approvals()
         self._check_missed_notifications()
-        self._handle_3437_errors()
 
         self.logger.info("Employee records sanitizing done. Have a great day!")
