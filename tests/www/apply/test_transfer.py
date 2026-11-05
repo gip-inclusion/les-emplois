@@ -5,7 +5,6 @@ from urllib.parse import quote
 import pytest
 from django.urls import reverse
 from django.utils import timezone
-from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
     assertNotContains,
@@ -599,8 +598,7 @@ def test_step_2_without_session(client):
     assert response.status_code == 404
 
 
-@freeze_time()
-@pytest.mark.usefixtures("temporary_bucket")
+@pytest.mark.usefixtures("temporary_bucket", "freeze_time_at_start")
 def test_step_3(client, snapshot, pdf_file):
     job_application = JobApplicationFactory(
         sent_by_prescriber_alone=True,

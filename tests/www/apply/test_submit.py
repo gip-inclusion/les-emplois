@@ -1256,8 +1256,7 @@ class TestApplyAsAuthorizedPrescriber:
             last_action_kind=ActionKind.APPLY,
         ).exists()
 
-    @freeze_time()
-    @pytest.mark.usefixtures("temporary_bucket")
+    @pytest.mark.usefixtures("temporary_bucket", "freeze_time_at_start")
     def test_apply_as_authorized_prescriber(self, client, pdf_file, snapshot):
         company = CompanyFactory(romes=("N1101", "N1105"), for_snapshot=True, with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})

@@ -37,6 +37,7 @@ from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
+from freezegun import freeze_time
 from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
@@ -310,6 +311,17 @@ def failing_cache():
             },
         )
         yield cache
+
+
+@pytest.fixture
+def freeze_time_at_start():
+    """Freeze time when the test starts.
+
+    Unlike `@freeze_time()`, which freezes it when the test module is imported: a test running
+    more than 15 minutes later would sign its S3 requests too far in the past, and get a 403.
+    """
+    with freeze_time() as frozen:
+        yield frozen
 
 
 @pytest.fixture(name="temporary_bucket_name", scope="session")
