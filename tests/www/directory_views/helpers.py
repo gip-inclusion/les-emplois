@@ -1,6 +1,6 @@
 from itou.cities.models import DirectoryActiveCity
-from itou.directory.services import get_directory_people
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.www.directory_views.views import get_directory_people
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
