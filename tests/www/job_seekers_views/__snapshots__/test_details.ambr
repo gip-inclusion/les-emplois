@@ -2198,7 +2198,7 @@
                                   Plateforme Insertion Valence
                               </td>
                               <td class="text-end w-50px">
-                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir le rendez-vous" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="visualisation-rdv" href="/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a/1?back_url=/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir le rendez-vous" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="visualisation-rdv" href="/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a/1?back_url=/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a">
                                       <i aria-label="Voir le rendez-vous du 15/09/2026" class="ri-arrow-drop-right-line fs-lg">
                                       </i>
                                   </a>
@@ -2232,7 +2232,7 @@
                                   ACME Inc.
                               </td>
                               <td class="text-end w-50px">
-                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir le rendez-vous" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="visualisation-rdv" href="/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a/1234?back_url=/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Voir le rendez-vous" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="visualisation-rdv" href="/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a/1234?back_url=/job-seekers/appointments/7614fc4b-aef9-4694-ab17-12324300180a">
                                       <i aria-label="Voir le rendez-vous du 06/08/2024" class="ri-arrow-drop-right-line fs-lg">
                                       </i>
                                   </a>

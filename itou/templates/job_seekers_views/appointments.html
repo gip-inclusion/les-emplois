@@ -64,7 +64,7 @@
                                         {% for agent in appointment.agents %}
                                             <span class="d-block">{{ agent.get_inverted_full_name }}</span>
                                             {% if agent.email|lower == request.user.email|lower %}
-                                                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">C’est vous</span>
+                                                <span class="badge badge-sm rounded-pill bg-info-lighter text-info">C’est vous</span>
                                             {% endif %}
                                         {% empty %}
                                             <i class="text-disabled">Non renseigné</i>
@@ -75,7 +75,7 @@
                                         {{ appointment.organization_name }}
                                     </td>
                                     <td class="text-end w-50px">
-                                        <a class="btn btn-sm btn-link btn-ico-only"
+                                        <a class="btn btn-sm btn-secondary btn-ico-only"
                                            href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                                            data-bs-toggle="tooltip"
                                            data-bs-title="Voir le rendez-vous"
