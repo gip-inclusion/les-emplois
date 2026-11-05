@@ -63,7 +63,7 @@ class JobSeekerSignupConflictModalResolver:
         def compare_name(name_key):
             return (
                 name_key in cleaned_data
-                and cleaned_data[name_key].lower() == getattr(self.existing_user, name_key).lower()
+                and cleaned_data[name_key].casefold() == getattr(self.existing_user, name_key).casefold()
             )
 
         self.fields = ConflictFields(
