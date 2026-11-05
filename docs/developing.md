@@ -46,6 +46,27 @@ psql  # connects directly to the itou database
 ./manage.py xxxx  # any commands work immediately
 ```
 
+### Stockage de secrets dans le .envrc
+
+Limitons le risque d’exposer un secret en utilisant un gestionnaire de secrets
+lié à la session.
+
+#### Linux
+
+La spécification FreeDesktop.org Secret Service a plusieurs implémentations :
+
+- Gnome propose un utilitaire nommé `secret-tool` via [`libsecret`](https://gnome.pages.gitlab.gnome.org/libsecret/)
+- KDE propose `kwallet-query` avec [`kwalletmanager`](https://invent.kde.org/utilities/kwalletmanager)
+- KeePassXC peut être interrogé par les deux outils précédents
+
+Enregistrer la commande au lieu du secret en clair permet de limiter le risque de
+fuite du secret si un logiciel malveillant a accès au disque. Par exemple:
+
+```shell
+CLEVER_TOKEN=$(secret-tool lookup name clevercloud.token)
+CLEVER_SECRET=$(secret-tool lookup name clevercloud.secret)
+```
+
 ## Compte superutilisateur local
 
 Parmi les comptes créées en peuplant la base de données pour le développement en local se trouve un compte superutilisateur :
