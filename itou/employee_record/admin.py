@@ -22,6 +22,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_organization_view_link,
 )
+from itou.utils.db import statement_timeout
 from itou.utils.pagination import FuzzyCountPaginator
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -98,6 +99,7 @@ def _compute_model_stats(model, list_url):
     return stats
 
 
+@statement_timeout(25_000)  # This page can be slow
 def stats(request, model_admin):
     context_data = {
         **admin.site.each_context(request),
