@@ -100,10 +100,12 @@ def pg_advisory_lock(name: str, wait: bool = True, release: bool = True):
             row = result.fetchone()
             if not row[0]:
                 raise CannotAcquireLock
-        yield
-        if release:
-            cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-            logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
+        try:
+            yield
+        finally:
+            if release:
+                cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+                logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
 
 
 class ExclusionViolationError(IntegrityError):

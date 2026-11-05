@@ -47,6 +47,14 @@ class TestPgAdvisoryLock:
         with pg_advisory_lock("lock", wait):
             assert self.other_session_can_acquire_lock("other-lock")
 
+    @pytest.mark.parametrize("wait", [False, True])
+    def test_lock_is_released_when_body_raises(self, wait):
+        lock = "lock"
+        with pytest.raises(ZeroDivisionError):
+            with pg_advisory_lock(lock, wait):
+                1 / 0
+        assert self.other_session_can_acquire_lock(lock)
+
     def test_no_wait_raises_if_lock_is_held_elsewhere(self):
         lock = "lock"
         self.lock_from_other_session(lock)
