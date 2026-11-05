@@ -191,6 +191,7 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     )
     readonly_fields = fields
     raw_id_fields = ("user",)
+    show_change_link = True
     list_select_related = ("employee_record", "employee_record__job_application")
 
     @admin.display(description="statut initial")
@@ -531,3 +532,8 @@ class EmployeeRecordUpdateNotificationAdmin(ReadonlyMixin, ASPExchangeInformatio
             },
         ),
     )
+
+
+@admin.register(models.EmployeeRecordTransitionLog)
+class EmployeeRecordTransitionLogAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
