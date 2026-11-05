@@ -37,7 +37,9 @@ class TestApprovalsListView:
         approval = ApprovalFactory(with_jobapplication=True, with_ongoing_contract=True)
         job_application = approval.jobapplication_set.get()
 
-        approval_for_other_company = ApprovalFactory(with_jobapplication=True)
+        approval_for_other_company = ApprovalFactory(
+            with_jobapplication=True, user__first_name="Olga", user__last_name="Othercompany"
+        )
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -60,6 +62,8 @@ class TestApprovalsListView:
             with_jobapplication__to_company=job_application.to_company,
             with_ongoing_contract=True,
             with_ongoing_contract__company=job_application.to_company,
+            user__first_name="Anna",
+            user__last_name="Anotherapproval",
         )
 
         employer = job_application.to_company.members.first()

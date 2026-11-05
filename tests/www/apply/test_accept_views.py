@@ -1897,8 +1897,12 @@ class TestProcessAcceptViewsInWizard:
 
         employer = self.company.members.first()
         colleague = CompanyMembershipFactory(company=self.company).user
-        inactive_employer = CompanyMembershipFactory(company=self.company, user__is_active=False).user
-        employer_with_inactive_membership = CompanyMembershipFactory(company=self.company, is_active=False).user
+        inactive_employer = CompanyMembershipFactory(
+            company=self.company, user__is_active=False, user__first_name="Igor", user__last_name="Inactiveuser"
+        ).user
+        employer_with_inactive_membership = CompanyMembershipFactory(
+            company=self.company, is_active=False, user__first_name="Inès", user__last_name="Inactivemembership"
+        ).user
         client.force_login(employer)
         # Good duration.
         hiring_start_at = today

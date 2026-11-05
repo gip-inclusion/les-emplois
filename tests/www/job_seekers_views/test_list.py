@@ -1702,7 +1702,7 @@ def test_filtered_by_organization_members(client, org_factory, membership_factor
     professional = organization.members.first()
     member = organization.members.last()
     old_member = membership_factory(organization)(user__is_active=False, user__first_name="Charlie").user
-    other_pro_not_in_orga = ProfessionalFactory(first_name="Deborah")
+    other_pro_not_in_orga = ProfessionalFactory(first_name="Deborah", last_name="Notinorga")
     prescriber_organization = is_prescriber_organization and organization or None
     company = is_company and organization or None
 

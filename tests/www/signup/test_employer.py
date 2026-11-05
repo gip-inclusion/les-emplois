@@ -384,10 +384,14 @@ class TestCompanySignup:
         user = ProfessionalFactory()
         client.force_login(user)
         company = CompanyFactory(siret="40219166200001")
-        membership_1 = CompanyMembershipFactory(company=company, is_admin=False)
+        membership_1 = CompanyMembershipFactory(
+            company=company, is_admin=False, user__first_name="Nadia", user__last_name="Nonadmin"
+        )
         response = client.get(reverse("signup:company_select"), {"siren": company.siret[:9]})
         assertContains(response, self.to_join_msg(membership_1.user))
-        membership_2 = CompanyMembershipFactory(company=company, is_admin=True)
+        membership_2 = CompanyMembershipFactory(
+            company=company, is_admin=True, user__first_name="Alice", user__last_name="Admin"
+        )
         assert company.memberships.count() == 2
         response = client.get(reverse("signup:company_select"), {"siren": company.siret[:9]})
         assertNotContains(response, self.to_join_msg(membership_1.user))
