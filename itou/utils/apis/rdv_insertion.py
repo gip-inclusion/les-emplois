@@ -1,4 +1,4 @@
-"""rdv-insertion API dedicated to les emplois."""
+"""rdv-insertion API dedicated to la plateforme de l'inclusion."""
 
 import datetime
 import hashlib
