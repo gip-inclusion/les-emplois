@@ -3117,8 +3117,12 @@ class TestApplicationView:
         organization = organization_factory()
         active_user = membership_factory(organization)().user
         active_user_2 = membership_factory(organization)().user
-        active_user_inactive_membership = membership_factory(organization)(is_active=False).user
-        inactive_user = membership_factory(organization)(user__is_active=False).user
+        active_user_inactive_membership = membership_factory(organization)(
+            is_active=False, user__first_name="Inès", user__last_name="Inactivemembership"
+        ).user
+        inactive_user = membership_factory(organization)(
+            user__is_active=False, user__first_name="Igor", user__last_name="Inactiveuser"
+        ).user
         job_seeker = JobSeekerFactory()
 
         client.force_login(active_user)

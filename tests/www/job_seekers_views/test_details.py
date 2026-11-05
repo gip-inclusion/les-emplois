@@ -724,8 +724,10 @@ def test_can_see_end_of_contract_banner(client, subtests):
 class TestLastAdvisor:
     def test_display_last_advisor(self, client):
         job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory()
-        assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
+        prescriber = PrescriberFactory(first_name="Paula", last_name="Prescriber")
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional__first_name="Adam", professional__last_name="Advisor"
+        )
         advisor = assignment.advisor
         url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
