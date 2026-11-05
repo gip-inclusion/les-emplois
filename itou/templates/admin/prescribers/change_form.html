@@ -2,7 +2,7 @@
 
 {% block submit_buttons_bottom %}
 
-    {# Whatever the state, the super user has access to refuse and validate actions #}
+    {# Whatever the state, support has access to refuse and validate actions #}
     {% if perms.prescribers.change_prescriberorganization and original.has_pending_authorization or user.is_itou_admin %}
 
         <div class="submit-row">
@@ -15,8 +15,9 @@
                    value="Valider l'habilitation"
                    name="_authorization_action_validate">
         </div>
+    {% endif %}
 
-    {% elif perms.prescribers.change_prescriberorganization and original.has_refused_authorization and not user.is_itou_admin %}
+    {% if perms.prescribers.change_prescriberorganization and original.has_refused_authorization %}
         {# Allow to validate an authorization after an error in a refusal. #}
 
         <div class="submit-row">
