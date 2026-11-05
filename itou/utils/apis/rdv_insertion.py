@@ -1,7 +1,6 @@
 """rdv-insertion API dedicated to la plateforme de l'inclusion."""
 
 import datetime
-import hashlib
 import json
 import logging
 
@@ -65,7 +64,7 @@ def get_follow_ups(job_seeker):
     if not nir:
         return []
     cache = caches["failsafe"]
-    cache_key = f"rdv-insertion-follow-ups:{hashlib.sha256(nir.encode()).hexdigest()}"
+    cache_key = f"rdv-insertion-follow-ups:{job_seeker.pk}"
     if (follow_ups := cache.get(cache_key)) is not None:
         return follow_ups
     try:

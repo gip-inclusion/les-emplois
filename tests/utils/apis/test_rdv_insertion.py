@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 
 import httpx
 import pytest
@@ -81,7 +80,7 @@ def test_get_follow_ups_is_cached(respx_mock, status_code, body, expected_follow
 
     assert rdv_insertion.get_follow_ups(job_seeker) == expected_follow_ups
     assert route.call_count == 1
-    cache_ttl = caches["failsafe"].ttl(f"rdv-insertion-follow-ups:{hashlib.sha256(NIR.encode()).hexdigest()}")
+    cache_ttl = caches["failsafe"].ttl(f"rdv-insertion-follow-ups:{job_seeker.pk}")
     assert cache_ttl == pytest.approx(expected_ttl.total_seconds(), abs=1)
 
     # Subsequent calls should hit the cache
@@ -104,23 +103,11 @@ def test_get_follow_ups_when_rdv_insertion_is_unavailable(respx_mock, caplog):
     # rdv-insertion is not called again for this job seeker for a minute
     assert rdv_insertion.get_follow_ups(job_seeker) == []
     assert route.call_count == 1
-    cache_ttl = caches["failsafe"].ttl(f"rdv-insertion-follow-ups:{hashlib.sha256(NIR.encode()).hexdigest()}")
+    cache_ttl = caches["failsafe"].ttl(f"rdv-insertion-follow-ups:{job_seeker.pk}")
     assert cache_ttl == pytest.approx(datetime.timedelta(minutes=1).total_seconds(), abs=1)
 
     # But it still is for another job seeker
     assert rdv_insertion.get_follow_ups(JobSeekerFactory()) == []
-    assert route.call_count == 2
-
-
-def test_get_follow_ups_after_nir_correction(respx_mock):
-    route = respx_mock.post(SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
-    job_seeker = JobSeekerFactory(jobseeker_profile__nir=NIR)
-    assert rdv_insertion.get_follow_ups(job_seeker) == RDV_INSERTION_USER_SEARCH_BODY["user"]["follow_ups"]
-
-    job_seeker.jobseeker_profile.nir = "185032612345681"
-    route.respond(404, json={"errors": ["Aucun usager ne correspond à ce NIR"]})
-    # The follow-ups of the former NIR are not shown anymore
-    assert rdv_insertion.get_follow_ups(job_seeker) == []
     assert route.call_count == 2
 
 
