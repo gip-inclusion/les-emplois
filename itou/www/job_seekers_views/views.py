@@ -35,7 +35,6 @@ from itou.emails.utils import redact_email_address
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.insertion.models import Orientation
-from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.job_applications.utils import xp_ref_iae_job_applications
 from itou.prescribers.models import PrescriberMembership
@@ -157,11 +156,6 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
-        is_in_overview_test_perimeter = bool(get_jobseeker_overview_data(self.request, self.object))
-        show_overview_tab = (
-            is_in_overview_test_perimeter
-            and self.request.current_organization.department == settings.OVERVIEW_TAB_TEST_DEPARTMENT
-        )
 
         return super().get_context_data(**kwargs) | {
             "matomo_custom_title": "Détail candidat",
@@ -169,8 +163,6 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
-            "is_in_overview_test_perimeter": is_in_overview_test_perimeter,
-            "show_overview_tab": show_overview_tab,
         }
 
 
@@ -458,84 +450,6 @@ class OrientationsTabView(BaseJobSeekerDetailView):
             "can_view_external_orientations": can_view_external,
             "orientations": orientations,
         }
-
-
-def get_jobseeker_overview_data(request, job_seeker):
-    """
-    Several conditions need to be cleared to display/access the overview tab:
-    - the user must be an authorized prescriber from one of the selected departments for the experiment
-    - the user must have logged in in the past 3 months
-    - the job seeker must have a valid approval with more than 90 days left, not suspended
-    - the job seeker must not be employed
-    - the job seeker hasn't applied for a job in over 30 days
-    - the job seeker made at least one job application in the past 6 months
-    """
-    now = timezone.now()
-    MIN_LAST_LOGIN = now - relativedelta(months=3)
-    THIRTY_DAYS_AGO = now - relativedelta(days=30)
-    SIX_MONTHS_AGO = now - relativedelta(months=6)
-    if (
-        request.from_authorized_prescriber
-        and request.user.last_login >= MIN_LAST_LOGIN
-        and request.current_organization.department
-        in [settings.OVERVIEW_TAB_TEST_DEPARTMENT, settings.OVERVIEW_TAB_CONTROL_DEPARTMENT]
-    ):
-        approval = job_seeker.latest_approval
-        if approval and approval.is_valid and approval.remainder.days > 90 and not approval.is_suspended:
-            contract = get_contracts(approval).first()
-            if contract and contract.has_ended:
-                job_apps = (
-                    job_seeker.job_applications.filter(created_at__gte=SIX_MONTHS_AGO)
-                    .filter(~Exists(JobApplication.objects.filter(pk=OuterRef("pk"), created_at__gte=THIRTY_DAYS_AGO)))
-                    .order_by("-created_at")
-                )
-                if job_apps.exists():
-                    state_order = {
-                        JobApplicationState.NEW: 0,
-                        JobApplicationState.PROCESSING: 1,
-                        JobApplicationState.REFUSED: 2,
-                    }
-
-                    job_app = sorted(list(job_apps), key=lambda jobapp: state_order.get(jobapp.state, 3))[0]
-                    return {
-                        "approval": approval,
-                        "contract": contract,
-                        "job_app": job_app,
-                    }
-
-    return None
-
-
-@check_request(lambda request: request.from_authorized_prescriber)
-def job_seeker_overview(request, public_id, template_name="job_seekers_views/overview.html"):
-    job_seeker = get_object_or_404(User.objects.with_advisors_count(), kind=UserKind.JOB_SEEKER, public_id=public_id)
-    overview_data = get_jobseeker_overview_data(request, job_seeker)
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
-
-    if not overview_data or request.current_organization.department != settings.OVERVIEW_TAB_TEST_DEPARTMENT:
-        raise PermissionDenied
-
-    has_applied_for_job_seeker = (
-        JobApplication.objects.prescriptions_of(request.user, request.current_organization)
-        .filter(job_seeker=job_seeker)
-        .exists()
-    )
-
-    context = {
-        "job_seeker": job_seeker,
-        "back_url": back_url,
-        "can_view_personal_information": can_view_personal_information(request, job_seeker),
-        "services_search_url": build_services_search_url(request, job_seeker),
-        "can_view_external_job_applications": can_view_external_actions(job_seeker, request),
-        "matomo_custom_title": "Synthèse usager",
-        "show_overview_tab": True,
-        "has_applied_for_job_seeker": has_applied_for_job_seeker,
-        "suspension": None,  # Not handled yet
-        "prolongation": None,  # Not handled yet
-        **overview_data,
-    }
-
-    return render(request, template_name, context)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])

@@ -967,9 +967,6 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
 NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 
-OVERVIEW_TAB_TEST_DEPARTMENT = "13" if SHOW_DEMO_ACCOUNTS_BANNER else "93"
-OVERVIEW_TAB_CONTROL_DEPARTMENT = "13"
-
 # Experiment: France Travail agents of this department can view job applications sent to SIAE of this department,
 # until the end date (inclusive).
 XP_REF_IAE_DEPARTMENT = "83"

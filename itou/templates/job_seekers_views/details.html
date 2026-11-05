@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load approvals %}
-{% load components %}
 {% load static %}
 {% load str_filters %}
 
@@ -17,7 +16,7 @@
 {% endblock %}
 
 {% block title_extra %}
-    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_overview_tab=show_overview_tab active_nav_tab="details" back_url=back_url only %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker active_nav_tab="details" back_url=back_url only %}
 {% endblock %}
 
 {% block content %}
@@ -45,20 +44,6 @@
                                             {% endif %}
                                         </div>
                                     </div>
-                                    {% if show_overview_tab %}
-                                        {% component_alert title=title content=content call_to_action=call_to_action variant="important" dismissible_once=True extra_id="overview-banner" %}
-                                            {% fragment as title %}
-                                                Synthèse
-                                            {% endfragment %}
-                                            {% fragment as content %}
-                                                <p class="mb-0">Découvrez le nouvel onglet “Synthèse”, repérez en un coup d’oeil les événements importants du parcours de cet usager.</p>
-                                            {% endfragment %}
-                                            {% fragment as call_to_action %}
-                                                <a class="btn btn-sm btn-primary"
-                                                   href="{% url "job_seekers_views:overview" public_id=job_seeker.public_id %}">Découvrir la synthèse</a>
-                                            {% endfragment %}
-                                        {% endcomponent_alert %}
-                                    {% endif %}
                                 </div>
                                 {% if pro_support_report %}
                                     <div class="col-12 order-1 order-xxl-1">
@@ -135,11 +120,4 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js' %}"></script>
-    {% if is_in_overview_test_perimeter and not show_overview_tab %}
-        <script src="https://tally.so/widgets/embed.js"></script>
-        <script src='{% static "js/overview_survey_control_popup.js" %}'
-                data-delaypopup="true"
-                data-userkind="prescripteur"
-                data-page="synthese-usager"></script>
-    {% endif %}
 {% endblock script %}
