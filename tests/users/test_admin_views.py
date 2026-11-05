@@ -1,3 +1,4 @@
+import datetime
 import random
 from functools import partial
 
@@ -184,7 +185,12 @@ class TestTransferUserData:
 
         # Create another job application to check that one_job_seeker_per_approval doesn't raise during the transfer
         job_application_2 = JobApplicationFactory(
-            sent_by_prescriber_alone=True, with_approval=True, job_seeker=from_user, approval=approval
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            job_seeker=from_user,
+            approval=approval,
+            # Time is frozen: without this, the -created_at ordering of the inconsistency checks would be a tie
+            created_at=job_application_1.created_at - datetime.timedelta(days=1),
         )
 
         orientation = OrientationFactory(beneficiary=from_user)
