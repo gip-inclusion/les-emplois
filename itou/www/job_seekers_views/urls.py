@@ -32,11 +32,6 @@ urlpatterns = [
         name="orientations",
     ),
     path(
-        "overview/<uuid:public_id>",
-        views.job_seeker_overview,
-        name="overview",
-    ),
-    path(
         "<uuid:public_id>/assignments/create",
         views.create_or_edit_assignment,
         name="create_assignment",
