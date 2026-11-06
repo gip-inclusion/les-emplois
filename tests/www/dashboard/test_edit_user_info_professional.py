@@ -263,6 +263,26 @@ def test_professional_cannot_create_membership_with_extra_form(client):
     assert CompanyMembership.include_inactive.count() == 1
 
 
+def test_professional_cannot_set_function_with_error(client):
+    COMPANY_FUNCTION_TOO_LONG = "a" * 200
+    user = ProfessionalFactory()
+    company_membership = CompanyMembershipFactory(user=user)
+    client.force_login(user)
+
+    post_data = {
+        **membership_formsets_management_data(company_memberships_count=1),
+        "company_memberships-0-id": company_membership.pk,
+        "company_memberships-0-function": COMPANY_FUNCTION_TOO_LONG,
+    }
+    response = client.post(reverse("dashboard:edit_user_info"), post_data)
+
+    assert response.status_code == 200
+    error = response.context["membership_forms"][0]["function"].errors[0]
+    assertContains(response, error)
+    company_membership.refresh_from_db()
+    assert company_membership.function == ""
+
+
 def test_edit_user_sso_alert(client):
     ALERT_COMPONENT = (
         "Pour les modifier, rendez-vous directement sur votre compte "
