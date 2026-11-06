@@ -1,5 +1,9 @@
+import datetime
+from zoneinfo import ZoneInfo
+
 import pytest
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.invitations.models import EmployerInvitation, InvitationAbstract
 from itou.users.enums import KIND_EMPLOYER
@@ -10,6 +14,26 @@ from tests.invitations.factories import (
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import ProfessionalFactory
+
+
+PARIS = ZoneInfo("Europe/Paris")
+EXPIRY_CASES = [
+    pytest.param(
+        datetime.datetime(2026, 6, 1, 10, 0, tzinfo=PARIS),
+        datetime.datetime(2026, 6, 15, 10, 0, tzinfo=PARIS),
+        id="no_dst_change",
+    ),
+    pytest.param(
+        datetime.datetime(2026, 10, 20, 0, 30, tzinfo=PARIS),
+        datetime.datetime(2026, 11, 2, 23, 30, tzinfo=PARIS),
+        id="autumn_dst_change",
+    ),
+    pytest.param(
+        datetime.datetime(2027, 3, 22, 12, 0, tzinfo=PARIS),
+        datetime.datetime(2027, 4, 5, 13, 0, tzinfo=PARIS),
+        id="spring_dst_change",
+    ),
+]
 
 
 class TestEmployerInvitationQuerySet:
@@ -40,12 +64,33 @@ class TestInvitationModel:
         # Must be an absolute URL
         assert invitation.acceptance_link.startswith("http")
 
-    def has_expired(self):
+    def test_has_expired(self):
         invitation = EmployerInvitationFactory(expired=True)
         assert invitation.has_expired
 
         invitation = EmployerInvitationFactory()
         assert not invitation.has_expired
+
+    @pytest.mark.parametrize("sent_at, expires_at", EXPIRY_CASES)
+    def test_expiry_definitions_agree(self, sent_at, expires_at):
+        invitation = EmployerInvitationFactory(sent_at=sent_at)
+        invitation.refresh_from_db()
+
+        for now, expired in [(expires_at - datetime.timedelta(minutes=1), False), (expires_at, True)]:
+            with freeze_time(now):
+                assert invitation.has_expired is expired
+                assert invitation.can_be_accepted is not expired
+                assert EmployerInvitation.objects.pending().contains(invitation) is not expired
+                assert EmployerInvitation.objects.valid().contains(invitation) is not expired
+                assert EmployerInvitation.objects.expired().contains(invitation) is expired
+
+    @pytest.mark.parametrize("sent_at, expires_at", EXPIRY_CASES)
+    def test_expiration_date_does_not_depend_on_the_time_zone_of_sent_at(self, sent_at, expires_at):
+        invitation = EmployerInvitationFactory(sent_at=sent_at)
+        assert invitation.expiration_date == expires_at
+
+        invitation.refresh_from_db()
+        assert invitation.expiration_date == expires_at
 
     def test_can_be_accepted(self):
         invitation = EmployerInvitationFactory(expired=True)

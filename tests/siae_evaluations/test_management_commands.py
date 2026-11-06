@@ -579,7 +579,7 @@ class TestManagementCommand:
 class TestArchivedAcceptedEvaluatedSiae:
     def setup_method(self):
         self.evaluated_siae = EvaluatedSiaeFactory(
-            evaluation_campaign__ended_at=timezone.now() - DELAY - datetime.timedelta(days=1),
+            evaluation_campaign__ended_at=timezone.localtime() - DELAY - datetime.timedelta(days=1),
             reviewed_at=timezone.make_aware(datetime.datetime(2024, 5, 17, 10, 10, 10)),
             final_reviewed_at=timezone.make_aware(datetime.datetime(2024, 7, 16, 11, 11, 11)),
             final_state=evaluation_enums.EvaluatedSiaeFinalState.ACCEPTED,
@@ -626,7 +626,7 @@ class TestArchivedAcceptedEvaluatedSiae:
             # refused_evaluated_siae
             EvaluatedSiaeFactory(
                 evaluation_campaign__institution__department="38",
-                evaluation_campaign__ended_at=timezone.now() - DELAY - datetime.timedelta(days=1),
+                evaluation_campaign__ended_at=timezone.localtime() - DELAY - datetime.timedelta(days=1),
                 final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED,
                 complete=True,
             ),

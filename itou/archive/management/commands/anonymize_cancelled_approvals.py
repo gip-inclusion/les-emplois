@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
         self.wet_run = wet_run
 
-        expired_since = timezone.now() - EXPIRATION_PERIOD
+        expired_since = timezone.localdate() - EXPIRATION_PERIOD
         self.logger.info("Anonymizing cancelled approvals after expiration period, expired since: %s", expired_since)
 
         cancelled_approval_to_anonymize = list(
