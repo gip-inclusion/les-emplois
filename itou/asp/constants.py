@@ -114,6 +114,7 @@ ASP_COMMUNES_AS_COUNTRIES = {
 # Some communes have changed their INSEE code and our code uses the INSEE code to deduce the
 # department: prefer the more recent codes that match their department.
 IGNORED_COMMUNES_TARGET_CODES = {
+    ("97520", "POINTE-A-PITRE"): "97120",
     ("97811", "SAINT-DENIS"): "97411",
     ("97816", "SAINT-PIERRE"): "97416",
     # 97824 seems unknown to INSEE
