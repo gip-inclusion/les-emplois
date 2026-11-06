@@ -9,10 +9,12 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
+from itou.asp.constants import IGNORED_COMMUNES_TARGET_CODES
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
 from itou.utils.command import BaseCommand
+from itou.utils.db import or_queries
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 
@@ -261,3 +263,15 @@ class Command(BaseCommand):
                     batch_size=1_000,
                 )
                 self.stdout.write(f"> realigned count={n_objs} JobSeeker profiles with updated communes.")
+
+            # Make sure ignored cities are still ignored
+            communes_to_ignore = list(
+                Commune.unfiltered_objects.filter(
+                    or_queries([Q(code=code, name=name) for code, name in IGNORED_COMMUNES_TARGET_CODES]), ignore=False
+                )
+            )
+            if communes_to_ignore:
+                for commune in communes_to_ignore:
+                    commune.ignore = True
+                    commune.save(update_fields={"ignore"})
+                    self.stdout.write(f"{commune} should be ignored - ignore flag set to True")
