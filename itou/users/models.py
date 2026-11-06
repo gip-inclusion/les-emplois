@@ -16,7 +16,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
+from django.db.models import Case, Count, Exists, F, OuterRef, Q, Subquery, When
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -95,6 +96,23 @@ class UserQuerySet(models.QuerySet):
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
 
+    @staticmethod
+    def last_name_annotation(*, prefix=""):
+        def apply_prefix(lookup: str):
+            if prefix:
+                return f"{prefix}{LOOKUP_SEP}{lookup}"
+            return lookup
+
+        lookups = {
+            apply_prefix("last_name"): "",
+            apply_prefix("kind"): UserKind.JOB_SEEKER,
+        }
+        return Case(
+            When(**lookups, then=F(apply_prefix("jobseeker_profile__birth_name"))),
+            default=F(apply_prefix("last_name")),
+            output_field=models.CharField(),
+        )
+
     def with_advisors_count(self, active=True):
         status_filter = Q()
         annotation_name = "advisors_nb"
@@ -170,6 +188,15 @@ class UserQuerySet(models.QuerySet):
                 ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
             )
         )
+
+    def annotate_with_last_name_for_display(self):
+        """Provide a `last_name_for_display` annotation that can be
+        used in an `order_by()` clause.
+
+        See `User.get_last_name_for_display()` for the equivalent in
+        Python for a single object.
+        """
+        return self.annotate(last_name_for_display=self.last_name_annotation())
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
@@ -533,18 +560,27 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
         self.set_old_values()
 
+    def get_last_name_for_display(self):
+        # See `UserQuerySet.annotate_with_last_name_for_display()` if
+        # you need the same value on a queryset (for ordering, for
+        # example).
+        last_name = self.last_name
+        if self.is_job_seeker:
+            return last_name if last_name else self.jobseeker_profile.birth_name
+        return last_name
+
     def get_full_name(self):
         """
         Return the first_name plus the last_name, with a space in between.
         """
-        full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
+        full_name = f"{self.first_name.strip().title()} {self.get_last_name_for_display().upper()}"
         return full_name.strip()
 
     def get_inverted_full_name(self):
         """
         Return the last_name plus the first_name, with a space in between.
         """
-        full_name = f"{self.last_name.upper()} {self.first_name.strip().title()}"
+        full_name = f"{self.get_last_name_for_display().upper()} {self.first_name.strip().title()}"
         return full_name.strip()
 
     def get_truncated_full_name(self):
@@ -552,8 +588,8 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         Return first name but display only last name's first letter for privacy.
         """
         name = self.first_name.strip().title()
-        if name and self.last_name:
-            name = f"{name} {self.last_name[0].upper()}."
+        if name and self.get_last_name_for_display():
+            name = f"{name} {self.get_last_name_for_display()[0].upper()}."
         return name
 
     def get_redacted_full_name(self):
@@ -567,7 +603,9 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             return part[0] + "*" * (min(len(part) - visible_chars, 10)) + last_char
 
         # we don't use get_full_name here to limit the transformations applied to the user's names in this context
-        return mask_unless(f"{self.first_name.title()} {self.last_name.title()}", False, get_mask_for_part)
+        return mask_unless(
+            f"{self.first_name.title()} {self.get_last_name_for_display().title()}", False, get_mask_for_part
+        )
 
     @property
     def is_job_seeker(self):
@@ -909,6 +947,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     FIELDS_HISTORY_TRIGGER_FIELDS = [
         "asp_uid",
         "birth_country",
+        "birth_name",
         "birth_place",
         "birthdate",
         "is_not_stalled_anymore",
@@ -947,6 +986,14 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         related_name="jobseeker_profile",
     )
 
+    birth_name = models.CharField(
+        max_length=150,  # same as `AbstractUser.last_name`
+        verbose_name="nom de naissance",
+        blank=True,
+        null=False,
+        default="",
+        db_default="",
+    )
     birthdate = models.DateField(
         verbose_name="date de naissance",
         null=True,
@@ -1363,7 +1410,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
+        if self.has_data_changed(["birth_name", "birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
@@ -1593,6 +1640,10 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 case IdentityCertificationAuthorities.API_PARTICULIER:
                     blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
                     blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
+                    if self.birth_name:
+                        blocked_fields.add("birth_name")
+                    else:
+                        blocked_fields.add("last_name")
 
                     # These fields can be empty even after the certification, generating an error
                     # when the form is validated. Hence we allow the edition of this field.

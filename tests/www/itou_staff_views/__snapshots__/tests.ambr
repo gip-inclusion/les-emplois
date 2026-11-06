@@ -19,6 +19,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -58,8 +59,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -282,6 +333,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -321,8 +373,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -434,6 +536,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -519,6 +622,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -558,8 +662,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -664,6 +818,7 @@
                  "cities_city"."last_synced_at",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1137,7 +1292,7 @@
 # ---
 # name: TestExportJobApplications.test_export[after][streaming content]
   '''
-  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
+  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_name,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   
   '''
 # ---
@@ -1161,6 +1316,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -1200,8 +1356,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -1306,6 +1512,7 @@
                  "cities_city"."last_synced_at",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1779,7 +1986,7 @@
 # ---
 # name: TestExportJobApplications.test_export[before][streaming content]
   '''
-  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
+  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_name,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   
   '''
 # ---
@@ -1803,6 +2010,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -1842,8 +2050,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -1948,6 +2206,7 @@
                  "cities_city"."last_synced_at",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -2580,8 +2839,8 @@
 # ---
 # name: TestExportJobApplications.test_export[contains][streaming content]
   '''
-  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
-  MME,Jane,Doe,290010101010125,,,2024-05-10T09:11:11+00:00,1990-01-01,,,jane.doe@test.local,0612345678,DJANGO,,12 rue Georges Bizet,,35000,Rennes,,,,,12,,RUE,Georges Bizet,,35000,,40,False,False,False,,,NON,,False,,False,,prescriber,,,,,12345678900012,FT,True,,2024-11-10,,EI,32112345600020,1234Z,ACME Inc.,Pierre DUPONT — pierre.dupont@test.local,,,,,,,,,Candidature spontanée,,,,,,,,,2024-05-10,2026-05-10,,,,,,,,XXXXX1234567,2024-05-10,2026-06-08,[2024-05-10;2024-06-09] (SENIOR),
+  job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_name,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
+  MME,Jane,Doe,290010101010125,,,2024-05-10T09:11:11+00:00,1990-01-01,Smith,,,jane.doe@test.local,0612345678,DJANGO,,12 rue Georges Bizet,,35000,Rennes,,,,,12,,RUE,Georges Bizet,,35000,,40,False,False,False,,,NON,,False,,False,,prescriber,,,,,12345678900012,FT,True,,2024-11-10,,EI,32112345600020,1234Z,ACME Inc.,Pierre DUPONT — pierre.dupont@test.local,,,,,,,,,Candidature spontanée,,,,,,,,,2024-05-10,2026-05-10,,,,,,,,XXXXX1234567,2024-05-10,2026-06-08,[2024-05-10;2024-06-09] (SENIOR),
   
   '''
 # ---
@@ -2605,6 +2864,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -2644,8 +2904,58 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nationality",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."creation_source"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
@@ -2715,6 +3025,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",

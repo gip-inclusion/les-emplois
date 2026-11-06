@@ -44,14 +44,16 @@ class OrientationSelectJobSeekerForm(forms.Form):
                 kind=UserKind.JOB_SEEKER,
                 pk__in=job_seekers_ids,
             )
+            .annotate_with_last_name_for_display()
             .exclude(
                 # FIXME: will be fixed when last_name (soon: birth_name)
                 # and first_name are enforced by a SQL constraint
                 last_name="",
                 first_name="",
+                jobseeker_profile__birth_name="",
             )
             .select_related("jobseeker_profile")
-            .order_by("last_name", "first_name")
+            .order_by("last_name_for_display", "first_name")
         )
         self.valid_public_ids = set()
         choices = [("", "---------")]
@@ -170,8 +172,10 @@ class OrientationsFilterForm(forms.Form):
         self.fields["structures"].choices = structures_choices
 
     def _get_choices_for_beneficiary(self, orientations_qs, request):
-        beneficiaries_qs = User.objects.filter(pk__in=orientations_qs.values("beneficiary")).order_by(
-            "last_name", "first_name"
+        beneficiaries_qs = (
+            User.objects.annotate_with_last_name_for_display()
+            .filter(pk__in=orientations_qs.values("beneficiary"))
+            .order_by("last_name_for_display", "first_name")
         )
 
         return [

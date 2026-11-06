@@ -85,6 +85,12 @@ class ChooseMembershipKindForm(forms.Form):
 
 
 class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):
+    birth_name = forms.CharField(
+        label="Nom de naissance",
+        required=True,
+        max_length=150,
+        strip=True,
+    )
     nir = forms.CharField(
         label="Numéro de sécurité sociale",
         required=True,
@@ -106,7 +112,9 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
         super().__init__(*args, **kwargs)
         self.fields["email"].label = "E-mail"
         self.fields["email"].widget.attrs["placeholder"] = ""
-        self.fields["last_name"].label = "Nom de famille"
+        self.fields["last_name"].label = "Nom d’usage"
+        self.fields["last_name"].help_text = "À renseigner si différent du nom de naissance (Exemple : nom marital)"
+        self.fields["last_name"].required = False
         self.fields["birth_place"].help_text = (
             "La commune de naissance est obligatoire lorsque vous êtes né en France. "
             "Elle ne doit pas être renseignée si vous êtes né à l'étranger."
@@ -152,7 +160,8 @@ class JobSeekerSignupWithOptionalNirForm(JobSeekerSignupForm):
 
 class JobSeekerCredentialsSignupForm(SignupForm):
     first_name = forms.CharField(disabled=True, required=False, label="Prénom")
-    last_name = forms.CharField(disabled=True, required=False, label="Nom")
+    last_name = forms.CharField(disabled=True, required=False, label="Nom d’usage")
+    birth_name = forms.CharField(disabled=True, required=False, label="Nom de naissance")
     birthdate = forms.DateField(
         disabled=True,
         required=False,
@@ -175,6 +184,7 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         self.fields["email"].initial = prior_cleaned_data.get("email")
         self.fields["first_name"].initial = prior_cleaned_data.get("first_name")
         self.fields["last_name"].initial = prior_cleaned_data.get("last_name")
+        self.fields["birth_name"].initial = prior_cleaned_data.get("birth_name")
         self.fields["birthdate"].initial = prior_cleaned_data.get("birthdate")
         self.fields["nir"].initial = prior_cleaned_data.get("nir")
         birth_location_fields = forms.fields_for_model(JobSeekerProfile, fields=["birth_place", "birth_country"])
@@ -203,6 +213,7 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         user.first_name = self.prior_cleaned_data["first_name"]
         user.last_name = self.prior_cleaned_data["last_name"]
         user.save()
+        user.jobseeker_profile.birth_name = self.prior_cleaned_data["birth_name"]
         user.jobseeker_profile.nir = self.prior_cleaned_data["nir"]
         user.jobseeker_profile.birthdate = self.prior_cleaned_data["birthdate"]
         user.jobseeker_profile.birth_place_id = self.prior_cleaned_data["birth_place"]

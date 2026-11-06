@@ -134,7 +134,9 @@ class FilterForm(forms.Form):
                     job_seeker.get_inverted_full_name(), predicate=can_view_personal_information(request, job_seeker)
                 ),
             )
-            for job_seeker in job_seeker_qs.order_by("last_name", "first_name")
+            for job_seeker in job_seeker_qs.annotate_with_last_name_for_display().order_by(
+                "last_name_for_display", "first_name"
+            )
             if job_seeker.get_inverted_full_name()
         ]
 
@@ -354,7 +356,15 @@ class JobSeekerExistsForm(forms.Form):
 
 
 class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileModelForm):
-    PROFILE_FIELDS = ["nationality", "birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = [
+        "nationality",
+        "birth_name",
+        "birth_country",
+        "birthdate",
+        "birth_place",
+        "nir",
+        "lack_of_nir_reason",
+    ]
 
     class Meta(JobSeekerProfileModelForm.Meta):
         pass
@@ -371,8 +381,8 @@ class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
 
 
 class CreateJobSeekerForOrientationStep1Form(JobSeekerProfileModelForm):
-    PROFILE_FIELDS = ["birthdate"]
-    REQUIRED_FIELDS = ["first_name", "last_name", "birthdate"]
+    PROFILE_FIELDS = ["birth_name", "birthdate"]
+    REQUIRED_FIELDS = ["first_name", "birth_name", "birthdate"]
 
     email = forms.EmailField(label="Adresse électronique personnelle", disabled=True)
 

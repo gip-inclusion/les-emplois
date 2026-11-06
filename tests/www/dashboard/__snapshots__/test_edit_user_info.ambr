@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditUserInfoView.test_edit_with_nir
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -19,6 +19,7 @@
       }),
       dict({
         'origin': list([
+          'AuthenticationBackend.get_user[utils/auth.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -58,31 +59,10 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          WHERE "users_user"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'EditJobSeekerInfoForm.__init__[users/forms.py]',
-          'EditJobSeekerInfoForm.__init__[users/forms.py]',
-          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
-          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
-          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
-          'edit_user_info[www/dashboard/views.py]',
-          'wrapper[utils/views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -129,10 +109,17 @@
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."creation_source"
-          FROM "users_jobseekerprofile"
-          WHERE "users_jobseekerprofile"."user_id" = %s
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

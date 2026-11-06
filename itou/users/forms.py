@@ -33,6 +33,21 @@ class JobSeekerProfileFieldsMixin:
             if field not in self.fields:
                 self.fields[field] = JobSeekerProfile._meta.get_field(field).formfield()
 
+    def clean(self):
+        super().clean()
+        self.auto_clear_last_name_if_same_as_birth_name()
+
+    def auto_clear_last_name_if_same_as_birth_name(self):
+        """In the given form, clear last name field (i.e. set "") if it's
+        the same as the birth name.
+
+        This is for users who forget to remove the last name when setting
+        a birth name that is the same.
+        """
+        if set(self.cleaned_data).issuperset({"last_name", "birth_name"}):
+            if self.cleaned_data["last_name"].casefold() == self.cleaned_data["birth_name"].casefold():
+                self.cleaned_data["last_name"] = ""
+
     def save(self, commit=True):
         user = super().save(commit=commit)
         update_fields = []
@@ -97,8 +112,8 @@ class PoleEmploiFieldsMixin:
 
 
 class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
-    PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
-    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
+    PROFILE_FIELDS = ["birth_name", "birthdate", "birth_place", "birth_country"]
+    REQUIRED_FIELDS = ["title", "first_name", "birth_name", "birthdate"]
 
     class Meta:
         model = User
@@ -112,6 +127,8 @@ class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMix
                 self.fields[fieldname].required = True
             except KeyError:
                 pass
+
+        self.fields["last_name"].label = "Nom d’usage"
 
         for fieldname, field in self.fields.items():
             if fieldname in self.readonly_pii_fields:
