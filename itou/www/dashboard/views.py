@@ -393,9 +393,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     if request.method == "POST" and all([form.is_valid(), *[formset.is_valid() for formset in memberships_formsets]]):
         form.save()
         for formset in memberships_formsets:
-            for membership in formset.save(commit=False):
-                membership.updated_by = request.user
-                membership.save(update_fields=["function", "updated_by", "updated_at"])
+            formset.save()
         messages.success(request, "Les informations de votre profil ont bien été mises à jour.", extra_tags="toast")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)

@@ -194,12 +194,10 @@ class TestEditUserInfoView:
         assert response.status_code == 302
         company_membership.refresh_from_db()
         assert company_membership.function == COMPANY_FUNCTION
-        assert company_membership.updated_by == user
         assert company_membership.updated_at == now
 
         prescriber_membership.refresh_from_db()
         assert prescriber_membership.function == PRESCRIBER_FUNCTION
-        assert prescriber_membership.updated_by == user
         assert prescriber_membership.updated_at == now
 
     def test_unchanged_membership_is_not_updated(self, client):
@@ -220,7 +218,6 @@ class TestEditUserInfoView:
         assert response.status_code == 302
         unchanged_membership.refresh_from_db()
         assert unchanged_membership.function == COMPANY_FUNCTION
-        assert not unchanged_membership.updated_by
         assert unchanged_membership.updated_at < now
 
     def test_professional_cannot_set_function_of_another_user_membership(self, client):

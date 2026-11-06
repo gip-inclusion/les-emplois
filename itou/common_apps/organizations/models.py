@@ -340,6 +340,12 @@ class MembershipAbstract(models.Model):
     class Meta:
         unique_together = ("user_id", "related_model_id")
     ```
+
+    `updated_by` was meant to track significant changes (`is_admin`, `is_active`), and is deliberately left untouched
+    for other changes (e.g. when a member edits their own `function`).
+    It is an unsatisfying audit trail: it only keeps the last author, without the change itself nor its date
+    (`updated_at` follows every change).
+    It should probably be removed.
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
