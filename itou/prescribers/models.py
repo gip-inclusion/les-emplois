@@ -398,7 +398,7 @@ class PrescriberMembership(MembershipAbstract):
         verbose_name="mis à jour par",
     )
     function = models.CharField(
-        verbose_name="fonction occupée dans l'organisation",
+        verbose_name="fonction occupée dans l’organisation",
         max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
         blank=True,
         default="",

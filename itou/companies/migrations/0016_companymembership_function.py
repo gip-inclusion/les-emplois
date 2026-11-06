@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 db_default="",
                 default="",
                 max_length=150,
-                verbose_name="fonction occupée dans l'entreprise",
+                verbose_name="fonction occupée dans l’entreprise",
             ),
         ),
     ]

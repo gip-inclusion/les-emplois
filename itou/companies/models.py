@@ -694,7 +694,7 @@ class CompanyMembership(MembershipAbstract):
         verbose_name="mis à jour par",
     )
     function = models.CharField(
-        verbose_name="fonction occupée dans l'entreprise",
+        verbose_name="fonction occupée dans l’entreprise",
         max_length=MEMBERSHIP_FUNCTION_MAX_LENGTH,
         blank=True,
         default="",
