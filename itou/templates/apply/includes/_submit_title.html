@@ -11,11 +11,6 @@
     {% if job_seeker|default:None %}
         pour {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
     {% endif %}
-{% elif orientation_process|default:False %}
-    Orienter
-    {% if job_seeker|default:None %}
-        {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
-    {% endif %}
 {% elif prescription_process %}
     Postuler
     {% if job_seeker|default:None %}
