@@ -50,12 +50,14 @@
                             <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end"
                                  role="group"
                                  aria-label="Actions sur la structure">
-                                <a class="btn btn-outline-primary btn-ico"
-                                   href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
-                                   {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
-                                    <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
-                                    <span>Voir la fiche publique</span>
-                                </a>
+                                {% if company.is_searchable %}
+                                    <a class="btn btn-outline-primary btn-ico"
+                                       href="{{ company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                       {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
+                                        <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
+                                        <span>Voir la fiche publique</span>
+                                    </a>
+                                {% endif %}
                                 <a class="btn btn-primary btn-ico"
                                    href="{% url 'companies_views:edit_company_step_contact_infos' %}?back_url={{ request.get_full_path|urlencode }}"
                                    {% matomo_event "employeurs" "clic" "modifier-infos-entreprise" %}>
@@ -64,6 +66,21 @@
                                 </a>
                             </div>
                         </div>
+                        {% if not company.is_searchable %}
+                            {% component_alert content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                {% fragment as content %}
+                                    <p class="mb-0">
+                                        Votre structure n’apparaît pas dans les résultats de recherche et sa fiche publique n’est pas accessible.
+                                        Si vous pensez qu’il s’agit d’une erreur,
+                                        <a href="{{ ITOU_HELP_CENTER_URL }}"
+                                           target="_blank"
+                                           rel="noopener"
+                                           class="has-external-link"
+                                           aria-label="Contactez le support (ouverture dans un nouvel onglet)">contactez le support</a>.
+                                    </p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                        {% endif %}
                         <div class="row">
                             <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                 <div class="c-box h-100 {% if not company.description and not company.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
