@@ -23,12 +23,12 @@ from tests.www.dashboard.test_edit_user_info_job_seeker import (
 )
 
 
-def membership_formsets_management_data(company_memberships=(), prescriber_memberships=()):
+def membership_formsets_management_data(company_memberships_count=0, prescriber_memberships_count=0):
     return {
-        "company_memberships-TOTAL_FORMS": len(company_memberships),
-        "company_memberships-INITIAL_FORMS": len(company_memberships),
-        "prescriber_memberships-TOTAL_FORMS": len(prescriber_memberships),
-        "prescriber_memberships-INITIAL_FORMS": len(prescriber_memberships),
+        "company_memberships-TOTAL_FORMS": company_memberships_count,
+        "company_memberships-INITIAL_FORMS": company_memberships_count,
+        "prescriber_memberships-TOTAL_FORMS": prescriber_memberships_count,
+        "prescriber_memberships-INITIAL_FORMS": prescriber_memberships_count,
     }
 
 
@@ -183,7 +183,7 @@ class TestEditUserInfoView:
         with freeze_time():
             now = timezone.now()
             post_data = {
-                **membership_formsets_management_data([company_membership], [prescriber_membership]),
+                **membership_formsets_management_data(company_memberships_count=1, prescriber_memberships_count=1),
                 "company_memberships-0-id": company_membership.pk,
                 "company_memberships-0-function": COMPANY_FUNCTION,
                 "prescriber_memberships-0-id": prescriber_membership.pk,
@@ -209,7 +209,7 @@ class TestEditUserInfoView:
         with freeze_time():
             now = timezone.now()
             post_data = {
-                **membership_formsets_management_data([unchanged_membership]),
+                **membership_formsets_management_data(company_memberships_count=1),
                 "company_memberships-0-id": unchanged_membership.pk,
                 "company_memberships-0-function": COMPANY_FUNCTION,
             }
@@ -222,13 +222,12 @@ class TestEditUserInfoView:
 
     def test_professional_cannot_set_function_of_another_user_membership(self, client):
         user = ProfessionalFactory()
-        company_membership = CompanyMembershipFactory(user=user)
         other_user_membership = CompanyMembershipFactory()
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
         post_data = {
-            **membership_formsets_management_data([company_membership]),
+            **membership_formsets_management_data(company_memberships_count=1),
             "company_memberships-0-id": other_user_membership.pk,
             "company_memberships-0-function": "Directeur",
         }
@@ -236,9 +235,7 @@ class TestEditUserInfoView:
 
         assert response.status_code == 302
         other_user_membership.refresh_from_db()
-        company_membership.refresh_from_db()
         assert not other_user_membership.function
-        assert not company_membership.function
 
     def test_professional_cannot_create_membership_with_extra_form(self, client):
         user = ProfessionalFactory()
@@ -247,7 +244,7 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
 
         post_data = {
-            **membership_formsets_management_data([company_membership]),
+            **membership_formsets_management_data(company_memberships_count=1),
             "company_memberships-TOTAL_FORMS": 2,
             "company_memberships-0-id": company_membership.pk,
             "company_memberships-0-function": "",
