@@ -208,14 +208,18 @@
     {% endif %}
     {% if membership_forms|length > 3 %}
         <script nonce="{{ csp_nonce }}">
-            {
+            (function() {
+                "use strict";
+
                 const sameMembershipFunctionCheckbox = document.getElementById("same-membership-function");
                 const [firstMembershipFunctionInput, ...otherMembershipFunctionInputs] = document.querySelectorAll("[data-emplois-membership-functions] input[list]");
 
-                function copyFirstMembershipFunction() {
-                    otherMembershipFunctionInputs.forEach((input) => {
-                        input.value = firstMembershipFunctionInput.value;
-                    });
+                function syncOtherMembershipFunctions() {
+                    if (sameMembershipFunctionCheckbox.checked) {
+                        otherMembershipFunctionInputs.forEach((input) => {
+                            input.value = firstMembershipFunctionInput.value;
+                        });
+                    }
                 }
 
                 function toggleSameMembershipFunction() {
@@ -223,20 +227,15 @@
                     otherMembershipFunctionInputs.forEach((input) => {
                         input.readOnly = sameMembershipFunctionCheckbox.checked;
                     });
-                    if (sameMembershipFunctionCheckbox.checked) {
-                        copyFirstMembershipFunction();
-                    }
+                    syncOtherMembershipFunctions();
                 }
 
                 sameMembershipFunctionCheckbox.addEventListener("change", toggleSameMembershipFunction);
-                firstMembershipFunctionInput.addEventListener("input", () => {
-                    if (sameMembershipFunctionCheckbox.checked) {
-                        copyFirstMembershipFunction();
-                    }
-                });
+                firstMembershipFunctionInput.addEventListener("input", syncOtherMembershipFunctions);
+
                 // The browser may restore the checkbox state when navigating back.
                 toggleSameMembershipFunction();
-            }
+            })();
         </script>
     {% endif %}
 {% endblock %}
