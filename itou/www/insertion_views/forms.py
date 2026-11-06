@@ -25,11 +25,7 @@ class OrientationSelectJobSeekerForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=True,
         label="Nom de l’usager",
-        widget=Select2Widget(
-            attrs={
-                "data-placeholder": "Nom de l’usager",
-            }
-        ),
+        widget=Select2Widget(attrs={"data-placeholder": ""}),
     )
 
     def __init__(self, request, *args, **kwargs):

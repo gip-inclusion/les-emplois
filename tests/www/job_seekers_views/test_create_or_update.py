@@ -735,9 +735,11 @@ class TestStandaloneCreateAsPrescriber:
         client.get(reverse("job_seekers_views:get_or_create_start", query={"tunnel": "standalone", "from_url": "/"}))
         kwargs = {"session_uuid": get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)}
         banner_to_find = "Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale."
-        assertNotContains(
-            client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs)),
-            banner_to_find,
+        response = client.get(reverse("job_seekers_views:search_by_email_for_sender", kwargs=kwargs))
+        assertNotContains(response, banner_to_find)
+        assertNotContains(response, "Créer un compte pour votre usager")
+        assertContains(
+            response, '<div class="form-text mt-n2 mb-2">Par exemple\xa0: julie@example.com</div>', html=True
         )
         client.post(
             reverse("job_seekers_views:check_nir_for_sender", kwargs=kwargs),
