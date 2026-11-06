@@ -68,6 +68,7 @@ class SlylyImmutableUnaccent(Transform):
 class AbstractSupportRemark(models.Model):
     class Meta:
         verbose_name = "commentaire du support"
+        verbose_name_plural = "commentaires du support"
         abstract = True
 
     remark = models.TextField(verbose_name="commentaire", blank=True)
