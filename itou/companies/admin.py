@@ -25,6 +25,7 @@ from itou.utils.admin import (
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import FuzzyCountPaginator
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 logger = logging.getLogger(__name__)
@@ -423,10 +424,12 @@ class SiaeConventionAdmin(ItouModelAdmin):
         return False
 
     def save_model(self, request, obj, form, change):
+        reactivated = False
         if change:
             old_obj = self.model.objects.get(id=obj.id)
             if obj.is_active and not old_obj.is_active:
                 # Itou staff manually reactivated convention.
+                reactivated = True
                 obj.reactivated_by = request.user
                 obj.reactivated_at = timezone.now()
             if not obj.is_active and old_obj.is_active:
@@ -434,6 +437,12 @@ class SiaeConventionAdmin(ItouModelAdmin):
                 # Start grace period.
                 obj.deactivated_at = timezone.now()
         super().save_model(request, obj, form, change)
+        if reactivated and (made_searchable := obj.siaes.make_searchable_after_reactivation()):
+            s = pluralizefr(made_searchable)
+            messages.info(
+                request,
+                f"{made_searchable} structure{s} de nouveau visible{s} (masquée{s} à la fin du délai de grâce).",
+            )
 
     @admin.display(description="fin de délai de grâce")
     def grace_period_end_at(self, obj):

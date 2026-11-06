@@ -92,6 +92,24 @@ class CompanyQuerySet(OrganizationQuerySet):
             | Q(has_convention_in_grace_period=True)
         )
 
+    def make_searchable_after_reactivation(self):
+        """Make visible again the companies hidden by `cleanup_siaes_after_grace_period()`.
+
+        Meant for companies whose convention was just reactivated. Nothing records why a company is not searchable, so
+        leave alone those where the cleanup cannot be the cause: the source of a data transfer (it also blocks job
+        applications), and those whose convention was reactivated before the end of its grace period.
+
+        Returns:
+            The number of companies made searchable.
+        """
+        grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        now = timezone.now()
+        return self.filter(
+            is_searchable=False,
+            block_job_applications=False,
+            convention__deactivated_at__lt=now - grace_period,
+        ).update(is_searchable=True, updated_at=now)
+
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
 

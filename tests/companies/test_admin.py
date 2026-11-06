@@ -9,11 +9,12 @@ from django.contrib.auth import get_user
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company, CompanyMembership
 from itou.users.models import User
 from itou.utils.models import PkSupportRemark
@@ -21,7 +22,7 @@ from tests.common_apps.organizations.tests import (
     assert_set_admin_role_creation,
     assert_set_admin_role_removal,
 )
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory, SiaeConventionFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -589,3 +590,77 @@ class TestJobDescriptionAdmin:
 
         job_description.refresh_from_db()
         assert job_description.last_employer_update_at == last_employer_update_at
+
+
+class TestSiaeConventionAdmin:
+    @staticmethod
+    def post_convention(admin_client, convention, is_active):
+        change_url = reverse("admin:companies_siaeconvention_change", args=[convention.pk])
+        data = {
+            "financial_annexes-TOTAL_FORMS": "0",
+            "financial_annexes-INITIAL_FORMS": "0",
+            "siaes-TOTAL_FORMS": "0",
+            "siaes-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        }
+        if is_active:
+            data["is_active"] = "on"
+        response = admin_client.post(change_url, data=data)
+        assertRedirects(response, change_url, fetch_redirect_response=False)
+        return response
+
+    def test_reactivation_makes_hidden_companies_searchable(self, admin_client):
+        convention = SiaeConventionFactory(after_grace_period=True)
+        hidden_company = CompanyFactory(convention=convention, kind=convention.kind, is_searchable=False)
+        transfer_source = CompanyFactory(
+            source=CompanySource.USER_CREATED,
+            convention=convention,
+            kind=convention.kind,
+            is_searchable=False,
+            block_job_applications=True,
+        )
+
+        response = self.post_convention(admin_client, convention, is_active=True)
+
+        convention.refresh_from_db()
+        assert convention.is_active is True
+        assert convention.reactivated_at is not None
+        hidden_company.refresh_from_db()
+        assert hidden_company.is_searchable is True
+        transfer_source.refresh_from_db()
+        assert transfer_source.is_searchable is False
+        assert [
+            message.message
+            for message in messages.get_messages(response.wsgi_request)
+            if message.level == messages.INFO
+        ] == ["1 structure de nouveau visible (masquée à la fin du délai de grâce)."]
+
+    def test_reactivation_during_grace_period_keeps_hidden_company(self, admin_client):
+        convention = SiaeConventionFactory(pending_grace_period=True)
+        company = CompanyFactory(convention=convention, kind=convention.kind, is_searchable=False)
+
+        response = self.post_convention(admin_client, convention, is_active=True)
+
+        company.refresh_from_db()
+        assert company.is_searchable is False
+        assert [message.level for message in messages.get_messages(response.wsgi_request)] == [messages.SUCCESS]
+
+    def test_deactivation_keeps_company_searchable_state(self, admin_client):
+        convention = SiaeConventionFactory(
+            is_active=True, deactivated_at=timezone.now() - timezone.timedelta(days=365)
+        )
+        searchable_company = CompanyFactory(convention=convention, kind=convention.kind)
+        hidden_company = CompanyFactory(
+            source=CompanySource.USER_CREATED, convention=convention, kind=convention.kind, is_searchable=False
+        )
+
+        self.post_convention(admin_client, convention, is_active=False)
+
+        convention.refresh_from_db()
+        assert convention.is_active is False
+        searchable_company.refresh_from_db()
+        assert searchable_company.is_searchable is True
+        hidden_company.refresh_from_db()
+        assert hidden_company.is_searchable is False
