@@ -36,6 +36,27 @@ from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users import factories as users_factories
 
 
+def test_deactivating_a_member_revokes_their_invitations_on_the_last_day():
+    company = companies_factories.CompanyFactory(with_membership=True)
+    admin = company.members.first()
+    sender_membership = companies_factories.CompanyMembershipFactory(company=company)
+    invitation = invitations_factories.EmployerInvitationFactory(
+        company=company,
+        sender=sender_membership.user,
+        sent_at=datetime.datetime(2026, 6, 1, 8, 0, tzinfo=datetime.UTC),
+    )
+
+    # Before its exact expiry, but already the calendar day of its expiration
+    with freeze_time(datetime.datetime(2026, 6, 15, 7, 0, tzinfo=datetime.UTC)):
+        invitation.refresh_from_db()
+        assert invitation.can_be_accepted
+
+        company.deactivate_membership(sender_membership, updated_by=admin)
+
+        invitation.refresh_from_db()
+        assert not invitation.can_be_accepted
+
+
 def assert_set_admin_role_creation(user, organization, mailoutbox):
     # New admin.
     assert user in organization.active_admin_members

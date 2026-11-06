@@ -1,7 +1,7 @@
+import datetime
 import logging
 import uuid
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -21,14 +21,11 @@ logger = logging.getLogger(__name__)
 class InvitationQuerySet(models.QuerySet):
     @property
     def valid_lookup(self):
-        # 1) `relativedelta(days=models.F("validity_days"))` raises TypeError exception,
-        # see https://stackoverflow.com/questions/6158859/making-queries-using-f-and-timedelta-at-django
-        # 2) `relativedelta(days=1) * models.F("validity_days")` still raises an exception
-        # `django.db.utils.ProgrammingError: can't adapt type 'relativedelta'`
-        # 3) getting rid of relativedelta and using dates directly is the only solution found so far
-        # see https://stackoverflow.com/questions/56167142/django-orm-get-records-that-are-older-than-records-duration-days
-        expiration_date = timezone.localdate() - models.F("validity_days")
-        return models.Q(sent_at__date__gt=expiration_date)
+        # Same definition as `InvitationAbstract.has_expired`: an exact duration since `sent_at`
+        validity = models.ExpressionWrapper(
+            models.F("validity_days") * datetime.timedelta(days=1), output_field=models.DurationField()
+        )
+        return models.Q(sent_at__gt=timezone.now() - validity)
 
     def valid(self):
         return self.filter(self.valid_lookup)
@@ -100,7 +97,7 @@ class InvitationAbstract(models.Model):
 
     @property
     def expiration_date(self):
-        return self.sent_at + relativedelta(days=self.validity_days)
+        return self.sent_at.astimezone(datetime.UTC) + datetime.timedelta(days=self.validity_days)
 
     @property
     def has_expired(self):
