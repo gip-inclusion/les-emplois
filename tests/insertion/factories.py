@@ -77,11 +77,12 @@ class OtherThematicFactory(GenericReferenceItemFactory):
 class StructureFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Structure
+        skip_postgeneration_save = True
 
     uid = factory.Sequence(lambda n: f"structure-uid-{n}")
     source = factory.SubFactory(GenericReferenceItemFactory)
     name = factory.Faker("company", locale="fr_FR")
-    description = factory.Faker("paragraph", locale="fr_FR")
+    description = "Description de la structure."
     updated_on = factory.LazyFunction(timezone.localdate)
 
     class Params:
@@ -90,6 +91,11 @@ class StructureFactory(factory.django.DjangoModelFactory):
             name="Les joies de l’apprentissage",
             description="Une structure spécialisé dans les apprentissages.",
         )
+
+    @factory.post_generation
+    def reseaux_porteurs(self, create, extracted, **kwargs):
+        if create and extracted:
+            self.reseaux_porteurs.set(extracted)
 
 
 class ServiceFactory(factory.django.DjangoModelFactory):
@@ -104,6 +110,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     description = "Description du service."
     contact_email = "contact@email.fake"
     updated_on = datetime.date(2025, 1, 1)
+    score_qualite = 0.5
 
     class Params:
         for_snapshot = factory.Trait(
@@ -126,6 +133,11 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     def thematics(self, create, extracted, **kwargs):
         if create:
             self.thematics.set(extracted if extracted is not None else [DefaultThematicFactory()])
+
+    @factory.post_generation
+    def publics(self, create, extracted, **kwargs):
+        if create and extracted:
+            self.publics.set(extracted)
 
 
 class MobilizationEventFactory(factory.django.DjangoModelFactory):

@@ -295,6 +295,7 @@ class Command(BaseCommand):
         service.extra = data.get("extra")
 
         service.updated_on = data["date_maj"]
+        service.score_qualite = data["score_qualite"]
 
         service.save()  # Save to have a PK for ManyToManyField fields
 
@@ -371,3 +372,6 @@ class Command(BaseCommand):
 
             if ArgumentData.SERVICES in data:
                 self.import_services(di_client, sources_except_emplois, force_update=force_update)
+
+            self.logger.info("Updating services search index")
+            Service.include_inactive.update_search_index()

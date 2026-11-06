@@ -12,11 +12,16 @@ from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+from django.contrib.postgres import search as postgres_search
+from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.db.models import Avg, BooleanField, Exists, F, OuterRef, Q, Value
+from django.contrib.postgres.indexes import GinIndex
+from django.db import connection, models, transaction
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Concat, Greatest, Round
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 from django_xworkflows import models as xwf_models
 from xworkflows import after_transition, before_transition
 
@@ -25,6 +30,7 @@ from itou.api.inbound_parsing.enums import InboundParsingKind
 from itou.companies.models import Company
 from itou.emails.utils import get_email_message
 from itou.files.models import File
+from itou.insertion import search as insertion_search
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     GenericReferenceItemKind,
@@ -200,13 +206,13 @@ class ServiceQuerySet(models.QuerySet):
         thematic_ids = list(GenericReferenceItem.objects.filter(value__in=thematics).values_list("id", flat=True))
         eligibility_codes = [code for code in [city.code_insee, city.department, city.siren_epci, "france"] if code]
         # An empty eligibility zone means national availability (aligned on data·inclusion).
-        eligibility_filter = Q(eligibility_zones__overlap=eligibility_codes) | Q(eligibility_zones=[])
+        eligibility_filter = models.Q(eligibility_zones__overlap=eligibility_codes) | models.Q(eligibility_zones=[])
         queryset = (
             self.annotate(
                 distance=Distance("coordinates", city.coords) / 1000,
-                has_thematic=Exists(
+                has_thematic=models.Exists(
                     self.model.thematics.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=thematic_ids,
                     )
                 ),
@@ -227,8 +233,8 @@ class ServiceQuerySet(models.QuerySet):
                 )
                 .filter(eligibility_filter)
                 .annotate(
-                    is_in_person=Value(True, output_field=BooleanField()),
-                    is_remote=Value(False, output_field=BooleanField()),
+                    is_in_person=models.Value(True, output_field=models.BooleanField()),
+                    is_remote=models.Value(False, output_field=models.BooleanField()),
                 )
                 .order_by("distance", "pk")
             )
@@ -238,34 +244,158 @@ class ServiceQuerySet(models.QuerySet):
                 queryset.filter(receptions__id__in=GenericReferenceItem.remote_reception_ids())
                 .filter(eligibility_filter)
                 .annotate(
-                    is_in_person=Value(False, output_field=BooleanField()),
-                    is_remote=Value(True, output_field=BooleanField()),
+                    is_in_person=models.Value(False, output_field=models.BooleanField()),
+                    is_remote=models.Value(True, output_field=models.BooleanField()),
                 )
                 .order_by("distance", "pk")
             )
 
         return (
             queryset.annotate(
-                is_in_person=Exists(
+                is_in_person=models.Exists(
                     self.model.receptions.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
                     )
                 ),
-                is_remote=Exists(
+                is_remote=models.Exists(
                     self.model.receptions.through.objects.filter(
-                        service=OuterRef("pk"),
+                        service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
                     )
                 ),
             )
             .filter(
-                Q(is_in_person=True) & Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
-                | Q(is_remote=True)
+                models.Q(is_in_person=True)
+                & models.Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
+                | models.Q(is_remote=True)
             )
             .filter(eligibility_filter)
             .order_by("-is_in_person", "distance", "pk")
         )
+
+    def keyword_search(self, q):
+        """Ranked like data·inclusion's search."""
+        # Why: typo tolerance as recommended by https://www.postgresql.org/docs/current/pgtrgm.html#PGTRGM-TEXT-SEARCH
+        # Each rare lexeme of `q` is OR-ed with its closest lexicon words, leaning towards frequent ones.
+        # Thresholds come from data·inclusion's data analysis.
+        query = postgres_search.SearchQuery(
+            RawSQL(
+                """
+                (
+                    SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
+                    FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
+                    LEFT JOIN insertion_wordfrequency AS common_word
+                        ON common_word.stem = lexeme AND common_word.service_count >= 100
+                    CROSS JOIN LATERAL (
+                        SELECT string_agg(quote_literal(closest.stem), '|') AS variants
+                        FROM (
+                            SELECT stem
+                            FROM insertion_wordfrequency
+                            WHERE common_word.stem IS NULL AND length(lexeme) >= 4 AND stem %% lexeme
+                            ORDER BY similarity(stem, lexeme) + 0.05 * ln(service_count + 1) DESC
+                            LIMIT 4
+                        ) AS closest
+                    ) AS expansion
+                )
+                """,
+                [q],
+            ),
+            config="simple",
+            search_type="raw",
+        )
+        rank = postgres_search.SearchRank(models.F("search_vector"), query, normalization=32, cover_density=True)
+        if " " in q.strip():
+            multi_word_query = postgres_search.SearchQuery(
+                insertion_search.MULTI_WORD_PREFIX + slugify(q).replace("-", ""), config="simple"
+            )
+            rank = Greatest(
+                rank,
+                postgres_search.SearchRank(
+                    models.F("search_vector"), multi_word_query, normalization=32, cover_density=True
+                ),
+            )
+            query |= multi_word_query
+        return (
+            self.filter(search_vector=query)
+            .annotate(search_score=Round(rank, 2))
+            .order_by(Round(models.F("search_score") * 10).desc(), models.F("score_qualite").desc(), "pk")
+        )
+
+    @transaction.atomic
+    def update_search_index(self):
+        """Weighted like data·inclusion's `build_search_index`."""
+        thematics = self.model.thematics.through.objects.filter(service=models.OuterRef("pk"))
+        structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
+        self.update(
+            search_vector=postgres_search.SearchVector(
+                _joined(
+                    thematics.values(
+                        text=Concat(
+                            "genericreferenceitem__label",
+                            models.Value(" "),
+                            _aliases(insertion_search.SINGLE_WORD_ALIASES),
+                            output_field=models.TextField(),
+                        )
+                    )
+                ),
+                "name",
+                config="french_unaccent",
+                weight="A",
+            )
+            + postgres_search.SearchVector(
+                _joined(thematics.values(text=_aliases(insertion_search.MULTI_WORD_ALIASES))),
+                config="simple",
+                weight="A",
+            )
+            + postgres_search.SearchVector(
+                _joined(
+                    Structure.reseaux_porteurs.through.objects.filter(structure=models.OuterRef("structure")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                models.Subquery(structure.values("name")),
+                "description",
+                models.Subquery(structure.values("description")),
+                config="french_unaccent",
+                weight="B",
+            )
+            + postgres_search.SearchVector(
+                _joined(
+                    self.model.publics.through.objects.filter(service=models.OuterRef("pk")).values(
+                        "genericreferenceitem__label"
+                    )
+                ),
+                "publics_details",
+                config="french_unaccent",
+                weight="C",
+            )
+        )
+        WordFrequency.objects.all().delete()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO insertion_wordfrequency (stem, service_count)
+                SELECT word, ndoc FROM ts_stat('SELECT search_vector FROM insertion_service WHERE is_active')
+                WHERE word NOT LIKE %(prefix)s
+                """,
+                {"prefix": f"{insertion_search.MULTI_WORD_PREFIX}%"},
+            )
+
+
+def _joined(queryset):
+    return models.Func(
+        ArraySubquery(queryset), models.Value(" "), function="array_to_string", output_field=models.TextField()
+    )
+
+
+def _aliases(aliases_by_thematic):
+    return models.Func(
+        models.Value(aliases_by_thematic, output_field=models.JSONField()),
+        "genericreferenceitem__value",
+        function="jsonb_extract_path_text",
+        output_field=models.TextField(),
+    )
 
 
 class ServiceManager(models.Manager.from_queryset(ServiceQuerySet)):
@@ -389,11 +519,14 @@ class Service(GeolocatedAddressMixin, models.Model):
     )
 
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
+    score_qualite = models.FloatField(verbose_name="score de qualité data·inclusion")
 
     is_active = models.BooleanField(verbose_name="actif", default=True)
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    search_vector = postgres_search.SearchVectorField(null=True)
 
     # Opaque data·inclusion payload (`GET /services?extra=true`), outside the v1 schema.
     # DORA currently sends funding_labels, online_form, and forms: [{name, url}]
@@ -458,6 +591,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         verbose_name = "service d'insertion"
         verbose_name_plural = "services d'insertion"
         base_manager_name = "include_inactive"
+        indexes = [GinIndex(fields=["search_vector"])]
 
     def __str__(self):
         return self.uid
@@ -477,6 +611,20 @@ class Service(GeolocatedAddressMixin, models.Model):
     @property
     def is_local(self):
         return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
+
+
+class WordFrequency(models.Model):
+    """Used to correct typos in keyword searches."""
+
+    stem = models.CharField(verbose_name="radical", primary_key=True)
+    service_count = models.PositiveIntegerField(verbose_name="nombre de services contenant le mot")
+
+    class Meta:
+        verbose_name = "fréquence d'apparition d'un mot dans les services et structures"
+        indexes = [GinIndex(fields=["stem"], name="%(class)s_stem_gin", opclasses=["gin_trgm_ops"])]
+
+    def __str__(self):
+        return self.stem
 
 
 class MobilizationEventManager(models.Manager):
@@ -778,12 +926,12 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    Q(
+                    models.Q(
                         sender_kind=SenderKind.PRESCRIBER,
                         sender_prescriber_organization__isnull=False,
                         sender_company__isnull=True,
                     )
-                    | Q(
+                    | models.Q(
                         sender_kind=SenderKind.EMPLOYER,
                         sender_company__isnull=False,
                         sender_prescriber_organization__isnull=True,
@@ -792,8 +940,12 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
                 name="orientation_sender_organization_consistent",
             ),
             models.CheckConstraint(
-                condition=(Q(status=OrientationStatus.REFUSED) & ~Q(refusal_reasons=[]) & ~Q(refusal_details=""))
-                | (~Q(status=OrientationStatus.REFUSED) & Q(refusal_reasons=[], refusal_details="")),
+                condition=(
+                    models.Q(status=OrientationStatus.REFUSED)
+                    & ~models.Q(refusal_reasons=[])
+                    & ~models.Q(refusal_details="")
+                )
+                | (~models.Q(status=OrientationStatus.REFUSED) & models.Q(refusal_reasons=[], refusal_details="")),
                 name="orientation_refusal_status_and_reasons_consistent",
             ),
         ]
@@ -862,7 +1014,9 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             status__in=[OrientationStatus.ACCEPTED, OrientationStatus.REFUSED],
             processing_date__isnull=False,
         )
-        avg_response_delay = orientations.aggregate(avg=Avg(F("processing_date") - F("created_at")))["avg"]
+        avg_response_delay = orientations.aggregate(
+            avg=models.Avg(models.F("processing_date") - models.F("created_at"))
+        )["avg"]
         if avg_response_delay is None:
             average_days = None
         else:
