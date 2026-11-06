@@ -1065,7 +1065,7 @@ def test_populate_memberships(snapshot):
                 None,
                 prescriber_membership.organization_id,
                 None,
-                None,
+                "",
                 datetime.date(2023, 2, 2),
             ),
             (
@@ -1074,7 +1074,7 @@ def test_populate_memberships(snapshot):
                 None,
                 None,
                 institution_membership.institution_id,
-                None,
+                "",
                 datetime.date(2023, 2, 2),
             ),
         ]
