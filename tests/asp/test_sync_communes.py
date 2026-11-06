@@ -114,7 +114,7 @@ def test_ignore_communes(tmp_path):
     ignored_communes_csv.write_text(
         dedent("""\
         code_com_insee;lib_com;date_deb_insee;date_fin_insee
-        98501;ACOUA;01/01/1900;30/03/2011
+        12345;IGNORED;01/01/1900;30/03/2011
     """)
     )
     management.call_command(
@@ -122,16 +122,16 @@ def test_ignore_communes(tmp_path):
         file_path=ignored_communes_csv,
         wet_run=True,
     )
-    acoua = Commune.objects.get(code="98501")
-    acoua.ignore = True
-    acoua.save()
+    ignored = Commune.objects.get(code="12345")
+    ignored.ignore = True
+    ignored.save()
     management.call_command(
         "sync_communes",
         file_path=ignored_communes_csv,
         wet_run=True,
     )
-    acoua = Commune.unfiltered_objects.get(pk=acoua.pk)
-    assert acoua.ignore
+    ignored = Commune.unfiltered_objects.get(pk=ignored.pk)
+    assert ignored.ignore
 
 
 def test_double_delete(tmp_path):
@@ -159,3 +159,22 @@ def test_double_delete(tmp_path):
     profile.refresh_from_db()
     assert profile.hexa_commune.start_date.year == 1900
     assert profile.birth_place.start_date.year == 1900
+
+
+def test_ignore_communes_kept(tmp_path):
+    # ACOUA is in KNOWN_IGNORED_COMMUNES
+    acoua = Commune.objects.create(code="98501", name="ACOUA", start_date=datetime.date(1900, 1, 1), ignore=False)
+    ignored_communes_csv = tmp_path / "data.csv"
+    ignored_communes_csv.write_text(
+        dedent("""\
+        code_com_insee;lib_com;date_deb_insee;date_fin_insee
+        98501;ACOUA;01/01/1900;30/03/2011
+    """)
+    )
+    management.call_command(
+        "sync_communes",
+        file_path=ignored_communes_csv,
+        wet_run=True,
+    )
+    acoua.refresh_from_db()
+    assert acoua.ignore

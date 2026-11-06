@@ -110,3 +110,32 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "VOH": "831",
     "YATE": "832",
 }
+
+# Some communes have changed their INSEE code and our code uses the INSEE code to deduce the
+# department: prefer the more recent codes that match their department.
+IGNORED_COMMUNES_TARGET_CODES = {
+    ("97520", "POINTE-A-PITRE"): "97120",
+    ("97811", "SAINT-DENIS"): "97411",
+    ("97816", "SAINT-PIERRE"): "97416",
+    # 97824 seems unknown to INSEE
+    ("97824", "CILAOS"): "97424",
+    # Mayotte's communes changed from 985xx INSEE codes to 976xx INSEE codes
+    ("98501", "ACOUA"): "97601",
+    ("98502", "BANDRABOUA"): "97602",
+    ("98503", "BANDRELE"): "97603",
+    ("98504", "BOUENI"): "97604",
+    ("98505", "CHICONI"): "97605",
+    ("98506", "CHIRONGUI"): "97606",
+    ("98507", "DEMBENI"): "97607",
+    ("98508", "DZAOUDZI"): "97608",
+    ("98509", "KANI KELI"): "97609",  # Renamed as KANI-KELI
+    ("98510", "KOUNGOU"): "97610",
+    ("98511", "MAMOUDZOU"): "97611",
+    ("98512", "MTSAMBORO"): "97612",
+    ("98513", "MTSANGAMOUJI"): None,  # New INSEE code is 97613 but it doesn't seem to exist in ASP
+    ("98514", "OUANGANI"): None,  # New INSEE code is 97614 but it doesn't seem to exist in ASP
+    ("98515", "PAMANDZI"): "97615",
+    ("98516", "SADA"): "97616",
+    ("98517", "TSINGONI"): "97617",
+    ("98609", "WALLIS ET FUTUNA"): None,  # Users should choose one of the 3 customary kingdoms (Uvea, Alo & Sigave)
+}
