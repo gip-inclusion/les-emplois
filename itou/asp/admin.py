@@ -51,7 +51,18 @@ class ASPModelAdmin(ReadonlyMixin, ItouModelAdmin):
 
 @admin.register(models.Commune)
 class CommuneAdmin(ASPModelAdmin):
-    pass
+    list_display = ASPModelAdmin.list_display + ("ignore",)
+
+    def get_queryset(self, request):
+        # Display ignored Commune in the admin
+        qs = self.model.unfiltered_objects.get_queryset()
+        # The rest comes from Django's BaseModelAdmin & ModelAdmin
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        if not self.has_view_or_change_permission(request):
+            qs = qs.none()
+        return qs
 
 
 @admin.register(models.Department)
