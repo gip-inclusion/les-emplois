@@ -137,4 +137,7 @@ IGNORED_COMMUNES_TARGET_CODES = {
     ("98515", "PAMANDZI"): "97615",
     ("98516", "SADA"): "97616",
     ("98517", "TSINGONI"): "97617",
+    # For Wallis et Futuna, users should choose one of the 3 customary kingdoms (Uvea, Alo & Sigave)
+    ("98600", "WALLIS ET FUTUNA"): None,
+    ("98609", "WALLIS ET FUTUNA"): None,
 }
