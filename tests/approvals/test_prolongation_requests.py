@@ -107,9 +107,9 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
     parameters = itertools.product(
         ProlongationRequestStatus,
         [
-            timezone.now() - relativedelta(days=11),  # Check we catch up missed run
-            timezone.now() - relativedelta(days=10),  # On the day
-            timezone.now() - relativedelta(days=9),  # Not before
+            timezone.localtime() - relativedelta(days=11),  # Check we catch up missed run
+            timezone.localtime() - relativedelta(days=10),  # On the day
+            timezone.localtime() - relativedelta(days=9),  # Not before
         ],
         [None, timezone.now()],
     )
