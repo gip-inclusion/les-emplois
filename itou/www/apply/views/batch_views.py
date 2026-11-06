@@ -55,7 +55,7 @@ def _get_and_lock_received_applications(request, application_ids, lock=True):
 def archive(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
-        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        # This is somewhat extreme but will force developers to always provide a proper next_url
         raise Http404
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
 
@@ -104,7 +104,7 @@ def archive(request):
 def unarchive(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
-        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        # This is somewhat extreme but will force developers to always provide a proper next_url
         raise Http404
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
 
@@ -144,7 +144,7 @@ def unarchive(request):
 def postpone(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
-        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        # This is somewhat extreme but will force developers to always provide a proper next_url
         raise Http404
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
 
@@ -215,7 +215,7 @@ def postpone(request):
 def add_to_pool(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
-        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        # This is somewhat extreme but will force developers to always provide a proper next_url
         raise Http404
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
 
@@ -281,7 +281,7 @@ def add_to_pool(request):
 def process(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
-        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        # This is somewhat extreme but will force developers to always provide a proper next_url
         raise Http404
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
 
