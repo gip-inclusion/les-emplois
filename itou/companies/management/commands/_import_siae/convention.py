@@ -22,7 +22,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
     and check data integrity on the fly.
     """
     conventions_to_deactivate = []
-    reactivations = 0
+    reactivated_conventions = []
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
     managed_siaes_with_conventions = Company.objects.filter(
@@ -82,7 +82,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         if convention.is_active != should_be_active:
             if should_be_active:
                 # Inactive convention should be activated.
-                reactivations += 1
+                reactivated_conventions.append(convention)
                 convention.is_active = True
                 updated_fields.add("is_active")
             elif convention.reactivated_at and convention.reactivated_at >= three_months_ago:
@@ -96,7 +96,11 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         if updated_fields:
             convention.save(update_fields=updated_fields | {"updated_at"})
 
-    print(f"{reactivations} conventions have been reactivated")
+    print(f"{len(reactivated_conventions)} conventions have been reactivated")
+    made_searchable = Company.objects.filter(
+        convention__in=reactivated_conventions
+    ).make_searchable_after_reactivation()
+    print(f"{made_searchable} siaes have been made searchable again")
 
     if len(conventions_to_deactivate) >= CONVENTION_DEACTIVATION_THRESHOLD and timezone.localdate().month <= 6:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
