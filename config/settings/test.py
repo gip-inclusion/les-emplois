@@ -36,6 +36,9 @@ DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
 DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
 HUEY["immediate"] = True  # noqa: F405
+# Tests leaving immediate mode use the Redis queue: xdist workers must not see each other's tasks
+if xdist_worker := os.getenv("PYTEST_XDIST_WORKER"):
+    HUEY["name"] += f"-{xdist_worker}"  # noqa: F405
 
 cellar_addon_host = os.getenv("CELLAR_ADDON_HOST_TEST")
 AWS_S3_ENDPOINT_URL = (
