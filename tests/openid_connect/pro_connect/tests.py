@@ -46,7 +46,7 @@ from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory, ProfessionalFactory, UserFactory
-from tests.utils.testing import accept_legal_terms
+from tests.utils.testing import accept_legal_terms, answer_email_tracking_consent
 
 
 class TestProConnectModel:
@@ -597,7 +597,8 @@ class TestProConnectLogin:
         PrescriberMembershipFactory(user=user)
         # completes welcoming tour
         response = client.get(response.url, follow=True)
-        accept_legal_terms(client, response)
+        response = accept_legal_terms(client, response)
+        answer_email_tracking_consent(client, response)
 
         # Then log out.
         response = client.post(reverse("account_logout"))

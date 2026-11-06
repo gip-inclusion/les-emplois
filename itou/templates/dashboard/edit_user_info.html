@@ -92,6 +92,15 @@
                                         {% endfragment %}
                                     {% endcomponent_alert %}
                                 </fieldset>
+                                {% if form.has_email_tracking_consent_field %}
+                                    <hr class="mt-2 mb-3">
+                                    <fieldset>
+                                        <legend class="h3"
+                                                id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</legend>
+                                        {% include "dashboard/includes/email_tracking_consent_explanation.html" only %}
+                                        {% bootstrap_field form.email_tracking_consent %}
+                                    </fieldset>
+                                {% endif %}
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                                 {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=prev_url %}

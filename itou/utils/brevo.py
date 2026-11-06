@@ -1,8 +1,10 @@
 import enum
 import logging
+import time
 from itertools import batched
 
 import httpx
+import tenacity
 from django.conf import settings
 
 
@@ -19,12 +21,29 @@ class BrevoListID(enum.IntEnum):
     EMPLOYERS = 203
     PRESCRIBERS = 204
     CANDIDATS = 82
-    CANDIDATS_AUTONOMES_BLOQUES = 83
-    CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC = 116
+
+
+# Brevo system attribute recording the consent to email open tracking (tracking pixel).
+# Imports want "Yes" or "No" and silently ignore a boolean. Brevo sets the related
+# _PIXEL_TRACKING_CONSENT_DATE and _PIXEL_TRACKING_CONSENT_SOURCE attributes on its own.
+PIXEL_TRACKING_CONSENT_ATTRIBUTE = "_PIXEL_TRACKING_CONSENT"
+
+
+def is_transient_error(exception):
+    """Tell whether a failed Brevo request may succeed if sent again: network errors, rate limiting, server errors."""
+    if isinstance(exception, httpx.HTTPStatusError):
+        response = exception.response
+        return response.status_code == 429 or response.is_server_error
+    return isinstance(exception, httpx.TransportError)
 
 
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
+    # Seconds to wait between two import requests of the same client, even from different
+    # import_users calls, to spare Brevo
+    IMPORT_BATCH_DELAY = 1
+    # Attempts per import request, when Brevo or the network fails transiently
+    IMPORT_ATTEMPTS = 3
 
     def __init__(self):
         self.client = httpx.Client(
@@ -36,6 +55,7 @@ class BrevoClient:
             base_url=settings.BREVO_API_URL,
             timeout=10,
         )
+        self._import_sent = False
 
     # context manager
     def __enter__(self):
@@ -50,33 +70,57 @@ class BrevoClient:
 
         return False
 
-    def _import_contacts(self, users, list_id, serializer):
+    @tenacity.retry(
+        retry=tenacity.retry_if_exception(is_transient_error),
+        wait=tenacity.wait_exponential(multiplier=2),
+        stop=tenacity.stop_after_attempt(IMPORT_ATTEMPTS),
+        before_sleep=tenacity.before_sleep_log(logger, logging.WARNING),
+        reraise=True,
+    )
+    def _post_import(self, payload):
+        return self.client.post("/contacts/import", json=payload).raise_for_status()
+
+    def _import_contacts(self, users, list_id, serializer, update_existing_contacts):
+        if self._import_sent:
+            time.sleep(self.IMPORT_BATCH_DELAY)
+        self._import_sent = True
+        payload = {
+            "listIds": [list_id],
+            "emailBlacklist": False,
+            "smsBlacklist": False,
+            "updateExistingContacts": update_existing_contacts,
+            "emptyContactsAttributes": False,
+            "jsonBody": [serializer(user) for user in users],
+        }
         try:
-            response = self.client.post(
-                "/contacts/import",
-                json={
-                    "listIds": [list_id],
-                    "emailBlacklist": False,
-                    "smsBlacklist": False,
-                    "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
-                    "emptyContactsAttributes": False,
-                    "jsonBody": [serializer(user) for user in users],
-                },
-            )
+            self._post_import(payload)
         except httpx.RequestError as e:
             logger.error("Brevo API: Request failed: %s", str(e))
             raise
-        if response.status_code != 202:
+        except httpx.HTTPStatusError as e:
             logger.error(
                 "Brevo API: Some emails were not imported, status_code=%d, content=%s",
-                response.status_code,
-                response.text,
+                e.response.status_code,
+                e.response.text,
             )
 
-    def import_users(self, users, list_id, serializer):
+    def import_users(self, users, list_id, serializer, *, update_existing_contacts=False):
+        """Import users as Brevo contacts of a list, in batches.
+
+        Imports are asynchronous: Brevo answers 202 and processes them later. Every request but the first one sent by
+        this client waits `IMPORT_BATCH_DELAY` seconds, even across calls. Requests failing transiently (network
+        errors, rate limiting, server errors) are tried up to IMPORT_ATTEMPTS times in total.
+
+        Args:
+            users: Users to import.
+            list_id: the Brevo list the imported contacts are added to. They are never removed from other lists.
+            serializer: function turning a user into a Brevo contact.
+            update_existing_contacts: by default, imports are meant for new contacts and leave existing ones
+                untouched. When True, existing contacts are also updated with the serialized attributes and added
+                to the list, and unknown ones are still created.
+        """
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
-            if batch:
-                self._import_contacts(batch, list_id, serializer)
+            self._import_contacts(batch, list_id, serializer, update_existing_contacts)
 
     def delete_contact(self, email):
         # Brevo rejects HTTP DELETE calls for addresses ending by
