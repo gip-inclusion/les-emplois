@@ -754,7 +754,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             return False
 
         if field in ["last_name", "first_name"]:
-            if current_value and current_value.lower() == value.lower():
+            if current_value and current_value.casefold() == value.casefold():
                 return False
 
         self.external_data_source_history.append(
