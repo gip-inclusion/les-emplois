@@ -1,0 +1,163 @@
+import pytest
+from django.contrib.gis.geos import Point
+
+from itou.companies.enums import CompanyKind
+from itou.directory.models import DirectoryProfile
+from itou.nexus.enums import NexusStructureKind, NexusUserKind, Service
+from itou.www.directory_views.views import get_directory_people, get_directory_person
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.insertion.factories import StructureFactory
+from tests.nexus.factories import NexusMembershipFactory
+from tests.users.factories import ProfessionalFactory
+
+
+ORIGIN = Point(-0.58, 44.84, srid=4326)
+
+
+def test_directory_people_merge_memberships_by_email():
+    user = ProfessionalFactory(first_name="Alice", last_name="Martin", email="alice@example.com", phone="")
+    company = CompanyFactory(coords=ORIGIN, kind="EI")
+    CompanyMembershipFactory(user=user, company=company)
+    NexusMembershipFactory(
+        source=Service.DORA,
+        user__source=Service.DORA,
+        user__email=user.email,
+        user__first_name="Different",
+        user__last_name="Name",
+        user__phone="0601020304",
+        user__kind=NexusUserKind.GUIDE,
+        structure__source=Service.DORA,
+        structure__coords=Point(-0.57, 44.84, srid=4326),
+        structure__kind=NexusStructureKind.ML,
+        structure__siret="12345678901234",
+    )
+
+    [person] = get_directory_people(ORIGIN)
+
+    assert person.full_name == "MARTIN Alice"
+    assert person.kind == NexusUserKind.FACILITY_MANAGER
+    assert person.phone == ""
+    assert person.public_id == user.public_id
+    assert len(person.organizations) == 2
+    assert person.main_organization.siret == company.siret
+    assert get_directory_person(ORIGIN, person.public_id).email == user.email
+
+
+def test_directory_people_exclude_opted_out_email_and_distant_structure():
+    opted_out = ProfessionalFactory(email="hidden@example.com")
+    DirectoryProfile.objects.create(user=opted_out, is_opted_out=True)
+    # Person has opted out, should be excluded even if they have a NexusMembership.
+    NexusMembershipFactory(
+        source=Service.DORA,
+        user__source=Service.DORA,
+        user__email=opted_out.email.upper(),
+        structure__source=Service.DORA,
+        structure__coords=ORIGIN,
+    )
+    visible = ProfessionalFactory()
+    CompanyMembershipFactory(
+        user=visible,
+        company=CompanyFactory(coords=Point(2.35, 48.85, srid=4326)),
+    )
+
+    assert get_directory_people(ORIGIN) == []
+
+
+def test_directory_people_keeps_structures_within_radius():
+    nearby = ProfessionalFactory(first_name="Near", last_name="By")
+    CompanyMembershipFactory(user=nearby, company=CompanyFactory(coords=Point(-0.58, 44.93, srid=4326)))
+    far = ProfessionalFactory(first_name="Far", last_name="Away")
+    CompanyMembershipFactory(user=far, company=CompanyFactory(coords=Point(-0.58, 45.20, srid=4326)))
+
+    people = get_directory_people(ORIGIN)
+
+    assert [person.full_name for person in people] == ["BY Near"]
+
+
+def test_directory_people_dedupes_organizations_by_siret():
+    user = ProfessionalFactory(email="alice@example.com")
+    company = CompanyFactory(coords=ORIGIN, kind="EI", siret="12345678901234")
+    CompanyMembershipFactory(user=user, company=company)
+    NexusMembershipFactory(
+        source=Service.DORA,
+        user__source=Service.DORA,
+        user__email=user.email,
+        structure__source=Service.DORA,
+        structure__coords=ORIGIN,
+        structure__siret=company.siret,
+        structure__kind=NexusStructureKind.EI,
+    )
+
+    [person] = get_directory_people(ORIGIN)
+
+    assert len(person.organizations) == 1
+    assert person.organizations[0].siret == company.siret
+
+
+def test_directory_people_resolves_dora_structure_by_siret():
+    siret = "12345678901234"
+    dora_structure = StructureFactory(
+        siret=siret,
+        name="Mission locale DORA",
+        coordinates=ORIGIN,
+        phone="0297010203",
+        email="dora@example.com",
+        website="https://dora.example.com",
+    )
+    NexusMembershipFactory(
+        source=Service.DORA,
+        user__source=Service.DORA,
+        user__email="guide@example.com",
+        user__kind=NexusUserKind.GUIDE,
+        structure__source=Service.DORA,
+        structure__coords=ORIGIN,
+        structure__siret=siret,
+        structure__kind=NexusStructureKind.ML,
+    )
+    [person] = get_directory_people(ORIGIN)
+
+    assert person.main_organization.name == "Mission locale DORA"
+    assert person.main_organization.phone == "0297010203"
+    assert dora_structure.uid in person.main_organization.card_url
+    assert get_directory_person(ORIGIN, person.public_id) == person
+
+
+@pytest.mark.parametrize("local_structures_count", [0, 2])
+def test_directory_people_keeps_nexus_data_without_unique_dora_match(local_structures_count):
+    siret = "12345678901234"
+    StructureFactory.create_batch(local_structures_count, siret=siret, coordinates=ORIGIN)
+    membership = NexusMembershipFactory(
+        source=Service.DORA,
+        user__source=Service.DORA,
+        structure__source=Service.DORA,
+        structure__coords=ORIGIN,
+        structure__siret=siret,
+        structure__name="Nexus structure",
+        structure__source_link="https://dora.example.com/structure",
+    )
+
+    [person] = get_directory_people(ORIGIN)
+
+    assert person.public_id == membership.user.public_id
+    assert person.main_organization.name == "Nexus structure"
+    assert person.main_organization.card_url == "https://dora.example.com/structure"
+    assert get_directory_person(ORIGIN, person.public_id) == person
+
+
+def test_directory_people_uses_closest_organization_as_main():
+    user = ProfessionalFactory()
+    close_company = CompanyFactory(name="Proche", coords=ORIGIN, kind="EI")
+    farther_company = CompanyFactory(name="Loin", coords=Point(-0.58, 44.93, srid=4326), kind="ACI")
+    CompanyMembershipFactory(user=user, company=farther_company)
+    CompanyMembershipFactory(user=user, company=close_company)
+
+    [person] = get_directory_people(ORIGIN)
+
+    assert person.main_organization.name == close_company.display_name
+    assert person.other_organizations_count == 1
+
+
+def test_directory_people_ignores_inactive_companies():
+    company = CompanyFactory(kind=CompanyKind.EI, convention__is_active=False, coords=ORIGIN)
+    CompanyMembershipFactory(company=company)
+    assert get_directory_people(ORIGIN) == []

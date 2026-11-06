@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
+from itou.directory.enums import ContactSubject
+from itou.emails.utils import MAX_SUBJECT_LENGTH
 from itou.users.enums import UserKind
 
 
@@ -23,3 +26,29 @@ class DirectoryProfile(models.Model):
 
     def __str__(self):
         return f"Profil annuaire de {self.user}"
+
+
+class ContactMessage(models.Model):
+    """
+    This model is for getting a coarse understanding of directory usage.
+    """
+
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="expéditeur",
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
+    # Don’t bother using a ForeignKey and adding indices to User and NexusUser,
+    # these relationships aren’t exploited.
+    recipient_id = models.UUIDField(verbose_name="identifiant du destinataire")
+    subject = models.CharField(verbose_name="objet", choices=ContactSubject.choices)
+    custom_subject = models.CharField(verbose_name="objet personnalisé", blank=True, max_length=MAX_SUBJECT_LENGTH)
+    created_at = models.DateTimeField(verbose_name="date d'envoi", default=timezone.now)
+
+    class Meta:
+        verbose_name = "message envoyé via l’annuaire"
+        verbose_name_plural = "messages envoyés via l’annuaire"
+
+    def __str__(self):
+        return f"Message de {self.sender} à {self.recipient_id}"

@@ -1,0 +1,74 @@
+import django.db.models.deletion
+import django.utils.timezone
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ("directory", "0001_initial"),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="ContactMessage",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "recipient_id",
+                    models.UUIDField(verbose_name="identifiant du destinataire"),
+                ),
+                (
+                    "subject",
+                    models.CharField(
+                        choices=[
+                            ("support", "Demande d'information sur un accompagnement"),
+                            ("scheme", "Demande d'information sur un dispositif"),
+                            ("orientation", "Orientation d'une personne"),
+                            ("coordination", "Coordination / suivi conjoint"),
+                            ("orientation_feedback", "Retour sur une orientation"),
+                            ("partnership", "Proposition de partenariat"),
+                            ("meeting", "Proposition de rencontre"),
+                            ("event", "Participation à un événement"),
+                            (
+                                "public_intervention",
+                                "Intervention auprès de nos publics",
+                            ),
+                            ("other", "Autre (préciser)"),
+                        ],
+                        verbose_name="objet",
+                    ),
+                ),
+                (
+                    "custom_subject",
+                    models.CharField(blank=True, max_length=250, verbose_name="objet personnalisé"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'envoi"),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="expéditeur",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "message envoyé via l’annuaire",
+                "verbose_name_plural": "messages envoyés via l’annuaire",
+            },
+        ),
+    ]

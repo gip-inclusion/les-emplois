@@ -20,6 +20,8 @@ from itou.utils.urls import get_absolute_url
 
 logger = logging.getLogger(__name__)
 
+MAX_SUBJECT_LENGTH = 250
+
 
 def remove_extra_line_breaks(text):
     """
@@ -58,7 +60,9 @@ def get_email_message(
     subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
     # Mailjet max subject length is 255
     subject = textwrap.shorten(
-        subject_prefix + get_email_text_template(subject, email_context), width=250, placeholder="..."
+        subject_prefix + get_email_text_template(subject, email_context),
+        width=MAX_SUBJECT_LENGTH,
+        placeholder="...",
     )
     body_text = get_email_text_template(body, email_context)
     email = mail.EmailMultiAlternatives(
