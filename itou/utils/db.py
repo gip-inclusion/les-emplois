@@ -49,15 +49,63 @@ def lock_timeout(timeout):
     return set_runtime_parameter("lock_timeout", timeout)
 
 
+def get_lock_id(name: str) -> int:
+    return binascii.crc32(name.encode())
+
+
+class CannotAcquireLock(Exception):
+    pass
+
+
 @contextlib.contextmanager
-def pg_advisory_lock(name):
-    lock_id = binascii.crc32(name.encode())
+def pg_advisory_lock(name: str, wait: bool = True, release: bool = True):
+    """Acquire a session-level advisory lock.
+
+    By default (``wait`` is True), wait for the lock to be released if
+    it has already been acquired by another session. If ``wait`` is
+    False, do not wait and immediately raises ``CannotAcquireLock``.
+
+    By default (``release`` is True), the lock is released when the
+    context manager exits. The function should be used like this:
+
+        with pg_advisory_lock("name", release=False):
+            do_something()
+
+    Otherwise (``release=False``), the lock will only be released when
+    the session ends. The function can then be used as an empty
+    context manager:
+
+        with pg_advisory_lock("name", release=False):
+            pass
+        do_something()
+
+    Using ``release=False`` is only possible for scripts and
+    management commands, never when serving HTTP requests (see
+    explanation in code).
+    """
+    if not release and connection.settings_dict.get("CONN_MAX_AGE") != 0:
+        # When CONN_MAX_AGE is not zero, the connection is reused. So
+        # if this function did not release the session-level lock, it
+        # would be held and would leak to other users of the same
+        # session, for example other HTTP requests. We do not want
+        # that.
+        raise ValueError("Cannot use `pg_advisory_lock(release=False)` with non-zero CONN_MAX_AGE")
+
+    lock_id = get_lock_id(name)
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
-        cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
-        yield
-        cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-    logger.info("Releasing advisory lock for %s (lock id %s).", name, lock_id)
+        lock_function = "pg_advisory_lock" if wait else "pg_try_advisory_lock"
+        result = cursor.execute(f"SELECT {lock_function}(%s)", (lock_id,))
+        if not wait:
+            row = result.fetchone()
+            if not row[0]:
+                raise CannotAcquireLock
+        try:
+            yield
+        finally:
+            if release:
+                cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+                logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
 
 
 class ExclusionViolationError(IntegrityError):

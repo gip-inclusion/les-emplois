@@ -106,7 +106,7 @@ def test_copy(pdf_file):
 @pytest.mark.usefixtures("temporary_bucket")
 def test_delete_unused_files_no_files(caplog):
     call_command("delete_unused_files")
-    assert caplog.messages[:-1] == [
+    assert caplog.messages[1:-1] == [
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 0 files in database",
