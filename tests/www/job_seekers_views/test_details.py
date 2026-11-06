@@ -1,3 +1,4 @@
+import copy
 import datetime
 import random
 import uuid
@@ -26,8 +27,10 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
+from itou.rdv_insertion.enums import MotifCategoryType
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerAssignmentDisplayMode
 from itou.users.models import JobSeekerAssignment
+from itou.utils.mocks.rdv_insertion import RDV_INSERTION_USER_SEARCH_BODY
 from itou.www.job_seekers_views.views import JobApplication, can_view_external_actions
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -41,6 +44,7 @@ from tests.geo.factories import create_qpv
 from tests.insertion.factories import OrientationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.rdv_insertion.factories import ParticipationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -2332,3 +2336,187 @@ class TestOverviewTab:
         del job_seeker.last_assignment
         rendered = template.render(Context({"job_seeker": job_seeker, "request": request}))
         assert pretty_indented(rendered) == snapshot(name="no active assignment")
+
+
+class TestAppointmentsTab:
+    SEARCH_URL = "https://rdv-insertion.fake/api/plateforme_inclusion/users/search"
+
+    @pytest.fixture(autouse=True)
+    def rdvi_settings(self, settings):
+        settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_BASE_URL = (
+            "https://rdv-insertion.fake/api/plateforme_inclusion/"
+        )
+        settings.RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = "S3cr3t!"
+
+    @pytest.fixture
+    def job_seeker(self):
+        return JobSeekerFactory(
+            for_snapshot=True, jobseeker_profile__nir=RDV_INSERTION_USER_SEARCH_BODY["user"]["nir"]
+        )
+
+    @pytest.fixture
+    def prescriber(self, job_seeker):
+        """An authorized prescriber who recently applied for the job seeker."""
+        membership = PrescriberMembershipFactory(
+            user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_kind=ActionKind.APPLY,
+        )
+        return membership.user
+
+    @freeze_time("2026-10-01")
+    def test_appointments(self, client, snapshot, respx_mock, job_seeker, prescriber):
+        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
+        ParticipationFactory(for_snapshot=True, job_seeker=job_seeker)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+
+    def test_appointment_without_lieu(self, client, respx_mock, job_seeker, prescriber):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        rdv = body["user"]["follow_ups"][0]["participations"][0]["rdv"]
+        rdv["lieu"] = None
+        rdv["address"] = "1 place de la Mairie 26000 Valence"
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={"public_id": job_seeker.public_id, "rdv_insertion_id": rdv["id"]},
+            )
+        )
+        assertContains(response, '<span class="d-block">1 place de la Mairie 26000 Valence</span>', html=True)
+        assertNotContains(response, "Maison départementale de Valence")
+
+    def test_agent_is_current_user(self, client, respx_mock, job_seeker, prescriber):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        body["user"]["follow_ups"][0]["participations"][0]["rdv"]["agents"][0]["email"] = prescriber.email
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "C’est vous")
+
+    @freeze_time("2026-10-01")
+    def test_appointment_details(self, client, snapshot, respx_mock, job_seeker, prescriber):
+        respx_mock.post(self.SEARCH_URL).respond(200, json=RDV_INSERTION_USER_SEARCH_BODY)
+        client.force_login(prescriber)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={"public_id": job_seeker.public_id, "rdv_insertion_id": 1},
+            )
+        )
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+
+    def test_stored_appointment_details(self, client, respx_mock, job_seeker):
+        membership = CompanyMembershipFactory()
+        participation = ParticipationFactory(job_seeker=job_seeker, appointment__company=membership.company)
+        client.force_login(membership.user)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={
+                    "public_id": job_seeker.public_id,
+                    "rdv_insertion_id": participation.appointment.rdv_insertion_id,
+                },
+            )
+        )
+        assertContains(response, "Suite à une candidature")
+        # Not stored by the invitation experiment
+        assertContains(
+            response, '<li><small>Modalité</small><i class="text-disabled">Non renseignée</i></li>', html=True
+        )
+        assertContains(
+            response, '<li><small>Pris par</small><i class="text-disabled">Non renseigné</i></li>', html=True
+        )
+        assertContains(
+            response,
+            f"""
+            <div>
+                <span>{membership.company.display_name}</span>
+                <i class="d-block text-disabled h3 fw-normal">Non renseigné</i>
+            </div>
+            """,
+            html=True,
+        )
+
+    def test_appointment_details_not_visible(self, client, respx_mock, job_seeker):
+        # Organized by another company
+        participation = ParticipationFactory(job_seeker=job_seeker)
+        client.force_login(CompanyMembershipFactory().user)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:appointment_details",
+                kwargs={
+                    "public_id": job_seeker.public_id,
+                    "rdv_insertion_id": participation.appointment.rdv_insertion_id,
+                },
+            )
+        )
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize("motif_category_type", [MotifCategoryType.SIAE, MotifCategoryType.AUTRE])
+    def test_only_rsa_appointments_from_api(self, client, respx_mock, job_seeker, prescriber, motif_category_type):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        body["user"]["follow_ups"][0]["motif_category"]["motif_category_type"] = motif_category_type
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "Aucun rendez-vous à afficher.")
+
+    def test_unexpected_appointment_data(self, client, respx_mock, job_seeker, prescriber, caplog):
+        body = copy.deepcopy(RDV_INSERTION_USER_SEARCH_BODY)
+        body["user"]["follow_ups"][0]["participations"][0]["rdv"]["motif"]["location_type"] = "teleportation"
+        respx_mock.post(self.SEARCH_URL).respond(200, json=body)
+        client.force_login(prescriber)
+
+        response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+        assert response.status_code == 200
+        assert "Unexpected rdv-insertion data" in caplog.messages
+
+    def test_tab_only_shown_with_appointments(self, client, respx_mock, job_seeker, prescriber):
+        respx_mock.post(self.SEARCH_URL).respond(404, json={"errors": ["Aucun usager ne correspond à ce NIR"]})
+        client.force_login(prescriber)
+        details_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        appointments_url = reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id})
+
+        assertNotContains(client.get(details_url), appointments_url)
+        assertContains(client.get(appointments_url), "Aucun rendez-vous à afficher.")
+
+        ParticipationFactory(job_seeker=job_seeker)
+        assertContains(client.get(details_url), appointments_url)
+
+    def test_employer_only_sees_its_company_appointments(self, client, respx_mock, job_seeker):
+        # No route: rdv-insertion must not be called for employers
+        membership = CompanyMembershipFactory()
+        ParticipationFactory(
+            job_seeker=job_seeker, appointment__company=membership.company, appointment__reason="Entretien chez nous"
+        )
+        ParticipationFactory(job_seeker=job_seeker, appointment__reason="Entretien ailleurs")
+        client.force_login(membership.user)
+
+        response = client.get(reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id}))
+        assertContains(response, "Entretien chez nous")
+        assertNotContains(response, "Entretien ailleurs")
+
+    @pytest.mark.parametrize("authorized", [True, False])
+    def test_prescriber_without_recent_link(self, client, respx_mock, job_seeker, authorized):
+        # No route: rdv-insertion must not be called for someone who can't see the appointments
+        ParticipationFactory(job_seeker=job_seeker)
+        client.force_login(PrescriberFactory(membership__organization__authorized=authorized))
+        details_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+        appointments_url = reverse("job_seekers_views:appointments", kwargs={"public_id": job_seeker.public_id})
+
+        assertNotContains(client.get(details_url), appointments_url)
+        assertContains(client.get(appointments_url), "Aucun rendez-vous à afficher.")
