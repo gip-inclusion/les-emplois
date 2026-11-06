@@ -133,6 +133,21 @@ class TestEditUserInfoView:
         assertContains(response, 'list="membership-function-suggestions"', count=2)
         assertContains(response, '<datalist id="membership-function-suggestions">', count=1)
 
+    def test_function_field_not_displayed_for_inactive_company(self, client):
+        user = ProfessionalFactory()
+        active_membership = CompanyMembershipFactory(user=user)
+        inactive_membership = CompanyMembershipFactory(
+            user=user,
+            company__subject_to_iae_rules=True,
+            company__convention__after_grace_period=True,
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:edit_user_info"))
+
+        assertContains(response, escape(f"Fonction chez {active_membership.company.display_name}"))
+        assertNotContains(response, escape(f"Fonction chez {inactive_membership.company.display_name}"))
+
     def test_function_fields_collapsed_beyond_three_memberships(self, client):
         user = ProfessionalFactory()
         CompanyMembershipFactory.create_batch(2, user=user)

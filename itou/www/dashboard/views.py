@@ -25,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -32,6 +33,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
@@ -352,30 +354,41 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             back_url=request.get_full_path(),
         )
     else:
-        company_memberships = request.user.companymembership_set.select_related("company").order_by("joined_at")
-        prescriber_memberships = request.user.prescribermembership_set.select_related("organization").order_by(
-            "joined_at"
-        )
         form = EditUserInfoForm(
             instance=request.user,
             data=request.POST or None,
         )
-        if company_memberships:
-            memberships_formsets.append(
-                CompanyMembershipsFormSet(
-                    data=request.POST or None,
-                    queryset=company_memberships,
-                    prefix="company_memberships",
-                )
+        if request.user.is_professional:
+            company_ids = [org.pk for org in request.organizations if isinstance(org, Company)]
+            prescriber_organization_ids = [
+                org.pk for org in request.organizations if isinstance(org, PrescriberOrganization)
+            ]
+            company_memberships = (
+                request.user.companymembership_set.filter(company_id__in=company_ids)
+                .select_related("company")
+                .order_by("joined_at")
             )
-        if prescriber_memberships:
-            memberships_formsets.append(
-                PrescriberMembershipsFormSet(
-                    data=request.POST or None,
-                    queryset=prescriber_memberships,
-                    prefix="prescriber_memberships",
-                )
+            prescriber_memberships = (
+                request.user.prescribermembership_set.filter(organization_id__in=prescriber_organization_ids)
+                .select_related("organization")
+                .order_by("joined_at")
             )
+            if company_memberships:
+                memberships_formsets.append(
+                    CompanyMembershipsFormSet(
+                        data=request.POST or None,
+                        queryset=company_memberships,
+                        prefix="company_memberships",
+                    )
+                )
+            if prescriber_memberships:
+                memberships_formsets.append(
+                    PrescriberMembershipsFormSet(
+                        data=request.POST or None,
+                        queryset=prescriber_memberships,
+                        prefix="prescriber_memberships",
+                    )
+                )
 
     if request.method == "POST" and all([form.is_valid(), *[formset.is_valid() for formset in memberships_formsets]]):
         form.save()
