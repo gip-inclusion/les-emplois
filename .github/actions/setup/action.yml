@@ -53,9 +53,11 @@ runs:
         key: ${{ steps.apt-cache-key.outputs.key }}
         path: ~/apt-cache/
     - name: 🌍 Install spatial libraries
-      # Unlike `dpkg --install`, apt installs the packages in the order their dependencies require
+      # Given .deb paths, apt still downloads the packages from the mirror and only uses the files if that fails.
+      # It skips the download of the files already in its archives directory.
       run: |
-        if ! sudo apt-get install --no-install-recommends ~/apt-cache/*.deb; then
+        sudo cp ~/apt-cache/*.deb /var/cache/apt/archives/
+        if ! sudo apt-get install --no-install-recommends --no-download gdal-bin; then
           echo "::warning::The cached spatial libraries no longer fit the runner image, bump the cache key"
           sudo apt-get update
           sudo apt-get install --no-install-recommends gdal-bin
