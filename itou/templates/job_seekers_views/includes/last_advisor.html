@@ -34,35 +34,45 @@
                         <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
                     {% endif %}
                     <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
-                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                    <div>
+                        {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+                    </div>
                 </div>
             {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
                 <i class="ri-user-line" aria-hidden="true"></i>
                 <div>
                     <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
                     <span class="d-block mb-1 disabled">Aucune structure associée</span>
-                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                    <div>
+                        {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+                    </div>
                 </div>
             {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR %}
                 <i class="{{ assignment.organization.icon }} disabled" aria-hidden="true"></i>
                 <div>
                     <span class="d-block h5 disabled">Accompagnateur non renseigné</span>
                     <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
-                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                    <div>
+                        {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+                    </div>
                 </div>
             {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG %}
                 <i class="{{ assignment.organization.icon }} disabled" aria-hidden="true"></i>
                 <div>
                     <span class="d-block h5 disabled">Accompagnateur non renseigné</span>
                     <span class="d-block mb-1">{{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}</span>
-                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                    <div>
+                        {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+                    </div>
                 </div>
             {% elif assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG %}
                 <i class="ri-user-line disabled" aria-hidden="true"></i>
                 <div>
                     <span class="d-block h5">{{ assignment.professional.get_full_name }}</span>
                     <span class="d-block mb-1 disabled">Aucune structure associée</span>
-                    <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+                    <div>
+                        {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+                    </div>
                 </div>
             {% endif %}
         </div>
