@@ -777,12 +777,13 @@ class TestSuspensionModel:
         today = timezone.localdate()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
         end_at = start_at + relativedelta(months=2)
-        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        # Suspension.start_date is too old.
+        # Suspension.start_at is before the start of the approval.
         suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = start_at - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1)
-        with pytest.raises(ValidationError):
+        suspension.end_at = suspension.start_at
+        with pytest.raises(ValidationError, match="La suspension ne peut pas commencer en dehors des limites"):
             suspension.clean()
 
         # suspension.end_at < suspension.start_at
