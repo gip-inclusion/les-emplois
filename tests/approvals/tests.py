@@ -777,12 +777,13 @@ class TestSuspensionModel:
         today = timezone.localdate()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
         end_at = start_at + relativedelta(months=2)
-        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        # Suspension.start_date is too old.
+        # Suspension.start_at is before the start of the approval.
         suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = start_at - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1)
-        with pytest.raises(ValidationError):
+        suspension.end_at = suspension.start_at
+        with pytest.raises(ValidationError, match="La suspension ne peut pas commencer en dehors des limites"):
             suspension.clean()
 
         # suspension.end_at < suspension.start_at
@@ -798,6 +799,73 @@ class TestSuspensionModel:
         suspension.end_at = end_at
         with pytest.raises(ValidationError):
             suspension.clean()
+
+    def test_clean_suspension_shortened_by_a_later_hiring(self):
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=today - relativedelta(days=10),
+            approval__start_at=today - relativedelta(days=100),
+        )
+        approval = job_application.approval
+        suspension = SuspensionFactory(
+            approval=approval,
+            reason=Suspension.Reason.BROKEN_CONTRACT,
+            start_at=today - relativedelta(days=20),
+        )
+
+        approval.unsuspend(hiring_start_at=job_application.hiring_start_at)
+
+        suspension.refresh_from_db()
+        assert suspension.end_at == today - relativedelta(days=11)
+        assert suspension.start_at < Suspension.next_min_start_at(
+            approval, suspension.pk, suspension.created_at.date()
+        )
+        suspension.clean()
+
+        suspension.start_at -= relativedelta(days=1)
+        suspension.clean()
+
+    def test_clean_suspension_followed_by_another_one(self):
+        today = timezone.localdate()
+        approval = ApprovalFactory(start_at=today - relativedelta(days=100))
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=today - relativedelta(days=60),
+            end_at=today - relativedelta(days=50),
+        )
+        SuspensionFactory(
+            approval=approval,
+            start_at=today - relativedelta(days=30),
+            end_at=today - relativedelta(days=20),
+        )
+
+        assert suspension.start_at < Suspension.next_min_start_at(
+            approval, suspension.pk, suspension.created_at.date()
+        )
+        suspension.clean()
+
+    def test_clean_new_suspension_before_min_start_at(self):
+        today = timezone.localdate()
+        hiring_start_at = today - relativedelta(days=10)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=hiring_start_at,
+            approval__start_at=today - relativedelta(days=100),
+        )
+        suspension = SuspensionFactory.build(
+            approval=job_application.approval,
+            start_at=hiring_start_at - relativedelta(days=1),
+            end_at=hiring_start_at,
+        )
+
+        with pytest.raises(ValidationError, match=f"La date de début minimum est : {hiring_start_at:%d/%m/%Y}"):
+            suspension.clean()
+
+        suspension.start_at = hiring_start_at
+        suspension.clean()
 
     def test_duration(self):
         expected_duration = datetime.timedelta(days=2)

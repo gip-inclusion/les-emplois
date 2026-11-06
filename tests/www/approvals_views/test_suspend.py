@@ -150,6 +150,36 @@ class TestApprovalSuspendView:
         form = SuspensionForm(approval=job_application.approval, siae=job_application.to_company, data=post_data)
         assert not form.is_valid()
 
+    def test_clean_form_start_at_before_min_start_at(self):
+        today = timezone.localdate()
+        hiring_start_at = today - relativedelta(days=1)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            hiring_start_at=hiring_start_at,
+            approval__start_at=today - relativedelta(days=100),
+        )
+        approval = job_application.approval
+        post_data = {
+            "start_at": (hiring_start_at - relativedelta(days=1)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "end_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "set_default_end_date": False,
+            "reason": Suspension.Reason.SUSPENDED_CONTRACT,
+            "reason_explanation": "",
+        }
+        expected_errors = [
+            f"Vous ne pouvez pas saisir une date de début de suspension qui précède le {hiring_start_at:%d/%m/%Y}."
+        ]
+
+        form = SuspensionForm(approval=approval, siae=job_application.to_company, data=post_data)
+        assert not form.is_valid()
+        assert form.errors["start_at"] == expected_errors
+
+        suspension = SuspensionFactory(approval=approval, start_at=hiring_start_at, end_at=today)
+        form = SuspensionForm(instance=suspension, approval=approval, siae=job_application.to_company, data=post_data)
+        assert not form.is_valid()
+        assert form.errors["start_at"] == expected_errors
+
     def test_update_suspension(self, client, snapshot, caplog):
         """
         Test the update of a suspension.
