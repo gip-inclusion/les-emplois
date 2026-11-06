@@ -114,8 +114,10 @@ ASP_COMMUNES_AS_COUNTRIES = {
 # Some communes have changed their INSEE code and our code uses the INSEE code to deduce the
 # department: prefer the more recent codes that match their department.
 IGNORED_COMMUNES_TARGET_CODES = {
-    # The proper INSEE code is 97411
     ("97811", "SAINT-DENIS"): "97411",
+    ("97816", "SAINT-PIERRE"): "97416",
+    # 97824 seems unknown to INSEE
+    ("97824", "CILAOS"): "97424",
     # Mayotte's communes changed from 985xx INSEE codes to 976xx INSEE codes
     ("98501", "ACOUA"): "97601",
     ("98502", "BANDRABOUA"): "97602",
