@@ -46,5 +46,8 @@
             <small>Identifiant France Travail</small>
             {{ job_seeker.jobseeker_profile.pole_emploi_id|strong_or_disabled_non_filled }}
         </li>
+        <li class="has-forced-line-break">
+            {% include "insertion/includes/rsa_rights.html" with profile=job_seeker.jobseeker_profile %}
+        </li>
     </ul>
 </div>

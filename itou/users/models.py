@@ -1090,6 +1090,24 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         choices=AllocationDuration.choices,
     )
 
+    # Those three fields are fed by API Particulier only, when orienting a job seeker.
+    # They are deliberately kept apart from has_rsa_allocation and rsa_allocation_since, which are
+    # declared by the user, sent to the ASP and used to prefill the IAE eligibility diagnosis.
+    rsa_certified_beneficiary = models.BooleanField(
+        verbose_name="droits RSA ouverts (API Particulier)",
+        null=True,
+    )
+    rsa_certified_start_date = models.DateField(
+        verbose_name="droits RSA ouverts depuis le (API Particulier)",
+        null=True,
+        blank=True,
+    )
+    rsa_certification_checked_at = models.DateTimeField(
+        verbose_name="date de vérification des droits RSA",
+        null=True,
+        blank=True,
+    )
+
     ass_allocation_since = models.CharField(
         max_length=2,
         verbose_name="bénéficiaire de l'ASS depuis",

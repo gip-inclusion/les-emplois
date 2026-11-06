@@ -1,10 +1,19 @@
-from allauth.account.models import EmailAddress
+import datetime
 
+import httpx
+import pytest
+from allauth.account.models import EmailAddress
+from django.utils import timezone
+from freezegun import freeze_time
+
+from itou.asp.models import RSAAllocation
 from itou.companies.models import CompanyMembership
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
-from itou.users.models import JobSeekerAssignment, User
-from itou.users.utils import deactivate_users
+from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
+from itou.users.utils import deactivate_users, refresh_rsa_certification
 from itou.utils import triggers
+from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -125,3 +134,133 @@ def test_deactivate_users_updated_by():
     membership = CompanyMembership.include_inactive.get(pk=membership.pk)
     assert not membership.is_active
     assert membership.updated_by == staff_user
+
+
+class TestRefreshRSACertification:
+    RSA_URL = "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite"
+
+    def mock_rsa(self, respx_mock, response_kind):
+        response = RESPONSES[AdministrativeCriteriaKind.RSA][response_kind]
+        return respx_mock.get(self.RSA_URL).respond(response["status_code"], json=response["json"])
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_beneficiary(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.CERTIFIED)
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is True
+        assert profile.rsa_certified_start_date == datetime.date(2024, 8, 1)
+        assert profile.rsa_certification_checked_at == timezone.now()
+        # The ASP fields are left untouched.
+        assert profile.has_rsa_allocation == RSAAllocation.NO
+        assert profile.rsa_allocation_since == ""
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_not_beneficiary(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.NOT_CERTIFIED)
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is False
+        assert profile.rsa_certified_start_date is None
+        assert profile.rsa_certification_checked_at == timezone.now()
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_not_found_means_no_subsidy(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.NOT_FOUND)
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is False
+        assert profile.rsa_certified_start_date is None
+        assert profile.rsa_certification_checked_at == timezone.now()
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_unprocessable_content_leaves_rights_unknown(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.UNPROCESSABLE_CONTENT)
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is None
+        assert profile.rsa_certified_start_date is None
+        # The identity was checked, don’t hammer the API with the same parameters.
+        assert profile.rsa_certification_checked_at == timezone.now()
+
+    @pytest.mark.parametrize("status_code", [409, 429, 500, 502, 503])
+    def test_api_error_is_swallowed_and_retried_later(self, api_particulier_settings, respx_mock, status_code, caplog):
+        respx_mock.get(self.RSA_URL).respond(status_code, json={})
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is None
+        assert profile.rsa_certification_checked_at is None
+        assert f"API Particulier answered with HTTP {status_code}" in caplog.text
+
+    def test_unreachable_api_is_swallowed(self, api_particulier_settings, respx_mock, caplog):
+        respx_mock.get(self.RSA_URL).mock(side_effect=httpx.ConnectTimeout)
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certification_checked_at is None
+        assert "API Particulier is unreachable" in caplog.text
+
+    def test_skipped_when_api_is_not_configured(self, respx_mock):
+        job_seeker = JobSeekerFactory(born_in_france=True)
+
+        refresh_rsa_certification(job_seeker)
+
+        assert len(respx_mock.calls) == 0
+        assert job_seeker.jobseeker_profile.rsa_certification_checked_at is None
+
+    def test_skipped_when_required_information_is_missing(self, api_particulier_settings, respx_mock):
+        # No birthdate: the API cannot be queried at all.
+        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None)
+
+        refresh_rsa_certification(job_seeker)
+
+        assert len(respx_mock.calls) == 0
+        assert job_seeker.jobseeker_profile.rsa_certification_checked_at is None
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_skipped_when_checked_less_than_24_hours_ago(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.CERTIFIED)
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            jobseeker_profile__rsa_certified_beneficiary=False,
+            jobseeker_profile__rsa_certification_checked_at=timezone.now() - datetime.timedelta(hours=23),
+        )
+
+        refresh_rsa_certification(job_seeker)
+
+        assert len(respx_mock.calls) == 0
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is False
+
+    @freeze_time("2025-01-06 11:11:11")
+    def test_refreshed_when_checked_more_than_24_hours_ago(self, api_particulier_settings, respx_mock):
+        self.mock_rsa(respx_mock, ResponseKind.CERTIFIED)
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            jobseeker_profile__rsa_certified_beneficiary=False,
+            jobseeker_profile__rsa_certification_checked_at=timezone.now() - datetime.timedelta(hours=25),
+        )
+
+        refresh_rsa_certification(job_seeker)
+
+        assert len(respx_mock.calls) == 1
+        profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile.pk)
+        assert profile.rsa_certified_beneficiary is True
+        assert profile.rsa_certified_start_date == datetime.date(2024, 8, 1)
