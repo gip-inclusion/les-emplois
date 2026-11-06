@@ -6,7 +6,7 @@ from django.conf import settings
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import Title
-from itou.utils.logging import redact_query_params
+from itou.utils.redaction import redact_query_params
 from itou.utils.types import InclusiveDateRange
 
 
