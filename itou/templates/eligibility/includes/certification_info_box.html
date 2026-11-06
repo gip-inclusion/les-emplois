@@ -19,13 +19,17 @@
                     <dd>
                         Aucune action n’est nécessaire.
                     </dd>
-                    <dt>{% include "eligibility/includes/badge_temporarily_certified.html" with override_text="JJ/MM/AAAA" only %}</dt>
+                    <dt>
+                        {% include "eligibility/includes/badge_temporarily_certified.html" with override_text="JJ/MM/AAAA" only %}
+                    </dt>
                     <dd>
                         Ce critère a été certifié lors du diagnostic, mais sa
                         validité peut avoir expiré depuis. Une nouvelle
                         vérification sera effectuée le jour de l’embauche.
                     </dd>
-                    <dt>{% include "eligibility/includes/badge_certification_future.html" with override_text="JJ/MM/AAAA" only %}</dt>
+                    <dt>
+                        {% include "eligibility/includes/badge_certification_future.html" with override_text="JJ/MM/AAAA" only %}
+                    </dt>
                     <dd>
                         Ce critère a été certifié lors du diagnostic, mais la
                         période certifiée commence dans le futur.

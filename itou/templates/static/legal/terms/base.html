@@ -36,7 +36,9 @@
                                 {% if is_update %}de la nouvelle version{% endif %}
                                 des Conditions Générales d'Utilisation. En bas de page, merci de cocher la case prévue à cet effet et de cliquer sur le bouton « J'accepte ».
                             </p>
-                            <div class="border rounded p-3 my-4">{% include requested_terms_version.template_name %}</div>
+                            <div class="border rounded p-3 my-4">
+                                {% include requested_terms_version.template_name %}
+                            </div>
                             <form method="post">
                                 {% csrf_token %}
                                 <hr class="mb-3">

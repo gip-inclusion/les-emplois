@@ -51,7 +51,9 @@
                     </div>
                 {% endif %}
             </div>
-            <div>{% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}</div>
+            <div>
+                {% include "job_seekers_views/includes/badge_assignment_duration.html" with assignment=assignment only %}
+            </div>
         </div>
         {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR %}
             {% component_alert content=content variant="info" extra_classes="mt-3 mb-0" %}

@@ -39,7 +39,9 @@
 
                             {# `is_safe_url` is secure enough to let us use request params here. #}
                             {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
-                            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+                            {% if request.GET.next %}
+                                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                            {% endif %}
 
                             {% itou_buttons_form primary_label="Confirmer" show_mandatory_fields_mention=False %}
 

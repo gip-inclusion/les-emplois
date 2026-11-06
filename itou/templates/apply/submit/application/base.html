@@ -26,7 +26,9 @@
                         <a class="btn-link ms-3"
                            href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}">Vérifier le profil</a>
                     {% endif %}
-                    {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
+                    {% if new_check_needed %}
+                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                    {% endif %}
                 </p>
             {% endfragment %}
         {% endcomponent_title %}

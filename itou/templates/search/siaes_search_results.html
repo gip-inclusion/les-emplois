@@ -30,7 +30,9 @@
         <div class="c-search__bar">
             <form>
                 {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
-                {% if job_seeker %}<input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">{% endif %}
+                {% if job_seeker %}
+                    <input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">
+                {% endif %}
             </form>
         </div>
     </div>

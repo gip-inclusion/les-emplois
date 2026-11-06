@@ -29,7 +29,9 @@
 
                             {# Hide all form fields. #}
                             {% for field in form %}
-                                {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}" />{% endif %}
+                                {% if field.value %}
+                                    <input type="hidden" name="{{ field.name }}" value="{{ field.value }}" />
+                                {% endif %}
                             {% endfor %}
 
                             {# Show the user a preview of the prolongation. #}

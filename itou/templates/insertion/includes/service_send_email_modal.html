@@ -16,7 +16,8 @@
                     {% partialdef service-send-email-modal-header inline %}
                         <div class="modal-header">
                             <h3 class="modal-title" id="service-send-email-modal-label">Contacter {% if service.contact_full_name %}{{ service.contact_full_name }}{% else %}le service{% endif %} par mail {{ service.contact_email }}</h3>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer">
+                            </button>
                         </div>
                     {% endpartialdef %}
                     <div class="modal-body">

@@ -23,7 +23,7 @@
                                 <br>
                                 Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
                                 sur <a href="{% url 'apply:start' company_pk=company.pk %}"
-    {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
+                                       {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                             {% else %}
                                 <br>
                                 Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=company.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
@@ -101,7 +101,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h3>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer">
+                            </button>
                         </div>
                         <div class="modal-body">
                             <p>
