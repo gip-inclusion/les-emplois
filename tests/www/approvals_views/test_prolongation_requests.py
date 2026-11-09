@@ -1,5 +1,4 @@
 import factory
-import httpx
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -379,7 +378,7 @@ class TestProlongationReportFileView:
         assert response.status_code == 404
 
     @pytest.mark.usefixtures("temporary_bucket")
-    def test_ok(self, client, xlsx_file):
+    def test_ok(self, client, xlsx_file, storage_http_client):
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)
         key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
@@ -400,4 +399,4 @@ class TestProlongationReportFileView:
             )
             assertRedirects(response, file.url(), fetch_redirect_response=False)
         xlsx_file.seek(0)
-        assert httpx.get(response.url).content == xlsx_file.read()
+        assert storage_http_client.get(response.url).content == xlsx_file.read()
