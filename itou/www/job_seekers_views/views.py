@@ -38,6 +38,7 @@ from itou.insertion.models import Orientation
 from itou.job_applications.models import JobApplication
 from itou.job_applications.utils import xp_ref_iae_job_applications
 from itou.prescribers.models import PrescriberMembership
+from itou.rdv_insertion.models import JobSeekerAppointmentData
 from itou.users.enums import ActionKind, AssignmentEndReason, JobSeekerCreationSource, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import (
@@ -45,6 +46,7 @@ from itou.users.perms import (
     can_orient_towards_insertion_service,
     can_view_pro_support_report,
 )
+from itou.utils.apis import rdv_insertion
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
@@ -152,6 +154,10 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
     def approval_missing_or_expired(self):
         return self.approval is None or self.approval.is_valid is False
 
+    @cached_property
+    def appointments(self):
+        return _get_job_seeker_appointments(self.request, self.object)
+
     def get_context_data(self, **kwargs):
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
@@ -163,6 +169,7 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
+            "show_appointments_tab": bool(self.appointments),
         }
 
 
@@ -450,6 +457,52 @@ class OrientationsTabView(BaseJobSeekerDetailView):
             "can_view_external_orientations": can_view_external,
             "orientations": orientations,
         }
+
+
+class AppointmentsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/appointments.html"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"appointments": self.appointments}
+
+
+@readonly_view
+@check_request(lambda request: request.from_prescriber or request.from_employer)
+def appointment_details(
+    request, public_id, rdv_insertion_id, template_name="job_seekers_views/appointment_details.html"
+):
+    job_seeker = get_object_or_404(User, kind=UserKind.JOB_SEEKER, public_id=public_id)
+    appointment = next(
+        (a for a in _get_job_seeker_appointments(request, job_seeker) if a.rdv_insertion_id == rdv_insertion_id), None
+    )
+    if appointment is None:
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "appointment": appointment,
+        "back_url": get_safe_url(
+            request, "back_url", fallback_url=reverse("job_seekers_views:appointments", args=(public_id,))
+        ),
+        "matomo_custom_title": "Détail d’un rendez-vous",
+    }
+    return render(request, template_name, context)
+
+
+def _get_job_seeker_appointments(request, job_seeker):
+    """Appointments the user can see, from rdv-insertion and the invitation experiment, most recent first."""
+    if can_view_external_actions(job_seeker, request):
+        api_appointments = JobSeekerAppointmentData.list_from_api(rdv_insertion.get_follow_ups(job_seeker))
+        stored_participations = job_seeker.rdvi_participations.all()
+    elif request.from_employer:
+        api_appointments = []
+        stored_participations = job_seeker.rdvi_participations.filter(
+            appointment__company=request.current_organization
+        )
+    else:
+        return []
+    stored_participations = stored_participations.select_related("appointment__company", "appointment__location")
+    stored_appointments = [JobSeekerAppointmentData.from_stored_participation(p) for p in stored_participations]
+    return sorted(api_appointments + stored_appointments, key=lambda a: a.start_at, reverse=True)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
