@@ -18,17 +18,17 @@ runs:
         docker kill --signal=SIGHUP ${{ job.services.postgres.id }}
       shell: bash
     # The Ubuntu mirror regularly slows down to a few kB/s: cache the packages.
-    # PRs and the merge queue only restore their own caches and the ones created on main:
-    # after bumping the key, seed it with `gh workflow run ci.yml --ref main`
+    # PRs and the merge queue only restore their own caches and the ones created on main.
+    # The schedule of ci.yml creates the weekly cache on main. To create it sooner, run `gh workflow run ci.yml --ref main`
     - name: 🔑 Spatial libraries cache key
       id: apt-cache-key
-      # the .deb files depend on the Ubuntu release and on the CPU architecture:
-      # `steps.apt-cache-key.outputs.key` will contain something like `apt-24.04-X64-gdal-bin-1`
+      # the .deb files depend on the Ubuntu release and on the CPU architecture, the week keeps them up to date:
+      # `steps.apt-cache-key.outputs.key` will contain something like `apt-26.04-X64-gdal-bin-2026-45`
       # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#setting-an-output-parameter
       # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
       run: |
         . /etc/os-release
-        echo "key=apt-$VERSION_ID-$RUNNER_ARCH-gdal-bin-1" >> "$GITHUB_OUTPUT"
+        echo "key=apt-$VERSION_ID-$RUNNER_ARCH-gdal-bin-$(date +%G-%V)" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: 💾 Restore spatial libraries cache
       id: apt-cache
@@ -54,11 +54,12 @@ runs:
         path: ~/apt-cache/
     - name: 🌍 Install spatial libraries
       # Given .deb paths, apt still downloads the packages from the mirror and only uses the files if that fails.
-      # It skips the download of the files already in its archives directory.
+      # It reuses the files of its archives directory that match the versions it resolves, so when the cache and
+      # the package lists of the image differ, the fallback only downloads the difference.
       run: |
         sudo cp ~/apt-cache/*.deb /var/cache/apt/archives/
         if ! sudo apt-get install --no-install-recommends --no-download gdal-bin; then
-          echo "::warning::The cached spatial libraries no longer fit the runner image, bump the cache key"
+          echo "::notice::The cached spatial libraries differ from the package lists of this runner image, downloading the difference"
           sudo apt-get update
           sudo apt-get install --no-install-recommends gdal-bin
         fi

@@ -3,6 +3,10 @@ name: 🔮 CI
 on:
   pull_request:
   merge_group:
+  schedule:
+    # Seeds the weekly cache of the spatial libraries on main, cf. the setup action
+    # Runs at 1:37 AM every Monday (arbitrary time to avoid the top of the hour)
+    - cron: "37 1 * * 1"
   # Allow this workflow to be triggered manually:
   # gh workflow run ci.yml --ref <branche>
   workflow_dispatch:
