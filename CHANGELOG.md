@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2026-11-09
+
+### Ajouté
+
+- [2FA : Ajout d’une étape suggérant aux utilisateurs de télécharger une appli](https://github.com/gip-inclusion/les-emplois/pull/9141)
+- [Employeur, Prescripteur : Ajout d’un log au changement de rôle administrateur dans une organisation](https://github.com/gip-inclusion/les-emplois/pull/9222)
+
+### Modifié
+
+- [Candidature : Corriger le lien mort vers Diagoriente](https://github.com/gip-inclusion/les-emplois/pull/9208)
+
+### Supprimé
+
+- [Interface : Suppression de la vue "Synthèse"](https://github.com/gip-inclusion/les-emplois/pull/9245)
+
 ## 2026-11-02
 
 ### Ajouté
