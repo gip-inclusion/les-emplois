@@ -1331,12 +1331,12 @@ class ProSupportReport(models.Model):
         related_name="+",
     )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
-    contract = models.OneToOneField(
+    contract = models.ForeignKey(
         Contract,
         verbose_name="contrat",
         null=True,
         on_delete=models.SET_NULL,
-        related_name="pro_support_report",
+        related_name="pro_support_reports",
     )
     contract_end_date = models.DateField(verbose_name="date de fin du contrat")
 
@@ -1376,6 +1376,12 @@ class ProSupportReport(models.Model):
                 name="%(class)s_solution_or_orientation",
                 condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
                 violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+            # The ASP renewals are merged into the same contract: each new end date calls for its own report.
+            models.UniqueConstraint(
+                fields=["contract", "contract_end_date"],
+                name="%(class)s_contract_end_date_unique",
+                violation_error_message="Un bilan existe déjà pour ce contrat et cette date de fin.",
             ),
         ]
 
