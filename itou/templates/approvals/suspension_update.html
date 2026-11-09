@@ -27,7 +27,9 @@
 
                             {% bootstrap_form_errors form alert_error_type="all" %}
 
-                            {% include "approvals/includes/contract_reasons_disabled_alert.html" with variant="warning" %}
+                            {% if has_ongoing_contract %}
+                                {% include "approvals/includes/ongoing_contract_alert.html" only %}
+                            {% endif %}
 
                             {% bootstrap_form form %}
 
