@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.timezone import now
@@ -87,6 +88,20 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
         return queryset
 
 
+class DuplicateSiretWithKindOtherFilter(admin.SimpleListFilter):
+    title = 'Doublons (organisations de type "Autre" avec SIRET identiques)'
+    parameter_name = "duplicate_organizations"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"),)
+
+    def queryset(self, request, queryset):
+        siret_dups = queryset.values("siret").annotate(Count("id")).filter(id__count__gte=1).values("siret")
+        if self.value() == "yes":
+            return queryset.filter(kind=PrescriberOrganizationKind.OTHER, siret__in=siret_dups).order_by("siret")
+        return queryset
+
+
 class PrescriberOrganizationMembersInline(MembersInline):
     model = PrescriberOrganization.members.through
     MEMBERSHIP_RO_LIMIT = 200
@@ -168,6 +183,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
         TmpCanBeDeletedFilter,
         HasMembersFilter,
         IsAuthorizedFilter,
+        DuplicateSiretWithKindOtherFilter,
         "kind",
         "is_brsa",
         "department",
