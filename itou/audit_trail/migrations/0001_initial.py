@@ -42,6 +42,7 @@ class Migration(migrations.Migration):
                                 "L’utilisateur est connecté (2FA validé le cas échéant)",
                             ),
                             ("MFA_RESET_REQUEST", "Demande de réinitialisation du 2FA"),
+                            ("MFA_RESET", "Réinitialisation du 2FA"),
                         ],
                         verbose_name="type de l’évènement",
                     ),
