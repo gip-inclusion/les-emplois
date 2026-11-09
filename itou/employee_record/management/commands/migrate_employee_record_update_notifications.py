@@ -16,6 +16,13 @@ from itou.employee_record.models import (
 from itou.utils.command import BaseCommand
 
 
+ASP_PROCESSING_INFORMATION = (
+    "asp_processing_code",
+    "asp_processing_label",
+    "archived_json",
+)
+
+
 def create_logs(employee_record, notification):
     # 3 processed EmployeeRecordUpdateNotification lack an asp_batch_file: fallback to updated_at
     wait_for_asp_timestamp = (
@@ -123,6 +130,7 @@ class Command(BaseCommand):
             er_notifications = list(employee_record.update_notifications.all())
             disable_employee_record = False
             reject_employee_record = False
+            reject_infos = None
             if er_notifications[-1].status == NotificationStatus.REJECTED and (
                 not employee_record.last_transition_timestamp  # This shouldn't be possible
                 or (er_notifications[-1].updated_at > employee_record.last_transition_timestamp)
@@ -146,6 +154,7 @@ class Command(BaseCommand):
                         disable_employee_record = True
                     else:
                         reject_employee_record = True
+                        reject_infos = {key: getattr(er_notifications[-1], key) for key in ASP_PROCESSING_INFORMATION}
                 else:
                     # Do not change the status yet, but keep the last update notification to change it later
                     er_notifications = er_notifications[:-1]
@@ -168,7 +177,10 @@ class Command(BaseCommand):
                 if reject_employee_record:
                     self.logger.info("Updating employee_record=%d status to MODIFICATION_REJECTED", employee_record.pk)
                     employee_record_to_update.status = Status.MODIFICATION_REJECTED
-                    employee_record_to_update.save(update_fields=("status", "updated_at"))
+
+                    for key in ASP_PROCESSING_INFORMATION:
+                        setattr(employee_record_to_update, key, reject_infos[key])
+                    employee_record_to_update.save(update_fields=("status", "updated_at") + ASP_PROCESSING_INFORMATION)
                 elif disable_employee_record:
                     if employee_record_to_update.status in {Status.DISABLED, Status.ARCHIVED}:
                         self.logger.info("employee_record=%d already disabled/archived - skipping", employee_record.pk)
