@@ -2633,9 +2633,9 @@ slippers==0.7.1 \
     --hash=sha256:686cc3faba2de23da840e1d66d2bbf10d6ee205510545633e1a709943eee5649 \
     --hash=sha256:7450987faf97b275e6fa19898111b1048c12486d537b3edfb9f5dcdb17dc0146
     # via -r base.in
-sqlparse==0.6.0 \
-    --hash=sha256:113c35c75365ab9cc9c7231d68c6428fb11c085fc8e9eb1ad659b7ddbf6cd2b9 \
-    --hash=sha256:b861c0288ce2fa56209a9a6412d2e066ac664b3873b89c26c9d8415e8e32996f
+sqlparse==0.6.1 \
+    --hash=sha256:3be5a72d04c873d690d7c6dedd33d6fae2ef82759881ceec02fc2efd0cba564f \
+    --hash=sha256:ca722573f848ff2d30e40ea30f53a104b7dea7635ea9285891263eb2c58fb6e7
     # via django
 tenacity==9.2.1 \
     --hash=sha256:9e56f17539296baab7beabb08b92f6ee3d7be92d8be72d763360677c2ad6580e \
