@@ -1252,7 +1252,15 @@ class Contract(models.Model):
 
     @property
     def has_ended(self):
-        return self.end_date and self.end_date < timezone.localdate()
+        """
+        A contract has ended if:
+        - it has an ending date prior to today
+        or
+        - the related company is no longer active or has been deleted.
+        """
+        if self.end_date:
+            return self.end_date < timezone.localdate()
+        return not self.company or not self.company.is_active
 
     class Meta:
         verbose_name = "contrat IAE"
