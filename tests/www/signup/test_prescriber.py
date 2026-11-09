@@ -1,3 +1,4 @@
+import random
 import uuid
 
 import httpx
@@ -594,7 +595,9 @@ class TestPrescribersViewsExceptions:
         The organization creation didn't work.
         The user is still created and can try again.
         """
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
+        # Organizations of the kind `OTHER` can share the same SIRET
+        org_kind_choices = list(set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.OTHER})
+        org = PrescriberOrganizationFactory(kind=random.choice(org_kind_choices))
         user = ProfessionalFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
         client.force_login(user)
 

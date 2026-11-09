@@ -353,6 +353,22 @@ class TestPrescriberOrganizationModel:
         with pytest.raises(ValidationError):
             org.add_or_activate_membership(non_professional)
 
+    def test_unique_siret_per_kind(self):
+        # Duplicate SIRET numbers are authorized for organizations with `OTHER` kind
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
+        PrescriberOrganizationFactory(siret=org.siret, kind=PrescriberOrganizationKind.OTHER)
+
+        # Same kind, but one organization doesn't have a SIRET
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML)
+        PrescriberOrganizationFactory(siret=None, kind=PrescriberOrganizationKind.ML)
+
+        # Same SIRET, but different kind
+        PrescriberOrganizationFactory(siret=org.siret, kind=PrescriberOrganizationKind.EPIDE)
+
+        # Same SIRET and same kind (other than `OTHER`)
+        with pytest.raises(IntegrityError, match="unique_siret_per_kind"):
+            PrescriberOrganizationFactory(siret=org.siret, kind=org.kind)
+
 
 class TestPrescriberOrganizationAdmin:
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
