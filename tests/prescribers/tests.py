@@ -770,6 +770,49 @@ class TestPrescriberOrganizationAdmin:
         assert len(response.context["errors"]) == 1
         assert response.context["errors"][0] == [expected_msg]
 
+    def test_duplicate_siret_filter(self, client):
+        client.force_login(self.user)
+
+        # Organizations with `OTHER` kind and duplicated SIRET
+        organization = PrescriberOrganizationFactory(siret="10000000000000", kind=PrescriberOrganizationKind.OTHER)
+        organization_2 = PrescriberOrganizationFactory(siret="10000000000000", kind=organization.kind)
+        organization_3 = PrescriberOrganizationFactory(siret="11000000000000", kind=PrescriberOrganizationKind.OTHER)
+        organization_4 = PrescriberOrganizationFactory(siret="11000000000000", kind=PrescriberOrganizationKind.OTHER)
+
+        # Organization with kind different from `OTHER`
+        organization_5 = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML)
+
+        # Organization with kind different from `OTHER` and duplicated SIRET
+        organization_6 = PrescriberOrganizationFactory(siret="10000000000000", kind=PrescriberOrganizationKind.ML)
+        organization_7 = PrescriberOrganizationFactory(siret="11000000000000", kind=PrescriberOrganizationKind.ML)
+
+        response = client.get(reverse("admin:prescribers_prescriberorganization_changelist"))
+        assertQuerySetEqual(
+            response.context["cl"].result_list,
+            [
+                organization_7,
+                organization_6,
+                organization_5,
+                organization_4,
+                organization_3,
+                organization_2,
+                organization,
+            ],
+        )  # default ordering is by reverse pk
+
+        response = client.get(
+            reverse("admin:prescribers_prescriberorganization_changelist", query={"duplicate_organizations": "yes"})
+        )
+        assertQuerySetEqual(
+            response.context["cl"].result_list,
+            [
+                organization_2,
+                organization,
+                organization_4,
+                organization_3,
+            ],
+        )  # ordering is done by SIRET and reverse pk
+
     def test_transfer_button(self, client):
         organization = PrescriberOrganizationFactory()
         transfer_url = reverse("admin:transfer_prescriberorg_data", kwargs={"from_org_pk": organization.pk})
