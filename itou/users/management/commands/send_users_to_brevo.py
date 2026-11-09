@@ -152,18 +152,37 @@ class Command(BaseCommand):
             kind=UserKind.JOB_SEEKER,
             is_active=True,
         ).order_by("pk")
-        self.import_professionals(professionals)
-        self.import_job_seekers(job_seekers)
-        # Imports are asynchronous, so this update doesn't depend on the daily import above. A user
-        # in both is sent twice with the same consent, which is harmless.
-        self.update_email_tracking_consents(professionals, job_seekers)
+        try:
+            self.import_professionals(professionals)
+            self.import_job_seekers(job_seekers)
+            # Imports are asynchronous, so this update doesn't depend on the daily import above. A user
+            # in both is sent twice with the same consent, which is harmless.
+            consents_sent = self.update_email_tracking_consents(professionals, job_seekers)
+        except Exception:
+            self.log_email_tracking_consent_catch_up()
+            raise
+        if not consents_sent:
+            self.log_email_tracking_consent_catch_up()
+
+    def log_email_tracking_consent_catch_up(self):
+        """Explain how to send the consents Brevo may have missed: the next runs only cover the latest days."""
+        self.logger.error(
+            "Some email tracking consents may not have reached Brevo. Once the issue is fixed, run "
+            "`send_users_to_brevo --wet-run --email-tracking-consent-days N`, with N covering every day since "
+            "the last successful run."
+        )
 
     def import_users(self, name, users, list_id, serializer, *, update_existing_contacts=False):
-        """Log the number of users, and import them into a Brevo list on a wet run."""
+        """Log the number of users, and import them into a Brevo list on a wet run.
+
+        Returns:
+            Whether Brevo accepted every batch, always True on a dry run.
+        """
         users = list(users)
         self.logger.info("%s count: %d", name, len(users))
-        if self.wet_run:
-            self.client.import_users(users, list_id, serializer, update_existing_contacts=update_existing_contacts)
+        if not self.wet_run:
+            return True
+        return self.client.import_users(users, list_id, serializer, update_existing_contacts=update_existing_contacts)
 
     def import_professionals(
         self, professionals, *, include_inactive_memberships=False, name_suffix="", update_existing_contacts=False
@@ -177,26 +196,29 @@ class Command(BaseCommand):
             include_inactive_memberships: also match former members, through their inactive memberships.
             name_suffix: appended to the name of each group of users in the logs.
             update_existing_contacts: see `BrevoClient.import_users()`.
+
+        Returns:
+            Whether Brevo accepted every batch.
         """
         authorized_prescriber = has_prescriber_membership(
             include_inactive=include_inactive_memberships,
             organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
-        self.import_users(
+        accepted = self.import_users(
             f"SIAE users{name_suffix}",
             professionals.filter(has_siae_membership(include_inactive=include_inactive_memberships)),
             BrevoListID.EMPLOYERS,
             employer_serializer,
             update_existing_contacts=update_existing_contacts,
         )
-        self.import_users(
+        accepted &= self.import_users(
             f"Prescribers{name_suffix}",
             professionals.filter(authorized_prescriber),
             BrevoListID.PRESCRIBERS,
             authorized_prescriber_serializer,
             update_existing_contacts=update_existing_contacts,
         )
-        self.import_users(
+        accepted &= self.import_users(
             f"Orienteurs{name_suffix}",
             professionals.filter(has_prescriber_membership(include_inactive=include_inactive_memberships)).exclude(
                 authorized_prescriber
@@ -205,6 +227,7 @@ class Command(BaseCommand):
             prescriber_serializer,
             update_existing_contacts=update_existing_contacts,
         )
+        return accepted
 
     def import_job_seekers(self, job_seekers):
         """Import the job seekers recently joined, stalled, or autonomous and waiting for a job."""
@@ -241,26 +264,30 @@ class Command(BaseCommand):
 
         Importing them updates the contacts Brevo knows, and creates the others in that list. Each answer is sent by
         every run within the update window.
+
+        Returns:
+            Whether Brevo accepted every batch.
         """
         recently_answered = Q(
             email_tracking_consent_updated_at__gte=timezone.now() - self.email_tracking_consent_window
         )
         name_suffix = " with a recent email tracking consent answer"
         professionals = professionals.filter(recently_answered)
-        self.import_professionals(professionals, name_suffix=name_suffix, update_existing_contacts=True)
+        accepted = self.import_professionals(professionals, name_suffix=name_suffix, update_existing_contacts=True)
         # Former members left their structure but remain in Brevo, in the list of their former structure.
         # Someone now in a structure is only sent to the list of their current one.
         former_members = professionals.exclude(has_siae_membership() | has_prescriber_membership())
-        self.import_professionals(
+        accepted &= self.import_professionals(
             former_members,
             include_inactive_memberships=True,
             name_suffix=f" (former members){name_suffix}",
             update_existing_contacts=True,
         )
-        self.import_users(
+        accepted &= self.import_users(
             f"Job seekers{name_suffix}",
             job_seekers.filter(recently_answered),
             BrevoListID.CANDIDATS,
             job_seeker_serializer,
             update_existing_contacts=True,
         )
+        return accepted
