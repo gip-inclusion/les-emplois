@@ -123,6 +123,7 @@ def reset_request_do_reset(request, token, template_name="otp_views/reset_reques
     context = {}
     try:
         context["success"] = reset_request.reset_devices(user=request.user)
+        AuditTrail.objects.log(AuditTrailEventType.MFA_RESET, request)
         context["next_url"] = reverse("otp_views:enrollment_step_0_intro")
         status = 200
     except xworkflows.base.AbortTransition:

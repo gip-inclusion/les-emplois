@@ -10,6 +10,7 @@ class AuditTrailEventType(models.TextChoices):
     PARTIAL_LOG_IN = "PARTIAL_LOG_IN", "L’utilisateur s’identifie (via un mot de passe ou un IDP)"
     LOG_IN = "LOG_IN", "L’utilisateur est connecté (2FA validé le cas échéant)"
     MFA_RESET_REQUEST = "MFA_RESET_REQUEST", "Demande de réinitialisation du 2FA"
+    MFA_RESET = "MFA_RESET", "Réinitialisation du 2FA"
 
 
 class AuditTrailManager(models.Manager):
