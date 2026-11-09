@@ -49,7 +49,7 @@ IMPORT_PAYLOAD = {
 
 
 def import_one_user(brevo_client):
-    brevo_client.import_users([{"email": "user@example.com"}], 31, lambda x: x)
+    return brevo_client.import_users([{"email": "user@example.com"}], 31, lambda x: x)
 
 
 def import_errors(caplog):
@@ -65,7 +65,7 @@ def test_import_users(respx_mock, caplog, brevo_client):
         return_value=httpx.Response(202)
     )
 
-    import_one_user(brevo_client)
+    assert import_one_user(brevo_client) is True
 
     assert route.call_count == 1
     assert import_errors(caplog) == []
@@ -76,7 +76,7 @@ def test_import_users_client_error_is_not_retried(respx_mock, caplog, brevo_clie
         return_value=httpx.Response(400, content="Bad Request")
     )
 
-    import_one_user(brevo_client)
+    assert import_one_user(brevo_client) is False
 
     assert route.call_count == 1
     assert import_retries(caplog) == []
