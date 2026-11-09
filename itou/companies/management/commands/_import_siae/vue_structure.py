@@ -18,6 +18,9 @@ from itou.companies.management.commands._import_siae.utils import get_fluxiae_df
 from itou.utils.validators import validate_naf, validate_siret
 
 
+BAD_EMAIL_VALUE = "email correspondant"
+
+
 def get_vue_structure_df():
     """
     The "Vue Structure" export has the following fields:
@@ -76,6 +79,10 @@ def get_vue_structure_df():
     # Drop rows without auth_email.
     df = df[df.auth_email.notnull()]
     df = df[df.auth_email != ""]
+    if BAD_EMAIL_VALUE in df.auth_email.values:
+        df = df[df.auth_email != BAD_EMAIL_VALUE]
+    else:
+        print("WARNING: The file does not contain any bad value anymore, the dirty workaround may be removed.")
 
     for idx, row in df.iterrows():
         validate_siret(row.siret)
