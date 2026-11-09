@@ -742,6 +742,31 @@ class TestContractQuerySet:
         )
 
 
+class TestContractModel:
+    def test_has_ended(self):
+        # Ongoing contracts
+        contract_no_enddate_active_siae = ContractFactory(end_date=None)
+        contract_enddate_in_future = ContractFactory(end_date=timezone.localdate() + timedelta(days=1))
+        contract_enddate_today = ContractFactory(end_date=timezone.localdate() + timedelta(days=1))
+        contract_enddate_in_future_inactive_siae = ContractFactory(
+            end_date=timezone.localdate() + timedelta(days=1), company__convention__is_active=False
+        )
+
+        assert not contract_no_enddate_active_siae.has_ended
+        assert not contract_enddate_in_future.has_ended
+        assert not contract_enddate_today.has_ended
+        assert not contract_enddate_in_future_inactive_siae.has_ended
+
+        # Ended contracts
+        contract_no_enddate_inactive_siae = ContractFactory(end_date=None, company__convention__is_active=False)
+        contract_no_enddate_deleted_siae = ContractFactory(end_date=None, company=None)
+        contract_enddate_in_past = ContractFactory(end_date=timezone.localdate() - timedelta(days=1))
+
+        assert contract_no_enddate_inactive_siae.has_ended
+        assert contract_no_enddate_deleted_siae.has_ended
+        assert contract_enddate_in_past.has_ended
+
+
 class TestProSupportReport:
     @pytest.mark.parametrize(
         "kwargs,constraint",
