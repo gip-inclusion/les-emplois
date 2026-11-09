@@ -1,11 +1,16 @@
+from functools import partial
+
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.urls import reverse
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.communications import registry as notifications_registry
 from itou.communications.models import DisabledNotification, NotificationSettings
+from itou.utils import constants as global_constants
+from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 
@@ -54,6 +59,63 @@ def test_job_seeker_allowed(client, snapshot):
     with assertSnapshotQueries(snapshot(name="view queries")):
         response = client.get(url)
     assert response.status_code == 200
+    assertNotContains(response, "Préférences pour")
+
+
+@pytest.mark.parametrize(
+    "user_factory, expected_organization, expected_scope",
+    [
+        pytest.param(
+            partial(
+                EmployerFactory,
+                membership__company__name="La Collecterie",
+            ),
+            "La Collecterie",
+            "cette structure",
+            id="employer",
+        ),
+        pytest.param(
+            partial(
+                PrescriberFactory,
+                membership__organization__name="Agence d’Arles",
+            ),
+            "Agence d’Arles",
+            "cette organisation",
+            id="prescriber",
+        ),
+    ],
+)
+def test_current_organization_displayed(client, user_factory, expected_organization, expected_scope):
+    client.force_login(user_factory())
+    response = client.get(reverse("dashboard:edit_user_notifications"))
+    assertContains(
+        response,
+        f'<span class="c-info__summary">Préférences pour\xa0: {expected_organization}</span>',
+        html=True,
+        count=1,
+    )
+    assertContains(response, f"Vos réglages ne s’appliquent qu’à {expected_scope}.", count=1)
+
+
+def test_current_organization_displayed_with_several_organizations(client):
+    employer = EmployerFactory()
+    current_company = CompanyFactory(name="Seconde structure")
+    current_company.add_or_activate_membership(employer)
+    client.force_login(employer)
+    session = client.session
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_company.organization_switch_key
+    session.save()
+
+    response = client.get(reverse("dashboard:edit_user_notifications"))
+
+    assertContains(
+        response,
+        '<span class="c-info__summary">Préférences pour\xa0: Seconde structure</span>',
+        html=True,
+        count=1,
+    )
+    assertContains(response, "changez d’organisation dans le menu pour régler leurs préférences.", count=1)
+    assertNotContains(response, "Vos réglages ne s’appliquent")
 
 
 def test_employer_create_update_notification_settings(client, snapshot):
