@@ -1,5 +1,6 @@
 import sys
 import uuid
+from collections import defaultdict
 from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -1278,6 +1279,62 @@ class ContractQuerySet(models.QuerySet):
                 ProSupportReport.objects.filter(contract=OuterRef("pk"), contract_end_date__gte=OuterRef("end_date"))
             )
         )
+
+    def get_company_contacts(self):
+        """Members of the company to write to about each contract, as a set of users by contract pk:
+        - the advisor of the employee in the company
+        - otherwise whoever accepted their last job application in the company, if still a member
+        - otherwise the administrators of the company."""
+        from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
+        from itou.users.models import JobSeekerAssignment
+
+        contracts = list(self.values_list("pk", "job_seeker_id", "company_id", named=True))
+        job_seeker_ids = {contract.job_seeker_id for contract in contracts}
+        company_ids = {contract.company_id for contract in contracts}
+
+        members = defaultdict(dict)
+        admins = defaultdict(set)
+        for membership in CompanyMembership.objects.filter(company__in=company_ids).select_related("user"):
+            members[membership.company_id][membership.user_id] = membership.user
+            if membership.is_admin:
+                admins[membership.company_id].add(membership.user)
+
+        # Both are sorted by ascending date: the most recent one overwrites the others.
+        advisor_ids = {
+            (job_seeker_id, company_id): professional_id
+            for job_seeker_id, company_id, professional_id in JobSeekerAssignment.objects.filter(
+                job_seeker__in=job_seeker_ids,
+                company__in=company_ids,
+                # Accepting a job application also assigns the job seeker to whoever accepted it: once this
+                # assignment is filtered out, the fallback below still picks them while they are a member, on purpose.
+                ended_at=None,
+                assigned_to_unknown_advisor=False,
+            )
+            .order_by("last_action_at")
+            .values_list("job_seeker_id", "company_id", "professional_id")
+            if professional_id in members[company_id]
+        }
+        accepted_by_ids = {
+            (job_seeker_id, company_id): user_id
+            for job_seeker_id, company_id, user_id in JobApplicationTransitionLog.objects.filter(
+                job_application__in=JobApplication.objects.accepted().filter(
+                    job_seeker__in=job_seeker_ids, to_company__in=company_ids
+                ),
+                transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+            )
+            .order_by("timestamp")
+            .values_list("job_application__job_seeker_id", "job_application__to_company_id", "user_id")
+        }
+
+        contacts = {}
+        for contract in contracts:
+            employee = (contract.job_seeker_id, contract.company_id)
+            company_members = members[contract.company_id]
+            contact = company_members.get(advisor_ids.get(employee)) or company_members.get(
+                accepted_by_ids.get(employee)
+            )
+            contacts[contract.pk] = {contact} if contact else admins[contract.company_id]
+        return contacts
 
 
 class Contract(models.Model):
