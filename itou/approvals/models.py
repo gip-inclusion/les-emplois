@@ -29,7 +29,7 @@ from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
-from itou.users.models import IdentityCertification
+from itou.users.models import IdentityCertification, User
 from itou.utils.apis import enums as api_enums
 from itou.utils.apis.pole_emploi import (
     DATE_FORMAT,
@@ -117,6 +117,9 @@ class ApprovalQuerySet(models.QuerySet):
 
     def starts_in_the_future(self):
         return self.filter(Q(start_at__gt=timezone.localdate()))
+
+    def for_job_seekers_assigned_to(self, user, organization):
+        return self.filter(user__in=User.objects.assigned_job_seeker_ids(user, organization, archived=False))
 
     def delete(self, enable_mass_delete=False):
         # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to
@@ -1087,8 +1090,8 @@ class SuspensionQuerySet(models.QuerySet):
 
 class Suspension(models.Model):
     """
-    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
-    without intervention of a prescriber or a posteriori control.
+    A PASS IAE (or approval) can be directly suspended, without a posteriori control, either by the SIAE currently
+    hiring the jobseeker or by an authorized France Travail prescriber.
 
     When a suspension is saved/edited/deleted, the end date of its approval is
     automatically pushed back or forth with a PostgreSQL trigger:
@@ -1139,7 +1142,7 @@ class Suspension(models.Model):
         )
 
         @staticmethod
-        def displayed_choices_for_siae(siae):
+        def displayed_choices(siae=None):
             """
             Old reasons are not showed anymore but kept to let users still see
             a nice label in their dashboard instead of just the enum stored in the DB.
@@ -1151,7 +1154,8 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [companies_enums.CompanyKind.ACI, companies_enums.CompanyKind.EI]:
+            # `siae` is None when the suspension has been created by an authorized France Travail prescriber.
+            if siae and siae.kind in [companies_enums.CompanyKind.ACI, companies_enums.CompanyKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -1172,6 +1176,17 @@ class Suspension(models.Model):
         null=True,
         on_delete=models.RESTRICT,  # Prevent a soft lock, also for traceability and accountability
         related_name="approvals_suspended",
+    )
+    # The author is `prescriber_organization` if set, else `siae`.
+    # The current manager is `siae` if set, else `prescriber_organization`.
+    # An employer can take over a suspension created by an authorized France Travail prescriber.
+    prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prescriptrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For the same reasons as for the `siae` field.
+        related_name="approvals_suspended_by_prescriber",
     )
     reason = models.CharField(
         verbose_name="motif",

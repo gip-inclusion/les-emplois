@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
@@ -14,6 +15,7 @@ from itou.approvals.enums import (
 )
 from itou.approvals.models import Approval
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -26,6 +28,14 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
+
+
+# Authorized FT prescribers are able to suspend approvals of their assigned jobseekers, which changes the detail page.
+AUTHORIZED_NON_FT_PRESCRIBER_KINDS = [
+    kind
+    for kind in PrescriberOrganizationKind
+    if kind not in (PrescriberOrganizationKind.OTHER, PrescriberOrganizationKind.FT)
+]
 
 
 class TestApprovalDetailView:
@@ -181,6 +191,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__kind=random.choice(AUTHORIZED_NON_FT_PRESCRIBER_KINDS),
             with_job_seeker_assignment=True,
         )
         approval = job_application.approval
@@ -270,6 +281,60 @@ class TestApprovalDetailView:
             name="Approval suspensions list as job_seeker/prescriber without modification buttons"
         )
 
+    @freeze_time("2024-09-25", tick=True)
+    def test_approval_detail_with_suspensions_as_ft_prescriber(self, client, snapshot):
+        job_application = JobApplicationFactory(
+            to_company__name="Mon SIAE",
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+            sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
+            sender_prescriber_organization__name="Mon agence France Travail",
+            with_job_seeker_assignment=True,
+        )
+        approval = job_application.approval
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
+        prescriber = job_application.sender
+
+        # Valid suspension created by the prescriber organization (i.e. France Travail).
+        current_suspension = SuspensionFactory(
+            id=1,
+            approval=approval,
+            start_at=timezone.localdate() - relativedelta(days=7),
+            end_at=timezone.localdate() + relativedelta(days=3),
+            siae=None,
+            prescriber_organization=job_application.sender_prescriber_organization,
+        )
+        # Older one created by an employer.
+        older_suspension = SuspensionFactory(
+            id=2,
+            approval=approval,
+            start_at=timezone.localdate() - relativedelta(days=30),
+            end_at=timezone.localdate() - relativedelta(days=20),
+            siae__name="Une SIAE",
+        )
+
+        client.force_login(prescriber)
+        with assertSnapshotQueries(snapshot(name="Approval detail view with suspensions as FT prescriber")):
+            response = client.get(url)
+
+        for suspension, assert_func in [(current_suspension, assertContains), (older_suspension, assertNotContains)]:
+            assert_func(response, reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk}))
+            assert_func(
+                response, reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension.pk})
+            )
+
+        suspensions_section = parse_response_to_soup(
+            response,
+            selector=".s-section .row:nth-of-type(2) .c-box",
+            replace_in_attr=[
+                ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
+            ],
+        )
+        assert pretty_indented(suspensions_section) == snapshot(
+            name="Approval suspensions list as FT prescriber with modification buttons"
+        )
+
     @freeze_time("2024-09-25", tick=True)  # tick is important for job applications' created_by
     def test_approval_detail_with_prolongations(self, client, snapshot):
         job_application = JobApplicationFactory(
@@ -277,6 +342,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__kind=random.choice(AUTHORIZED_NON_FT_PRESCRIBER_KINDS),
             with_job_seeker_assignment=True,
         )
         approval = job_application.approval
@@ -466,6 +532,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__kind=random.choice(AUTHORIZED_NON_FT_PRESCRIBER_KINDS),
             with_job_seeker_assignment=True,
         )
         approval = job_application.approval
