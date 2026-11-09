@@ -49,9 +49,13 @@ def lock_timeout(timeout):
     return set_runtime_parameter("lock_timeout", timeout)
 
 
+def get_lock_id(name: str) -> int:
+    return binascii.crc32(name.encode())
+
+
 @contextlib.contextmanager
-def pg_advisory_lock(name):
-    lock_id = binascii.crc32(name.encode())
+def pg_advisory_lock(name: str):
+    lock_id = get_lock_id(name)
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
         cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
