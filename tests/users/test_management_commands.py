@@ -235,6 +235,13 @@ def test_shorten_active_sessions():
     ]
 
 
+CONSENT_CATCH_UP_ERROR = (
+    "Some email tracking consents may not have reached Brevo. Once the issue is fixed, run "
+    "`send_users_to_brevo --wet-run --email-tracking-consent-days N`, with N covering every day since "
+    "the last successful run."
+)
+
+
 class TestCommandSendUsersToBrevo:
     @pytest.fixture(autouse=True)
     def setup(self, settings, respx_mock, mocker):
@@ -975,6 +982,25 @@ class TestCommandSendUsersToBrevo:
 
         [update] = self.imports(update_existing_contacts=True)
         assert [contact["email"] for contact in update["jsonBody"]] == [caught_up.email]
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_request_error(self, caplog, mocker):
+        JobSeekerFactory(with_verified_email=True)
+        self.import_mock.mock(side_effect=httpx.ConnectTimeout("Connection timed out"))
+        mocker.patch("tenacity.nap.time.sleep")
+
+        with pytest.raises(httpx.ConnectTimeout):
+            call_command("send_users_to_brevo", wet_run=True)
+
+        assert CONSENT_CATCH_UP_ERROR in caplog.messages
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_email_tracking_consents_accepted(self, caplog):
+        JobSeekerFactory(with_verified_email=True)
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert CONSENT_CATCH_UP_ERROR not in caplog.messages
 
 
 @freeze_time("2022-09-13")

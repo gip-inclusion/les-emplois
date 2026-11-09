@@ -103,6 +103,8 @@ class BrevoClient:
                 e.response.status_code,
                 e.response.text,
             )
+            return False
+        return True
 
     def import_users(self, users, list_id, serializer, *, update_existing_contacts=False):
         """Import users as Brevo contacts of a list, in batches.
@@ -118,9 +120,14 @@ class BrevoClient:
             update_existing_contacts: by default, imports are meant for new contacts and leave existing ones
                 untouched. When True, existing contacts are also updated with the serialized attributes and added
                 to the list, and unknown ones are still created.
+
+        Returns:
+            Whether Brevo accepted every batch.
         """
+        accepted = True
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
-            self._import_contacts(batch, list_id, serializer, update_existing_contacts)
+            accepted &= self._import_contacts(batch, list_id, serializer, update_existing_contacts)
+        return accepted
 
     def delete_contact(self, email):
         # Brevo rejects HTTP DELETE calls for addresses ending by

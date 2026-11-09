@@ -280,6 +280,11 @@
     ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
+      40,
+      'Some email tracking consents may not have reached Brevo. Once the issue is fixed, run `send_users_to_brevo --wet-run --email-tracking-consent-days N`, with N covering every day since the last successful run.',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
       20,
       'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
     ),
