@@ -108,6 +108,9 @@ def test_management_command_default_run(caplog, faker):
     )
     employee_record.refresh_from_db()
     assert employee_record.status == Status.MODIFICATION_REJECTED
+    assert employee_record.asp_processing_code == rejected_notification_last.asp_processing_code
+    assert employee_record.asp_processing_label == rejected_notification_last.asp_processing_label
+    assert employee_record.archived_json == rejected_notification_last.archived_json
     logs = list(employee_record.logs.all())
     assert all(log.recovered for log in logs)
     assert len(logs) == 9
