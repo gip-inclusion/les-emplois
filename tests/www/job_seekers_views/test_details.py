@@ -1333,6 +1333,14 @@ class TestContracts:
             end_date="2028-06-30",
             company__kind=CompanyKind.EI,
         )  # approval inside contract dates
+        ContractFactory(
+            company__name="Crini’Hair",
+            job_seeker=job_seeker,
+            start_date="2024-10-01",
+            end_date=None,
+            company__kind=CompanyKind.EI,
+            company__convention__is_active=False,
+        )  # approval inside contract dates, inactive company
 
         # An employer needs an ongoing contract with the job seeker to view their contracts
         if (company := user.company_set.first()) and has_ongoing_contract:

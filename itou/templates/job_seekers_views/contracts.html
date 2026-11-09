@@ -68,6 +68,15 @@
                                     </span>
                                 </div>
                             </div>
+                            {% if contract.has_ended and not contract.end_date %}
+                                <div class="mt-3">
+                                    {% component_info c_info__summary=c_info__summary %}
+                                        {% fragment as c_info__summary %}
+                                            La date de fin du contrat n’est pas disponible car l’entreprise est inactive.
+                                        {% endfragment %}
+                                    {% endcomponent_info %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% empty %}
