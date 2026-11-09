@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
-from itou.companies.models import Company, JobDescription, SiaeACIConvergencePHC
+from itou.companies.models import Company, Contract, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
@@ -20,6 +20,7 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
+    ContractFactory,
     JobDescriptionFactory,
     ProSupportReportFactory,
     SiaeConventionFactory,
@@ -722,6 +723,23 @@ class TestSiaeACIConvergencePHCModel:
         instance.siret = instance.siret[:-1]
         with pytest.raises(IntegrityError, match=r".*aci_cvg_phc_siret.*"):
             instance.save()
+
+
+class TestContractQuerySet:
+    def test_ongoing(self):
+        # These contracts are no longer running according to ASP data
+        ContractFactory(end_date=None, company__convention__is_active=False)
+        ContractFactory(end_date=timezone.localdate() - timedelta(days=1))
+
+        contract_end_date_in_future = ContractFactory(end_date=timezone.localdate() + timedelta(days=1))
+        contract_end_date_today = ContractFactory(end_date=timezone.localdate())
+        contract_no_end_date_active_siae = ContractFactory(end_date=None)
+
+        assertQuerySetEqual(
+            Contract.objects.ongoing(),
+            [contract_end_date_in_future, contract_end_date_today, contract_no_end_date_active_siae],
+            ordered=False,
+        )
 
 
 class TestProSupportReport:
