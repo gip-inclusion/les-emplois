@@ -200,14 +200,15 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 
     class Meta:
         verbose_name = "organisation"
-        # This DB constraint works with null fields, but not with blank ones
-        # If both org1 and org2 are created:
-        # OK  => org1: (kind="ML", siret=None) + org2: (kind="ML", siret=None)
-        # OK  => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret=None)
-        # OK =>  org1: (kind="ML", siret="12345678900000") + org2; (kind="PLIE", siret="12345678900000")
-        # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
-        unique_together = ("siret", "kind")
         constraints = [
+            models.UniqueConstraint(
+                name="unique_siret_per_kind",
+                fields=["siret", "kind"],
+                condition=~models.Q(kind=PrescriberOrganizationKind.OTHER),
+                violation_error_message=(
+                    'Seules les organisations de type "Autre" peuvent avoir des doublons avec un SIRET identique.'
+                ),
+            ),
             models.CheckConstraint(
                 name="validated_odc_is_brsa",
                 condition=~models.Q(
