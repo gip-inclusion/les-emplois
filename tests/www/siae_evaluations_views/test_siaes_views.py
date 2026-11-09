@@ -1494,6 +1494,7 @@ class TestSiaeEvaluatedSiaeDetailView:
         evaluation_campaign.save(update_fields=["ended_at"])
         response = client.get(url)
         assert response.status_code == 200
+        assert response.context["back_url"] is None
 
     def test_with_certified_criteria(self, client):
         membership = CompanyMembershipFactory(company__evaluable_kind=True)

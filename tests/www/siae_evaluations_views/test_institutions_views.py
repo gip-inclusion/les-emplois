@@ -5,7 +5,6 @@ import html5lib
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from django.utils.html import escape
@@ -253,11 +252,10 @@ class TestInstitutionEvaluatedSiaeListView:
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
         assertContains(
             response,
             f"""
-            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -348,12 +346,11 @@ class TestInstitutionEvaluatedSiaeListView:
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
 
         assertContains(
             response,
             f"""
-            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -396,11 +393,9 @@ class TestInstitutionEvaluatedSiaeListView:
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        detail_url_with_back_url = f"{detail_url}?back_url={url}"
         assertContains(
             response,
-            f'<a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">'
-            "Voir le résultat</a>",
+            f'<a href="{detail_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Voir le résultat</a>',
             html=True,
             count=1,
         )
@@ -443,12 +438,11 @@ class TestInstitutionEvaluatedSiaeListView:
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
 
         assertContains(
             response,
             f"""
-            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -484,14 +478,13 @@ class TestInstitutionEvaluatedSiaeListView:
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
         assertContains(
             response,
             f"""
             <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{sanction_url}">
                 Voir la décision de sanction
             </a>
-            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Voir le résultat
             </a>
             """,
@@ -761,6 +754,30 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluation_campaign.save(update_fields=["ended_at"])
         response = client.get(url)
         assertNotContains(response, self.submit_text)
+
+    def test_back_url(self, client):
+        client.force_login(self.user)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now(),
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        url = reverse(
+            "siae_evaluations_views:evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        list_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        )
+
+        # The back link always leads to the parent list (i.e. when coming back from the job application details).
+        response = client.get(url)
+        assert response.context["back_url"] == list_url
+
+        # So a `back_url` parameter is ignored.
+        response = client.get(add_url_params(url, {"back_url": reverse("dashboard:index")}))
+        assert response.context["back_url"] == list_url
 
     def test_recently_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -1043,7 +1060,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
 
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1080,7 +1097,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
+        assertContains(response, back_url)
         assertContains(response, uploaded_status)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
@@ -1357,7 +1374,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
 
         # EvaluatedAdministrativeCriteria not yet submitted
         not_transmitted_status = "Justificatifs non transmis"
-        response = client.get(add_url_params(url, {"back_url": back_url}))
+        response = client.get(url)
         assertContains(response, evaluated_siae)
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
@@ -1384,7 +1401,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = client.get(url)
-        assertNotContains(response, back_url)
+        assertContains(response, back_url)
         assertContains(
             response,
             f"""
