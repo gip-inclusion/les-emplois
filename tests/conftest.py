@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
+import httpx
 import pandas  # noqa F401
 import paramiko
 import patchy
@@ -369,6 +370,18 @@ def temporary_bucket(request, temporary_bucket_setup, temporary_bucket_settings)
     else:
         if marker:
             pytest.fail("The bucket was not empty like expected")
+
+
+@pytest.fixture(name="storage_http_client")
+def storage_http_client_fixture():
+    """HTTP client for unauthenticated requests to the S3 storage.
+
+    In CI, the storage is a remote Cellar bucket whose response time sometimes
+    exceeds the 5 seconds default timeout of httpx, unlike boto3 calls which
+    are retried automatically.
+    """
+    with httpx.Client(timeout=30, transport=httpx.HTTPTransport(retries=2)) as client:
+        yield client
 
 
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")

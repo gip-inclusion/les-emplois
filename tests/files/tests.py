@@ -4,7 +4,6 @@ import os
 import re
 import uuid
 
-import httpx
 import pytest
 from botocore.config import Config
 from django.conf import settings
@@ -37,14 +36,14 @@ def test_urls():
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_bucket_policy_for_anonymous_user():
+def test_bucket_policy_for_anonymous_user(storage_http_client):
     base_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}"
-    response = httpx.head(f"{base_url}/test_file.pdf")
+    response = storage_http_client.head(f"{base_url}/test_file.pdf")
     assert response.status_code == 403
 
     with io.BytesIO() as content:
         default_storage.save("test_file.pdf", content)
-    response = httpx.head(f"{base_url}/test_file.pdf")
+    response = storage_http_client.head(f"{base_url}/test_file.pdf")
     assert response.status_code == 403
 
     # Resumes are no longer publicly readable, they must be served through
@@ -52,15 +51,15 @@ def test_bucket_policy_for_anonymous_user():
     filename = f"{uuid.uuid4()}.pdf"
     root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}"
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume/{filename}")
-    response = httpx.head(f"{root_url}/resume/{filename}")
+    response = storage_http_client.head(f"{root_url}/resume/{filename}")
     assert response.status_code == 403
 
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"news-images/{filename}")
-    response = httpx.head(f"{root_url}/news-images/{filename}")
+    response = storage_http_client.head(f"{root_url}/news-images/{filename}")
     assert response.status_code == 200
 
     with io.BytesIO() as content:
-        response = httpx.put(base_url, content=content)
+        response = storage_http_client.put(base_url, content=content)
     assert response.status_code == 403
 
 

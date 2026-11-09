@@ -1,6 +1,5 @@
 import datetime
 
-import httpx
 import pytest
 from django.core.files.storage import default_storage
 from django.templatetags.static import static
@@ -423,7 +422,7 @@ class TestViewProof:
         assert response.status_code == 404
 
     @pytest.mark.usefixtures("temporary_bucket")
-    def test_access_siae(self, client, pdf_file):
+    def test_access_siae(self, client, pdf_file, storage_http_client):
         job_app = EvaluatedJobApplicationFactory()
         key = default_storage.save("evaluations/test.pdf", pdf_file)
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
@@ -437,7 +436,7 @@ class TestViewProof:
             response = client.get(url)
             assertRedirects(response, crit.proof.url(), fetch_redirect_response=False)
         pdf_file.seek(0)
-        assert httpx.get(response.url).content == pdf_file.read()
+        assert storage_http_client.get(response.url).content == pdf_file.read()
 
     def test_access_other_siae(self, client):
         institution = InstitutionFactory(name="DDETS 01", department="01")
@@ -451,7 +450,7 @@ class TestViewProof:
         assert response.status_code == 404
 
     @pytest.mark.usefixtures("temporary_bucket")
-    def test_access_institution(self, client, pdf_file):
+    def test_access_institution(self, client, pdf_file, storage_http_client):
         membership = InstitutionMembershipFactory()
         job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__institution=membership.institution
@@ -468,7 +467,7 @@ class TestViewProof:
             response = client.get(url)
             assertRedirects(response, crit.proof.url(), fetch_redirect_response=False)
         pdf_file.seek(0)
-        assert httpx.get(response.url).content == pdf_file.read()
+        assert storage_http_client.get(response.url).content == pdf_file.read()
 
     def test_access_siae_member_of_a_prescriber_organization(self, client):
         # request.organizations contains every organization of the user, whatever its kind.
