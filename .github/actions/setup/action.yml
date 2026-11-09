@@ -28,21 +28,28 @@ runs:
       # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
       run: |
         . /etc/os-release
-        echo "key=apt-$VERSION_ID-$RUNNER_ARCH-gdal-bin-$(date +%G-%V)" >> "$GITHUB_OUTPUT"
+        prefix="apt-$VERSION_ID-$RUNNER_ARCH-gdal-bin-"
+        echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+        echo "key=$prefix$(date +%G-%V)" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: 💾 Restore spatial libraries cache
       id: apt-cache
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # https://github.com/actions/cache v6.1.0
       with:
         key: ${{ steps.apt-cache-key.outputs.key }}
+        # Scheduled workflows can stop for weeks: an older cache still avoids most of the download
+        restore-keys: ${{ steps.apt-cache-key.outputs.prefix }}
         path: ~/apt-cache/
     - name: 🌍 Download spatial libraries
       if: steps.apt-cache.outputs.cache-hit != 'true'
       # Django loads GDAL and GEOS with ctypes: no need for headers or compilers
+      # If an older cache was restored, its .deb files are copied first so that apt only downloads the missing ones.
+      # `find` rather than a glob: when no cache was restored, an unmatched glob is passed to `cp` as a literal and makes it fail
       run: |
+        mkdir -p ~/apt-cache
+        sudo find ~/apt-cache -name '*.deb' -exec cp -t /var/cache/apt/archives/ {} +
         sudo apt-get update
         sudo apt-get install --no-install-recommends --download-only gdal-bin
-        mkdir -p ~/apt-cache
         cp /var/cache/apt/archives/*.deb ~/apt-cache/
       shell: bash
     - name: 💾 Save spatial libraries cache
