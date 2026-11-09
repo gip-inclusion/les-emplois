@@ -31,13 +31,4 @@ class Migration(migrations.Migration):
             name="hashed_session_key",
             field=models.CharField(max_length=64, verbose_name="hash de la clé de session"),
         ),
-        migrations.SeparateDatabaseAndState(
-            database_operations=[],
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="mobilizationevent",
-                    name="session_key",
-                ),
-            ],
-        ),
     ]

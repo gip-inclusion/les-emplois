@@ -11,9 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            "ALTER TABLE insertion_mobilizationevent DROP COLUMN IF EXISTS session_key;",
-            migrations.RunSQL.noop,
-            elidable=True,
+        migrations.RemoveField(
+            model_name="mobilizationevent",
+            name="session_key",
         ),
     ]
