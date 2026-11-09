@@ -22,6 +22,20 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
                         <h2 class="h3">Gestion des notifications</h2>
+                        {% if request.current_organization %}
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Préférences pour : {{ request.current_organization.display_name }}
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    {% if request.organizations|length > 1 %}
+                                        Vous êtes membre de plusieurs organisations : changez d’organisation dans le menu pour régler leurs préférences.
+                                    {% else %}
+                                        Vos réglages ne s’appliquent qu’à cette {{ request.from_employer|yesno:"structure,organisation" }}.
+                                    {% endif %}
+                                {% endfragment %}
+                            {% endcomponent_info %}
+                        {% endif %}
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <div class="form-group">
