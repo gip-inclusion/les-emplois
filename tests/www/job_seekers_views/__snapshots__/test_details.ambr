@@ -13503,7 +13503,7 @@
       }),
       dict({
         'origin': list([
-          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'ProSupportReportQuerySet.first[<site-packages>/django/db/models/query.py]',
           'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -15085,7 +15085,7 @@
       }),
       dict({
         'origin': list([
-          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'ProSupportReportQuerySet.first[<site-packages>/django/db/models/query.py]',
           'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -16561,7 +16561,7 @@
       }),
       dict({
         'origin': list([
-          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'ProSupportReportQuerySet.first[<site-packages>/django/db/models/query.py]',
           'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),

@@ -1296,6 +1296,13 @@ class SiaeACIConvergencePHC(models.Model):
         return self.siret
 
 
+class ProSupportReportQuerySet(models.QuerySet):
+    def covering_contract_end_date(self):
+        # Renewals under the same parent contract are merged into one contract with a later end date,
+        # which calls for a new report. An end date brought forward does not: the report still covers the contract.
+        return self.filter(contract_end_date__gte=F("contract__end_date"))
+
+
 class ProSupportReport(models.Model):
     """
     The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
@@ -1362,6 +1369,8 @@ class ProSupportReport(models.Model):
         blank=True,
         default="",
     )
+
+    objects = ProSupportReportQuerySet.as_manager()
 
     class Meta:
         verbose_name = "bilan d’accompagnement"
