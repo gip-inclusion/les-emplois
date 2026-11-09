@@ -284,7 +284,10 @@ class Command(BaseCommand):
         service.nombre_semaines = data.get("nombre_semaines") or None
 
         service.contact_full_name = data["contact_nom_prenom"] or ""
-        service.contact_email = data["courriel"] or ""
+
+        extra = data.get("extra", {})
+        service.contact_email = data["courriel"] or extra.get("contact_email") or ""
+
         self._void_if_max_len(service, "contact_email")
         service.contact_phone = data["telephone"] or ""
         self._void_if_max_len(service, "contact_phone")
@@ -292,7 +295,7 @@ class Command(BaseCommand):
         self._fill_geolocation_from_api_data(service, data)
 
         # Producer-specific blob; see Service.extra for the expected DORA shape.
-        service.extra = data.get("extra")
+        service.extra = extra
 
         service.updated_on = data["date_maj"]
 

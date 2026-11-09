@@ -62,7 +62,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").extra == {
         "funding_labels": ["France Travail", "Conseil départemental"],
     }
-    assert Service.objects.get(uid="emplois-de-linclusion--null").extra is None
+    assert Service.objects.get(uid="emplois-de-linclusion--null").extra == {}
 
     assert (
         Structure.objects.get(uid="dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd").opening_hours
@@ -85,6 +85,8 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         Service.objects.get(uid="mission-locale--with-mobilization-link").lien_mobilisation
         == "https://example.com/mobilisation"
     )
+    assert Service.objects.get(uid="mission-locale--with-mobilization-link").contact_email == "extra@email.com"
+
     assertQuerySetEqual(
         Service.objects.get(uid="mission-locale--with-mobilization-link").mobilizations.all(),
         ["utiliser-lien-mobilisation"],
