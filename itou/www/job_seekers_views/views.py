@@ -247,12 +247,12 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             pro_support_reports = self.object.pro_support_reports.select_related("company").order_by("-created_at")
             if self.request.from_employer:
                 pro_support_reports = pro_support_reports.filter(company=self.request.current_organization)
+            elif contract_end_date:
+                # The job seeker is at the end of their last contract: a report on a previous contract,
+                # or on a previous end date of this contract, would hide the request for a new report.
+                pro_support_reports = pro_support_reports.filter(contract=last_contract).covering_contract_end_date()
             pro_support_report = pro_support_reports.first()
-            if pro_support_report and (
-                not can_view_pro_support_report(self.request, pro_support_report)
-                # A report on a previous contract does not cover the contract ending soon.
-                or (contract_end_date and pro_support_report.contract_end_date != contract_end_date)
-            ):
+            if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
                 pro_support_report = None
 
         return context | {
@@ -587,7 +587,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     last_contract = (
         job_seeker.contracts.filter(company=request.current_organization).order_by("-start_date", "-pk").first()
     )
-    if ProSupportReport.objects.filter(contract=last_contract).exists():
+    if last_contract.pro_support_reports.covering_contract_end_date().exists():
         raise Http404
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 

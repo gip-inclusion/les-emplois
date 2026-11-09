@@ -175,7 +175,9 @@ class UserQuerySet(models.QuerySet):
     def with_last_contract_has_pro_support_report(self, siae):
         return self.annotate(
             last_contract_has_pro_support_report=Exists(
-                ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
+                ProSupportReport.objects.filter(
+                    contract=self.last_contract_pk_lookup(siae=siae)
+                ).covering_contract_end_date()
             )
         )
 
