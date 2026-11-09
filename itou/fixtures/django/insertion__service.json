@@ -72,7 +72,8 @@
       "extra": {
         "funding_labels": [
           "Conseil départemental de la Vienne"
-        ]
+        ],
+        "is_contact_public": true
       },
       "fee": 2,
       "fee_details": "Évaluation initiale : 450€ -->4h",
@@ -135,7 +136,8 @@
         "funding_labels": [
           "Conseil départemental de la Drôme",
           "Région Réunion"
-        ]
+        ],
+        "is_contact_public": false
       },
       "fee": 1,
       "fee_details": "",
@@ -320,7 +322,8 @@
         "funding_labels": [
           "Conseil départemental de la Savoie",
           "Conseil Départemental de l'Essonne"
-        ]
+        ],
+        "is_contact_public": true
       },
       "fee": 1,
       "fee_details": "Le microcrédit mobilité comporte un taux d'intérêt de 9,75%",
@@ -561,7 +564,8 @@
       "extra": {
         "funding_labels": [
           "Région Réunion"
-        ]
+        ],
+        "is_contact_public": false
       },
       "fee": 1,
       "fee_details": "",
@@ -689,7 +693,8 @@
       "extra": {
         "funding_labels": [
           "Conseil départemental de la Savoie"
-        ]
+        ],
+        "is_contact_public": true
       },
       "fee": 1,
       "fee_details": "",
@@ -1267,7 +1272,8 @@
           "France Travail",
           "Conseil départemental"
         ],
-        "online_form": "https://example.com/formulaire-inscription-cej"
+        "online_form": "https://example.com/formulaire-inscription-cej",
+        "is_contact_public": true
       },
       "fee": 1,
       "fee_details": "Service entièrement pris en charge, sans avance de frais.",
