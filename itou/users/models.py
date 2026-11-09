@@ -333,6 +333,8 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         "address_line_2",
         "post_code",
         "city",
+        "email_tracking_consent",
+        "email_tracking_consent_updated_at",
     ]
 
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
@@ -391,6 +393,19 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     terms_accepted_at = models.DateTimeField(
         editable=False,
         verbose_name="date de dernière acceptation des CGU",
+        null=True,
+        blank=True,
+    )
+
+    email_tracking_consent = models.BooleanField(
+        verbose_name="consentement au suivi de l’ouverture des e-mails",
+        db_default=False,
+        default=False,
+    )
+    email_tracking_consent_updated_at = models.DateTimeField(
+        editable=False,
+        verbose_name="date du choix de suivi de l’ouverture des e-mails",
+        help_text="Vide si l’utilisateur n’a jamais été interrogé",
         null=True,
         blank=True,
     )
@@ -834,6 +849,28 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         if self.terms_accepted_at is None:
             return True
         return self.terms_accepted_at < get_latest_terms_datetime()
+
+    @property
+    def can_answer_email_tracking_consent(self):
+        return self.is_job_seeker or self.is_professional
+
+    @property
+    def must_answer_email_tracking_consent(self):
+        return self.can_answer_email_tracking_consent and self.email_tracking_consent_updated_at is None
+
+    def set_email_tracking_consent(self, consent):
+        """Record the user’s choice about email open tracking (tracking pixel), with its date as a proof.
+
+        Repeating the recorded choice is not a new answer: its date still proves when it was made.
+
+        Returns:
+            Whether the choice was recorded.
+        """
+        if self.email_tracking_consent_updated_at is not None and self.email_tracking_consent == consent:
+            return False
+        self.email_tracking_consent = consent
+        self.email_tracking_consent_updated_at = timezone.now()
+        return True
 
     @cached_property
     def last_assignment(self):

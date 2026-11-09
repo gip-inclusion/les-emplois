@@ -49,6 +49,16 @@ def check_request(test_func, err_msg=""):
     return decorator
 
 
+def skip_compliance_checks(view_func):
+    """Decorator marking a view as exempt from the compliance checks (see itou.www.middleware.ComplianceMiddleware).
+
+    Works like Django's @login_not_required: sets an attribute on the view
+    function that the ComplianceMiddleware subclasses inspect.
+    """
+    view_func._skip_compliance_checks = True
+    return view_func
+
+
 class LoginNotRequiredMixin:
     @classmethod
     def as_view(cls, *args, **kwargs):
