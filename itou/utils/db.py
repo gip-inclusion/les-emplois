@@ -1,5 +1,6 @@
 import binascii
 import contextlib
+import inspect
 import logging
 
 import psycopg.errors
@@ -51,6 +52,39 @@ def lock_timeout(timeout):
 
 def get_lock_id(name: str) -> int:
     return binascii.crc32(name.encode())
+
+
+def check_connection_is_not_reused():
+    # When CONN_MAX_AGE is not zero, the connection is reused. So if
+    # the caller does not release a session-level lock, it will be
+    # held and will leak to other users of the same session, for
+    # example other HTTP requests. Let's not provide a tool that could
+    # shoot ourselves in the foot.
+    if connection.settings_dict.get("CONN_MAX_AGE") != 0:
+        caller = inspect.currentframe().f_back.f_code.co_name
+        raise ValueError(f"Cannot use `{caller}` with non-zero CONN_MAX_AGE")
+
+
+class CannotAcquireLock(Exception):
+    def __init__(self, lock_name, lock_id):
+        self.lock_name = lock_name
+        self.lock_id = lock_id
+        super().__init__()
+
+    def __str__(self):
+        return f"Cannot acquire lock for {self.lock_name} (lock id {self.lock_id})"
+
+
+def pg_try_advisory_lock(name: str):
+    check_connection_is_not_reused()
+    lock_id = get_lock_id(name)
+    logger.info("Trying to acquire advisory lock for %s (lock id %s).", name, lock_id)
+    with connection.cursor() as cursor:
+        result = cursor.execute("SELECT pg_try_advisory_lock(%s)", (lock_id,))
+        row = result.fetchone()
+        if not row[0]:
+            raise CannotAcquireLock(name, lock_id)
+    logger.info("Acquired advisory lock for %s (lock id %s).", name, lock_id)
 
 
 @contextlib.contextmanager
