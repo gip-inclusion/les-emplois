@@ -236,3 +236,133 @@ RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY_WITHOUT_LIEU = {
     **RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY,
     "data": {**RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY["data"], "lieu": None, "address": ""},
 }
+
+RDV_INSERTION_USER_SEARCH_BODY = {
+    "user": {
+        "id": 1,
+        "affiliation_number": "1234567",
+        "role": "demandeur",
+        "created_at": "2026-09-01T10:00:00.000+02:00",
+        "department_internal_id": "8765",
+        "first_name": "Camille",
+        "last_name": "Martin",
+        "title": "madame",
+        "address": "12 rue des Lilas 26000 Valence",
+        "phone_number": "+33612345678",
+        "email": "camille.martin@example.com",
+        "birth_date": "1985-03-12",
+        "rights_opening_date": None,
+        "birth_name": None,
+        "rdv_solidarites_user_id": 9876,
+        "nir": "285032612345653",
+        "france_travail_id": None,
+        "referents": [
+            {
+                "id": 2,
+                "email": "claire.durand@drome.fr",
+                "first_name": "Claire",
+                "last_name": "Durand",
+                "rdv_solidarites_agent_id": 42,
+            }
+        ],
+        "tags": [{"id": 1, "value": "Prioritaire"}],
+        "follow_ups": [
+            {
+                "id": 1,
+                "created_at": "2026-09-01T10:00:00.000+02:00",
+                "status": "rdv_seen",
+                "human_status": "RDV honoré",
+                "closed_at": None,
+                "motif_category": {
+                    "id": 1,
+                    "short_name": "rsa_orientation",
+                    "name": "RSA orientation",
+                    "motif_category_type": "rsa_orientation",
+                },
+                "participations": [
+                    {
+                        "id": 1,
+                        "status": "seen",
+                        "created_at": "2026-09-01T10:00:00.000+02:00",
+                        "starts_at": "2026-09-15T14:00:00.000+02:00",
+                        "created_by": "agent",
+                        "rdv": {
+                            "id": 1,
+                            "duration_in_min": 30,
+                            "cancelled_at": None,
+                            "address": "5 avenue de la Gare 26000 Valence",
+                            "uuid": "2a1f0d7e-6b3c-4c8e-9f11-3d2e5b7a9c10",
+                            "created_by": "agent",
+                            "status": "seen",
+                            "users_count": 1,
+                            "max_participants_count": None,
+                            "rdv_solidarites_rdv_id": 5555,
+                            "starts_at": "2026-09-15T14:00:00.000+02:00",
+                            "agents": [
+                                {
+                                    "id": 2,
+                                    "email": "claire.durand@drome.fr",
+                                    "first_name": "Claire",
+                                    "last_name": "Durand",
+                                    "rdv_solidarites_agent_id": 42,
+                                }
+                            ],
+                            "lieu": {
+                                "rdv_solidarites_lieu_id": 77,
+                                "name": "Maison départementale de Valence",
+                                "address": "5 avenue de la Gare 26000 Valence",
+                                "phone_number": None,
+                            },
+                            "motif": {
+                                "rdv_solidarites_motif_id": 55,
+                                "name": "Rendez-vous d'orientation",
+                                "collectif": False,
+                                "location_type": "public_office",
+                                "follow_up": False,
+                                "motif_category": {
+                                    "id": 1,
+                                    "short_name": "rsa_orientation",
+                                    "name": "RSA orientation",
+                                    "motif_category_type": "rsa_orientation",
+                                },
+                            },
+                            "organisation": {
+                                "id": 1,
+                                "name": "Plateforme Insertion Valence",
+                                "email": "insertion@drome.fr",
+                                "phone_number": "0475000000",
+                                "department_number": "26",
+                                "rdv_solidarites_organisation_id": 1234,
+                                "department_id": 1,
+                            },
+                        },
+                    }
+                ],
+                "invitations": [
+                    {
+                        "id": 1,
+                        "format": "sms",
+                        "clicked": False,
+                        "rdv_with_referents": False,
+                        "created_at": "2026-09-01T10:00:00.000+02:00",
+                        "delivery_status": None,
+                        "delivered_at": None,
+                        "expires_at": "2026-09-08T10:00:00.000+02:00",
+                    }
+                ],
+            }
+        ],
+        "organisations": [
+            {
+                "id": 1,
+                "name": "Plateforme Insertion Valence",
+                "email": "insertion@drome.fr",
+                "phone_number": "0475000000",
+                "department_number": "26",
+                "rdv_solidarites_organisation_id": 1234,
+                "department_id": 1,
+                "user_archived_at": None,
+            }
+        ],
+    }
+}

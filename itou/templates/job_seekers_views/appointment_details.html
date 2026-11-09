@@ -1,0 +1,115 @@
+{% extends "layout/base.html" %}
+{% load badges %}
+{% load components %}
+
+{% block title %}
+    Rendez-vous du {{ appointment.start_at|date:"d/m/Y" }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ appointment.reason }}
+                {% participation_status_badge appointment.status appointment.start_at extra_classes="badge-base" %}
+            </h1>
+            <p>{{ appointment.start_at|date:"d/m/Y · G\hi" }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Informations</h2>
+                        <ul class="list-data">
+                            <li>
+                                <small>Usager</small>
+                                <strong>{{ job_seeker.get_inverted_full_name }}</strong>
+                            </li>
+                            <li>
+                                <small>Thématique</small>
+                                <strong>{{ appointment.theme }}</strong>
+                            </li>
+                            <li>
+                                <small>Motif</small>
+                                <strong>{{ appointment.reason }}</strong>
+                            </li>
+                            <li>
+                                <small>Modalité</small>
+                                {% if appointment.location_type %}
+                                    <strong>{{ appointment.location_type.label }}</strong>
+                                {% else %}
+                                    <i class="text-disabled">Non renseignée</i>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <small>Pris par</small>
+                                {% if appointment.created_by %}
+                                    <strong>{{ appointment.created_by.label }}</strong>
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <small>Lieu</small>
+                                {% if appointment.location_name or appointment.address %}
+                                    <strong>
+                                        {% if appointment.location_name %}
+                                            <span class="d-block">{{ appointment.location_name }}</span>
+                                        {% endif %}
+                                        {% if appointment.address %}
+                                            <span class="d-block">{{ appointment.address }}</span>
+                                        {% endif %}
+                                    </strong>
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                    {% for agent in appointment.agents %}
+                        <div class="c-box c-box--organization mb-3 mb-md-4">
+                            <div class="c-box--organization__summary">
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ appointment.organization_name }}</span>
+                                    <span class="d-block h3">{{ agent.get_inverted_full_name }}</span>
+                                </div>
+                            </div>
+                            <div class="c-box--organization__detail">
+                                <hr class="my-4">
+                                <ul class="c-box--organization__list-contact">
+                                    <li>
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <span class="text-break">{{ agent.email }}</span>
+                                        {% include "includes/copy_to_clipboard.html" with content=agent.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="c-box c-box--organization mb-3 mb-md-4">
+                            <div class="c-box--organization__summary">
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ appointment.organization_name }}</span>
+                                    <i class="d-block text-disabled h3 fw-normal">Non renseigné</i>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

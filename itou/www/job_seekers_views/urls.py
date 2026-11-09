@@ -32,6 +32,16 @@ urlpatterns = [
         name="orientations",
     ),
     path(
+        "appointments/<uuid:public_id>",
+        views.AppointmentsTabView.as_view(),
+        name="appointments",
+    ),
+    path(
+        "appointments/<uuid:public_id>/<int:rdv_insertion_id>",
+        views.appointment_details,
+        name="appointment_details",
+    ),
+    path(
         "<uuid:public_id>/assignments/create",
         views.create_or_edit_assignment,
         name="create_assignment",
