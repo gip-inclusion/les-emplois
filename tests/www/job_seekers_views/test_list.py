@@ -1533,16 +1533,25 @@ def test_create_pro_support_report_action_in_list_for_employer(client):
     contract_ends_soon = create_contract(today + datetime.timedelta(days=20))
     contract_ended = create_contract(today - datetime.timedelta(days=20), approval_end_at=today)
     ProSupportReportFactory(contract=create_contract(today + datetime.timedelta(days=20)))
+    contract_renewed_since_report = create_contract(today + datetime.timedelta(days=20))
+    ProSupportReportFactory(
+        contract=contract_renewed_since_report, contract_end_date=today + datetime.timedelta(days=10)
+    )
+    # The contract end date was brought forward since the report.
+    ProSupportReportFactory(
+        contract=create_contract(today + datetime.timedelta(days=20)),
+        contract_end_date=today + datetime.timedelta(days=25),
+    )
     create_contract(today + datetime.timedelta(days=31))
     create_contract(today - datetime.timedelta(days=20), approval_end_at=today - datetime.timedelta(days=1))
 
     response = client.get(reverse("job_seekers_views:list_organization"))
-    for contract in (contract_ends_soon, contract_ended):
+    for contract in (contract_ends_soon, contract_ended, contract_renewed_since_report):
         create_url = reverse(
             "job_seekers_views:create_pro_support_report", kwargs={"public_id": contract.job_seeker.public_id}
         )
         assertContains(response, f"{create_url}?back_url=", count=1)
-    assertContains(response, "Remplir le bilan</a>", count=2)
+    assertContains(response, "Remplir le bilan</a>", count=3)
 
 
 @freeze_time("2026-01-15")
