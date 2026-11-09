@@ -1,0 +1,9 @@
+{% load components %}
+{% component_alert title="Attention : un contrat est actuellement en cours pour cette personne" content=content variant="warning" %}
+    {% fragment as content %}
+        <p class="mb-0">
+            D’après les données de l’extranet IAE 2.0 de l’ASP, <b>un contrat est en cours pour cette personne</b>.
+            Nous vous invitons à vérifier attentivement sa situation avant de suspendre son PASS IAE.
+        </p>
+    {% endfragment %}
+{% endcomponent_alert %}

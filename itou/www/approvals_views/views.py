@@ -669,6 +669,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     preview = False
 
     form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
+    has_ongoing_contract = Contract.objects.ongoing().filter(job_seeker=approval.user).exists()
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
@@ -696,6 +697,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         "back_url": back_url,
         "form": form,
         "preview": preview,
+        "has_ongoing_contract": has_ongoing_contract,
     }
     return render(request, template_name, context)
 
@@ -835,6 +837,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         instance=suspension,
         data=request.POST or None,
     )
+    has_ongoing_contract = Contract.objects.ongoing().filter(job_seeker=suspension.approval.user).exists()
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
@@ -855,6 +858,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         "suspension": suspension,
         "back_url": back_url,
         "form": form,
+        "has_ongoing_contract": has_ongoing_contract,
     }
     return render(request, template_name, context)
 

@@ -2182,38 +2182,6 @@
       }),
       dict({
         'origin': list([
-          'SuspensionForm.__init__[www/approvals_views/forms.py]',
-          'suspension_update[www/approvals_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_contract"
-          WHERE (("companies_contract"."end_date" IS NULL
-                  OR "companies_contract"."end_date" >= %s)
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s, %s))
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
-                                OR EXISTS
-                                  (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
-                                   LIMIT 1))
-                           AND V0."id" = ("companies_contract"."company_id"))
-                    LIMIT 1)
-                 AND "companies_contract"."job_seeker_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'next_min_start_at[approvals/models.py]',
@@ -2323,6 +2291,37 @@
                  AND "approvals_suspension"."end_at" < %s
                  AND NOT ("approvals_suspension"."id" = %s))
           ORDER BY "approvals_suspension"."start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'suspension_update[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_contract"
+          WHERE (("companies_contract"."end_date" IS NULL
+                  OR "companies_contract"."end_date" >= %s)
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s, %s))
+                           AND (V0."kind" IN (%s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1))
+                           AND V0."id" = ("companies_contract"."company_id"))
+                    LIMIT 1)
+                 AND "companies_contract"."job_seeker_id" = %s)
           LIMIT 1
         ''',
       }),
