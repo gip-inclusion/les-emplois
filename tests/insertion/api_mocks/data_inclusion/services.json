@@ -213,7 +213,11 @@
       "mobilisation_precisions": null,
       "volume_horaire_hebdomadaire": null,
       "nombre_semaines": null,
-      "horaires_accueil": null
+      "horaires_accueil": null,
+      "extra": {
+        "is_contact_public": false,
+        "contact_email": "extra@email.com"
+      }
     },
     {
       "source": "dora",
