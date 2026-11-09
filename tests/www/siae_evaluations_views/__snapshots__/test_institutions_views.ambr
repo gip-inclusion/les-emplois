@@ -1119,7 +1119,7 @@
                       <hr class="m-0"/>
                       <div class="c-box--results__footer">
                           <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                              <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/siae_evaluation/evaluated_siae_detail/1000/?back_url=/siae_evaluation/institution_evaluated_siae_list/10/">
+                              <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/siae_evaluation/evaluated_siae_detail/1000/">
                                   Voir le résultat
                               </a>
                               <a class="btn btn-primary btn-block w-100 w-md-auto" href="/siae_evaluation/institution_evaluated_siae_notify/1000/">
