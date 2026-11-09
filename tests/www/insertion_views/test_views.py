@@ -321,6 +321,12 @@ class TestServices:
             data-matomo-option="voir-coordonnees-contact">
         Contacter le service par email
     </button>"""
+    DISPLAY_SERVICE_CONTACT_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="voir-coordonnees-contact">
+        Contacter le service par email
+    </a>"""
     MISSING_CONTACT_LABEL = "Informations de contact non renseignées"
     DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
     FORMS_TO_FILL = "Documents à compléter"
@@ -861,18 +867,66 @@ class TestServices:
         )
         assert contact_button.get_text(strip=True) == expected_label
 
-    def test_detail_contact_button_shown_when_public(self, client):
+    @pytest.mark.parametrize(
+        "extra,is_authenticated_user",
+        [
+            pytest.param({"is_contact_public": False}, True, id="authenticated_user_sees_private_contact"),
+            pytest.param({"is_contact_public": True}, False, id="unauthenticated_user_sees_public_contact"),
+        ],
+    )
+    def test_detail_contact_button_shown_when_public_or_authenticated_user(self, client, extra, is_authenticated_user):
         service = ServiceFactory(
             uid="test-contact-public-uid",
             updated_on="2025-01-15",
             contact_email="contact@example.com",
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
+            extra=extra,
         )
+
+        if is_authenticated_user:
+            client.force_login(PrescriberFactory())
+
         response = client.get(self.get_service_url(service))
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
+
+    @pytest.mark.parametrize(
+        "extra",
+        [
+            pytest.param({"is_contact_public": False}, id="contact_info_private"),
+            pytest.param(None, id="no_extra_field"),
+            pytest.param(
+                {
+                    "other_extra": True,
+                },
+                id="extra_does_not_contain_field",
+            ),
+        ],
+    )
+    def test_detail_contact_button_redirects_to_auth_when_info_private_and_unauthenticated_user(self, client, extra):
+        service = ServiceFactory(
+            uid="test-contact-public-uid",
+            updated_on="2025-01-15",
+            contact_full_name="Joe Blow",
+            contact_email="contact@example.com",
+            structure__uid="test-structure-contact-public-uid",
+            structure__updated_on="2025-01-15",
+            extra=extra,
+        )
+
+        service_url = self.get_service_url(service)
+        response = client.get(service_url)
+
+        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, "Joe Blow")
+        assertNotContains(response, "contact@example.com")
+        assertContains(
+            response,
+            self.DISPLAY_SERVICE_CONTACT_LINK % f"{self.LOGIN_URL}?next={urlencode(service_url)}",
+            html=True,
+        )
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory()
@@ -1068,7 +1122,7 @@ class TestServices:
         ],
     )
     def test_render_contact_modal(self, client, user_factory, assertion_mailto, assertion_button):
-        service = ServiceFactory(contact_email="contact@example.com")
+        service = ServiceFactory(contact_email="contact@example.com", extra={"is_contact_public": True})
         if user_factory:
             client.force_login(user_factory())
         response = client.get(self.get_service_url(service))

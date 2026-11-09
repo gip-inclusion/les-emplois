@@ -164,9 +164,13 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         return form
 
     def get_context_data(self, **kwargs):
-        can_view_contact_modal = bool(
+        has_contact_to_display = bool(
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
         )
+        can_view_contact_modal = has_contact_to_display and bool(
+            self.request.user.is_authenticated or (self.object.extra or {}).get("is_contact_public")
+        )
+
         orient_for_job_seeker_context = get_orient_for_job_seeker_context(self.request)
         send_email_form = self.get_send_email_form(self.request, orient_for_job_seeker_context.get("job_seeker"))
         return (
@@ -180,6 +184,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "formatted_categories": self.format_categories(),
                 "contact_button_label": self.get_contact_button_label(),
+                "has_contact_to_display": has_contact_to_display,
                 "can_view_contact_modal": can_view_contact_modal,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
                 "send_email_form": send_email_form,
