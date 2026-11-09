@@ -817,7 +817,10 @@ class TestProSupportReport:
         report.refresh_from_db()
         assert report.notified_prescriber is None
 
-    def test_unique_per_contract(self):
+    def test_unique_per_contract_end_date(self):
         report = ProSupportReportFactory()
-        with pytest.raises(IntegrityError, match="companies_prosupportreport_contract_id_key"):
-            ProSupportReportFactory(contract=report.contract)
+        ProSupportReportFactory(
+            contract=report.contract, contract_end_date=report.contract_end_date + timedelta(days=1)
+        )
+        with pytest.raises(IntegrityError, match="prosupportreport_contract_end_date_unique"):
+            ProSupportReportFactory(contract=report.contract, contract_end_date=report.contract_end_date)
