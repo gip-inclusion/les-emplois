@@ -1,7 +1,7 @@
-from rest_framework import throttling
+from itou.api import throttling
 
 
-class JobApplicationSearchThrottle(throttling.SimpleRateThrottle):
+class FailSafeJobApplicationSearchThrottle(throttling.FailSafeSimpleRateThrottle):
     scope = "job-applications-search"
 
     def get_cache_key(self, request, view):
