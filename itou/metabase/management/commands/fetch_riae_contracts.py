@@ -21,14 +21,18 @@ class Command(BaseCommand):
         QUERY_LIMIT = 100_000  # Limit to <100MB data in ram (estimated with pympler.asizeof.asizeof)
 
         # Schema:
-        # [{'Contrat Date Embauche': '2023-01-01',
+        # [{'Categorie Sortie': 'Autres sorties',
+        #   'Contrat Date Embauche': '2023-01-01',
         #   'Contrat Date Fin Contrat': '2023-04-30',
-        #   'Contrat Date Sortie Definitive': None,
+        #   'Contrat Date Sortie Definitive': '2023-04-30',
         #   'Contrat ID Ctr': ##########,
         #   'Contrat ID Structure': ###,
         #   'Contrat Mesure Disp Code': 'ACI_DC',
         #   'Contrat Parent ID': ##########,
         #   'Emplois Candidat ID': ##,
+        #   'Motif Sortie': 'Au chômage',
+        #   'Rcs Code': 4,
+        #   'Rms Code': 10,
         #   'Type Contrat': 'initial'}]
         base_query = client.build_query(
             table=2150,

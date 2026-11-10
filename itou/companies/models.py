@@ -1270,6 +1270,24 @@ class Contract(models.Model):
             return self.end_date < timezone.localdate()
         return not self.company or not self.company.is_active
 
+    @property
+    def exit_reason(self):
+        """
+        Exit reason declared to the ASP, if the contract ended with an exit.
+
+        An exit on an older row, followed by a renewal, is not the end of the contract.
+        """
+        if self.end_date is None:
+            return None
+        return next(
+            (
+                row["Motif Sortie"]
+                for row in self.details
+                if row["Contrat Date Sortie Definitive"] == self.end_date.isoformat()
+            ),
+            None,
+        )
+
     class Meta:
         verbose_name = "contrat IAE"
         verbose_name_plural = "contrats IAE"
