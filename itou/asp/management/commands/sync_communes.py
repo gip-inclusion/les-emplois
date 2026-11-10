@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
-from itou.asp.constants import IGNORED_COMMUNES_TARGET_CODES
+from itou.asp.constants import ASP_COMMUNES_AS_COUNTRIES, IGNORED_COMMUNES_TARGET_CODES
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
@@ -275,3 +275,12 @@ class Command(BaseCommand):
                     commune.ignore = True
                     commune.save(update_fields={"ignore"})
                     self.stdout.write(f"{commune} should be ignored - ignore flag set to True")
+
+            missing = set(ASP_COMMUNES_AS_COUNTRIES) - set(
+                Commune.objects.filter(name__in=ASP_COMMUNES_AS_COUNTRIES).values_list("name", flat=True)
+            )
+            if missing:
+                self.stdout.write(
+                    f"ASP_COMMUNES_AS_COUNTRIES references unknown communes {sorted(missing)}: "
+                    "they might have been updated/deleted - please investigate"
+                )
