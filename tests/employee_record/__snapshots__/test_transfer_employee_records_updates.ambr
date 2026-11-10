@@ -30,6 +30,11 @@
     'Employee record notifications processing done!',
   ])
 # ---
+# name: test_parse_file[logs]
+  list([
+    '<EmployeeRecordUpdateNotification pk=1234> performed transition EmployeeRecordUpdateNotificationWorkflow.process (SENT -> PROCESSED)',
+  ])
+# ---
 # name: test_preflight
   list([
     'Preflight activated, checking for possible serialization errors...',

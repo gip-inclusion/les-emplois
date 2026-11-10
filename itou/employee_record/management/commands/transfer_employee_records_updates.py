@@ -1,3 +1,5 @@
+import os.path
+
 import paramiko
 from django.conf import settings
 from django.db import transaction
@@ -173,7 +175,9 @@ class Command(EmployeeRecordTransferCommand):
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
             # so use an atomic block to avoid creating more incoherence when something breaks.
             with open(parse_file_name, "rb") as parse_file, transaction.atomic():
-                self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
+                self._parse_feedback_file(
+                    os.path.basename(parse_file.name), JSONParser().parse(parse_file), dry_run=not wet_run
+                )
         elif upload or download:
             if not settings.ASP_SFTP_HOST:
                 self.logger.warning("Your environment is missing ASP_SFTP_HOST to run this command.")

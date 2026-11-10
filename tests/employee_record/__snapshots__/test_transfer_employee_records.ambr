@@ -30,6 +30,12 @@
     'Employee records processing done!',
   ])
 # ---
+# name: test_parse_file[logs]
+  list([
+    "Record: line_number=1, processing_code='0000', processing_label='OK'",
+    '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.process (SENT -> PROCESSED)',
+  ])
+# ---
 # name: test_preflight
   list([
     'Preflight activated, checking for possible serialization errors...',
