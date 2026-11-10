@@ -140,4 +140,5 @@ IGNORED_COMMUNES_TARGET_CODES = {
     # For Wallis et Futuna, users should choose one of the 3 customary kingdoms (Uvea, Alo & Sigave)
     ("98600", "WALLIS ET FUTUNA"): None,
     ("98609", "WALLIS ET FUTUNA"): None,
+    ("98701", "ST PIERRE ET MIQUELON"): None,  # Users should choose St Pierre (97502) or Miquelon-Langlade (97501)
 }
