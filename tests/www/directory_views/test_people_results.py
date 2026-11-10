@@ -1,14 +1,18 @@
+import uuid
+
 import pytest
 from django.contrib.gis.geos import Point
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City, DirectoryActiveCity
+from itou.companies.enums import CompanyKind
 from itou.directory.models import DirectoryProfile
 from tests.cities.factories import create_city_geispolsheim, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import ProfessionalFactory
+from tests.users.factories import EmployerFactory, ProfessionalFactory
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup
 from tests.www.directory_views.utils import KM, coords_within_directory_radius
 
@@ -129,7 +133,7 @@ def test_exclude_opted_out_email_and_distant_organization(client):
     client.force_login(user)
     response = client.get(reverse("directory:people_results"))
 
-    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
+    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', html=True, count=1)
 
 
 def test_directory_people_ignores_inactive_companies(client):
@@ -151,7 +155,7 @@ def test_directory_people_ignores_inactive_companies(client):
     client.force_login(user)
     response = client.get(reverse("directory:people_results"))
 
-    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
+    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', html=True, count=1)
 
 
 def test_ordering_and_pagination(client, snapshot):
@@ -245,3 +249,124 @@ def test_directory_nav_visibility(active, assertion, client):
         """,
         html=True,
     )
+
+
+def test_search_q(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        user__first_name="Manuel",
+        user__last_name="Calavera",
+    ).user
+    other_user = EmployerFactory(membership=False, first_name="Julie", last_name="Durand")
+    company = CompanyFactory(coords=vannes.coords, insee_city=vannes)
+    CompanyMembershipFactory(user=other_user, company=company)
+
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"))
+    page = parse_response_to_soup(response)
+
+    response = client.get(
+        reverse("directory:people_results"),
+        {"q": other_user.public_id},
+        headers={"HX-Request": "true"},
+    )
+    update_page_with_htmx(page, "#people-search-form", response)
+
+    assert [heading.text for heading in page.select("#people-search-results h3")] == ["DURAND Julie"]
+
+    # Simulate page state after user interactions.
+    [empty_option] = page.select('#people-search-form select[name="q"] option[value=""]')
+    del empty_option["selected"]
+    [option] = page.select(f'#people-search-form select[name="q"] option[value="{other_user.public_id}"]')
+    option["selected"] = ""
+    [clear_filters] = page.select("#people-clear-filters")
+    clear_filters["class"].remove("d-none")
+    assertSoupEqual(
+        page,
+        parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": other_user.public_id})),
+    )
+
+
+def test_people_search_shows_nearest_structure_after_type_filter(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+        user__first_name="Manuel",
+        user__last_name="Calavera",
+    ).user
+    other_user = EmployerFactory(membership=False, first_name="Julie", last_name="Durand")
+    company = CompanyFactory(
+        coords=vannes.coords,
+        insee_city=vannes,
+        kind=CompanyKind.EI,
+    )
+    CompanyMembershipFactory(user=other_user, company=company)
+
+    client.force_login(user)
+    data = [
+        (CompanyKind.EI, "DURAND Julie"),
+        (CompanyKind.AI, "CALAVERA Manuel"),
+    ]
+    for kind, expected_name in data:
+        [other_name] = [name for _kind, name in data if name != expected_name]
+        response = client.get(reverse("directory:people_results"), {"kind": kind})
+        assertContains(response, f"<h3>{expected_name}</h3>", count=1)
+        assertNotContains(response, f"<h3>{other_name}</h3>")
+
+
+def test_empty_results_message(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+    ).user
+
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"), {"kind": CompanyKind.EI})
+
+    assertContains(response, '<p class="mb-0">Aucun résultat avec les filtres actuels.</p>', html=True, count=1)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param(
+            {"q": uuid.UUID("00000000-0000-0000-0000-000000000000")},
+            id="uuid",
+        ),
+        pytest.param(
+            {"kind": "INVALID"},
+            id="kind",
+        ),
+    ],
+)
+def test_invalid_form_data(client, payload):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+        user__first_name="Manuel",
+        user__last_name="Calavera",
+    ).user
+
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"), payload)
+
+    [value] = payload.values()
+    assertContains(
+        response,
+        f"Sélectionnez un choix valide. {value} n’en fait pas partie.",
+        html=True,
+        count=1,
+    )
+    assertContains(response, '<p class="mb-0">Aucun résultat avec les filtres actuels.</p>', html=True, count=1)

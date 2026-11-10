@@ -1,6 +1,6 @@
 {% load humanize %}
 {% load str_filters %}
 
-<p class="mb-0" id="people-search-count">
+<p class="mb-0" id="people-search-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {{ results.paginator.count|intcomma }} résultat{{ results.paginator.count|pluralizefr }}
 </p>

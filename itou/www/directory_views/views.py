@@ -10,6 +10,7 @@ from itou.users.models import User
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.readonly import readonly_view
+from itou.www.directory_views.forms import PeopleSearchForm
 from itou.www.directory_views.perms import can_access_directory
 
 
@@ -67,13 +68,38 @@ def get_directory_people(origin, *, public_id=None):
     )
 
 
+def _filter_people(people, form):
+    selected_person_key = form.cleaned_data["q"]
+    structure_kinds = set(form.cleaned_data["kind"])
+    if selected_person_key:
+        people = [person for person in people if person.public_id == selected_person_key]
+    if structure_kinds:
+        # Match any affiliation, even if another structure is shown first.
+        people = [
+            person
+            for person in people
+            if structure_kinds.intersection(organization.kind for organization in person.directory_organizations)
+        ]
+    return people
+
+
 @check_request(can_access_directory)
 @readonly_view
 def people_results(request, template_name="directory/people_results.html"):
     people = get_directory_people(request.current_organization.coords)
+    form = PeopleSearchForm(request.GET, people=people)
+    if form.is_valid():
+        people = _filter_people(people, form)
+    else:
+        people = []
     results = pager(people, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     context = {
+        "form": form,
         "results": results,
         "matomo_custom_title": "Annuaire pro - Personnes",
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "directory/includes/people_results.html" if request.htmx else template_name,
+        context,
+    )

@@ -1,4 +1,7 @@
 {% load str_filters %}
+{% if request.htmx %}
+    {% include "directory/includes/people_counter.html" with results=results request=request only %}
+{% endif %}
 <div id="people-search-results">
     {% for person in results %}
         {% with person.directory_organizations.0 as closest_organization %}
@@ -43,7 +46,13 @@
     {% empty %}
         <div class="c-box c-box--results mb-3 mb-md-4">
             <div class="c-box--results__body">
-                <p class="mb-0">Annuaire vide.</p>
+                <p class="mb-0">
+                    {% if form.has_changed %}
+                        Aucun résultat avec les filtres actuels.
+                    {% else %}
+                        Annuaire vide.
+                    {% endif %}
+                </p>
             </div>
         </div>
     {% endfor %}
