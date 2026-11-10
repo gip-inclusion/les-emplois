@@ -509,6 +509,11 @@ API_ESD = {
     "BASE_URL": os.getenv("API_ESD_BASE_URL"),
 }
 
+API_RELAY_CNAV = {
+    "RELAY_URL": os.getenv("API_RELAY_CNAV_URL"),
+    "RELAY_TOKEN": os.getenv("API_RELAY_CNAV_TOKEN"),
+}
+
 # France Travail Connect - technically one of ESD's APIs.
 FRANCETRAVAIL_CONNECT_AUTH_BASE_URL = os.getenv("FRANCETRAVAIL_CONNECT_AUTH_BASE_URL")
 
