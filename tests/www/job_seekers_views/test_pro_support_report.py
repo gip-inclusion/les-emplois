@@ -74,8 +74,11 @@ def test_create_pro_support_report_for_employer(
     contract = end_of_journey_contract(membership.company, end_date)
     if hired_elsewhere:
         ContractFactory(job_seeker=contract.job_seeker, start_date=timezone.localdate())
+    advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
     advisor = JobSeekerAssignmentFactory(
-        job_seeker=contract.job_seeker, prescriber_organization=PrescriberOrganizationFactory(authorized=True)
+        job_seeker=contract.job_seeker,
+        professional=advisor_membership.user,
+        prescriber_organization=advisor_membership.organization,
     ).professional
     client.force_login(membership.user)
 
