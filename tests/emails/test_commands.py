@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.emails.models import Email
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 class TestExpireOldEmails:
@@ -26,7 +27,8 @@ class TestExpireOldEmails:
                 body_html="<html><body>Bonjour",
             )
         call_command("delete_old_emails")
-        assert caplog.messages[1] == "Deleted 1 email"
+        filtered_caplog_messages = check_and_filter_out_advisory_lock_messages(caplog.messages)
+        assert filtered_caplog_messages[1] == "Deleted 1 email"
         assertQuerySetEqual(Email.objects.all(), [after_cutoff, old])
 
     def test_wet_run(self, caplog):
@@ -46,5 +48,6 @@ class TestExpireOldEmails:
                 body_html="<html><body>Bonjour",
             )
         call_command("delete_old_emails", wet_run=True)
-        assert caplog.messages[0] == "Deleted 1 email"
+        filtered_caplog_messages = check_and_filter_out_advisory_lock_messages(caplog.messages)
+        assert filtered_caplog_messages[0] == "Deleted 1 email"
         assertQuerySetEqual(Email.objects.all(), [after_cutoff])

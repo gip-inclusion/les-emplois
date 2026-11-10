@@ -21,6 +21,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_batch[send_users_to_brevo_batch]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 2',
@@ -104,6 +114,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_email_tracking_consents_professionals[send_users_to_brevo_email_tracking_consents_professionals]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
@@ -204,6 +224,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_errors[send_users_to_brevo_errors]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 1',
@@ -293,6 +323,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_job_seekers[send_users_to_brevo_job_seekers]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 0',
@@ -366,6 +406,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_orienteurs[send_users_to_brevo_orienteurs]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
@@ -446,6 +496,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_prescribers[send_users_to_brevo_prescribers]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 0',
@@ -519,6 +579,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_siae[send_users_to_brevo_siae]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo:fdc18b9ef757d678593202b22035e759 (lock id 2311150423).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,

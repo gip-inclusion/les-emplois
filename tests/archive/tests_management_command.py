@@ -67,6 +67,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedJobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -419,7 +420,8 @@ class TestAnonymizeJobseekersManagementCommand:
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
         call_command("anonymize_jobseekers", wet_run=True)
 
-        assert ("Anonymizing job seekers is suspended, exiting command" in caplog.messages[0]) is suspended
+        filtered_caplog_messages = check_and_filter_out_advisory_lock_messages(caplog.messages)
+        assert ("Anonymizing job seekers is suspended, exiting command" in filtered_caplog_messages[0]) is suspended
         assert User.objects.exists() is suspended
 
     def test_dry_run(self, respx_mock):

@@ -16,13 +16,14 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 class TestManagementCommand:
     def test_no_campaign(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -32,7 +33,7 @@ class TestManagementCommand:
         EvaluationCampaignFactory()
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -45,7 +46,7 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -89,11 +90,13 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert sorted(caplog.messages[:-1]) == [
+        messages = check_and_filter_out_advisory_lock_messages(caplog.messages)
+        assert len(messages) == 3
+        assert sorted(messages[0:-1]) == [
             "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1",
             "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 02 - Campagne 1",
         ]
-        assert caplog.messages[-1].startswith(
+        assert messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
         # EvaluatedSiae are not ordered.
@@ -163,8 +166,8 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == [
-            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1"
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
+            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1",
         ]
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
@@ -203,7 +206,7 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -262,7 +265,7 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -300,8 +303,8 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == [
-            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test"
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
+            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test",
         ]
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
@@ -402,8 +405,8 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == [
-            "Emailed second reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test"
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
+            "Emailed second reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test",
         ]
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
@@ -469,7 +472,7 @@ class TestManagementCommand:
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_answer)
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -512,7 +515,7 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -534,7 +537,7 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -545,7 +548,9 @@ class TestManagementCommand:
         with freeze_time(one_day_later):  # It has now been 7 days since last notification
             with django_capture_on_commit_callbacks(execute=True):
                 call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == ["Reminded “DDETS 01” to control SIAE during the submission freeze."]
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
+            "Reminded “DDETS 01” to control SIAE during the submission freeze.",
+        ]
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -569,7 +574,7 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        assert caplog.messages[:-1] == []
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == []
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
@@ -597,7 +602,7 @@ class TestArchivedAcceptedEvaluatedSiae:
         call_command("archive_accepted_evaluated_siae")
         EvaluatedSiae.objects.get(archive_accepted_job_applications_nb__isnull=True)
         assert EvaluatedJobApplication.objects.count() == 3
-        assert caplog.messages[:-1] == [
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
             "Command launched with wet_run=False",
             "Found count=1 EvaluatedSiae to archive",
             "Deleted count=3 linked EvaluatedJobApplication",
@@ -633,7 +638,7 @@ class TestArchivedAcceptedEvaluatedSiae:
         ]
 
         call_command("archive_accepted_evaluated_siae", wet_run=True)
-        assert caplog.messages[:-1] == [
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
             "Found count=1 EvaluatedSiae to archive",
             "Deleted count=3 linked EvaluatedJobApplication",
             f"Archived count=1 EvaluatedSiae: [{self.evaluated_siae.pk}]",

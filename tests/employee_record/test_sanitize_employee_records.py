@@ -11,6 +11,7 @@ from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import sanitize_employee_records
 from tests.employee_record import factories
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.fixture(name="command")
@@ -19,6 +20,7 @@ def command_fixture():
 
 
 def process_output(caplog_messages):
+    caplog_messages = check_and_filter_out_advisory_lock_messages(caplog_messages)
     assert caplog_messages[-1].startswith(
         "Management command itou.employee_record.management.commands.sanitize_employee_records succeeded in "
     )

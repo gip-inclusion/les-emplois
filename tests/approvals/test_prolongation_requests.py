@@ -13,6 +13,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 from tests.users.factories import PrescriberFactory, ProfessionalFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 def test_unique_approval_for_pending_constraint():
@@ -121,7 +122,7 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
             call_command("prolongation_requests_chores", "email_reminder", wet_run=wet_run)
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
-    assert caplog.messages[:-1] == snapshot()
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot()
     assert caplog.messages[-1].startswith(
         "Management command itou.approvals.management.commands.prolongation_requests_chores succeeded in "
     )

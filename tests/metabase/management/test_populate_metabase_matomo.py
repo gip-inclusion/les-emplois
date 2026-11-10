@@ -6,6 +6,8 @@ from django.test import override_settings
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
+
 
 MATOMO_HEADERS = (
     "Unique visitors,Visits,Users,Actions,Maximum actions in one visit,Bounces,"
@@ -57,7 +59,7 @@ def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
         # Use pool_size=1 for stable output
         management.call_command("populate_metabase_matomo", wet_run=True, pool_size=1)
 
-    assert caplog.messages[:-1] == snapshot(name="retry output")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="retry output")
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.populate_metabase_matomo failed in"
     )
@@ -98,7 +100,7 @@ def test_matomo_empty_output(respx_mock, caplog, snapshot):
     # Use pool_size=1 for stable output
     management.call_command("populate_metabase_matomo", wet_run=True, pool_size=1)
 
-    assert caplog.messages[:-1] == snapshot(name="empty output")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="empty output")
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.populate_metabase_matomo succeeded in"
     )

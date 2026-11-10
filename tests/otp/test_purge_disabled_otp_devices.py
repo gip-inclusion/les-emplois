@@ -23,10 +23,10 @@ class TestCommand:
             [self.not_disabled, self.disabled_too_recently],
             ordered=False,
         )
-        assert caplog.messages[0] == "1 disabled TOTP devices have been purged"
+        assert caplog.messages[2] == "1 disabled TOTP devices have been purged"
 
     def test_dry_run(self, caplog):
         assert ItouTOTPDevice.objects.count() == 3
         call_command("purge_disabled_otp_devices", wet_run=False)
         assert ItouTOTPDevice.objects.count() == 3
-        assert caplog.messages[0] == "1 disabled TOTP devices would be purged"
+        assert caplog.messages[2] == "1 disabled TOTP devices would be purged"

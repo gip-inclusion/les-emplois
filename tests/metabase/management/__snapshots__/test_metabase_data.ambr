@@ -6,6 +6,16 @@
 # name: test_fetch_kpi[False][logs]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data:3488660023d6e72961d26a284909d54b (lock id 2415767115).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data:3488660023d6e72961d26a284909d54b (lock id 2415767115).',
+    ),
+    tuple(
       'itou.metabase.management.commands.metabase_data',
       20,
       'Command launched with wet_run=False',
@@ -115,6 +125,16 @@
 # ---
 # name: test_fetch_kpi[True][logs]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data:9bcbb7f726ee824be52bc6b325d0da63 (lock id 3618814614).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data:9bcbb7f726ee824be52bc6b325d0da63 (lock id 3618814614).',
+    ),
     tuple(
       'itou.metabase.management.commands.metabase_data',
       20,

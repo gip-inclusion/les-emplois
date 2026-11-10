@@ -11,6 +11,7 @@ from itou.metabase.management.commands import metabase_data
 from itou.metabase.models import DatumKey
 from itou.users.models import User
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.fixture()
@@ -151,4 +152,4 @@ def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.metabase_data succeeded in "
     )
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")

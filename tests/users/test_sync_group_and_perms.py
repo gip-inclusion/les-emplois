@@ -4,11 +4,12 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 
 from itou.users.management.commands import sync_group_and_perms
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 def test_command(snapshot, caplog):
     call_command("sync_group_and_perms")
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.sync_group_and_perms succeeded in"
     )

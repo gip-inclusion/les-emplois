@@ -7,6 +7,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES, JobApplicationState
 from itou.job_applications.models import JobApplication
 from tests.job_applications.factories import JobApplicationFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 def test_archive(caplog):
@@ -40,7 +41,7 @@ def test_archive(caplog):
 
     # Dry run
     call_command("archive_job_applications")
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         "Command launched with wet_run=False",
         expected_log,
         "Setting transaction to be rollback as wet_run=False",
@@ -70,7 +71,9 @@ def test_archive(caplog):
         ],
         ordered=False,
     )
-    assert caplog.messages[:-1] == [expected_log]
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
+        expected_log,
+    ]
     assert caplog.messages[-1].startswith(
         "Management command itou.job_applications.management.commands.archive_job_applications succeeded in"
     )

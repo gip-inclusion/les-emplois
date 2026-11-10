@@ -6,6 +6,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import ItouStaffFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.mark.parametrize("wet_run", [True, False])
@@ -65,7 +66,7 @@ def test_command(wet_run, caplog):
             + expected_logs
             + ["Setting transaction to be rollback as wet_run=False"]
         )
-    assert caplog.messages[:-1] == expected_logs
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == expected_logs
     assert caplog.messages[-1].startswith(
         "Management command itou.scripts.management.commands.move_job_applications succeeded in"
     )

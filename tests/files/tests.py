@@ -22,7 +22,7 @@ from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
-from tests.utils.testing import default_storage_ls_files
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages, default_storage_ls_files
 
 
 @pytest.mark.usefixtures("temporary_bucket")
@@ -105,7 +105,7 @@ def test_copy(pdf_file):
 @pytest.mark.usefixtures("temporary_bucket")
 def test_delete_unused_files_no_files(caplog):
     call_command("delete_unused_files")
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 0 files in database",
@@ -145,7 +145,7 @@ def test_delete_unused_files_from_database(caplog):
     assert File.objects.all().count() == 9
     assert not File.objects.filter(pk__in=[old_orphan.pk, scan.file_id]).exists()
 
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         "Starting unused file removal",
         "Deleted 2 orphans files from database",
         "Checking existing files: 9 files in database",
@@ -181,7 +181,7 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
     # a file that was just uploaded before the File object was commited to the database.
     call_command("delete_unused_files")
     assert File.objects.count() == 2  # No changes in db
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 2 files in database",
@@ -201,7 +201,7 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
 
     call_command("delete_unused_files")
     assert File.objects.count() == 2  # No changes in db
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 2 files in database",

@@ -13,6 +13,7 @@ from itou.insertion.models import GenericReferenceItem, GenericReferenceItemKind
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiItemsIterator, DataInclusionApiPaginatedResponse
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.fixture(name="apis_mocks")
@@ -106,7 +107,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         e.value for e in GenericReferenceItemKind
     }
 
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")
     assert caplog.messages[-1].startswith(
         "Management command itou.insertion.management.commands.import_structures_and_services succeeded in"
     )
@@ -119,7 +120,7 @@ def test_full_import_dry_run(caplog, snapshot, apis_mocks):
     assert Service.objects.count() == 0
     assert GenericReferenceItem.objects.count() == 0
 
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")
     assert caplog.messages[-1].startswith(
         "Management command itou.insertion.management.commands.import_structures_and_services succeeded in"
     )
@@ -141,7 +142,7 @@ def test_full_import_idempotence(caplog, snapshot, apis_mocks):
         "GenericReferenceItem": GenericReferenceItem.objects.in_bulk(),
     } == expected
 
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")
     assert caplog.messages[-1].startswith(
         "Management command itou.insertion.management.commands.import_structures_and_services succeeded in"
     )
