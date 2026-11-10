@@ -6,7 +6,7 @@ import logging
 import psycopg.errors
 from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.db.models import Q
-from django.db.utils import InternalError
+from django.db.utils import InternalError, OperationalError
 from psycopg import sql
 
 
@@ -93,7 +93,12 @@ def pg_advisory_lock(name: str):
     lock_id = get_lock_id(name)
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
-        cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
+        try:
+            cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
+        except OperationalError as exc:
+            if isinstance(exc.__cause__, psycopg.errors.LockNotAvailable):
+                raise CannotAcquireLock(name, lock_id) from exc
+            raise
         try:
             yield
         finally:
