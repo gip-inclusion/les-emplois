@@ -285,7 +285,7 @@ class Command(BaseCommand):
 
         service.contact_full_name = data["contact_nom_prenom"] or ""
 
-        extra = data.get("extra", {})
+        extra = data.get("extra", {}) or {}
         service.contact_email = data["courriel"] or extra.get("contact_email") or ""
 
         self._void_if_max_len(service, "contact_email")

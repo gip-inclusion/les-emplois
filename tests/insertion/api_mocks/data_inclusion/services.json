@@ -33,7 +33,8 @@
       "mobilisation_precisions": null,
       "volume_horaire_hebdomadaire": null,
       "nombre_semaines": null,
-      "horaires_accueil": null
+      "horaires_accueil": null,
+      "extra": null
     },
     {
       "source": "emplois-de-linclusion",
