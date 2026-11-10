@@ -1,8 +1,9 @@
 import random
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from unittest import mock
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -16,6 +17,7 @@ from itou.companies.models import Company, Contract, JobDescription, SiaeACIConv
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -740,6 +742,71 @@ class TestContractQuerySet:
             [contract_end_date_in_future, contract_end_date_today, contract_no_end_date_active_siae],
             ordered=False,
         )
+
+    @pytest.mark.parametrize(
+        "today",
+        [date(2026, 11, 10), date(2027, 1, 12)],
+        ids=["same_year", "new_year"],
+    )
+    def test_in_monthly_recap(self, today):
+        first_day_of_month = today.replace(day=1)
+        last_day_of_month = first_day_of_month + relativedelta(months=1, days=-1)
+        first_day_of_last_month = first_day_of_month - relativedelta(months=1)
+        last_day_of_last_month = first_day_of_month - timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+        two_years_ago = today - relativedelta(years=2)
+        three_years_ago = today - relativedelta(years=3)
+        expired_approval = {"start_at": two_years_ago, "end_at": yesterday}
+
+        def make_contract(end_date, **approval_kwargs):
+            return ContractFactory(
+                job_seeker=ApprovalFactory(**approval_kwargs).user, start_date=two_years_ago, end_date=end_date
+            )
+
+        with freeze_time(today):
+            contract_ending_this_month = make_contract(last_day_of_month)
+            # Unlike an ended contract, it needs no valid approval.
+            contract_ending_today_with_expired_approval = make_contract(today, **expired_approval)
+            contract_ending_this_month_before_hiring_elsewhere = make_contract(last_day_of_month)
+            ContractFactory(
+                job_seeker=contract_ending_this_month_before_hiring_elsewhere.job_seeker,
+                start_date=yesterday,
+                end_date=None,
+            )
+            # Or a renewal not declared to the ASP yet.
+            contract_ended_last_month = make_contract(first_day_of_last_month)
+            # Ended before the recap is sent: it needs a valid approval as well.
+            contract_ended_this_month = make_contract(first_day_of_month)
+            last_contract_ended_last_month = make_contract(last_day_of_last_month)
+            ContractFactory(
+                job_seeker=last_contract_ended_last_month.job_seeker,
+                start_date=three_years_ago,
+                end_date=last_day_of_last_month,
+            )
+            # Not in the recap.
+            make_contract(last_day_of_month + timedelta(days=1))  # Or a renewal declared to the ASP.
+            make_contract(first_day_of_last_month - timedelta(days=1))
+            make_contract(None)
+            make_contract(last_day_of_last_month, **expired_approval)
+            make_contract(first_day_of_month, **expired_approval)
+            contract_ended_before_hiring_elsewhere = make_contract(last_day_of_last_month)
+            ContractFactory(
+                job_seeker=contract_ended_before_hiring_elsewhere.job_seeker, start_date=yesterday, end_date=None
+            )
+            ContractFactory(job_seeker=None, end_date=last_day_of_month)
+
+            assertQuerySetEqual(
+                Contract.objects.in_monthly_recap(),
+                [
+                    contract_ending_this_month,
+                    contract_ending_today_with_expired_approval,
+                    contract_ending_this_month_before_hiring_elsewhere,
+                    contract_ended_last_month,
+                    contract_ended_this_month,
+                    last_contract_ended_last_month,
+                ],
+                ordered=False,
+            )
 
     @pytest.mark.parametrize(
         "days_after_contract_end_date,expected",
