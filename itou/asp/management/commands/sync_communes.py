@@ -9,6 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
+from itou.asp.constants import ASP_COMMUNES_AS_COUNTRIES
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
@@ -261,3 +262,10 @@ class Command(BaseCommand):
                     batch_size=1_000,
                 )
                 self.stdout.write(f"> realigned count={n_objs} JobSeeker profiles with updated communes.")
+
+            for commune_name in ASP_COMMUNES_AS_COUNTRIES:
+                if not Commune.objects.filter(name=commune_name).exists():
+                    self.stdout.write(
+                        f"ASP_COMMUNES_AS_COUNTRIES references unknown {commune_name}: "
+                        "it might have been updated/deleted - please investigate"
+                    )
