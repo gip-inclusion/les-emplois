@@ -19,12 +19,13 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
@@ -1727,6 +1728,139 @@ class TestJobSeekerAssignment:
             [archived_assignment_no_organization, archived_assignment_with_organization],
             ordered=False,
         )
+
+    def test_get_authorized_prescriber_assignments(self):
+        now = timezone.now()
+        last_week = now - datetime.timedelta(days=7)
+        last_month = now - datetime.timedelta(days=30)
+        job_seeker = JobSeekerFactory()
+        other_job_seeker = JobSeekerFactory()
+
+        # Created first so that the order cannot come from the primary key.
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        latest = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=last_week,
+            ended=True,
+        )
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=last_month,
+        )
+        other_latest = JobSeekerAssignmentFactory(
+            job_seeker=other_job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=last_month,
+        )
+        # More recent, but not an authorized prescriber.
+        membership = PrescriberMembershipFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=now,
+        )
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, company=CompanyFactory(), last_action_at=now)
+        job_seeker_without_assignment = JobSeekerFactory()
+
+        with assertNumQueries(1):
+            assignments = JobSeekerAssignment.objects.get_authorized_prescriber_assignments(
+                [job_seeker.pk, other_job_seeker.pk, job_seeker_without_assignment.pk]
+            )
+            assert {
+                job_seeker_id: (assignment.professional, assignment.prescriber_organization)
+                for job_seeker_id, assignment in assignments.items()
+            } == {
+                job_seeker.pk: (latest.professional, latest.prescriber_organization),
+                other_job_seeker.pk: (other_latest.professional, other_latest.prescriber_organization),
+            }
+
+    @pytest.mark.parametrize(
+        "authorization_status",
+        [
+            PrescriberAuthorizationStatus.NOT_SET,
+            PrescriberAuthorizationStatus.REFUSED,
+        ],
+    )
+    def test_get_authorized_prescriber_assignments_unauthorized_organization(self, authorization_status):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        assignment = JobSeekerAssignmentFactory(
+            professional=membership.user, prescriber_organization=membership.organization
+        )
+        assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([assignment.job_seeker_id]) == {
+            assignment.job_seeker_id: assignment
+        }
+
+        # The authorization is no longer validated after the assignment.
+        membership.organization.authorization_status = authorization_status
+        membership.organization.save()
+        assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([assignment.job_seeker_id]) == {}
+
+    @pytest.mark.parametrize("deactivated", ["membership", "user"], ids=["left_organization", "deactivated_user"])
+    def test_get_authorized_prescriber_assignments_inactive_member(self, deactivated):
+        now = timezone.now()
+        last_month = now - datetime.timedelta(days=30)
+        job_seeker = JobSeekerFactory()
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        previous = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=last_month,
+        )
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        latest = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=now,
+        )
+        inactive = membership if deactivated == "membership" else membership.user
+
+        inactive.is_active = False
+        inactive.save()
+        assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([job_seeker.pk]) == {
+            job_seeker.pk: previous
+        }
+
+        # Reactivated.
+        inactive.is_active = True
+        inactive.save()
+        assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([job_seeker.pk]) == {
+            job_seeker.pk: latest
+        }
+
+    def test_get_authorized_prescriber_assignments_member_of_another_organization(self):
+        now = timezone.now()
+        last_month = now - datetime.timedelta(days=30)
+        job_seeker = JobSeekerFactory()
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        other_organization_assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=membership.organization,
+            last_action_at=last_month,
+        )
+        left_organization = PrescriberOrganizationFactory(authorized=True)
+        PrescriberMembershipFactory(user=membership.user, organization=left_organization, is_active=False)
+        # A coworker still active in the organization the prescriber left.
+        PrescriberMembershipFactory(organization=left_organization)
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=membership.user,
+            prescriber_organization=left_organization,
+            last_action_at=now,
+        )
+
+        assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([job_seeker.pk]) == {
+            job_seeker.pk: other_organization_assignment
+        }
 
     def test_is_still_member(self):
         # No organization

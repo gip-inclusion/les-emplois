@@ -1749,6 +1749,26 @@ class JobSeekerAssignmentManager(models.Manager):
                 qs = qs.filter(ended_at=None)
         return qs
 
+    def get_authorized_prescriber_assignments(self, job_seeker_ids):
+        """The assignment of the authorized prescriber to notify about each job seeker, by job seeker pk."""
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        return (
+            self.filter(
+                # The default manager only keeps active members, whose user is active too.
+                Exists(
+                    PrescriberMembership.objects.filter(
+                        user=OuterRef("professional"), organization=OuterRef("prescriber_organization")
+                    )
+                ),
+                job_seeker__in=job_seeker_ids,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("job_seeker_id", "-last_action_at")
+            .distinct("job_seeker_id")
+            .in_bulk(field_name="job_seeker_id")
+        )
+
 
 class JobSeekerAssignment(models.Model):
     """
