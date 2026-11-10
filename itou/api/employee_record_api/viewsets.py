@@ -3,13 +3,13 @@ import logging
 from django.db.models.functions import TruncDate
 from rest_framework import mixins, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.throttling import UserRateThrottle
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
 from itou.api.employee_record_api.serializers import (
     EmployeeRecordAPISerializer,
 )
+from itou.api.throttling import FailSafeUserRateThrottle
 from itou.employee_record.models import EmployeeRecord, Status
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.readonly import ReadonlyViewMixin
@@ -18,7 +18,7 @@ from itou.utils.readonly import ReadonlyViewMixin
 logger = logging.getLogger("api_drf")
 
 
-class EmployeeRecordRateThrottle(UserRateThrottle):
+class FailSafeEmployeeRecordRateThrottle(FailSafeUserRateThrottle):
     # For the record, we suspect API calls made by GTA software (used by SIAEs)
     # to be a bit excessive for the least.
     rate = "60/min"
@@ -27,7 +27,7 @@ class EmployeeRecordRateThrottle(UserRateThrottle):
 class AbstractEmployeeRecordViewSet(
     LoginNotRequiredMixin, ReadonlyViewMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
-    throttle_classes = [EmployeeRecordRateThrottle]
+    throttle_classes = [FailSafeEmployeeRecordRateThrottle]
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
