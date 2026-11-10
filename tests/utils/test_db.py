@@ -76,6 +76,24 @@ class TestPgAdvisoryLock(AdvisoryLockTestBase):
                     cursor.execute("select 1 / 0")
         assert not self.other_session_can_acquire_lock(lock)
 
+    @pytest.mark.parametrize("conn_max_age", [10, None])
+    def test_cannot_call_with_persistent_connections(self, conn_max_age):
+        lock = "lock"
+        body_ran = False
+        with mock.patch.dict(
+            connection.settings_dict,
+            {"CONN_MAX_AGE": conn_max_age},
+        ):
+            with pytest.raises(
+                ValueError,
+                match="Cannot use `pg_advisory_lock.*",
+            ):
+                with pg_advisory_lock(lock):
+                    body_ran = True
+        assert not body_ran
+        # No lock has been acquired, another session can lock.
+        assert self.other_session_can_acquire_lock(lock)
+
 
 class TestPgTryAdvisoryLock(AdvisoryLockTestBase):
     def test_can_acquire_lock_if_not_already_held(self):

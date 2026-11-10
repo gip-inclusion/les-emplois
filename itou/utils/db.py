@@ -90,6 +90,7 @@ def pg_try_advisory_lock(name: str):
 
 @contextlib.contextmanager
 def pg_advisory_lock(name: str):
+    check_connection_is_not_reused()
     lock_id = get_lock_id(name)
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
