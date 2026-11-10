@@ -54,10 +54,7 @@ class TestPgAdvisoryLock(AdvisoryLockTestBase):
         with connection.cursor() as cursor:
             # Let's fail quickly.
             cursor.execute("SET lock_timeout = '50ms'")
-            with pytest.raises(
-                OperationalError,
-                match="canceling statement due to lock timeout",
-            ):
+            with pytest.raises(CannotAcquireLock):
                 with pg_advisory_lock(lock):
                     body_ran = True
         assert not body_ran
