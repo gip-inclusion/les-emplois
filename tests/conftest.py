@@ -46,7 +46,7 @@ from tests.openid_connect.pro_connect.testing import ProConnectSetup
 
 
 # Rewrite before importing itou code.
-pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.test")
+pytest.register_assert_rewrite("tests.utils.testing", "tests.utils.htmx.testing")
 
 # ruff: disable[E402]
 from config.sentry import sentry_init
