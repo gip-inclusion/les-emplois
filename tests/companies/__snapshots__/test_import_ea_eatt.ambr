@@ -112,6 +112,18 @@
 # name: test_command_errors[friday][logs]
   list([
     dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
       'funcName': '_log',
       'levelno': 20,
       'message': '[chan 0] Opened sftp connection (server version 3)',
@@ -151,6 +163,18 @@
 # ---
 # name: test_command_errors[monday][logs]
   list([
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
     dict({
       'funcName': '_log',
       'levelno': 20,
@@ -192,6 +216,18 @@
 # name: test_command_errors[thursday][logs]
   list([
     dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
       'funcName': '_log',
       'levelno': 20,
       'message': '[chan 0] Opened sftp connection (server version 3)',
@@ -232,6 +268,18 @@
 # name: test_command_errors[tuesday][logs]
   list([
     dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
       'funcName': '_log',
       'levelno': 20,
       'message': '[chan 0] Opened sftp connection (server version 3)',
@@ -271,6 +319,18 @@
 # ---
 # name: test_command_errors[wednesday][logs]
   list([
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
     dict({
       'funcName': '_log',
       'levelno': 20,
@@ -316,6 +376,18 @@
 # name: test_process_file_from_archive[logs]
   list([
     dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
       'funcName': 'process_file',
       'info_stats': dict({
         'creatable_sirets': 2,
@@ -348,6 +420,18 @@
 # ---
 # name: test_process_file_when_there_is_no_company_rows[logs]
   list([
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Trying to acquire advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
+    dict({
+      'funcName': 'pg_try_advisory_lock',
+      'levelno': 20,
+      'message': 'Acquired advisory lock for command:itou.companies.management.commands.import_ea_eatt (lock id 3530205219).',
+      'module': 'db',
+    }),
     dict({
       'funcName': 'process_file',
       'levelno': 20,

@@ -7,6 +7,7 @@ from django.utils import timezone
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
+from tests.utils.testing import command_lock_logs
 
 
 def process_output(caplog_messages):
@@ -72,6 +73,7 @@ def test_default_run(caplog, faker):
     assert EmployeeRecord.objects.filter(status=Status.READY).count() == 0
     call_command("resend_employee_record_with_3446_notification", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("resend_employee_record_with_3446_notification"),
         "Starting resending employee records - starting at pk=0",
         "[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.ready (PROCESSED -> READY)",
         f"Could not transition employee_record={rejected_notification_with_borked_data.employee_record.pk} to READY",
@@ -86,6 +88,7 @@ def test_default_run(caplog, faker):
     caplog.clear()
     call_command("resend_employee_record_with_3446_notification", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("resend_employee_record_with_3446_notification"),
         f"Starting resending employee records - starting at pk={rejected_notification_with_borked_data.pk}",
         "Changed 0 employee records to READY status",
         "Stored last migrated employee record notification - pk=0",
@@ -98,6 +101,7 @@ def test_default_run(caplog, faker):
     caplog.clear()
     call_command("resend_employee_record_with_3446_notification", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("resend_employee_record_with_3446_notification"),
         "Starting resending employee records - starting at pk=0",
         "Changed 0 employee records to READY status",
         "Stored last migrated employee record notification - pk=0",
@@ -111,6 +115,7 @@ def test_default_run(caplog, faker):
     caplog.clear()
     call_command("resend_employee_record_with_3446_notification", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("resend_employee_record_with_3446_notification"),
         "Starting resending employee records - starting at pk=0",
         "Changed 0 employee records to READY status",
         "Stored last migrated employee record notification - pk=0",

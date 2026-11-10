@@ -229,7 +229,10 @@ DATABASES = {
         "ATOMIC_REQUESTS": True,
         # Since we have the health checks enabled, no need to define a max age:
         # if the connection was closed on the database side, the check will detect it
-        "CONN_MAX_AGE": None,
+        # When not serving HTTP requests, connections cannot be reused,
+        # so CONN_MAX_AGE has no use. But we set it to zero to be
+        # explicit, see `itou.utils.pg_try_advisory_lock()`.
+        "CONN_MAX_AGE": None if WEB_SERVER_MODE else 0,
         "CONN_HEALTH_CHECKS": True,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRESQL_ADDON_DB"),

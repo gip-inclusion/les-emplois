@@ -12,6 +12,7 @@ from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
 from itou.utils.mocks.pole_emploi import API_OFFRES_RESPONSE_OK
+from tests.utils.testing import command_lock_logs
 
 
 @override_settings(
@@ -101,6 +102,7 @@ def test_sync_ft_offers(caplog, respx_mock):
                 + expected_logs
                 + ["Setting transaction to be rollback as wet_run=False"]
             )
+        expected_logs = command_lock_logs("sync_ft_offers") + expected_logs
         assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == expected_logs
         assert JobDescription.objects.count() == (2 if wet_run else 0)
 
@@ -146,6 +148,7 @@ def test_sync_ft_offers(caplog, respx_mock):
         "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+        *command_lock_logs("sync_ft_offers"),
         "retrieved count=2 offers from FT API",
         "retrieved count=2 PEC offers from FT API",
         "retrieved count=2 offers from FT API",
@@ -173,6 +176,7 @@ def test_sync_ft_offers(caplog, respx_mock):
         "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+        *command_lock_logs("sync_ft_offers"),
         "retrieved count=0 offers from FT API",
         "retrieved count=0 PEC offers from FT API",
         "retrieved count=2 offers from FT API",

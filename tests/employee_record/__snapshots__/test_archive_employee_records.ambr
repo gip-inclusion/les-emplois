@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_management_command_default_run
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.archive_employee_records (lock id 3568706312).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.archive_employee_records (lock id 3568706312).',
     'Command launched with wet_run=False',
     'Start archiving employee records',
     'Found 1 possibly archivable employee record(s)',
@@ -11,6 +13,8 @@
 # ---
 # name: test_management_command_wet_run
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.archive_employee_records (lock id 3568706312).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.archive_employee_records (lock id 3568706312).',
     'Start archiving employee records',
     'Found 1 possibly archivable employee record(s)',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.archive (NEW -> ARCHIVED)',

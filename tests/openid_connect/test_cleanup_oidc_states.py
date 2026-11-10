@@ -8,6 +8,7 @@ from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect.models import FranceConnectState
 from itou.openid_connect.ft_connect.models import FranceTravailConnectState
 from itou.openid_connect.pro_connect.models import ProConnectState
+from tests.utils.testing import command_lock_logs
 
 
 def test_cleanup(caplog):
@@ -38,6 +39,7 @@ def test_cleanup(caplog):
         assertQuerySetEqual(model.objects.all(), expected)
 
     assert caplog.messages[:-1] == [
+        *command_lock_logs("cleanup_oidc_states"),
         "Deleted 1 obsolete FranceConnectState",
         "Deleted 1 obsolete FranceTravailConnectState",
         "Deleted 2 obsolete ProConnectStates",

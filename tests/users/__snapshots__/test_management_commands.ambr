@@ -21,6 +21,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_batch[send_users_to_brevo_batch]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 2',
@@ -69,6 +79,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_errors[send_users_to_brevo_errors]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
@@ -119,6 +139,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_job_seekers[send_users_to_brevo_job_seekers]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 0',
@@ -162,6 +192,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_orienteurs[send_users_to_brevo_orienteurs]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
@@ -207,6 +247,16 @@
 # name: TestCommandSendUsersToBrevo.test_wet_run_prescribers[send_users_to_brevo_prescribers]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
       'SIAE users count: 0',
@@ -250,6 +300,16 @@
 # ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_siae[send_users_to_brevo_siae]
   list([
+    tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.users.management.commands.send_users_to_brevo (lock id 1055049100).',
+    ),
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
@@ -402,6 +462,8 @@
 # ---
 # name: test_pe_certify_users
   list([
+    'Trying to acquire advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
+    'Acquired advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
     'about to resolve first_name and last_name for count=1 users',
     'only count=1 users have the necessary data to be resolved',
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
@@ -418,6 +480,8 @@
 # ---
 # name: test_pe_certify_users.1
   list([
+    'Trying to acquire advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
+    'Acquired advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
     'about to resolve first_name and last_name for count=1 users',
     'only count=1 users have the necessary data to be resolved',
     'HTTP Request: POST https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie "HTTP/1.1 200 OK"',
@@ -431,6 +495,8 @@
 # ---
 # name: test_pe_certify_users_dry_run
   list([
+    'Trying to acquire advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
+    'Acquired advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
     'Command launched with wet_run=False',
     'about to resolve first_name and last_name for count=1 users',
     'only count=1 users have the necessary data to be resolved',
@@ -447,6 +513,8 @@
 # ---
 # name: test_pe_certify_users_with_swap
   list([
+    'Trying to acquire advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
+    'Acquired advisory lock for command:itou.users.management.commands.pe_certify_users (lock id 3270374831).',
     'about to resolve first_name and last_name for count=1 users',
     'only count=1 users have the necessary data to be resolved',
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',

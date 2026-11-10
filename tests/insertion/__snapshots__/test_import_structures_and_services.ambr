@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_full_import_dry_run[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
+    'Acquired advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
     'Command launched with wet_run=False',
     'Importing data·inclusion references data',
     'HTTP Request: GET https://api.data.inclusion.gouv.fr/api/v1/doc/frais "HTTP/1.1 200 OK"',
@@ -271,6 +273,8 @@
 # ---
 # name: test_full_import_idempotence[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
+    'Acquired advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
     'Importing data·inclusion references data',
     'HTTP Request: GET https://api.data.inclusion.gouv.fr/api/v1/doc/frais "HTTP/1.1 200 OK"',
     'SUMMARY GenericReferenceItem current_collection_keys_count=2 comparative_collection_keys_count=2 common_keys_count=2 added_keys_count=0 updated_keys_count=0 removed_keys_count=0',
@@ -302,13 +306,21 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 60,
+    'num_queries': 61,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -321,6 +333,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -332,6 +345,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SHOW lock_timeout',
       }),
@@ -343,6 +357,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           
@@ -358,6 +373,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -379,6 +395,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -400,6 +417,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -421,6 +439,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -442,6 +461,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -463,6 +483,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -484,6 +505,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -505,6 +527,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -525,6 +548,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_genericreferenceitem" ("source",
@@ -547,6 +571,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_genericreferenceitem"."id",
@@ -567,6 +592,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_genericreferenceitem" ("source",
@@ -589,6 +615,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_structure"."id",
@@ -608,6 +635,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -634,6 +662,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id"
@@ -650,6 +679,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -685,6 +715,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -720,6 +751,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -755,6 +787,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -791,6 +824,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -814,6 +848,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure_reseaux_porteurs" ("structure_id",
@@ -830,6 +865,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -865,6 +901,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_structure" ("address_line_1",
@@ -899,6 +936,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "insertion_structure"
@@ -914,6 +952,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_structure"."id",
@@ -931,6 +970,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_service"."id",
@@ -950,6 +990,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -975,6 +1016,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1000,6 +1042,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1047,6 +1090,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1094,6 +1138,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1142,6 +1187,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1166,6 +1212,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_thematics" ("service_id",
@@ -1185,6 +1232,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1209,6 +1257,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_publics" ("service_id",
@@ -1228,6 +1277,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1252,6 +1302,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_receptions" ("service_id",
@@ -1270,6 +1321,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1294,6 +1346,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_mobilization_publics" ("service_id",
@@ -1312,6 +1365,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1358,6 +1412,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_thematics" ("service_id",
@@ -1375,6 +1430,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_receptions" ("service_id",
@@ -1391,6 +1447,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_mobilization_publics" ("service_id",
@@ -1409,6 +1466,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1457,6 +1515,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
@@ -1481,6 +1540,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_mobilizations" ("service_id",
@@ -1498,6 +1558,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1544,6 +1605,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_thematics" ("service_id",
@@ -1561,6 +1623,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_receptions" ("service_id",
@@ -1577,6 +1640,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_mobilization_publics" ("service_id",
@@ -1595,6 +1659,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service" ("address_line_1",
@@ -1641,6 +1706,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_thematics" ("service_id",
@@ -1658,6 +1724,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_receptions" ("service_id",
@@ -1674,6 +1741,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_service_mobilization_publics" ("service_id",
@@ -1690,6 +1758,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "insertion_service"
@@ -1705,6 +1774,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           
@@ -1716,6 +1786,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -1724,6 +1795,8 @@
 # ---
 # name: test_full_import_wet_run[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
+    'Acquired advisory lock for command:itou.insertion.management.commands.import_structures_and_services (lock id 1949829301).',
     'Importing data·inclusion references data',
     'HTTP Request: GET https://api.data.inclusion.gouv.fr/api/v1/doc/frais "HTTP/1.1 200 OK"',
     "ADDED item key=('gratuit',) data=['label', 'description']",

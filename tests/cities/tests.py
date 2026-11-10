@@ -13,6 +13,7 @@ from tests.cities.factories import create_city_guerande, create_city_vannes, cre
 from tests.companies.factories import JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import command_lock_logs
 
 
 def test_create_test_cities():
@@ -86,6 +87,7 @@ def test_sync_cities(settings, caplog, respx_mock):
 
     management.call_command("sync_cities", wet_run=True)
     assert caplog.messages[:-1] == [
+        *command_lock_logs("sync_cities"),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
@@ -162,6 +164,7 @@ def test_sync_cities(settings, caplog, respx_mock):
 
     management.call_command("sync_cities", wet_run=True)
     assert caplog.messages[:-1] == [
+        *command_lock_logs("sync_cities"),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
@@ -323,6 +326,7 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
     management.call_command("sync_cities", wet_run=True)
     new_city = City.objects.get(code_insee="19248")
     assert caplog.messages[:-1] == [
+        *command_lock_logs("sync_cities"),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"

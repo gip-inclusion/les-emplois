@@ -1,18 +1,24 @@
 # serializer version: 1
 # name: test_nothing_to_report[False]
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
     'Checking employee records waiting for an ASP response',
     'No missing file found',
   ])
 # ---
 # name: test_nothing_to_report[True]
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
     'Checking employee records waiting for an ASP response',
     'No missing file found',
   ])
 # ---
 # name: test_report[False]
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
     'Checking employee records waiting for an ASP response',
     'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecord that seems to have been lost',
     'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecordUpdateNotification that seems to have been lost',
@@ -21,6 +27,8 @@
 # ---
 # name: test_report[True]
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.detect_missing_asp_files (lock id 3561263073).',
     'Checking employee records waiting for an ASP response',
     'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecord that seems to have been lost',
     'Found filename=RIAE_FS_20000101120001.json for model=EmployeeRecordUpdateNotification that seems to have been lost',

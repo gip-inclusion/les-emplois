@@ -22,7 +22,7 @@ from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
-from tests.utils.testing import default_storage_ls_files
+from tests.utils.testing import command_lock_logs, default_storage_ls_files
 
 
 @pytest.mark.usefixtures("temporary_bucket")
@@ -106,6 +106,7 @@ def test_copy(pdf_file):
 def test_delete_unused_files_no_files(caplog):
     call_command("delete_unused_files")
     assert caplog.messages[:-1] == [
+        *command_lock_logs("delete_unused_files"),
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 0 files in database",
@@ -146,6 +147,7 @@ def test_delete_unused_files_from_database(caplog):
     assert not File.objects.filter(pk__in=[old_orphan.pk, scan.file_id]).exists()
 
     assert caplog.messages[:-1] == [
+        *command_lock_logs("delete_unused_files"),
         "Starting unused file removal",
         "Deleted 2 orphans files from database",
         "Checking existing files: 9 files in database",
@@ -182,6 +184,7 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
     call_command("delete_unused_files")
     assert File.objects.count() == 2  # No changes in db
     assert caplog.messages[:-1] == [
+        *command_lock_logs("delete_unused_files"),
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 2 files in database",
@@ -202,6 +205,7 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
     call_command("delete_unused_files")
     assert File.objects.count() == 2  # No changes in db
     assert caplog.messages[:-1] == [
+        *command_lock_logs("delete_unused_files"),
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 2 files in database",

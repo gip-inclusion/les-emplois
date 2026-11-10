@@ -33,7 +33,6 @@ from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import caches
 from django.core.files.storage import storages
-from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
@@ -42,6 +41,7 @@ from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
 import itou.emails.utils
+from itou.files.management.commands.configure_buckets import Command as configure_buckets_command
 from tests.openid_connect.pro_connect.testing import ProConnectSetup
 
 
@@ -328,7 +328,11 @@ def temporary_bucket_setup_fixture(temporary_bucket_name, temporary_dora_bucket_
     with override_settings(
         AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_dora_bucket_name
     ):
-        call_command("configure_buckets")
+        # The "configure_buckets" command uses `pg_try_advisory_lock`
+        # to avoid simultaneous runs (see `BaseCommand`). That
+        # requires a database connection. Setting one here is
+        # complicated. Just call the underlying code instead.
+        configure_buckets_command().handle()
     yield temporary_bucket_name
     client = s3_client()
     with contextlib.suppress(NoObjectsInBucket):
