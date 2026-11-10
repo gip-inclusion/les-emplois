@@ -6,6 +6,16 @@
 # name: test_fetch_kpi[False][logs]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    ),
+    tuple(
       'itou.metabase.management.commands.metabase_data',
       20,
       'Command launched with wet_run=False',
@@ -116,6 +126,16 @@
 # name: test_fetch_kpi[True][logs]
   list([
     tuple(
+      'itou.utils.db',
+      20,
+      'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    ),
+    tuple(
+      'itou.utils.db',
+      20,
+      'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    ),
+    tuple(
       'itou.metabase.management.commands.metabase_data',
       20,
       'Fetching datum_key=flux_iae_data_updated_at',
@@ -193,6 +213,8 @@
 # ---
 # name: test_fetch_stalled_job_seekers[False][logs]
   list([
+    'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
     'Command launched with wet_run=False',
     'Number of stalled job seekers: 4',
     'Number of stalled job seekers in database: 4',
@@ -204,6 +226,8 @@
 # ---
 # name: test_fetch_stalled_job_seekers[True][logs]
   list([
+    'Trying to acquire advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
+    'Acquired advisory lock for command:itou.metabase.management.commands.metabase_data (lock id 2618330174).',
     'Number of stalled job seekers: 4',
     'Number of stalled job seekers in database: 4',
     'Number of job seekers exiting stalled status: 3',

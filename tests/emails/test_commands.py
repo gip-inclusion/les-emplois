@@ -26,7 +26,7 @@ class TestExpireOldEmails:
                 body_html="<html><body>Bonjour",
             )
         call_command("delete_old_emails")
-        assert caplog.messages[1] == "Deleted 1 email"
+        assert caplog.messages[3] == "Deleted 1 email"
         assertQuerySetEqual(Email.objects.all(), [after_cutoff, old])
 
     def test_wet_run(self, caplog):
@@ -46,5 +46,5 @@ class TestExpireOldEmails:
                 body_html="<html><body>Bonjour",
             )
         call_command("delete_old_emails", wet_run=True)
-        assert caplog.messages[0] == "Deleted 1 email"
+        assert caplog.messages[2] == "Deleted 1 email"
         assertQuerySetEqual(Email.objects.all(), [after_cutoff])

@@ -1,13 +1,21 @@
 # serializer version: 1
 # name: test_delete_orientations_documents[sql]
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -19,6 +27,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -29,6 +38,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -76,6 +86,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -91,6 +102,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -103,6 +115,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

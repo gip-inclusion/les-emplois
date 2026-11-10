@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_missed_notifications
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.sanitize_employee_records (lock id 2573737353).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.sanitize_employee_records (lock id 2573737353).',
     'Checking employee records coherence before transferring to ASP',
     'found 0 employee records with missing approval',
     'found 1 missed employee records notifications',
@@ -11,6 +13,8 @@
 # ---
 # name: test_missed_notifications_limit
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.sanitize_employee_records (lock id 2573737353).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.sanitize_employee_records (lock id 2573737353).',
     'Checking employee records coherence before transferring to ASP',
     'found 0 employee records with missing approval',
     'found 3 missed employee records notifications',

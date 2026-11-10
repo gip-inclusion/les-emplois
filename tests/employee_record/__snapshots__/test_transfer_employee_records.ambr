@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_download_file_error
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -15,11 +17,15 @@
 # ---
 # name: test_missing_environment_asp_sftp_host
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Your environment is missing ASP_SFTP_HOST to run this command.',
   ])
 # ---
 # name: test_option_asp_test
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Using *TEST* JSON serializers (SIRET number mapping)',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
@@ -32,6 +38,8 @@
 # ---
 # name: test_preflight
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Preflight activated, checking for possible serialization errors...',
     'Found 3 object(s) to check, split in chunks of 700 objects.',
     'Checking file #1 (chunk of 3 objects)',
@@ -40,6 +48,8 @@
 # ---
 # name: test_preflight_with_error
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Preflight activated, checking for possible serialization errors...',
     'Found 1 object(s) to check, split in chunks of 700 objects.',
     'Checking file #1 (chunk of 1 objects)',
@@ -53,20 +63,31 @@
 # ---
 # name: test_preflight_without_an_accepted_job_application
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Preflight activated, checking for possible serialization errors...',
     'No object to check. Exiting preflight.',
   ])
 # ---
 # name: test_preflight_without_object
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     'Preflight activated, checking for possible serialization errors...',
     'No object to check. Exiting preflight.',
   ])
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -76,6 +97,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -90,6 +112,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -103,6 +126,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "employee_record_employeerecord"."id",
@@ -410,6 +434,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -430,6 +455,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "employee_record_employeerecord"
@@ -463,6 +489,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "employee_record_employeerecordtransitionlog" ("transition",
@@ -489,6 +516,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -497,6 +525,8 @@
 # ---
 # name: test_upload_and_download[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -506,6 +536,8 @@
     '[chan 0] sftp session closed.',
     'Employee records processing done!',
     'Management command itou.employee_record.management.commands.transfer_employee_records succeeded in 0.00 seconds',
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 1] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -522,8 +554,15 @@
 # ---
 # name: test_upload_and_download[upload]
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -531,6 +570,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -541,6 +581,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "employee_record_employeerecord"."id",
@@ -846,6 +887,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -864,6 +906,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "employee_record_employeerecord"
@@ -896,6 +939,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "employee_record_employeerecordtransitionlog" ("transition",
@@ -920,6 +964,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -928,6 +973,8 @@
 # ---
 # name: test_upload_file_error
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -940,6 +987,8 @@
 # ---
 # name: test_upload_only_create_a_limited_number_of_files
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -952,6 +1001,8 @@
 # ---
 # name: test_upload_without_an_accepted_job_application
   list([
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records (lock id 3921469245).',
     '[chan 0] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',

@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_sync_rome_appellation[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.jobs.management.commands.sync_romes_and_appellations (lock id 1639213595).',
+    'Acquired advisory lock for command:itou.jobs.management.commands.sync_romes_and_appellations (lock id 1639213595).',
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
     'HTTP Request: GET https://pe.fake/offresdemploi/v2/referentiel/metiers "HTTP/1.1 200 OK"',
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',

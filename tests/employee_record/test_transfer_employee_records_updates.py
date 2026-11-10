@@ -10,6 +10,7 @@ from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
+from tests.utils.testing import command_lock_logs
 
 
 @pytest.fixture(name="mocked_sftp")
@@ -74,7 +75,8 @@ def test_connection_error(mocker, caplog):
         "Management command itou.employee_record.management.commands.transfer_employee_records_updates failed in "
     )
     assert caplog.messages[:-1] == [
-        "Error when executing itou.employee_record.management.commands.transfer_employee_records_updates"
+        *command_lock_logs("transfer_employee_records_updates"),
+        "Error when executing itou.employee_record.management.commands.transfer_employee_records_updates",
     ]
 
 

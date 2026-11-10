@@ -419,7 +419,7 @@ class TestAnonymizeJobseekersManagementCommand:
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
         call_command("anonymize_jobseekers", wet_run=True)
 
-        assert ("Anonymizing job seekers is suspended, exiting command" in caplog.messages[0]) is suspended
+        assert ("Anonymizing job seekers is suspended, exiting command" in caplog.messages[2]) is suspended
         assert User.objects.exists() is suspended
 
     def test_dry_run(self, respx_mock):

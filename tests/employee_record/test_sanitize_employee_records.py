@@ -10,6 +10,7 @@ from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import sanitize_employee_records
 from tests.employee_record import factories
+from tests.utils.testing import command_lock_logs
 
 
 @pytest.fixture(name="command")
@@ -30,6 +31,7 @@ def test_handle_dry_run(mocker, caplog):
     call_command("sanitize_employee_records", wet_run=False)
 
     assert process_output(caplog.messages) == [
+        *command_lock_logs("sanitize_employee_records"),
         "Command launched with wet_run=False",
         "Checking employee records coherence before transferring to ASP",
         "Employee records sanitizing done. Have a great day!",
@@ -48,6 +50,7 @@ def test_missing_approvals(caplog):
 
     assert models.EmployeeRecord.objects.count() == 0
     assert process_output(caplog.messages) == [
+        *command_lock_logs("sanitize_employee_records"),
         "Checking employee records coherence before transferring to ASP",
         "found 1 employee records with missing approval",
         "deleted 1/1 employee records with missing approval",

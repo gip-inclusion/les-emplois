@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_chores_send_reminder_to_prescriber_organization_other_members[False-0]
   list([
+    'Trying to acquire advisory lock for command:itou.approvals.management.commands.prolongation_requests_chores (lock id 3987154543).',
+    'Acquired advisory lock for command:itou.approvals.management.commands.prolongation_requests_chores (lock id 3987154543).',
     'Command launched with wet_run=False',
     '2 prolongation requests can be reminded',
     '2/2 prolongation requests reminded',
@@ -9,6 +11,8 @@
 # ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members[True-2]
   list([
+    'Trying to acquire advisory lock for command:itou.approvals.management.commands.prolongation_requests_chores (lock id 3987154543).',
+    'Acquired advisory lock for command:itou.approvals.management.commands.prolongation_requests_chores (lock id 3987154543).',
     '2 prolongation requests can be reminded',
     '2/2 prolongation requests reminded',
   ])

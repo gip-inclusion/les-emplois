@@ -36,6 +36,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.utils.testing import command_lock_logs
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -1026,6 +1027,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             call_command("send_check_authorized_members_email")
         assert len(mailoutbox) == 0
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1044,6 +1046,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 1 prescriber organizations",
             f"Sent reminder notification to user {self.prescriber_1.user_id} "
@@ -1059,6 +1062,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1074,6 +1078,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 1 companies",
             f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
             f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
@@ -1123,6 +1128,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 1 companies",
             f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
             f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
@@ -1144,6 +1150,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1158,6 +1165,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 0 prescriber organizations",
             "Processing 0 institutions",
@@ -1172,6 +1180,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("send_check_authorized_members_email")
         assert self.process_output(caplog.messages) == [
+            *command_lock_logs("send_check_authorized_members_email"),
             "Processing 0 companies",
             "Processing 1 prescriber organizations",
             (
@@ -1413,12 +1422,12 @@ def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
     )
     del_count = 1 if is_after_cutoff else 0
     call_command("delete_old_nir_modification_requests", wet_run=False)
-    assert caplog.messages[1] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert caplog.messages[3] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1
 
     caplog.clear()
     call_command("delete_old_nir_modification_requests", wet_run=True)
-    assert caplog.messages[0] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert caplog.messages[2] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1 - del_count
 
 
