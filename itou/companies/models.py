@@ -2,6 +2,7 @@ import sys
 import uuid
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
@@ -1235,6 +1236,35 @@ class ContractQuerySet(models.QuerySet):
         if company:
             contracts = contracts.filter(company=company)
         return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
+
+    def in_monthly_recap(self):
+        """The rule of User.objects.at_end_of_journey(), by calendar month.
+
+        Each contract keeps its job seeker at the end of their journey in the company of the contract,
+        so the company can fill in their pro support report."""
+        from itou.users.models import User
+
+        today = timezone.localdate()
+        first_day_of_month = today.replace(day=1)
+        is_last_contract_ended_with_valid_approval = Q(
+            Exists(
+                User.objects.filter(
+                    User.objects.last_contract_ended_with_valid_approval_lookup(), pk=OuterRef("job_seeker_id")
+                )
+            ),
+            pk=self.last_pk_lookup(OuterRef("job_seeker_id")),
+        )
+        # The report is filled in on the last contract of the job seeker in the company.
+        is_last_contract_in_company = Q(pk=self.last_pk_lookup(OuterRef("job_seeker_id"), OuterRef("company_id")))
+        return self.filter(
+            # Contracts of people unknown to the platform are imported without job seeker.
+            Q(
+                is_last_contract_in_company,
+                end_date__range=(today, first_day_of_month + relativedelta(months=1, days=-1)),
+                job_seeker__isnull=False,
+            )
+            | Q(is_last_contract_ended_with_valid_approval, end_date__gte=first_day_of_month - relativedelta(months=1))
+        )
 
 
 class Contract(models.Model):
