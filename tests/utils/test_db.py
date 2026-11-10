@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from django.db import connection
-from django.db.utils import OperationalError
+from django.db.utils import DataError
 
 from itou.utils.db import CannotAcquireLock, get_lock_id, pg_advisory_lock, pg_try_advisory_lock
 
@@ -61,6 +61,21 @@ class TestPgAdvisoryLock(AdvisoryLockTestBase):
                 with pg_advisory_lock(lock):
                     body_ran = True
         assert not body_ran
+
+    def test_lock_is_released_when_body_raises_without_aborted_transaction(self):
+        lock = "lock"
+        with pytest.raises(ZeroDivisionError):
+            with pg_advisory_lock(lock):
+                1 / 0
+        assert self.other_session_can_acquire_lock(lock)
+
+    def test_lock_is_released_when_body_raises_with_aborted_transaction(self):
+        lock = "lock"
+        with pytest.raises(DataError, match="division by zero"):
+            with pg_advisory_lock(lock):
+                with connection.cursor() as cursor:
+                    cursor.execute("select 1 / 0")
+        assert self.other_session_can_acquire_lock(lock)
 
 
 class TestPgTryAdvisoryLock(AdvisoryLockTestBase):

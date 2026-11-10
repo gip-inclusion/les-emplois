@@ -6,6 +6,7 @@ import logging
 import psycopg.errors
 from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.db.models import Q
+from django.db.utils import InternalError
 from psycopg import sql
 
 
@@ -93,9 +94,29 @@ def pg_advisory_lock(name: str):
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
         cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
-        yield
+        try:
+            yield
+        finally:
+            if _try_to_unlock_advisory_lock(cursor, lock_id):
+                logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
+            else:
+                logger.error("Could not release advisory lock for %s (lock id %s)", name, lock_id)
+
+
+def _try_to_unlock_advisory_lock(cursor, lock_id: int) -> bool:
+    try:
         cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-    logger.info("Releasing advisory lock for %s (lock id %s).", name, lock_id)
+    except InternalError as exc:
+        if not isinstance(exc.__cause__, psycopg.errors.InFailedSqlTransaction):
+            raise
+        # Could happen if a previous PostgreSQL error caused the
+        # transaction to be aborted.
+        try:
+            cursor.execute("ROLLBACK")
+            cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+        except Exception:
+            return False
+    return True
 
 
 class ExclusionViolationError(IntegrityError):
