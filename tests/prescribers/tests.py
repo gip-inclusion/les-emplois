@@ -770,6 +770,32 @@ class TestPrescriberOrganizationAdmin:
         assert len(response.context["errors"]) == 1
         assert response.context["errors"][0] == [expected_msg]
 
+    def test_duplicate_siret_filter(self, client):
+        client.force_login(self.user)
+
+        organization = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
+        duplicate = PrescriberOrganizationFactory(siret=organization.siret, kind=organization.kind)
+        other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML)
+
+        response = client.get(reverse("admin:prescribers_prescriberorganization_changelist"))
+        assertContains(response, organization.display_name)
+        assertContains(response, duplicate.display_name)
+        assertContains(response, other_org.display_name)
+
+        response = client.get(
+            reverse("admin:prescribers_prescriberorganization_changelist", query={"duplicate_organizations": "yes"})
+        )
+        assertContains(response, organization.display_name)
+        assertContains(response, duplicate.display_name)
+        assertNotContains(response, other_org.display_name)
+
+        response = client.get(
+            reverse("admin:prescribers_prescriberorganization_changelist", query={"duplicate_organizations": "no"})
+        )
+        assertNotContains(response, organization.display_name)
+        assertNotContains(response, duplicate.display_name)
+        assertContains(response, other_org.display_name)
+
     def test_transfer_button(self, client):
         organization = PrescriberOrganizationFactory()
         transfer_url = reverse("admin:transfer_prescriberorg_data", kwargs={"from_org_pk": organization.pk})
