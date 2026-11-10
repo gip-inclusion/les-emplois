@@ -14,6 +14,7 @@ from django.conf import Path
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.files.storage import default_storage
+from django.core.management import get_commands
 from django.http import HttpResponse
 from django.template import Template
 from django.template.loader import render_to_string
@@ -24,6 +25,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.utils.db import get_lock_id
 from itou.utils.legal_terms import get_terms_versions
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 
@@ -317,3 +319,13 @@ PAGINATION_PAGE_ONE_MARKUP = """
     <li class="page-item active">
         <a class="page-link" aria-label="Page 1" aria-current="page" href="%s">1</a>
     </li>"""
+
+
+def command_lock_logs(command_name):
+    """Logs emitted when a management command acquires its advisory lock."""
+    lock_name = f"command:{get_commands()[command_name]}.management.commands.{command_name}"
+    lock_id = get_lock_id(lock_name)
+    return [
+        f"Trying to acquire advisory lock for {lock_name} (lock id {lock_id}).",
+        f"Acquired advisory lock for {lock_name} (lock id {lock_id}).",
+    ]
