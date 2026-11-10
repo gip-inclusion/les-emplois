@@ -948,13 +948,21 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 92,
+    'num_queries': 93,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -967,6 +975,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -978,6 +987,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "users_user"
@@ -996,6 +1006,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1054,6 +1065,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1347,6 +1359,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -1380,6 +1393,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -1413,6 +1427,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "institutions_institutionmembership"."id",
@@ -1448,6 +1463,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1475,6 +1491,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1502,6 +1519,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1529,6 +1547,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1556,6 +1575,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1583,6 +1603,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1610,6 +1631,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1637,6 +1659,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1664,6 +1687,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -1689,6 +1713,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "archive_anonymizedprofessional" ("id",
@@ -1717,6 +1742,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1777,6 +1803,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "account_emailaddress"."id"
@@ -1802,6 +1829,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id"
@@ -1827,6 +1855,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -1860,6 +1889,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_siaeconvention"."id"
@@ -1885,6 +1915,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_prosupportreport"."id",
@@ -1923,6 +1954,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id"
@@ -1948,6 +1980,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id"
@@ -1973,6 +2006,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_nirmodificationrequest"."id",
@@ -2004,6 +2038,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerassignment"."id",
@@ -2041,6 +2076,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id"
@@ -2066,6 +2102,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id"
@@ -2091,6 +2128,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -2124,6 +2162,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "institutions_institutionmembership"."id",
@@ -2157,6 +2196,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2182,6 +2222,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2207,6 +2248,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2232,6 +2274,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2257,6 +2300,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2282,6 +2326,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -2307,6 +2352,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplicationtransitionlog"."id",
@@ -2339,6 +2385,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplicationcomment"."id",
@@ -2369,6 +2416,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id"
@@ -2394,6 +2442,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id"
@@ -2419,6 +2468,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -2454,6 +2504,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -2489,6 +2540,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2514,6 +2566,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2539,6 +2592,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2564,6 +2618,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2589,6 +2644,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2614,6 +2670,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2657,6 +2714,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2700,6 +2758,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2743,6 +2802,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2786,6 +2846,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id"
@@ -2811,6 +2872,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id"
@@ -2836,6 +2898,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id"
@@ -2861,6 +2924,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id"
@@ -2886,6 +2950,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "otp_itoustaticdevice"."id"
@@ -2911,6 +2976,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "employee_record_employeerecordtransitionlog"."id",
@@ -2948,6 +3014,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -2973,6 +3040,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -2998,6 +3066,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -3023,6 +3092,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -3048,6 +3118,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmenttransitionlog"."id",
@@ -3081,6 +3152,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "communications_notificationsettings"."id"
@@ -3106,6 +3178,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "rdv_insertion_invitationrequest"."id"
@@ -3131,6 +3204,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_mobilizationevent"."id"
@@ -3156,6 +3230,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id"
@@ -3181,6 +3256,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id"
@@ -3206,6 +3282,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3230,6 +3307,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3254,6 +3332,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3278,6 +3357,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3302,6 +3382,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3326,6 +3407,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3350,6 +3432,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3374,6 +3457,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3398,6 +3482,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3422,6 +3507,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3446,6 +3532,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3470,6 +3557,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3494,6 +3582,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3518,6 +3607,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3542,6 +3632,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3566,6 +3657,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3590,6 +3682,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3614,6 +3707,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3638,6 +3732,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "audit_trail_audittrail"
@@ -3662,6 +3757,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "companies_contract"
@@ -3686,6 +3782,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "companies_prosupportreport"
@@ -3710,6 +3807,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3730,6 +3828,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

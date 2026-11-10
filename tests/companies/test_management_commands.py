@@ -12,7 +12,7 @@ from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.testing import remove_greetings
+from tests.utils.testing import command_lock_logs, remove_greetings
 
 
 def test_update_companies_job_app_score(caplog):
@@ -24,8 +24,8 @@ def test_update_companies_job_app_score(caplog):
 
     # Dry run first
     management.call_command("update_companies_job_app_score", wet_run=False)
-    assert caplog.messages[0] == "Command launched with wet_run=False"
-    assert caplog.messages[1] == "Updated 2 companies"
+    assert caplog.messages[2] == "Command launched with wet_run=False"
+    assert caplog.messages[3] == "Updated 2 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
@@ -37,7 +37,7 @@ def test_update_companies_job_app_score(caplog):
 
     # Wet run now
     management.call_command("update_companies_job_app_score", wet_run=True)
-    assert caplog.messages[0] == "Updated 2 companies"
+    assert caplog.messages[2] == "Updated 2 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
@@ -56,7 +56,7 @@ def test_update_companies_job_app_score(caplog):
     caplog.clear()
     management.call_command("update_companies_job_app_score", wet_run=True)
     # company_2 changed
-    assert caplog.messages[0] == "Updated 1 companies"
+    assert caplog.messages[2] == "Updated 1 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
@@ -151,7 +151,10 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
         ordered=False,
     )
 
-    assert caplog.messages[:-1] == ["Deactivated 2 JobDescriptions"]
+    assert caplog.messages[:-1] == [
+        *command_lock_logs("deactivate_old_job_descriptions"),
+        "Deactivated 2 JobDescriptions",
+    ]
     assert len(mailoutbox) == 2
 
     assert set(sum((mail.to for mail in mailoutbox), [])) == set(
@@ -201,7 +204,10 @@ def test_deactivate_spontaneous_jobapps(snapshot, mailoutbox, django_capture_on_
     assert company.spontaneous_applications_open_since is None
     assert not company.is_open_to_spontaneous_applications
 
-    assert caplog.messages[:-1] == ["Deactivated spontaneous job applications for 1 Companies"]
+    assert caplog.messages[:-1] == [
+        *command_lock_logs("deactivate_spontaneous_jobapps"),
+        "Deactivated spontaneous job applications for 1 Companies",
+    ]
     assert len(mailoutbox) == 2
 
     assert set(sum((mail.to for mail in mailoutbox), [])) == set(

@@ -6,6 +6,7 @@ from django.core.management import call_command
 
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from tests.job_applications.factories import JobApplicationFactory
+from tests.utils.testing import command_lock_logs
 
 
 @pytest.mark.parametrize("wet_run", [True, False])
@@ -46,6 +47,7 @@ def test_purge_orphaned_support_remarks(caplog, wet_run):
             + expected_logs
             + ["Setting transaction to be rollback as wet_run=False"]
         )
+    expected_logs = command_lock_logs("purge_orphaned_support_remarks") + expected_logs
     assert caplog.messages[:-1] == expected_logs
     assert caplog.messages[-1].startswith(
         "Management command itou.utils.management.commands.purge_orphaned_support_remarks succeeded in"

@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from itou.analytics.management.commands import collect_analytics_data
 from itou.analytics.models import Datum, DatumCode
 from tests.analytics import factories
+from tests.utils.testing import command_lock_logs
 
 
 class CodeTest(models.TextChoices):
@@ -46,6 +47,7 @@ def test_handle_default_options(command, caplog):
     assert single_show_data_call_args.args[1:] == ({},)
     assert command.save_data.call_args_list == []
     assert process_output(caplog.messages) == [
+        *command_lock_logs("collect_analytics_data"),
         "Collecting analytics data before '2022-01-01 00:00:00+00:00'.",
         "Analytics data computed.",
     ]
@@ -65,6 +67,7 @@ def test_handle_offset_option(command, caplog):
     call_command("collect_analytics_data", save=False, offset=7)
 
     assert process_output(caplog.messages) == [
+        *command_lock_logs("collect_analytics_data"),
         "Collecting analytics data before '2021-12-25 00:00:00+00:00'.",
         "Analytics data computed.",
     ]

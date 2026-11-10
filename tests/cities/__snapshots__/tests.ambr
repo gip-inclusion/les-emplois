@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_resolve_insee_cities[dry_run]
   list([
+    'Trying to acquire advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
+    'Acquired advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
     'Command launched with wet_run=False',
     "Failed to find matching city for item.city='ERAND' item.post_code='44350'",
     "Failed to find matching city for item.city='Guérande' item.post_code='54350'",
@@ -10,6 +12,8 @@
 # ---
 # name: test_resolve_insee_cities[first_pass]
   list([
+    'Trying to acquire advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
+    'Acquired advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
     "Failed to find matching city for item.city='ERAND' item.post_code='44350'",
     "Failed to find matching city for item.city='Guérande' item.post_code='54350'",
     'count=1 JobSeeker updated and err_count=2 JobSeeker without a resolution.',
@@ -17,6 +21,8 @@
 # ---
 # name: test_resolve_insee_cities[second_pass]
   list([
+    'Trying to acquire advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
+    'Acquired advisory lock for command:itou.cities.management.commands.resolve_insee_cities (lock id 3037269354).',
     'count=0 JobSeeker updated and err_count=0 JobSeeker without a resolution.',
   ])
 # ---

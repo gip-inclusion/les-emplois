@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_command_call
   list([
+    'Trying to acquire advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
+    'Acquired advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
     "Files in local's 'test_command_call0': ['fluxIAE_ITOU_.tar.gz']",
     "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
     "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=11",
@@ -11,6 +13,8 @@
 # ---
 # name: test_command_check_content_length
   list([
+    'Trying to acquire advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
+    'Acquired advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
     "Files in local's 'test_command_check_content_len0': ['fluxIAE_ITOU_.tar.gz']",
     "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
     "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=0 local_content_length=11",
@@ -21,6 +25,8 @@
 # ---
 # name: test_command_retries
   list([
+    'Trying to acquire advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
+    'Acquired advisory lock for command:itou.metabase.management.commands.upload_data_to_pilotage (lock id 2537753146).',
     "Files in local's 'test_command_retries0': ['fluxIAE_ITOU_.tar.gz']",
     "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
     "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=0",

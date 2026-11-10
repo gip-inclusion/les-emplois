@@ -304,6 +304,8 @@
 # ---
 # name: test_command[logs]
   list([
+    'Trying to acquire advisory lock for command:itou.users.management.commands.sync_group_and_perms (lock id 4251707558).',
+    'Acquired advisory lock for command:itou.users.management.commands.sync_group_and_perms (lock id 4251707558).',
     'group name=annuaire-pro created',
     'group name=annuaire-pro, permission add_directoryactivecity added',
     'group name=annuaire-pro, permission change_directoryactivecity added',

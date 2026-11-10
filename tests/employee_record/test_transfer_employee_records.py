@@ -18,6 +18,7 @@ from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
 from tests.users.factories import JobSeekerProfileFactory
+from tests.utils.testing import command_lock_logs
 
 
 @pytest.fixture(name="mocked_sftp")
@@ -82,7 +83,8 @@ def test_connection_error(mocker, caplog):
         "Management command itou.employee_record.management.commands.transfer_employee_records failed in "
     )
     assert caplog.messages[:-1] == [
-        "Error when executing itou.employee_record.management.commands.transfer_employee_records"
+        *command_lock_logs("transfer_employee_records"),
+        "Error when executing itou.employee_record.management.commands.transfer_employee_records",
     ]
 
 

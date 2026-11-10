@@ -11,6 +11,7 @@ from itou.employee_record.models import (
     EmployeeRecordUpdateNotification,
 )
 from tests.employee_record import factories
+from tests.utils.testing import command_lock_logs
 
 
 def process_output(caplog_messages):
@@ -63,6 +64,7 @@ def test_management_command_default_run(caplog, faker):
 
     call_command("migrate_employee_record_update_notifications", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("migrate_employee_record_update_notifications"),
         "Starting migrating employee records - starting at pk=0 - v3",
         "Migrated 2 EmployeeRecordUpdateNotification to 6 EmployeeRecordTransitionLog",
         f"Stored last migrated employee record - pk={employee_record.pk}",
@@ -94,6 +96,7 @@ def test_management_command_default_run(caplog, faker):
     caplog.clear()
     call_command("migrate_employee_record_update_notifications", wet_run=True, include_last_rejected=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("migrate_employee_record_update_notifications"),
         "Starting migrating employee records - starting at pk=0 - v3",
         f"Updating employee_record={employee_record.pk} status to MODIFICATION_REJECTED",
         "Migrated 1 EmployeeRecordUpdateNotification to 3 EmployeeRecordTransitionLog",
@@ -144,6 +147,7 @@ def test_batch_size_continue(caplog, mocker):
     # First call handle first_employee_record but leaves one rejected notification
     call_command("migrate_employee_record_update_notifications", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("migrate_employee_record_update_notifications"),
         "Starting migrating employee records - starting at pk=0 - v3",
         "Migrated 1 EmployeeRecordUpdateNotification to 3 EmployeeRecordTransitionLog",
         f"Stored last migrated employee record - pk={first_employee_record.pk}",
@@ -153,6 +157,7 @@ def test_batch_size_continue(caplog, mocker):
     caplog.clear()
     call_command("migrate_employee_record_update_notifications", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("migrate_employee_record_update_notifications"),
         f"Starting migrating employee records - starting at pk={first_employee_record.pk} - v3",
         "Migrated 1 EmployeeRecordUpdateNotification to 3 EmployeeRecordTransitionLog",
         f"Stored last migrated employee record - pk={second_employee_record.pk}",
@@ -162,6 +167,7 @@ def test_batch_size_continue(caplog, mocker):
     caplog.clear()
     call_command("migrate_employee_record_update_notifications", wet_run=True)
     assert process_output(caplog.messages) == [
+        *command_lock_logs("migrate_employee_record_update_notifications"),
         f"Starting migrating employee records - starting at pk={second_employee_record.pk} - v3",
         "Migrated 0 EmployeeRecordUpdateNotification to 0 EmployeeRecordTransitionLog",
         "Stored last migrated employee record - pk=0",
