@@ -21,6 +21,7 @@ from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.users.enums import KIND_EMPLOYER
+from itou.users.models import UserQuerySet
 from itou.utils.models import InclusiveDateRangeField, check_nullable_date_order_constraint
 from itou.utils.validators import validate_html
 
@@ -724,6 +725,11 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
     def viewable(self):
         viewable_campaigns = EvaluationCampaign.objects.viewable()
         return self.filter(evaluated_siae__evaluation_campaign__in=viewable_campaigns)
+
+    def with_job_seeker_last_name_for_display(self):
+        return self.annotate(
+            job_seeker_last_name_for_display=UserQuerySet.last_name_annotation(prefix="job_application__job_seeker")
+        )
 
 
 class EvaluatedJobApplication(models.Model):

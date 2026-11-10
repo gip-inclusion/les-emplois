@@ -151,7 +151,7 @@ def export_ft_api_rejections(request):
                 approval.pe_notification_exit_code,
                 approval.user.jobseeker_profile.nir,
                 approval.user.jobseeker_profile.pole_emploi_id,
-                approval.user.last_name,
+                approval.user.get_last_name_for_display(),
                 approval.user.first_name,
                 approval.user.jobseeker_profile.birthdate.isoformat(),
                 approval.origin_siae_kind,

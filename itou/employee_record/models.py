@@ -22,7 +22,7 @@ from itou.emails.utils import get_email_message
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
-from itou.users.models import JobSeekerProfile
+from itou.users.models import JobSeekerProfile, UserQuerySet
 from itou.utils.admin import get_admin_url
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
@@ -236,6 +236,11 @@ class EmployeeRecordQuerySet(models.QuerySet):
                 .values("timestamp")[:1],
                 output_field=models.DateTimeField(),
             )
+        )
+
+    def with_job_seeker_last_name_for_display(self):
+        return self.annotate(
+            job_seeker_last_name_for_display=UserQuerySet.last_name_annotation(prefix="job_application__job_seeker")
         )
 
 

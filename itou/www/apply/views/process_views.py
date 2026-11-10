@@ -807,7 +807,7 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                 data = {
                     "user": {
                         "first_name": job_application.job_seeker.first_name,  # Required
-                        "last_name": job_application.job_seeker.last_name,  # Required
+                        "last_name": job_application.job_seeker.get_last_name_for_display(),  # Required
                         "title": (
                             "madame" if job_application.job_seeker.title == Title.MME else "monsieur"
                         ),  # Required!

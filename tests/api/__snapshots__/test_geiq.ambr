@@ -77,6 +77,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("job_applications_jobapplication"."state" = %s
                  AND "companies_company"."kind" = %s
                  AND "companies_company"."siret"::text LIKE %s)
@@ -133,6 +135,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "job_seeker_last_name_for_display",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -172,6 +179,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -340,7 +348,7 @@
                  AND "companies_company"."kind" = %s
                  AND "companies_company"."siret"::text LIKE %s)
           ORDER BY "companies_company"."siret" ASC,
-                   "users_user"."last_name" ASC,
+                   45 ASC,
                    "users_user"."first_name" ASC,
                    "job_applications_jobapplication"."id" ASC
           LIMIT 2
@@ -436,6 +444,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("job_applications_jobapplication"."state" = %s
                  AND "companies_company"."kind" = %s)
         ''',
@@ -491,6 +501,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "job_seeker_last_name_for_display",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -530,6 +545,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -697,7 +713,7 @@
           WHERE ("job_applications_jobapplication"."state" = %s
                  AND "companies_company"."kind" = %s)
           ORDER BY "companies_company"."siret" ASC,
-                   "users_user"."last_name" ASC,
+                   45 ASC,
                    "users_user"."first_name" ASC,
                    "job_applications_jobapplication"."id" ASC
           LIMIT 2

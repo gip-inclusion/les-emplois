@@ -5,7 +5,7 @@
     <div class="alert bg-warning-lightest border-1 border-warning mb-0">
         <p class="text-warning">
             Connecté en tant que
-            <b>{{ user.first_name }} {{ user.last_name|upper }}</b>, <em>{{ user.kind }}</em>, pk=<span class="font-monospace">{{ user.pk }}</span>
+            <b>{{ user.first_name }} {{ user.get_last_name_for_display|upper }}</b>, <em>{{ user.kind }}</em>, pk=<span class="font-monospace">{{ user.pk }}</span>
         </p>
         <form action="{% url 'hijack:release' %}" method="post" class="text-end">
             {% csrf_token %}

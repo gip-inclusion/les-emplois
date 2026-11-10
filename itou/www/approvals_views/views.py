@@ -147,7 +147,7 @@ class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
         return (
             queryset.filter(*form_filters)
             .distinct()  # Because of the suspended_qs_filter that looks into suspensions
-            .select_related("user")
+            .select_related("user", "user__jobseeker_profile")
             .prefetch_related("suspension_set")
         )
 
@@ -760,7 +760,7 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
                 )
             )
         )
-        .select_related("approval__user")
+        .select_related("approval__user", "approval__user__jobseeker_profile")
         .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
@@ -819,7 +819,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
                 )
             )
         )
-        .select_related("approval__user")
+        .select_related("approval__user__jobseeker_profile")
         .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
@@ -872,7 +872,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
                 )
             )
         )
-        .select_related("approval__user")
+        .select_related("approval__user__jobseeker_profile")
         .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
@@ -938,7 +938,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
                 )
             )
         )
-        .select_related("approval__user")
+        .select_related("approval__user", "approval__user__jobseeker_profile")
         .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )

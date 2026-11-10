@@ -34,6 +34,7 @@ class Command(BaseCommand):
             .select_related(
                 "service",
                 "beneficiary",
+                "beneficiary__jobseeker_profile",
                 "sender",
                 "sender_prescriber_organization",
                 "sender_company",
