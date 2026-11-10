@@ -39,7 +39,6 @@ from itou.companies.enums import (
     ProSupportReportSolution,
 )
 from itou.emails.utils import get_email_message
-from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.enums import UserKind
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
@@ -1386,15 +1385,8 @@ class ProSupportReport(models.Model):
         from itou.users.models import JobSeekerAssignment
         from itou.users.notifications import ProSupportReportCreatedNotification
 
-        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
-        assignment = (
-            JobSeekerAssignment.objects.filter(
-                job_seeker_id=self.job_seeker_id,
-                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-            )
-            .select_related("professional", "prescriber_organization")
-            .order_by("-last_action_at")
-            .first()
+        assignment = JobSeekerAssignment.objects.get_authorized_prescriber_assignments([self.job_seeker_id]).get(
+            self.job_seeker_id
         )
         if assignment:
             self.notified_prescriber = assignment.professional
