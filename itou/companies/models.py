@@ -1293,6 +1293,32 @@ class Contract(models.Model):
         verbose_name_plural = "contrats IAE"
 
 
+class ContractExit(models.Model):
+    """
+    A negative exit declared to the ASP, recorded the night it reaches our data.
+
+    `Contract.updated_at` is rewritten every night by the import: it can't tell when an exit appeared.
+    """
+
+    # The import deletes the contracts missing from a night's ASP data and recreates them with the same pk
+    # when they come back: the exit must survive, or it would be detected (and notified) again.
+    contract = models.ForeignKey(
+        Contract,
+        verbose_name="contrat",
+        on_delete=models.DO_NOTHING,
+        db_constraint=False,
+        related_name="exits",
+    )
+    exit_date = models.DateField(verbose_name="date de sortie")
+
+    class Meta:
+        verbose_name = "sortie de contrat IAE"
+        verbose_name_plural = "sorties de contrat IAE"
+        constraints = [
+            models.UniqueConstraint(fields=["contract", "exit_date"], name="unique_contract_exit_date"),
+        ]
+
+
 class SiaeACIConvergencePHC(models.Model):
     siret = models.CharField(
         editable=False,

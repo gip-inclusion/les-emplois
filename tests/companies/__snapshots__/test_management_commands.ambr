@@ -1145,3 +1145,75 @@
 # name: test_deactivate_spontaneous_jobapps[email subject]
   '[TEST] La réception des candidatures spontanées pour votre structure a été suspendue'
 # ---
+# name: test_detect_contract_exits[SQL]
+  dict({
+    'num_queries': 5,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.handle[companies/management/commands/detect_contract_exits.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/detect_contract_exits.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_contract"."id",
+                 "companies_contract"."end_date",
+                 "companies_contract"."details"
+          FROM "companies_contract"
+          WHERE ("companies_contract"."end_date" BETWEEN %s AND %s
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "companies_contractexit" U0
+                             WHERE (U0."contract_id" = ("companies_contract"."id")
+                                    AND U0."exit_date" = ("companies_contract"."end_date"))
+                             LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/detect_contract_exits.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "companies_contractexit" ("contract_id",
+                                                "exit_date")
+          SELECT *
+          FROM UNNEST((%s)::bigint[], (%s)::date[]) RETURNING "companies_contractexit"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
