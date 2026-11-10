@@ -93,9 +93,20 @@ def pg_advisory_lock(name: str):
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
         cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
-        yield
-        cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-    logger.info("Releasing advisory lock for %s (lock id %s).", name, lock_id)
+        try:
+            yield
+        finally:
+            try:
+                cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+            except Exception:
+                # Could happen if a previous PostgreSQL error caused
+                # the transaction to be aborted. We could try hard to
+                # unlock by issuing a ROLLBACK first, but we don't
+                # know what the caller wants, maybe there are
+                # savepoints, etc. So we keep the lock.
+                logger.error("Could not release advisory lock for %s (lock id %s)", name, lock_id)
+            else:
+                logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
 
 
 class ExclusionViolationError(IntegrityError):
