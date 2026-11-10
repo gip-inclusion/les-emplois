@@ -1416,8 +1416,9 @@ def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
     assert caplog.messages[1] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1
 
+    caplog.clear()
     call_command("delete_old_nir_modification_requests", wet_run=True)
-    assert caplog.messages[4] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert caplog.messages[0] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1 - del_count
 
 
