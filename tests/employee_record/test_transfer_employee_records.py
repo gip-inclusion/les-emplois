@@ -342,3 +342,38 @@ def test_duplicates_with_an_extension_update_the_existing_new_notification(sftp_
     notification = employee_record.update_notifications.get()
     assert notification.status == NotificationStatus.NEW
     assert notification.updated_at == expected_updated_at
+
+
+@freezegun.freeze_time("2021-09-27")
+@pytest.mark.usefixtures("mocked_sftp")
+def test_parse_file(snapshot, sftp_directory, caplog):
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+
+    call_command("transfer_employee_records", upload=True, download=False, preflight=False, wet_run=True)
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.SENT
+    assert employee_record.asp_batch_line_number == 1
+    assert employee_record.asp_batch_file is not None
+
+    process_incoming_file(sftp_directory, "0000", "OK")
+
+    caplog.clear()
+    [feedback_filename] = [
+        filepath
+        for filepath in sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir()
+        if filepath.name.endswith("FichierRetour.json")
+    ]
+    call_command(
+        "transfer_employee_records",
+        parse_file_name=feedback_filename,
+        upload=False,
+        download=False,
+        preflight=False,
+        wet_run=True,
+    )
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.PROCESSED
+    assert employee_record.asp_processing_code == "0000"
+    assert employee_record.archived_json.get("libelleTraitement") == "OK"
+
+    assert process_output(caplog.messages) == snapshot(name="logs")

@@ -1,3 +1,5 @@
+import os.path
+
 import paramiko
 from django.conf import settings
 from django.db import transaction
@@ -211,7 +213,9 @@ class Command(EmployeeRecordTransferCommand):
                 transaction.atomic(),
                 triggers.context(**self.get_trigger_context()),
             ):
-                self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
+                self._parse_feedback_file(
+                    os.path.basename(parse_file.name), JSONParser().parse(parse_file), dry_run=not wet_run
+                )
         elif upload or download:
             if not settings.ASP_SFTP_HOST:
                 self.logger.info("Your environment is missing ASP_SFTP_HOST to run this command.")

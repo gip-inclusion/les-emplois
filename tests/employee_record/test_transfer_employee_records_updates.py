@@ -186,3 +186,38 @@ def test_upload_and_download(snapshot, sftp_directory, caplog):
     assert notification.archived_json.get("libelleTraitement") == "OK"
 
     assert process_output(caplog.messages) == snapshot(name="logs")
+
+
+@freezegun.freeze_time("2021-09-27")
+@pytest.mark.usefixtures("mocked_sftp")
+def test_parse_file(snapshot, sftp_directory, caplog):
+    notification = EmployeeRecordUpdateNotificationFactory(pk=1234, ready_for_transfer=True)
+
+    call_command("transfer_employee_records_updates", upload=True, download=False, preflight=False, wet_run=True)
+    notification.refresh_from_db()
+    assert notification.status == NotificationStatus.SENT
+    assert notification.asp_batch_line_number == 1
+    assert notification.asp_batch_file is not None
+
+    process_incoming_file(sftp_directory, "0000", "OK")
+
+    caplog.clear()
+    [feedback_filename] = [
+        filepath
+        for filepath in sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir()
+        if filepath.name.endswith("FichierRetour.json")
+    ]
+    call_command(
+        "transfer_employee_records_updates",
+        parse_file_name=feedback_filename,
+        upload=False,
+        download=False,
+        preflight=False,
+        wet_run=True,
+    )
+    notification.refresh_from_db()
+    assert notification.status == NotificationStatus.PROCESSED
+    assert notification.asp_processing_code == "0000"
+    assert notification.archived_json.get("libelleTraitement") == "OK"
+
+    assert process_output(caplog.messages) == snapshot(name="logs")
