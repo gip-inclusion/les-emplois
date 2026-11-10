@@ -1,20 +1,9 @@
-from django.core.cache import caches
-from rest_framework import throttling
+from itou.api import throttling
 
 
-class FailSafeAnonRateThrottle(throttling.AnonRateThrottle):
+class FailSafeAnonRateThrottle(throttling.FailSafeAnonRateThrottle):
     rate = "30/minute"
 
-    @property
-    def cache(self):
-        # The property allows swapping cache configuration in tests.
-        return caches["failsafe"]
 
-
-class FailSafeUserRateThrottle(throttling.UserRateThrottle):
+class FailSafeUserRateThrottle(throttling.FailSafeUserRateThrottle):
     rate = "60/minute"
-
-    @property
-    def cache(self):
-        # The property allows swapping cache configuration in tests.
-        return caches["failsafe"]
