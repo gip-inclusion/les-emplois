@@ -1547,6 +1547,34 @@ def test_matomo_context_processor(client, settings, snapshot):
     assertContains(response, matomo_tarteaucitron_integration)
 
 
+class TestWebauthnSurvey:
+    SCRIPT_SELECTOR = 'script[src$="js/webauthn_survey.js"]'
+
+    @pytest.fixture(autouse=True)
+    def setup(self, settings):
+        settings.MATOMO_BASE_URL = "https://fake.matomo.url"
+
+    def test_anonymous(self, client):
+        response = client.get(reverse("search:employers_home"))
+        assertContains(response, "matomo-custom-init")
+        assert parse_response_to_soup(response).select(self.SCRIPT_SELECTOR) == []
+
+    def test_authenticated(self, client):
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"), follow=True)
+        [script] = parse_response_to_soup(response).select(self.SCRIPT_SELECTOR)
+        assert script["data-emplois-user-id"] == str(user.pk)
+
+    def test_hijacked(self, client):
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+        client.post(reverse("hijack:acquire"), {"user_pk": JobSeekerFactory().pk, "next": "/"})
+        response = client.get(reverse("dashboard:index"), follow=True)
+        assertContains(response, "matomo-custom-init")
+        assert parse_response_to_soup(response).select(self.SCRIPT_SELECTOR) == []
+
+
 @pytest.mark.parametrize("state", JobApplicationState.values)
 def test_job_application_state_badge_processing(state, snapshot):
     job_application = JobApplicationFactory(
