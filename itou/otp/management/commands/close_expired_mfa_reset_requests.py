@@ -7,7 +7,7 @@ from itou.utils.command import BaseCommand
 class Command(BaseCommand):
     help = "Cleanup expired 2FA reset requests."
 
-    ATOMIC_HANDLE = False
+    ATOMIC_HANDLE = True
     AUTO_TRIGGER_CONTEXT = False
 
     def handle(self, *args, **kwargs):
