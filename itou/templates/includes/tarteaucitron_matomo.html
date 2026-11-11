@@ -116,4 +116,7 @@
         /* beautify ignore:end */
     </script>
     <script src="{% static "js/matomo.js" %}"></script>
+    {% if matomo_user_id and not request.user.is_hijacked %}
+        <script src="{% static "js/webauthn_survey.js" %}" data-emplois-user-id="{{ matomo_user_id }}"></script>
+    {% endif %}
 {% endif %}
