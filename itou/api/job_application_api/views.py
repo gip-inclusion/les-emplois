@@ -13,7 +13,7 @@ from itou.api.job_application_api.serializers import (
     JobApplicationSearchRequestSerializer,
     JobApplicationSearchResponseSerializer,
 )
-from itou.api.job_application_api.throttling import JobApplicationSearchThrottle
+from itou.api.job_application_api.throttling import FailSafeJobApplicationSearchThrottle
 from itou.companies.models import JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.utils.auth import LoginNotRequiredMixin
@@ -95,7 +95,7 @@ class JobApplicationSearchView(
     authentication_classes = (DepartmentTokenAuthentication,)
     permission_classes = (JobApplicationSearchAPIPermission,)
     serializer_class = JobApplicationSearchResponseSerializer
-    throttle_classes = [JobApplicationSearchThrottle]
+    throttle_classes = [FailSafeJobApplicationSearchThrottle]
     queryset = (
         JobApplication.objects.annotate(
             last_modification_at=Coalesce(
