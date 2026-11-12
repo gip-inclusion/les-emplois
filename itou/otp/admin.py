@@ -1,3 +1,5 @@
+import re
+
 import xworkflows
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
@@ -72,7 +74,7 @@ class ResetRequestAdmin(ItouModelAdmin):
         def org_link(org, admin):
             link = format_html('<a href="{}">{}</a>', reverse(admin, args=(org.pk,)), org.name)
             if hasattr(org, "phone") and org.phone:
-                link += format_html(' (<a href="tel:{}">{}</a>)', org.phone, org.phone)
+                link += format_html(' (<a href="tel:{}">{}</a>)', re.sub(r"\s", "", org.phone), org.phone)
             return link
 
         for membership in get_active_company_memberships(obj.user):
