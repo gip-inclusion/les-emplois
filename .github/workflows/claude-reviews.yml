@@ -10,7 +10,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
       && github.event.action == 'labeled'
       && github.event.label.name == 'review-claude'
-      && contains(github.event.pull_request.labels.*.name, 'no-ai') == false
+      && contains(github.event.pull_request.labels.*.name, 'noai') == false
       && contains(github.event.pull_request.labels.*.name, 'no-review') == false
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -36,7 +36,7 @@ jobs:
   security-review:
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository
-      && contains(github.event.pull_request.labels.*.name, 'no-ai') == false
+      && contains(github.event.pull_request.labels.*.name, 'noai') == false
       && contains(github.event.pull_request.labels.*.name, 'no-review') == false
       && (
         (github.event.action == 'labeled' && github.event.label.name == 'review-claude-sec')
