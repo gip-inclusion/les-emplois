@@ -89,10 +89,10 @@ def migrate_commune(obsolete_commune, target_code, *, commune_model=None, job_se
     if obsolete_commune is None:
         # The commune doesn't exist on this system: nothing to do
         return
-    updated_profiles = []
     if target_code is not None:
+        profiles_to_update = list(job_seeker_profile_model.objects.filter(birth_place=obsolete_commune))
         # If the target is empty, keep the current commune, since removing the info won't solve anything
-        for profile in job_seeker_profile_model.objects.filter(birth_place=obsolete_commune):
+        for profile in profiles_to_update:
             if profile.birthdate:
                 profile.birth_place = commune_model.objects.filter(
                     Q(start_date__lte=profile.birthdate, end_date__gte=profile.birthdate)
@@ -121,7 +121,7 @@ def migrate_commune(obsolete_commune, target_code, *, commune_model=None, job_se
                     target_code,
                     profile.birth_place,
                 )
-    JobSeekerProfile.objects.bulk_update(updated_profiles, ["birth_place", "birth_country"])
+        JobSeekerProfile.objects.bulk_update(profiles_to_update, ["birth_place", "birth_country"])
 
     if target_code is not None:
         # If the target is empty, keep the current commune, since it should still be accepted by the ASP
