@@ -1405,3 +1405,11 @@ class ProSupportReport(models.Model):
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]
+
+    @property
+    def renewal_end_date(self):
+        # The ASP import postpones the end date of a renewed contract, while the report keeps the one it was
+        # written for. An end date brought forward (early exit, ASP correction) is not a renewal.
+        if self.contract and self.contract.end_date and self.contract.end_date > self.contract_end_date:
+            return self.contract.end_date
+        return None
