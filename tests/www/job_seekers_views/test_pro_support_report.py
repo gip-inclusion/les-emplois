@@ -9,6 +9,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import ProSupportReportBarrier, ProSupportReportOrientation, ProSupportReportSolution
 from itou.companies.models import ProSupportReport
+from itou.users.enums import ActionKind
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
@@ -75,7 +76,9 @@ def test_create_pro_support_report_for_employer(
     if hired_elsewhere:
         ContractFactory(job_seeker=contract.job_seeker, start_date=timezone.localdate())
     advisor = JobSeekerAssignmentFactory(
-        job_seeker=contract.job_seeker, prescriber_organization=PrescriberOrganizationFactory(authorized=True)
+        job_seeker=contract.job_seeker,
+        prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+        last_action_at=timezone.now() - datetime.timedelta(seconds=10),
     ).professional
     client.force_login(membership.user)
 
@@ -114,6 +117,12 @@ def test_create_pro_support_report_for_employer(
     assert report.orientation == answer.get("orientation", "")
     # The authorized prescriber is notified.
     assert [email.to for email in mailoutbox] == [[advisor.email]]
+
+    # The employer is the last advisor
+    last_assignment = report.job_seeker.last_assignment
+    assert last_assignment.professional == report.author
+    assert last_assignment.company == report.company
+    assert last_assignment.last_action_kind == ActionKind.FILL_REPORT
 
     # Sent reports cannot be modified.
     response = client.get(create_url(contract.job_seeker))
