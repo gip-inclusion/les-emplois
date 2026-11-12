@@ -285,15 +285,21 @@ class ResetRequest(xwf_models.WorkflowEnabled, models.Model):
     def reset_link(self):
         return get_absolute_url(reverse("otp_views:reset_request_do_reset", args=(self.token,)))
 
-    def _credibility_according_to_last_connections(self) -> float:
-        """Tell if we’ve already seen the machine doing the request."""
+    def _audit_trail_event(self) -> AuditTrail | None:
+        """Find the audit trail event matching this reset request."""
         try:
-            event = AuditTrail.objects.get(
+            return AuditTrail.objects.get(
                 event_type=AuditTrailEventType.MFA_RESET_REQUEST,
                 user=self.user,
                 data__itou_mfa_reset_request_pk=self.pk,
             )
-        except AuditTrail.DoesNotExist:  # Too old, had been removed
+        except AuditTrail.DoesNotExist:
+            return None
+
+    def _credibility_according_to_last_connections(self) -> float:
+        """Tell if we’ve already seen the machine doing the request."""
+        event = self._audit_trail_event()
+        if event is None:
             return 0.5  # A neutral result
         return event.credibility()
 
@@ -313,6 +319,15 @@ class ResetRequest(xwf_models.WorkflowEnabled, models.Model):
             self._credibility_according_to_weekday(),
         ]
         return fmean(values, weights=[80, 20])
+
+    def credibility_explanation(self) -> list[str]:
+        event = self._audit_trail_event()
+        explanation = event.credibility_explanation() if event else ["Aucune trace dans l’audit trail ☹"]
+        if self._credibility_according_to_weekday():
+            explanation.append("L’utilisateur a fait sa demande en semaine.")
+        else:
+            explanation.append("L’utilisateur a fait sa demande pendant le week-end.")
+        return explanation
 
     @property
     def is_suspicious(self) -> bool:

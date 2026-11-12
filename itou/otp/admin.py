@@ -62,9 +62,12 @@ class ResetRequestAdmin(ItouModelAdmin):
     save_on_top = False
     change_form_template = "admin/otp/resetrequest/change_form.html"
     list_display = ("user", "state", "created_at", "updated_at")
-    fields = ("user", "structure", "state", "created_at", "updated_at")
+    fields = ("user", "structure", "audit_trail", "state", "created_at", "updated_at")
     readonly_fields = fields
     inlines = (PkSupportRemarkInline, ResetRequestTransitionsInline)
+
+    def audit_trail(self, obj):
+        return mark_safe("<br>".join(obj.credibility_explanation()))
 
     def structure(self, obj):
         links = []
