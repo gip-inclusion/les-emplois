@@ -1421,3 +1421,12 @@ class ProSupportReport(models.Model):
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]
+
+    @property
+    def renewal_end_date(self):
+        # The report no longer covers its contract (see ProSupportReportQuerySet.covering_contract_end_date()):
+        # the ASP import postponed the end date of the renewed contract, while the report keeps the one it was
+        # written for.
+        if self.contract and self.contract.end_date and self.contract.end_date > self.contract_end_date:
+            return self.contract.end_date
+        return None
