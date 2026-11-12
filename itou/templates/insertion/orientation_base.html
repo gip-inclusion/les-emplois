@@ -10,3 +10,8 @@
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% include "includes/zendesk_widget.html" %}
+{% endblock %}

@@ -751,17 +751,29 @@ csp_img_src = [
     "https://*.tile.openstreetmap.org",
     "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
+    # Zendesk Web Widget assets (launcher icons, avatars).
+    "https://*.zdassets.com",
+    "https://*.zendesk.com",
 ]
 csp_script_src = [
     CSP.SELF,
     CSP.NONCE,
     "https://stats.inclusion.beta.gouv.fr",
     "https://tally.so",
+    # Zendesk Web Widget: the snippet bootstraps itself from ekr.
+    "https://static.zdassets.com",
+    "https://ekr.zdassets.com",
 ]
 csp_connect_src = [
     CSP.SELF,
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
     API_GEOPF_BASE_URL,
+    # Zendesk Web Widget: config fetch, then REST + websocket for the chat itself.
+    "https://ekr.zdassets.com",
+    "https://*.zendesk.com",
+    "wss://*.zendesk.com",
+    "https://*.zopim.com",
+    "wss://*.zopim.com",
 ]
 
 if MATOMO_BASE_URL:
