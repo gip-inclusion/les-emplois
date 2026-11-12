@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 from datetime import timedelta
 from unittest.mock import patch
@@ -26,7 +27,7 @@ from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
-from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
+from itou.www.insertion_views.views import DORA_CAMPAIGN_SESSION_KEY, OrientationStep, OrientationWizardView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.geo.factories import create_qpv
@@ -371,6 +372,26 @@ def test_orientation_select_job_seeker_dora_modal(client, query, shown):
     )
 
     assert response.context["show_dora_modal"] is shown
+
+
+@pytest.mark.parametrize(
+    "query,flagged",
+    [
+        ({"mtm_campaign": "DORA"}, True),
+        ({"mtm_campaign": "other"}, False),
+        ({}, False),
+    ],
+)
+def test_orientation_select_job_seeker_stores_dora_campaign(client, query, flagged):
+    prescriber = PrescriberFactory()
+    service = ServiceFactory(source__value="dora")
+    client.force_login(prescriber)
+
+    client.get(
+        reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}, query=query)
+    )
+
+    assert client.session.get(DORA_CAMPAIGN_SESSION_KEY) is (True if flagged else None)
 
 
 def test_session_isolation_between_users(client):
@@ -1000,3 +1021,96 @@ def test_conformity_step_when_api_particulier_is_down(client, respx_mock):
     job_seeker.jobseeker_profile.refresh_from_db()
     assert job_seeker.jobseeker_profile.rsa_certified_beneficiary is None
     assert job_seeker.jobseeker_profile.rsa_certification_checked_at is None
+
+
+def test_zendesk_widget_not_registered_without_the_campaign_param(client):
+    prescriber = PrescriberFactory()
+    service = ServiceFactory(source__value="dora")
+    client.force_login(prescriber)
+
+    response = client.get(
+        reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+    )
+
+    assertNotContains(response, "tarteaucitron.services.zendesk")
+
+
+def test_zendesk_widget_registered_on_every_orientation_tunnel_page(client):
+    """The Zendesk service must be registered on all the pages of the orientation tunnel."""
+    prescriber = PrescriberFactory()
+    job_seeker = JobSeekerFactory()
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
+    service = ServiceFactory(source__value="dora")
+    client.force_login(prescriber)
+
+    needle = "tarteaucitron.services.zendesk"
+
+    # The tunnel entry point, with the campaign param that enables the widget.
+    select_job_seeker_url = reverse(
+        "insertion_views:orientation_select_job_seeker",
+        kwargs={"service_uid": service.uid},
+        query={"mtm_campaign": "DORA"},
+    )
+    assertContains(client.get(select_job_seeker_url), needle)
+
+    # Job seeker creation branch: search by email, then the two creation steps.
+    response = client.get(
+        reverse(
+            "job_seekers_views:get_or_create_start",
+            query={
+                "tunnel": "orientation",
+                "from_url": reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}),
+                "service_uid": service.uid,
+            },
+        ),
+        follow=True,
+    )
+    assertContains(response, needle)
+    job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+    search_by_email_url = reverse(
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
+    )
+    response = client.post(search_by_email_url, data={"email": "not-a-known-user@example.com"}, follow=True)
+    assert response.request["PATH_INFO"] == reverse(
+        "job_seekers_views:create_job_seeker_step_1_for_orientation",
+        kwargs={"session_uuid": job_seeker_session_name},
+    )
+    assertContains(response, needle)
+    # Step 2 is only reachable once step 1 has been completed.
+    response = client.post(
+        reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_orientation",
+            kwargs={"session_uuid": job_seeker_session_name},
+        ),
+        data={"first_name": "Michel", "last_name": "Durant", "birthdate": datetime.date(1978, 12, 20)},
+        follow=True,
+    )
+    assert response.request["PATH_INFO"] == reverse(
+        "job_seekers_views:create_job_seeker_step_2_for_orientation",
+        kwargs={"session_uuid": job_seeker_session_name},
+    )
+    assertContains(response, needle)
+
+    # Wizard branch: each step must be completed to reach the next one.
+    client.post(select_job_seeker_url, data={"job_seeker": job_seeker.public_id}, follow=True)
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+
+    def step_url(step):
+        return reverse("insertion_views:orientation_steps", kwargs={"session_uuid": session_uuid, "step": step})
+
+    assertContains(client.get(step_url(OrientationStep.CONFORMITY)), needle)
+    client.post(step_url(OrientationStep.CONFORMITY), {"confirms_conditions": "on"})
+
+    assertContains(client.get(step_url(OrientationStep.REFERENT)), needle)
+    client.post(
+        step_url(OrientationStep.REFERENT),
+        {
+            "referent_last_name": "Dupont",
+            "referent_first_name": "Jean",
+            "referent_phone": "0612345678",
+            "referent_email": "jean@example.com",
+        },
+    )
+
+    assertContains(client.get(step_url(OrientationStep.DOCUMENTS)), needle)

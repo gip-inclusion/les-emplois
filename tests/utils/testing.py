@@ -26,6 +26,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.utils.legal_terms import get_terms_versions
 from itou.utils.session import SessionNamespace, SessionNamespaceException
+from itou.www.insertion_views.views import DORA_CAMPAIGN_SESSION_KEY
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -36,7 +37,14 @@ BASE_NUM_QUERIES = 2
 def session_names_without_known_keys(session):
     session_names = []
     for k in session.keys():
-        if k in ["_auth_user_id", "_auth_user_backend", "_auth_user_hash", "current_organization", "_csrftoken"]:
+        if k in [
+            "_auth_user_id",
+            "_auth_user_backend",
+            "_auth_user_hash",
+            "current_organization",
+            "_csrftoken",
+            DORA_CAMPAIGN_SESSION_KEY,
+        ]:
             continue
         if k.endswith("_session_kind"):
             continue
