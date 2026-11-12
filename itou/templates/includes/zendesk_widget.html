@@ -1,0 +1,49 @@
+{% comment %}
+    Zendesk Talk widget (callback request), shown along the orientation tunnel to users coming
+    from the DORA campaign (mtm_campaign=DORA, stored in session by the tunnel entry point).
+    This is a temporary solution to facilitate the transition of DORA users who may struggle to
+    understand how to create orientations in this application.
+
+    The widget writes ZD-* identifiers to localStorage on load, so it requires consent: it is
+    registered as a tarteaucitron service instead of being loaded directly. The service is only
+    pushed on the pages that may show it, so it does not appear in the consent panel for the
+    (vast majority of) users the widget never loads for.
+
+    Must be included after tarteaucitron.js, i.e. in {% templatetag openblock %} block script {% templatetag closeblock %}, not in the <head>.
+{% endcomment %}
+<script nonce="{{ csp_nonce }}">
+    /* beautify ignore:start */
+        tarteaucitron.services.zendesk = {
+            "key": "zendesk",
+            "type": "support",
+            "name": "Zendesk",
+            "uri": "https://www.zendesk.fr/company/agreements-and-terms/cookie-policy/",
+            "readmoreLink": "https://www.zendesk.fr/company/agreements-and-terms/cookie-policy/",
+            "needConsent": true,
+            // The widget stores its identifiers in localStorage (ZD-* keys), not in cookies.
+            "cookies": [],
+            "js": function() {
+                "use strict";
+                window.zESettings = {
+                    webWidget: {
+                        launcher: {
+                            talkLabel: {
+                                "fr": "Besoin d’aide ? Demandez à être rappelé",
+                            }
+                        },
+                    }
+                };
+                tarteaucitron.addScript(
+                    "https://static.zdassets.com/ekr/snippet.js?key=cdbe12d1-fce4-4514-a35e-de03fc0a0c1a",
+                    "ze-snippet",
+                    function() {
+                        zE(function() {
+                            zE("webWidget", "setLocale", "fr");
+                        });
+                    }
+                );
+            }
+        };
+        (tarteaucitron.job = tarteaucitron.job || []).push('zendesk');
+        /* beautify ignore:end */
+</script>
