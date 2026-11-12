@@ -1,11 +1,19 @@
 import xworkflows
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.otp.enums import RESET_REQUEST_TRANSITION_NAMES, ResetRequestTransition
 from itou.otp.models import ItouTOTPDevice, ResetRequest, ResetRequestTransitionLog
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, ReadonlyMixin
+from itou.utils.perms.middleware import (
+    get_active_company_memberships,
+    get_active_institution_memberships,
+    get_active_prescriber_memberships,
+)
 
 
 @admin.register(ItouTOTPDevice)
@@ -54,9 +62,26 @@ class ResetRequestAdmin(ItouModelAdmin):
     save_on_top = False
     change_form_template = "admin/otp/resetrequest/change_form.html"
     list_display = ("user", "state", "created_at", "updated_at")
-    fields = ("user", "state", "created_at", "updated_at")
+    fields = ("user", "structure", "state", "created_at", "updated_at")
     readonly_fields = fields
     inlines = (PkSupportRemarkInline, ResetRequestTransitionsInline)
+
+    def structure(self, obj):
+        links = []
+
+        def org_link(org, admin):
+            link = format_html('<a href="{}">{}</a>', reverse(admin, args=(org.pk,)), org.name)
+            if hasattr(org, "phone") and org.phone:
+                link += format_html(' (<a href="tel:{}">{}</a>)', org.phone, org.phone)
+            return link
+
+        for membership in get_active_company_memberships(obj.user):
+            links.append(org_link(membership.company, "admin:companies_company_change"))
+        for membership in get_active_prescriber_memberships(obj.user):
+            links.append(org_link(membership.organization, "admin:prescribers_prescriberorganization_change"))
+        for membership in get_active_institution_memberships(obj.user):
+            links.append(org_link(membership.institution, "admin:institutions_institution_change"))
+        return mark_safe(", ".join(links))
 
     def response_change(self, request, obj):
         for transition in obj.state.transitions():
