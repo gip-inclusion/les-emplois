@@ -141,4 +141,5 @@ IGNORED_COMMUNES_TARGET_CODES = {
     ("98600", "WALLIS ET FUTUNA"): None,
     ("98609", "WALLIS ET FUTUNA"): None,
     ("98701", "ST PIERRE ET MIQUELON"): None,  # Users should choose St Pierre (97502) or Miquelon-Langlade (97501)
+    ("98402", "ARCHIPEL DES COMORES"): None,  # User should use the country COMORES or one of Mayotte's communes
 }
