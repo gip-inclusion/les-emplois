@@ -11,8 +11,9 @@
 
     Must be included after tarteaucitron.js, i.e. in {% templatetag openblock %} block script {% templatetag closeblock %}, not in the <head>.
 {% endcomment %}
-<script nonce="{{ csp_nonce }}">
-    /* beautify ignore:start */
+{% if request.session.dora_orientation_campaign %}
+    <script nonce="{{ csp_nonce }}">
+        /* beautify ignore:start */
         tarteaucitron.services.zendesk = {
             "key": "zendesk",
             "type": "support",
@@ -46,4 +47,5 @@
         };
         (tarteaucitron.job = tarteaucitron.job || []).push('zendesk');
         /* beautify ignore:end */
-</script>
+    </script>
+{% endif %}

@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch, Q
-from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
 from django.urls import reverse
@@ -65,6 +65,10 @@ from itou.www.utils.wizard import WizardView
 
 
 logger = logging.getLogger(__name__)
+
+# Users coming from the DORA campaign get the Zendesk callback widget along the orientation tunnel.
+# The mtm_campaign param is only present on the tunnel entry point, hence the session flag.
+DORA_CAMPAIGN_SESSION_KEY = "dora_orientation_campaign"
 
 
 class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
@@ -332,12 +336,14 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
-    def setup(self, request, *args, service_uid, **kwargs):
+    def setup(self, request: HttpRequest, *args, service_uid: str, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         self.service = get_object_or_404(
             insertion_models.Service.objects.select_related("kind", "source", "structure"),
             uid=service_uid,
         )
+        if request.GET.get("mtm_campaign") == "DORA":
+            request.session[DORA_CAMPAIGN_SESSION_KEY] = True
 
     def get_form_kwargs(self):
         return super().get_form_kwargs() | {"request": self.request}
@@ -523,6 +529,7 @@ class OrientationWizardView(WizardView):
                 extra_tags="toast",
             )
             self.wizard_session.delete()
+            request.session.pop(DORA_CAMPAIGN_SESSION_KEY, None)
             return HttpResponseRedirect(
                 reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
             )
