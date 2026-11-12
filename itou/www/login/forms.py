@@ -39,8 +39,12 @@ class FindExistingUserViaEmailForm(forms.Form):
                 format_error_modal_content(
                     mark_safe(
                         "<p>Cette adresse e-mail est inconnue de nos services.</p>"
-                        "<p>Si vous êtes déjà inscrit(e), "
-                        "assurez-vous de saisir correctement votre adresse e-mail.</p>"
+                        "<p><strong>Vous avez déjà un compte ?</strong></p>"
+                        "<p>Si vous avez changé d’adresse e-mail sur France Travail ou FranceConnect depuis votre "
+                        "dernière connexion, cliquez sur <strong>Retour</strong> et renseignez l’ancienne adresse "
+                        "e-mail associée à votre compte sur la plateforme.</p>"
+                        "<p>À l’étape suivante, connectez-vous avec France Travail ou FranceConnect en utilisant "
+                        "votre nouvelle adresse e-mail pour retrouver votre compte.</p>"
                         "<p>Si vous n'êtes pas encore inscrit(e), "
                         "nous vous invitons à cliquer sur Inscription pour créer votre compte.</p>"
                     ),
