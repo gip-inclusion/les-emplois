@@ -47,6 +47,13 @@ class AuditTrail(models.Model):
 
     objects = AuditTrailManager()
 
+    def _login_events(self):
+        return AuditTrail.objects.filter(
+            event_type=AuditTrailEventType.LOG_IN,
+            user=self.user,
+            timestamp__lt=self.timestamp - datetime.timedelta(days=1),
+        ).order_by("timestamp")
+
     def credibility(self) -> float:
         """Measure the credibility of this event according to the past events.
 
@@ -55,11 +62,7 @@ class AuditTrail(models.Model):
 
         Consider >= 0.5 to be OK, < 0.5 to be suspicious.
         """
-        trail = AuditTrail.objects.filter(
-            event_type=AuditTrailEventType.LOG_IN,
-            user=self.user,
-            timestamp__lt=self.timestamp - datetime.timedelta(days=1),
-        )
+        trail = self._login_events()
         known_browser_ids = {event.browser_id for event in trail if event.browser_id}
         known_ips = {event.ip for event in trail}
 
@@ -72,6 +75,39 @@ class AuditTrail(models.Model):
         if ip_is_known and not browser_is_known:
             return 0.6
         return 0
+
+    def credibility_explanation(self) -> list[str]:
+        matching_ips = self._login_events().filter(ip=self.ip)
+        matching_browser_ids = self._login_events().filter(browser_id=self.browser_id)
+        explanation = []
+        if len(matching_browser_ids) > 1:
+            explanation.append(
+                f"L’utilisateur s’est connecté {len(matching_browser_ids)} fois avec cet ordinateur, "
+                f"du {matching_browser_ids.first().timestamp:%Y-%m-%d} au "
+                f"{matching_browser_ids.last().timestamp:%Y-%m-%d}"
+            )
+        elif len(matching_browser_ids) == 1:
+            explanation.append(
+                f"L’utilisateur s’est connecté une seule fois avec cet ordinateur "
+                f"le {matching_browser_ids.first().timestamp:%Y-%m-%d}"
+            )
+        else:
+            explanation.append("L’utilisateur ne s’est jamais connecté avec cet ordinateur auparavant.")
+        if len(matching_ips) > 1:
+            explanation.append(
+                f"L’utilisateur s’est connecté {len(matching_ips)} fois via ce réseau, "
+                f"du {matching_ips.first().timestamp:%Y-%m-%d} au "
+                f"{matching_ips.last().timestamp:%Y-%m-%d}"
+            )
+        elif len(matching_ips) == 1:
+            explanation.append(
+                f"L’utilisateur s’est connecté une seule fois via ce réseau, "
+                f"le {matching_ips.first().timestamp:%Y-%m-%d}"
+            )
+        else:
+            explanation.append("L’utilisateur n’avait jamais utilisé ce réseau auparavant.")
+
+        return explanation
 
     @property
     def is_suspicious(self) -> bool:
