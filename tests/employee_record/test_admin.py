@@ -4,7 +4,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.models import Approval
-from itou.employee_record.enums import NotificationStatus, Status
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from tests.employee_record import factories
 from tests.users.factories import ItouStaffFactory
@@ -139,32 +139,26 @@ def test_asp_processing_display(admin_client, err_code, err_message, expected):
 
 def test_asp_stats(admin_client):
     factories.EmployeeRecordWithProfileFactory(status=Status.SENT)
-    factories.EmployeeRecordUpdateNotificationFactory(status=NotificationStatus.REJECTED, asp_processing_code="3441")
+    factories.EmployeeRecordWithProfileFactory(status=Status.REJECTED, asp_processing_code="3441")
 
     record_stats_url = reverse("admin:employee_record_employeerecord_stats")
     response = admin_client.get(reverse("admin:employee_record_employeerecord_changelist"))
     assertContains(response, record_stats_url)
     response = admin_client.get(record_stats_url)
-    assertContains(response, "<h2>Total : 2</h2>")  # Thanks to EmployeeRecordUpdateNotificationFactory
+    assertContains(response, "<h2>Total : 2</h2>")
     assertContains(
         response,
         '<li><a href="/admin/employee_record/employeerecord/?status=SENT">Envoyée</a> : 1 (50.00 %)</li>',
         html=True,
     )
-
-    notification_stats_url = reverse("admin:employee_record_employeerecordupdatenotification_stats")
-    response = admin_client.get(reverse("admin:employee_record_employeerecordupdatenotification_changelist"))
-    assertContains(response, notification_stats_url)
-    response = admin_client.get(notification_stats_url)
-    assertContains(response, "<h2>Total : 1</h2>")
     assertContains(
         response,
         """\
             <li>
-                <a href="/admin/employee_record/employeerecordupdatenotification/?status=REJECTED">En erreur</a> : 1 (100.00 %)
+                <a href="/admin/employee_record/employeerecord/?status=REJECTED">En erreur</a> : 1 (50.00 %)
                     <ul>
                         <li>
-                            <a href="/admin/employee_record/employeerecordupdatenotification/?status=REJECTED&amp;asp_processing_code=3441">3441</a> : 1 (100.00 %)
+                            <a href="/admin/employee_record/employeerecord/?status=REJECTED&amp;asp_processing_code=3441">3441</a> : 1 (100.00 %)
                         </li>
                     </ul>
 

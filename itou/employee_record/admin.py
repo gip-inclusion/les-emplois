@@ -12,7 +12,7 @@ from itoutils.urls import add_url_params
 
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
-from itou.employee_record.enums import NotificationStatus, Status
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from itou.utils.admin import (
     ItouModelAdmin,
@@ -53,7 +53,9 @@ class EmployeeRecordAdminForm(forms.ModelForm):
             ).order_by("-number")
 
 
-def _compute_model_stats(model, list_url):
+def _compute_employee_record_stats():
+
+    list_url = reverse("admin:employee_record_employeerecord_changelist")
 
     def _format_value(value, total):
         if not value:
@@ -62,36 +64,33 @@ def _compute_model_stats(model, list_url):
             return "-"
         return f"{value} ({100 * value / total:.2f} %)"
 
-    status_enum = NotificationStatus if model == EmployeeRecordUpdateNotification else Status
-    status_aggregates = {str(status): Count("pk", filter=Q(status=status)) for status in status_enum}
+    status_aggregates = {str(status): Count("pk", filter=Q(status=status)) for status in Status}
 
-    counts = model.objects.aggregate(
+    counts = models.EmployeeRecord.objects.aggregate(
         total=Count("pk"),
         # Count by status
         **status_aggregates,
     )
     errors_infos = {}
     for error_code, count in sorted(
-        model.objects.filter(status=getattr(status_enum, "REJECTED"))
+        models.EmployeeRecord.objects.filter(status=Status.REJECTED)
         .values_list("asp_processing_code")
         .annotate(count=Count("pk"))
     ):
         errors_infos[error_code] = {
             "count": count,
-            "value": _format_value(count, counts[getattr(status_enum, "REJECTED")]),
-            "url": add_url_params(
-                list_url, {"status": getattr(status_enum, "REJECTED"), "asp_processing_code": error_code}
-            ),
+            "value": _format_value(count, counts[Status.REJECTED]),
+            "url": add_url_params(list_url, {"status": Status.REJECTED, "asp_processing_code": error_code}),
         }
 
     stats = {
         "total": counts["total"],
         "infos": {},
     }
-    for status in status_enum:
+    for status in Status:
         stats["infos"][status.label] = {
             "value": _format_value(counts[status], counts["total"]),
-            "infos": errors_infos if status == getattr(status_enum, "REJECTED") else {},
+            "infos": errors_infos if status == Status.REJECTED else {},
             "url": add_url_params(list_url, {"status": status}),
         }
     return stats
@@ -101,19 +100,14 @@ def _compute_model_stats(model, list_url):
 def stats(request, model_admin):
     context_data = {
         **admin.site.each_context(request),
-        "title": f"Statistiques {model_admin.model._meta.verbose_name}",
+        "title": "Statistiques fiches salarié",
         "subtitle": None,
-        "statistic": _compute_model_stats(
-            model_admin.model,
-            list_url=reverse(f"admin:{model_admin.opts.app_label}_{model_admin.opts.model_name}_changelist"),
-        ),
+        "statistic": _compute_employee_record_stats(),
     }
     return render(request, "admin/employee_record/stats.html", context_data)
 
 
 class ASPExchangeInformationAdminMixin:
-    change_list_template = "admin/employee_record/change_list_with_stats.html"
-
     @admin.display(description="dernier mouvement")
     def last_movement(self, obj):
         movement = sorted(
@@ -161,21 +155,6 @@ class ASPExchangeInformationAdminMixin:
         end = obj.archived_json["personnePhysique"]["passDateFin"]
         return f"{number} ({start} – {end})"
 
-    @property
-    def stats_url(self):
-        return reverse(f"admin:{self.opts.app_label}_{self.opts.model_name}_stats")
-
-    def get_urls(self):
-        additional_urls = [
-            path(
-                "stats",
-                self.admin_site.admin_view(stats),
-                name=f"{self.opts.app_label}_{self.opts.model_name}_stats",
-                kwargs={"model_admin": self},
-            ),
-        ]
-        return additional_urls + super().get_urls()
-
 
 class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     model = models.EmployeeRecordTransitionLog
@@ -216,6 +195,8 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
 
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
+    change_list_template = "admin/employee_record/change_list_with_stats.html"
+
     form = EmployeeRecordAdminForm
     list_select_related = ["job_application__job_seeker"]
 
@@ -430,6 +411,21 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                 }
             )
         return super().render_change_form(request, context, **kwargs)
+
+    @property
+    def stats_url(self):
+        return reverse(f"admin:{self.opts.app_label}_{self.opts.model_name}_stats")
+
+    def get_urls(self):
+        additional_urls = [
+            path(
+                "stats",
+                self.admin_site.admin_view(stats),
+                name=f"{self.opts.app_label}_{self.opts.model_name}_stats",
+                kwargs={"model_admin": self},
+            ),
+        ]
+        return additional_urls + super().get_urls()
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)
