@@ -40,6 +40,11 @@ def report_url(report):
     return reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id})
 
 
+def assert_shows_report(response, report):
+    assertContains(response, f'href="{report_url(report)}?back_url=')
+    assertNotContains(response, 'id="pro-support-report-form"')
+
+
 @freeze_time("2026-01-15")
 @pytest.mark.parametrize(
     "end_date,hired_elsewhere,situation,has_solution,answer",
@@ -115,9 +120,8 @@ def test_create_pro_support_report_for_employer(
     # The authorized prescriber is notified.
     assert [email.to for email in mailoutbox] == [[advisor.email]]
 
-    # Sent reports cannot be modified.
-    response = client.get(create_url(contract.job_seeker))
-    assert response.status_code == 404
+    # Sent reports cannot be modified: the page shows the report instead.
+    assert_shows_report(client.get(create_url(contract.job_seeker)), report)
 
 
 @freeze_time("2026-01-15")
@@ -129,7 +133,7 @@ def test_create_pro_support_report_after_renewal_for_employer(client, membership
         created_at=timezone.now() - datetime.timedelta(days=30),
     )
     client.force_login(membership.user)
-    assert client.get(create_url(contract.job_seeker)).status_code == 404
+    assert_shows_report(client.get(create_url(contract.job_seeker)), previous_report)
 
     contract.end_date = datetime.date(2026, 2, 10)
     contract.save(update_fields=["end_date", "updated_at"])
@@ -150,7 +154,7 @@ def test_create_pro_support_report_after_renewal_for_employer(client, membership
     report = ProSupportReport.objects.exclude(pk=previous_report.pk).get()
     assert report.contract == contract
     assert report.contract_end_date == datetime.date(2026, 2, 10)
-    assert client.get(create_url(contract.job_seeker)).status_code == 404
+    assert_shows_report(client.get(create_url(contract.job_seeker)), report)
 
     # The card shows the new report.
     details_url = reverse("job_seekers_views:details", kwargs={"public_id": contract.job_seeker.public_id})
@@ -167,16 +171,16 @@ def test_create_pro_support_report_after_renewal_for_employer(client, membership
 def test_create_pro_support_report_when_contract_end_date_moves_for_employer(client, membership):
     report_end_date = datetime.date(2026, 2, 10)
     contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
-    ProSupportReportFactory(contract=contract, contract_end_date=report_end_date)
+    report = ProSupportReportFactory(contract=contract, contract_end_date=report_end_date)
     client.force_login(membership.user)
 
     # The contract end date was brought forward since the report.
-    assert client.get(create_url(contract.job_seeker)).status_code == 404
+    assert_shows_report(client.get(create_url(contract.job_seeker)), report)
 
     # Then it is extended, without going past the end date of the report.
     contract.end_date = report_end_date
     contract.save(update_fields=["end_date", "updated_at"])
-    assert client.get(create_url(contract.job_seeker)).status_code == 404
+    assert_shows_report(client.get(create_url(contract.job_seeker)), report)
 
     # Then it is extended past the end date of the report.
     contract.end_date = report_end_date + datetime.timedelta(days=2)
@@ -251,6 +255,34 @@ def test_create_pro_support_report_not_found_for_employer(client, membership, co
 
 
 @freeze_time("2026-01-15")
+def test_create_pro_support_report_already_filled_in_by_a_coworker(client, membership):
+    contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
+    coworker = CompanyMembershipFactory(company=membership.company).user
+    report = ProSupportReportFactory(
+        contract=contract,
+        contract_end_date=contract.end_date,
+        author=coworker,
+        created_at=datetime.datetime(2026, 1, 13, tzinfo=datetime.UTC),
+    )
+    client.force_login(membership.user)
+    url = create_url(contract.job_seeker)
+
+    response = client.get(url)
+    assertContains(
+        response,
+        f"Le bilan d’accompagnement de ce contrat a déjà été rempli le 13/01/2026 par {coworker.get_full_name()}.",
+    )
+    assert_shows_report(response, report)
+
+    # Both may have opened the form before the report was sent.
+    response = client.post(
+        url, data={"autonomy": "3", "has_solution": "True", "solution": ProSupportReportSolution.TRAINING}
+    )
+    assert_shows_report(response, report)
+    assert ProSupportReport.objects.get() == report
+
+
+@freeze_time("2026-01-15")
 @pytest.mark.parametrize(
     "current_company_traits",
     [{"subject_to_iae_rules": True}, {"not_subject_to_iae_rules": True}],
@@ -287,6 +319,22 @@ def test_create_pro_support_report_from_another_company_of_the_employer(client, 
     )
     assertRedirects(response, url, fetch_redirect_response=False)
     assertContains(client.get(url), 'id="pro-support-report-form"')
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_already_filled_in_from_another_company_of_the_employer(client, membership):
+    contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
+    report = ProSupportReportFactory(contract=contract, contract_end_date=contract.end_date)
+    current_company = CompanyMembershipFactory(user=membership.user, company__subject_to_iae_rules=True).company
+    client.force_login(membership.user)
+    client.post(
+        reverse("dashboard:switch_organization"), {"organization_key": current_company.organization_switch_key}
+    )
+
+    # The report can only be read from its company.
+    response = client.get(create_url(contract.job_seeker))
+    assertContains(response, f"Connectez-vous à la structure {membership.company.display_name}")
+    assertNotContains(response, report_url(report))
 
 
 @freeze_time("2026-01-15")

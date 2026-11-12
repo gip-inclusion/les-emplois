@@ -604,12 +604,16 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         .order_by("-start_date", "-pk")
         .first()
     )
-    if last_contract.has_covering_pro_support_report:
-        raise Http404
+    pro_support_report = None
+    if other_company is None and last_contract.has_covering_pro_support_report:
+        # When a report covers the contract end date, so does the one with the latest end date.
+        pro_support_report = (
+            last_contract.pro_support_reports.select_related("author").order_by("-contract_end_date").first()
+        )
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 
     form = None
-    if not other_company:
+    if not other_company and not pro_support_report:
         form = ProSupportReportForm(
             request.path,
             data=request.POST or None,
@@ -631,6 +635,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     context = {
         "form": form,
         "other_company": other_company,
+        "pro_support_report": pro_support_report,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
         "back_url": back_url,

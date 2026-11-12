@@ -46,6 +46,16 @@
                                     </form>
                                 {% endfragment %}
                             {% endcomponent_info %}
+                        {% elif pro_support_report %}
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0" %}
+                                {% fragment as c_info__summary %}
+                                    Le bilan d’accompagnement de ce contrat a déjà été rempli le {{ pro_support_report.created_at|date:"d/m/Y" }} par {{ pro_support_report.author.get_full_name }}.
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    <a href="{% url 'job_seekers_views:pro_support_report' public_id=pro_support_report.public_id %}?back_url={{ back_url|urlencode }}"
+                                       class="btn btn-sm btn-link ps-0">Consulter le bilan</a>
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         {% else %}
                             <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
