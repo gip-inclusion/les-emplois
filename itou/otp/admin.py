@@ -27,7 +27,7 @@ class ItouTOTPDeviceAdmin(ReadonlyMixin, ItouModelAdmin):
 class ResetRequestTransitionsInline(ReadonlyMixin, ItouTabularInline):
     model = ResetRequestTransitionLog
     extra = 0
-    fields = ("transition_display", "from_state_display", "to_state_display", "timestamp", "user")
+    fields = ("transition_display", "from_state_display", "to_state_display", "timestamp", "user", "msg")
     readonly_fields = fields
 
     @admin.display(description="transition")
