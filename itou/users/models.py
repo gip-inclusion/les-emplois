@@ -1037,6 +1037,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 "L'ID unique envoyé à l'ASP doit être composé de 30 caractères hexadécimaux.",
             ),
         ],
+        db_index=True,
     )
 
     education_level = models.CharField(
