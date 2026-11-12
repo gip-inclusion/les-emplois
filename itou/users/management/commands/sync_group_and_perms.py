@@ -115,6 +115,7 @@ def get_permissions_dict():
         jobs_models.Rome: PERMS_READ,
         otp_models.ItouTOTPDevice: PERMS_READ,
         otp_models.ResetRequest: PERMS_EDIT,
+        otp_models.ResetRequestTransitionLog: PERMS_READ,
         prescribers_models.PrescriberMembership: PERMS_ADD,
         prescribers_models.PrescriberOrganization: PERMS_ALL,
         siae_evaluations_models.Calendar: PERMS_READ,
