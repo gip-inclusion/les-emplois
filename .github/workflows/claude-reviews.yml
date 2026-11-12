@@ -1,0 +1,89 @@
+name: 🤖 Claude reviews
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, labeled]
+
+jobs:
+  review:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.action == 'labeled'
+      && github.event.label.name == 'review-claude'
+      && contains(github.event.pull_request.labels.*.name, 'no-ai') == false
+      && contains(github.event.pull_request.labels.*.name, 'no-review') == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: ${{ github.workflow }}-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }} # comments are authored by `github-actions[bot]`
+          plugin_marketplaces: "https://github.com/anthropics/claude-plugins-official.git"
+          plugins: "code-review@claude-plugins-official"
+          prompt: "/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment"
+            --append-system-prompt "Rédige en français tous les commentaires que tu publies sur la pull request."
+
+  security-review:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && contains(github.event.pull_request.labels.*.name, 'no-ai') == false
+      && contains(github.event.pull_request.labels.*.name, 'no-review') == false
+      && (
+        (github.event.action == 'labeled' && github.event.label.name == 'review-claude-sec')
+        || (
+          github.event.action != 'labeled'
+          && vars.CLAUDE_SECURITY_REVIEW_AUTO == 'true'
+          && github.event.pull_request.draft == false
+          && github.actor != 'dependabot[bot]'
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: ${{ github.workflow }}-security-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: 🎯 Point origin/HEAD to the base branch
+        run: git remote set-head origin "$BASE_REF"
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+      - uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            DÉPÔT : ${{ github.repository }}
+            NUMÉRO DE LA PR : ${{ github.event.pull_request.number }}
+
+            Cette pull request est extraite dans le répertoire de travail courant
+            et `origin/HEAD` pointe sur sa branche de base.
+
+            1. Lance le skill intégré `security-review` avec l'outil Skill et suis ses
+               instructions à la lettre, filtrage des faux positifs compris.
+            2. Publie ensuite uniquement ce qui ressort de son rapport final.
+               - Un commentaire par point identifié, sur la ligne concernée, avec
+                 `mcp__github_inline_comment__create_inline_comment` (`confirmed: true`),
+                 précisant la sévérité, le scénario d'exploitation et le correctif recommandé ;
+               - Dans le cas où le rapport ne mentionne aucun problème, publie un unique
+                 court commentaire afin de l'indiquer avec `gh pr comment`.
+            Rédige les commentaires en français. Ne publie que des commentaires GitHub,
+            ne modifie aucun fichier.
+          claude_args: |
+            --allowedTools "Skill,Task,Agent,Read,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git remote show:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),mcp__github_inline_comment__create_inline_comment"
