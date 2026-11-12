@@ -583,15 +583,23 @@ def create_or_edit_assignment(
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_request(can_fill_pro_support_report)
+@check_request(lambda request: request.from_employer)
 def create_pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report_create.html"):
-    job_seeker = get_object_or_404(
-        User.objects.at_end_of_journey(siae=request.current_organization),
-        public_id=public_id,
-        kind=UserKind.JOB_SEEKER,
+    job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    # Members of several companies may come from an email about another one of them.
+    company = next(
+        (
+            org
+            for org in sorted(request.organizations, key=lambda org: org != request.current_organization)
+            if isinstance(org, Company) and User.objects.filter(pk=job_seeker.pk).at_end_of_journey(siae=org).exists()
+        ),
+        None,
     )
+    if company is None:
+        raise Http404
+    other_company = company if company != request.current_organization else None
     last_contract = (
-        job_seeker.contracts.filter(company=request.current_organization)
+        job_seeker.contracts.filter(company=company)
         .with_has_covering_pro_support_report()
         .order_by("-start_date", "-pk")
         .first()
@@ -600,26 +608,29 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         raise Http404
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 
-    form = ProSupportReportForm(
-        request.path,
-        data=request.POST or None,
-        initial={"has_solution": request.GET.get("has_solution")},
-        instance=ProSupportReport(
-            job_seeker=job_seeker,
-            company=request.current_organization,
-            author=request.user,
-            contract=last_contract,
-            contract_end_date=last_contract.end_date,
-        ),
-    )
-    if request.method == "POST" and form.is_valid():
-        report = form.save()
-        report.notify_authorized_prescriber()
-        messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
-        return HttpResponseRedirect(back_url)
+    form = None
+    if not other_company:
+        form = ProSupportReportForm(
+            request.path,
+            data=request.POST or None,
+            initial={"has_solution": request.GET.get("has_solution")},
+            instance=ProSupportReport(
+                job_seeker=job_seeker,
+                company=company,
+                author=request.user,
+                contract=last_contract,
+                contract_end_date=last_contract.end_date,
+            ),
+        )
+        if request.method == "POST" and form.is_valid():
+            report = form.save()
+            report.notify_authorized_prescriber()
+            messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
+            return HttpResponseRedirect(back_url)
 
     context = {
         "form": form,
+        "other_company": other_company,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
         "back_url": back_url,
