@@ -75,6 +75,7 @@ class Migration(migrations.Migration):
                             ("GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"),
                             ("SELF_ASSIGN", "se positionner comme accompagnateur"),
                             ("ORIENT", "orientation vers un service"),
+                            ("FILL_REPORT", "saisie d'un bilan d'accompagnement"),
                         ],
                         default="CREATE",
                         verbose_name="dernière action effectuée",
