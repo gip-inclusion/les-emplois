@@ -72,15 +72,15 @@ def _compute_employee_record_stats():
         **status_aggregates,
     )
     errors_infos = {}
-    for error_code, count in sorted(
-        models.EmployeeRecord.objects.filter(status=Status.REJECTED)
-        .values_list("asp_processing_code")
+    for status, error_code, count in sorted(
+        models.EmployeeRecord.objects.filter(status__in=(Status.REJECTED, Status.MODIFICATION_REJECTED))
+        .values_list("status", "asp_processing_code")
         .annotate(count=Count("pk"))
     ):
-        errors_infos[error_code] = {
+        errors_infos.setdefault(status, {})[error_code] = {
             "count": count,
-            "value": _format_value(count, counts[Status.REJECTED]),
-            "url": add_url_params(list_url, {"status": Status.REJECTED, "asp_processing_code": error_code}),
+            "value": _format_value(count, counts[status]),
+            "url": add_url_params(list_url, {"status": status, "asp_processing_code": error_code}),
         }
 
     stats = {
@@ -90,7 +90,7 @@ def _compute_employee_record_stats():
     for status in Status:
         stats["infos"][status.label] = {
             "value": _format_value(counts[status], counts["total"]),
-            "infos": errors_infos if status == Status.REJECTED else {},
+            "infos": errors_infos.get(status, {}),
             "url": add_url_params(list_url, {"status": status}),
         }
     return stats

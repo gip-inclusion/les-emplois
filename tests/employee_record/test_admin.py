@@ -140,25 +140,40 @@ def test_asp_processing_display(admin_client, err_code, err_message, expected):
 def test_asp_stats(admin_client):
     factories.EmployeeRecordWithProfileFactory(status=Status.SENT)
     factories.EmployeeRecordWithProfileFactory(status=Status.REJECTED, asp_processing_code="3441")
+    factories.EmployeeRecordWithProfileFactory(status=Status.MODIFICATION_REJECTED, asp_processing_code="3442")
 
     record_stats_url = reverse("admin:employee_record_employeerecord_stats")
     response = admin_client.get(reverse("admin:employee_record_employeerecord_changelist"))
     assertContains(response, record_stats_url)
     response = admin_client.get(record_stats_url)
-    assertContains(response, "<h2>Total : 2</h2>")
+    assertContains(response, "<h2>Total : 3</h2>")
     assertContains(
         response,
-        '<li><a href="/admin/employee_record/employeerecord/?status=SENT">Envoyée</a> : 1 (50.00 %)</li>',
+        '<li><a href="/admin/employee_record/employeerecord/?status=SENT">Envoyée</a> : 1 (33.33 %)</li>',
         html=True,
     )
     assertContains(
         response,
         """\
             <li>
-                <a href="/admin/employee_record/employeerecord/?status=REJECTED">En erreur</a> : 1 (50.00 %)
+                <a href="/admin/employee_record/employeerecord/?status=REJECTED">En erreur</a> : 1 (33.33 %)
                     <ul>
                         <li>
                             <a href="/admin/employee_record/employeerecord/?status=REJECTED&amp;asp_processing_code=3441">3441</a> : 1 (100.00 %)
+                        </li>
+                    </ul>
+
+            </li>""",  # noqa:E501
+        html=True,
+    )
+    assertContains(
+        response,
+        """\
+            <li>
+                <a href="/admin/employee_record/employeerecord/?status=MODIFICATION_REJECTED">Mise à jour en erreur</a> : 1 (33.33 %)
+                    <ul>
+                        <li>
+                            <a href="/admin/employee_record/employeerecord/?status=MODIFICATION_REJECTED&amp;asp_processing_code=3442">3442</a> : 1 (100.00 %)
                         </li>
                     </ul>
 
