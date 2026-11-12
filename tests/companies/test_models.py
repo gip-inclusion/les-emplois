@@ -264,6 +264,15 @@ class TestCompanyModel:
         company.kind = CompanyKind.OPCS
         assert company.is_opcs
 
+    def test_can_use_rdv_service_public(self):
+        company = CompanyFactory.build()
+        assert company.can_use_rdv_service_public is False
+        company.allow_rdv_service_public = True
+        assert company.can_use_rdv_service_public is True
+        # Companies of the RDV-Insertion experiment keep proposing appointments through RDV-Insertion for now
+        company.rdv_solidarites_id = 1234
+        assert company.can_use_rdv_service_public is False
+
     def test_add_or_activate_membership(self, caplog):
         company = CompanyFactory()
         assert 0 == company.members.count()

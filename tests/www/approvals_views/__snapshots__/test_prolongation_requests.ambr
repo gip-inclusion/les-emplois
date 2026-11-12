@@ -1475,6 +1475,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  T6."id",
                  T6."password",
                  T6."last_login",

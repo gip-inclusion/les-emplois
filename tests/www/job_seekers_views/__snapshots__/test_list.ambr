@@ -130,6 +130,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -487,6 +488,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "rdv_insertion_location"."id",
                  "rdv_insertion_location"."name",
                  "rdv_insertion_location"."address",
@@ -660,7 +662,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -1090,7 +1093,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "users_jobseekerassignment"
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -1259,6 +1263,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1616,6 +1621,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "rdv_insertion_location"."id",
                  "rdv_insertion_location"."name",
                  "rdv_insertion_location"."address",
@@ -1789,7 +1795,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -2219,7 +2226,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "users_jobseekerassignment"
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -4936,7 +4944,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "users_jobseekerassignment"
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -6139,7 +6148,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "users_jobseekerassignment"
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")

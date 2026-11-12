@@ -178,7 +178,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "insertion_mobilizationemail"
           INNER JOIN "insertion_service" ON ("insertion_mobilizationemail"."service_id" = "insertion_service"."id")
           INNER JOIN "users_user" ON ("insertion_mobilizationemail"."sender_id" = "users_user"."id")

@@ -935,6 +935,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1346,6 +1347,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1852,6 +1854,7 @@
                  T10."job_app_score",
                  T10."is_searchable",
                  T10."rdv_solidarites_id",
+                 T10."allow_rdv_service_public",
                  "eligibility_geiqeligibilitydiagnosis"."id",
                  "eligibility_geiqeligibilitydiagnosis"."author_id",
                  "eligibility_geiqeligibilitydiagnosis"."author_kind",
@@ -1937,6 +1940,7 @@
                  T13."job_app_score",
                  T13."is_searchable",
                  T13."rdv_solidarites_id",
+                 T13."allow_rdv_service_public",
                  T14."id",
                  T14."address_line_1",
                  T14."address_line_2",
@@ -2004,6 +2008,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  T15."id",
                  T15."password",
                  T15."last_login",
@@ -2319,7 +2324,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -2710,7 +2716,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "users_jobseekerassignment"
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")

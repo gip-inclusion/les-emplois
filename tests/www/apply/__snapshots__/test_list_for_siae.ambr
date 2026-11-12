@@ -130,6 +130,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -505,6 +506,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -880,6 +882,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1106,7 +1109,8 @@
                              T3."convention_id",
                              T3."job_app_score",
                              T3."is_searchable",
-                             T3."rdv_solidarites_id"
+                             T3."rdv_solidarites_id",
+                             T3."allow_rdv_service_public"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
@@ -1252,6 +1256,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1616,6 +1621,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1887,6 +1893,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -2412,6 +2419,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."allow_rdv_service_public",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2479,6 +2487,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -2666,7 +2675,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "companies_company"
           WHERE ("companies_company"."id") IN ((%s))
         ''',
@@ -2984,6 +2994,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -3509,6 +3520,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."allow_rdv_service_public",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3576,6 +3588,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -3763,7 +3776,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public"
           FROM "companies_company"
           WHERE ("companies_company"."id") IN ((%s))
         ''',
@@ -4055,6 +4069,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -4785,6 +4800,7 @@
                  T10."job_app_score",
                  T10."is_searchable",
                  T10."rdv_solidarites_id",
+                 T10."allow_rdv_service_public",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4852,6 +4868,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -5445,6 +5462,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -6028,6 +6046,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."allow_rdv_service_public",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -6095,6 +6114,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
