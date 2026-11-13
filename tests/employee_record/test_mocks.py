@@ -50,3 +50,4 @@ def test_fake_serializers():
     employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
 
     assert fake_serializers.TestEmployeeRecordBatchSerializer(EmployeeRecordBatch([employee_record])).data
+    assert fake_serializers.TestEmployeeRecordForUpdateBatchSerializer(EmployeeRecordBatch([employee_record])).data
