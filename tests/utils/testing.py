@@ -80,25 +80,6 @@ def pretty_indented(soup, indent=4):
     return soup.prettify(formatter=HTMLFormatter(indent=indent))
 
 
-def pprint_html(response, **selectors):
-    """
-    Pretty-print HTML responses (or fragment selected with :arg:`selector`)
-
-    Heed the warning from
-    https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing :
-
-    > Since it adds whitespace (in the form of newlines), prettify() changes
-      the meaning of an HTML document and should not be used to reformat one.
-      The goal of prettify() is to help you visually understand the structure
-      of the documents you work with.
-
-    Use `snapshot`s, `assertHTMLEqual` and `assertContains(…, html=True)` to
-    make assertions.
-    """
-    parser = BeautifulSoup(response.content, "html5lib")
-    print("\n\n".join([elt.prettify() for elt in parser.find_all(**selectors)]))
-
-
 def remove_static_hash(content):
     return re.sub(r"\.[\da-f]{12}\.(svg|png|jpg|pdf)\b", r".\1", content)
 
