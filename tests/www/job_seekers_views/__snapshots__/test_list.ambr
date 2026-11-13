@@ -4548,23 +4548,24 @@
                             WHERE (U0."user_id" = ("users_user"."id")
                                    AND U0."end_at" >= %s)
                             LIMIT 1)) AS "last_contract_ended_with_valid_approval",
-                        EXISTS
-               (SELECT %s AS "a"
+          
+               (SELECT
+                  (SELECT U0."public_id" AS "public_id"
+                   FROM "companies_prosupportreport" U0
+                   WHERE (U0."contract_id" = (V0."id")
+                          AND U0."contract_end_date" >= (V0."end_date"))
+                   ORDER BY U0."contract_end_date" DESC
+                   LIMIT 1) AS "covering_pro_support_report_public_id"
                 FROM "companies_contract" V0
-                WHERE (EXISTS
-                         (SELECT %s AS "a"
-                          FROM "companies_prosupportreport" U0
-                          WHERE (U0."contract_id" = (V0."id")
-                                 AND U0."contract_end_date" >= (V0."end_date"))
-                          LIMIT 1)
-                       AND V0."id" =
-                         (SELECT U0."id" AS "pk"
-                          FROM "companies_contract" U0
-                          WHERE (U0."job_seeker_id" = ("users_user"."id")
-                                 AND U0."company_id" = %s)
-                          ORDER BY U0."start_date" DESC, 1 DESC
-                          LIMIT 1))
-                LIMIT 1) AS "last_contract_has_pro_support_report"
+                WHERE V0."id" =
+                    (SELECT U0."id" AS "pk"
+                     FROM "companies_contract" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."company_id" = %s)
+                     ORDER BY U0."start_date" DESC,
+                              1 DESC
+                     LIMIT 1)
+                ORDER BY RANDOM() ASC) AS "last_contract_pro_support_report_public_id"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4743,23 +4744,24 @@
                          WHERE (U0."user_id" = ("users_user"."id")
                                 AND U0."end_at" >= %s)
                          LIMIT 1)) AS "last_contract_ended_with_valid_approval",
-                     EXISTS
-            (SELECT %s AS "a"
+          
+            (SELECT
+               (SELECT U0."public_id" AS "public_id"
+                FROM "companies_prosupportreport" U0
+                WHERE (U0."contract_id" = (V0."id")
+                       AND U0."contract_end_date" >= (V0."end_date"))
+                ORDER BY U0."contract_end_date" DESC
+                LIMIT 1) AS "covering_pro_support_report_public_id"
              FROM "companies_contract" V0
-             WHERE (EXISTS
-                      (SELECT %s AS "a"
-                       FROM "companies_prosupportreport" U0
-                       WHERE (U0."contract_id" = (V0."id")
-                              AND U0."contract_end_date" >= (V0."end_date"))
-                       LIMIT 1)
-                    AND V0."id" =
-                      (SELECT U0."id" AS "pk"
-                       FROM "companies_contract" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."company_id" = %s)
-                       ORDER BY U0."start_date" DESC, 1 DESC
-                       LIMIT 1))
-             LIMIT 1) AS "last_contract_has_pro_support_report",
+             WHERE V0."id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE (U0."job_seeker_id" = ("users_user"."id")
+                         AND U0."company_id" = %s)
+                  ORDER BY U0."start_date" DESC,
+                           1 DESC
+                  LIMIT 1)
+             ORDER BY RANDOM() ASC) AS "last_contract_pro_support_report_public_id",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",

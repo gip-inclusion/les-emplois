@@ -909,7 +909,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     if request_from_siae:
         queryset = queryset.with_end_of_journey(
             siae=request.current_organization
-        ).with_last_contract_has_pro_support_report(siae=request.current_organization)
+        ).with_last_contract_pro_support_report_public_id(siae=request.current_organization)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     has_job_seekers_with_more_actions = False
@@ -931,7 +931,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         job_seeker.show_create_pro_support_report = (
             request_from_siae
             and (job_seeker.contract_ending_soon or job_seeker.last_contract_ended_with_valid_approval)
-            and not job_seeker.last_contract_has_pro_support_report
+            and job_seeker.last_contract_pro_support_report_public_id is None
+        )
+        job_seeker.show_pro_support_report = (
+            request_from_siae and job_seeker.last_contract_pro_support_report_public_id is not None
         )
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
@@ -939,6 +942,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or can_orient_towards_insertion_service(request)
             or bool(job_seeker.pro_support_request_mailto)
             or job_seeker.show_create_pro_support_report
+            or job_seeker.show_pro_support_report
         )
         has_job_seekers_with_more_actions = has_job_seekers_with_more_actions or job_seeker.show_more_actions
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)

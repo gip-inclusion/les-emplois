@@ -173,6 +173,15 @@ class UserQuerySet(models.QuerySet):
             )
         )
 
+    def with_last_contract_pro_support_report_public_id(self, siae):
+        return self.annotate(
+            last_contract_pro_support_report_public_id=Subquery(
+                Contract.objects.with_covering_pro_support_report_public_id()
+                .filter(pk=self.last_contract_pk_lookup(siae=siae))
+                .values("covering_pro_support_report_public_id")
+            )
+        )
+
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
     def get_duplicated_pole_emploi_ids(self):

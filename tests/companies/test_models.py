@@ -766,6 +766,23 @@ class TestContractQuerySet:
             is False
         )
 
+    def test_with_covering_pro_support_report_public_id(self):
+        contract = ContractFactory(end_date=timezone.localdate())
+        contracts_qs = Contract.objects.with_covering_pro_support_report_public_id()
+        assert contracts_qs.get(pk=contract.pk).covering_pro_support_report_public_id is None
+
+        ProSupportReportFactory(contract=contract, contract_end_date=contract.end_date - timedelta(days=10))
+        assert contracts_qs.get(pk=contract.pk).covering_pro_support_report_public_id is None
+
+        report = ProSupportReportFactory(contract=contract, contract_end_date=contract.end_date)
+        assert contracts_qs.get(pk=contract.pk).covering_pro_support_report_public_id == report.public_id
+
+        # The contract renewal was cancelled after a report on the new end date.
+        latest_report = ProSupportReportFactory(
+            contract=contract, contract_end_date=contract.end_date + timedelta(days=10)
+        )
+        assert contracts_qs.get(pk=contract.pk).covering_pro_support_report_public_id == latest_report.public_id
+
 
 class TestContractModel:
     def test_has_ended(self):

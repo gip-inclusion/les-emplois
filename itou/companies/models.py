@@ -1238,6 +1238,14 @@ class ContractQuerySet(models.QuerySet):
     def with_has_covering_pro_support_report(self):
         return self.annotate(has_covering_pro_support_report=Exists(self.covering_pro_support_reports_lookup()))
 
+    def with_covering_pro_support_report_public_id(self):
+        return self.annotate(
+            covering_pro_support_report_public_id=Subquery(
+                # Several reports cover a contract whose renewal was cancelled: the latest one is shown.
+                self.covering_pro_support_reports_lookup().order_by("-contract_end_date").values("public_id")[:1]
+            )
+        )
+
 
 class Contract(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)

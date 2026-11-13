@@ -103,6 +103,10 @@
                                                 <a href="{% url 'job_seekers_views:create_pro_support_report' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                                    class="dropdown-item"
                                                    {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Remplir le bilan</a>
+                                            {% elif job_seeker.show_pro_support_report %}
+                                                <a href="{% url 'job_seekers_views:pro_support_report' public_id=job_seeker.last_contract_pro_support_report_public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="dropdown-item"
+                                                   {% matomo_event "employeurs" "clic" "voir-bilan-liste" %}>Voir le bilan</a>
                                             {% endif %}
                                             {% if request.current_organization.is_authorized %}
                                                 {% if not job_seeker.has_valid_approval %}
