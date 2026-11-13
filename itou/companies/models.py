@@ -1230,14 +1230,13 @@ class ContractQuerySet(models.QuerySet):
             Exists(Company.objects.active().filter(pk=OuterRef("company_id"))),
         )
 
-    def with_has_covering_pro_support_report(self):
+    def covering_pro_support_reports_lookup(self):
         # A renewal postpones the end date of the contract and calls for a new report.
         # An end date brought forward does not: the existing report still covers the contract.
-        return self.annotate(
-            has_covering_pro_support_report=Exists(
-                ProSupportReport.objects.filter(contract=OuterRef("pk"), contract_end_date__gte=OuterRef("end_date"))
-            )
-        )
+        return ProSupportReport.objects.filter(contract=OuterRef("pk"), contract_end_date__gte=OuterRef("end_date"))
+
+    def with_has_covering_pro_support_report(self):
+        return self.annotate(has_covering_pro_support_report=Exists(self.covering_pro_support_reports_lookup()))
 
 
 class Contract(models.Model):
