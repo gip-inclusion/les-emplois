@@ -1303,6 +1303,90 @@ def test_filtered_by_end_of_journey_for_siae(client, snapshot):
 
 
 @freeze_time("2026-01-15")
+def test_end_of_journey_for_siae_shows_pro_support_report_status(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    client.force_login(membership.user)
+    url = reverse("job_seekers_views:list_organization")
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    in_twenty_days = today + datetime.timedelta(days=20)
+
+    arnaud, bernard, charles = (
+        ApprovalFactory(
+            user__last_name=last_name,
+            start_at=in_the_past,
+            end_at=in_twenty_days,
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__start_date=in_the_past,
+            with_ongoing_contract__end_date=in_twenty_days,
+        ).user
+        for last_name in ("Arnaud", "Bernard", "Charles")
+    )
+    for job_seeker in (arnaud, bernard, charles):
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=membership.user, company=company)
+    ProSupportReportFactory(contract=arnaud.contracts.get())
+
+    response = client.get(url, {"end_of_journey": "on", "order": "full_name"})
+    assert response.context["page_obj"].object_list == [bernard, charles, arnaud]
+    headers = [th.get_text(strip=True) for th in parse_response_to_soup(response, selector="thead").find_all("th")]
+    assert headers[2:4] == ["Dernière action", "Bilan d’accompagnement"]
+    assertContains(
+        response,
+        '<span class="badge badge-sm rounded-pill bg-success-lighter text-success">Bilan rempli</span>',
+        html=True,
+        count=1,
+    )
+    assertContains(
+        response,
+        '<span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">Bilan à remplir</span>',
+        html=True,
+        count=2,
+    )
+    response = client.get(url, {"end_of_journey": "on", "order": "-full_name"})
+    assert response.context["page_obj"].object_list == [charles, bernard, arnaud]
+
+    # Without the end of journey filter, the chosen order applies alone.
+    response = client.get(url, {"order": "full_name"})
+    assert response.context["page_obj"].object_list == [arnaud, bernard, charles]
+
+    for ending_soon_filter in ("contract_ending_soon", "approval_ending_soon"):
+        response = client.get(url, {ending_soon_filter: "on", "order": "full_name"})
+        assert response.context["page_obj"].object_list == [arnaud, bernard, charles]
+        headers = [th.get_text(strip=True) for th in parse_response_to_soup(response, selector="thead").find_all("th")]
+        assert "Bilan d’accompagnement" not in headers
+        assertNotContains(response, "Bilan rempli")
+        assertNotContains(response, "Bilan à remplir")
+
+
+@freeze_time("2026-01-15")
+def test_end_of_journey_for_authorized_prescriber_shows_no_pro_support_report_status(client):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
+    prescriber = organization.members.get()
+    client.force_login(prescriber)
+    today = timezone.localdate()
+    in_the_past = today - datetime.timedelta(days=180)
+    in_twenty_days = today + datetime.timedelta(days=20)
+    report = ProSupportReportFactory(
+        contract__start_date=in_the_past,
+        contract__end_date=in_twenty_days,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=report.job_seeker, professional=prescriber, prescriber_organization=organization
+    )
+
+    response = client.get(reverse("job_seekers_views:list"), {"end_of_journey": "on"})
+    [job_seeker] = response.context["page_obj"].object_list
+    assert job_seeker == report.job_seeker
+    assert not hasattr(job_seeker, "last_contract_pro_support_report_public_id")
+    headers = [th.get_text(strip=True) for th in parse_response_to_soup(response, selector="thead").find_all("th")]
+    assert "Bilan d’accompagnement" not in headers
+    assertNotContains(response, "Bilan à remplir")
+
+
+@freeze_time("2026-01-15")
 def test_filtered_by_end_of_journey_for_authorized_prescriber(client):
     organization = PrescriberOrganizationFactory(with_membership=True, authorized=True)
     prescriber = organization.members.get()
