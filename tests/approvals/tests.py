@@ -500,7 +500,7 @@ class TestApprovalModel:
 
         assert suspended_approval.ongoing_suspension == suspension
 
-    def tests_is_suspended(self):
+    def test_is_suspended(self):
         now = timezone.localdate()
         ApprovalFactory(start_at=now - relativedelta(years=1))
         ApprovalFactory(start_at=now - relativedelta(years=1))
@@ -521,7 +521,7 @@ class TestApprovalModel:
             for approval in approvals:
                 approval.state
 
-    def tests_ongoing_suspension(self):
+    def test_ongoing_suspension(self):
         now = timezone.localdate()
         ApprovalFactory(start_at=now - relativedelta(years=1))
         ApprovalFactory(start_at=now - relativedelta(years=1))
