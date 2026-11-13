@@ -815,10 +815,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         return {"in_progress": in_progress_prolongations, "not_in_progress": not_in_progress_prolongations}
 
-    def prolongation_requests_for_status_card(self):
-        # Don't show granted prolongation requests as they will have generated a proper prolongation
-        return self.prolongationrequest_set.exclude(status=enums.ProlongationRequestStatus.GRANTED)
-
     def pending_prolongation_request(self):
         return self.prolongationrequest_set.filter(status=enums.ProlongationRequestStatus.PENDING).first()
 
