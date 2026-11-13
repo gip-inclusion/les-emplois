@@ -614,7 +614,7 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
 
     # Update the object's data with the recorded changes, for the preview.
     # NOTE(vperron): This may seem "ugly" but it's probably acceptable here since it:
-    # - only takes in pre-validated and cleand data (the ModelForms do call full_clean()
+    # - only takes in pre-validated and cleaned data (the ModelForms do call full_clean()
     #   on the underlying models)
     # - enables us to perform a single save() in the whole block instead of at least 2 (custom
     #   form) or 3 (existing forms)

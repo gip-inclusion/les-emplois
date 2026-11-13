@@ -85,7 +85,7 @@ class JobSeekerAddressForm(forms.ModelForm):
         super().clean()
         address_line_1 = self.cleaned_data.get("address_line_1")
 
-        # Address was filled (manually with fallback or programatically with select2)
+        # Address was filled (manually with fallback or programmatically with select2)
         # the address field should not be required anymore as we don't really use it
         if address_line_1:
             if "address_for_autocomplete" in self.errors:
