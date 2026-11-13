@@ -99,6 +99,13 @@
                     {% endif %}
                     <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"
                        class="btn btn-outline-primary">Voir la fiche du salarié</a>
+                    {% if record_first_read %}
+                        <form hx-post="{% url "job_seekers_views:record_pro_support_report_first_read" public_id=report.public_id %}"
+                              hx-trigger="load"
+                              hx-swap="none">
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
