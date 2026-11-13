@@ -181,6 +181,17 @@ class UserQuerySet(models.QuerySet):
             )
         )
 
+    def with_last_contract_pro_support_report_public_id(self, siae):
+        return self.annotate(
+            last_contract_pro_support_report_public_id=Subquery(
+                ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
+                .covering_contract_end_date()
+                # Several reports cover a contract whose renewal was cancelled: the latest one is shown.
+                .order_by("-contract_end_date")
+                .values("public_id")[:1]
+            )
+        )
+
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
     def get_duplicated_pole_emploi_ids(self):

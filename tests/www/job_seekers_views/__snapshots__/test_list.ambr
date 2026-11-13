@@ -4548,8 +4548,8 @@
                             WHERE (U0."user_id" = ("users_user"."id")
                                    AND U0."end_at" >= %s)
                             LIMIT 1)) AS "last_contract_ended_with_valid_approval",
-                        EXISTS
-               (SELECT %s AS "a"
+          
+               (SELECT V0."public_id" AS "public_id"
                 FROM "companies_prosupportreport" V0
                 INNER JOIN "companies_contract" V1 ON (V0."contract_id" = V1."id")
                 WHERE (V0."contract_id" =
@@ -4557,10 +4557,12 @@
                           FROM "companies_contract" U0
                           WHERE (U0."job_seeker_id" = ("users_user"."id")
                                  AND U0."company_id" = %s)
-                          ORDER BY U0."start_date" DESC, 1 DESC
+                          ORDER BY U0."start_date" DESC,
+                                   1 DESC
                           LIMIT 1)
                        AND V0."contract_end_date" >= (V1."end_date"))
-                LIMIT 1) AS "last_contract_has_pro_support_report"
+                ORDER BY V0."contract_end_date" DESC
+                LIMIT 1) AS "last_contract_pro_support_report_public_id"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4739,8 +4741,8 @@
                          WHERE (U0."user_id" = ("users_user"."id")
                                 AND U0."end_at" >= %s)
                          LIMIT 1)) AS "last_contract_ended_with_valid_approval",
-                     EXISTS
-            (SELECT %s AS "a"
+          
+            (SELECT V0."public_id" AS "public_id"
              FROM "companies_prosupportreport" V0
              INNER JOIN "companies_contract" V1 ON (V0."contract_id" = V1."id")
              WHERE (V0."contract_id" =
@@ -4748,10 +4750,12 @@
                        FROM "companies_contract" U0
                        WHERE (U0."job_seeker_id" = ("users_user"."id")
                               AND U0."company_id" = %s)
-                       ORDER BY U0."start_date" DESC, 1 DESC
+                       ORDER BY U0."start_date" DESC,
+                                1 DESC
                        LIMIT 1)
                     AND V0."contract_end_date" >= (V1."end_date"))
-             LIMIT 1) AS "last_contract_has_pro_support_report",
+             ORDER BY V0."contract_end_date" DESC
+             LIMIT 1) AS "last_contract_pro_support_report_public_id",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",

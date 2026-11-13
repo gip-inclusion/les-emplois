@@ -293,6 +293,31 @@ class TestQuerySet:
         newer_contract.save(update_fields=["end_date", "updated_at"])
         assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is False
 
+    def test_with_last_contract_pro_support_report_public_id(self):
+        report = ProSupportReportFactory()
+        job_seeker_without_report = ContractFactory(company=report.company).job_seeker
+
+        job_seekers_qs = User.objects.with_last_contract_pro_support_report_public_id(siae=report.company)
+        assert (
+            job_seekers_qs.get(pk=report.job_seeker_id).last_contract_pro_support_report_public_id == report.public_id
+        )
+        assert job_seekers_qs.get(pk=job_seeker_without_report.pk).last_contract_pro_support_report_public_id is None
+
+        # A renewal postpones the end date of the contract: its report does not cover the new end date.
+        contract = report.contract
+        contract.end_date += relativedelta(months=6)
+        contract.save(update_fields=["end_date", "updated_at"])
+        assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_pro_support_report_public_id is None
+
+        # The renewal was cancelled after a report on the new end date.
+        latest_report = ProSupportReportFactory(contract=contract)
+        contract.end_date -= relativedelta(months=6)
+        contract.save(update_fields=["end_date", "updated_at"])
+        assert (
+            job_seekers_qs.get(pk=report.job_seeker_id).last_contract_pro_support_report_public_id
+            == latest_report.public_id
+        )
+
 
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
