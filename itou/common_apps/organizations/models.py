@@ -310,9 +310,6 @@ class MembershipQuerySet(models.QuerySet):
     def admin(self):
         return self.filter(self.admin_lookup)
 
-    def active_admin(self):
-        return self.active().filter(self.admin_lookup)
-
     @staticmethod
     def to_users_qs(memberships):
         """
