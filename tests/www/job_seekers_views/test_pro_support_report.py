@@ -484,3 +484,61 @@ class TestSendProSupportReportIntroduction:
         assert mailoutbox == []
         report.refresh_from_db()
         assert report.introduction_email_sent_at is None
+
+
+def first_read_url(report):
+    return reverse("job_seekers_views:record_pro_support_report_first_read", kwargs={"public_id": report.public_id})
+
+
+class TestRecordProSupportReportFirstRead:
+    @freeze_time("2026-01-15 10:00")
+    def test_record(self, client):
+        report = ProSupportReportFactory()
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.get(report_url(report))
+        assertContains(response, f'hx-post="{first_read_url(report)}"')
+        report.refresh_from_db()
+        assert report.first_read_at is None
+
+        client.post(first_read_url(report))
+        report.refresh_from_db()
+        assert report.first_read_at == timezone.now()
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+    def test_already_read(self, client):
+        report = ProSupportReportFactory(first_read_at=timezone.now() - datetime.timedelta(days=1))
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == 200
+        assert ProSupportReport.objects.get().first_read_at == report.first_read_at
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (lambda report, organization: PrescriberMembershipFactory(organization=organization).user, 200),
+            (lambda report, organization: CompanyMembershipFactory(company=report.company).user, 403),
+        ],
+        ids=["coworker_of_the_recipient", "employer_of_the_report"],
+    )
+    def test_read_by_someone_else(self, client, user_factory, status_code):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        report.notified_prescriber = organization.members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(user_factory(report, organization))
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == status_code
+        report.refresh_from_db()
+        assert report.first_read_at is None

@@ -1915,7 +1915,8 @@
                  "companies_prosupportreport"."solution",
                  "companies_prosupportreport"."orientation",
                  "companies_prosupportreport"."introduction_email_sent_at",
-                 "companies_prosupportreport"."introduction_email_recipient_id"
+                 "companies_prosupportreport"."introduction_email_recipient_id",
+                 "companies_prosupportreport"."first_read_at"
           FROM "companies_prosupportreport"
           WHERE "companies_prosupportreport"."author_id" IN (%s,
                                                              %s,

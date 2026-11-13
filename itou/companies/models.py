@@ -1373,6 +1373,7 @@ class ProSupportReport(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    first_read_at = models.DateTimeField(verbose_name="date de première lecture", null=True, blank=True)
 
     class Meta:
         verbose_name = "bilan d’accompagnement"

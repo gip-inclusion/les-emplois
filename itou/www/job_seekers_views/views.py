@@ -13,7 +13,7 @@ from django.db.models import Count, DateTimeField, Exists, F, IntegerField, Oute
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -642,6 +642,7 @@ def pro_support_report(request, public_id, template_name="job_seekers_views/pro_
             if introduction_contact and report.introduction_email_sent_at is None
             else None
         ),
+        "record_first_read": report.first_read_at is None and report.notified_prescriber_id == request.user.pk,
         "back_url": get_safe_url(
             request,
             "back_url",
@@ -687,6 +688,17 @@ def send_pro_support_report_introduction(
         return HttpResponseClientRefresh()
     context = {"form": form, "report": report, "contact": contact}
     return render(request, template_name + "#pro-support-report-introduction-form", context)
+
+
+# Called by the report page once loaded, which stays readonly.
+# Nothing to record is not an error: the page may be open twice, and htmx shows an alert on errors.
+@http_methods(db_write=["POST"])
+@check_request(lambda request: request.from_authorized_prescriber)
+def record_pro_support_report_first_read(request, public_id):
+    ProSupportReport.objects.filter(public_id=public_id, notified_prescriber=request.user, first_read_at=None).update(
+        first_read_at=timezone.now()
+    )
+    return HttpResponse()
 
 
 @http_methods(db_write=["POST"])
