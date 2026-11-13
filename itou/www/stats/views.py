@@ -68,13 +68,6 @@ def get_params_for_region(region, *, with_department_name=True):
     return params
 
 
-def get_params_for_whole_country():
-    return {
-        mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
-        mb.REGION_FILTER_KEY: list(REGIONS.keys()),
-    }
-
-
 def get_params_aci_asp_ids_for_department(department):
     return {
         mb.ASP_SIAE_FILTER_KEY_FLAVOR2: list(
