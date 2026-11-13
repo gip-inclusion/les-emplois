@@ -10,6 +10,8 @@ permissions: {}
 jobs:
   reset:
     runs-on: ubuntu-latest
+    # Environment secrets are only readable by jobs that run on the branches it allows (main)
+    environment: demo
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
