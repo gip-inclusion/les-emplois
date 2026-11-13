@@ -7,8 +7,13 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Territoire</h1>
-            <p>Gérez le conventionnement des organisations et accédez aux principaux indicateurs de leur activité.</p>
+            {% if request.from_prescriber %}
+                <h1>Territoire</h1>
+                <p>Gérez le conventionnement des organisations et accédez aux principaux indicateurs de leur activité.</p>
+            {% else %}
+                <h1>Territoire</h1>
+                <p>Habilitez les OHPD (Organisations habilitées par le préfet du département) de votre département.</p>
+            {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -24,7 +29,11 @@
                 <div class="col-12">
                     <div class="tab-content">
                         <h2 class="mb-3 mb-md-4">Gestion des habilitations</h2>
-                        <p>Cet espace vous permet de consulter les organisations délégataires déjà habilitées et de traiter les nouvelles demandes. Cette page est accessible uniquement aux administrateurs de votre structure.</p>
+                        {% if request.from_prescriber %}
+                            <p>Cet espace vous permet de consulter les organisations délégataires déjà habilitées et de traiter les nouvelles demandes. Cette page est accessible uniquement aux administrateurs de votre structure.</p>
+                        {% else %}
+                            <p>Cet espace vous permet de suivre les OHPD (Organisations habilitées par le préfet du département) déjà habilitées, ainsi que de traiter les nouvelles demandes.</p>
+                        {% endif %}
 
                         <p class="mb-0">
                             {% with paginator.count as counter %}
